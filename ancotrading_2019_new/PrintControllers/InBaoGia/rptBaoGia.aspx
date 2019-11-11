@@ -1,1 +1,0 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="rptBaoGia.aspx.cs" Inherits="PrintControllers_InBaoGia_Default" %>
