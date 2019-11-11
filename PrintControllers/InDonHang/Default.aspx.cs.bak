@@ -1,0 +1,1039 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.IO;
+using NPOI.HSSF.UserModel;
+using NPOI.HPSF;
+using NPOI.POIFS.FileSystem;
+using NPOI.SS.UserModel;
+using NPOI.SS.Util;
+using System.Data;
+using HSSFUtils;
+
+public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
+{
+    public LinqDBDataContext db = new LinqDBDataContext();
+    private String fmt0 = "#,##0" , fmt0i0 = "#,##0.0" , fmt0i00 = "#,##0.00" , fmt0i000 = "#,##0.000";
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        //try
+        //{
+            String c_donhang_id = Request.QueryString["c_donhang_id"];
+            var pTang = (from p in db.c_phidonhangs where p.c_donhang_id.Equals(c_donhang_id) && p.phitang.Equals(true) select p.phi).Sum();
+            var pGiam = (from p in db.c_phidonhangs where p.c_donhang_id.Equals(c_donhang_id) && p.phitang.Equals(false) select p.phi).Sum();
+
+            var diengiaicong = db.c_phidonhangs.FirstOrDefault(p => p.c_donhang_id.Equals(c_donhang_id) && p.phitang.Equals(true));
+            var diengiaitru = db.c_phidonhangs.FirstOrDefault(p => p.c_donhang_id.Equals(c_donhang_id) && p.phitang.Equals(false));
+
+            decimal tang, giam;
+            tang = pTang == null ? 0 : pTang.Value;
+            giam = pGiam == null ? 0 : pGiam.Value;
+
+            decimal total = (decimal)mdbc.ExecuteScalar("select totalamount from c_donhang where c_donhang_id = @c_donhang_id", "@c_donhang_id", c_donhang_id);
+            total = total + tang - giam;
+			
+			String totalWord = MoneyToWord.ConvertMoneyToText(total.ToString()).Replace("Dollars", "").Replace("Cents", "").Replace("Cent", "");
+			
+			int j =  totalWord.LastIndexOf("and");
+		
+			if ((j > 0))
+			{
+				totalWord = totalWord.Insert(totalWord.Length, "cents");    
+			}
+			
+            c_donhang dh = db.c_donhangs.FirstOrDefault(p => p.c_donhang_id.Equals(c_donhang_id));
+
+            String no_cont = "";
+
+            if (dh.cont20 != null)
+            {
+                if (dh.cont20.Value.Equals(0))
+                {
+                    no_cont += "";
+                }
+                else
+                {
+                    no_cont += String.Format(" {0} x 20\" ", dh.cont20.Value);
+                }
+            }
+
+            if (dh.cont40 != null)
+            {
+                if (dh.cont40.Value.Equals(0))
+                {
+                    no_cont += "";
+                }
+                else
+                {
+                    no_cont += String.Format("+ {0} x 40\" ", dh.cont40.Value);
+                }
+            }
+
+            if (dh.cont40hc != null)
+            {
+                if (dh.cont40hc.Value.Equals(0))
+                {
+                    no_cont += "";
+                }
+                else
+                {
+                    no_cont += String.Format("+ {0} x 40HC ", dh.cont40hc.Value);
+                }
+            }
+
+            if (dh.cont45 != null)
+            {
+                if (dh.cont45.Value.Equals(0))
+                {
+                    no_cont += "";
+                }
+                else
+                {
+                    no_cont += String.Format("+ {0} x 45\" ", dh.cont45.Value);
+                }
+            }
+
+            if (dh.contle != null)
+            {
+                if (dh.contle.Value.Equals(0))
+                {
+                    no_cont += "";
+                }
+                else
+                {
+                    no_cont += String.Format("+ {0} x LCL ", dh.contle.Value);
+                }
+            }
+            if (!no_cont.Equals(""))
+            {
+                no_cont = no_cont.Substring(1);    
+            }
+
+            String select = String.Format(@"select 
+                            dh.sochungtu, dh.customer_order_no, round(ddh.v2 * 35.31466672, 2)  as cbf, kt.ten_kichthuoc
+                            , dtkd.ten_dtkd, dtkd.diachi, dtkd.tel, dtkd.fax
+                            , dh.payer, dh.ngaylap, {2} as phitang, {3} as phigiam, '{4}' as diengiaicong, '{5}' as diengiaitru
+                            , sp.ma_sanpham, ddh.ma_sanpham_khach, tl.ten_trongluong
+							, (CASE 
+								WHEN kt.ten_kichthuoc = 'inch' then dbo.f_taomotainchQoPo(sp.md_sanpham_id) 
+								ELSE ddh.mota_tienganh
+							END) as mota_tienganh
+                            , ddh.sl_outer
+							, (case ddh.sl_outer when 0 then ' ' else (cast(ddh.sl_outer as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) end) as ten_donggoi
+							, ddh.soluong, dvt.ten_dvt, ddh.giafob, dh.discount
+                            , (ddh.l2 / kt.tile) as l2, (ddh.w2 / kt.tile) as w2, (ddh.h2 / kt.tile) as h2, dh.shipmenttime, cb.ten_cangbien, pmt.ten_paymentterm, (' In favor of ANCO COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
+                            , ddh.v2, ddh.sl_inner, (select ten_dvt from md_donvitinh where dg.dvt_inner = md_donvitinh.md_donvitinh_id) as dvt_inner, ((sp.trongluong / tl.tile) * ddh.soluong) as trluong
+                            , dh.portdischarge , (select dbo.get_commodity(N'{0}'))  + ' products' as commodity
+                            , '{1}' as money, N'{6}' as no_cont
+                            , sp.l_inch, sp.w_inch, sp.h_inch, sp.l_cm, sp.w_cm, sp.h_cm, hs.hscode
+                        from
+                            c_donhang dh
+							left join md_doitackinhdoanh dtkd on dh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
+                            left join c_dongdonhang ddh on dh.c_donhang_id = ddh.c_donhang_id
+							left join md_sanpham sp on ddh.md_sanpham_id = sp.md_sanpham_id
+							left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id
+                            left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
+							left join md_cangbien cb on dh.md_cangbien_id = cb.md_cangbien_id
+							left join md_paymentterm pmt on dh.md_paymentterm_id = pmt.md_paymentterm_id
+							left join md_nganhang ngh on dh.md_nganhang_id = ngh.md_nganhang_id
+							left join md_kichthuoc kt on dh.md_kichthuoc_id = kt.md_kichthuoc_id
+							left join md_trongluong tl on dh.md_trongluong_id = tl.md_trongluong_id
+							left join md_hscode hs on sp.md_hscode_id = hs.md_hscode_id
+                        where
+							dh.c_donhang_id = N'{0}' order by sp.ma_sanpham asc", c_donhang_id == null ? "" : c_donhang_id, totalWord, tang, giam, diengiaicong == null ? "" : diengiaicong.mota.Replace("'", "\""), diengiaitru == null ? "" : diengiaitru.mota.Replace("'", "\""), no_cont);
+
+            DataTable dt = mdbc.GetData(select);
+
+            if (dt.Rows.Count != 0)
+            {
+                HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt);
+                String saveAsFileName = String.Format("DonHang-{0}.xls", DateTime.Now);
+                this.SaveFile(hssfworkbook, saveAsFileName);
+            }
+            else
+            {
+                Response.Write("<h3>Đơn hàng không có dữ liệu</h3>");
+            }
+        //}
+        //catch (Exception ex)
+        //{
+        //    Response.Write(String.Format("<h3>Quá trình chiếc xuất xảy ra lỗi {0}</h3>", ex.Message));
+        //}
+    }		
+
+    public HSSFWorkbook CreateWorkBookPO(DataTable dt)
+    {
+        string tenkt = dt.Rows[0]["ten_kichthuoc"].ToString();
+        HSSFWorkbook hssfworkbook = new HSSFWorkbook();
+        ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
+		//Logo
+		//private String logoPath, productImagePath;
+		String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "anco_logo_print.png");
+		//String productImagePath = Server.MapPath("~/images/products/fullsize/");
+		System.Drawing.Image logo = System.Drawing.Image.FromFile(logoPath);
+        MemoryStream mslogo = new MemoryStream();
+        logo.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+        IDrawing patriarchlogo = s1.CreateDrawingPatriarch();
+        HSSFClientAnchor anchorlogo = new HSSFClientAnchor(0, 0, 0, 0, 1, 0, 2, 3);
+        anchorlogo.AnchorType = 3;
+
+        int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
+        IPicture signaturePicturelogo = patriarchlogo.CreatePicture(anchorlogo, indexlogo);
+	//
+        ICellStyle cFmt0, cFmt0i0, cFmt0i00, cFmt0i000;
+        cFmt0 = this.GetStyleNumber(hssfworkbook, fmt0);
+        cFmt0i0 = this.GetStyleNumber(hssfworkbook, fmt0i0);
+        cFmt0i00 = this.GetStyleNumber(hssfworkbook, fmt0i00);
+        cFmt0i000 = this.GetStyleNumber(hssfworkbook, fmt0i000);
+
+        IFont fontBold = hssfworkbook.CreateFont();
+        fontBold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
+
+        ICellStyle cellBold = hssfworkbook.CreateCellStyle();
+        cellBold.SetFont(fontBold);
+        cellBold.WrapText = true;
+        cellBold.Alignment = HorizontalAlignment.Left;
+        cellBold.VerticalAlignment = VerticalAlignment.Top;
+
+        ICellStyle cellBoldCenter = hssfworkbook.CreateCellStyle();
+        cellBoldCenter.Alignment = HorizontalAlignment.Center;
+        cellBoldCenter.VerticalAlignment = VerticalAlignment.Top;
+        cellBoldCenter.SetFont(fontBold);
+
+        IFont font12 = hssfworkbook.CreateFont();
+        font12.FontHeightInPoints = 10;
+
+        IFont font12Bold = hssfworkbook.CreateFont();
+        font12Bold.FontHeightInPoints = 10;
+        font12Bold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
+
+        IFont font16Bold = hssfworkbook.CreateFont();
+        font16Bold.FontHeightInPoints = 16;
+        font16Bold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
+
+        IFont font12BoldItalic = hssfworkbook.CreateFont();
+        font12BoldItalic.FontHeightInPoints = 10;
+        font12BoldItalic.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
+        font12BoldItalic.IsItalic = true;
+
+        IFont font22Bold = hssfworkbook.CreateFont();
+        font22Bold.FontHeightInPoints = 22;
+        font22Bold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
+
+        IFont font14Bold = hssfworkbook.CreateFont();
+        font14Bold.FontHeightInPoints = 14;
+        font14Bold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
+
+        IFont font18Bold = hssfworkbook.CreateFont();
+        font18Bold.FontHeightInPoints = 18;
+        font18Bold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
+
+        // Cell Style 
+        ICellStyle styleCenter18Bold = hssfworkbook.CreateCellStyle();
+        styleCenter18Bold.SetFont(font18Bold);
+        styleCenter18Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleCenter18Bold.Alignment = HorizontalAlignment.Center;
+        styleCenter18Bold.WrapText = true;
+
+        ICellStyle styleTop14Bold = hssfworkbook.CreateCellStyle();
+        styleTop14Bold.SetFont(font14Bold);
+        styleTop14Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleTop14Bold.WrapText = true;
+
+        ICellStyle styleCenter22Bold = hssfworkbook.CreateCellStyle();
+        styleCenter22Bold.SetFont(font22Bold);
+        styleCenter22Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleCenter22Bold.Alignment = HorizontalAlignment.Center;
+        styleCenter22Bold.WrapText = true;
+
+        ICellStyle styleCenter12Bold = hssfworkbook.CreateCellStyle();
+        styleCenter12Bold.SetFont(font12Bold);
+        styleCenter12Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleCenter12Bold.Alignment = HorizontalAlignment.Center;
+        styleCenter12Bold.WrapText = true;
+		
+		ICellStyle styleTop12 = hssfworkbook.CreateCellStyle();
+        styleTop12.SetFont(font12);
+        styleTop12.VerticalAlignment = VerticalAlignment.Top;
+        styleTop12.Alignment = HorizontalAlignment.Left;
+        styleTop12.WrapText = true;
+
+        ICellStyle styleCenter16Bold = hssfworkbook.CreateCellStyle();
+        styleCenter16Bold.SetFont(font16Bold);
+        styleCenter16Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleCenter16Bold.Alignment = HorizontalAlignment.Center;
+        styleCenter16Bold.WrapText = true;
+
+        ICellStyle styleRight12Bold = hssfworkbook.CreateCellStyle();
+        styleRight12Bold.SetFont(font12Bold);
+        styleRight12Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleRight12Bold.Alignment = HorizontalAlignment.Right;
+        styleRight12Bold.WrapText = true;
+
+        ICellStyle styleCenterBorder12Bold = hssfworkbook.CreateCellStyle();
+        styleCenterBorder12Bold.SetFont(font12Bold);
+        styleCenterBorder12Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleCenterBorder12Bold.Alignment = HorizontalAlignment.Center;
+        styleCenterBorder12Bold.WrapText = true;
+        styleCenterBorder12Bold.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleCenterBorder12Bold.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleCenterBorder12Bold.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleCenterBorder12Bold.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+
+        ICellStyle styleBorder12Bold = hssfworkbook.CreateCellStyle();
+        styleBorder12Bold.SetFont(font12Bold);
+        styleBorder12Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleBorder12Bold.WrapText = true;
+        styleBorder12Bold.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+
+        ICellStyle styleCenterBorderBottom12 = hssfworkbook.CreateCellStyle();
+        styleCenterBorderBottom12.SetFont(font12);
+        styleCenterBorderBottom12.VerticalAlignment = VerticalAlignment.Top;
+        styleCenterBorderBottom12.Alignment = HorizontalAlignment.Center;
+        styleCenterBorderBottom12.WrapText = true;
+        styleCenterBorderBottom12.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+
+        ICellStyle style12BoldItalic = hssfworkbook.CreateCellStyle();
+        style12BoldItalic.SetFont(font12BoldItalic);
+        style12BoldItalic.VerticalAlignment = VerticalAlignment.Top;
+        style12BoldItalic.WrapText = true;
+
+        ICellStyle styleCenter12 = hssfworkbook.CreateCellStyle();
+        styleCenter12.SetFont(font12);
+        styleCenter12.VerticalAlignment = VerticalAlignment.Top;
+        styleCenter12.Alignment = HorizontalAlignment.Center;
+        styleCenter12.WrapText = true;
+
+        ICellStyle style12 = hssfworkbook.CreateCellStyle();
+        style12.SetFont(font12);
+        style12.VerticalAlignment = VerticalAlignment.Top;
+        style12.WrapText = true;
+
+        ICellStyle style12Bold = hssfworkbook.CreateCellStyle();
+        style12Bold.SetFont(font12Bold);
+        style12Bold.VerticalAlignment = VerticalAlignment.Top;
+        style12Bold.WrapText = true;
+
+        ICellStyle style12TopBold = hssfworkbook.CreateCellStyle();
+        style12TopBold.SetFont(font12Bold);
+        style12TopBold.VerticalAlignment = VerticalAlignment.Top;
+        style12TopBold.WrapText = true;
+
+        ICellStyle style12Top = hssfworkbook.CreateCellStyle();
+        style12Top.SetFont(font12);
+        style12Top.VerticalAlignment = VerticalAlignment.Top;
+        style12Top.WrapText = true;
+
+        ICellStyle styleBorder12 = hssfworkbook.CreateCellStyle();
+        styleBorder12.SetFont(font12);
+        styleBorder12.VerticalAlignment = VerticalAlignment.Top;
+        styleBorder12.WrapText = true;
+        styleBorder12.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+
+
+        ICellStyle styleBorder12LeftNone = hssfworkbook.CreateCellStyle();
+        styleBorder12LeftNone.SetFont(font12);
+        styleBorder12LeftNone.VerticalAlignment = VerticalAlignment.Top;
+        styleBorder12LeftNone.WrapText = true;
+        styleBorder12LeftNone.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12LeftNone.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12LeftNone.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12LeftNone.BorderLeft = NPOI.SS.UserModel.BorderStyle.None;
+
+
+        ICellStyle styleBorderCenter12 = hssfworkbook.CreateCellStyle();
+        styleBorderCenter12.SetFont(font12);
+        styleBorderCenter12.VerticalAlignment = VerticalAlignment.Top;
+        styleBorderCenter12.Alignment = HorizontalAlignment.Center;
+        styleBorderCenter12.WrapText = true;
+        styleBorderCenter12.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorderCenter12.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorderCenter12.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorderCenter12.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+
+        ICellStyle styleNumber0Border12 = hssfworkbook.CreateCellStyle();
+        styleNumber0Border12.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0");
+        styleNumber0Border12.SetFont(font12);
+        styleNumber0Border12.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber0Border12.Alignment = HorizontalAlignment.Right;
+        styleNumber0Border12.WrapText = true;
+        styleNumber0Border12.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0Border12.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0Border12.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0Border12.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+
+        ICellStyle styleNumber0Border12RightNone = hssfworkbook.CreateCellStyle();
+        styleNumber0Border12RightNone.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0");
+        styleNumber0Border12RightNone.SetFont(font12);
+        styleNumber0Border12RightNone.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber0Border12RightNone.Alignment = HorizontalAlignment.Right;
+        styleNumber0Border12RightNone.WrapText = true;
+        styleNumber0Border12RightNone.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0Border12RightNone.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0Border12RightNone.BorderRight = NPOI.SS.UserModel.BorderStyle.None;
+        styleNumber0Border12RightNone.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+
+
+        ICellStyle styleNumber0i0Border12 = hssfworkbook.CreateCellStyle();
+        styleNumber0i0Border12.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0.0");
+        styleNumber0i0Border12.SetFont(font12);
+        styleNumber0i0Border12.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber0i0Border12.Alignment = HorizontalAlignment.Right;
+        styleNumber0i0Border12.WrapText = true;
+        styleNumber0i0Border12.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0i0Border12.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0i0Border12.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0i0Border12.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+
+
+        ICellStyle styleNumber0i00Border12 = hssfworkbook.CreateCellStyle();
+        styleNumber0i00Border12.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0.00");
+        styleNumber0i00Border12.SetFont(font12);
+        styleNumber0i00Border12.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber0i00Border12.Alignment = HorizontalAlignment.Right;
+        styleNumber0i00Border12.WrapText = true;
+        styleNumber0i00Border12.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0i00Border12.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0i00Border12.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0i00Border12.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+
+
+        ICellStyle styleNumber0i000Border12 = hssfworkbook.CreateCellStyle();
+        styleNumber0i000Border12.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0.000");
+        styleNumber0i000Border12.SetFont(font12);
+        styleNumber0i000Border12.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber0i000Border12.Alignment = HorizontalAlignment.Right;
+        styleNumber0i000Border12.WrapText = true;
+        styleNumber0i000Border12.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0i000Border12.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0i000Border12.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleNumber0i000Border12.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+
+
+
+        ICellStyle styleNumber012 = hssfworkbook.CreateCellStyle();
+        styleNumber012.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0");
+        styleNumber012.SetFont(font12);
+        styleNumber012.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber012.Alignment = HorizontalAlignment.Right;
+        styleNumber012.WrapText = true;
+
+
+        ICellStyle styleNumber0i012 = hssfworkbook.CreateCellStyle();
+        styleNumber0i012.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0.0");
+        styleNumber0i012.SetFont(font12);
+        styleNumber0i012.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber0i012.Alignment = HorizontalAlignment.Right;
+        styleNumber0i012.WrapText = true;
+
+
+        ICellStyle styleNumber0i0012 = hssfworkbook.CreateCellStyle();
+        styleNumber0i0012.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0.00");
+        styleNumber0i0012.SetFont(font12);
+        styleNumber0i0012.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber0i0012.Alignment = HorizontalAlignment.Right;
+        styleNumber0i0012.WrapText = true;
+
+        ICellStyle styleNumber0i00012 = hssfworkbook.CreateCellStyle();
+        styleNumber0i00012.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0.000");
+        styleNumber0i00012.SetFont(font12);
+        styleNumber0i00012.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber0i00012.Alignment = HorizontalAlignment.Right;
+        styleNumber0i00012.WrapText = true;
+
+
+        ICellStyle styleNumber012Bold = hssfworkbook.CreateCellStyle();
+        styleNumber012Bold.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0");
+        styleNumber012Bold.SetFont(font12Bold);
+        styleNumber012Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber012Bold.Alignment = HorizontalAlignment.Right;
+        styleNumber012Bold.WrapText = true;
+
+
+        ICellStyle styleNumber0i012Bold = hssfworkbook.CreateCellStyle();
+        styleNumber0i012Bold.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0.0");
+        styleNumber0i012Bold.SetFont(font12Bold);
+        styleNumber0i012Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber0i012Bold.Alignment = HorizontalAlignment.Right;
+        styleNumber0i012Bold.WrapText = true;
+
+
+        ICellStyle styleNumber0i0012Bold = hssfworkbook.CreateCellStyle();
+        styleNumber0i0012Bold.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0.00");
+        styleNumber0i0012Bold.SetFont(font12Bold);
+        styleNumber0i0012Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber0i0012Bold.Alignment = HorizontalAlignment.Right;
+        styleNumber0i0012Bold.WrapText = true;
+
+        ICellStyle styleNumber0i00012Bold = hssfworkbook.CreateCellStyle();
+        styleNumber0i00012Bold.DataFormat = NPOIUtils.GetDataFormat(hssfworkbook, "#,#0.000");
+        styleNumber0i00012Bold.SetFont(font12Bold);
+        styleNumber0i00012Bold.VerticalAlignment = VerticalAlignment.Top;
+        styleNumber0i00012Bold.Alignment = HorizontalAlignment.Right;
+        styleNumber0i00012Bold.WrapText = true;
+		
+
+        // set A1
+        s1.CreateRow(0).CreateCell(0).SetCellValue("ANCO COMPANY LIMITED");
+        // set A2
+        s1.CreateRow(1).CreateCell(0).SetCellValue("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
+        // set A3
+        s1.CreateRow(2).CreateCell(0).SetCellValue("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com");
+
+        
+
+        // set A4
+        s1.CreateRow(3).CreateCell(0).SetCellValue("PROFORMA INVOICE");
+        // set J7
+        s1.CreateRow(4).CreateCell(9).SetCellValue("Date:");
+		s1.GetRow(4).GetCell(9).CellStyle = cellBold;
+		
+        s1.GetRow(4).CreateCell(10).SetCellValue(DateTime.Parse(dt.Rows[0]["ngaylap"].ToString()).ToString("dd/MMM/yyyy"));
+		s1.GetRow(4).GetCell(10).CellStyle = cellBold;
+		
+		// CellRangeAddress(first row, last row, first column, last column) [4 la 5, 10 la 11]
+		s1.AddMergedRegion(new CellRangeAddress(4, 4, 10, 11));
+		
+        // set J8
+        s1.CreateRow(5).CreateCell(9).SetCellValue("No.:");
+		s1.GetRow(5).GetCell(9).CellStyle = cellBold;
+		
+        s1.GetRow(5).CreateCell(10).SetCellValue(dt.Rows[0]["sochungtu"].ToString());
+		s1.GetRow(5).GetCell(10).CellStyle = cellBold;
+		
+		s1.AddMergedRegion(new CellRangeAddress(5, 5, 10, 11));
+
+        // set A7 dtkd.ten_dtkd, dtkd.diachi, dtkd.tel, dtkd.fax
+
+        HSSFRichTextString rich = new HSSFRichTextString(String.Format("{0}\n{1}\nTel:{2}\nFax{3}", dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString()));
+        s1.CreateRow(6).CreateCell(1).SetCellValue("The Buyer:");
+		s1.GetRow(6).GetCell(1).CellStyle = cellBold;
+		
+        s1.GetRow(6).CreateCell(2).SetCellValue(rich);
+		s1.GetRow(6).GetCell(2).CellStyle = cellBold;
+        s1.GetRow(6).HeightInPoints = 60;
+        // set A8
+        s1.CreateRow(7).CreateCell(1).SetCellValue("The Payer:");
+		//s1.GetRow(7).GetCell(1).CellStyle = cellBold;
+		
+        s1.GetRow(7).CreateCell(2).SetCellValue(dt.Rows[0]["payer"].ToString());
+        //s1.GetRow(7).GetCell(2).CellStyle = cellBold;
+
+        s1.CreateRow(8).CreateCell(1).SetCellValue("ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:");
+		//s1.GetRow(8).GetCell(1).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(8, 8, 1, 12));
+
+        //s1.AddMergedRegion(new CellRangeAddress(7, 7, 0, 12));
+        s1.CreateRow(9).CreateCell(1).SetCellValue("Customer's order no.:");
+		//s1.GetRow(9).GetCell(1).CellStyle = cellBold;
+		
+        s1.GetRow(9).CreateCell(3).SetCellValue(dt.Rows[0]["customer_order_no"].ToString());
+		s1.GetRow(9).GetCell(3).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(9, 9, 3, 12));
+
+        s1.CreateRow(10).CreateCell(1).SetCellValue("Commodity:");
+		//s1.GetRow(10).GetCell(1).CellStyle = cellBold;
+		
+        s1.GetRow(10).CreateCell(3).SetCellValue(dt.Rows[0]["commodity"].ToString());
+		s1.GetRow(10).GetCell(3).CellStyle = cellBold;
+		
+        s1.CreateRow(11).CreateCell(1).SetCellValue("Item nos., description, packing, quantity, unit price and amount:");
+		//s1.GetRow(11).GetCell(1).CellStyle = cellBold;
+		
+        HSSFUtils.CellStyleModel cellStyleModel = new HSSFUtils.CellStyleModel(hssfworkbook);
+        cellStyleModel.BorderAll = true;
+        ICellStyle right = cellStyleModel.CreateCellStyle();
+        right.VerticalAlignment = VerticalAlignment.Top;
+        right.Alignment = HorizontalAlignment.Right;
+
+        
+
+        ICellStyle border = hssfworkbook.CreateCellStyle();
+        border.BorderBottom = border.BorderLeft 
+            = border.BorderRight 
+            = border.BorderTop 
+            = NPOI.SS.UserModel.BorderStyle.Thin;
+        border.VerticalAlignment = VerticalAlignment.Top;
+        border.WrapText = true;
+
+        ICellStyle borderWrap = hssfworkbook.CreateCellStyle();
+        borderWrap.SetFont(fontBold);
+        borderWrap.BorderBottom = borderWrap.BorderLeft
+            = borderWrap.BorderRight
+            = borderWrap.BorderTop
+            = NPOI.SS.UserModel.BorderStyle.Thin;
+        borderWrap.WrapText = true;
+        borderWrap.VerticalAlignment = VerticalAlignment.Top;
+        borderWrap.Alignment = HorizontalAlignment.Center;
+
+        IRow rowColumnHeader = s1.CreateRow(12);
+        // create column of table details
+        rowColumnHeader.CreateCell(0).SetCellValue("No.");
+        rowColumnHeader.CreateCell(1).SetCellValue("ANCO Item No.");
+        rowColumnHeader.CreateCell(2).SetCellValue("Picture - Only for shape ref.");
+        rowColumnHeader.CreateCell(3).SetCellValue("Customer Item No.");
+        rowColumnHeader.CreateCell(4).SetCellValue("Description");
+        rowColumnHeader.CreateCell(5).SetCellValue("Packing inner/master");
+        rowColumnHeader.CreateCell(6).SetCellValue("");
+        rowColumnHeader.CreateCell(7).SetCellValue("Nbr of Packs");
+        rowColumnHeader.CreateCell(8).SetCellValue("Quantity (sets/pcs)");
+        rowColumnHeader.CreateCell(9).SetCellValue("");
+        rowColumnHeader.CreateCell(10).SetCellValue("FOB price (USD)");
+        rowColumnHeader.CreateCell(11).SetCellValue("CBM");
+        rowColumnHeader.CreateCell(12).SetCellValue("Amount (USD)");
+        rowColumnHeader.CreateCell(13).SetCellValue("Master Packing size (LxWxH) " + dt.Rows[0]["ten_kichthuoc"].ToString());
+        rowColumnHeader.CreateCell(14).SetCellValue("");
+        rowColumnHeader.CreateCell(15).SetCellValue("");
+        rowColumnHeader.CreateCell(16).SetCellValue(dt.Rows[0]["ten_trongluong"].ToString().ToUpper());
+        rowColumnHeader.CreateCell(17).SetCellValue("");
+        rowColumnHeader.CreateCell(18).SetCellValue("");
+        rowColumnHeader.CreateCell(19).SetCellValue("CBF");
+
+        rowColumnHeader.CreateCell(20).SetCellValue("Product size (LxWxH) cm");
+        rowColumnHeader.CreateCell(21).SetCellValue("");
+        rowColumnHeader.CreateCell(22).SetCellValue("");
+
+        rowColumnHeader.CreateCell(23).SetCellValue("Product size (LxWxH) inch");
+        rowColumnHeader.CreateCell(24).SetCellValue("");
+        rowColumnHeader.CreateCell(25).SetCellValue("");
+        rowColumnHeader.CreateCell(26).SetCellValue("HS CODE");
+		
+		
+
+        s1.SetColumnWidth(1, 4000);
+        s1.SetColumnWidth(2, 4000);
+        s1.SetColumnWidth(4, 10000);
+        s1.SetColumnWidth(10, 4000);
+        s1.SetColumnWidth(12, 4000);
+        s1.SetColumnWidth(13, 1500);
+        s1.SetColumnWidth(14, 1500);
+        s1.SetColumnWidth(15, 1500);
+        s1.SetColumnWidth(16, 0);
+        s1.SetColumnWidth(26, 4000);
+
+        /*if (tenkt.Equals("cm"))
+        {
+            s1.SetColumnWidth(19, 0);
+            s1.SetColumnWidth(23, 0);
+            s1.SetColumnWidth(24, 0);
+            s1.SetColumnWidth(25, 0);
+        }
+
+        if (tenkt.Equals("inch"))
+        {
+            s1.SetColumnWidth(20, 0);
+            s1.SetColumnWidth(21, 0);
+            s1.SetColumnWidth(22, 0);
+        }*/
+		
+		s1.SetColumnWidth(19, 0);
+		s1.SetColumnWidth(23, 0);
+		s1.SetColumnWidth(24, 0);
+		s1.SetColumnWidth(25, 0);
+		s1.SetColumnWidth(20, 0);
+		s1.SetColumnWidth(21, 0);
+		s1.SetColumnWidth(22, 0);
+
+        for (int i = 0; i <= 26; i++)
+        {
+            rowColumnHeader.GetCell(i).CellStyle = borderWrap;
+        }
+
+        s1.AddMergedRegion(new CellRangeAddress(0, 0, 0, 12));
+        s1.AddMergedRegion(new CellRangeAddress(1, 1, 0, 12));
+        s1.AddMergedRegion(new CellRangeAddress(2, 2, 0, 12));
+        s1.AddMergedRegion(new CellRangeAddress(3, 3, 0, 12));
+        s1.AddMergedRegion(new CellRangeAddress(6, 6, 2, 12));
+        s1.AddMergedRegion(new CellRangeAddress(7, 7, 2, 12));
+        s1.AddMergedRegion(new CellRangeAddress(9, 9, 1, 2));
+        s1.AddMergedRegion(new CellRangeAddress(10, 10, 3, 12));
+        s1.AddMergedRegion(new CellRangeAddress(11, 11, 1, 12));
+        s1.AddMergedRegion(new CellRangeAddress(4, 4, 11, 12));
+        s1.AddMergedRegion(new CellRangeAddress(5, 5, 11, 12));
+        s1.AddMergedRegion(new CellRangeAddress(12, 12, 5, 6));
+        s1.AddMergedRegion(new CellRangeAddress(12, 12, 8, 9));
+        s1.AddMergedRegion(new CellRangeAddress(12, 12, 13, 15));
+
+        s1.AddMergedRegion(new CellRangeAddress(12, 12, 20, 22));
+        s1.AddMergedRegion(new CellRangeAddress(12, 12, 23, 25));
+        
+
+        
+
+        for (int i = 0; i < dt.Rows.Count; i++)
+        {
+            try
+            {
+                string imagesPath = System.IO.Path.Combine(Server.MapPath("~"), "images/products/fullsize");
+                //grab the image file
+                string anhhienthi = "";
+                try
+                {
+                    if (dt.Rows[i]["ma_sanpham"].ToString().ElementAt(9).ToString().Equals("F"))
+                    {
+                        anhhienthi = dt.Rows[i]["ma_sanpham"].ToString().Substring(0, 11);
+                    }
+                    else
+                    {
+                        anhhienthi = dt.Rows[i]["ma_sanpham"].ToString().Substring(0, 8);
+                    }
+                }
+                catch
+                {
+                    anhhienthi = dt.Rows[i]["ma_sanpham"].ToString().Substring(0, 8);
+                }
+				
+				 imagesPath = System.IO.Path.Combine(imagesPath,anhhienthi + ".jpg");
+                System.Drawing.Image image = System.Drawing.Image.FromFile(imagesPath);
+                MemoryStream ms = new MemoryStream();
+                //pull the memory stream from the image (I need this for the byte array later)
+                image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                //the drawing patriarch will hold the anchor and the master information
+                IDrawing patriarch = s1.CreateDrawingPatriarch();
+                //store the coordinates of which cell and where in the cell the image goes
+                int intx1 = 2;
+                int inty1 = 13 + i;
+                int intx2 = 3;
+                int inty2 = 14 + i;
+
+
+                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
+                //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
+                anchor.AnchorType = 2;
+                //add the byte array and encode it for the excel file
+                int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
+                IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+            }
+            catch { }
+            IRow row = s1.CreateRow(13 + i);
+            row.HeightInPoints = 60;
+
+            row.CreateCell(0).SetCellValue(i + 1);
+            row.CreateCell(1).SetCellValue(dt.Rows[i]["ma_sanpham"].ToString());
+            row.CreateCell(2).SetCellValue("");
+            row.CreateCell(3).SetCellValue(dt.Rows[i]["ma_sanpham_khach"].ToString());
+            row.CreateCell(4).SetCellValue(dt.Rows[i]["mota_tienganh"].ToString());
+            row.GetCell(4).CellStyle.WrapText = true;
+
+            if (decimal.Parse(dt.Rows[i]["sl_inner"].ToString()) != 0)
+            {
+                row.CreateCell(5).SetCellValue(dt.Rows[i]["sl_inner"].ToString() + " " + dt.Rows[i]["dvt_inner"].ToString());
+            }
+            else {
+                row.CreateCell(5).SetCellValue("");
+            }
+            
+            row.CreateCell(6).SetCellValue(dt.Rows[i]["ten_donggoi"].ToString());
+            row.CreateCell(7).CellFormula = String.Format("I{0}/S{0}", 14 + i);
+            row.CreateCell(8).SetCellValue(double.Parse(dt.Rows[i]["soluong"].ToString()));
+            row.CreateCell(9).SetCellValue(dt.Rows[i]["ten_dvt"].ToString());
+            
+            row.CreateCell(10).SetCellValue(double.Parse(dt.Rows[i]["giafob"].ToString()));
+
+            row.CreateCell(11).CellFormula = String.Format("((N{0} * O{0} * P{0}) * H{0})/1000000", 14 + i);
+
+            row.CreateCell(12).CellFormula = String.Format("IF(K{0}*I{0}<>0,K{0}*I{0},0)", 14 + i);
+            row.CreateCell(13).SetCellValue(double.Parse(dt.Rows[i]["l2"].ToString()));
+            row.CreateCell(14).SetCellValue(double.Parse(dt.Rows[i]["w2"].ToString()));
+            row.CreateCell(15).SetCellValue(double.Parse(dt.Rows[i]["h2"].ToString()));
+            row.CreateCell(16).SetCellValue(double.Parse(dt.Rows[i]["trluong"].ToString()));
+            row.CreateCell(17).SetCellValue(double.Parse(dt.Rows[i]["v2"].ToString()));
+            row.CreateCell(18).SetCellValue(double.Parse(dt.Rows[i]["sl_outer"].ToString()));
+
+            row.CreateCell(20).SetCellValue(double.Parse(dt.Rows[i]["l_cm"].ToString()));
+            row.CreateCell(21).SetCellValue(double.Parse(dt.Rows[i]["w_cm"].ToString()));
+            row.CreateCell(22).SetCellValue(double.Parse(dt.Rows[i]["h_cm"].ToString()));
+
+            row.CreateCell(23).SetCellValue(double.Parse(dt.Rows[i]["l_inch"].ToString()));
+            row.CreateCell(24).SetCellValue(double.Parse(dt.Rows[i]["w_inch"].ToString()));
+            row.CreateCell(25).SetCellValue(double.Parse(dt.Rows[i]["h_inch"].ToString()));
+
+			row.CreateCell(26).SetCellValue(dt.Rows[i]["hscode"].ToString());
+            row.CreateCell(19).SetCellValue(double.Parse(dt.Rows[i]["cbf"].ToString()));
+
+            
+            
+            for (int j = 0; j <= 19; j++)
+            {
+                row.GetCell(j).CellStyle = border;
+
+                // No of pack
+                cellStyleModel.HorizontalAlignment = HorizontalAlignment.Right;
+                cellStyleModel.FormatData = "#,##0.0";
+                row.GetCell(7).CellStyle = cellStyleModel.CreateCellStyle();
+
+                // Quantity
+                row.GetCell(8).CellStyle = styleNumber0Border12RightNone;//cFmt0;
+
+                row.GetCell(9).CellStyle = styleBorder12LeftNone;
+
+                // Prices
+                row.GetCell(10).CellStyle = cFmt0i00;
+
+                // CBM
+                row.GetCell(11).CellStyle = cFmt0i000;
+				//
+                row.GetCell(26).CellStyle = cFmt0i000;
+				//
+                row.GetCell(12).CellStyle = right;
+                row.GetCell(12).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+
+                row.GetCell(13).CellStyle = right;
+                row.GetCell(13).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+
+                row.GetCell(14).CellStyle = right;
+                row.GetCell(14).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+
+                row.GetCell(15).CellStyle = right;
+                row.GetCell(15).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+
+                row.GetCell(20).CellStyle = right;
+                row.GetCell(20).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+
+
+                row.GetCell(21).CellStyle = right;
+                row.GetCell(21).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+
+                row.GetCell(22).CellStyle = right;
+                row.GetCell(22).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+
+                row.GetCell(23).CellStyle = right;
+                row.GetCell(23).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+
+                row.GetCell(24).CellStyle = right;
+                row.GetCell(24).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+
+                row.GetCell(25).CellStyle = right;
+                row.GetCell(25).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+                
+                // Amount
+                row.GetCell(16).CellStyle = right;
+                row.GetCell(16).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+            }
+        }
+        s1.SetColumnWidth(17, 0);
+        s1.SetColumnWidth(18, 0);
+        // Sub total
+        s1.CreateRow(13 + dt.Rows.Count).CreateCell(4).SetCellValue("Sub total:");
+		s1.GetRow(13 + dt.Rows.Count).GetCell(4).CellStyle = cellBold;
+        
+        // khong lay border
+        cellStyleModel.BorderAll = false;
+        s1.GetRow(13 + dt.Rows.Count).CreateCell(7).CellFormula = String.Format("SUM(H{0}:H{1})", 14, 13 + dt.Rows.Count);
+        //cellStyleModel.FormatData = "#,##0.0";
+        s1.GetRow(13 + dt.Rows.Count).GetCell(7).CellStyle = styleNumber0i012Bold;
+
+        s1.GetRow(13 + dt.Rows.Count).CreateCell(8).CellFormula = String.Format("SUM(I{0}:I{1})", 14, 13 + dt.Rows.Count);
+        //cellStyleModel.FormatData = "#,##0";
+        s1.GetRow(13 + dt.Rows.Count).GetCell(8).CellStyle = styleNumber012Bold;
+
+        //s1.GetRow(13 + dt.Rows.Count).CreateCell(10).CellFormula = String.Format("SUM(K{0}:K{1})", 14, 13 + dt.Rows.Count);
+        //cellStyleModel.FormatData = "#,##0.00";
+        //s1.GetRow(13 + dt.Rows.Count).GetCell(10).CellStyle = cellStyleModel.CreateCellStyle();
+
+        s1.GetRow(13 + dt.Rows.Count).CreateCell(11).CellFormula = String.Format("SUM(L{0}:L{1})", 14, 13 + dt.Rows.Count);
+        //cellStyleModel.FormatData = "#,##0.000";
+        s1.GetRow(13 + dt.Rows.Count).GetCell(11).CellStyle = styleNumber0i00012Bold;
+
+        s1.GetRow(13 + dt.Rows.Count).CreateCell(12).CellFormula = String.Format("SUM(M{0}:M{1})", 14, 13 + dt.Rows.Count);
+        //cellStyleModel.FormatData = "#,##0.00";
+        s1.GetRow(13 + dt.Rows.Count).GetCell(12).CellStyle = styleNumber0i0012Bold;
+			
+		ICellStyle cellRight = hssfworkbook.CreateCellStyle();
+        cellRight.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+        cellRight.Alignment = HorizontalAlignment.Right;
+        cellRight.VerticalAlignment = VerticalAlignment.Top;
+		
+		
+        s1.CreateRow(14 + dt.Rows.Count).CreateCell(4).SetCellValue(String.Format("Discount ({0}%)", dt.Rows[0]["discount"]));
+        s1.GetRow(14 + dt.Rows.Count).CreateCell(12).CellFormula = String.Format("M{0}*R{1}/100", 14 + dt.Rows.Count, 15 + dt.Rows.Count);
+		s1.GetRow(14 + dt.Rows.Count).GetCell(12).CellStyle = cellRight;
+		
+        s1.GetRow(14 + dt.Rows.Count).CreateCell(17).SetCellValue(dt.Rows[0]["discount"].ToString());
+		
+
+        if (decimal.Parse(dt.Rows[0]["discount"].ToString()) == 0)
+        {
+            s1.GetRow(14 + dt.Rows.Count).Height = 1;
+        }
+
+        HSSFUtils.CellStyleModel cellStyle = new HSSFUtils.CellStyleModel(hssfworkbook);
+        s1.CreateRow(15 + dt.Rows.Count).CreateCell(4).SetCellValue(dt.Rows[0]["diengiaicong"].ToString() + "(+)");
+        s1.GetRow(15 + dt.Rows.Count).CreateCell(12).SetCellValue(double.Parse(dt.Rows[0]["phitang"].ToString()));
+        cellStyleModel.FormatData = "#,##0.00";
+        s1.GetRow(15 + dt.Rows.Count).GetCell(12).CellStyle = cellStyleModel.CreateCellStyle();
+        s1.GetRow(15 + dt.Rows.Count).GetCell(12).CellStyle.Alignment = HorizontalAlignment.Right;
+
+
+        if (decimal.Parse(dt.Rows[0]["phitang"].ToString()) == 0)
+        {
+            s1.GetRow(15 + dt.Rows.Count).Height = 1;
+        }
+
+
+        s1.CreateRow(16 + dt.Rows.Count).CreateCell(4).SetCellValue(dt.Rows[0]["diengiaitru"].ToString() + "(-)");
+        s1.GetRow(16 + dt.Rows.Count).CreateCell(12).SetCellValue(double.Parse(dt.Rows[0]["phigiam"].ToString()));
+        cellStyleModel.FormatData = "#,##0.00";
+        s1.GetRow(16 + dt.Rows.Count).GetCell(12).CellStyle = cellStyleModel.CreateCellStyle();
+        s1.GetRow(16 + dt.Rows.Count).GetCell(12).CellStyle.Alignment = HorizontalAlignment.Right;
+
+        if (decimal.Parse(dt.Rows[0]["phigiam"].ToString()) == 0)
+        {
+            s1.GetRow(16 + dt.Rows.Count).Height = 1;
+        }
+
+
+        s1.CreateRow(17 + dt.Rows.Count).CreateCell(4).SetCellValue("Total");
+		s1.GetRow(17 + dt.Rows.Count).GetCell(4).CellStyle = cellBold;
+        s1.GetRow(17 + dt.Rows.Count).CreateCell(12).CellFormula = String.Format("M{0} - M{1} + M{2} - M{3} ", 14 + dt.Rows.Count, 15 + dt.Rows.Count, 16 + dt.Rows.Count, 17 + dt.Rows.Count);
+        
+        //cellStyleModel.FormatData = "#,##0.00";
+        s1.GetRow(17 + dt.Rows.Count).GetCell(12).CellStyle = styleNumber0i0012Bold;
+
+        s1.CreateRow(18 + dt.Rows.Count).CreateCell(1).SetCellValue("Say:USD " + dt.Rows[0]["money"].ToString().Replace("Dollars", ""));
+		s1.GetRow(18 + dt.Rows.Count).GetCell(1).CellStyle = styleRight12Bold;
+		
+        s1.CreateRow(19 + dt.Rows.Count).CreateCell(1).SetCellValue("(10% more or less in quantity and amount are acceptable).");
+		s1.GetRow(19 + dt.Rows.Count).GetCell(1).CellStyle = styleRight12Bold;
+		
+        s1.CreateRow(20 + dt.Rows.Count).CreateCell(1).SetCellValue("No. of Container(s):");
+		//s1.GetRow(20 + dt.Rows.Count).GetCell(1).CellStyle = style12Bold;
+		
+		s1.GetRow(20 + dt.Rows.Count).CreateCell(3).SetCellValue(dt.Rows[0]["no_cont"].ToString());
+		s1.GetRow(20 + dt.Rows.Count).GetCell(3).CellStyle = style12Bold;
+		
+		
+        //s1.AddMergedRegion(new CellRangeAddress(20 + dt.Rows.Count, 20 + dt.Rows.Count, 1, 12));
+
+        s1.CreateRow(21 + dt.Rows.Count).CreateCell(1).SetCellValue("Port of loading :");
+        s1.GetRow(21 + dt.Rows.Count).CreateCell(3).SetCellValue(dt.Rows[0]["ten_cangbien"].ToString());
+
+        s1.CreateRow(22 + dt.Rows.Count).CreateCell(1).SetCellValue("Port of discharge :");
+        s1.GetRow(22 + dt.Rows.Count).CreateCell(3).SetCellValue(dt.Rows[0]["portdischarge"].ToString());
+
+        s1.CreateRow(23 + dt.Rows.Count).CreateCell(1).SetCellValue("Shipment Time:");
+        s1.GetRow(23 + dt.Rows.Count).CreateCell(3).SetCellValue( DateTime.Parse(dt.Rows[0]["shipmenttime"].ToString()).ToString("dd/MMM/yyyy"));
+        
+        s1.CreateRow(24 + dt.Rows.Count).CreateCell(1).SetCellValue("Payment term:");
+        s1.GetRow(24 + dt.Rows.Count).CreateCell(3).SetCellValue(dt.Rows[0]["ten_paymentterm"].ToString());
+        s1.GetRow(24 + dt.Rows.Count).GetCell(3).CellStyle = style12Bold;
+        
+
+        s1.CreateRow(25 + dt.Rows.Count).CreateCell(3).SetCellValue(dt.Rows[0]["mota"].ToString());
+		s1.GetRow(25 + dt.Rows.Count).GetCell(3).CellStyle = styleTop12;
+		
+        s1.AddMergedRegion(new CellRangeAddress(25 + dt.Rows.Count, 25 + dt.Rows.Count, 3, 12));
+        s1.GetRow(25 + dt.Rows.Count).HeightInPoints = 45;
+		
+		
+
+        s1.CreateRow(26 + dt.Rows.Count).CreateCell(1).SetCellValue("This agreement comes into effect from the signing date.:");
+        s1.AddMergedRegion(new CellRangeAddress(26 + dt.Rows.Count, 26 + dt.Rows.Count, 1, 12));
+
+        s1.CreateRow(28 + dt.Rows.Count).CreateCell(1).SetCellValue("CONFIRMED BY THE BUYER");
+        s1.GetRow(28 + dt.Rows.Count).GetCell(1).CellStyle = styleCenter12Bold;
+        s1.AddMergedRegion(new CellRangeAddress(28 + dt.Rows.Count, 28 + dt.Rows.Count, 1, 4));
+
+        s1.GetRow(28 + dt.Rows.Count).CreateCell(5).SetCellValue("ANCO COMPANY LTD.");
+        s1.GetRow(28 + dt.Rows.Count).GetCell(5).CellStyle = styleCenter12Bold;
+        s1.AddMergedRegion(new CellRangeAddress(28 + dt.Rows.Count, 28 + dt.Rows.Count, 5, 12));
+
+        s1.CreateRow(29 + dt.Rows.Count).CreateCell(5).SetCellValue("(Signed)");
+        s1.GetRow(29 + dt.Rows.Count).GetCell(5).CellStyle = styleCenter12Bold;
+        s1.AddMergedRegion(new CellRangeAddress(29 + dt.Rows.Count, 29 + dt.Rows.Count, 5, 12));
+
+
+        s1.AddMergedRegion(new CellRangeAddress(18 + dt.Rows.Count, 18 + dt.Rows.Count, 1, 12));
+        s1.AddMergedRegion(new CellRangeAddress(19 + dt.Rows.Count, 19 + dt.Rows.Count, 1, 12));
+
+        s1.AddMergedRegion(new CellRangeAddress(20 + dt.Rows.Count, 20 + dt.Rows.Count, 1, 2));
+        s1.AddMergedRegion(new CellRangeAddress(21 + dt.Rows.Count, 21 + dt.Rows.Count, 1, 2));
+        s1.AddMergedRegion(new CellRangeAddress(22 + dt.Rows.Count, 22 + dt.Rows.Count, 1, 2));
+        s1.AddMergedRegion(new CellRangeAddress(23 + dt.Rows.Count, 23 + dt.Rows.Count, 1, 2));
+        s1.AddMergedRegion(new CellRangeAddress(24 + dt.Rows.Count, 24 + dt.Rows.Count, 1, 2));
+
+        s1.AddMergedRegion(new CellRangeAddress(21 + dt.Rows.Count, 21 + dt.Rows.Count, 3, 5));
+        s1.AddMergedRegion(new CellRangeAddress(22 + dt.Rows.Count, 22 + dt.Rows.Count, 3, 5));
+        s1.AddMergedRegion(new CellRangeAddress(23 + dt.Rows.Count, 23 + dt.Rows.Count, 3, 5));
+        s1.AddMergedRegion(new CellRangeAddress(24 + dt.Rows.Count, 24 + dt.Rows.Count, 3, 5));
+        //s1.AddMergedRegion(new CellRangeAddress(24 + dt.Rows.Count, 24 + dt.Rows.Count, 1, 12));
+
+        
+        // Style of Company Name
+        ICellStyle cellStyleCompany = hssfworkbook.CreateCellStyle();
+        cellStyleCompany.Alignment = HorizontalAlignment.Center;
+        cellStyleCompany.SetFont(CreateFontSize(hssfworkbook, 15));
+
+        // Style of Company Information 
+        ICellStyle cellStyleInfomation = hssfworkbook.CreateCellStyle();
+        cellStyleInfomation.Alignment = HorizontalAlignment.Center;
+        cellStyleInfomation.SetFont(CreateFontSize(hssfworkbook, 12));
+
+        // Style of Company Information 
+        ICellStyle cellStyleTitle = hssfworkbook.CreateCellStyle();
+        cellStyleTitle.Alignment = HorizontalAlignment.Center;
+        cellStyleTitle.SetFont(CreateFontSize(hssfworkbook, 18));
+
+
+        s1.GetRow(0).GetCell(0).CellStyle = cellStyleCompany;
+        s1.GetRow(1).GetCell(0).CellStyle = cellStyleInfomation;
+        s1.GetRow(2).GetCell(0).CellStyle = cellStyleInfomation;
+        s1.GetRow(3).GetCell(0).CellStyle = styleCenter18Bold;
+        s1.GetRow(12).HeightInPoints = 25;
+		s1.GetRow(3).HeightInPoints = 40;
+
+
+
+
+        ICellStyle cellUn = hssfworkbook.CreateCellStyle();
+        IFont funderline = hssfworkbook.CreateFont();
+        funderline.Underline = FontUnderlineType.Single;
+        funderline.FontHeightInPoints = 12;
+        cellUn.SetFont(funderline);
+        cellUn.Alignment = HorizontalAlignment.Center;
+        cellUn.VerticalAlignment = VerticalAlignment.Bottom;
+        s1.GetRow(2).GetCell(0).CellStyle = cellUn;
+
+        return hssfworkbook;
+    }
+
+    public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName)
+    {
+        MemoryStream exportData = new MemoryStream();
+        hsswb.Write(exportData);
+
+        Response.ContentType = "application/vnd.ms-excel";
+        Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
+        Response.Clear();
+        Response.BinaryWrite(exportData.GetBuffer());
+        Response.End();
+    }
+
+    public IFont CreateFontSize(HSSFWorkbook hsswb, short size)
+    {
+        IFont font = hsswb.CreateFont();
+        font.FontHeightInPoints = size;
+        return font;
+    }
+
+    public ICellStyle GetStyleNumber(HSSFWorkbook workbook, String format)
+    {
+        ICellStyle s = workbook.CreateCellStyle();
+        s.Alignment = HorizontalAlignment.Right;
+        s.VerticalAlignment = VerticalAlignment.Top;
+        s.BorderLeft = s.BorderRight = s.BorderBottom = s.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        s.DataFormat = CellDataFormat.GetDataFormat(workbook, format);
+        return s;
+    }
+}

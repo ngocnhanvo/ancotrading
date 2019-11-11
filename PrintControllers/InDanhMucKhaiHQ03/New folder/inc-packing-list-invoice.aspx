@@ -1,0 +1,993 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="inc-packing-list-invoice.aspx.cs" Inherits="inc_packing_list_invoice" %>
+<%@ Register src="jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
+<script>
+    $(function() {
+        $('#lay-center-plivn').parent().layout({
+            north: {
+                size: "50%"
+                , minSize: "0%"
+                , maxSize: "100%"
+                , onresize_end: function() {
+                var o = $("#layout-north-plivn").height();
+                $("#grid_ds_plivn").setGridHeight(o - 90);
+                }
+            },
+            center: {
+                onresize_end: function() {
+                var o = $("#lay-center-plivn").height();
+                $("#grid_ds_chitietplivn").setGridHeight(o - 90);
+                }
+            }
+        })
+    });
+
+    function activePackingListInvoie() {
+        var msg = "";
+        var id = $('#grid_ds_plivn').jqGrid('getGridParam', 'selrow');
+
+        if (id == null) {
+            msg = "Bạn hãy chọn 1 Packing List - Invoice mà bạn muốn hiệu lực.!";
+            // append dialog-taoky to body
+            $('body').append('<div title="Thông Báo" id=\"dialog-active-packinglist\"><h3>' + msg + '</h3></div>');
+
+            // create new dialog
+            $('#dialog-active-packinglist').dialog({
+                modal: true
+                , open: function(event, ui) {
+                    //hide close button.
+                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                }
+                , buttons: {
+                    'Thoát': function() {
+                        $(this).dialog("destroy").remove();
+                    }
+                }
+            });
+        } else {
+            msg = "Có phải bạn muốn hiệu lực Packing List - Invoice này.?";
+            var p = '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><span id="dialog-caution">' + msg + '</span></p>';
+            var h3 = '<h3 style="padding: 10px" class="ui-state-highlight ui-corner-all">' + p + '<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div></h3>';
+
+            // append dialog-taoky to body
+            $('body').append('<div title="Thông Báo" id=\"dialog-active-packinglist\">' + h3 + '</div>');
+
+            // create new dialog
+            $('#dialog-active-packinglist').dialog({
+                modal: true
+                , open: function(event, ui) {
+                    //hide close button.
+                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                }
+                , buttons:
+                [
+                    {
+                        id: "btn-active-packinglist",
+                        text: "Có",
+                        click: function() {
+                            $("#dialog-caution").ajaxStart(function() {
+                                $("#wait").css("display", "block");
+                                $("#btn-active-packinglist").button("disable");
+                                $("#btn-close").button("disable");
+                            });
+
+                            $("#dialog-caution").ajaxComplete(function() {
+                                $("#wait").css("display", "none");
+                                $("#btn-close span").text("Thoát");
+                                $("#btn-close").button("enable");
+                            });
+
+                            $.get("Controllers/PackingInvoiceController.ashx?action=activepacking&pakId=" + id, function(result) {
+                                //$('#dialog-caution').css({ 'color': 'green' });
+                            $('#dialog-active-packinglist').find('#dialog-caution').html(result);
+                                $('#grid_ds_plivn').jqGrid().trigger('reloadGrid');
+                            });
+                        }
+                    },
+                    {
+                        id: "btn-close",
+                        text: "Không",
+                        click: function() {
+                            $(this).dialog("destroy").remove();
+                        }
+                    }
+                ]
+            });
+        }
+    }
+
+    function funcPrintPKLI() {
+        $.get('Controllers/PartnerController.ashx?action=getoption&isncc=1', function (result) {
+            var pId = $('#grid_ds_plivn').jqGrid('getGridParam', 'selrow');
+            var name = 'dialog-print-pkli';
+            var title = 'Trích xuất dữ liệu';
+            var content = '<table style="width:100%">' +
+                                '<tr>' +
+                                    '<td>' +
+                                        '<input id="printPkliList" type="radio" name="rdoPrintType" value="printPkliList" />' +
+                                        '<label for="printPkliList">In Sale Contract</label>' +
+                                    '</td>' +
+
+                                    '<td>' +
+                                        '<input id="printPackingList" type="radio" name="rdoPrintType" value="printPackingList" checked="checked" />' +
+                                        '<label for="printPackingList">In Packing List</label>' +
+                                    '</td>' +
+                                '</tr>' +
+                                '<tr>' +
+                                    '<td>' +
+                                        '<input id="printInvoice" type="radio" name="rdoPrintType" value="printInvoice" />' +
+                                        '<label for="printInvoice">In Invoice</label>' +
+                                    '</td>' +
+
+                                    '<td>' +
+                                        '<input id="printHQ" type="radio" name="rdoPrintType" value="printHQ" />' +
+                                        '<label for="printHQ">In Tờ Khai Hải Quan</label>' +
+                                    '</td>' +
+                                '</tr>' +
+                                '<tr>' +
+                                    '<td>' +
+                                        '<input id="printKhaiHQ" type="radio" name="rdoPrintType" value="printKhaiHQ" />' +
+                                        '<label for="printKhaiHQ">In Danh Mục Khai Hải Quan (Mẫu 1)</label>' +
+                                    '</td>' +
+                                    '<td>' +
+                                        '<input id="printPaymentRequest" type="radio" name="rdoPrintType" value="printPaymentRequest" />' +
+                                        '<label for="printPaymentRequest">In mẫu payment request</label>' +
+                                    '</td>' +
+                                '</tr>' +
+
+                                '<tr>' +
+                                    '<td>' +
+                                        '<input id="printKhaiHQ02" type="radio" name="rdoPrintType" value="printKhaiHQ02" />' +
+                                        '<label for="printKhaiHQ02">In Danh Mục Khai Hải Quan (Mẫu 2)</label>' +
+                                    '</td>' +
+                                    '<td>' +
+                                        '<input id="printBL" type="radio" name="rdoPrintType" value="printBL" />' +
+                                        '<label for="printBL">In Mẫu BL</label>' +
+                                        '<div id="md_ncu_id" style="display:none">' + result + '</div>' +
+                                    '</td>' +
+                                '</tr>' +
+
+                                '<tr>' +
+                                    '<td>' +
+                                        '<input id="printKhaiHQ03" type="radio" name="rdoPrintType" value="printKhaiHQ03" />' +
+                                        '<label for="printKhaiHQ03">In Danh Mục Khai Hải Quan (HScode)</label>' +
+                                    '</td>' +
+                                    '<td>' +
+
+                                    '</td>' +
+                                '</tr>' +
+                          '</table>' + '<script>$(function(){ $("[name=\'rdoPrintType\']").bind("click", function () { if($(this).attr("value") == "printBL"){ $("#md_ncu_id").css("display","block");  }else{  $("#md_ncu_id").css("display","none");  }  }); });<\/script>';
+
+            $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
+            $('#' + name).dialog({
+                width: 500
+                , modal: true
+                , open: function (event, ui) {
+                    //hide close button.
+                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                }
+                , buttons: [
+                {
+                    id: "btn-print-ok",
+                    text: "In",
+                    click: function () {
+                        var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-pkli').val();
+
+                        var printURL = "PrintControllers/";
+                        var windowSize = "width=700,height=700,scrollbars=yes";
+                        if (typeof printType != 'undefined') {
+                            if (printType == "printPackingList") {
+                                if (pId != null) {
+                                    printURL += "InPackingList/";
+                                    window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Packing List", windowSize);
+                                } else {
+                                    alert('Bạn chưa chọn packing lsit - invoice cần in phiếu packing list');
+                                }
+                            } else if (printType == 'printInvoice') {
+                                if (pId != null) {
+                                    printURL += "InInvoice/";
+                                    window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Invoice", windowSize);
+                                } else {
+                                    alert('Bạn chưa chọn packing lsit - invoice cần in phiếu invoice');
+                                }
+                            } else if (printType == 'printHQ') {
+                                if (pId != null) {
+                                    printURL += "InToKhaiHQ/";
+                                    window.open(printURL + "?c_packinglist_id=" + pId, "In Tờ Khai Hải Quan", windowSize);
+                                } else {
+                                    alert('Bạn chưa chọn packing lsit - invoice cần in phiếu tờ khai hải quan');
+                                }
+                            } else if (printType == 'printKhaiHQ') {
+                                if (pId != null) {
+                                    printURL += "InDanhMucKhaiHQ/";
+                                    window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);
+                                } else {
+                                    alert('Bạn chưa chọn packing lsit - invoice cần in phiếu tờ khai hải quan');
+                                }
+                            } else if (printType == 'printKhaiHQ02') {
+                                if (pId != null) {
+                                    printURL += "InDanhMucKhaiHQ02/";
+                                    window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);
+                                } else {
+                                    alert('Bạn chưa chọn packing lsit - invoice cần in phiếu tờ khai hải quan');
+                                }
+                            } else if (printType == 'printBL') {
+                                if (pId != null) {
+                                    printURL += "InBL/";
+                                    window.open(printURL + "?c_packinglist_id=" + pId + "&md_doitackinhdoanh_id=" + $('#md_ncu_id').find('select').val(), "In Mẫu BL", windowSize);
+                                } else {
+                                    alert('Bạn chưa chọn packing lsit - invoice cần in phiếu book container');
+                                }
+                            } else if (printType == 'printPaymentRequest') {
+                                if (pId != null) {
+                                    printURL += "InPaymentRequest/";
+                                    window.open("SendMail/PaymentRequest.aspx?pklId=" + pId, "In Mẫu PaymentRequest", windowSize);
+                                    //window.open(printURL + "?c_packinglist_id=" + pId, "In Mẫu PaymentRequest", windowSize);
+                                } else {
+                                    alert('Bạn chưa chọn packing lsit - invoice cần in phiếu payment request');
+                                }
+                            } else if (printType == 'printKhaiHQ03') {
+                                if (pId != null) {
+                                    printURL += "InDanhMucKhaiHQ03/";
+                                    window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan (HScode)", windowSize);
+                                    //window.open(printURL + "?c_packinglist_id=" + pId, "In Mẫu PaymentRequest", windowSize);
+                                } else {
+                                    alert('Bạn chưa chọn packing lsit - invoice cần in phiếu tờ khai hải quan');
+                                }
+                            }
+                            else {
+                                if (pId != null) {
+                                    printURL += "InSaleContact/";
+                                    window.open(printURL + "?c_packinglist_id=" + pId, "In Sale Contract", windowSize);
+                                } else {
+                                    alert('Bạn chưa chọn packing lsit - invoice cần in phiếu tờ khai hải quan');
+                                }
+                            }
+                        } else {
+                            alert('Hãy chọn cách in.!');
+                        }
+                    }
+                }
+                , {
+                    id: "btn-print-close",
+                    text: "Thoát",
+                    click: function () {
+                        $(this).dialog("destroy").remove();
+                    }
+                }
+                ]
+            });
+        });
+    }
+
+    function sendMailPKLINV() {
+        var pklId = $('#grid_ds_plivn').jqGrid('getGridParam', 'selrow');
+        if (pklId == null) {
+            alert('Hãy chọn một Packing List - Invoice mà bạn muốn gửi email!');
+        } else {
+             window.open("SendMail/PaymentRequest.aspx?pklId=" + pklId, "Gửi email");
+        }
+    }
+
+   
+</script>
+<DIV class="ui-layout-north ui-widget-content" id="layout-north-plivn">
+    <uc1:jqGrid ID="grid_ds_plivn"
+        Caption="Packing List - Invoice"
+        SortName="pi.ngaytao"
+        BtnPrint="funcPrintPKLI"
+        FuncActive="activePackingListInvoie"
+        FuncSendMail="sendMailPKLINV"
+        FuncTaoPKLCungKH="function(){ add_tab('Tạo Packing List - Invoice Cùng Khách Hàng', 'inc-tao-chungtuxuathang-cungkh.aspx')}"
+        FuncTaoPKLCungPO="function(){ add_tab('Tạo Packing List - Invoice Cùng PO', 'inc-tao-chungtuxuathang-cungpo.aspx')}"
+    
+        UrlFileAction="Controllers/PackingInvoiceController.ashx"
+        ColNames="['c_packinginvoice_id', 'TT' , 'Số Packing List', 'Số Invoice', 'Đơn Hàng'
+                     , 'Ngày Lập', 'Người Lập'
+                     , 'Consignee', 'Notifparty', 'Alsonotifyparty', 'Mv'
+                     , 'Ngày Vận Đơn', 'Nơi Đi', 'Nơi Đến', 'BLNo', 'Commodity', 'Discount', 'Handling Fee'
+                     , 'Diễn Giải Cộng' , 'Giá Trị Cộng', 'Diễn Giải Trừ', 'Giá Trị Trừ'
+                     , 'Diễn Giải Cộng PO', 'Giá Trị Cộng PO', 'Diễn Giải Trừ PO', 'Giá Trị Trừ PO'
+                     , 'Comoodity VN', 'Ngày Mở Tờ Khai', 'Ngày Phải TT'
+                     , 'Total Dis' , 'Total Net', 'Total Gross'
+                     , 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật'
+                     , 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
+        RowNumbers="true"
+        OndblClickRow="function(rowid) { $(this).jqGrid('editGridRow', rowid, {
+                
+                width:900
+                , beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+                }
+                , afterSubmit: function(rs, postdata){
+                    return showMsgDialog(rs); 
+                }
+                
+            }); }"
+        ColModel="[
+            {
+                fixed: true, name: 'c_packinginvoice_id'
+                , index: 'c_packinginvoice_id'
+                , width: 100
+                , hidden: true 
+                , editable:true
+                , edittype: 'text'
+                , key: true
+            },
+            {
+                 fixed: true, name: 'md_trangthai_id'
+                 , index: 'md_trangthai_id'
+                 , editable: false
+                 , width: 100
+                 , edittype: 'text'
+                 , align: 'center'
+                 , formatter: 'imagestatus'
+            },
+            {
+                 fixed: true, name: 'so_pkl'
+                 , index: 'so_pkl'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 1, rowpos: 1 }
+            },
+            {
+                 fixed: true, name: 'so_inv'
+                 , index: 'so_inv'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 1, rowpos: 2 }
+            },
+            {
+                 fixed: true, name: 'sodh'
+                 , index: 'dbo.LayChungTuDonHang(pi.c_packinginvoice_id)'
+                 , editable: false
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 1, rowpos: 2 }
+            },
+            {
+                 fixed: true, name: 'ngaylap'
+                 , index: 'ngaylap'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+                 , formoptions: { colpos: 1, rowpos: 3 }
+            },
+            {
+                 fixed: true, name: 'nguoilap'
+                 , index: 'nguoilap'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 1, rowpos: 4 }
+            },
+            {
+                 fixed: true, name: 'consignee'
+                 , index: 'consignee'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 1, rowpos: 5 }
+            },
+            {
+                 fixed: true, name: 'notifparty'
+                 , index: 'notifparty'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 1, rowpos: 6 }
+            },
+            {
+                 fixed: true, name: 'alsonotifyparty'
+                 , index: 'alsonotifyparty'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 1, rowpos: 7 }
+            },
+            {
+                 fixed: true, name: 'mv'
+                 , index: 'mv'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 1, rowpos: 8 }
+            },
+            {
+                 fixed: true, name: 'etd'
+                 , index: 'etd'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+                 , formoptions: { colpos: 1, rowpos: 9 }
+            },
+            {
+                 fixed: true, name: 'noidi'
+                 , index: 'noidi'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'select'
+                 , editoptions: { dataUrl: 'Controllers/PortController.ashx?action=getoption' }
+                 , formoptions: { colpos: 1, rowpos: 10 }
+            },
+            {
+                 fixed: true, name: 'noiden'
+                 , index: 'noiden'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 1, rowpos: 11 }
+            },
+            {
+                 fixed: true, name: 'blno'
+                 , index: 'blno'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 2, rowpos: 1 }
+            },
+            {
+                 fixed: true, name: 'commodity'
+                 , index: 'commodity'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 2, rowpos: 2 }
+            },
+            {
+                 fixed: true, name: 'discount'
+                 , index: 'discount'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editrules: { number:true, minValue:0 }
+                 , editoptions:{ defaultValue:'0', readonly: 'readonly' }
+                 , formoptions: { colpos: 2, rowpos: 3 }
+            },
+            {
+                 fixed: true, name: 'handling_fee'
+                 , index: 'handling_fee'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editrules: { number:true, minValue:0 }
+                 , editoptions:{ defaultValue:'0' }
+                 , formoptions: { colpos: 2, rowpos: 4 }
+            },
+            {
+                 fixed: true, name: 'diengiai_cong'
+                 , index: 'diengiai_cong'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 2, rowpos: 5 }
+            },
+            {
+                 fixed: true, name: 'giatri_cong'
+                 , index: 'giatri_cong'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editrules: { number:true, minValue:0 }
+                 , editoptions:{ defaultValue:'0' }
+                 , formoptions: { colpos: 2, rowpos: 6 }
+            },
+            {
+                 fixed: true, name: 'diengiai_tru'
+                 , index: 'diengiai_tru'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 2, rowpos: 7 }
+            },
+            {
+                 fixed: true, name: 'giatri_tru'
+                 , index: 'giatri_tru'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editrules: { number:true, minValue:0 }
+                 , editoptions:{ defaultValue:'0' }
+                 , formoptions: { colpos: 2, rowpos: 8 }
+            },
+            
+            
+            
+            
+            {
+                 fixed: true, name: 'diengiaicong_po'
+                 , index: 'diengiaicong_po'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 3, rowpos: 5 }
+                 , editoptions:{ readonly: 'readonly' }
+            },
+            {
+                 fixed: true, name: 'giatricong_po'
+                 , index: 'giatricong_po'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editrules: { number:true, minValue:0 }
+                 , editoptions:{ defaultValue:'0', readonly: 'readonly' }
+                 , formoptions: { colpos: 3, rowpos: 6 }
+            },
+            {
+                 fixed: true, name: 'diengiaitru_po'
+                 , index: 'diengiaitru_po'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions:{ readonly: 'readonly' }
+                 , formoptions: { colpos: 3, rowpos: 7 }
+            },
+            {
+                 fixed: true, name: 'giatritru_po'
+                 , index: 'giatritru_po'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editrules: { number:true, minValue:0 }
+                 , editoptions:{ defaultValue:'0', readonly: 'readonly' }
+                 , formoptions: { colpos:3, rowpos: 8 }
+            },
+            {
+                 fixed: true, name: 'commodityvn'
+                 , index: 'commodityvn'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , formoptions: { colpos: 2, rowpos: 9 }
+            },
+            {
+                 fixed: true, name: 'ngay_motokhai'
+                 , index: 'ngay_motokhai'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+                 , formoptions: { colpos: 2, rowpos: 10 }
+            },
+            {
+                 fixed: true, name: 'ngay_phaitt'
+                 , index: 'ngay_phaitt'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+                 , formoptions: { colpos: 2, rowpos: 11 }
+            },
+            {
+                 fixed: true, name: 'totaldis'
+                 , index: 'totaldis'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions:{ readonly: 'readonly' }
+                 , formoptions: { colpos: 2, rowpos: 12 }
+            },
+            {
+                 fixed: true, name: 'totalnet'
+                 , index: 'totalnet'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions:{ readonly: 'readonly' }
+                 , formoptions: { colpos: 2, rowpos: 13 }
+            },            
+            {
+                 fixed: true, name: 'totalgross'
+                 , index: 'totalgross'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions:{ readonly: 'readonly' }
+                 , formoptions: { colpos: 2, rowpos: 14 }
+            },
+            {
+                fixed: true, name: 'ngaytao'
+                , index: 'ngaytao'
+                , width: 100
+                , editable:false
+                , edittype: 'text'
+                , hidden: true 
+                , editrules:{ edithidden : true }
+            },
+            {
+                fixed: true, name: 'nguoitao'
+                , index: 'nguoitao'
+                , width: 100
+                , editable:false
+                , edittype: 'text'
+                , hidden: true 
+                , editrules:{ edithidden : true }
+            },
+            {
+                fixed: true, name: 'ngaycapnhat'
+                , index: 'ngaycapnhat'
+                , width: 100
+                , editable:false
+                , edittype: 'text'
+                , hidden: true 
+                , editrules:{ edithidden : true }
+            },
+            {
+                fixed: true, name: 'nguoicapnhat'
+                , index: 'nguoicapnhat'
+                , width: 100
+                , editable:false
+                , edittype: 'text'
+                , hidden: true 
+                , editrules:{ edithidden : true }
+            },
+            {
+                fixed: true, name: 'mota'
+                , index: 'mota'
+                , width: 100
+                , editable:true
+                , edittype: 'textarea'
+                , formoptions: { colpos: 2, rowpos: 15 }
+            },
+            {
+                fixed: true, name: 'hoatdong', hidden: true
+                , index: 'hoatdong'
+                , width: 100
+                , editable:true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions:{ value:'True:False', defaultValue: 'True' }
+                , formatter: 'checkbox'
+            }
+            ]"
+        GridComplete="var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 90);"
+        FilterToolbar="true"
+        Height="170"
+        MultiSelect="false"
+        ShowEdit="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
+        ShowDel="<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
+        EditFormOptions=" 
+                width:900
+                , beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+                }
+                , afterSubmit: function(rs, postdata){
+                    return showMsgDialog(rs); 
+                }
+            "
+        ViewFormOptions="
+                width:900
+                , beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+                }
+                , afterSubmit: function(rs, postdata){
+                    return showMsgDialog(rs); 
+                }
+            "
+        DelFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+                }
+                , afterSubmit: function(rs, postdata){
+                    return showMsgDialog(rs); 
+                }
+            "
+        OnSelectRow="function(ids) {
+		                if(ids == null) {
+			                ids=0;
+			                if($('#grid_ds_chitietplivn').jqGrid('getGridParam','records') &gt; 0 )
+			                {
+				                $('#grid_ds_chitietplivn').jqGrid('setGridParam',{url:'Controllers/DongPackingListInvoiceController.ashx?&pklId='+ids,page:1});
+				                $('#grid_ds_chitietplivn').jqGrid().trigger('reloadGrid');
+				            } 
+				        } else {
+                            $.ajax({
+                                    url: 'Controllers/PackingInvoiceController.ashx?action=getinvoiceinformation&pakId='+ids,
+                                    beforeSend:function(){
+                                        $('#grid_ds_plivn').jqGrid('setCaption','đang tải...');
+                                    },
+                                    success: function(data){
+                                         $('#grid_ds_plivn').jqGrid('setCaption', data);
+                                         $('#grid_ds_chitietplivn').jqGrid('setGridParam',{url:'Controllers/DongPackingListInvoiceController.ashx?&pklId='+ids,page:1});
+			                            $('#grid_ds_chitietplivn').jqGrid().trigger('reloadGrid');	
+                                    }
+                                });    
+                            
+			                		
+		                } }"
+        runat="server" />
+</DIV>
+
+<DIV class="ui-layout-center ui-widget-content" id="lay-center-plivn" style="padding:0;"> 
+			<uc1:jqGrid  ID="grid_ds_chitietplivn" 
+            SortName="ma_sanpham" 
+            SortOrder="asc"
+            UrlFileAction="Controllers/DongPackingListInvoiceController.ashx" 
+            ColNames="['c_dongpklinv_id', 'Packing List Invoice', 'TT', 'STT', 'Mã SP', 'Mã SP', 'Mô Tả TA', 'Mã SP Khách', 'Số Lượng', 'Giá', 'Thành Tiền',  'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
+            RowNumbers="true"
+            ColModel = "[
+            {
+                fixed: true, name: 'c_dongpklinv_id'
+                , index: 'c_dongpklinv_id'
+                , width: 100
+                , hidden: true 
+                , editable:true
+                , edittype: 'text'
+                , key: true
+            },
+            {
+                 fixed: true, name: 'c_packinginvoice_id'
+                 , index: 'c_packinginvoice_id'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , hidden: true
+            },
+            {
+                fixed: true, name: 'trangthai'
+                , index: 'sp.trangthai'
+                , width: 100
+                , editable:false
+                , formatter:'imagestatus'
+                , align: 'center'
+                , search: false
+                , viewable: false
+                , sortable: false
+            },
+            {
+                fixed: true, name: 'line'
+                , index: 'line'
+                , width: 50
+                , edittype: 'text'
+                , editable:true
+                , align:'right'
+            },
+            {
+                fixed: true, name: 'sanpham_id'
+                , index: 'sanpham_id'
+                , width: 100
+                , hidden: true 
+                , editable:true
+                , edittype: 'text'
+            },
+            {
+                fixed: true, name: 'ma_sanpham'
+                , index: 'ma_sanpham'
+                , width: 100
+                , edittype: 'text'
+                , editable:true
+                , editoptions: { 
+                    dataInit : function (elem) { 
+                        $(elem).combogrid({
+                            searchIcon: true,
+                            width: '480px',
+                            url: 'Controllers/ProductController.ashx?action=getcombogrid',
+                            colModel: [
+                                { 'columnName': 'md_sanpham_id', 'width': '0', 'label': 'ID', hidden:true }
+                              , { 'columnName': 'ma_sanpham', 'width': '50', 'label': 'Mã SP', 'align':'left'}
+                              , { 'columnName': 'mota_tiengviet', 'width': '50', 'label': 'Mô Tả TV' , 'align':'left'}],
+                              select: function(event, ui) {
+                                    $(elem).val(ui.item.ma_sanpham);
+                                    $('#sanpham_id').val(ui.item.md_sanpham_id);
+                                    return false;
+                              }
+                        });
+                    } 
+                }
+            },
+            {
+                fixed: true, name: 'mota_tienganh'
+                , index: 'mota_tienganh'
+                , width: 200
+                , edittype: 'text'
+                , editable:true
+            },
+            {
+                fixed: true, name: 'ma_sanpham_khach'
+                , index: 'dpk.ma_sanpham_khach'
+                , width: 100
+                , edittype: 'text'
+                , editable:true
+            },
+            {
+                fixed: true, name: 'soluong'
+                , index: 'soluong'
+                , width: 100
+                , edittype: 'text'
+                , editable:true
+                , editrules: { required:true, number:true, minValue:0 }
+                , editoptions:{ defaultValue:'0' }
+                , align:'right'
+                , formatter:'numberic'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
+            },
+            {
+                fixed: true, name: 'gia'
+                , index: 'gia'
+                , width: 100
+                , edittype: 'text'
+                , editable:true
+                , editrules: { required:true, number:true, minValue:0 }
+                , editoptions:{ defaultValue:'0' }
+                , align:'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+            },
+            {
+                fixed: true, name: 'thanhtien'
+                , index: 'thanhtien'
+                , width: 100
+                , edittype: 'text'
+                , editable:false
+                , align:'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+            },
+            {
+                fixed: true, name: 'ngaytao'
+                , index: 'ngaytao'
+                , width: 100
+                , editable:false
+                , edittype: 'text'
+                , hidden: true 
+                , editrules:{ edithidden : true }
+            },
+            {
+                fixed: true, name: 'nguoitao'
+                , index: 'nguoitao'
+                , width: 100
+                , editable:false
+                , edittype: 'text'
+                , hidden: true 
+                , editrules:{ edithidden : true }
+            },
+            {
+                fixed: true, name: 'ngaycapnhat'
+                , index: 'ngaycapnhat'
+                , width: 100
+                , editable:false
+                , edittype: 'text'
+                , hidden: true 
+                , editrules:{ edithidden : true }
+            },
+            {
+                fixed: true, name: 'nguoicapnhat'
+                , index: 'nguoicapnhat'
+                , width: 100
+                , editable:false
+                , edittype: 'text'
+                , hidden: true 
+                , editrules:{ edithidden : true }
+            },
+            {
+                fixed: true, name: 'mota'
+                , index: 'mota'
+                , width: 500
+                , editable:true
+                , edittype: 'textarea'
+            },
+            {
+                fixed: true, name: 'hoatdong', hidden: true
+                , index: 'hoatdong'
+                , width: 100
+                , editable:true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions:{ value:'True:False', defaultValue: 'True' }
+                , formatter: 'checkbox'
+            }
+            ]"
+            Caption = "Chi Tiết Packing List - Invoice"
+            GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 90);"
+            FilterToolbar = "true"
+            Height = "150"
+            MultiSelect = "false" 
+            ViewFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+                }
+            "
+            runat="server" />
+	</DIV> 
+
+<script>
+
+    function capnhatphicongphitru() {
+        var msg = "";
+        var id = $('#grid_ds_plivn').jqGrid('getGridParam', 'selrow');
+
+        if (id == null) {
+            alert('Hãy chọn một Packing List - Invoice mà bạn muốn cập nhật!');
+        } else {
+            msg = "Cập nhật phí cộng, phí trừ.";
+            var p = '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><span id="dialog-caution">' + msg + '</span></p>';
+            var h3 = '<h3 style="padding: 10px" class="ui-state-highlight ui-corner-all">' + p + '<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div></h3>';
+
+            // append dialog-taoky to body
+            $('body').append('<div title="Thông Báo" id=\"dialog-capnhatinvoice\">' + h3 + '</div>');
+
+            // create new dialog
+            $('#dialog-capnhatinvoice').dialog({
+                modal: true
+            , open: function (event, ui) {
+                //hide close button.
+                $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+            }
+            , buttons:
+            [
+                {
+                    id: "btn-active",
+                    text: "Có",
+                    click: function () {
+                        $("#wait").css("display", "block");
+                        $("#btn-active").button("disable");
+                        $("#btn-close").button("disable");
+
+
+                        $.get("Controllers/PackingInvoiceController.ashx?action=updatephicongphitru&pakId=" + id, function (result) {
+                            //$('#dialog-caution').css({ 'color': 'green' });
+                            $('#dialog-capnhatinvoice').find('#dialog-caution').html(result.split(':')[1]);
+                            $('#grid_ds_plivn').jqGrid().trigger('reloadGrid');
+                            setTimeout(function () {
+                                $("#grid_ds_plivn").jqGrid('setSelection', result.split(':')[0]);
+                            }, 1000);
+                            $("#wait").css("display", "none");
+                            $("#btn-close span").text("Thoát");
+                            $("#btn-close").button("enable");
+                        });
+                    }
+                },
+                {
+                    id: "btn-close",
+                    text: "Không",
+                    click: function () {
+                        $(this).dialog("destroy").remove();
+                    }
+                }
+            ]
+            });
+        }
+    }
+
+    setTimeout(function () {
+        $('#grid_ds_plivn-pager_left table tr').append(
+            '<td onclick="capnhatphicongphitru()" class="ui-pg-button ui-corner-all" title="Cập nhật phí cộng phí trừ" id="capnhat_grid_ds_plivn">' +
+            '<div class="ui-pg-div"><span class="ui-icon ui-icon-gear"></span></div><td>')
+        , 5000
+    });
+</script>
+
+<style type="text/css">
+
+    #capnhat_grid_ds_plivn:hover
+    {
+        border: 1px solid #f5ad66;
+        background: #f5f0e5 url(images/ui-bg_glass_100_f5f0e5_1x400.png) 50% 50% repeat-x;
+        font-weight: normal;
+        color: #a46313;
+        padding:0
+    }
+    #capnhat_grid_ds_plivn:active
+    {
+        cursor:wait
+    }
+</style>
+
