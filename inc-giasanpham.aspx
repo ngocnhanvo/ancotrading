@@ -355,7 +355,6 @@
             FilterToolbar = "true"
             SortName="gsp.md_giasanpham_id" 
             UrlFileAction="Controllers/ProductPriceController.ashx" 
-            ColNames="['md_giasanpham_id', 'Tên Phiên Bản', 'Tên Sản Phẩm', 'Tên Sản Phẩm', 'Giá', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', ' Mã Số Khách', 'Hoạt động']"
             RowNumbers="true"
             OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid,{ 
             
@@ -372,8 +371,10 @@
             }); }"
             ColModel = "[
             {
-                fixed: true, name: 'md_giasanpham_id'
+                fixed: true
+                , name: 'md_giasanpham_id'
                 , index: 'gsp.md_giasanpham_id'
+                , label: 'md_giasanpham_id'
                 , width: 100
                 , hidden: true 
                 , editable:true
@@ -381,16 +382,20 @@
                 , key: true
             },
             {
-                 fixed: true, name: 'md_phienbangia_id'
+                 fixed: true
+                 , name: 'md_phienbangia_id'
                  , index: 'pbg.md_phienbangia_id'
+                 , label: 'Tên Phiên Bản'
                  , width: 100
                  , edittype: 'text'
                  , editable: true
                  , hidden: true
             },
             {
-                fixed: true, name: 'sanpham_id'
+                fixed: true
+                , name: 'sanpham_id'
                 , index: 'sp.md_sanpham_id'
+                , label: 'Tên Sản Phẩm'
                 , width: 100
                 , hidden: true 
                 , editable:true
@@ -398,8 +403,10 @@
                 , editrules: { required:true }
             },
             {
-                fixed: true, name: 'masp'
+                fixed: true
+                , name: 'masp'
                 , index: 'sp.ma_sanpham'
+                , label: 'Tên Sản Phẩm'
                 , width: 100
                 , edittype: 'text'
                 , editable:true
@@ -424,8 +431,10 @@
                 , editrules: { required:true }
             },
             {
-                fixed: true, name: 'gia'
+                fixed: true
+                , name: 'gia'
                 , index: 'gsp.gia'
+                , label: 'Giá'
                 , width: 100
                 , edittype: 'text'
                 , editable:true
@@ -435,42 +444,65 @@
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
             },
             {
-                fixed: true, name: 'ngaytao'
+                fixed: true
+                , name: 'ngaytao'
+                , label: 'Ngày Tạo'
                 , index: 'gsp.ngaytao'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
             },
             {
-                fixed: true, name: 'nguoitao'
+                fixed: true
+                , name: 'nguoitao'
+                , label: 'Người Tạo'
                 , index: 'gsp.nguoitao'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
             },
             {
-                fixed: true, name: 'ngaycapnhat'
+                fixed: true
+                , name: 'ngaycapnhat'
                 , index: 'gsp.ngaycapnhat'
+                , label: 'Ngày Cập Nhật'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
             },
             {
-                fixed: true, name: 'nguoicapnhat'
+                fixed: true
+                , name: 'nguoicapnhat'
                 , index: 'gsp.nguoicapnhat'
+                , label: 'Người Cập Nhật'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
             },
             {
-                fixed: true, name: 'mota'
+                fixed: true
+                , name: 'mota'
                 , index: 'gsp.mota'
+                , label: 'Mã Số Khách'
                 , width: 100
                 , editable:true
                 , edittype: 'textarea'
             },
             {
-                fixed: true, name: 'hoatdong', hidden: true
+                fixed: true
+                , name: 'barcode'
+                , index: 'gsp.barcode'
+                , label: 'Mã Barcode'
+                , hidden: true
+                , editrules:{ edithidden: true }
+                , width: 100
+                , editable:true
+            },
+            {
+                fixed: true
+                , name: 'hoatdong'
+                , label: 'Hoạt động'
+                , hidden: true
                 , index: 'gsp.hoatdong'
                 , width: 100
                 , editable:true

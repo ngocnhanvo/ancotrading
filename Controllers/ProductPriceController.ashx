@@ -9,7 +9,7 @@ public class ProductPriceController : IHttpHandler
 {
     private LinqDBDataContext db = new LinqDBDataContext();
 
-    
+
     public void ProcessRequest(HttpContext context)
     {
         String action, oper;
@@ -42,7 +42,7 @@ public class ProductPriceController : IHttpHandler
                 break;
         }
     }
-    
+
     public void activeVersion(HttpContext context)
     {
         String phienbangia_id = context.Request.QueryString["vId"];
@@ -52,10 +52,10 @@ public class ProductPriceController : IHttpHandler
         {
             context.Response.Write("Hiện trạng thái của phiên bản giá đã là hiệu lực!");
         }
-		else if(count_gsp <= 0)
-		{
-			context.Response.Write("Phiên bản giá chưa có dữ liệu!");
-		}
+        else if(count_gsp <= 0)
+        {
+            context.Response.Write("Phiên bản giá chưa có dữ liệu!");
+        }
         else {
             pbg.md_trangthai_id = "HIEULUC";
             db.SubmitChanges();
@@ -93,6 +93,7 @@ public class ProductPriceController : IHttpHandler
                 gsp.md_sanpham_id = context.Request.Form["sanpham_id"];
                 gsp.gia = decimal.Parse(context.Request.Form["gia"]);
                 gsp.mota = context.Request.Form["mota"];
+                gsp.barcode = context.Request.Form["barcode"];
 
                 gsp.hoatdong = hd;
                 gsp.ngaycapnhat = DateTime.Now;
@@ -116,10 +117,10 @@ public class ProductPriceController : IHttpHandler
             {
                 hd = true;
             }
-            
+
             String md_sanpham_id = context.Request.Form["sanpham_id"];
             String md_phienbangia_id = context.Request.Form["md_phienbangia_id"];
-            
+
             String select = "select md_trangthai_id from md_phienbangia where md_phienbangia_id = @md_phienbangia_id";
             String isActive = (String)mdbc.ExecuteScalar(select, "@md_phienbangia_id", md_phienbangia_id);
             if (isActive.Equals("HIEULUC"))
@@ -143,6 +144,7 @@ public class ProductPriceController : IHttpHandler
                         md_sanpham_id = md_sanpham_id,
                         gia = decimal.Parse(context.Request.Form["gia"]),
                         mota = context.Request.Form["mota"],
+                        barcode = context.Request.Form["barcode"],
                         hoatdong = hd,
                         ngaytao = DateTime.Now,
                         ngaycapnhat = DateTime.Now,
@@ -155,7 +157,7 @@ public class ProductPriceController : IHttpHandler
                     jqGridHelper.Utils.writeResult(1, "Đã thêm mới thành công!");
                 }
             }
-            
+
         }catch(Exception ex){
             jqGridHelper.Utils.ShowMsg(ex.Message);
         }
@@ -191,24 +193,29 @@ public class ProductPriceController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
-        
+
+
         String cateId = context.Request.QueryString["cateId"];
-        
-        String sqlCount = "SELECT COUNT(*) AS count FROM md_giasanpham gsp, md_sanpham sp, md_phienbangia pbg " +
-            " WHERE gsp.md_sanpham_id = sp.md_sanpham_id " +
-            " AND gsp.md_phienbangia_id = pbg.md_phienbangia_id " +
-            " AND gsp.md_phienbangia_id = N'{0}'"+ filter;
-        
+
+        string sqlCount = @"
+            SELECT 
+                COUNT(1) AS count 
+            FROM 
+                md_giasanpham gsp, md_sanpham sp
+            WHERE 
+                gsp.md_sanpham_id = sp.md_sanpham_id
+                AND gsp.md_phienbangia_id = N'{0}'
+        ";
+
         if (cateId != null)
         {
-            sqlCount = string.Format(sqlCount, cateId);
+            sqlCount = string.Format(sqlCount, cateId, filter);
         }
         else
         {
-            sqlCount = string.Format(sqlCount, 0);
+            sqlCount = string.Format(sqlCount, 0, filter);
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -235,26 +242,37 @@ public class ProductPriceController : IHttpHandler
             sidx = "gia";
         }
 
-        string strsql = "select * from( " +
-            " select gsp.md_giasanpham_id, pbg.md_phienbangia_id, " +
-            " sp.md_sanpham_id, sp.ma_sanpham as tensp, gsp.gia, " +
-            " gsp.ngaytao, gsp.nguoitao, gsp.ngaycapnhat, gsp.nguoicapnhat, " +
-            " gsp.mota, gsp.hoatdong,  ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            " FROM md_giasanpham gsp, md_sanpham sp, md_phienbangia pbg " + 
-            " WHERE gsp.md_sanpham_id = sp.md_sanpham_id " +
-            " AND gsp.md_phienbangia_id = pbg.md_phienbangia_id " + filter +
-            " AND gsp.md_phienbangia_id = N'{0}')P " +
-            " WHERE RowNum > @start AND RowNum < @end";
-        
+        string strsql = @"
+            select * from(
+                select 
+                    gsp.md_giasanpham_id
+                    , gsp.md_phienbangia_id
+                    , sp.md_sanpham_id
+                    , sp.ma_sanpham as tensp
+                    , gsp.gia
+                    , gsp.ngaytao
+                    , gsp.nguoitao
+                    , gsp.ngaycapnhat
+                    , gsp.nguoicapnhat
+                    , gsp.mota
+                    , gsp.barcode
+                    , gsp.hoatdong
+                    , ROW_NUMBER() OVER (ORDER BY {1} {2}) as RowNum
+                FROM md_giasanpham gsp, md_sanpham sp
+                WHERE 
+                    gsp.md_sanpham_id = sp.md_sanpham_id
+                    AND gsp.md_phienbangia_id = N'{0}' {3}
+            )P
+            WHERE RowNum > @start AND RowNum < @end";
+
         if (cateId != null)
         {
-            strsql = string.Format(strsql, cateId);
+            strsql = string.Format(strsql, cateId, sidx, sord, filter);
         }
         else
         {
-            strsql = string.Format(strsql, 0);
+            strsql = string.Format(strsql, 0, sidx, sord, filter);
         }
-        
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
@@ -275,6 +293,7 @@ public class ProductPriceController : IHttpHandler
             xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[9] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[10] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[11] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

@@ -4,16 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.UI;
-using System.Data.SqlClient;
-using System.Web.Security;
 using System.Data;
-using System.Web.Configuration;
 using System.Web.Script.Serialization;
-using System.Data.Linq;
 using System.IO;
-using System.Collections.Generic;
-using Newtonsoft.Json;
 
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -1017,8 +1010,8 @@ public class API_Android : IHttpHandler {
         {
             if (gia_fob < 0)
             {
-                string gia_fob_str = UserUtils.get_giasanpham(context, c_baogia_id, pro.md_sanpham_id, db);
-                try { gia_fob = decimal.Parse(gia_fob_str); } catch { gia_fob = 0; }
+                var itemJS = UserUtils.get_giasanpham(context, c_baogia_id, pro.md_sanpham_id, db);
+                try { gia_fob = decimal.Parse(itemJS["gia"].ToString()); } catch { gia_fob = 0; }
             }
             String dvt_inner = "", dvt_outer = "", ghichu_vachngan = "", trangthai = "BT", md_donggoi_id = "";
 
@@ -1252,8 +1245,8 @@ public class API_Android : IHttpHandler {
             md_nhacungungmacdinh ncumd = db.md_nhacungungmacdinhs.FirstOrDefault(s => s.md_sanpham_id == pro.md_sanpham_id & s.macdinh == true);
             if (gia_fob < 0)
             {
-                string gia_fob_str = UserUtils.get_giasanpham(context, c_donhang_id, pro.md_sanpham_id, db);
-                try { gia_fob = decimal.Parse(gia_fob_str); } catch { gia_fob = 0; }
+                var itemJS = UserUtils.get_giasanpham(context, c_donhang_id, pro.md_sanpham_id, db);
+                try { gia_fob = decimal.Parse(itemJS["gia"].ToString()); } catch { gia_fob = 0; }
             }
             String dvt_inner = "", dvt_outer = "", ghichu_vachngan = "", trangthai = "BT", md_donggoi_id = "";
             bool? doigia_donggoi = false;

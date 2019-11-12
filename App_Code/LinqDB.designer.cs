@@ -9284,6 +9284,8 @@ public partial class c_danhsachdathang : INotifyPropertyChanging, INotifyPropert
 	
 	private string _trangthai;
 	
+	private System.Nullable<bool> _vinhgia_vnd;
+	
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -9338,6 +9340,8 @@ public partial class c_danhsachdathang : INotifyPropertyChanging, INotifyPropert
     partial void Onngay_tigiaChanged();
     partial void OntrangthaiChanging(string value);
     partial void OntrangthaiChanged();
+    partial void Onvinhgia_vndChanging(System.Nullable<bool> value);
+    partial void Onvinhgia_vndChanged();
     #endregion
 	
 	public c_danhsachdathang()
@@ -9705,7 +9709,7 @@ public partial class c_danhsachdathang : INotifyPropertyChanging, INotifyPropert
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota", DbType="NVarChar(255)")]
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota", DbType="NVarChar(MAX)")]
 	public string mota
 	{
 		get
@@ -9845,6 +9849,26 @@ public partial class c_danhsachdathang : INotifyPropertyChanging, INotifyPropert
 		}
 	}
 	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_vinhgia_vnd", DbType="Bit")]
+	public System.Nullable<bool> vinhgia_vnd
+	{
+		get
+		{
+			return this._vinhgia_vnd;
+		}
+		set
+		{
+			if ((this._vinhgia_vnd != value))
+			{
+				this.Onvinhgia_vndChanging(value);
+				this.SendPropertyChanging();
+				this._vinhgia_vnd = value;
+				this.SendPropertyChanged("vinhgia_vnd");
+				this.Onvinhgia_vndChanged();
+			}
+		}
+	}
+	
 	public event PropertyChangingEventHandler PropertyChanging;
 	
 	public event PropertyChangedEventHandler PropertyChanged;
@@ -9950,6 +9974,8 @@ public partial class c_dongdonhang : INotifyPropertyChanging, INotifyPropertyCha
 	
 	private System.Nullable<double> _discount;
 	
+	private string _barcode;
+	
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -10032,6 +10058,8 @@ public partial class c_dongdonhang : INotifyPropertyChanging, INotifyPropertyCha
     partial void OngiachuanChanged();
     partial void OndiscountChanging(System.Nullable<double> value);
     partial void OndiscountChanged();
+    partial void OnbarcodeChanging(string value);
+    partial void OnbarcodeChanged();
     #endregion
 	
 	public c_dongdonhang()
@@ -10815,6 +10843,26 @@ public partial class c_dongdonhang : INotifyPropertyChanging, INotifyPropertyCha
 				this._discount = value;
 				this.SendPropertyChanged("discount");
 				this.OndiscountChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_barcode", DbType="NVarChar(MAX)")]
+	public string barcode
+	{
+		get
+		{
+			return this._barcode;
+		}
+		set
+		{
+			if ((this._barcode != value))
+			{
+				this.OnbarcodeChanging(value);
+				this.SendPropertyChanging();
+				this._barcode = value;
+				this.SendPropertyChanged("barcode");
+				this.OnbarcodeChanged();
 			}
 		}
 	}
@@ -12063,7 +12111,7 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota_tiengviet", DbType="NVarChar(255)")]
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota_tiengviet", DbType="NVarChar(MAX)")]
 	public string mota_tiengviet
 	{
 		get
@@ -12083,7 +12131,7 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota_tienganh", DbType="NVarChar(255)")]
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota_tienganh", DbType="NVarChar(MAX)")]
 	public string mota_tienganh
 	{
 		get
@@ -12143,7 +12191,7 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_huongdan_dathang", DbType="NVarChar(255)")]
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_huongdan_dathang", DbType="NVarChar(MAX)")]
 	public string huongdan_dathang
 	{
 		get
@@ -12183,7 +12231,7 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tem_dan", DbType="NVarChar(255)")]
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tem_dan", DbType="NVarChar(MAX)")]
 	public string tem_dan
 	{
 		get
@@ -12383,7 +12431,7 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota", DbType="NVarChar(255)")]
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota", DbType="NVarChar(MAX)")]
 	public string mota
 	{
 		get
@@ -12703,7 +12751,7 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ghichu_vachngan", DbType="NVarChar(500)")]
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ghichu_vachngan", DbType="NVarChar(MAX)")]
 	public string ghichu_vachngan
 	{
 		get
@@ -19430,6 +19478,8 @@ public partial class c_nhapxuat : INotifyPropertyChanging, INotifyPropertyChange
 	
 	private System.Nullable<System.DateTime> _ngay_tigia;
 	
+	private System.Nullable<bool> _vinhgia_vnd;
+	
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -19498,6 +19548,8 @@ public partial class c_nhapxuat : INotifyPropertyChanging, INotifyPropertyChange
     partial void OnsophieunhapChanged();
     partial void Onngay_tigiaChanging(System.Nullable<System.DateTime> value);
     partial void Onngay_tigiaChanged();
+    partial void Onvinhgia_vndChanging(System.Nullable<bool> value);
+    partial void Onvinhgia_vndChanged();
     #endregion
 	
 	public c_nhapxuat()
@@ -20141,6 +20193,26 @@ public partial class c_nhapxuat : INotifyPropertyChanging, INotifyPropertyChange
 				this._ngay_tigia = value;
 				this.SendPropertyChanged("ngay_tigia");
 				this.Onngay_tigiaChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_vinhgia_vnd", DbType="Bit")]
+	public System.Nullable<bool> vinhgia_vnd
+	{
+		get
+		{
+			return this._vinhgia_vnd;
+		}
+		set
+		{
+			if ((this._vinhgia_vnd != value))
+			{
+				this.Onvinhgia_vndChanging(value);
+				this.SendPropertyChanging();
+				this._vinhgia_vnd = value;
+				this.SendPropertyChanged("vinhgia_vnd");
+				this.Onvinhgia_vndChanged();
 			}
 		}
 	}
@@ -31830,6 +31902,8 @@ public partial class md_giasanpham : INotifyPropertyChanging, INotifyPropertyCha
 	
 	private System.Nullable<bool> _hoatdong;
 	
+	private string _barcode;
+	
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -31854,6 +31928,8 @@ public partial class md_giasanpham : INotifyPropertyChanging, INotifyPropertyCha
     partial void OnmotaChanged();
     partial void OnhoatdongChanging(System.Nullable<bool> value);
     partial void OnhoatdongChanged();
+    partial void OnbarcodeChanging(string value);
+    partial void OnbarcodeChanged();
     #endregion
 	
 	public md_giasanpham()
@@ -32057,6 +32133,26 @@ public partial class md_giasanpham : INotifyPropertyChanging, INotifyPropertyCha
 				this._hoatdong = value;
 				this.SendPropertyChanged("hoatdong");
 				this.OnhoatdongChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_barcode", DbType="NVarChar(2000)")]
+	public string barcode
+	{
+		get
+		{
+			return this._barcode;
+		}
+		set
+		{
+			if ((this._barcode != value))
+			{
+				this.OnbarcodeChanging(value);
+				this.SendPropertyChanging();
+				this._barcode = value;
+				this.SendPropertyChanged("barcode");
+				this.OnbarcodeChanged();
 			}
 		}
 	}
@@ -42880,6 +42976,12 @@ public partial class nhanvien : INotifyPropertyChanging, INotifyPropertyChanged
 	
 	private string _email_cc;
 	
+	private string _otp;
+	
+	private System.Nullable<System.DateTime> _otp_created;
+	
+	private System.Nullable<int> _otp_used;
+	
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -42918,6 +43020,12 @@ public partial class nhanvien : INotifyPropertyChanging, INotifyPropertyChanged
     partial void Onemail_passChanged();
     partial void Onemail_ccChanging(string value);
     partial void Onemail_ccChanged();
+    partial void OnotpChanging(string value);
+    partial void OnotpChanged();
+    partial void Onotp_createdChanging(System.Nullable<System.DateTime> value);
+    partial void Onotp_createdChanged();
+    partial void Onotp_usedChanging(System.Nullable<int> value);
+    partial void Onotp_usedChanged();
     #endregion
 	
 	public nhanvien()
@@ -43261,6 +43369,66 @@ public partial class nhanvien : INotifyPropertyChanging, INotifyPropertyChanged
 				this._email_cc = value;
 				this.SendPropertyChanged("email_cc");
 				this.Onemail_ccChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_otp", DbType="VarChar(6)")]
+	public string otp
+	{
+		get
+		{
+			return this._otp;
+		}
+		set
+		{
+			if ((this._otp != value))
+			{
+				this.OnotpChanging(value);
+				this.SendPropertyChanging();
+				this._otp = value;
+				this.SendPropertyChanged("otp");
+				this.OnotpChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_otp_created", DbType="DateTime")]
+	public System.Nullable<System.DateTime> otp_created
+	{
+		get
+		{
+			return this._otp_created;
+		}
+		set
+		{
+			if ((this._otp_created != value))
+			{
+				this.Onotp_createdChanging(value);
+				this.SendPropertyChanging();
+				this._otp_created = value;
+				this.SendPropertyChanged("otp_created");
+				this.Onotp_createdChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_otp_used", DbType="Int")]
+	public System.Nullable<int> otp_used
+	{
+		get
+		{
+			return this._otp_used;
+		}
+		set
+		{
+			if ((this._otp_used != value))
+			{
+				this.Onotp_usedChanging(value);
+				this.SendPropertyChanging();
+				this._otp_used = value;
+				this.SendPropertyChanged("otp_used");
+				this.Onotp_usedChanged();
 			}
 		}
 	}

@@ -3,29 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
 using System.Data;
-using System.Data.SqlClient;
-using System.IO;
-using NPOI.HSSF.UserModel;
-using NPOI.HPSF;
-using NPOI.POIFS.FileSystem;
-using NPOI.SS.UserModel;
-using NPOI.SS.Util;
-using System.Data;
-using HSSFUtils;
-using NPOI.HSSF;
-using NPOI.HSSF.Util;
-using NPOI.DDF;
-using NPOI.HSSF.Model;
-using NPOI.HSSF.Record;
-using NPOI.HSSF.Record.Aggregates;
-using NPOI.HSSF.Record.AutoFilter;
 using ExcelLibrary.SpreadSheet;
-using ExcelLibrary;
 
 public class CreateQuotationFromExcel : IHttpHandler 
 {
@@ -192,8 +171,8 @@ public class CreateQuotationFromExcel : IHttpHandler
                 if (sp != null)
                 {
                     try { 
-                        string gia = UserUtils.get_giasanpham(context, id, sp.md_sanpham_id, db);
-                        giafob = decimal.Parse(gia);
+                        var itemJS = UserUtils.get_giasanpham(context, id, sp.md_sanpham_id, db);
+                        giafob = decimal.Parse(itemJS["gia"].ToString());
                     } catch { }
                     
                     docquyen = check_hanghoadocquyen(sp.md_sanpham_id, khachhang_id);

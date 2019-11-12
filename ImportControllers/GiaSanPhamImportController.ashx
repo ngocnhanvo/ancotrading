@@ -49,7 +49,7 @@ public class GiaSanPhamImportController : IHttpHandler
 					String cellTenPB = row.GetCell(1).Value == null ? String.Empty : row.GetCell(1).Value.ToString();
 					decimal cellGia = row.GetCell(2).Value == null ? 0 : decimal.Parse(row.GetCell(2).Value.ToString());
 					String cellMoTa = row.GetCell(3).Value == null ? String.Empty : row.GetCell(3).Value.ToString();
-					
+					String cellBarCode = row.GetCell(4).Value == null ? String.Empty : row.GetCell(4).Value.ToString();
 					md_phienbangia pbg = ImportUtils.getPhienBanGia(cellTenPB);
 					md_sanpham sp = ImportUtils.getSanPham(cellMaHH);
 					
@@ -68,7 +68,7 @@ public class GiaSanPhamImportController : IHttpHandler
 					if (next)
 					{
 						md_giasanpham gsp = ImportUtils.getGiaSanPham(cellTenPB, cellMaHH);
-						GiaSanPhamImport import = new GiaSanPhamImport(sp.md_sanpham_id, pbg.md_phienbangia_id, cellGia, cellMoTa);
+						GiaSanPhamImport import = new GiaSanPhamImport(sp.md_sanpham_id, pbg.md_phienbangia_id, cellGia, cellMoTa, cellBarCode);
 						if (gsp == null)
 						{
 							import.Import();

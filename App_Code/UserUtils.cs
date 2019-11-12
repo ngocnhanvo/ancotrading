@@ -121,9 +121,12 @@ public static class UserUtils
 		return gianhap;
 	}
 
-    public static string get_giasanpham(HttpContext context, string c_baogia_id, string md_sanpham_id, LinqDBDataContext db)
+    public static Dictionary<string, object> get_giasanpham(HttpContext context, string c_baogia_id, string md_sanpham_id, LinqDBDataContext db)
     {
-        string msg = "0";
+        var itemJS = new Dictionary<string, object>();
+        itemJS["gia"] = "-1";
+        itemJS["barcode"] = "";
+
         var baogia = db.c_baogias.Where(d => d.c_baogia_id.Equals(c_baogia_id)).
             Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, ngaybaogia = s.ngaybaogia }).FirstOrDefault();
         if (baogia == null)
@@ -146,25 +149,28 @@ public static class UserUtils
                     {
                         gia_sp = gsp.gia.GetValueOrDefault(-1);
                     }
-                    msg = "" + gia_sp;
+                    itemJS["gia"] = gia_sp + "";
+                    itemJS["barcode"] = "";
                 }
                 //Lấy theo bảng giá đặc biệt
                 else if (baogia.gia_db == true)
                 {
                     string md_doitackinhdoanh_id = baogia.md_doitackinhdoanh_id;
-                    decimal gia_sp = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", md_doitackinhdoanh_id, "@ngaytinhgia", baogia.ngaybaogia);
-                    msg = "" + gia_sp;
+                    var items = mdbc.GetDataFromProcedure("getGiaMuaSp_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", md_doitackinhdoanh_id, "@ngaytinhgia", baogia.ngaybaogia);
+                    itemJS["gia"] = items.Rows[0]["gia"].ToString();
+                    itemJS["barcode"] = items.Rows[0]["barcode"].ToString();
                 }
                 //Lấy theo giá chuẩn
                 else
                 {
                     decimal gia_sp = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", baogia.md_doitackinhdoanh_id, "@loai_bg", true, "@ngaytinhgia", baogia.ngaybaogia);
-                    msg = "" + gia_sp;
+                    itemJS["gia"] = gia_sp + "";
+                    itemJS["barcode"] = "";
                 }
             }
         }
 
-        return msg;
+        return itemJS;
     }
 
     public static string get_sapxep_qodetail(HttpContext context, string c_baogia_id, string spstr, string default_od, LinqDBDataContext db)

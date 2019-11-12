@@ -48,33 +48,8 @@ public class QuotationDetailController : IHttpHandler
         context.Response.Charset = "UTF-8";
         string c_baogia_id = context.Request.QueryString["c_baogia_id"];
         string md_sanpham_id = context.Request.QueryString["md_sanpham_id"];
-		string gia = UserUtils.get_giasanpham(context, c_baogia_id, md_sanpham_id, db);
-		context.Response.Write(gia);
-        // var baogia = db.c_baogias.FirstOrDefault(d => d.c_baogia_id.Equals(c_baogia_id));
-        // var sp = db.md_sanphams.FirstOrDefault(s => s.md_sanpham_id.Equals(md_sanpham_id));
-        // if (baogia != null)
-        // {
-            // if (sp != null)
-            // {
-				// if(baogia.gia_db == true) {
-					// string md_doitackinhdoanh_id = db.c_baogias.FirstOrDefault(p => p.c_baogia_id.Equals(c_baogia_id)).md_doitackinhdoanh_id;
-					// decimal gia_sp = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", md_doitackinhdoanh_id, "@ngaytinhgia", baogia.ngaybaogia);
-					// context.Response.Write(gia_sp);
-				// }
-				// else {
-					// decimal gia_sp = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", db.c_baogias.FirstOrDefault(p => p.c_baogia_id.Equals(c_baogia_id)).md_doitackinhdoanh_id, "@loai_bg", true, "@ngaytinhgia", baogia.ngaybaogia);
-					// context.Response.Write(gia_sp);
-				// }
-            // }
-            // else
-            // {
-                // context.Response.Write("0");
-            // }
-        // }
-        // else
-        // {
-            // context.Response.Write("0");
-        // }
+		var itemJS = UserUtils.get_giasanpham(context, c_baogia_id, md_sanpham_id, db);
+		context.Response.Write(itemJS["gia"].ToString());
     }
 
     public void getSelectOption(HttpContext context)
