@@ -1690,9 +1690,13 @@
 	if(xemgiaHH.toLowerCase() == 'false') {
 		var parent = $('#tab-product-details');
 		parent.find('a[href="#nav-tabs-2"]').parent().remove();
-		parent.find('a[href="#nav-tabs-3"]').parent().remove();
 		parent.find('#nav-tabs-2').remove();
-		parent.find('#nav-tabs-3').remove();
+	}
+
+	if (xemgiaNoiHH.toLowerCase() == 'false') {
+	    var parent = $('#tab-product-details');
+	    parent.find('a[href="#nav-tabs-3"]').parent().remove();
+	    parent.find('#nav-tabs-3').remove();
 	}
 	
 	if(chietxuatHH.toLowerCase() == 'false') {
