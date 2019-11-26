@@ -978,4 +978,144 @@ public class MainHub : Hub
         response["data_bk"] = parrams.data_bk;
         Clients.Caller.QOPOexcute(response);
     }
+
+    public void searchProduct(string _params)
+    {
+        string ma_sanpham = _params;
+        var response = new Dictionary<string, object>()
+        {
+            { "Success", false },
+            { "Message", "" }
+        };
+
+        string msg = "";
+        try
+        {
+            string json = @"{{ ""ma_sanpham"":""{0}"", ""gia_fob"":""{1}"", ""image"":""{2}"", ""detai"":""{3}"", ""bientau"":""{4}"", ""mausac"":""{5}"", ""cbm"":""{6}""}}";
+
+            string strsql =
+                    @"select top 25 T.* from(
+					select sp.md_sanpham_id, sp.ma_sanpham, gsp.gia, dt.ma_iso, pbg.ngay_hieuluc, sp.l_cm, sp.w_cm, sp.h_cm,
+					row_number() over(partition by sp.ma_sanpham order by pbg.ngay_hieuluc desc) as rn
+					FROM md_sanpham sp
+					left join md_giasanpham gsp on gsp.md_sanpham_id = sp.md_sanpham_id
+					left join md_phienbangia pbg on gsp.md_phienbangia_id = pbg.md_phienbangia_id 
+					left join md_banggia bg on pbg.md_banggia_id = bg.md_banggia_id 
+					left join md_dongtien dt on bg.md_dongtien_id = dt.md_dongtien_id 
+					 WHERE 1=1 
+					 AND gsp.hoatdong = 1 
+					 AND bg.banggiaban = 1 
+					 AND substring(bg.ten_banggia,0,5) = 'FOB-' 
+					 AND sp.ma_sanpham like N'%{0}%' and sp.trangthai = 'DHD' 
+				 )T
+				where T.rn = 1 order by T.ma_sanpham";
+
+            strsql = string.Format(strsql, ma_sanpham);
+            System.Data.DataTable dt = mdbc.GetData(strsql);
+            string detail = "";
+            foreach (System.Data.DataRow row in dt.Rows)
+            {
+                string msp = row["ma_sanpham"].ToString(), image = "", spId = row["md_sanpham_id"].ToString();
+                if (!msp.Contains("-F"))
+                {
+                    image = msp.Substring(0, 8) + ".jpg";
+                }
+                else
+                {
+                    image = msp.Substring(0, 11) + ".jpg";
+                }
+                string detai_json = "", bientau_json = "", mausac_json = "", detai_chk = "", bientau_chk = "", mausac_chk = "", v2 = "";
+                string chungloai = msp.Substring(0, 2);
+
+                string sql_detail = string.Format(@"
+				select A.detai, A.bientau, A.mausac, dtai.ta_ngan as detai_ta, A.bientau as bientau_ta, msac.ta_ngan as mausac_ta from (
+					select distinct 
+					substring(sp.ma_sanpham, 0, 7) as todetai, 
+					substring(sp.ma_sanpham, 10, 2) as bientau,
+					substring(sp.ma_sanpham, 7, 2) as detai,
+					substring(sp.ma_sanpham, 13, 2) as mausac
+					from md_sanpham sp
+					where 1=1
+					and sp.hoatdong = 1 
+					and sp.trangthai = 'DHD'
+				) A
+				left join md_detai dtai on dtai.code_cl = '{1}' and dtai.code_dt = A.detai
+				left join md_mausac msac on msac.code_cl = '{1}' and msac.code_dt = A.detai and msac.code_mau = A.mausac
+				where 
+				A.todetai = '{0}'
+				order by A.detai, A.bientau, A.mausac
+			", msp.Substring(0, 6), chungloai);
+                System.Data.DataTable dt_detail = mdbc.GetData(sql_detail);
+                foreach (System.Data.DataRow row_dt in dt_detail.Rows)
+                {
+                    if (!detai_chk.Split(',').Contains(row_dt["detai"].ToString()))
+                    {
+                        detai_chk += row_dt["detai"] + ",";
+                        string dtTA = row_dt["detai_ta"].ToString();
+                        dtTA = dtTA.Replace(System.Environment.NewLine, " ");
+                        dtTA = dtTA.Replace("\n", " ");
+                        detai_json += row_dt["detai"] + " : " + dtTA + ",";
+                    }
+
+                    string detai_bientau = row_dt["detai"] + " - " + row_dt["bientau"];
+                    if (!bientau_chk.Split(',').Contains(detai_bientau))
+                    {
+                        bientau_chk += detai_bientau + ",";
+                        bientau_json += detai_bientau + ",";
+                    }
+
+                    string detai_bientau_mausac = row_dt["detai"] + " - " + row_dt["bientau"] + " - " + row_dt["mausac"];
+                    if (!mausac_chk.Split(',').Contains(detai_bientau_mausac))
+                    {
+                        mausac_chk += detai_bientau_mausac + ",";
+                        string msTA = row_dt["mausac_ta"].ToString();
+                        msTA = msTA.Replace(System.Environment.NewLine, " ");
+                        msTA = msTA.Replace("\n", " ");
+                        mausac_json += detai_bientau_mausac + " : " + msTA + ",";
+                    }
+                }
+                if (detai_json != "")
+                {
+                    detai_json = detai_json.Substring(0, detai_json.Length - 1);
+                }
+                if (bientau_json != "")
+                {
+                    bientau_json = bientau_json.Substring(0, bientau_json.Length - 1);
+                }
+                if (mausac_json != "")
+                {
+                    mausac_json = mausac_json.Substring(0, mausac_json.Length - 1);
+                }
+
+                string strsqlDG =
+                @"
+			select convert(decimal(18,3), dg.v2 / dg.sl_outer) as v2
+			FROM md_donggoisanpham dgsp, md_donggoi dg
+			WHERE 
+			dgsp.md_sanpham_id = '{0}'
+			AND dgsp.md_donggoi_id = dg.md_donggoi_id
+			AND dgsp.macdinh = 1";
+
+                strsqlDG = string.Format(strsqlDG, spId);
+                System.Data.DataTable dtDG = mdbc.GetData(strsqlDG);
+                foreach (System.Data.DataRow rowDG in dtDG.Rows)
+                {
+                    v2 = rowDG["v2"].ToString();
+                }
+                detail += string.Format(json, msp, "$" + row["gia"].ToString(), image, detai_json, bientau_json, mausac_json, v2) + ",";
+            }
+            if (detail != "")
+            {
+                detail = detail.Substring(0, detail.Length - 1);
+            }
+            response["Success"] = true;
+            msg = "[" + detail + "]";
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+        response["Message"] = msg;
+        Clients.Caller.searchProduct(response);
+    }
 }
