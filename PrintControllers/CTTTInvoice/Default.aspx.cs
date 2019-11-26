@@ -41,7 +41,15 @@ public partial class PrintControllers_CTTTInvoice_Default : System.Web.UI.Page
 			md_doitackinhdoanh_id = "null";
 		else
 			md_doitackinhdoanh_id = "N'"+ md_doitackinhdoanh_id +"'";
-		string str = String.Format(@"exec [dbo].[rpt_chitietthanhtoaninvoice] N'{0}',N'{1}',{2}", startdate, enddate, md_doitackinhdoanh_id);
+		string str = String.Format(@"
+                declare @tungay datetime = convert(datetime, N'{0}', 103);
+                declare @denngay datetime = convert(datetime, N'{1}', 103);
+                exec [dbo].[rpt_chitietthanhtoaninvoice] @tungay, @denngay, {2}
+            "
+            , startdate
+            , enddate
+            , md_doitackinhdoanh_id
+        );
         return str;
     }
 }
