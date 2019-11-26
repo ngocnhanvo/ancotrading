@@ -476,18 +476,18 @@ public class DongDonHangController : IHttpHandler
         context.Response.Charset = "UTF-8";
 
         //// filter
-        String filter = "";
+        string filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
         if (_search)
         {
-            String _filters = context.Request.QueryString["filters"];
+            string _filters = context.Request.QueryString["filters"];
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
 
-        String poId = context.Request.QueryString["poId"];
+        string poId = context.Request.QueryString["poId"];
 
-        String sqlCount = "SELECT COUNT(*) AS count " +
+        string sqlCount = "SELECT COUNT(*) AS count " +
             " FROM c_dongdonhang ddh, c_donhang dh, md_sanpham sp, md_donggoi dg, md_doitackinhdoanh dtkd " +
             " WHERE ddh.c_donhang_id = dh.c_donhang_id " +
             " AND ddh.md_sanpham_id = sp.md_sanpham_id " +
@@ -506,8 +506,8 @@ public class DongDonHangController : IHttpHandler
 
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
-        String sidx = context.Request.QueryString["sidx"];
-        String sord = context.Request.QueryString["sord"];
+        string sidx = context.Request.QueryString["sidx"];
+        string sord = context.Request.QueryString["sord"];
         int total_page;
         int count = (int)mdbc.ExecuteScalar(sqlCount);
         int start, end;
@@ -530,28 +530,37 @@ public class DongDonHangController : IHttpHandler
             sidx = "ddh.c_dongdonhang_id";
         }
 
-        String strsql = "select * from( " +
-            " select " +
-            "    ddh.c_dongdonhang_id, dh.c_donhang_id, sp.trangthai, ddh.sothutu, sp.md_sanpham_id " +
-            "    , sp.ma_sanpham, ddh.ma_sanpham_khach " +
-            "    , ddh.giafob, ddh.soluong " +
-            "    , dg.ten_donggoi, ddh.sl_inner " +
-            "    , ddh.l1, ddh.w1, ddh.h1,  ddh.sl_outer, ddh.l2, ddh.w2, ddh.h2 " +
-            "    , ddh.sl_cont, ddh.v2, dtkd.ma_dtkd, ddh.ngaytao, ddh.nguoitao " +
-            "    , ddh.ngaycapnhat,  ddh.nguoicapnhat, ddh.mota, ddh.hoatdong ,ddh.trangthai as trangthai_ddh, ddh.docquyen" +
-            "    , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            "FROM  " +
-            "   c_dongdonhang ddh " +
-            " 	left join c_donhang dh on ddh.c_donhang_id = dh.c_donhang_id " +
-            " 	left join md_sanpham sp on ddh.md_sanpham_id = sp.md_sanpham_id " +
-            " 	left join md_kieudang kd on kd.md_kieudang_id = sp.md_kieudang_id " +
-            " 	left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id " +
-            " 	left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id " +
-            " 	left join md_doitackinhdoanh dtkd on ddh.nhacungungid = dtkd.md_doitackinhdoanh_id " +
-            "WHERE  " +
-            "   dh.c_donhang_id = N'{0}' " + filter +
-            ")P " +
-            " WHERE RowNum > @start AND RowNum < @end";
+        string strsql = @"
+                select * from(
+                    select
+                        ddh.c_dongdonhang_id
+                        , dh.c_donhang_id
+                        , sp.trangthai
+                        , ddh.sothutu
+                        , sp.md_sanpham_id
+                        , sp.ma_sanpham
+                        , ddh.ma_sanpham_khach
+                        , ddh.giafob
+                        , ddh.soluong
+                        , dg.ten_donggoi
+                        , ddh.sl_inner
+                        , ddh.l1, ddh.w1, ddh.h1,  ddh.sl_outer, ddh.l2, ddh.w2, ddh.h2
+                        , ddh.sl_cont, ddh.v2, dtkd.ma_dtkd, ddh.ngaytao, ddh.nguoitao
+                        , ddh.ngaycapnhat,  ddh.nguoicapnhat, ddh.mota
+                        , ddh.hoatdong ,ddh.trangthai as trangthai_ddh, ddh.docquyen, ddh.barcode
+                        , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
+            @" FROM
+                c_dongdonhang ddh
+                left join c_donhang dh on ddh.c_donhang_id = dh.c_donhang_id
+                left join md_sanpham sp on ddh.md_sanpham_id = sp.md_sanpham_id
+                left join md_kieudang kd on kd.md_kieudang_id = sp.md_kieudang_id
+                left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
+                left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id
+                left join md_doitackinhdoanh dtkd on ddh.nhacungungid = dtkd.md_doitackinhdoanh_id
+            WHERE
+                dh.c_donhang_id = N'{0}' " + filter +
+            @" )P
+            WHERE RowNum > @start AND RowNum < @end";
 
         if (poId != null)
         {
@@ -600,6 +609,7 @@ public class DongDonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["docquyen"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["barcode"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

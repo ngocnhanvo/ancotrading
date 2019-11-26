@@ -4,148 +4,156 @@
 <%@ Import Namespace="System.Linq" %>
 <%@ Register src="UserNameProfile.ascx" tagname="UserNameProfile" tagprefix="us1" %>
 <%
-	string manv = Context.User.Identity.Name;
-	String selAdmin = "select isadmin from nhanvien where manv = @manv";
-	bool isadmin = (bool)mdbc.ExecuteScalar(selAdmin, "@manv", manv);
-	bool? xemgiaHH, xemgiaHHST, xemgiaHHNHD, xemgiaHHDQ, xemgiaDSDH;
-	xemgiaHH = xemgiaHHST = xemgiaHHNHD = xemgiaHHDQ =  xemgiaDSDH = false;
-	
-	bool? chietxuatHH, chietxuatHHST, chietxuatHHNHD, chietxuatHHDQ, chietxuatLHH, chietxuatDGSP, chietxuatDGST, chietxuatHSCode, chietxuatNNL, chietxuatKDSP, chietxuatCNSP, chietxuatDeTai, chietxuatMauSac;
-	chietxuatHH = chietxuatHHST = chietxuatHHNHD = chietxuatHHDQ = chietxuatLHH = chietxuatDGSP = chietxuatDGST = chietxuatHSCode = chietxuatNNL = chietxuatKDSP = chietxuatCNSP = chietxuatDeTai = chietxuatMauSac = false;
-	
-	String sql = "select * from menu m, phanquyen pq, vaitro vt, nhanvien nv " +
-		" WHERE m.hoatdong = 1 AND nv.hoatdong = 1 " +
-		" AND pq.hoatdong = 1 AND vt.hoatdong = 1 " +
-		" AND m.mamenu = pq.mamenu " +
-		" AND pq.mavt = vt.mavt " +
-		" AND vt.mavt = nv.mavt " +
-		" AND nv.manv = @manv " +
-		" ORDER BY m.sortorder asc, m.ngaytao desc";
+    string manv = Context.User.Identity.Name;
+    String selAdmin = "select isadmin from nhanvien where manv = @manv";
+    bool isadmin = (bool)mdbc.ExecuteScalar(selAdmin, "@manv", manv);
+    bool? xemgiaHH, xemgiaHHST, xemgiaHHNHD, xemgiaHHDQ, xemgiaDSDH, xemgiaNoiHH;
+    xemgiaHH = xemgiaHHST = xemgiaHHNHD = xemgiaHHDQ =  xemgiaDSDH = xemgiaNoiHH = false;
 
-	String sqlAdmin = "select * from menu ORDER BY sortorder asc, ngaytao desc";
+    bool? chietxuatHH, chietxuatHHST, chietxuatHHNHD, chietxuatHHDQ, chietxuatLHH, chietxuatDGSP, chietxuatDGST, chietxuatHSCode, chietxuatNNL, chietxuatKDSP, chietxuatCNSP, chietxuatDeTai, chietxuatMauSac;
+    chietxuatHH = chietxuatHHST = chietxuatHHNHD = chietxuatHHDQ = chietxuatLHH = chietxuatDGSP = chietxuatDGST = chietxuatHSCode = chietxuatNNL = chietxuatKDSP = chietxuatCNSP = chietxuatDeTai = chietxuatMauSac = false;
+
+    String sql = "select * from menu m, phanquyen pq, vaitro vt, nhanvien nv " +
+        " WHERE m.hoatdong = 1 AND nv.hoatdong = 1 " +
+        " AND pq.hoatdong = 1 AND vt.hoatdong = 1 " +
+        " AND m.mamenu = pq.mamenu " +
+        " AND pq.mavt = vt.mavt " +
+        " AND vt.mavt = nv.mavt " +
+        " AND nv.manv = @manv " +
+        " ORDER BY m.sortorder asc, m.ngaytao desc";
+
+    String sqlAdmin = "select * from menu ORDER BY sortorder asc, ngaytao desc";
 
 
-	System.Data.DataTable dt = new System.Data.DataTable();
+    System.Data.DataTable dt = new System.Data.DataTable();
 
-	bool PTSP, NGHVU, KETOAN, BAOCAO, HETHONG;
-	PTSP = NGHVU = KETOAN = BAOCAO = HETHONG = false;
+    bool PTSP, NGHVU, KETOAN, BAOCAO, HETHONG;
+    PTSP = NGHVU = KETOAN = BAOCAO = HETHONG = false;
 
-	if (isadmin)
-	{
-		dt = mdbc.GetData(sqlAdmin);
-		PTSP = NGHVU = KETOAN = BAOCAO = HETHONG = true;
-		xemgiaHH = xemgiaHHST = xemgiaHHNHD = xemgiaHHDQ = xemgiaDSDH = true;
-		chietxuatHH = chietxuatHHST = chietxuatHHNHD = 
-		chietxuatHHDQ = chietxuatLHH = chietxuatDGSP = 
-		chietxuatDGST = chietxuatHSCode = chietxuatNNL = 
-		chietxuatKDSP = chietxuatCNSP = chietxuatDeTai = 
-		chietxuatMauSac = true;
-	}
-	else
-	{
-		dt = mdbc.GetData(sql, "@manv", manv);
-		
-		#region XemGia
-		xemgiaHH = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("mamenu") == "c8a12cddaf85c128673b499264846938"
-		select myRow.Field<bool>("gia")).FirstOrDefault();
-		
-		xemgiaHHST = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("mamenu") == "68ff4867b9727e6f4bb055821fe1fa75"
-		select myRow.Field<bool>("gia")).FirstOrDefault();
-		
-		xemgiaHHNHD = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("mamenu") == "43a087d627cbdc5272b4484044dc799d"
-		select myRow.Field<bool>("gia")).FirstOrDefault();
-		
-		xemgiaDSDH = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-ds-dathang.aspx"
-		select myRow.Field<bool>("gia")).FirstOrDefault();
-		#endregion XemGia
-		
-		#region ChietXuat
-		chietxuatHH = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-hanghoa.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatHHST = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-hanghoasoanthao.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatHHNHD = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-hanghoa-nhd.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatHHDQ = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-hanghoa-docquyen.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatLHH = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-loaihanghoa.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatDGSP = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-donggoi-sanpham.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatDGST = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-donggoi-sanpham-soanthao.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatHSCode = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-hscode.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatNNL = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-nhomnangluc.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatKDSP = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-kieudangsanpham.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatCNSP = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-chucnangsanpham.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatDeTai = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-detai.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		
-		chietxuatMauSac = (from myRow in dt.AsEnumerable()
-		where myRow.Field<string>("url") == "inc-mausac.aspx"
-		select myRow.Field<bool>("chietxuat")).FirstOrDefault();
-		#endregion ChietXuat
-		
-		foreach (System.Data.DataRow row in dt.Rows)
-		{
-			bool truyxuat = bool.Parse(row["truyxuat"].ToString());
-			if (row["module_id"].Equals("PTSP") && truyxuat)
-			{
-				PTSP = true;
-			}
+    if (isadmin)
+    {
+        dt = mdbc.GetData(sqlAdmin);
+        PTSP = NGHVU = KETOAN = BAOCAO = HETHONG = true;
+        xemgiaHH = xemgiaNoiHH = xemgiaHHST = xemgiaHHNHD = xemgiaHHDQ = xemgiaDSDH = true;
+        chietxuatHH = chietxuatHHST = chietxuatHHNHD =
+        chietxuatHHDQ = chietxuatLHH = chietxuatDGSP =
+        chietxuatDGST = chietxuatHSCode = chietxuatNNL =
+        chietxuatKDSP = chietxuatCNSP = chietxuatDeTai =
+        chietxuatMauSac = true;
+    }
+    else
+    {
+        dt = mdbc.GetData(sql, "@manv", manv);
 
-			if (row["module_id"].Equals("NGHVU") && truyxuat)
-			{
-				NGHVU = true;
-			}
+        #region XemGia
+        var xemgiaFld = (from myRow in dt.AsEnumerable()
+                         where myRow.Field<string>("mamenu") == "c8a12cddaf85c128673b499264846938"
+                         select new {
+                             gia = myRow.Field<bool>("gia"),
+                             vaitro = myRow.Field<string>("tenvt")
+                         }).FirstOrDefault();
 
-			if (row["module_id"].Equals("KETOAN") && truyxuat)
-			{
-				KETOAN = true;
-			}
+        if (xemgiaFld.gia == true)
+            xemgiaHH = true;
+        if (xemgiaFld.vaitro != "Nghiệp Vụ")
+            xemgiaNoiHH = true;
 
-			if (row["module_id"].Equals("BAOCAO") && truyxuat)
-			{
-				BAOCAO = true;
-			}
+        xemgiaHHST = (from myRow in dt.AsEnumerable()
+                      where myRow.Field<string>("mamenu") == "68ff4867b9727e6f4bb055821fe1fa75"
+                      select myRow.Field<bool>("gia")).FirstOrDefault();
 
-			if (row["module_id"].Equals("HETHONG") && truyxuat)
-			{
-				HETHONG = true;
-			}
-		}
-	}
+        xemgiaHHNHD = (from myRow in dt.AsEnumerable()
+                       where myRow.Field<string>("mamenu") == "43a087d627cbdc5272b4484044dc799d"
+                       select myRow.Field<bool>("gia")).FirstOrDefault();
+
+        xemgiaDSDH = (from myRow in dt.AsEnumerable()
+                      where myRow.Field<string>("url") == "inc-ds-dathang.aspx"
+                      select myRow.Field<bool>("gia")).FirstOrDefault();
+        #endregion XemGia
+
+        #region ChietXuat
+        chietxuatHH = (from myRow in dt.AsEnumerable()
+                       where myRow.Field<string>("url") == "inc-hanghoa.aspx"
+                       select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatHHST = (from myRow in dt.AsEnumerable()
+                         where myRow.Field<string>("url") == "inc-hanghoasoanthao.aspx"
+                         select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatHHNHD = (from myRow in dt.AsEnumerable()
+                          where myRow.Field<string>("url") == "inc-hanghoa-nhd.aspx"
+                          select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatHHDQ = (from myRow in dt.AsEnumerable()
+                         where myRow.Field<string>("url") == "inc-hanghoa-docquyen.aspx"
+                         select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatLHH = (from myRow in dt.AsEnumerable()
+                        where myRow.Field<string>("url") == "inc-loaihanghoa.aspx"
+                        select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatDGSP = (from myRow in dt.AsEnumerable()
+                         where myRow.Field<string>("url") == "inc-donggoi-sanpham.aspx"
+                         select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatDGST = (from myRow in dt.AsEnumerable()
+                         where myRow.Field<string>("url") == "inc-donggoi-sanpham-soanthao.aspx"
+                         select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatHSCode = (from myRow in dt.AsEnumerable()
+                           where myRow.Field<string>("url") == "inc-hscode.aspx"
+                           select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatNNL = (from myRow in dt.AsEnumerable()
+                        where myRow.Field<string>("url") == "inc-nhomnangluc.aspx"
+                        select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatKDSP = (from myRow in dt.AsEnumerable()
+                         where myRow.Field<string>("url") == "inc-kieudangsanpham.aspx"
+                         select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatCNSP = (from myRow in dt.AsEnumerable()
+                         where myRow.Field<string>("url") == "inc-chucnangsanpham.aspx"
+                         select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatDeTai = (from myRow in dt.AsEnumerable()
+                          where myRow.Field<string>("url") == "inc-detai.aspx"
+                          select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+
+        chietxuatMauSac = (from myRow in dt.AsEnumerable()
+                           where myRow.Field<string>("url") == "inc-mausac.aspx"
+                           select myRow.Field<bool>("chietxuat")).FirstOrDefault();
+        #endregion ChietXuat
+
+        foreach (System.Data.DataRow row in dt.Rows)
+        {
+            bool truyxuat = bool.Parse(row["truyxuat"].ToString());
+            if (row["module_id"].Equals("PTSP") && truyxuat)
+            {
+                PTSP = true;
+            }
+
+            if (row["module_id"].Equals("NGHVU") && truyxuat)
+            {
+                NGHVU = true;
+            }
+
+            if (row["module_id"].Equals("KETOAN") && truyxuat)
+            {
+                KETOAN = true;
+            }
+
+            if (row["module_id"].Equals("BAOCAO") && truyxuat)
+            {
+                BAOCAO = true;
+            }
+
+            if (row["module_id"].Equals("HETHONG") && truyxuat)
+            {
+                HETHONG = true;
+            }
+        }
+    }
 %>
 <html>
 <head>
@@ -208,7 +216,7 @@
 
 <script src="jQuery/jquery.maskedinput-1.3.min.js" type="text/javascript"></script>
 <script src="jQuery/jquery.form.js" type="text/javascript"></script>
-
+<script src="jQuery/jquery.signalR-2.2.0.min.js" type="text/javascript"></script>
 
 <!-- theme -->
 <link rel="stylesheet" type="text/css" media="screen" href="theme/silver/css/style.css" />
@@ -1004,13 +1012,13 @@ div.ui-jqdialog-content td.form-view-data {
         }
 		
 		var showPBGCforEveryOne = false;
-		var xemgiaHH, xemgiaHHST, xemgiaHHNHD, xemgiaHHDQ, xemgiaDSDH;
+		var xemgiaHH, xemgiaHHST, xemgiaHHNHD, xemgiaHHDQ, xemgiaDSDH, xemgiaNoiHH;
 		xemgiaHH = '<%=xemgiaHH%>';
 		xemgiaHHST = '<%=xemgiaHHST%>';
 		xemgiaHHNHD = '<%=xemgiaHHNHD%>';
 		xemgiaHHDQ = '<%=xemgiaHHDQ%>';
 		xemgiaDSDH = '<%=xemgiaDSDH%>';
-		console.log('DSDH:' + xemgiaDSDH);
+	    xemgiaNoiHH = '<%=xemgiaNoiHH%>';
 		
 		var chietxuatHH, chietxuatHHST, chietxuatHHNHD, chietxuatHHDQ, chietxuatLHH, chietxuatDGSP, chietxuatDGST, chietxuatHSCode, chietxuatNNL, chietxuatKDSP, chietxuatCNSP, chietxuatDeTai, chietxuatMauSac, chietxuatBoCai, selectHinhThucBan;
 		chietxuatHH = '<%=chietxuatHH%>';

@@ -1588,13 +1588,6 @@
             SortName="ddh.sothutu" 
             SortOrder="desc"
             UrlFileAction="Controllers/DongDonHangController.ashx" 
-            ColNames="['c_dongdonhang_id', 'Đơn Hàng','TT','Trạng Thái', 'STT', 'Mã SP'
-                    , 'Mã SP', 'Mã SP Khách'
-                    ,  'Giá', 'Số Lượng', 'Đóng Gói', 'Đóng Gói Inner'
-                    , 'L1', 'W1', 'H1', 'Đóng Gói Outer'
-                    , 'L2', 'W2', 'H2', 'SL Cont', 'V2', 'Nhà cung ứng'
-                    , 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật'
-                    , 'Người Cập Nhật', 'Mô tả', 'Hoạt động', 'Độc quyền']"
             RowNumbers="true"
             OndblClickRow = "function(rowid) { 
 												/*$(this).jqGrid('editGridRow', rowid,
@@ -1622,6 +1615,7 @@
             ColModel = "[
             {
                 name: 'c_dongdonhang_id'
+				, label: 'c_dongdonhang_id'
                 , index: 'c_dongdonhang_id'
                 , fixed:true , width: 100
                 , hidden: true 
@@ -1631,6 +1625,7 @@
             },
             {
                 name: 'c_donhang_id'
+				, label: 'Đơn Hàng'
                 , index: 'dh.c_donhang_id'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1638,7 +1633,9 @@
                 , hidden: true
             },
             {
-                 fixed: true, name: 'trangthai'
+                 fixed: true
+				 , name: 'trangthai'
+				 , label: 'TT'
                  , index: 'sp.trangthai'
                  , editable: false
                  , width: 100
@@ -1651,6 +1648,7 @@
             },
 			{
                  fixed: true, name: 'trangthai_ddh'
+				 , label: 'Trạng Thái'
                  , index: 'ddh.trangthai'
                  , editable: false
                  , width: 100
@@ -1663,6 +1661,7 @@
             },
             {
                 name: 'sothutu'
+				, label: 'STT'
                 , index: 'ddh.sothutu'
                 , fixed:true , width: 50
                 , edittype: 'text'
@@ -1673,6 +1672,7 @@
             },
             {
                 name: 'sanpham_id'
+				, label: 'Mã SP'
                 , index: 'sp.sanpham_id'
                 , fixed:true , width: 100
                 , hidden: true 
@@ -1681,6 +1681,7 @@
             },
             {
                 name: 'ma_sanpham'
+				, label: 'Mã SP'
                 , index: 'sp.ma_sanpham'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1712,6 +1713,7 @@
             },
             {
                 name: 'ma_sanpham_khach'
+				, label: 'Mã SP Khách'
                 , index: 'ddh.ma_sanpham_khach'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1719,6 +1721,7 @@
             },
 			{
 				name: 'giafob'
+				, label: 'Giá'
 				, index: 'ddh.giafob'
 				, fixed:true , width: 100
 				, edittype: 'text'
@@ -1731,6 +1734,7 @@
 			},
             {
                 name: 'soluong'
+				, label: 'Số Lượng'
                 , index: 'ddh.soluong'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1743,6 +1747,7 @@
             
             {
                 name: 'md_donggoi_id'
+				, label: 'Đóng Gói'
                 , index: 'dg.ten_donggoi'
                 , fixed:true , width: 100
                 , edittype: 'select'
@@ -1753,6 +1758,7 @@
             },
             {
                 name: 'sl_inner'
+				, label: 'Đóng Gói Inner'
                 , index: 'ddh.sl_inner'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1761,6 +1767,7 @@
             },
             {
                 name: 'l1'
+				, label: 'L1'
                 , index: 'ddh.l1'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1770,6 +1777,7 @@
             },
             {
                 name: 'w1'
+				, label: 'W1'
                 , index: 'ddh.w1'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1779,6 +1787,7 @@
             },
             {
                 name: 'h1'
+				, label: 'H1'
                 , index: 'ddh.h1'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1788,6 +1797,7 @@
             },
             {
                 name: 'sl_outer'
+				, label: 'Đóng Gói Outer'
                 , index: 'ddh.sl_outer'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1796,6 +1806,7 @@
             },
             {
                 name: 'l2'
+				, label: 'L2'
                 , index: 'ddh.l2'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1805,6 +1816,7 @@
             },
             {
                 name: 'w2'
+				, label: 'W2'
                 , index: 'ddh.w2'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1814,6 +1826,7 @@
             },
             {
                 name: 'h2'
+				, label: 'H2'
                 , index: 'ddh.h2'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1823,6 +1836,7 @@
             },
 			{
                 name: 'sl_cont'
+				, label: 'SL Cont'
                 , index: 'ddh.sl_cont'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1833,6 +1847,7 @@
             },
             {
                 name: 'v2'
+				, label: 'V2'
                 , index: 'ddh.v2'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1841,6 +1856,7 @@
             },
 			{
                  name: 'nhacungungid'
+				 , label: 'Nhà cung ứng'
                  , index: 'dtkd.ma_dtkd'
                  , editable: true
                  , fixed:true 
@@ -1851,6 +1867,7 @@
             
             {
                 name: 'ngaytao'
+				, label: 'Ngày Tạo'
                 , index: 'ddh.ngaytao'
                 , fixed:true , width: 100
                 , editable:false
@@ -1860,6 +1877,7 @@
             },
             {
                 name: 'nguoitao'
+				, label: 'Người Tạo'
                 , index: 'ddh.nguoitao'
                 , fixed:true , width: 100
                 , editable:false
@@ -1869,6 +1887,7 @@
             },
             {
                 name: 'ngaycapnhat'
+				, label: 'Ngày Cập Nhật'
                 , index: 'ddh.ngaycapnhat'
                 , fixed:true , width: 100
                 , editable:false
@@ -1878,6 +1897,7 @@
             },
             {
                 name: 'nguoicapnhat'
+				, label: 'Người Cập Nhật'
                 , index: 'ddh.nguoicapnhat'
                 , fixed:true , width: 100
                 , editable:false
@@ -1887,6 +1907,7 @@
             },
             {
                 name: 'mota'
+				, label: 'Mô tả'
                 , index: 'ddh.mota'
                 , fixed:true , width: 100
                 , editable:true
@@ -1896,6 +1917,7 @@
             },
             {
                 name: 'hoatdong', hidden: true
+				, label: 'Hoạt động'
                 , index: 'ddh.hoatdong'
                 , width: 30
                 , editable:true
@@ -1906,12 +1928,21 @@
             },
 			{
                 name: 'docquyen'
+				, label: 'Độc quyền'
                 , index: 'ddh.docquyen'
                 , fixed:true , width: 100
                 , editable:true
                 , edittype: 'textarea'
 				, hidden: false
 				, editrules: { edithidden:true }
+            },
+			{
+                name: 'barcode'
+				, label: 'Barcode'
+                , index: 'ddh.barcode'
+                , fixed:true 
+				, width: 100
+				, hidden: true
             }
             ]"
             GridComplete = "let o = $('#tabs-donhang-details'); $(this).setGridHeight($(o).height() - 97);$(this).setGridWidth($(o).width())"

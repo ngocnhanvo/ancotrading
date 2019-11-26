@@ -43,7 +43,7 @@ public partial class PrintControllers_InThongTinSanPhamMore_Default : System.Web
 					, cb.ma_cangbien as [Cang Bien], dtkd.ma_dtkd as [NCC]
 					, hscode.ma_hscode as [HS Code]
 					, sp.chucnangsp
-					, sp.ngayxacnhan
+					, CONVERT(VARCHAR, sp.ngayxacnhan, 103) as ngayxacnhan
 					, sp.hinhthucban
 					, sp.mota
 					, sp.mota as ghichu
@@ -78,7 +78,7 @@ public partial class PrintControllers_InThongTinSanPhamMore_Default : System.Web
 					, isnull(dg.vn,0) as vn
 					, isnull(dg.vl,0) as vl
 					, dg.ghichu_vachngan
-                    , dg.ngayxacnhan as ngayxacnhan_donggoi
+                    , CONVERT(VARCHAR, dg.ngayxacnhan, 103) as ngayxacnhan_donggoi
 					, sp.trangthai
 					, dg.mota as [ghi chu dong goi]
                 from 

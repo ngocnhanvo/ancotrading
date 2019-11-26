@@ -337,7 +337,21 @@ public class DanhSachDatHangController : IHttpHandler
 					else {
 						emailCC = UserUtils.mailKCS;
 					}
-					mail.Send(nv.email, mailObj["email"].ToString(), emailCC, "", mailObj["tieude"].ToString(), mailObj["noidung"].ToString(), "");
+					
+                    var dsdh = mailObj["dsdh"] as c_danhsachdathang;
+					string fileTTSP = taoFileThongTinSanPham(context, manv, dsdh);
+					var fileDDHs = taoFileDonDatHang(context, manv, mailObj["ma_dtkd"].ToString(), dsdh);
+					string fileXNBB = taoFileXacNhanBaoBi(context, manv, dsdh);
+
+                    mail.Send(
+						nv.email
+						, mailObj["email"].ToString()
+						, emailCC
+						, ""
+						, mailObj["tieude"].ToString()
+						, mailObj["noidung"].ToString()
+						, fileTTSP + ";" + fileDDHs[0] + ";" + fileXNBB + ";" + fileDDHs[1]
+					);
 				}
             }
         }
