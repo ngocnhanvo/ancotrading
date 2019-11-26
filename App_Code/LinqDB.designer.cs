@@ -21,7 +21,7 @@ using System.Reflection;
 
 
 
-[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="ancotrading2019")]
+[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="ancotradingTest2018ver2")]
 public partial class LinqDBDataContext : System.Data.Linq.DataContext
 {
 	
