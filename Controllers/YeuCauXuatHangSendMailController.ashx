@@ -82,7 +82,7 @@ public class YeuCauXuatHangSendMailController : IHttpHandler {
 				// tạo file pdf
 				rptXuatHang report = new rptXuatHang();
 				string path = context.Server.MapPath("../FileSendMail/AnCoYeuCauXuatHang" + DateTime.Now.ToString("ddMMyyyyhhmmss") + ".pdf");
-				SqlDataAdapter da = new SqlDataAdapter(YeuCauXuatHangSql.getSql(c_donhang_id), mdbc.GetConnection);
+				SqlDataAdapter da = new SqlDataAdapter(YeuCauXuatHangSql.getSql(c_donhang_id, ""), mdbc.GetConnection);
 				DataSet ds = new DataSet();
 				da.Fill(ds);
 				report.DataSource = ds;

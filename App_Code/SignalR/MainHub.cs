@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Newtonsoft.Json;
+using System.IO;
 
 [HubName("mainhub")]
 public class MainHub : Hub
@@ -14,12 +15,14 @@ public class MainHub : Hub
         public string Password { get; set; }
     }
 
+    public string emailcc = "anco@ancopottery.com,info@ancopottery.com";
+
     public void Login(UserLoginMobile user)
     {
         string manv = user.Username;
         string password = user.Password;
         string json = string.Format(@"[{{ ""user"":""{0}"", ""key"":""{1}"", ""status"":""{2}""}}]", manv, "", "false");
-        var response = new Dictionary<string,object>()
+        var response = new Dictionary<string, object>()
         {
             { "Success", false },
             { "Message", json }
@@ -40,7 +43,7 @@ public class MainHub : Hub
             response["Success"] = true;
             response["Message"] = json;
         }
-        
+
         Clients.Caller.Login(response);
     }
 
@@ -64,14 +67,13 @@ public class MainHub : Hub
 			""dong10"":""{10}"", ""dong11"":""{11}"", ""dong12"":""{12}"", ""dong13"":""{13}"", ""dong14"":""{14}"",
 			""dong15"":""{15}"", ""dong16"":""{16}"", ""image"":""{17}"", ""detai"":""{18}"", ""bientau"":""{19}"", ""mausac"":""{20}""}}]";
 
-
-            md_sanpham sp = db.md_sanphams.FirstOrDefault(s => s.ma_sanpham == ma_sanpham & s.trangthai == "DHD");
+            var sp = db.md_sanphams.Where(s => s.ma_sanpham == ma_sanpham & s.trangthai == "DHD").FirstOrDefault();
             if (sp != null)
             {
                 string cl = sp.ma_sanpham.Substring(0, 2);
                 string bc = sp.ma_sanpham.Substring(9, 2);
 
-                md_chungloai plhh = db.md_chungloais.FirstOrDefault(s => s.code_cl == cl);
+                var plhh = db.md_chungloais.Where(s => s.code_cl == cl).FirstOrDefault();
                 if (plhh != null)
                 {
                     dong0 = plhh.ta_ngan.ToUpper();
@@ -86,28 +88,71 @@ public class MainHub : Hub
                     & s.ma_sanpham.Substring(11, 3) == msp_1103 & s.ma_sanpham.Substring(9, 2).Contains("S")).Select(s => s.ma_sanpham.Substring(9, 2)).FirstOrDefault();
                     //Lay cac ma cai thuoc bo cua san pham
                     string md_bo_id = db.md_bos.Where(s => s.ma_bo == bc & s.ma_bo_cha == ma_bo_cha).Select(s => s.md_bo_id).FirstOrDefault();
-                    foreach (md_bo_chitiet bct in db.md_bo_chitiets.Where(s => s.md_bo_id == md_bo_id))
+                    foreach (var bct in db.md_bo_chitiets.Where(s => s.md_bo_id == md_bo_id))
                     {
                         string sanpham_add = msp_0009 + bct.md_bo_detail + msp_1103;
                         arr_sanpham += ",'" + sanpham_add + "'";
                     }
                 }
                 string strsql =
-                @"select T.* from(
-					select sp.ma_sanpham, gsp.gia, dt.ma_iso, pbg.ngay_hieuluc, sp.l_cm, sp.w_cm, sp.h_cm,
-					row_number() over(partition by sp.ma_sanpham order by pbg.ngay_hieuluc desc) as rn
-					FROM md_sanpham sp, md_banggia bg, md_phienbangia pbg,
-					 md_giasanpham gsp, md_dongtien dt 
-					 WHERE gsp.md_phienbangia_id = pbg.md_phienbangia_id 
-					 AND pbg.md_banggia_id = bg.md_banggia_id 
-					 AND bg.md_dongtien_id = dt.md_dongtien_id 
-					 AND gsp.hoatdong = 1 
-					 AND bg.banggiaban = 1 
-					 AND substring(bg.ten_banggia,0,5) = 'FOB-'
-					 AND sp.ma_sanpham in ({0}) 
-					 AND gsp.md_sanpham_id = sp.md_sanpham_id
-				 )T
-				where T.rn = 1 order by T.ma_sanpham";
+                @"    
+                    declare @tblBG table (
+	                    bgid nvarchar(32)
+	                    , tenbg nvarchar(MAX)
+	                    , bgban bit
+	                    , pbgid nvarchar(32)
+	                    , ngayhl datetime
+	                    , dongtien nvarchar(32)
+                    )
+                    insert into @tblBG
+                    select bg.md_banggia_id, bg.ten_banggia, bg.banggiaban, pbg.md_phienbangia_id, pbg.ngay_hieuluc, dt.ma_iso
+                    from md_banggia (nolock) bg
+                    inner join md_phienbangia (nolock) pbg on bg.md_banggia_id = pbg.md_banggia_id
+                    inner join md_dongtien (nolock) dt on bg.md_dongtien_id = dt.md_dongtien_id
+                    where 
+	                    1=1
+	                    and bg.banggiaban = 1
+	                    AND substring(bg.ten_banggia, 0, 5) = 'FOB-' 
+
+                    declare @tblGia table (
+	                    spid nvarchar(32)
+	                    , ma_sanpham nvarchar(MAX)
+	                    , l_cm decimal(18,1)
+	                    , w_cm decimal(18,1)
+	                    , h_cm decimal(18,1)
+	                    , gia decimal(18,2)
+	                    , pbgid nvarchar(32)
+                    )
+                    insert into @tblGia
+                    select 
+		                    sp.*
+		                    , gsp.gia
+		                    ,gsp.md_phienbangia_id
+	                    from (
+		                    select sp.md_sanpham_id, sp.ma_sanpham, sp.l_cm, sp.w_cm, sp.h_cm
+		                    FROM 
+			                    md_sanpham (nolock) sp
+		                    WHERE 
+			                    1=1
+			                    AND sp.ma_sanpham in ({0})
+	                    ) sp
+	                    inner join md_giasanpham (nolock) gsp on gsp.md_sanpham_id = sp.md_sanpham_id
+	                    where
+		                    1=1
+		                    AND gsp.hoatdong = 1 
+
+                    select 
+	                    T.* 
+                    from (
+	                    select 
+		                    gia.*
+		                    , row_number() over(partition by gia.ma_sanpham order by bg.ngayhl desc) as rn
+	                    from 
+		                    @tblGia gia
+		                    inner join @tblBG bg on bg.pbgid = gia.pbgid
+	                )T
+                    where T.rn = 1 order by T.ma_sanpham
+                ";
 
                 strsql = string.Format(strsql, arr_sanpham);
                 System.Data.DataTable dt = mdbc.GetData(strsql);
@@ -158,7 +203,7 @@ public class MainHub : Hub
 				dg.sl_outer, (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer) as dvtouter,
 				dg.l1, dg.w1, dg.h1,
 				dg.l2_mix, dg.w2_mix, dg.h2_mix, convert(decimal(18,3), dg.v2 / dg.sl_outer) as v2, dg.sl_cont_mix, dg.soluonggoi_ctn_20, dg.soluonggoi_ctn, dg.soluonggoi_ctn_40hc
-				FROM md_donggoisanpham dgsp, md_donggoi dg
+				FROM md_donggoisanpham (nolock) dgsp, md_donggoi (nolock) dg
 				WHERE 
 				dgsp.md_sanpham_id = '{0}'
 				AND dgsp.md_donggoi_id = dg.md_donggoi_id
@@ -223,12 +268,18 @@ public class MainHub : Hub
                 //dong 15
                 strsql =
                 @"
-				select cb.ten_cangbien
-				FROM md_cangxuathang cxh, md_cangbien cb
-				WHERE 
-				cxh.md_sanpham_id = '{0}'
-				AND cxh.md_cangbien_id = cb.md_cangbien_id
-				AND cxh.macdinh = 1";
+				    select top 1 cb.ten_cangbien 
+                    from md_cangbien (nolock) cb 
+                    where cb.md_cangbien_id = (
+	                    select top 1
+		                    cxh.md_cangbien_id
+	                    FROM 
+		                    md_cangxuathang (nolock) cxh
+	                    WHERE 
+		                    cxh.md_sanpham_id = '{0}'
+		                    and cxh.macdinh = 1
+                    )
+                ";
 
                 strsql = string.Format(strsql, sp.md_sanpham_id);
                 dt = mdbc.GetData(strsql);
@@ -251,22 +302,24 @@ public class MainHub : Hub
                 string chungloai = msp.Substring(0, 2);
 
                 string sql_detail = string.Format(@"
-					select A.detai, A.bientau, A.mausac, dtai.ta_ngan as detai_ta, A.bientau as bientau_ta, msac.ta_ngan as mausac_ta from (
-						select distinct 
-						substring(sp.ma_sanpham, 0, 7) as todetai, 
-						substring(sp.ma_sanpham, 10, 2) as bientau,
-						substring(sp.ma_sanpham, 7, 2) as detai,
-						substring(sp.ma_sanpham, 13, 2) as mausac
-						from md_sanpham sp
-						where 1=1
-						and sp.hoatdong = 1 
-						and sp.trangthai = 'DHD'
-					) A
-					left join md_detai dtai on dtai.code_cl = '{1}' and dtai.code_dt = A.detai
-					left join md_mausac msac on msac.code_cl = '{1}' and msac.code_dt = A.detai and msac.code_mau = A.mausac
-					where 
-					A.todetai = '{0}'
-					order by A.detai, A.bientau, A.mausac
+					select 
+	                    A.detai, A.bientau, A.mausac, dtai.ta_ngan as detai_ta, A.bientau as bientau_ta, msac.ta_ngan as mausac_ta 
+                    from (
+	                    select distinct 
+	                    substring(sp.ma_sanpham, 0, 7) as todetai, 
+	                    substring(sp.ma_sanpham, 10, 2) as bientau,
+	                    substring(sp.ma_sanpham, 7, 2) as detai,
+	                    substring(sp.ma_sanpham, 13, 2) as mausac
+	                    from md_sanpham (nolock) sp
+	                    where 1=1
+	                    and sp.hoatdong = 1 
+	                    and sp.trangthai = 'DHD'
+                    ) A
+                    left join md_detai (nolock) dtai on dtai.code_cl = '{1}' and dtai.code_dt = A.detai
+                    left join md_mausac (nolock) msac on msac.code_cl = '{1}' and msac.code_dt = A.detai and msac.code_mau = A.mausac
+                    where 
+                    A.todetai = '{0}'
+                    order by A.detai, A.bientau, A.mausac
 				", msp.Substring(0, 6), chungloai);
                 System.Data.DataTable dt_detail = mdbc.GetData(sql_detail);
                 foreach (System.Data.DataRow row_dt in dt_detail.Rows)
@@ -313,6 +366,7 @@ public class MainHub : Hub
 
                 string kq_json = string.Format(json, dong0, dong1, dong2, dong3, dong4, dong5, dong6, dong7, dong8, dong9, dong10, dong11, dong12, dong13, dong14,
                 dong15, dong16, image, detai_json, bientau_json, mausac_json);
+                response["Success"] = true;
                 response["Message"] = kq_json;
             }
         }
@@ -321,5 +375,607 @@ public class MainHub : Hub
 
         }
         Clients.Caller.ProductInfo(response);
+    }
+
+    public void GetPrice(dynamic _params)
+    {
+        string ma_sanpham = _params.spnew;
+        string spchanged = _params.sp;
+        var response = new Dictionary<string, object>()
+        {
+            { "Success", false },
+            { "Message", "" }
+        };
+        try
+        {
+            var db = new LinqDBDataContext();
+            string strsql =
+                    @"select T.* from(
+					select gsp.gia,
+					row_number() over(partition by sp.ma_sanpham order by pbg.ngay_hieuluc desc) as rn
+					FROM md_sanpham sp, md_banggia bg, md_phienbangia pbg,
+					 md_giasanpham gsp, md_dongtien dt 
+					 WHERE gsp.md_phienbangia_id = pbg.md_phienbangia_id 
+					 AND pbg.md_banggia_id = bg.md_banggia_id 
+					 AND bg.md_dongtien_id = dt.md_dongtien_id 
+					 AND gsp.hoatdong = 1 AND bg.banggiaban = 1 
+					 AND sp.ma_sanpham = N'{0}' 
+					 AND substring(bg.ten_banggia,0,5) = 'FOB-'
+					 AND gsp.md_sanpham_id = sp.md_sanpham_id
+				 )T
+				where T.rn = 1";
+
+            strsql = string.Format(strsql, ma_sanpham);
+            System.Data.DataTable dt = mdbc.GetData(strsql);
+            var rs = new Dictionary<string, object>();
+            rs["ma_sanpham"] = ma_sanpham;
+            rs["spcu"] = spchanged;
+            rs["gia"] = "(unknown)";
+            foreach (System.Data.DataRow row in dt.Rows)
+            {
+                rs["gia"] = "$" + row["gia"].ToString();
+                break;
+            }
+
+            response["Success"] = true;
+            response["Message"] = JsonConvert.SerializeObject(rs);
+        }
+        catch (Exception ex)
+        {
+            response["Message"] = ex.Message;
+        }
+        Clients.Caller.GetPrice(response);
+    }
+
+    public void PartnerInfo(string parrams)
+    {
+        var response = new Dictionary<string, object>()
+        {
+            { "Success", false },
+            { "Message", "" }
+        };
+        try
+        {
+            var db = new LinqDBDataContext();
+            var dtkds = from a in db.md_doitackinhdoanhs.Where(s => s.hoatdong == true)
+                        join b in db.md_loaidtkds on a.md_loaidtkd_id equals b.md_loaidtkd_id
+                        where b.ma_loaidtkd == "KH"
+                        orderby a.ma_dtkd
+                        select new { a.ma_dtkd, a.ten_dtkd, a.tel, a.email, a.diachi };
+            string json = "[";
+            string json_detail = "";
+            foreach (var dtkd in dtkds)
+            {
+                json_detail += "{\"ma_dtkd\":\"" + dtkd.ma_dtkd + "\",";
+                json_detail += "\"title\":\"" + dtkd.ten_dtkd + "\",";
+                json_detail += "\"phone\":\"" + dtkd.tel + "\",";
+                json_detail += "\"email\":\"" + dtkd.email + "\",";
+                json_detail += "\"address\":\"" + dtkd.diachi + "\"},";
+            }
+            if (json_detail != "")
+            {
+                json_detail = json_detail.Substring(0, json_detail.Length - 1);
+            }
+            json += json_detail + "]";
+
+            response["Success"] = true;
+            response["Message"] = json;
+        }
+        catch (Exception ex)
+        {
+            response["Message"] = ex.Message;
+        }
+        Clients.Caller.PartnerInfo(response);
+    }
+
+    public void CreateQO(dynamic parrams)
+    {
+        var response = new Dictionary<string, object>()
+        {
+            { "Success", false },
+            { "Message", "" }
+        };
+
+        string msg = "";
+        try
+        {
+            var db = new LinqDBDataContext();
+            var exec = new ExcuteSignalR();
+            string username = parrams.username + "";
+            string ma_dtkd = parrams.ma_dtkd + "";
+            string ten_dtkd = parrams.ten_dtkd + "";
+            string email = parrams.email + "";
+            string phone = parrams.phone + "";
+            string address = parrams.address + "";
+            string nguoilienhe = parrams.nguoilienhe + "";
+            string json_data = parrams.json_data + "";
+            var d = JsonConvert.DeserializeObject<List<Objects.Json_product>>(json_data);
+
+            var nv = db.nhanviens.FirstOrDefault(p => p.manv == username);
+            if (nv == null)
+            {
+                msg = "Not found user \"" + username + "\" in system.";
+            }
+            else
+            {
+                var dtkd = exec.createDTKD(db, ma_dtkd, ten_dtkd, email, phone, address, nguoilienhe);
+
+                bool hd = false, gia_db = false;
+                int check = 0; // validate form on server
+                int qo_mau = 1;
+
+                String sochungtu = jqGridHelper.Utils.taoChungTuQO(dtkd.md_doitackinhdoanh_id, qo_mau, DateTime.Now.Year.ToString());
+
+
+                string md_trongluong_id = "", md_cangbien_id = "", md_dongtien_id = "", md_kichthuoc_id = "";
+                md_trongluong trl = db.md_trongluongs.FirstOrDefault(s => s.ten_trongluong == "kg");
+                md_dongtien dtien = db.md_dongtiens.FirstOrDefault(s => s.ma_iso == "USD");
+                md_cangbien cb = db.md_cangbiens.FirstOrDefault(s => s.ma_cangbien == "HCMP");
+                md_kichthuoc kt = db.md_kichthuocs.FirstOrDefault(s => s.ten_kichthuoc == "cm");
+                if (trl != null)
+                {
+                    md_trongluong_id = trl.md_trongluong_id;
+                    md_dongtien_id = dtien.md_dongtien_id;
+                    md_kichthuoc_id = kt.md_kichthuoc_id;
+                    md_cangbien_id = cb.md_cangbien_id;
+                }
+
+                c_baogia mnu = new c_baogia
+                {
+                    c_baogia_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                    sobaogia = sochungtu,
+
+                    md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id,
+                    shipmenttime = 75,
+                    ngaybaogia = DateTime.Now,
+                    ngayhethan = DateTime.Now.AddMonths(6),
+                    md_trongluong_id = md_trongluong_id,
+                    md_cangbien_id = md_cangbien_id,
+                    md_dongtien_id = md_dongtien_id,
+                    md_kichthuoc_id = md_kichthuoc_id,
+                    totalcbm = 0,
+                    totalcbf = 0,
+                    totalquo = 0,
+                    isform = true,
+                    moq_item_color = "",
+                    md_trangthai_id = "SOANTHAO",
+
+                    nguoitao = username,
+                    nguoicapnhat = username,
+                    mota = "",
+                    hoatdong = hd,
+                    gia_db = gia_db,
+                    ngaytao = DateTime.Now,
+                    ngaycapnhat = DateTime.Now
+                };
+
+                if (json_data == null | json_data == "" | json_data == "[]")
+                {
+                    check = 1;
+                    msg = "Error: Have no product.";
+                }
+                else if (ma_dtkd.Trim() == "")
+                {
+                    check = 1;
+                    msg = "Error: Customer Code is not empty.";
+                }
+                else if (ten_dtkd.Trim() == "")
+                {
+                    check = 1;
+                    msg = "Error: Customer Name is not empty.";
+                }
+
+                if (check == 0)
+                {
+                    if (1 == 1)
+                    {
+                        c_baogiaqr mnuqr = new c_baogiaqr();
+                        mnu.CopyPropertiesTo(mnuqr);
+                        mnuqr.c_baogiaqr_id = mnu.c_baogia_id;
+                        mnuqr.sobaogia = "***/" + sochungtu.Substring(4);
+                        db.c_baogiaqrs.InsertOnSubmit(mnuqr);
+                        db.SubmitChanges();
+
+                        String getOrder = "select max(sothutu) as count from c_chitietbaogiaqr where c_baogiaqr_id = @c_baogia_id";
+                        object omax = mdbc.ExecuteScalar(getOrder, "@c_baogia_id", mnuqr.c_baogiaqr_id);
+                        int maxOrder = (omax.ToString().Equals("")) ? 0 : (int)omax;
+                        foreach (var row in d)
+                        {
+                            decimal gia_fob = 0;
+                            try { gia_fob = decimal.Parse(row.gia_fob.Replace("$", "").Replace(" ", "")); } catch { }
+                            exec.add_ctbg(row.ma_sanpham, maxOrder, gia_fob, mnuqr.c_baogiaqr_id, username, dtkd.md_doitackinhdoanh_id, db, "qr", row.soluong);
+                        }
+                        db.SubmitChanges();
+                    }
+
+                    try
+                    {
+                        var ms = new MemoryStream();
+                        // Lấy thông tin smtp
+                        md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
+                        var context = System.Web.HttpContext.Current;
+                        String path = context.Server.MapPath("~/FileSendMail/");
+                        String fileNameXLS = nv.manv + "-Quotation-" + DateTime.Now.ToString("mmhh-dd-MM-yyyy") + ".xls";
+                        String logoPath = context.Server.MapPath("~/images/anco_logo_print.png");
+                        String productImagePath = context.Server.MapPath("~/images/products/fullsize/");
+                        var rptQO = new Objects.BaoGiaMauReport_QRCode(db, mnu.c_baogia_id, logoPath, productImagePath, "qr");
+
+                        NPOI.HSSF.UserModel.HSSFWorkbook wb = rptQO.CreateWBQuotation();
+                        wb.Write(ms);
+                        File.WriteAllBytes(path + fileNameXLS, ms.ToArray());
+                        ms.Close();
+                        md_mailtemplate tmp = db.md_mailtemplates.FirstOrDefault(p => p.use_for.Equals("QRCode") && p.default_mail.Equals(true));
+                        GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.Value);
+                        email = email.Trim();
+                        if (email == "")
+                        {
+                            email = nv.email;
+                        }
+                        else
+                        {
+                            emailcc = emailcc + "," + nv.email;
+                        }
+
+                        if (nguoilienhe.Trim() != "")
+                        {
+                            ten_dtkd = nguoilienhe;
+                        }
+                        emailcc = "";
+                        mail.Send(nv.email, email, emailcc, "", tmp.subject_mail,
+                        tmp.content_mail.Replace("%0D", "<br/>").Replace("[ten_dtkd]", ten_dtkd), path + fileNameXLS);
+                        msg = parrams.success;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        msg = parrams.success + "\nSend mail error." + ex.Message;
+                    }
+                    response["Success"] = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            msg = ex + "";
+        }
+        response["Message"] = msg;
+        response["data_bk"] = parrams.data_bk;
+        Clients.Caller.QOPOexcute(response);
+    }
+
+    public void CreatePO(dynamic parrams)
+    {
+        var response = new Dictionary<string, object>()
+        {
+            { "Success", false },
+            { "Message", "" }
+        };
+        string msg = "";
+        try
+        {
+            var db = new LinqDBDataContext();
+            var exec = new ExcuteSignalR();
+            string username = parrams.username + "";
+            string ma_dtkd = parrams.ma_dtkd + "";
+            string ten_dtkd = parrams.ten_dtkd + "";
+            string email = parrams.email + "";
+            string phone = parrams.phone + "";
+            string address = parrams.address + "";
+            string nguoilienhe = parrams.nguoilienhe + "";
+            string json_data = parrams.json_data + "";
+            var d = JsonConvert.DeserializeObject<List<Objects.Json_product>>(json_data);
+            var nv = db.nhanviens.FirstOrDefault(p => p.manv == username);
+            if (nv == null)
+            {
+                msg = "Not found user \"" + username + "\" in system.";
+            }
+            else if (ma_dtkd.Trim() == "")
+            {
+                msg = "Error: Customer Code is not empty.";
+            }
+            else if (ten_dtkd.Trim() == "")
+            {
+                msg = "Error: Customer Name is not empty.";
+            }
+            else if (json_data == null | json_data == "" | json_data == "[]")
+            {
+                msg = "Error: Have no product.";
+            }
+            else
+            {
+                md_doitackinhdoanh dtkd = exec.createDTKD(db, ma_dtkd, ten_dtkd, email, phone, address, nguoilienhe);
+                string sochungtu = jqGridHelper.Utils.taoChungTuPO(dtkd.md_doitackinhdoanh_id, 1, DateTime.Now.Year.ToString());
+
+                string md_trongluong_id = "", md_cangbien_id = "", md_dongtien_id = "", md_kichthuoc_id = "", md_nganhang_id = "", md_paymentterm_id = "";
+                md_trongluong trl = db.md_trongluongs.FirstOrDefault(s => s.ten_trongluong == "kg");
+                md_dongtien dtien = db.md_dongtiens.FirstOrDefault(s => s.ma_iso == "USD");
+                md_cangbien cb = db.md_cangbiens.FirstOrDefault(s => s.ma_cangbien == "HCMP");
+                md_kichthuoc kt = db.md_kichthuocs.FirstOrDefault(s => s.ten_kichthuoc == "cm");
+                md_nganhang nh = db.md_nganhangs.FirstOrDefault(s => s.ma_nganhang == "VIETCOMBANK");
+                md_paymentterm pmt = db.md_paymentterms.FirstOrDefault(s => s.ten_paymentterm == "CAD AT 60 DAYS");
+                if (trl != null)
+                {
+                    md_trongluong_id = trl.md_trongluong_id;
+                    md_dongtien_id = dtien.md_dongtien_id;
+                    md_kichthuoc_id = kt.md_kichthuoc_id;
+                    md_cangbien_id = cb.md_cangbien_id;
+                }
+
+                if (nh != null)
+                {
+                    md_nganhang_id = nh.md_nganhang_id;
+                }
+
+                if (pmt != null)
+                {
+                    md_paymentterm_id = pmt.md_paymentterm_id;
+                }
+                string c_donhang_id = ImportUtils.getNEWID();
+                c_donhangqr mnu = new c_donhangqr();
+                mnu.c_donhangqr_id = c_donhang_id;
+                mnu.md_trangthai_id = "SOANTHAO";
+                mnu.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id;
+                mnu.c_baogia_id = "";
+                mnu.ngaylap = DateTime.Now;
+                mnu.nguoilap = nv.manv;
+                mnu.md_cangbien_id = md_cangbien_id;
+                mnu.discount = 0;
+                mnu.shipmentdate = DateTime.Now.AddMonths(6);
+                mnu.shipmenttime = DateTime.Now.AddMonths(6);
+                mnu.md_paymentterm_id = md_paymentterm_id;
+                mnu.md_nganhang_id = md_nganhang_id;
+                mnu.md_trongluong_id = md_trongluong_id;
+                mnu.md_dongtien_id = md_dongtien_id;
+                mnu.md_kichthuoc_id = md_kichthuoc_id;
+                mnu.cont20 = 0;
+                mnu.cont40 = 0;
+                mnu.cont40hc = 0;
+                mnu.cont45 = 0;
+                mnu.contle = 0;
+                mnu.payer = "";
+                mnu.portdischarge = "";
+                mnu.donhang_mau = true;
+                mnu.isdonhangtmp = false;
+                mnu.dagui_mail = false;
+                mnu.hoahong = 0;
+                mnu.md_nguoilienhe_id = "";
+                mnu.ismakepi = false;
+                mnu.customer_order_no = "";
+                mnu.gia_db = false;
+                mnu.chkPBGCu = false;
+                mnu.phienbangiacu = "";
+                mnu.ghichu = "";
+                mnu.ngaydieuchinh = DateTime.Now;
+                mnu.md_banggia_id = "";
+                mnu.sochungtu = "***/" + sochungtu.Substring(4);
+
+                mnu.mota = "";
+                mnu.hoatdong = true;
+                mnu.ngaytao = DateTime.Now;
+                mnu.ngaycapnhat = DateTime.Now;
+                mnu.nguoitao = nv.manv;
+                mnu.nguoicapnhat = nv.manv;
+
+                db.c_donhangqrs.InsertOnSubmit(mnu);
+                db.SubmitChanges();
+
+                String getOrder = "select max(sothutu) as count from c_dongdonhangqr where c_donhangqr_id = @c_donhang_id";
+                object omax = mdbc.ExecuteScalar(getOrder, "@c_donhang_id", c_donhang_id);
+                int maxOrder = (omax.ToString().Equals("")) ? 0 : (int)omax;
+                foreach (var row in d)
+                {
+                    decimal gia_fob = 0;
+                    try { gia_fob = decimal.Parse(row.gia_fob.Replace("$", "").Replace(" ", "")); } catch { }
+                    exec.add_ctdonhang(row.ma_sanpham, row.soluong.ToString(), maxOrder, gia_fob, mnu.c_donhangqr_id, username, dtkd.md_doitackinhdoanh_id, db, "qr");
+                }
+                db.SubmitChanges();
+                response["Success"] = true;
+                msg = parrams.success;
+            }
+        }
+        catch (Exception ex)
+        {
+            msg = ex + "";
+        }
+        response["Message"] = msg;
+        response["data_bk"] = parrams.data_bk;
+        Clients.Caller.QOPOexcute(response);
+    }
+
+    public void SendMailQO(dynamic parrams)
+    {
+        var response = new Dictionary<string, object>()
+        {
+            { "Success", false },
+            { "Message", "" }
+        };
+        string msg = "";
+        try
+        {
+            var db = new LinqDBDataContext();
+            var exec = new ExcuteSignalR();
+            string username = parrams.username + "";
+            string ma_dtkd = parrams.ma_dtkd + "";
+            string ten_dtkd = parrams.ten_dtkd + "";
+            string email = parrams.email + "";
+            string phone = parrams.phone + "";
+            string address = parrams.address + "";
+            string nguoilienhe = parrams.nguoilienhe + "";
+            string json_data = parrams.json_data + "";
+            var d = JsonConvert.DeserializeObject<List<Objects.Json_product>>(json_data);
+
+            md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
+            nhanvien nv = db.nhanviens.FirstOrDefault(p => p.manv == username);
+            if (nv == null)
+            {
+                msg = "Not found user \"" + username + "\" in system.";
+            }
+            else if (ten_dtkd == "" | ten_dtkd == null)
+            {
+                msg = "Customer Name is not empty.";
+            }
+            else if (email == "" | email == null)
+            {
+                msg = "Email is not empty.";
+            }
+            else if (d.Count() <= 0)
+            {
+                msg = "Have no products.";
+            }
+            else
+            {
+                try
+                {
+                    string html_span = "<span style=\"font-size: 11.0pt; font-family: 'Calibri','sans-serif'\">{0}</span>";
+                    GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.Value);
+                    string subject = "[Anco] Product information (" + DateTime.Now.ToString("dd/MM/yyyy HH:mm") + ")";
+                    string body = "";
+                    body += string.Format(html_span, "Dear " + (nguoilienhe.Trim() != "" ? nguoilienhe : ten_dtkd));
+                    body += "<br><br>";
+
+                    body += string.Format(html_span, "Thank you for your time to visit us.");
+                    body += "<br><br>";
+
+                    body += string.Format(html_span, "Following your visit, we would like to send a quick summary of your selected items as follows:");
+                    body += "<br><br>";
+
+                    body += "<table>";
+                    body += "<tr><th>Item</th><th style='width:10px'></th><th>Price</th></tr>";
+
+                    foreach (var row in d)
+                    {
+                        body += "<tr><td><b>" + string.Format(html_span, row.ma_sanpham) + "</b></td>";
+                        body += "<td></td>";
+                        body += "<td>" + string.Format(html_span, row.gia_fob) + "</td></tr>";
+                    }
+                    body += "</table>";
+                    body += "<br><br>";
+
+                    body += string.Format(html_span, "The detailed photo quotation will be sent to you in couple days.");
+                    body += "<br><br>";
+
+                    body += string.Format(html_span, "Thank you for your kind attention.");
+                    body += "<br><br>";
+
+                    body += string.Format(html_span, "Kind Regards,");
+                    body += "<br>";
+                    body += string.Format(html_span, "Anco Company Limited");
+
+
+                    mail.Send(nv.email, email.Trim(), emailcc + "," + nv.email, subject, body, "");
+                    response["Success"] = true;
+                    msg = parrams.success;
+                }
+                catch (Exception ex)
+                {
+                    msg = ex.Message;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            msg = ex + "";
+        }
+        response["Message"] = msg;
+        response["data_bk"] = parrams.data_bk;
+        Clients.Caller.QOPOexcute(response);
+    }
+
+    public void SendMail(dynamic parrams)
+    {
+        var response = new Dictionary<string, object>()
+        {
+            { "Success", false },
+            { "Message", "" }
+        };
+        string msg = "";
+        try
+        {
+            var db = new LinqDBDataContext();
+            var exec = new ExcuteSignalR();
+            string username = parrams.username + "";
+            string ma_dtkd = parrams.ma_dtkd + "";
+            string ten_dtkd = parrams.ten_dtkd + "";
+            string email = parrams.email + "";
+            string phone = parrams.phone + "";
+            string address = parrams.address + "";
+            string nguoilienhe = parrams.nguoilienhe + "";
+            string note = parrams.note + "";
+            string json_data = parrams.json_data + "";
+            var d = JsonConvert.DeserializeObject<List<Objects.Json_product>>(json_data);
+
+            md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
+            nhanvien nv = db.nhanviens.FirstOrDefault(p => p.manv == username);
+            if (nv == null)
+            {
+                msg = "Not found user \"" + username + "\" in system.";
+            }
+            else if (ten_dtkd == "" | ten_dtkd == null)
+            {
+                msg = "Customer Name is not empty.";
+            }
+            else if (email == "" | email == null)
+            {
+                msg = "Email is not empty.";
+            }
+            else if (d.Count() <= 0)
+            {
+                msg = "Have no products.";
+            }
+            else
+            {
+                string html_span = "<span style=\"font-size: 11.0pt; font-family: 'Calibri','sans-serif'\">{0}</span>";
+                GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.Value);
+                string subject = "Request a quote for customer \"" + ten_dtkd + "\"";
+                string body = "";
+                body += string.Format(html_span, "Dear Anco's Sales Team,");
+                body += "<br><br>";
+
+                body += string.Format(html_span, "We are " + ten_dtkd + ". We are interested in your following items:");
+                body += "<br><br>";
+
+                foreach (var row in d)
+                {
+                    body += "<b>" + string.Format(html_span, row.ma_sanpham) + "</b>";
+                    body += "<br>";
+                }
+
+                body += "<br>";
+                body += string.Format(html_span, "Please send us a quotation for the above-mentioned items through our following contact:");
+                body += "<br>";
+                body += "<br>";
+
+                body += string.Format(html_span, "- Our company's name: " + ten_dtkd);
+                body += "<br>";
+                body += string.Format(html_span, "- Our address: " + address);
+                body += "<br>";
+                body += string.Format(html_span, "- Our email's address: " + email);
+                body += "<br>";
+                body += string.Format(html_span, "- Person contact: " + nguoilienhe);
+                body += "<br>";
+                body += string.Format(html_span, "- Customer's brief introduction: " + note);
+                body += "<br>";
+                body += "<br>";
+
+                body += string.Format(html_span, "We look forward to receiving your quotation.");
+                body += "<br>";
+                body += "<br>";
+
+                body += string.Format(html_span, "Kind Regards,");
+                body += "<br>";
+                body += string.Format(html_span, nguoilienhe);
+
+                mail.Send(nv.email, email.Trim(), emailcc, subject, body, "");
+                response["Success"] = true;
+                msg = parrams.success;
+            }
+        }
+        catch (Exception ex)
+        {
+            msg = ex + "";
+        }
+        response["Message"] = msg;
+        response["data_bk"] = parrams.data_bk;
+        Clients.Caller.QOPOexcute(response);
     }
 }
