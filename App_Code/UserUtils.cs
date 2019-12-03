@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 
 public static class UserUtils
@@ -16,110 +17,108 @@ public static class UserUtils
     //Mail Ke Toan NCU
     public static string mailKeToanNCU = "ketoanTEST@ancometal.com";
 
-    public static decimal get_gianhap(HttpContext context, string ma_dtkd_select, decimal gia_fob, decimal discount, decimal discount_vinhgia) {
-		//Tinh % theo nha cung ung
-		
-		int getptr = 0;
-		//lay % gia mua
-		if(gia_fob == -1 & discount == -1 & discount_vinhgia ==  -1)
-			getptr = 1;
-		//lay ty gia mua
-		else if(gia_fob == -2 & discount == -2 & discount_vinhgia ==  -2)
-			getptr = 2;
-		
-		decimal gianhap = -1;
-		string[] arr1 = new string[] { "ANBINH","ANCO1","ANCO2" };
+    public static decimal get_gianhap(HttpContext context, string ma_dtkd_select, decimal gia_fob, decimal discount, decimal discount_vinhgia)
+    {
+        //Tinh % theo nha cung ung
+
+        int getptr = 0;
+        //lay % gia mua
+        if (gia_fob == -1 & discount == -1 & discount_vinhgia == -1)
+            getptr = 1;
+        //lay ty gia mua
+        else if (gia_fob == -2 & discount == -2 & discount_vinhgia == -2)
+            getptr = 2;
+
+        decimal gianhap = -1;
+        string[] arr1 = new string[] { "ANBINH", "ANCO1", "ANCO2" };
         //Neu doi tac la VINHGIA
         if (("VINHGIA").Contains(ma_dtkd_select))
-		{
-			decimal tygia = /*23300*/1;
-			decimal discountVNN = decimal.Parse("0.82");
-			decimal	gianhaptam = gia_fob - (gia_fob * discount_vinhgia)/100;
+        {
+            decimal tygia = /*23300*/1;
+            decimal discountVNN = decimal.Parse("0.82");
+            decimal gianhaptam = gia_fob - (gia_fob * discount_vinhgia) / 100;
             gianhap = gianhaptam * discountVNN;
-			gianhap = gianhap * tygia;
-			
-			if(getptr == 1) {
-				gianhap = 1;
-				gianhap = gianhap * discountVNN;
-			}
-			else if(getptr == 2) {
-				gianhap = tygia;
-			}
-			else {
-				if(tygia > 1) {
-					gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
-				}
-			}
-		}
-		//Neu doi tac la ANBINH, ANCO1, ANCO2
-		else if(arr1.Contains(ma_dtkd_select))
-		{
-			decimal tygia = 23000;
-			decimal discountVNN = decimal.Parse("0.80");
-			decimal gianhaptam = gia_fob - (gia_fob*discount)/100;
-			gianhap = gianhaptam * discountVNN;
-			gianhap = gianhap * tygia;
-			if(getptr == 1) {
-				gianhap = 1;
-				gianhap =  gianhap * discountVNN;
-			}
-			else if(getptr == 2) {
-				gianhap = tygia;
-			}
-			else {
-				if(ma_dtkd_select == "ANCO1") 
-				{
-					if(tygia > 1) {
-						gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
-					}
-				}
-				else {
-					gianhap = -1;
-				}
-			}
-		}
-		//Neu doi tac la TITAN
-		else if(ma_dtkd_select == "TITAN")
-		{
-			decimal tygia = 22200;
-			decimal discountVNN = decimal.Parse("0.95");
-			decimal gianhaptam = gia_fob - (gia_fob*discount)/100;
-			gianhap = gianhaptam * discountVNN;
-			gianhap = gianhap * tygia;
-			if(getptr == 1) {
-				gianhap = 1;
-				gianhap = gianhap * discountVNN;
-			}
-			else if(getptr == 2) {
-				gianhap = tygia;
-			}
-			else {
-				if(tygia > 1) {
-					gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
-				}
-			}
-		}
-		
-		
-		 /////////////////
-		 
-		// //Neu doi tac la VINHGIA_HACA-HK, VINHGIA_HACA2-SB7, VINHGIA_HACA2-RESTO, VINHGIA_HACA2-CB, VINHGIA_HACA2, VINHGIA_HACA
-		// else if(("VINHGIA_HACA-HK, VINHGIA_HACA2-SB7, VINHGIA_HACA2-RESTO, VINHGIA_HACA2-CB, VINHGIA_HACA2, VINHGIA_HACA").Contains(ma_dtkd_select))
-		// {
-		// gianhap = item.giafob.Value * 21100;
-		// }
-			 // //Neu doi tac la ANBINH_HACA2-CB, ANBINH_HACA2, ANBINH_HACA-HK
-		// else if(("ANBINH_HACA2-CB, ANBINH_HACA2, ANBINH_HACA-HK ").Contains(ma_dtkd_select))
-		// {
-				// gianhap = item.giafob.Value * 21500;
-		// }
-		// //Neu doi tac la ANCO1_HACA-HK, ANCO2_HACA-HK, ANCO2_HACA2
-		// else if(("ANCO1_HACA-HK, ANCO2_HACA-HK, ANCO2_HACA2, ANBINH_HACA-HK").Contains(ma_dtkd_select))
-		// {
-		// gianhap = item.giafob.Value * 21500;
-		// }
-		return gianhap;
-	}
+            gianhap = gianhap * tygia;
+
+            if (getptr == 1)
+            {
+                gianhap = 1;
+                gianhap = gianhap * discountVNN;
+            }
+            else if (getptr == 2)
+            {
+                gianhap = tygia;
+            }
+            else
+            {
+                if (tygia > 1)
+                {
+                    gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
+                }
+            }
+        }
+        //Neu doi tac la ANBINH, ANCO1, ANCO2 tỷ giá mua theo ngay tạo
+        else if (arr1.Contains(ma_dtkd_select))
+        {
+            decimal tygia = 23000;
+            decimal discountVNN = decimal.Parse("0.80");
+            decimal gianhaptam = gia_fob - (gia_fob * discount) / 100;
+            gianhap = gianhaptam * discountVNN;
+            gianhap = gianhap * tygia;
+            if (getptr == 1)
+            {
+                gianhap = 1;
+                gianhap = gianhap * discountVNN;
+            }
+            else if (getptr == 2)
+            {
+                //var db = new LinqDBDataContext();
+                //var tgm = db.md_tygiamuas.Where(s => s.ngayapdung <= DateTime.Now & s.ngayketthuc >= DateTime.Now).FirstOrDefault();
+                //tygia = (decimal)tgm.nhan_voi.Value;
+                gianhap = tygia;
+            }
+            else
+            {
+                if (ma_dtkd_select == "ANCO1")
+                {
+                    if (tygia > 1)
+                    {
+                        gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
+                    }
+                }
+                else
+                {
+                    gianhap = -1;
+                }
+            }
+        }
+        //Neu doi tac la TITAN
+        else if (ma_dtkd_select == "TITAN")
+        {
+            decimal tygia = 22200;
+            decimal discountVNN = decimal.Parse("0.95");
+            decimal gianhaptam = gia_fob - (gia_fob * discount) / 100;
+            gianhap = gianhaptam * discountVNN;
+            gianhap = gianhap * tygia;
+            if (getptr == 1)
+            {
+                gianhap = 1;
+                gianhap = gianhap * discountVNN;
+            }
+            else if (getptr == 2)
+            {
+                gianhap = tygia;
+            }
+            else
+            {
+                if (tygia > 1)
+                {
+                    gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
+                }
+            }
+        }
+        return gianhap;
+    }
 
     public static Dictionary<string, object> get_giasanpham(HttpContext context, string c_baogia_id, string md_sanpham_id, LinqDBDataContext db)
     {
@@ -261,5 +260,22 @@ public static class UserUtils
         if (!string.IsNullOrEmpty(msg))
             msg = msg.Substring(0, msg.Length - 1);
         return msg;
+    }
+
+    public static void SetFormValue(string key, string value)
+    {
+        var collection = System.Web.HttpContext.Current.Request.Form;
+
+        // Get the "IsReadOnly" protected instance property.
+        var propInfo = collection.GetType().GetProperty("IsReadOnly", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        // Mark the collection as NOT "IsReadOnly"
+        propInfo.SetValue(collection, false, new object[] { });
+
+        // Change the value of the key.
+        collection[key] = value;
+
+        // Mark the collection back as "IsReadOnly"     
+        propInfo.SetValue(collection, true, new object[] { });
     }
 }
