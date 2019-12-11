@@ -344,11 +344,11 @@ public class API_Android : IHttpHandler {
                         dong14 = dong14.Substring(2);
                     }
 
-                    if(dong9 == "") {
+                    /*if(dong9 == "") {
                         if(row["l1"].ToString() != "0.0" & row["w1"].ToString() != "0.0" & row["h1"].ToString() != "0.0") {
                             dong9 = row["l1"] + "x" + row["w1"] + "xH" + row["h1"] + "cm";
                         }
-                    }
+                    }*/
                 }
                 //dong 15
                 strsql =
