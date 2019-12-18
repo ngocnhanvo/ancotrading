@@ -88,7 +88,7 @@ public partial class ReportWizard_RptKhachHang_rpt_doanhsokh_quocgia_tyle : Syst
         }
         else
         {
-            Response.Write(sql);
+            Response.Write("<center><h1>Không có dữ liệu</h1></center>");
         }
     }
 
