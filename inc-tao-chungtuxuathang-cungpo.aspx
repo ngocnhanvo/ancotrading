@@ -544,20 +544,7 @@
 							id: "btn_po",
 							text: "Có",
 							click: function() {
-							$("#create_pkl_po").ajaxStart(function() {
-									$("#wait").css("display", "block");
-									$("#btn_po").button("disable");
-									$("#btn_close").button("disable");
-								});
-
-								$("#create_pkl_po").ajaxComplete(function() {
-									$("#wait").css("display", "none");
-									$("#btn_close span").text("Thoát");
-									$("#btn_close").button("enable");
-								});
-
-								var data = new Object();
-								
+								let data = new Object();
 								data["txtSoPackingList"] = $(form + " #txtSoPackingList").val();
 								data["txtSoInvoice"] = $(form + " #txtSoInvoice").val();
 								data["txtNgayLap"] = $(form + " #txtNgayLap").val();
@@ -573,14 +560,23 @@
 								data["txtDienGiaiTruLai"] = $(form + " #txtDienGiaiTruLai").val();
 								data["txtGiaTriTruLai"] = $(form + " #txtGiaTriTruLai").val();
 								data["arrayPhieuXuat"] = $('#grid_ds_xuatkho_cungpo').getGridParam('selarrrow').join(", ");
+
+								$("#wait").css("display", "block");
+								$("#btn_po").button("disable");
+								$("#btn_close").button("disable");
+
 								$.ajax({
 									url: "Controllers/TaoPackingListController.ashx",
 									type: "POST",
 									data: { p: data },
-									error: function(rs) {
+									error: function (rs) {
+									    $("#wait").css("display", "none");
 										Popup("Error", 450, 300, rs.responseText);
 									},
-									success: function(rs) {
+									success: function (rs) {
+									    $("#wait").css("display", "none");
+									    $("#btn_close span").text("Thoát");
+									    $("#btn_close").button("enable");
 										$('#create_pkl_po').find('#dialog_caution').html(rs);
 									}
 								});
