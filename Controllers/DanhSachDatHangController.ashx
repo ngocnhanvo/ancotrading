@@ -924,7 +924,7 @@ public class DanhSachDatHangController : IHttpHandler
                             {
                                 mail.Send(nv.email, UserUtils.mailKCS, nv.email_cc, "", tmp.subject_mail, noidung, path + fileName + ";" + path + fileNamePdf + ";" + path + fileNameExcel);
                             }
-                            resp += String.Format("Đã gửi mail thành công đến:<br/>{0}<br/>{1}<br/>", nv.email_cc, "quality@ancometal.com");
+                            resp += String.Format("Đã gửi mail thành công đến:<br/>{0}<br/>{1}<br/>", nv.email_cc, UserUtils.mailKCS);
                         }
 
                         if (lstGNCC.Contains(sendMail[i]))
