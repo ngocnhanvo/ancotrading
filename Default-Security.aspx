@@ -52,11 +52,13 @@
                              gia = myRow.Field<bool>("gia"),
                              vaitro = myRow.Field<string>("tenvt")
                          }).FirstOrDefault();
-
-        if (xemgiaFld.gia == true)
-            xemgiaHH = true;
-        if (xemgiaFld.vaitro != "Nghiệp Vụ")
-            xemgiaNoiHH = true;
+		
+		if(xemgiaFld != null) {
+			if (xemgiaFld.gia == true)
+				xemgiaHH = true;
+			if (xemgiaFld.vaitro != "Nghiệp Vụ")
+				xemgiaNoiHH = true;
+		}
 
         xemgiaHHST = (from myRow in dt.AsEnumerable()
                       where myRow.Field<string>("mamenu") == "68ff4867b9727e6f4bb055821fe1fa75"
