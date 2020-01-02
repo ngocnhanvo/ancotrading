@@ -868,7 +868,7 @@ public class DanhSachDatHangController : IHttpHandler
                                         if (!string.IsNullOrEmpty(doitac.email))
                                             mail.Send(nv.email, doitac.email, nv.email_cc, "", tmp.subject_mail, noidung, fileDDHs[0] + ";" + fileDDHs[1] + ";" + pathInBaoBi);
                                         if (!string.IsNullOrEmpty(doitac.emailkt))
-                                            mail.Send(nv.email, doitac.emailkt, nv.email_cc, "", tmp.subject_mail, noidungKhongGia, fileDDHsKhongGia[0] + ";" + fileDDHsKhongGia[1] + ";" + pathInBaoBi);
+                                            mail.Send(nv.email, doitac.emailkt, "", "", tmp.subject_mail, noidungKhongGia, fileDDHsKhongGia[0] + ";" + fileDDHsKhongGia[1] + ";" + pathInBaoBi);
                                     }
                                 }
                                 else
@@ -878,7 +878,7 @@ public class DanhSachDatHangController : IHttpHandler
                                         if (!string.IsNullOrEmpty(doitac.email))
                                             mail.Send(nv.email, doitac.email, nv.email_cc, "", tmp.subject_mail, noidung, fileDDHs[0] + ";" + fileDDHs[1] + ";" + pathInBaoBi + ";" + path + fileNameExcel);
                                         if (!string.IsNullOrEmpty(doitac.emailkt))
-                                            mail.Send(nv.email, doitac.emailkt, nv.email_cc, "", tmp.subject_mail, noidungKhongGia, fileDDHsKhongGia[0] + ";" + fileDDHsKhongGia[1] + ";" + pathInBaoBi + ";" + path + fileNameExcel);
+                                            mail.Send(nv.email, doitac.emailkt, "", "", tmp.subject_mail, noidungKhongGia, fileDDHsKhongGia[0] + ";" + fileDDHsKhongGia[1] + ";" + pathInBaoBi + ";" + path + fileNameExcel);
                                     }
                                 }
                                 resp += string.Format("<br/>Đã gửi mail thành công đến:<br/>{0}<br/>{1}<br/>", ccSend, toSend);
@@ -1284,8 +1284,8 @@ public class DanhSachDatHangController : IHttpHandler
     public List<string> taoFileDonDatHang(HttpContext context, string manv, string ma_dtkd, c_danhsachdathang dsdh, bool guiNCC)
     {
         //-Tao file dinh kem
-        String fileName = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + ".xls";
-        String fileNamePdf = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + ".pdf";
+        String fileName = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + guiNCC.ToString() + ".xls";
+        String fileNamePdf = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy")+ guiNCC.ToString() + ".pdf";
         MemoryStream ms = new MemoryStream();
         //-- Tao excel
 
