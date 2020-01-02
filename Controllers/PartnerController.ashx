@@ -60,48 +60,48 @@ public class PartnerController : IHttpHandler
 
     public void getHoaHong(HttpContext context) {
         string dtkd_id = context.Request.Form["md_doitackinhdoanh_id"];
-		string sct_dh = context.Request.Form["sct_dh"];
-		string where_ex = "";
-		string id_dt = "";
-		string ma_dt = "";
-		decimal hh_ = 0;
-		c_donhang dh = db.c_donhangs.FirstOrDefault(d=>d.sochungtu == sct_dh);
-		if(dh != null) {
-			if(dh.md_nguoilienhe_id != null & dh.md_nguoilienhe_id != "") {
-				where_ex = " and lh.doitaclienquan = '"+ dh.md_nguoilienhe_id +"'";
-			}		
-			else {
-				where_ex = " and lh.md_doitackinhdoanh_id = '" + dtkd_id + "'";
-			}
-		}
-		else {
-			where_ex = " and lh.md_doitackinhdoanh_id = '" + dtkd_id + "'";
-		}			
-		
-		String sql = String.Format(@"select top 1 lh.doitaclienquan, (select ma_dtkd from md_doitackinhdoanh where md_doitackinhdoanh_id = lh.doitaclienquan) as tendtkd
+        string sct_dh = context.Request.Form["sct_dh"];
+        string where_ex = "";
+        string id_dt = "";
+        string ma_dt = "";
+        decimal hh_ = 0;
+        c_donhang dh = db.c_donhangs.FirstOrDefault(d=>d.sochungtu == sct_dh);
+        if(dh != null) {
+            if(dh.md_nguoilienhe_id != null & dh.md_nguoilienhe_id != "") {
+                where_ex = " and lh.doitaclienquan = '"+ dh.md_nguoilienhe_id +"'";
+            }
+            else {
+                where_ex = " and lh.md_doitackinhdoanh_id = '" + dtkd_id + "'";
+            }
+        }
+        else {
+            where_ex = " and lh.md_doitackinhdoanh_id = '" + dtkd_id + "'";
+        }
+
+        String sql = String.Format(@"select top 1 lh.doitaclienquan, (select ma_dtkd from md_doitackinhdoanh where md_doitackinhdoanh_id = lh.doitaclienquan) as tendtkd
 									 from md_nguoilienhe lh
 									 where 1=1 "+ where_ex);
-		String sql_hh = String.Format(@"select top 1 coalesce(lh.muchoahong, 0)
+        String sql_hh = String.Format(@"select top 1 coalesce(lh.muchoahong, 0)
 									 from md_nguoilienhe lh
 									 where 1=1 "+ where_ex);
-		DataTable data = mdbc.GetData(sql);
-		
-		if(data.Rows.Count > 0){
-			id_dt = data.Rows[0][0].ToString();
-			ma_dt = data.Rows[0][1].ToString();
-		}
-		object hh = mdbc.ExecuteScalar(sql_hh);
-		hh_ = (hh == null) ? 0 : decimal.Parse(hh.ToString());
-		SelectHtmlControl s = new SelectHtmlControl(sql);
-		
-		string xml = "<root>";
-		xml += "<madtkd>" + id_dt + "</madtkd>";
-		xml += "<tendtkd>" + ma_dt + "</tendtkd>";
-		xml += "<hoahong>" + hh_ + "</hoahong>";
-		xml += "</root>";
-		context.Response.Write(xml);
-	}
-    
+        DataTable data = mdbc.GetData(sql);
+
+        if(data.Rows.Count > 0){
+            id_dt = data.Rows[0][0].ToString();
+            ma_dt = data.Rows[0][1].ToString();
+        }
+        object hh = mdbc.ExecuteScalar(sql_hh);
+        hh_ = (hh == null) ? 0 : decimal.Parse(hh.ToString());
+        SelectHtmlControl s = new SelectHtmlControl(sql);
+
+        string xml = "<root>";
+        xml += "<madtkd>" + id_dt + "</madtkd>";
+        xml += "<tendtkd>" + ma_dt + "</tendtkd>";
+        xml += "<hoahong>" + hh_ + "</hoahong>";
+        xml += "</root>";
+        context.Response.Write(xml);
+    }
+
     public void getSelectOptionHoaHong(HttpContext context)
     {
         String sql = @"select md_doitackinhdoanh_id as id, ma_dtkd 
@@ -113,27 +113,27 @@ public class PartnerController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
+
     public void getSearchOption(HttpContext context)
     {
         String isNCC = context.Request.QueryString["isncc"];
-		switch (isNCC)
+        switch (isNCC)
         {
             case "0":
                 isNCC = "and ldt.ma_loaidtkd = 'KH'";
                 break;
             case "1":
-				isNCC = "and ldt.ma_loaidtkd = 'NCC'";
+                isNCC = "and ldt.ma_loaidtkd = 'NCC'";
                 break;
-			case "2":
-				isNCC = "and ldt.ma_loaidtkd = 'NHH'";
+            case "2":
+                isNCC = "and ldt.ma_loaidtkd = 'NHH'";
                 break;
             default:
                 isNCC = "";
                 break;
         }
 
-		String sql = String.Format(@"select dtkd.md_doitackinhdoanh_id, dtkd.ma_dtkd 
+        String sql = String.Format(@"select dtkd.md_doitackinhdoanh_id, dtkd.ma_dtkd 
 		from md_doitackinhdoanh dtkd 
 		left join md_loaidtkd ldt on dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id
 		where dtkd.hoatdong = 1 {0} order by dtkd.ma_dtkd asc", isNCC);
@@ -170,22 +170,22 @@ public class PartnerController : IHttpHandler
     public void getSelectOption(HttpContext context)
     {
         String isNCC = context.Request.QueryString["isncc"];
-		switch (isNCC)
+        switch (isNCC)
         {
             case "0":
                 isNCC = "and ldt.ma_loaidtkd = 'KH'";
                 break;
             case "1":
-				isNCC = "and ldt.ma_loaidtkd = 'NCC'";
+                isNCC = "and ldt.ma_loaidtkd = 'NCC'";
                 break;
-			case "2":
-				isNCC = "and ldt.ma_loaidtkd = 'NHH'";
+            case "2":
+                isNCC = "and ldt.ma_loaidtkd = 'NHH'";
                 break;
             default:
                 isNCC = "";
                 break;
         }
-        
+
         String sql = String.Format(@"select dtkd.md_doitackinhdoanh_id, dtkd.ma_dtkd 
 		from md_doitackinhdoanh dtkd 
 		left join md_loaidtkd ldt on dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id
@@ -273,15 +273,15 @@ public class PartnerController : IHttpHandler
 
         context.Response.Write(json);
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
         String incc = context.Request.Form["isncc"].ToLower();
         bool hd, ncc;
         hd = ncc = false;
-        
+
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
 
@@ -294,7 +294,7 @@ public class PartnerController : IHttpHandler
             m.md_loaidtkd_id = context.Request.Form["tenloai"];
             m.md_quocgia_id = context.Request.Form["tenqg"];
             m.md_khuvuc_id = context.Request.Form["tenkv"];
-			m.md_nguondtkd_id = context.Request.Form["md_nguondtkd_id"];
+            m.md_nguondtkd_id = context.Request.Form["md_nguondtkd_id"];
             m.md_banggia_id = context.Request.Form["banggia"] == "" ? null : context.Request.Form["banggia"];
             m.ma_dtkd = context.Request.Form["ma_dtkd"];
             m.ten_dtkd = context.Request.Form["ten_dtkd"];
@@ -303,6 +303,7 @@ public class PartnerController : IHttpHandler
             m.tel = context.Request.Form["tel"];
             m.fax = context.Request.Form["fax"];
             m.email = context.Request.Form["email"];
+            m.emailkt = context.Request.Form["emailkt"];
             m.url = context.Request.Form["url"];
             m.diachi = context.Request.Form["diachi"];
             m.so_taikhoan = context.Request.Form["so_taikhoan"];
@@ -347,7 +348,7 @@ public class PartnerController : IHttpHandler
                 md_loaidtkd_id = context.Request.Form["tenloai"],
                 md_quocgia_id = context.Request.Form["tenqg"],
                 md_khuvuc_id = context.Request.Form["tenkv"],
-				md_nguondtkd_id = context.Request.Form["md_nguondtkd_id"],
+                md_nguondtkd_id = context.Request.Form["md_nguondtkd_id"],
                 md_banggia_id = context.Request.Form["banggia"] == "" ? null : context.Request.Form["banggia"],
                 ma_dtkd = context.Request.Form["ma_dtkd"],
                 ten_dtkd = context.Request.Form["ten_dtkd"],
@@ -356,6 +357,7 @@ public class PartnerController : IHttpHandler
                 tel = context.Request.Form["tel"],
                 fax = context.Request.Form["fax"],
                 email = context.Request.Form["email"],
+                emailkt = context.Request.Form["emailkt"],
                 url = context.Request.Form["url"],
                 diachi = context.Request.Form["diachi"],
                 so_taikhoan = context.Request.Form["so_taikhoan"],
@@ -436,24 +438,24 @@ public class PartnerController : IHttpHandler
 								END    
 							END
 							SELECT count(distinct ColumnName) as count FROM @Results WHERE ColumnName != '[dbo].[md_doitackinhdoanh]'";
-		int count = (int)mdbc.ExecuteScalar(sqlCount);
-		if(count > 0)
-		{
-			jqGridHelper.Utils.writeResult(0, "ĐT/ Kinh doanh đang được sử dụng, không thể xóa!");
-		}
-		else
-		{
-			String sql = "delete from md_doitackinhdoanh where md_doitackinhdoanh_id IN (" + id + ")";
-			mdbc.ExcuteNonQuery(sql);
-			jqGridHelper.Utils.writeResult(1, "Xóa thành công.");
-		}
+        int count = (int)mdbc.ExecuteScalar(sqlCount);
+        if(count > 0)
+        {
+            jqGridHelper.Utils.writeResult(0, "ĐT/ Kinh doanh đang được sử dụng, không thể xóa!");
+        }
+        else
+        {
+            String sql = "delete from md_doitackinhdoanh where md_doitackinhdoanh_id IN (" + id + ")";
+            mdbc.ExcuteNonQuery(sql);
+            jqGridHelper.Utils.writeResult(1, "Xóa thành công.");
+        }
     }
 
     public void load(HttpContext context)
     {
         String isncc = context.Request.QueryString["isncc"];
         String productId = context.Request.QueryString["productId"];
-        
+
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
 
@@ -466,13 +468,13 @@ public class PartnerController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
         String sqlCount = "SELECT COUNT(1) AS count " +
             " FROM md_doitackinhdoanh dtkd " +
             " LEFT JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id " +
             " LEFT JOIN md_khuvuc kv ON dtkd.md_khuvuc_id = kv.md_khuvuc_id " +
             " LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id " +
-			" LEFT JOIN md_nguondtkd ndt ON dtkd.md_nguondtkd_id = ndt.md_nguondtkd_id" +
+            " LEFT JOIN md_nguondtkd ndt ON dtkd.md_nguondtkd_id = ndt.md_nguondtkd_id" +
             " WHERE 1=1 and dtkd.hoatdong = 1 {0} " + filter;
 
         if (isncc != null)
@@ -482,7 +484,7 @@ public class PartnerController : IHttpHandler
         else {
             sqlCount = String.Format(sqlCount, "");
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -511,22 +513,22 @@ public class PartnerController : IHttpHandler
 
         string strsql = "SELECT * FROM( " +
             " SELECT dtkd.md_doitackinhdoanh_id, dtkd.md_loaidtkd_id, dtkd.md_quocgia_id, dtkd.md_khuvuc_id, " +
-			" dtkd.ma_dtkd, dtkd.ten_dtkd, dtkd.daidien, dtkd.chucvu, dtkd.tel, dtkd.fax, dtkd.email, dtkd.url, dtkd.diachi, "+
-			" dtkd.md_banggia_id, dtkd.so_taikhoan, dtkd.nganhang, dtkd.masothue, dtkd.tong_congno, dtkd.isncc, " +
-			" dtkd.ngaytao, dtkd.nguoitao, dtkd.ngaycapnhat, dtkd.nguoicapnhat, dtkd.mota, dtkd.hoatdong, dtkd.islienhe, dtkd.isdocquyen, dtkd.md_cangbien_id, " +
-			" qg.ten_quocgia as tenqg, kv.ten_khuvuc as tenkv, ldt.ten_loaidtkd as tenloai, " +
+            " dtkd.ma_dtkd, dtkd.ten_dtkd, dtkd.daidien, dtkd.chucvu, dtkd.tel, dtkd.fax, dtkd.email, dtkd.emailkt, dtkd.url, dtkd.diachi, "+
+            " dtkd.md_banggia_id, dtkd.so_taikhoan, dtkd.nganhang, dtkd.masothue, dtkd.tong_congno, dtkd.isncc, " +
+            " dtkd.ngaytao, dtkd.nguoitao, dtkd.ngaycapnhat, dtkd.nguoicapnhat, dtkd.mota, dtkd.hoatdong, dtkd.islienhe, dtkd.isdocquyen, dtkd.md_cangbien_id, " +
+            " qg.ten_quocgia as tenqg, kv.ten_khuvuc as tenkv, ldt.ten_loaidtkd as tenloai, " +
             @" (case when md_cangbien_id is not null then (select ten_cangbien from md_cangbien where md_cangbien_id = dtkd.md_cangbien_id)
                     else null end) as cangbien, " +
-			" ndt.ten_nguondtkd as md_nguondtkd_id, " +
+            " ndt.ten_nguondtkd as md_nguondtkd_id, " +
             " ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
             " FROM md_doitackinhdoanh dtkd " +
-			" LEFT JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id " +
+            " LEFT JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id " +
             " LEFT JOIN md_khuvuc kv ON dtkd.md_khuvuc_id = kv.md_khuvuc_id " +
-            " LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id " + 
-			" LEFT JOIN md_nguondtkd ndt ON dtkd.md_nguondtkd_id = ndt.md_nguondtkd_id " +
+            " LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id " +
+            " LEFT JOIN md_nguondtkd ndt ON dtkd.md_nguondtkd_id = ndt.md_nguondtkd_id " +
             " WHERE 1=1 and dtkd.hoatdong = 1 {0} " + filter +
             " )P WHERE RowNum > @start AND RowNum < @end";
-        
+
         if (isncc != null)
         {
             strsql = String.Format(strsql, " AND isncc = " + isncc);
@@ -535,7 +537,7 @@ public class PartnerController : IHttpHandler
         {
             strsql = String.Format(strsql, "");
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
@@ -554,6 +556,7 @@ public class PartnerController : IHttpHandler
             xml += "<cell><![CDATA[" + row["tel"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["fax"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["email"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["emailkt"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["url"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["diachi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tenqg"] + "]]></cell>";
@@ -565,7 +568,7 @@ public class PartnerController : IHttpHandler
             xml += "<cell><![CDATA[" + CultureInfoUtil.currencyUSD(row["tong_congno"]) + "]]></cell>";
             xml += "<cell><![CDATA[" + row["isncc"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["cangbien"] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row["md_nguondtkd_id"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["md_nguondtkd_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";

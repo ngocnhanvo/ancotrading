@@ -1310,6 +1310,7 @@
       <Column Name="tel" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Column Name="fax" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
       <Column Name="email" Type="System.String" DbType="NVarChar(512)" CanBeNull="true" />
+      <Column Name="emailkt" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="url" Type="System.String" DbType="NVarChar(512)" CanBeNull="true" />
       <Column Name="diachi" Type="System.String" DbType="NVarChar(1000)" CanBeNull="true" />
       <Column Name="md_banggia_id" Type="System.String" DbType="NVarChar(32)" CanBeNull="true" />

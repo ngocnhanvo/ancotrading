@@ -109,23 +109,9 @@
             FilterToolbar="true"
 			BtnPrint="funcPrint"
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 90);"
-            ColNames="['dtkd.md_doitackinhdoanh_id', 'Loại Đối Tác', 'Mã Đối Tác','Tên Đối Tác','Đại Diện','Chức Vụ','Điện Thoại','Fax','Email','Website','Địa Chỉ', 'Quốc Gia', 'Khu Vực', 'Bảng giá mặc định', 'Số Tài Khoản','Ngân Hàng','Mã Số Thuế','Tổng Công Nợ','Là Nhà Cung Cấp', 'Thuộc cảng biển', 'Nguồn đối tác', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
             RowNumbers="true"
             OndblClickRow = "
 				function(rowid) { 
-					// $(this).jqGrid('editGridRow', rowid,
-                    // {
-                        // width:400,
-                        // afterSubmit: function(rs, postdata){
-                            // return showMsgDialog(rs);
-                        // }
-                        // , beforeShowForm: function (formid) {
-                            // formid.closest('div.ui-jqdialog').dialogCenter(); 
-                        // }
-                        // , errorTextFormat:function(data) { 
-                            // return 'Lỗi: ' + data.responseText 
-                        // }
-                    // }); 
 					$('#edit_grid_ds_doitackinhdoanh').click();
 				}
 			"
@@ -144,6 +130,7 @@
             ColModel = "[
             {
                 fixed: true, name: 'md_doitackinhdoanh_id'
+                , label: 'dtkd.md_doitackinhdoanh_id'
                 , index: 'dtkd.md_doitackinhdoanh_id'
                 , width: 100
                 , hidden: true 
@@ -153,6 +140,7 @@
             },
             {
                  fixed: true, name: 'tenloai'
+                 , label: 'Loại Đối Tác'
                  , index: 'ldt.ten_loaidtkd'
                  , editable: true
                  , width: 100
@@ -162,6 +150,7 @@
             },
             {
                 fixed: true, name: 'ma_dtkd'
+                , label: 'Mã Đối Tác'
                 , index: 'dtkd.ma_dtkd'
                 , width: 100
                 , edittype: 'text'
@@ -169,6 +158,7 @@
             },
             {
                 fixed: true, name: 'ten_dtkd'
+                , label: 'Tên Đối Tác'
                 , index: 'dtkd.ten_dtkd'
                 , width: 100
                 , edittype: 'text'
@@ -176,6 +166,7 @@
             },
             {
                 fixed: true, name: 'daidien'
+                , label: 'Đại Diện'
                 , index: 'dtkd.daidien'
                 , width: 100
                 , edittype: 'text'
@@ -185,6 +176,7 @@
             },
             {
                 fixed: true, name: 'chucvu'
+                , label: 'Chức Vụ'
                 , index: 'dtkd.chucvu'
                 , width: 100
                 , edittype: 'text'
@@ -194,6 +186,7 @@
             },
             {
                 fixed: true, name: 'tel'
+                , label: 'Điện Thoại'
                 , index: 'dtkd.tel'
                 , width: 100
                 , edittype: 'text'
@@ -201,6 +194,7 @@
             },
             {
                 fixed: true, name: 'fax'
+                , label: 'Fax'
                 , index: 'dtkd.fax'
                 , width: 100
                 , edittype: 'text'
@@ -210,13 +204,23 @@
             },
             {
                 fixed: true, name: 'email'
+                , label: 'Email'
                 , index: 'dtkd.email'
                 , width: 100
                 , edittype: 'text'
                 , editable:true
             },
             {
+                fixed: true, name: 'emailkt'
+                , label: 'Email (không giá FOB)'
+                , index: 'dtkd.emailkt'
+                , width: 100
+                , edittype: 'text'
+                , editable:true
+            },
+            {
                 fixed: true, name: 'url'
+                , label: 'Website'
                 , index: 'dtkd.url'
                 , width: 100
                 , edittype: 'text'
@@ -227,6 +231,7 @@
             
             {
                 fixed: true, name: 'diachi'
+                , label: 'Địa Chỉ'
                 , index: 'dtkd.diachi'
                 , width: 100
                 , edittype: 'text'
@@ -234,6 +239,7 @@
             },
             {
                  fixed: true, name: 'tenqg'
+                 , label: 'Quốc Gia'
                  , index: 'qg.ten_quocgia'
                  , editable: true
                  , width: 100
@@ -244,6 +250,7 @@
             },
             {
                 fixed: true, name: 'tenkv'
+                , label: 'Khu Vực'
                 , index: 'kv.ten_khuvuc'
                 , width: 100
                 , edittype: 'select'
@@ -254,6 +261,7 @@
             },
             {
                 fixed: true, name: 'banggia'
+                , label: 'Bảng giá mặc định'
                 , index: 'banggia'
                 , width: 100
                 , edittype: 'select'
@@ -264,6 +272,7 @@
             },
             {
                 fixed: true, name: 'so_taikhoan'
+                , label: 'Số Tài Khoản'
                 , index: 'dtkd.so_taikhoan'
                 , width: 100
                 , edittype: 'text'
@@ -273,6 +282,7 @@
             },
             {
                 fixed: true, name: 'nganhang'
+                , label: 'Ngân Hàng'
                 , index: 'dtkd.nganhang'
                 , width: 100
                 , edittype: 'text'
@@ -282,6 +292,7 @@
             },
             {
                 fixed: true, name: 'masothue'
+                , label: 'Mã Số Thuế'
                 , index: 'dtkd.masothue'
                 , width: 100
                 , edittype: 'text'
@@ -291,6 +302,7 @@
             },
             {
                 fixed: true, name: 'tong_congno'
+                , label: 'Tổng Công Nợ'
                 , index: 'dtkd.tong_congno'
                 , width: 100
                 , edittype: 'text'
@@ -300,6 +312,7 @@
             },
             {
                 fixed: true, name: 'isncc'
+                , label: 'Là Nhà Cung Cấp'
                 , index: 'dtkd.isncc'
                 , width: 100
                 , edittype: 'checkbox'
@@ -310,6 +323,7 @@
             },
             {
                  fixed: true, name: 'md_cangbien_id'
+                 , label: 'Thuộc cảng biển'
                  , index: 'cangbien'
                  , editable: true
                  , width: 100
@@ -320,6 +334,7 @@
             },
 			{
                  fixed: true, name: 'md_nguondtkd_id'
+                 , label: 'Nguồn đối tác'
                  , index: 'ndt.ten_nguondtkd'
                  , editable: true
                  , width: 100
@@ -330,6 +345,7 @@
             },
             {
                 fixed: true, name: 'ngaytao'
+                , label: 'Ngày Tạo'
                 , index: 'dtkd.ngaytao'
                 , width: 100
                 , editable:false
@@ -338,6 +354,7 @@
             },
             {
                 fixed: true, name: 'nguoitao'
+                , label: 'Người Tạo'
                 , index: 'dtkd.nguoitao'
                 , width: 100
                 , editable:false
@@ -346,6 +363,7 @@
             },
             {
                 fixed: true, name: 'ngaycapnhat'
+                , label: 'Ngày Cập Nhật'
                 , index: 'dtkd.ngaycapnhat'
                 , width: 100
                 , editable:false
@@ -354,6 +372,7 @@
             },
             {
                 fixed: true, name: 'nguoicapnhat'
+                , label: 'Người Cập Nhật'
                 , index: 'dtkd.nguoicapnhat'
                 , width: 100
                 , editable:false
@@ -362,6 +381,7 @@
             },
             {
                 fixed: true, name: 'mota'
+                , label: 'Mô tả'
                 , index: 'dtkd.mota'
                 , width: 100
                 , editable:true
@@ -369,6 +389,7 @@
             },
             {
                 fixed: true, name: 'hoatdong', hidden: true
+                , label: 'Hoạt động'
                 , index: 'hoatdong'
                 , width: 100
                 , editable:true

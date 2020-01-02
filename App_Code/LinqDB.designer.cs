@@ -29252,6 +29252,8 @@ public partial class md_doitackinhdoanh : INotifyPropertyChanging, INotifyProper
 	
 	private string _email;
 	
+	private string _emailkt;
+	
 	private string _url;
 	
 	private string _diachi;
@@ -29314,6 +29316,8 @@ public partial class md_doitackinhdoanh : INotifyPropertyChanging, INotifyProper
     partial void OnfaxChanged();
     partial void OnemailChanging(string value);
     partial void OnemailChanged();
+    partial void OnemailktChanging(string value);
+    partial void OnemailktChanged();
     partial void OnurlChanging(string value);
     partial void OnurlChanged();
     partial void OndiachiChanging(string value);
@@ -29573,6 +29577,26 @@ public partial class md_doitackinhdoanh : INotifyPropertyChanging, INotifyProper
 				this._email = value;
 				this.SendPropertyChanged("email");
 				this.OnemailChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_emailkt", DbType="NVarChar(MAX)")]
+	public string emailkt
+	{
+		get
+		{
+			return this._emailkt;
+		}
+		set
+		{
+			if ((this._emailkt != value))
+			{
+				this.OnemailktChanging(value);
+				this.SendPropertyChanging();
+				this._emailkt = value;
+				this.SendPropertyChanged("emailkt");
+				this.OnemailktChanged();
 			}
 		}
 	}
