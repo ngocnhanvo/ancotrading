@@ -1,14 +1,15 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="inc-chiatachpo-taopi.aspx.cs" Inherits="inc_chiatachpo_taopi" %>
-<%@ Register src="jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
+
+<%@ Register Src="jqGrid.ascx" TagName="jqGrid" TagPrefix="uc1" %>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#layout-center-chiatachpo').parent().layout({
             north: {
                 size: "50%"
                 , minSize: "0%"
                 , maxSize: "100%"
-                , onresize_end: function() {
-                    var o = $("#layout-north-chiatachpo").height();
+                , onresize_end: function () {
+                    let o = $("#layout-north-chiatachpo").height();
                     $("#grid_ds_po_chiatach").setGridHeight(o - 90);
                 }
             }
@@ -19,18 +20,18 @@
         $('#layout-center-chiatachpo').layout({
             west: {
                 size: "48.5%"
-                , onresize_end: function() {
-                    var h = $("#layout-west-soanthao").height();
-                    var w = $("#layout-west-soanthao").width();
+                , onresize_end: function () {
+                    let h = $("#layout-west-soanthao").height();
+                    let w = $("#layout-west-soanthao").width();
                     $("#grid_ds_chitietpo_chiatachpo").setGridHeight(h - 70);
                     $("#grid_ds_chitietpo_chiatachpo").setGridWidth(w - 2);
                 }
             }
             , east: {
                 size: "48.5%"
-                , onresize_end: function() {
-                    var h = $("#layout-east-soanthao").height();
-                    var w = $("#layout-east-soanthao").width();
+                , onresize_end: function () {
+                    let h = $("#layout-east-soanthao").height();
+                    let w = $("#layout-east-soanthao").width();
                     $("#grid_ds_dachon_chiatachpo").setGridHeight(h - 70);
                     $("#grid_ds_dachon_chiatachpo").setGridWidth(w - 2);
                 }
@@ -39,68 +40,83 @@
 
         $(".btn-active").button().css({ 'width': '100%', 'height': '25%' });
 
-        $('#add-all-chiatachpo').click(function() {
-            var idExist = jQuery("#grid_ds_dachon_chiatachpo").jqGrid('getDataIDs');
-            var gridData = jQuery("#grid_ds_chitietpo_chiatachpo");
-            var ids = gridData.jqGrid('getDataIDs');
-
-            for (var i = 0, il = ids.length; i < il; i++) {
-                var ret = gridData.jqGrid('getRowData', ids[i], true);
-
-
-                    var datarow = {
-                        c_dongdonhang_id: ret.c_dongdonhang_id
-                        , c_donhang_id: ret.c_donhang_id
-                        , sanpham_id: ret.sanpham_id
-                        , ma_sanpham: ret.ma_sanpham
-                        , ma_sanpham_khach: ret.ma_sanpham_khach
-                        , md_doitackinhdoanh_id: ret.md_doitackinhdoanh_id
-                        , soluong: ret.soluong
-                        , soluong_dadat_old: ret.soluong_dadat
-                        , soluong_dadat: ret.soluong_conlai
-                        , soluong_conlai: ret.soluong_conlai
-                    };
-                    $("#grid_ds_dachon_chiatachpo").jqGrid('addRowData', ids[i], datarow);
-                    gridData.jqGrid('delRowData', ids[i]);
-                
-            }
+        $('#add-all-chiatachpo').click(function () {
+            let idExist = jQuery("#grid_ds_dachon_chiatachpo").jqGrid('getDataIDs');
+            console.log(idExist);
+            let gridData = jQuery("#grid_ds_chitietpo_chiatachpo");
+            let ids = gridData.jqGrid('getDataIDs');
+            let idsL = ids.length;
+            if (idsL > 0) {
+                for (let idIndex = 0; idIndex < idsL; idIndex++) {
+                    let id = ids[idIndex];
+                    if (idExist.lastIndexOf(id) <= -1) {
+                        let ret = gridData.jqGrid('getRowData', id, true);
+                        let datarow = {
+                            c_dongdonhang_id: ret.c_dongdonhang_id
+                                , c_donhang_id: ret.c_donhang_id
+                                , sanpham_id: ret.sanpham_id
+                                , ma_sanpham: ret.ma_sanpham
+                                , ma_sanpham_khach: ret.ma_sanpham_khach
+                                , md_doitackinhdoanh_id: ret.md_doitackinhdoanh_id
+                                , soluong: ret.soluong
+                                , soluong_dadat_old: ret.soluong_dadat
+                                , soluong_dadat: ret.soluong_conlai
+                                , soluong_conlai: ret.soluong_conlai
+                        };
+                        $("#grid_ds_dachon_chiatachpo").jqGrid('addRowData', id, datarow);
+                    }
+                }
+                for (let idIndex = idsL - 1; idIndex >= 0; idIndex--) {
+                    let id = ids[idIndex];
+                    $(`#${id}`, `#${gridData.attr('id')}`).hide();
+                    //gridData.jqGrid('delRowData', id);
+                }
+            } else { alert("Have no row"); }
         });
 
-        $('#add-chiatachpo').click(function() {
-            var idExist = jQuery("#grid_ds_dachon_chiatachpo").jqGrid('getDataIDs');
-            var id = jQuery("#grid_ds_chitietpo_chiatachpo").jqGrid('getGridParam', 'selrow');
-            if (id) {
-                var ret = jQuery("#grid_ds_chitietpo_chiatachpo").jqGrid('getRowData', id);
+        $('#add-chiatachpo').click(function () {
+            let idExist = $("#grid_ds_dachon_chiatachpo").jqGrid('getDataIDs');
+            let ids = $("#grid_ds_chitietpo_chiatachpo").jqGrid('getGridParam', 'selarrrow');
+            let idsL = ids.length;
+            if (idsL > 0) {
+                for (let idIndex = 0; idIndex < idsL; idIndex++) {
+                    let id = ids[idIndex];
+                    if (idExist.lastIndexOf(id) <= -1) {
+                        let ret = jQuery("#grid_ds_chitietpo_chiatachpo").jqGrid('getRowData', id);
+                        let datarow = {
+                            c_dongdonhang_id: ret.c_dongdonhang_id
+                            , c_donhang_id: ret.c_donhang_id
+                            , sanpham_id: ret.sanpham_id
+                            , ma_sanpham: ret.ma_sanpham
+                            , ma_sanpham_khach: ret.ma_sanpham_khach
+                            , md_doitackinhdoanh_id: ret.md_doitackinhdoanh_id
+                            , soluong: ret.soluong
+                            , soluong_dadat_old: ret.soluong_dadat
+                            , soluong_dadat: ret.soluong_conlai
+                            , soluong_conlai: ret.soluong_conlai
+                        };
+                        jQuery("#grid_ds_dachon_chiatachpo").jqGrid('addRowData', id, datarow);
+                    }
+                }
 
-               
-                
-                    var datarow = {
-                        c_dongdonhang_id: ret.c_dongdonhang_id
-                        , c_donhang_id: ret.c_donhang_id
-                        , sanpham_id: ret.sanpham_id
-                        , ma_sanpham: ret.ma_sanpham
-                        , ma_sanpham_khach: ret.ma_sanpham_khach
-                        , md_doitackinhdoanh_id: ret.md_doitackinhdoanh_id
-                        , soluong: ret.soluong
-                        , soluong_dadat_old: ret.soluong_dadat
-                        , soluong_dadat: ret.soluong_conlai
-                        , soluong_conlai: ret.soluong_conlai
-                    };
-                    jQuery("#grid_ds_chitietpo_chiatachpo").jqGrid('delRowData', id);
-                    jQuery("#grid_ds_dachon_chiatachpo").jqGrid('addRowData', id, datarow);
-
+                for (let idIndex = idsL - 1; idIndex >= 0; idIndex--) {
+                    let id = ids[idIndex];
+                    $(`#${id}`, '#grid_ds_chitietpo_chiatachpo').hide();
+                    //jQuery("#grid_ds_chitietpo_chiatachpo").jqGrid('delRowData', id);
+                }
             } else { alert("Please select row"); }
         });
 
-        $('#back-all-chiatachpo').click(function() {
+        $('#back-all-chiatachpo').click(function () {
+            let gridData = jQuery("#grid_ds_dachon_chiatachpo");
+            let gridWaitData = jQuery("#grid_ds_chitietpo_chiatachpo")
+            let ids = gridData.jqGrid('getDataIDs');
+            let idsL = ids.length;
+            for (let idIndex = 0; idIndex < idsL; idIndex++) {
+                let id = ids[idIndex];
+                let ret = gridData.jqGrid('getRowData', id, true);
 
-            var gridData = jQuery("#grid_ds_dachon_chiatachpo")
-            var ids = gridData.jqGrid('getDataIDs');
-
-            for (var i = 0, il = ids.length; i < il; i++) {
-                var ret = gridData.jqGrid('getRowData', ids[i], true);
-
-                var datarow = {
+                let datarow = {
                     c_dongdonhang_id: ret.c_dongdonhang_id
                         , c_donhang_id: ret.c_donhang_id
                         , sanpham_id: ret.sanpham_id
@@ -112,19 +128,23 @@
                         , soluong_dadat: ret.soluong_conlai
                         , soluong_conlai: ret.soluong_conlai
                 };
-                $("#grid_ds_chitietpo_chiatachpo").jqGrid('addRowData', ids[i], datarow);
-                gridData.jqGrid('delRowData', ids[i]);
+
+                $(`#${id}`, '#grid_ds_chitietpo_chiatachpo').show();
+            }
+
+            for (let idIndex = idsL - 1; idIndex >= 0; idIndex--) {
+                let id = ids[idIndex];
+                gridData.jqGrid('delRowData', id);
             }
         });
 
         $('#back-chiatachpo').click(function () {
-
-            var gridData = jQuery("#grid_ds_dachon_chiatachpo");
-            var id = gridData.jqGrid('getGridParam', 'selrow');
+            let gridData = jQuery("#grid_ds_dachon_chiatachpo");
+            let id = gridData.jqGrid('getGridParam', 'selrow');
             if (id) {
-                var ret = gridData.jqGrid('getRowData', id);
+                let ret = gridData.jqGrid('getRowData', id);
 
-                var datarow = {
+                let datarow = {
                     c_dongdonhang_id: ret.c_dongdonhang_id
                         , c_donhang_id: ret.c_donhang_id
                         , sanpham_id: ret.sanpham_id
@@ -137,7 +157,8 @@
                         , soluong_conlai: ret.soluong_conlai
                 };
 
-                jQuery("#grid_ds_chitietpo_chiatachpo").jqGrid('addRowData', id, datarow);
+                //jQuery("#grid_ds_chitietpo_chiatachpo").jqGrid('addRowData', id, datarow);
+                $(`#${id}`, '#grid_ds_chitietpo_chiatachpo').show();
                 gridData.jqGrid('delRowData', id);
 
             } else { alert("Please select row"); }
@@ -146,9 +167,9 @@
 
 
     function funcCreatePI(postData) {
-        var msg = "";
-        var gridData = jQuery("#grid_ds_dachon_chiatachpo")
-        var ids = gridData.jqGrid('getDataIDs');
+        let msg = "";
+        let gridData = jQuery("#grid_ds_dachon_chiatachpo")
+        let ids = gridData.jqGrid('getDataIDs');
 
         if (ids.length == 0) {
             msg = "Hãy chọn danh sách sản phẩm mà bạn muốn tạo PI.!";
@@ -158,20 +179,20 @@
             // create new dialog
             $('#dialog-create-pi').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
                 , buttons: {
-                    'Thoát': function() {
+                    'Thoát': function () {
                         $(this).dialog("destroy").remove();
                     }
                 }
             });
         } else {
             msg = "Có phải bạn muốn PI từ danh sách sản phẩm này.?";
-            var p = '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><span id="dialog-caution">' + msg + '</span></p>';
-            var h3 = '<h3 style="padding: 10px" class="ui-state-highlight ui-corner-all">' + p + '<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div></h3>';
+            let p = '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><span id="dialog-caution">' + msg + '</span></p>';
+            let h3 = '<h3 style="padding: 10px" class="ui-state-highlight ui-corner-all">' + p + '<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div></h3>';
 
             // append dialog-taoky to body
             $('body').append('<div title="Thông Báo" id=\"dialog-create-pi\">' + h3 + '</div>');
@@ -179,7 +200,7 @@
             // create new dialog
             $('#dialog-create-pi').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
@@ -188,14 +209,14 @@
                     {
                         id: "btn-create-pi",
                         text: "Có",
-                        click: function() {
-                            $("#dialog-caution").ajaxStart(function() {
+                        click: function () {
+                            $("#dialog-caution").ajaxStart(function () {
                                 $("#wait").css("display", "block");
                                 $("#btn-create-pi").button("disable");
                                 $("#btn-close").button("disable");
                             });
 
-                            $("#dialog-caution").ajaxComplete(function() {
+                            $("#dialog-caution").ajaxComplete(function () {
                                 $("#wait").css("display", "none");
                                 $("#btn-close span").text("Thoát");
                                 $("#btn-close").button("enable");
@@ -211,18 +232,18 @@
                                 type: "POST",
                                 datetype: "json",
                                 data: { grid_form: postData, action: "SaveDatHang" },
-                                error: function(rs) {
+                                error: function (rs) {
                                     Popup("Error", 500, 400, rs.responseText);
                                 },
-                                success: function(rs) {
-									var type = eval($(rs).find("type").text());
-									var message = $(rs).find("message").text();
+                                success: function (rs) {
+                                    let type = eval($(rs).find("type").text());
+                                    let message = $(rs).find("message").text();
                                     $('#dialog-create-pi').find('#dialog-caution').html(message);
-									var ids = gridData.jqGrid('getDataIDs');
+                                    var ids = gridData.jqGrid('getDataIDs');
 
-									for (var i = 0, il = ids.length; i < il; i++) {
-										jQuery("#grid_ds_dachon_chiatachpo").jqGrid('delRowData', ids[i]);
-									}
+                                    for (let i = 0, il = ids.length; i < il; i++) {
+                                        jQuery("#grid_ds_dachon_chiatachpo").jqGrid('delRowData', ids[i]);
+                                    }
                                 }
                             });
                         }
@@ -230,7 +251,7 @@
                     {
                         id: "btn-close",
                         text: "Không",
-                        click: function() {
+                        click: function () {
                             $(this).dialog("destroy").remove();
                         }
                     }
@@ -238,25 +259,25 @@
             });
         }
     }
-    
+
 </script>
 
 
-<DIV class="ui-layout-north ui-widget-content" id="layout-north-chiatachpo">
-    <uc1:jqGrid  ID="grid_ds_po_chiatach" 
-            Caption="Đơn Hàng"
-            SortName="c_donhang_id" 
-            UrlFileAction="Controllers/DonHangChiaTachController.ashx" 
-            AfterRefresh = "function(){ 
-                var gridData = jQuery('#grid_ds_dachon_chiatachpo')
-                var ids = gridData.jqGrid('getDataIDs');
-                for (var i = 0, il = ids.length; i &lt; il; i++) {
+<div class="ui-layout-north ui-widget-content" id="layout-north-chiatachpo">
+    <uc1:jqGrid ID="grid_ds_po_chiatach"
+        Caption="Đơn Hàng"
+        SortName="c_donhang_id"
+        UrlFileAction="Controllers/DonHangChiaTachController.ashx"
+        AfterRefresh="function(){ 
+                let gridData = jQuery('#grid_ds_dachon_chiatachpo')
+                let ids = gridData.jqGrid('getDataIDs');
+                for (let i = 0, il = ids.length; i &lt; il; i++) {
                     gridData.jqGrid('delRowData', ids[i]);
                 }
                 jQuery('#grid_ds_chitietpo_chiatachpo').jqGrid().trigger('reloadGrid');
             }"
-            PostData = "'status' : 'hieuluc'"
-            ColNames="['c_donhang_id', '', 'Đơn Hàng Mẫu', 'Số Chứng Từ','Khách Hàng'
+        PostData="'status' : 'hieuluc'"
+        ColNames="['c_donhang_id', '', 'Đơn Hàng Mẫu', 'Số Chứng Từ','Khách Hàng'
                 , 'Ngày Lập', 'Người Lập', 'Cảng Biển'
                 , 'Discount', 'Shipment Date'
                 , 'Shipment Time', 'Paymentterm'
@@ -265,8 +286,8 @@
                 , 'Make PI', 'Bảng Giá', 'Ngày Tạo'
                 , 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật'
                 , 'Mô tả', 'Hoạt động']"
-            RowNumbers="true"
-            ColModel = "[
+        RowNumbers="true"
+        ColModel="[
             {
                 fixed: true, name: 'c_donhang_id'
                 , index: 'c_donhang_id'
@@ -516,8 +537,8 @@
                 , formoptions: { colpos: 1, rowpos: 20 }
             }
             ]"
-            GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
-            OnSelectRow = "function(ids) {
+        GridComplete="var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
+        OnSelectRow="function(ids) {
                         
                         
 		                if(ids == null) {
@@ -543,26 +564,24 @@
                                 gridData.jqGrid('delRowData', ids[i]);
                             }		
 		                } }"
-            FilterToolbar = "true"
-            Height = "420"
-            runat="server" />
-</DIV>
+        FilterToolbar="true"
+        Height="420"
+        runat="server" />
+</div>
 
 
-<DIV class="ui-layout-center ui-widget-content" id="layout-center-chiatachpo">
-    
-    <DIV class="ui-layout-west ui-widget-content" id="layout-west-soanthao">
-                <uc1:jqGrid  ID="grid_ds_chitietpo_chiatachpo" 
-            SortName="dtkd.ma_dtkd" 
-            UrlFileAction="Controllers/DongDonHangChiaTachController.ashx" 
-            ColNames="['c_dongdonhang_id', 'Đơn Hàng', 'Mã SP'
-                    , 'Mã SP', 'Mã SP Khách', 'Đối Tác', 'Số Lượng Đơn Hàng'
-                    , 'Số Lượng Đã Đặt', 'Số Lượng Còn Lại']"
+<div class="ui-layout-center ui-widget-content" id="layout-center-chiatachpo">
+
+    <div class="ui-layout-west ui-widget-content" id="layout-west-soanthao">
+        <uc1:jqGrid ID="grid_ds_chitietpo_chiatachpo"
+            SortName="dtkd.ma_dtkd"
+            UrlFileAction="Controllers/DongDonHangChiaTachController.ashx"
             RowNumbers="true"
-            OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid); }"
-            ColModel = "[
+            OndblClickRow="function(rowid) { $(this).jqGrid('editGridRow', rowid); }"
+            ColModel="[
             {
                 fixed: true, name: 'c_dongdonhang_id'
+                , label: 'c_dongdonhang_id'
                 , index: 'c_dongdonhang_id'
                 , width: 100
                 , editable:true
@@ -572,6 +591,7 @@
             },
             {
                 fixed: true, name: 'c_donhang_id'
+                , label: 'Đơn Hàng'
                 , index: 'dh.c_donhang_id'
                 , width: 100
                 , edittype: 'text'
@@ -581,6 +601,7 @@
             },
             {
                 fixed: true, name: 'sanpham_id'
+                , label: 'Mã SP'
                 , index: 'sp.sanpham_id'
                 , width: 100
                 , hidden: true 
@@ -591,6 +612,7 @@
             },
             {
                 fixed: true, name: 'ma_sanpham'
+                , label: 'Mã SP'
                 , index: 'sp.ma_sanpham'
                 , width: 100
                 , edittype: 'text'
@@ -617,6 +639,7 @@
             },
             {
                 fixed: true, name: 'ma_sanpham_khach'
+                , label: 'Mã SP Khách'
                 , index: 'ddh.ma_sanpham_khach'
                 , width: 100
                 , edittype: 'text'
@@ -625,6 +648,7 @@
             },
             {
                 fixed: true, name: 'md_doitackinhdoanh_id'
+                , label: 'Đối Tác'
                 , index: 'dtkd.ma_dtkd'
                 , width: 100
                 , editable:true
@@ -633,6 +657,7 @@
             },
             {
                 fixed: true, name: 'soluong'
+                , label: 'Số Lượng Đơn Hàng'
                 , index: 'ddh.soluong'
                 , width: 100
                 , edittype: 'text'
@@ -641,6 +666,7 @@
             },
             {
                 fixed: true, name: 'soluong_dadat'
+                , label: 'Số Lượng Đã Đặt'
                 , index: 'ddh.soluong_dadat'
                 , width: 100
                 , edittype: 'text'
@@ -649,6 +675,7 @@
             },
             {
                 fixed: true, name: 'soluong_conlai'
+                , label: 'Số Lượng Còn Lại'
                 , index: 'ddh.soluong_conlai'
                 , width: 100
                 , edittype: 'text'
@@ -656,155 +683,161 @@
                 , sortable: false
             }
             ]"
-            RowNum = "200"
-            Caption = "Danh sách sản phẩm"
-            GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 70);"
-            ShowRefresh = "false"
-            Height = "150"
-            MultiSelect = "false" 
+            RowNum="200"
+            Caption="Danh sách sản phẩm"
+            GridComplete="var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 70);"
+            ShowRefresh="false"
+            Height="150"
+            MultiSelect="true"
             runat="server" />
-    </DIV>
-    
-    <DIV class="ui-layout-east ui-widget-content" id="layout-east-soanthao">
-         <script>
-             $(document).ready(function() {
+    </div>
+
+    <div class="ui-layout-east ui-widget-content" id="layout-east-soanthao">
+        <script>
+            $(document).ready(function () {
                 var lastSel = -1;
-                 jQuery("#grid_ds_dachon_chiatachpo").jqGrid({
-                     datatype: "local",
-                     height: 250,
-                     colNames: ['c_dongdonhang_id', 'Đơn Hàng', 'Mã SP'
-                    , 'Mã SP', 'Mã SP Khách', 'Đối Tác', 'SL Đơn Hàng'
-                    , 'SL Đặt Tiếp', 'SL Còn Lại'],
-                     colModel: [
-                                {
-                                    fixed: true, name: 'c_dongdonhang_id'
-                                    , index: 'c_dongdonhang_id'
-                                    , width: 100
-                                    , editable: false
-                                    , edittype: 'text'
-                                    , sortable: false
-                                    , hidden: true
-                                },
-                                {
-                                    fixed: true, name: 'c_donhang_id'
-                                    , index: 'dh.c_donhang_id'
-                                    , width: 100
-                                    , edittype: 'select'
-                                    , editable: false
-                                    , editoptions: { dataUrl: 'Controllers/DonHangController.ashx?action=getoption' }
-                                    , sortable: false
-                                    , hidden: true
-                                },
-                                {
-                                    fixed: true, name: 'sanpham_id'
-                                    , index: 'sp.sanpham_id'
-                                    , width: 100
-                                    , hidden: true
-                                    , editable: false
-                                    , edittype: 'text'
-                                    , sortable: false
-                                },
-                                {
-                                    fixed: true, name: 'ma_sanpham'
-                                    , index: 'sp.ma_sanpham'
-                                    , width: 100
-                                    , edittype: 'text'
-                                    , editable: false
-                                    , sortable: false
-                                },
-                                {
-                                    fixed: true, name: 'ma_sanpham_khach'
-                                    , index: 'ddh.ma_sanpham_khach'
-                                    , width: 100
-                                    , edittype: 'text'
-                                    , editable: false
-                                    , sortable: false
-                                },
-                                {
-                                    fixed: true, name: 'md_doitackinhdoanh_id'
-                                    , index: 'sp.md_doitackinhdoanh_id'
-                                    , width: 100
-                                    , editable: false
-                                    , edittype: 'text'
-                                    , sortable: false
-                                },
-                                {
-                                    fixed: true, name: 'soluong'
-                                    , index: 'ddh.soluong'
-                                    , width: 100
-                                    , edittype: 'text'
-                                    , editable: false
-                                    , sortable: false
-                                    , align: 'right'
-                                },
-                                {
-                                    fixed: true, name: 'soluong_dadat'
-                                    , index: 'ddh.soluong_dadat'
-                                    , width: 100
-                                    , edittype: 'text'
-                                    , editable: true
-                                    , sortable: false
-                                    , editrules: { required: true, number: true }
-                                    , align: 'right'
-                                },
-                                {
-                                    fixed: true, name: 'soluong_conlai'
-                                    , index: 'ddh.soluong_conlai'
-                                    , width: 100
-                                    , edittype: 'text'
-                                    , editable: false
-                                    , sortable: false
-                                    , hidden: true
-                                    , align: 'right'
-                                }
-                                ],
-                     autowidth: true,
-                     multiselect: false,
-                     caption: "Danh sách sản phẩm đã chọn",
-                     gridComplete: function() { var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 70); },
-                     showRefresh: false,
-                     //rowNumbers: true,
-                     viewrecords:true,
-                     cellsubmit: 'clientArray',
-                     onSelectRow: function(id) {
-                         //if (id && id !== lastSel) {
-                             jQuery("#grid_ds_dachon_chiatachpo").jqGrid('restoreRow', lastSel);
-                             jQuery("#grid_ds_dachon_chiatachpo").jqGrid('editRow', id, true, null, null, 'clientArray');
-                             lastSel = id;
-                         //}
-                     },
-                     pager: $('#grid_ds_dachon_chiatachpo-pager')
-                 });
-                 $('#grid_ds_dachon_chiatachpo').jqGrid('navGrid', '#grid_ds_dachon_chiatachpo-pager', { add: false, edit: false, del: false, search: false, refresh: false }, { height: 280, reloadAfterSubmit: false }, { height: 280, reloadAfterSubmit: false }, { reloadAfterSubmit: false }, {});
+                jQuery("#grid_ds_dachon_chiatachpo").jqGrid({
+                    datatype: "local",
+                    height: 250,
+                    colModel: [
+                       {
+                           fixed: true, name: 'c_dongdonhang_id'
+                           , label: 'c_dongdonhang_id'
+                           , index: 'c_dongdonhang_id'
+                           , width: 100
+                           , editable: false
+                           , edittype: 'text'
+                           , sortable: false
+                           , hidden: true
+                       },
+                       {
+                           fixed: true, name: 'c_donhang_id'
+                           , label: 'Đơn Hàng'
+                           , index: 'dh.c_donhang_id'
+                           , width: 100
+                           , edittype: 'select'
+                           , editable: false
+                           , editoptions: { dataUrl: 'Controllers/DonHangController.ashx?action=getoption' }
+                           , sortable: false
+                           , hidden: true
+                       },
+                       {
+                           fixed: true, name: 'sanpham_id'
+                           , label: 'Mã SP'
+                           , index: 'sp.sanpham_id'
+                           , width: 100
+                           , hidden: true
+                           , editable: false
+                           , edittype: 'text'
+                           , sortable: false
+                       },
+                       {
+                           fixed: true, name: 'ma_sanpham'
+                           , label: 'Mã SP'
+                           , index: 'sp.ma_sanpham'
+                           , width: 100
+                           , edittype: 'text'
+                           , editable: false
+                           , sortable: false
+                       },
+                       {
+                           fixed: true, name: 'ma_sanpham_khach'
+                           , label: 'Mã SP Khách'
+                           , index: 'ddh.ma_sanpham_khach'
+                           , width: 100
+                           , edittype: 'text'
+                           , editable: false
+                           , sortable: false
+                       },
+                       {
+                           fixed: true, name: 'md_doitackinhdoanh_id'
+                           , label: 'Đối Tác'
+                           , index: 'sp.md_doitackinhdoanh_id'
+                           , width: 100
+                           , editable: false
+                           , edittype: 'text'
+                           , sortable: false
+                       },
+                       {
+                           fixed: true, name: 'soluong'
+                           , label: 'SL Đơn Hàng'
+                           , index: 'ddh.soluong'
+                           , width: 100
+                           , edittype: 'text'
+                           , editable: false
+                           , sortable: false
+                           , align: 'right'
+                       },
+                       {
+                           fixed: true, name: 'soluong_dadat'
+                           , label: 'SL Đặt Tiếp'
+                           , index: 'ddh.soluong_dadat'
+                           , width: 100
+                           , edittype: 'text'
+                           , editable: true
+                           , sortable: false
+                           , editrules: { required: true, number: true }
+                           , align: 'right'
+                       },
+                       {
+                           fixed: true, name: 'soluong_conlai'
+                           , label: 'SL Còn Lại'
+                           , index: 'ddh.soluong_conlai'
+                           , width: 100
+                           , edittype: 'text'
+                           , editable: false
+                           , sortable: false
+                           , hidden: true
+                           , align: 'right'
+                       }
+                    ],
+                    autowidth: true,
+                    multiselect: false,
+                    caption: "Danh sách sản phẩm đã chọn",
+                    gridComplete: function () { var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 70); },
+                    showRefresh: false,
+                    //rowNumbers: true,
+                    viewrecords: true,
+                    cellsubmit: 'clientArray',
+                    onSelectRow: function (id) {
+                        //if (id && id !== lastSel) {
+                        jQuery("#grid_ds_dachon_chiatachpo").jqGrid('restoreRow', lastSel);
+                        jQuery("#grid_ds_dachon_chiatachpo").jqGrid('editRow', id, true, null, null, 'clientArray');
+                        lastSel = id;
+                        //}
+                    },
+                    pager: $('#grid_ds_dachon_chiatachpo-pager')
+                });
+                $('#grid_ds_dachon_chiatachpo').jqGrid('navGrid', '#grid_ds_dachon_chiatachpo-pager', { add: false, edit: false, del: false, search: false, refresh: false }, { height: 280, reloadAfterSubmit: false }, { height: 280, reloadAfterSubmit: false }, { reloadAfterSubmit: false }, {});
 
-                 $("#grid_ds_dachon_chiatachpo").jqGrid('navButtonAdd', '#grid_ds_dachon_chiatachpo-pager', {
-                     caption: ""
-                    , title: "Lưu đơn đặt hàng"
-                    , buttonicon: "icon-pi"
-                    , onClickButton: function() {
-						//var id = jQuery("#grid_ds_dachon_chiatachpo").jqGrid('getGridParam', 'selrow');
-						//jQuery("#grid_ds_dachon_chiatachpo").jqGrid('saveRow', id, true, 'clientArray', null, null);
-						var rowids = $("#grid_ds_dachon_chiatachpo").jqGrid('getDataIDs');
-                        for(var i in rowids) {
-							$("#grid_ds_dachon_chiatachpo").jqGrid('saveRow', rowids[i], true, 'clientArray', null, null);
-						}
+                $("#grid_ds_dachon_chiatachpo").jqGrid('navButtonAdd', '#grid_ds_dachon_chiatachpo-pager', {
+                    caption: ""
+                   , title: "Lưu đơn đặt hàng"
+                   , buttonicon: "icon-pi"
+                   , onClickButton: function () {
+                       //var id = jQuery("#grid_ds_dachon_chiatachpo").jqGrid('getGridParam', 'selrow');
+                       //jQuery("#grid_ds_dachon_chiatachpo").jqGrid('saveRow', id, true, 'clientArray', null, null);
+                       var rowids = $("#grid_ds_dachon_chiatachpo").jqGrid('getDataIDs');
+                       for (var i in rowids) {
+                           $("#grid_ds_dachon_chiatachpo").jqGrid('saveRow', rowids[i], true, 'clientArray', null, null);
+                       }
 
-                        var gridData = jQuery(this).getRowData();
-                        var postData = JSON.stringify(gridData);
-                        funcCreatePI(postData);
-                    }
-                 });
-             });
+                       var gridData = jQuery(this).getRowData();
+                       var postData = JSON.stringify(gridData);
+                       funcCreatePI(postData);
+                   }
+                });
+            });
         </script>
         <table class="ui-layout-center" id="grid_ds_dachon_chiatachpo"></table>
         <div id="grid_ds_dachon_chiatachpo-pager"></div>
-    </DIV>
-    
-    <DIV class="ui-layout-center ui-widget-content" id="layout-center-soanthao" style="background: #E0CFC2">
+    </div>
+
+    <div class="ui-layout-center ui-widget-content" id="layout-center-soanthao" style="background: #E0CFC2">
         <button id="add-all-chiatachpo" class="btn-active">>></button>
         <button id="add-chiatachpo" class="btn-active">></button>
         <button id="back-all-chiatachpo" class="btn-active"><<</button>
         <button id="back-chiatachpo" class="btn-active"><</button>
-    </DIV>
-</DIV>
+    </div>
+</div>
 
