@@ -552,12 +552,13 @@ public class PackingInvoiceController : IHttpHandler
         string ngayMTK = context.Request.Form["ngay_motokhai"];
         DateTime dateNMTK = DateTime.ParseExact(ngayMTK, "dd/MM/yyyy", null);
         md_tygiamua tgm = db.md_tygiamuas.Where(s => s.ngayapdung <= dateNMTK & s.ngayketthuc >= dateNMTK & s.trangthai == "HIEULUC").FirstOrDefault();
-        if (tgm == null)
-        {
-            loi = 1;
-            jqGridHelper.Utils.writeResult(0, "Không có tỷ giá áp dụng cho ngày mở tờ khai đã chọn");
-        }
-        else if (!m.md_trangthai_id.Equals("SOANTHAO"))
+        //if (tgm == null)
+        //{
+        //    loi = 1;
+        //    jqGridHelper.Utils.writeResult(0, "Không có tỷ giá áp dụng cho ngày mở tờ khai đã chọn");
+        //}
+        //else 
+        if (!m.md_trangthai_id.Equals("SOANTHAO"))
         {
             loi = 1;
             jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi Packing List Invoice đã hiệu lực!");
@@ -581,7 +582,7 @@ public class PackingInvoiceController : IHttpHandler
             m.noiden = context.Request.Form["noiden"];
             m.blno = context.Request.Form["blno"];
             m.commodity = context.Request.Form["commodity"];
-            m.tygiaUSD_VND = tgm.nhan_voi;
+            m.tygiaUSD_VND = tgm != null ? tgm.nhan_voi : 1;
             m.handling_fee = handling_fee.Equals("") ? 0 : decimal.Parse(handling_fee);
             m.discount = discount.Equals("") ? 0 : decimal.Parse(discount);
             //--
