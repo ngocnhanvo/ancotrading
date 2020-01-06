@@ -173,7 +173,7 @@ public class DanhSachDatHangController : IHttpHandler
             string fileTTSP = taoFileThongTinSanPham(context, nv.manv, dsdh);
             var fileDDHsKhongGia = taoFileDonDatHang(context, nv.manv, mailObj["ma_dtkd"].ToString(), dsdh, false);
             string fileXNBB = taoFileXacNhanBaoBi(context, nv.manv, dsdh);
-            string emailkt = mailObj["emailkt"] + "";
+            string emailkt = mailObj["email"] + "";
 
             if (!string.IsNullOrEmpty(emailkt))
             {
