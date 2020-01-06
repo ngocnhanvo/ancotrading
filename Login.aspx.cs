@@ -48,16 +48,27 @@ public partial class Login : System.Web.UI.Page
 					body += username + "[" + strrandom + "]";
                     sql = "update nhanvien set otp = @otp, otp_created = getdate() where manv = @manv";
                     mdbc.ExcuteNonQuery(sql, "@manv", username, "@otp", strrandom.Replace(" ",""));
-                    TwilioClient.Init(Public.accountSid, Public.authToken);
-                    CreateMessageOptions options = new CreateMessageOptions(new Twilio.Types.PhoneNumber("+84935385878"));
-                    options.Body = body;
-                    options.From = new Twilio.Types.PhoneNumber(Public.fromTwillo);
-                    ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
-                    var message = MessageResource.Create(options);
-                    if (string.IsNullOrEmpty(message.ErrorMessage))
+
+                    string ErrorMessage = "";
+                    try
+                    {
+                        TwilioClient.Init(Public.accountSid, Public.authToken);
+                        CreateMessageOptions options = new CreateMessageOptions(new Twilio.Types.PhoneNumber("+84935385878"));
+                        options.Body = body;
+                        options.From = new Twilio.Types.PhoneNumber(Public.fromTwillo);
+                        ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+                        var message = MessageResource.Create(options);
+                        ErrorMessage = message.ErrorMessage;
+                    }
+                    catch
+                    {
+
+                    }
+
+                    if (string.IsNullOrEmpty(ErrorMessage))
                         Response.Redirect("OTP.aspx?us=" + username, true);
                     else
-                        msg = message.ErrorMessage;
+                        msg = ErrorMessage;
                 }
             }
 

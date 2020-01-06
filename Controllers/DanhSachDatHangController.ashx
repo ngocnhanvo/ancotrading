@@ -175,7 +175,7 @@ public class DanhSachDatHangController : IHttpHandler
             string fileXNBB = taoFileXacNhanBaoBi(context, nv.manv, dsdh);
             string emailkt = mailObj["email"] + "";
 
-            if (!string.IsNullOrEmpty(emailkt))
+            //if (!string.IsNullOrEmpty(emailkt))
             {
                 mail.Send(
                     nv.email
@@ -379,7 +379,14 @@ public class DanhSachDatHangController : IHttpHandler
             {
                 msg += vnn_msg;
                 db.SubmitChanges();
-                guidonhangSendMail(context, lstMail, nv, mail, "VINHGIA");
+                try
+                {
+                    guidonhangSendMail(context, lstMail, nv, mail, "VINHGIA");
+                }
+                catch (Exception ex)
+                {
+                    msg += string.Format(@"<div style='color:red'>Gửi mail thất bại: {0}.</div>", ex.Message);
+                }
             }
         }
 
@@ -403,7 +410,14 @@ public class DanhSachDatHangController : IHttpHandler
             {
                 msg += vnn_msg;
                 db.SubmitChanges();
-                guidonhangSendMail(context, lstMail, nv, mail, "ANCO2");
+                try
+                {
+                    guidonhangSendMail(context, lstMail, nv, mail, "ANCO2");
+                }
+                catch (Exception ex)
+                {
+                    msg += string.Format(@"<div style='color:red'>Gửi mail thất bại: {0}.</div>", ex.Message);
+                }
             }
         }
 
