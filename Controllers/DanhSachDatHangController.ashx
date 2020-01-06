@@ -175,7 +175,7 @@ public class DanhSachDatHangController : IHttpHandler
             string fileXNBB = taoFileXacNhanBaoBi(context, nv.manv, dsdh);
             string emailkt = mailObj["email"] + "";
 
-            if (!string.IsNullOrEmpty(emailkt))
+            //if (!string.IsNullOrEmpty(emailkt))
             {
                 mail.Send(
                     nv.email
