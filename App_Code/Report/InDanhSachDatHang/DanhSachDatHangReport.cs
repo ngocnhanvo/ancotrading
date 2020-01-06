@@ -157,7 +157,7 @@ public class DanhSachDatHangReport
 				mota_tru.Add(tru.Rows[i]["mota"].ToString());
 			}
 			tbl.Rows[0]["mota_cong"] = tbl.Rows[lastRow]["mota_cong"] = string.Join(",", mota_cong);
-			tbl.Rows[0]["mota_cong"] = tbl.Rows[lastRow]["mota_tru"] = string.Join(",", mota_tru);
+			tbl.Rows[0]["mota_tru"] = tbl.Rows[lastRow]["mota_tru"] = string.Join(",", mota_tru);
 			HSSFWorkbook hssfworkbook = this.CreateHSSFWorkbook(tbl, phitang, phigiam);
             String saveAsFileName = String.Format("DonDatHang-{0}.xls", DateTime.Now);
             return hssfworkbook;
