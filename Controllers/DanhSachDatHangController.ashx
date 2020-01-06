@@ -173,9 +173,9 @@ public class DanhSachDatHangController : IHttpHandler
             string fileTTSP = taoFileThongTinSanPham(context, nv.manv, dsdh);
             var fileDDHsKhongGia = taoFileDonDatHang(context, nv.manv, mailObj["ma_dtkd"].ToString(), dsdh, false);
             string fileXNBB = taoFileXacNhanBaoBi(context, nv.manv, dsdh);
-            string emailkt = mailObj["email"] + "";
+            string emailkt = mailObj["emailkt"] + "";
 
-            //if (!string.IsNullOrEmpty(emailkt))
+            if (!string.IsNullOrEmpty(emailkt))
             {
                 mail.Send(
                     nv.email
