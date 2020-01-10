@@ -180,7 +180,7 @@ public class DanhSachDatHangController : IHttpHandler
                 mail.Send(
                     nv.email
                     , emailkt
-                    , ""
+                    , emailCC
                     , ""
                     , mailObj["tieude"].ToString()
                     , mailObj["noidung"].ToString()
