@@ -360,7 +360,12 @@ public static class UserUtils
             //Neu doi tac la VINHGIA
             if (maNCC == "VINHGIA")
                 gianhap = ddonhang.giafob.GetValueOrDefault(0);
-
+			else {
+				decimal gianhap2 = UserUtils.get_gianhap(context, ma_dtkd_select, item.giafob.Value, donhang.discount.Value, discount_vinhgia);
+				if(gianhap2 > -1) {
+					gianhap = gianhap2;
+				}
+			}
             var ddsdh = new c_dongdsdh();
 
             ddsdh.c_dongdsdh_id = ImportUtils.getNEWID();
