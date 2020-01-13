@@ -361,7 +361,7 @@ public static class UserUtils
             if (maNCC == "VINHGIA")
                 gianhap = ddonhang.giafob.GetValueOrDefault(0);
 			else {
-				decimal gianhap2 = UserUtils.get_gianhap(context, ma_dtkd_select, item.giafob.Value, donhang.discount.Value, discount_vinhgia);
+				decimal gianhap2 = UserUtils.get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.Value, 0);
 				if(gianhap2 > -1) {
 					gianhap = gianhap2;
 				}
