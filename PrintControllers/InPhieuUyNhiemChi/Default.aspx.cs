@@ -65,7 +65,7 @@ public partial class PrintControllers_InPhieuNhapHang_Default : System.Web.UI.Pa
 			bangchu = VNN_ConvertMoney.convert(tien, ma_iso);
 			bangso = VNN_ConvertMoney.sep_thous(VNN_ConvertMoney.autoRound((decimal)tien, 2).ToString(), ",", ".");
 			str = String.Format(@" select
-			N'007.100. 0321642' as sotk_no1,
+			N'007.100. 0321642' as sotk_no,
 			N'CÔNG TY TNHH AN CƠ BÌNH DƯƠNG' as tentk_no,
 			N'3B/2 Kp.1B,P.An Phú, TX.Thuận An, Bình Dương' as diachi_no,
 			N'VCB-HCM' as nganhang_no,
