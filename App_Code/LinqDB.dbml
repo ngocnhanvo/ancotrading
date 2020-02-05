@@ -444,6 +444,7 @@
       <Column Name="giachuan" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
       <Column Name="discount" Type="System.Double" DbType="Float" CanBeNull="true" />
       <Column Name="barcode" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="phi" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.c_dongdonhangqr" Member="c_dongdonhangqrs">

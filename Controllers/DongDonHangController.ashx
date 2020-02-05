@@ -60,10 +60,10 @@ public class DongDonHangController : IHttpHandler
             {
                 string gia_sp = "1";
                 string dtkd_id = db.c_donhangs.FirstOrDefault(p => p.c_donhang_id.Equals(c_donhang_id)).md_doitackinhdoanh_id;
-                if(donhang.gia_db == true)
+                if (donhang.gia_db == true)
                     gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@ngaytinhgia", donhang.ngaylap);
-                else if(donhang.isdonhangtmp == true)
-                    gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia_Mau", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@loai_bg", true, "@ngaytinhgia", donhang.ngaylap,"@mau",1);
+                else if (donhang.isdonhangtmp == true)
+                    gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia_Mau", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@loai_bg", true, "@ngaytinhgia", donhang.ngaylap, "@mau", 1);
                 else
                     gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@loai_bg", true, "@ngaytinhgia", donhang.ngaylap);
 
@@ -136,6 +136,7 @@ public class DongDonHangController : IHttpHandler
                     {
                         m.giafob = decimal.Parse(context.Request.Form["giafob"]);
                     }
+                    m.phi = decimal.Parse(context.Request.Form["phi"]);
                     m.soluong = decimal.Parse(context.Request.Form["soluong"]);
                     m.soluong_conlai = decimal.Parse(context.Request.Form["soluong"]);
 
@@ -181,7 +182,7 @@ public class DongDonHangController : IHttpHandler
                     {
                         m.trangthai = "DQ";
                     }
-                    else if(donggoi.doigia_donggoi == true)
+                    else if (donggoi.doigia_donggoi == true)
                     {
                         m.trangthai = "DGDG";
                     }
@@ -226,7 +227,9 @@ public class DongDonHangController : IHttpHandler
                     jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi đơn hàng đã kết thúc!");
                 }
             }
-        }catch(Exception ex){
+        }
+        catch (Exception ex)
+        {
             jqGridHelper.Utils.writeResult(0, ex.Message);
         }
     }
@@ -251,14 +254,16 @@ public class DongDonHangController : IHttpHandler
 
         var itemJS = UserUtils.get_giasanpham(context, c_donhang_id, md_sanpham_id, db);
         string barcode = "";
-        decimal gia_sp = decimal.Parse(context.Request.Form["giafob"]);;
-        try {
+        decimal gia_sp = decimal.Parse(context.Request.Form["giafob"]); ;
+        try
+        {
             barcode = itemJS["barcode"].ToString();
-        } catch { }
+        }
+        catch { }
 
         // Lấy đóng gói của sản phẩm
         //md_donggoi donggoi = LinqUtils.getDongGoi(md_sanpham_id);
-        md_donggoi donggoi = db.md_donggois.FirstOrDefault(s=>s.md_donggoi_id == context.Request.Form["md_donggoi_id"]);
+        md_donggoi donggoi = db.md_donggois.FirstOrDefault(s => s.md_donggoi_id == context.Request.Form["md_donggoi_id"]);
         // Lấy số thứ tự cao nhất trong đơn hàng
         int maxLine = LinqUtils.getMaxSttDonHang(c_donhang_id);
 
@@ -277,7 +282,7 @@ public class DongDonHangController : IHttpHandler
         // kiem tra tinh hop le doi voi ma hang co 2 nha cung ung
         bool checkncu_cb = false;
         string ncu_line = sanpham.nhacungung;
-        var nhacungung = db.md_doitackinhdoanhs.FirstOrDefault(nc=>nc.md_doitackinhdoanh_id.Equals(sanpham.nhacungung));
+        var nhacungung = db.md_doitackinhdoanhs.FirstOrDefault(nc => nc.md_doitackinhdoanh_id.Equals(sanpham.nhacungung));
         string ncc_cangbien = "", dh_cangbien = "";
         try { ncc_cangbien = nhacungung.md_cangbien_id; } catch { }
         try { dh_cangbien = donhang.md_cangbien_id; } catch { }
@@ -361,7 +366,7 @@ public class DongDonHangController : IHttpHandler
 
         //var check_cbien = db.md_sanphams.Where(s=>s.md_cangbien_id.Equals(donhang.md_cangbien_id) & s.md_sanpham_id == md_sanpham_id).Count();
 
-        if(check_cbien <= 0 && donhang.donhang_mau.Value.Equals(false))
+        if (check_cbien <= 0 && donhang.donhang_mau.Value.Equals(false))
         {
             next = false;
             jqGridHelper.Utils.writeResult(0, "Mã hàng này không thuộc cảng biển được chọn trên PO!");
@@ -389,6 +394,8 @@ public class DongDonHangController : IHttpHandler
             mnu.ma_sanpham_khach = context.Request.Form["ma_sanpham_khach"];
             mnu.sothutu = maxLine + 10;
             mnu.giafob = gia_sp;
+            string phi = context.Request.Form["phi"];
+            mnu.phi = decimal.Parse(string.IsNullOrEmpty(phi) ? "0" : phi);
             mnu.soluong = decimal.Parse(context.Request.Form["soluong"]);
             mnu.soluong_conlai = decimal.Parse(context.Request.Form["soluong"]);
             mnu.soluong_daxuat = 0;
@@ -425,7 +432,7 @@ public class DongDonHangController : IHttpHandler
             {
                 mnu.trangthai = "DQ";
             }
-            else if(donggoi.doigia_donggoi == true)
+            else if (donggoi.doigia_donggoi == true)
             {
                 mnu.trangthai = "DGDG";
             }
@@ -457,13 +464,14 @@ public class DongDonHangController : IHttpHandler
     {
         String id = context.Request.Form["id"];
         c_dongdonhang ddh = db.c_dongdonhangs.FirstOrDefault(p => p.c_dongdonhang_id.Equals(id));
-        c_donhang dh = db.c_donhangs.FirstOrDefault(c=>c.c_donhang_id.Equals(ddh.c_donhang_id));
+        c_donhang dh = db.c_donhangs.FirstOrDefault(c => c.c_donhang_id.Equals(ddh.c_donhang_id));
 
         if (dh.md_trangthai_id.Equals("HIEULUC"))
         {
             jqGridHelper.Utils.writeResult(0, "Không thể xóa dòng trong PO đã hiệu lực!");
         }
-        else {
+        else
+        {
             db.c_dongdonhangs.DeleteOnSubmit(ddh);
             db.SubmitChanges();
             jqGridHelper.Utils.writeResult(1, "Xóa dòng thành công!");
@@ -541,6 +549,7 @@ public class DongDonHangController : IHttpHandler
                         , sp.ma_sanpham
                         , ddh.ma_sanpham_khach
                         , ddh.giafob
+                        , isnull(ddh.phi, 0) as phi
                         , ddh.soluong
                         , dg.ten_donggoi
                         , ddh.sl_inner
@@ -589,6 +598,7 @@ public class DongDonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["ma_sanpham"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_sanpham_khach"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["giafob"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["soluong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_donggoi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sl_inner"] + "]]></cell>";
