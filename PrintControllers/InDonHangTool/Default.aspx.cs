@@ -200,10 +200,13 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
 														, ddh.ma_sanpham_khach, ddh.mota_tienganh
 														, ddh.sl_outer , ddh.sl_inner
 														, (case ddh.sl_outer when 0 then ' ' else (cast(ddh.sl_outer as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) end) as ten_donggoi
-														, ddh.soluong, dvt.ten_dvt as dvt_sp, ddh.giafob
+														, ddh.soluong
+                                                        , dvt.ten_dvt as dvt_sp
+                                                        , (ddh.giafob + isnull(ddh.phi, 0)) as giafob
 														, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch , dh.shipmenttime, cb.ten_cangbien, pmt.ten_paymentterm, (' In favor of ANCO COMPANY LTD. Account No. : ' + replace(ngh.thongtin,'''','''''')) as mota
 														, ddh.v2 as cbm, (sp.trongluong * ddh.soluong) as trongluong
-														, (ddh.soluong * ddh.giafob) as amount,(case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
+														, (ddh.soluong * (ddh.giafob + isnull(ddh.phi, 0))) as amount
+                                                        ,(case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
 														, N'{8}' as no_cont
 														, (case dg.sl_inner when 0 then ' ' else (cast(dg.sl_inner as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as sl_inner_
 														, dh.portdischarge , (select dbo.get_commodity(N'{0}') )  + ' products' as commodity
