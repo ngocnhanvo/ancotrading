@@ -2,44 +2,43 @@
 <%@ Register src="jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
 
 <script>
-	function updateMoTaGiaPO_CallBack(c_donhang_id, md_sanpham_id) {
-		var frm = "#FrmGrid_grid_ds_chitietpo";
+    function updateMoTaGiaPO_CallBack(c_donhang_id, md_sanpham_id) {
+        var frm = "#FrmGrid_grid_ds_chitietpo";
         $.ajax({
             url: "Controllers/DongDonHangController.ashx?action=getmotagia&c_donhang_id=" + c_donhang_id + "&md_sanpham_id=" + md_sanpham_id,
             type: "GET",
             success: function (data) {
-				$("#ma_sanpham_khach", frm).val(data);
-				// var check_docquyen = $('#docquyen','#FrmGrid_grid_ds_chitietpo').val();
-				// if(check_docquyen.length > 0) {
-					// $("#ma_sanpham_khach", frm).val("");
-				// }
-				// else {
-					// $("#ma_sanpham_khach", frm).val(data);
-				// }
+                $("#ma_sanpham_khach", frm).val(data);
+                // var check_docquyen = $('#docquyen','#FrmGrid_grid_ds_chitietpo').val();
+                // if(check_docquyen.length > 0) {
+                // $("#ma_sanpham_khach", frm).val("");
+                // }
+                // else {
+                // $("#ma_sanpham_khach", frm).val(data);
+                // }
             }
         });
     }
 
-	function updateGiaSanPhamPO_CallBack(c_donhang_id, md_sanpham_id)
-    {
-		var frm = "#FrmGrid_grid_ds_chitietpo";
-		var giafob =  $('#giafob', frm);
-		var docquyen = $('#docquyen',frm); 
-		giafob.val('Đang tải...');
+    function updateGiaSanPhamPO_CallBack(c_donhang_id, md_sanpham_id) {
+        var frm = "#FrmGrid_grid_ds_chitietpo";
+        var giafob = $('#giafob', frm);
+        var docquyen = $('#docquyen', frm);
+        giafob.val('Đang tải...');
         $.ajax({
             url: "Controllers/DongDonHangController.ashx?action=getgiasanpham&c_donhang_id=" + c_donhang_id + "&md_sanpham_id=" + md_sanpham_id,
             type: "GET",
             success: function (data) {
                 giafob.val(data);
-				updateMoTaGiaPO_CallBack(c_donhang_id, md_sanpham_id);
+                updateMoTaGiaPO_CallBack(c_donhang_id, md_sanpham_id);
             }
         });
     }
-	
+
     function updateNhaCungUngPO_CallBack(md_sanpham_id) {
-		var frm = "#FrmGrid_grid_ds_chitietpo";
+        var frm = "#FrmGrid_grid_ds_chitietpo";
         var c_dongdonhang_id = $("#c_dongdonhang_id", frm).val();
-    
+
         $("#nhacungungid", frm)
                     .html("<option value=''>Đang tải nhà cung ứng...</option>")
                     .attr("disabled", "disabled");
@@ -47,7 +46,7 @@
         $.ajax({
             url: "Controllers/NhaCungUngMacDinhController.ashx?action=getoptionselected&c_dongdonhang_id=" + c_dongdonhang_id + "&md_sanpham_id=" + md_sanpham_id,
             type: "GET",
-            success: function(packingHtml) {
+            success: function (packingHtml) {
                 if (packingHtml != 'null') {
                     $("#nhacungungid", frm).removeAttr("disabled").html(packingHtml);
                 } else {
@@ -58,20 +57,20 @@
     }
 
     function updatePackingPO_CallBack(md_sanpham_id) {
-		var frm = "#FrmGrid_grid_ds_chitietpo";
+        var frm = "#FrmGrid_grid_ds_chitietpo";
         var c_dongdonhang_id = $("#c_dongdonhang_id", frm).val();
-		var c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
+        var c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
         $("#md_donggoi_id", frm).html("<option value=''>Đang tải đóng gói...</option>").attr("disabled", "disabled");
         $.ajax({
-        url: "Controllers/PackingController.ashx?action=getoptionselected&c_dongdonhang_id=" + c_dongdonhang_id + "&md_sanpham_id=" + md_sanpham_id +
-		"&c_donhang_id=" + c_donhang_id,
+            url: "Controllers/PackingController.ashx?action=getoptionselected&c_dongdonhang_id=" + c_dongdonhang_id + "&md_sanpham_id=" + md_sanpham_id +
+            "&c_donhang_id=" + c_donhang_id,
             type: "GET",
-            success: function(packingHtml) {
-				var arr_pkl = packingHtml.split('(##)'); 
-				
+            success: function (packingHtml) {
+                var arr_pkl = packingHtml.split('(##)');
+
                 if (packingHtml != 'null') {
                     $("#md_donggoi_id", frm).removeAttr("disabled").html(arr_pkl[0]);
-					$("#docquyen", frm).val(arr_pkl[1]);
+                    $("#docquyen", frm).val(arr_pkl[1]);
                 } else {
                     $("#md_donggoi_id", frm).html("<option value=''>Không tìm thấy đóng gói!</option>");
                 }
@@ -81,47 +80,47 @@
 
     // This function gets called whenever an edit dialog is opened
     function populatePackingPO() {
-		var frm = "#FrmGrid_grid_ds_chitietpo";
+        var frm = "#FrmGrid_grid_ds_chitietpo";
         // first of all update the city based on the country
         updatePackingPO_CallBack($("#sanpham_id", frm).val());
         updateNhaCungUngPO_CallBack($("#sanpham_id", frm).val());
-		
-		var id_sel = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
-		celgia_db = $('#grid_ds_po').jqGrid ('getCell', id_sel, 'gia_db');
-		//--
-		var giafob = $('#giafob', frm);
-		var docquyen = $('#tr_docquyen', frm);
-		if(celgia_db == 'True') {
-			giafob.prop('disabled', true);
-		}
-		else {
-			if(vnnIsAdmin == 'True')
-				giafob.prop('disabled', false);
-			else
-				giafob.prop('disabled', true);
-		}
-		docquyen.hide();
+
+        var id_sel = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
+        celgia_db = $('#grid_ds_po').jqGrid('getCell', id_sel, 'gia_db');
+        //--
+        var giafob = $('#giafob', frm);
+        var docquyen = $('#tr_docquyen', frm);
+        if (celgia_db == 'True') {
+            giafob.prop('disabled', true);
+        }
+        else {
+            if (vnnIsAdmin == 'True')
+                giafob.prop('disabled', false);
+            else
+                giafob.prop('disabled', true);
+        }
+        docquyen.hide();
         //$("#md_donggoi_id").bind("change", function(e) { updatePackingPO_CallBack($("#sanpham_id").val()); });
         //$("#nhacungungid").bind("change", function(e) { updateNhaCungUngPO_CallBack($("#sanpham_id").val()); });  
     }
 
-    $(function() {
-		$('#lay-center-po').parent().layout({
+    $(function () {
+        $('#lay-center-po').parent().layout({
             south: {
                 size: "50%"
             }
             , center: {
-                onresize: function() {
+                onresize: function () {
                     var h = $("#lay-center-po").height();
                     $("#grid_ds_po").setGridHeight(h - 90);
                 }
             }
         });
-		
-		// Layout nho duoi
+
+        // Layout nho duoi
         $('#layout-south-po').layout({
             center: {
-                onresize: function() {
+                onresize: function () {
                     var o = $("#tabs-donhang-details")
                     $("#grid_ds_chitietpo").setGridWidth(o.width());
                     $("#grid_khoanphi").setGridWidth(o.width());
@@ -131,64 +130,64 @@
                 }
             }
         });
-		
+
         // $('#lay-center-po').parent().layout({
-            // north: {
-                // size: "50%"
-                // , minSize: "0%"
-                // , maxSize: "100%"
-                // , onresize_end: function() {
-                    // var o = $("#layout-north-po").height();
-                    // $("#grid_ds_po").setGridHeight(o - 90);
-                    
-                // }
-            // },
-            // center: {
-                // onresize_end: function() {
-                    // var o = $("#lay-center-po").height();
-                    // $("#grid_ds_chitietpo").setGridHeight(o - 98);
-                    // $("#grid_khoanphi").setGridHeight(o - 98);
-                // }
-            // }
+        // north: {
+        // size: "50%"
+        // , minSize: "0%"
+        // , maxSize: "100%"
+        // , onresize_end: function() {
+        // var o = $("#layout-north-po").height();
+        // $("#grid_ds_po").setGridHeight(o - 90);
+
+        // }
+        // },
+        // center: {
+        // onresize_end: function() {
+        // var o = $("#lay-center-po").height();
+        // $("#grid_ds_chitietpo").setGridHeight(o - 98);
+        // $("#grid_khoanphi").setGridHeight(o - 98);
+        // }
+        // }
         // });
 
         $('#tabs-donhang-details').tabs();
 
-       
+
     });
 
     function createOnchange() {
-		var frm = "#FrmGrid_grid_ds_po";
-		var md_doitackinhdoanh_id = $("#md_doitackinhdoanh_id", frm);
-		var sct_dh = $("#sochungtu", frm).val();
-		if(md_doitackinhdoanh_id.attr('id') != null) {
-			md_doitackinhdoanh_id.off('change');
-			md_doitackinhdoanh_id.change(function() {
-				var dtkd = $(this).val();
-				$.ajax({
-					url: "Controllers/PartnerController.ashx?action=getHoaHong",
-					type: "POST",
-					datatype: "xml",
-					data: { md_doitackinhdoanh_id: dtkd, sct_dh: '' },
-					error: function(rs) {
-					
-					},
-					success: function(rs) {
-						var madtkd = $(rs).find("madtkd").text();
-						var tendtkd = $(rs).find("tendtkd").text();
-						var hoahong = $(rs).find("hoahong").text();
-						$("#md_nguoilienhe_id", frm).val(madtkd);
-						$("#hoahong",frm).val(hoahong);
-					}
-				});
-			});
-			//md_doitackinhdoanh_id.change();
-		}
-		else {
-			setTimeout(function() { 
-				createOnchange(); 
-			}, 100);
-		}
+        var frm = "#FrmGrid_grid_ds_po";
+        var md_doitackinhdoanh_id = $("#md_doitackinhdoanh_id", frm);
+        var sct_dh = $("#sochungtu", frm).val();
+        if (md_doitackinhdoanh_id.attr('id') != null) {
+            md_doitackinhdoanh_id.off('change');
+            md_doitackinhdoanh_id.change(function () {
+                var dtkd = $(this).val();
+                $.ajax({
+                    url: "Controllers/PartnerController.ashx?action=getHoaHong",
+                    type: "POST",
+                    datatype: "xml",
+                    data: { md_doitackinhdoanh_id: dtkd, sct_dh: '' },
+                    error: function (rs) {
+
+                    },
+                    success: function (rs) {
+                        var madtkd = $(rs).find("madtkd").text();
+                        var tendtkd = $(rs).find("tendtkd").text();
+                        var hoahong = $(rs).find("hoahong").text();
+                        $("#md_nguoilienhe_id", frm).val(madtkd);
+                        $("#hoahong", frm).val(hoahong);
+                    }
+                });
+            });
+            //md_doitackinhdoanh_id.change();
+        }
+        else {
+            setTimeout(function () {
+                createOnchange();
+            }, 100);
+        }
     }
 
     function funcActivePO() {
@@ -203,12 +202,12 @@
             // create new dialog
             $('#dialog-active-po').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
                 , buttons: {
-                    'Thoát': function() {
+                    'Thoát': function () {
                         $(this).dialog("destroy").remove();
                     }
                 }
@@ -225,7 +224,7 @@
             // create new dialog
             $('#dialog-active-po').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
@@ -234,20 +233,20 @@
                     {
                         id: "btn-active",
                         text: "Có",
-                        click: function() {
-                            $("#dialog-caution").ajaxStart(function() {
+                        click: function () {
+                            $("#dialog-caution").ajaxStart(function () {
                                 $("#wait").css("display", "block");
                                 $("#btn-active").button("disable");
                                 $("#btn-close").button("disable");
                             });
 
-                            $("#dialog-caution").ajaxComplete(function() {
+                            $("#dialog-caution").ajaxComplete(function () {
                                 $("#wait").css("display", "none");
                                 $("#btn-close span").text("Thoát");
                                 $("#btn-close").button("enable");
                             });
 
-                            $.get("Controllers/DonHangController.ashx?action=activepo&poId=" + id, function(result) {
+                            $.get("Controllers/DonHangController.ashx?action=activepo&poId=" + id, function (result) {
                                 //$('#dialog-caution').css({ 'color': 'green' });
                                 $('#dialog-active-po').find('#dialog-caution').html(result);
                                 $('#grid_ds_po').jqGrid().trigger('reloadGrid');
@@ -257,7 +256,7 @@
                     {
                         id: "btn-close",
                         text: "Không",
-                        click: function() {
+                        click: function () {
                             $(this).dialog("destroy").remove();
                         }
                     }
@@ -265,8 +264,8 @@
             });
         }
     }
-	
-	function HuyDonHang() {
+
+    function HuyDonHang() {
         var msg = "";
         var id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
 
@@ -345,7 +344,7 @@
     function funcPI() {
         var msg = "";
         var id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
-        
+
         if (id == null) {
             msg = "Bạn hãy chọn 1 đơn hàng mà bạn muốn tạo PI.!";
             // append dialog-taoky to body
@@ -354,12 +353,12 @@
             // create new dialog
             $('#dialog-create-pi').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
                 , buttons: {
-                    'Thoát': function() {
+                    'Thoát': function () {
                         $(this).dialog("destroy").remove();
                     }
                 }
@@ -376,7 +375,7 @@
             // create new dialog
             $('#dialog-create-pi').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
@@ -385,22 +384,22 @@
                     {
                         id: "btn-active",
                         text: "Có",
-                        click: function() {
-                            $("#dialog-caution").ajaxStart(function() {
+                        click: function () {
+                            $("#dialog-caution").ajaxStart(function () {
                                 $("#wait").css("display", "block");
                                 $("#btn-active").button("disable");
                                 $("#btn-close").button("disable");
                             });
 
-                            $("#dialog-caution").ajaxComplete(function() {
+                            $("#dialog-caution").ajaxComplete(function () {
                                 $("#wait").css("display", "none");
                                 $("#btn-close span").text("Thoát");
                                 $("#btn-close").button("enable");
                             });
 
-                            $.get("Controllers/DonHangController.ashx?action=createpi&poId=" + id, function(result) {
+                            $.get("Controllers/DonHangController.ashx?action=createpi&poId=" + id, function (result) {
                                 //$('#dialog-caution').css({ 'color': 'green' });
-                            $('#dialog-create-pi').find('#dialog-caution').html(result);
+                                $('#dialog-create-pi').find('#dialog-caution').html(result);
                                 $('#grid_ds_po').jqGrid().trigger('reloadGrid');
                             });
                         }
@@ -408,7 +407,7 @@
                     {
                         id: "btn-close",
                         text: "Không",
-                        click: function() {
+                        click: function () {
                             $(this).dialog("destroy").remove();
                         }
                     }
@@ -430,42 +429,42 @@
             // create new dialog
             $('#dialog-view-capacity').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
                 , buttons: {
-                    'Thoát': function() {
+                    'Thoát': function () {
                         $(this).dialog("destroy").remove();
                     }
                 }
             });
         } else {
-        $.get("Controllers/DonHangController.ashx?action=viewcapacity&poId=" + id, function(result) {
-            // append dialog-taoky to body
-            $('body').append('<div title="Xem Năng Lực" id=\"dialog-view-capacity\">' + result + '</div>');
+            $.get("Controllers/DonHangController.ashx?action=viewcapacity&poId=" + id, function (result) {
+                // append dialog-taoky to body
+                $('body').append('<div title="Xem Năng Lực" id=\"dialog-view-capacity\">' + result + '</div>');
 
-            // create new dialog
-            $('#dialog-view-capacity').dialog({
-                modal: true
-                    , width: 800
-                    , open: function(event, ui) {
-                        //hide close button.
-                        $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
-                    }
-                    , buttons:
-                    [
-                        {
-                            id: "btn-close",
-                            text: "Thoát",
-                            click: function() {
-                                $(this).dialog("destroy").remove();
-                            }
+                // create new dialog
+                $('#dialog-view-capacity').dialog({
+                    modal: true
+                        , width: 800
+                        , open: function (event, ui) {
+                            //hide close button.
+                            $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                         }
-                    ]
-            });
+                        , buttons:
+                        [
+                            {
+                                id: "btn-close",
+                                text: "Thoát",
+                                click: function () {
+                                    $(this).dialog("destroy").remove();
+                                }
+                            }
+                        ]
+                });
 
-        });
+            });
         }
     }
 
@@ -479,76 +478,76 @@
 								'<input id="printPoDetails" type="radio" name="rdoPrintType" value="printPoDetails" checked="checked" />' +
 								'<label for="printPoDetails">Chiết xuất đơn hàng</label>' +
 							'</td>' +
-							
-							
+
+
 							'<td>' +
 								'<input id="printPacking" type="radio" name="rdoPrintType" value="printPacking" />' +
 								'<label for="printPacking">In packing list</label>' +
 							'</td>' +
 						'</tr>' +
-						
+
 						'<tr>' +
 							'<td>' +
 								'<input id="printST_PO" type="radio" name="rdoPrintType" value="printST_PO" />' +
 								'<label for="printST_PO">Chiết xuất tất cả đơn hàng</label>' +
 							'</td>' +
-							
-							
+
+
 							'<td>' +
 								'<input id="printDanhMuc" type="radio" name="rdoPrintType" value="printDanhMuc" />' +
 								'<label for="printDanhMuc">In danh mục khai hải quan</label>' +
 							'</td>' +
 						'</tr>' +
-						
+
 						'<tr>' +
 							'<td>' +
 								'<input id="printPo" type="radio" name="rdoPrintType" value="printPo" />' +
 								'<label for="printPo">In đơn hàng</label>' +
 							'</td>' +
-							
-	
+
+
 							'<td>' +
 								'<input id="printToKhai" type="radio" name="rdoPrintType" value="printToKhai" />' +
 								'<label for="printToKhai">In tờ khai hải quan</label>' +
 							'</td>' +
 						'</tr>' +
-						
+
 						'<tr>' +
 							'<td>' +
 								'<input id="printRequired" type="radio" name="rdoPrintType" value="printRequired" />' +
 								'<label for="printRequired">In yêu cầu xuất hàng</label>' +
 							'</td>' +
-							
-							
+
+
 							'<td>' +
 								'<input id="printPoTinhHinhXuLyPI" type="radio" name="rdoPrintType" value="printPoTinhHinhXuLyPI" />' +
 								 '<label for="printPoTinhHinhXuLyPI">In tình hình xử lý PI</label>' +
 							'</td>' +
 						'</tr>' +
-						
+
 						'<tr>' +
 							'<td>' +
 								'<input id="printBook" type="radio" name="rdoPrintType" value="printBook" />' +
 								'<label for="printBook">In Bookcontainer</label>' +
 							'</td>' +
-							
+
 							'<td>' +
 								'<input id="printInvoice" type="radio" name="rdoPrintType" value="printInvoice" />' +
 								'<label for="printInvoice">In Invoice</label>' +
 							'</td>' +
-														
+
 							'<td style="display: none">' +
 								'<input id="printPoTem" type="radio" name="rdoPrintType" value="printPoTem" />' +
 								'<label for="printPoTem" style="display: none">In đơn hàng tem</label>' +
-							'</td>' +							
+							'</td>' +
 						'</tr>' +
-						
+
 						'<tr>' +
 							'<td>' +
 								'<input id="printsale" type="radio" name="rdoPrintType" value="printsale" />' +
 								'<label for="printsale">In sales contract</label>' +
 							'</td>' +
-														
+
 							'<td>' +
 								'<input id="printxbb" type="radio" name="rdoPrintType" value="printxbb" style="display: none" />' +
 								 '<label for="printxbb" style="display: none" >In xác nhận bao bì</label>' +
@@ -558,9 +557,9 @@
 
         $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
         $('#' + name).dialog({
-			width: 500,
+            width: 500,
             modal: true
-            , open: function(event, ui) {
+            , open: function (event, ui) {
                 //hide close button.
                 $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
             }
@@ -568,17 +567,17 @@
             {
                 id: "btn-print-ok",
                 text: "In",
-                click: function() {
+                click: function () {
                     var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-po').val();
                     var printURL = "PrintControllers/";
                     var windowSize = "width=700,height=700,scrollbars=yes";
-					if (typeof printType != 'undefined') {
+                    if (typeof printType != 'undefined') {
                         if (printType == "printRequired") {
                             if (poId != null) {
                                 printURL += "InYeuCauXuatHang/";
                                 window.open(printURL + "?c_donhang_id=" + poId, "In Phiếu Xuất", windowSize);
                             } else {
-                            alert('Bạn chưa chọn đơn hàng cần in.!');
+                                alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         } else if (printType == 'printPoDetails') {
                             if (poId != null) {
@@ -622,8 +621,8 @@
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
-						}
-						else if (printType == 'printToKhai') {
+                        }
+                        else if (printType == 'printToKhai') {
                             if (poId != null) {
                                 printURL += "InPO/ToKhaiHQ.aspx";
                                 window.open(printURL + "?c_donhang_id=" + poId, "In Ctờ khai hải quan", windowSize);
@@ -631,7 +630,7 @@
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         }
-						else if (printType == 'printDanhMuc') {
+                        else if (printType == 'printDanhMuc') {
                             if (poId != null) {
                                 printURL += "InPO/DanhMucHQ.aspx";
                                 window.open(printURL + "?c_donhang_id=" + poId, "In danh mục khai hải quan", windowSize);
@@ -639,7 +638,7 @@
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         }
-						else if (printType == 'printsale') {
+                        else if (printType == 'printsale') {
                             if (poId != null) {
                                 printURL += "InPO/SaleContract.aspx";
                                 window.open(printURL + "?c_donhang_id=" + poId, "In Sale Contract", windowSize);
@@ -647,7 +646,7 @@
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         }
-						else if (printType == 'printInvoice') {
+                        else if (printType == 'printInvoice') {
                             if (poId != null) {
                                 printURL += "InPO/Invoice.aspx";
                                 window.open(printURL + "?c_donhang_id=" + poId, "In Invoice", windowSize);
@@ -655,7 +654,7 @@
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         }
-						else if (printType == 'printPacking') {
+                        else if (printType == 'printPacking') {
                             if (poId != null) {
                                 printURL += "InPO/PackingList.aspx";
                                 window.open(printURL + "?c_donhang_id=" + poId, "In Packing List", windowSize);
@@ -663,11 +662,11 @@
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         }
-						else if (printType == 'printST_PO') {
-                                printURL += "InPO/printST_PO.aspx";
-                                window.open(printURL, "Chiết xuất tất cả các PO đang \"Soạn Thảo\"", windowSize);
+                        else if (printType == 'printST_PO') {
+                            printURL += "InPO/printST_PO.aspx";
+                            window.open(printURL, "Chiết xuất tất cả các PO đang \"Soạn Thảo\"", windowSize);
                         }
-						else {
+                        else {
                             printURL += "InDSYeuCauXuatHang/";
                             window.open(printURL, "In Danh Sách Phiếu Xuất", windowSize);
                         }
@@ -679,7 +678,7 @@
             , {
                 id: "btn-print-close",
                 text: "Thoát",
-                click: function() {
+                click: function () {
                     $(this).dialog("destroy").remove();
                 }
             }
@@ -692,7 +691,7 @@
         if (poId == null) {
             alert('Hãy chọn một đơn hàng mà bạn muốn gửi email!');
         } else {
-            $.get("Controllers/DonHangController.ashx?action=sendmail&poId=" + poId, function(result) {
+            $.get("Controllers/DonHangController.ashx?action=sendmail&poId=" + poId, function (result) {
                 window.open(result, "Gửi email");
             });
         }
@@ -710,12 +709,12 @@
             // create new dialog
             $('#dialog-ketthuc-donhang').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
                 , buttons: {
-                    'Thoát': function() {
+                    'Thoát': function () {
                         $(this).dialog("destroy").remove();
                     }
                 }
@@ -731,7 +730,7 @@
             // create new dialog
             $('#dialog-ketthuc-donhang').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
@@ -740,20 +739,20 @@
                     {
                         id: "btn-active",
                         text: "Có",
-                        click: function() {
-                            $("#dialog-caution").ajaxStart(function() {
+                        click: function () {
+                            $("#dialog-caution").ajaxStart(function () {
                                 $("#wait").css("display", "block");
                                 $("#btn-active").button("disable");
                                 $("#btn-close").button("disable");
                             });
 
-                            $("#dialog-caution").ajaxComplete(function() {
+                            $("#dialog-caution").ajaxComplete(function () {
                                 $("#wait").css("display", "none");
                                 $("#btn-close span").text("Thoát");
                                 $("#btn-close").button("enable");
                             });
 
-                            $.get("Controllers/DonHangController.ashx?action=stoppo&poId=" + id, function(result) {
+                            $.get("Controllers/DonHangController.ashx?action=stoppo&poId=" + id, function (result) {
                                 //$('#dialog-caution').css({ 'color': 'green' });
                                 $('#dialog-ketthuc-donhang').find('#dialog-caution').html(result);
                                 $('#grid_ds_po').jqGrid().trigger('reloadGrid');
@@ -763,7 +762,7 @@
                     {
                         id: "btn-close",
                         text: "Không",
-                        click: function() {
+                        click: function () {
                             $(this).dialog("destroy").remove();
                         }
                     }
@@ -771,8 +770,8 @@
             });
         }
     }
-	
-	function CopyDonHang() {
+
+    function CopyDonHang() {
         var msg = "";
         var id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
 
@@ -784,12 +783,12 @@
             // create new dialog
             $('#dialog-saochep-donhang').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
                 , buttons: {
-                    'Thoát': function() {
+                    'Thoát': function () {
                         $(this).dialog("destroy").remove();
                     }
                 }
@@ -805,7 +804,7 @@
             // create new dialog
             $('#dialog-saochep-donhang').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
@@ -814,20 +813,20 @@
                     {
                         id: "btn-active",
                         text: "Có",
-                        click: function() {
-                            $("#dialog-caution").ajaxStart(function() {
+                        click: function () {
+                            $("#dialog-caution").ajaxStart(function () {
                                 $("#wait").css("display", "block");
                                 $("#btn-active").button("disable");
                                 $("#btn-close").button("disable");
                             });
 
-                            $("#dialog-caution").ajaxComplete(function() {
+                            $("#dialog-caution").ajaxComplete(function () {
                                 $("#wait").css("display", "none");
                                 $("#btn-close span").text("Thoát");
                                 $("#btn-close").button("enable");
                             });
 
-                            $.get("Controllers/DonHangController.ashx?action=CopyDonHang&poId=" + id, function(result) {
+                            $.get("Controllers/DonHangController.ashx?action=CopyDonHang&poId=" + id, function (result) {
                                 //$('#dialog-caution').css({ 'color': 'green' });
                                 $('#dialog-saochep-donhang').find('#dialog-caution').html(result);
                                 $('#grid_ds_po').jqGrid().trigger('reloadGrid');
@@ -837,34 +836,34 @@
                     {
                         id: "btn-close",
                         text: "Không",
-                        click: function() {
+                        click: function () {
                             $(this).dialog("destroy").remove();
                         }
                     }
                 ]
             });
         }
-   }
+    }
 
-   function ShowPBGCu_grid_ds_po(frmID, action) {
-       var ShowPBGCu = function () {
-           var chkPBGCu = $('#chkPBGCu', frmID);
-           var tr_phienbangiacu = $('#tr_phienbangiacu', frmID);
-           if (chkPBGCu.prop('checked') == true) {
-               tr_phienbangiacu.show();
-           }
-           else {
-               tr_phienbangiacu.hide();
-           }
-       }
+    function ShowPBGCu_grid_ds_po(frmID, action) {
+        var ShowPBGCu = function () {
+            var chkPBGCu = $('#chkPBGCu', frmID);
+            var tr_phienbangiacu = $('#tr_phienbangiacu', frmID);
+            if (chkPBGCu.prop('checked') == true) {
+                tr_phienbangiacu.show();
+            }
+            else {
+                tr_phienbangiacu.hide();
+            }
+        }
 
-       var chkPBGCu_ = $('#chkPBGCu', frmID);
-       chkPBGCu_.off('change');
-       chkPBGCu_.change(function () {
-           ShowPBGCu();
-       });
-       ShowPBGCu();
-   }
+        var chkPBGCu_ = $('#chkPBGCu', frmID);
+        chkPBGCu_.off('change');
+        chkPBGCu_.change(function () {
+            ShowPBGCu();
+        });
+        ShowPBGCu();
+    }
 </script>
 <DIV class="ui-layout-center ui-widget-content" id="lay-center-po" style="padding:0;">
 <uc1:jqGrid  ID="grid_ds_po"
@@ -1562,8 +1561,8 @@
             runat="server" />
 			
 	<script type="text/javascript">
-        $(function () {
-            $("#grid_ds_po").jqGrid('navButtonAdd', '#grid_ds_po-pager',
+	    $(function () {
+	        $("#grid_ds_po").jqGrid('navButtonAdd', '#grid_ds_po-pager',
 		    {
 		        caption: "",
 		        buttonicon: "ui-icon-cancel",
@@ -1571,7 +1570,7 @@
 		        onClickButton: HuyDonHang
 		    });
 
-        });
+	    });
     </script>
 	
 	
@@ -1723,6 +1722,19 @@
 				name: 'giafob'
 				, label: 'Giá'
 				, index: 'ddh.giafob'
+				, fixed:true , width: 100
+				, edittype: 'text'
+				, editable: true
+				, editrules: { required:true, number: true }
+				, editoptions:{ defaultValue: '0' }
+				, align: 'right'
+				, formatter:'currency'
+				, formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+			},
+                {
+				name: 'phi'
+				, label: 'Phí'
+				, index: 'ddh.phi'
 				, fixed:true , width: 100
 				, edittype: 'text'
 				, editable: true
@@ -2468,276 +2480,276 @@
 			</table>
 		</div> 
 	<script>
-		var hide_dtkd_philqpo = function(frm) {
-			$('#tr_md_doitackinhdoanh_id', frm).hide();
-			$('#tr_phitang_kh', frm).hide();
-			$('#tr_diengiai_kh', frm).hide();
-			$('#tbl_dsncc_check_ptr', frm).hide();
-			$('#tbl_dsncc_check_chhet', frm).hide();
-		}
-		
-		var hide_dtkd_philqpo1 = function(frm) {
-			$('#tr_md_doitackinhdoanh_id', frm).hide();
-			$('#tr_phitang_kh', frm).show();
-			$('#tr_diengiai_kh', frm).show();
-			$('#tbl_dsncc_check_ptr', frm).hide();
-			$('#tbl_dsncc_check_chhet', frm).hide();
-		}
-		
-		var show_dtkd_philqpo = function(frm) {
-			$('#tr_phitang_kh', frm).show();
-			$('#tr_diengiai_kh', frm).show();
-			$('#tbl_dsncc_check_ptr', frm).hide();
-		}
-		
-		var checkbox_khoanphilq = function() {
-			var frm = '#FrmGrid_grid_khoanphi';
-			$('#check_chhet', frm).off('change');
-			$('#check_chhet', frm).change(function() {
-				var chk_ptr = $('#check_ptr', frm);
-				var chk_ptrCBM = $('#check_ptrCBM', frm);
-				if($(this).prop('checked')) {
-					chk_ptr.prop('checked', false);
-					chk_ptrCBM.prop('checked', false);
-					hide_dtkd_philqpo1(frm);
-					$('#tbl_dsncc_check_chhet', frm).show();		
-				}
-				else if(chk_ptr.prop('checked') == false & chk_ptrCBM.prop('checked') == false) {
-					hide_dtkd_philqpo(frm);
-				}
-			});
-			
-			$('#check_ptr', frm).off('change');
-			$('#check_ptr', frm).change(function() {
-				var chk_het = $('#check_chhet', frm);
-				var chk_ptrCBM = $('#check_ptrCBM', frm);
-				if($(this).prop('checked')) {
-					chk_het.prop('checked', false);
-					chk_ptrCBM.prop('checked', false);
-					hide_dtkd_philqpo1(frm);
-					$('#tbl_dsncc_check_ptr', frm).show();
-				}
-				else if(chk_het.prop('checked') == false & chk_ptrCBM.prop('checked') == false) {
-					hide_dtkd_philqpo(frm);
-				}
-			});
-			
-			$('#check_ptrCBM', frm).off('change');
-			$('#check_ptrCBM', frm).change(function() {
-				var chk_ptr = $('#check_ptr', frm);
-				var chk_het = $('#check_chhet', frm);
-				if($(this).prop('checked')) {
-					chk_ptr.prop('checked', false);
-					chk_het.prop('checked', false);
-					hide_dtkd_philqpo1(frm);
-				}
-				else if(chk_ptr.prop('checked') == false & chk_het.prop('checked') == false) {
-					hide_dtkd_philqpo(frm);
-				}
-			});
-			
-			$('#tracho_ncc', frm).off('change');
-			$('#tracho_ncc', frm).change(function() {
-				var chk_ptr = $('#check_ptr', frm);
-				var chk_het = $('#check_chhet', frm);
-				var chk_ptrCBM = $('#check_ptrCBM', frm);
-				if($(this).prop('checked')) {
-					if(chk_het.prop('checked')) {
-						hide_dtkd_philqpo1();
-					}
-					else if(chk_ptr.prop('checked') | chk_ptrCBM.prop('checked')) {
-						hide_dtkd_philqpo1();
-					}
-					else {
-						hide_dtkd_philqpo();
-					}
-					$('#tr_header_ncc', frm).show();
-					$('#tr_check_chhet', frm).show();
-					$('#tr_check_ptr', frm).show();
-					$('#tr_check_ptrCBM', frm).show();
-					$('.row_detail', frm).show();
-					//$('#editmodgrid_khoanphi').css('width', '410px');
-				}
-				else {
-					$('#tr_header_ncc', frm).hide();
-					$('#tr_phitang_kh', frm).hide();
-					$('#tr_diengiai_kh', frm).hide();
-					$('#tr_check_chhet', frm).hide();
-					$('#tr_check_ptr', frm).hide();
-					$('#tr_check_ptrCBM', frm).hide();
-					$('#tr_header_ncc', frm).hide();
-					$('#check_chhet', frm).prop( 'checked', false );
-					$('#check_ptrCBM', frm).prop( 'checked', false );
-					$('#check_ptr', frm).prop( 'checked', false );
-					$('.row_detail', frm).hide();
-					
-					//$('#editmodgrid_khoanphi').css('width', '300px');
-				}
-			});
-			
-			$('#phitang', frm).off('change');
-			$('#phitang', frm).change(function() {
-				var phitang_kh = $('#phitang_kh', frm);
-				phitang_kh.prop('checked', $(this).prop('checked'));
-			});
-		};
-		
-		var header_phidongpo = function() {
-			var frm = '#FrmGrid_grid_khoanphi';
-			$('#tr_header_kh', frm).show();
-			$('#tr_header_kh .CaptionTD', frm).attr('colspan', 2).css({ 'font-size':'20px', 'background-color':'#FFF' });
-			$('#tr_header_kh .DataTD', frm).remove();
-			$('#tr_header_ncc', frm).show();
-			$('#tr_header_ncc .CaptionTD', frm).attr('colspan', 2).css({'font-size':'20px', 'border-top':'6px solid #383838', 'background-color':'#FFF'});
-			$('#tr_header_ncc .DataTD', frm).remove();
-			
-			$('#tr_dsncc_check_ptr', frm).hide();
-			$('#tr_dsncc_check_chhet', frm).hide();
-			$('#tr_md_doitackinhdoanh_id', frm).hide();
-			
-			$('#check_ptrCBM', frm).change(); 
-			$('#check_chhet', frm).change(); 
-			$('#tracho_ncc', frm).change();
-			
-			show_selectoption_dsphi();
-			show_congthuc_giamua();
-			show_chuyenhetNCC();
-			//'<tr rowpos="3" class="FormData"><td colspan=2></td>Khách hàng</tr>'.insertBefore($('#tr_phi'));
-		};
-		
-		var show_selectoption_dsphi = function() {
-			var frm = '#FrmGrid_grid_khoanphi';
-			var myVar = setInterval(function() {
-				var options = $('#md_doitackinhdoanh_id',frm).children('option');
-				if(options.length > 0) {
-					clearInterval(myVar);
-					var c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
-					var allow = '';
-					var txt_sel = $('#md_doitackinhdoanh_id',frm).children('option:selected').text();
-					$.getJSON('Controllers/DonHangController.ashx?action=get_dsncc&c_donhang_id=' + c_donhang_id, function(result) {
-						for(var i in result) {
-							var row = result[i];
-							allow += row['ma_dtkd'] + ',';
-						}
-						allow = allow.split(',');
-						var ii = 0;
-						options.each(function() {
-							if(allow.indexOf($(this).text()) > -1) {
-								$(this).show();
-								if(allow.indexOf(txt_sel) <= -1) {
-									if(ii == 0) { $(this).prop('selected', true); }
-									ii++;
-								}
-							}
-							else {
-								$(this).hide();
-							}
-						});
-					});
-				}
-			}, 1000);
-		}
-		var show_chuyenhetNCC = function() {
-			show_congthuc_giamua('chncc');
-		};
-		
-		var show_congthuc_giamua = function(chncc) {
-			var frm = '#FrmGrid_grid_khoanphi';
-			var ava_chk = 'check_ptr';
-			if(chncc != null & chncc != '') {
-				ava_chk = 'check_chhet';
-			}
-			var dsncc_check_ptr = $('#dsncc_'+ava_chk, frm);
-			
-			var c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
-			var tbl_edit_dsncc = JSON.parse('[{"id":"","ma_dtkd":"","tien":"0"}]');
-			try {
-				tbl_edit_dsncc = JSON.parse(dsncc_check_ptr.val());
-			}
-			catch(r) {
-				//alert(r);
-			}
-			
-			$('#tbl_dsncc_'+ava_chk, frm).remove();
-			$.getJSON('Controllers/DonHangController.ashx?action=get_dsncc&c_donhang_id=' + c_donhang_id, function(result) {
-				var tbl = '<tr id="tbl_dsncc_'+ ava_chk +'"><td style="padding-top: 6px;" colspan="2"><table>';
-				for(var i in result) {
-					var row = result[i];
-					tbl += 
+	    var hide_dtkd_philqpo = function (frm) {
+	        $('#tr_md_doitackinhdoanh_id', frm).hide();
+	        $('#tr_phitang_kh', frm).hide();
+	        $('#tr_diengiai_kh', frm).hide();
+	        $('#tbl_dsncc_check_ptr', frm).hide();
+	        $('#tbl_dsncc_check_chhet', frm).hide();
+	    }
+
+	    var hide_dtkd_philqpo1 = function (frm) {
+	        $('#tr_md_doitackinhdoanh_id', frm).hide();
+	        $('#tr_phitang_kh', frm).show();
+	        $('#tr_diengiai_kh', frm).show();
+	        $('#tbl_dsncc_check_ptr', frm).hide();
+	        $('#tbl_dsncc_check_chhet', frm).hide();
+	    }
+
+	    var show_dtkd_philqpo = function (frm) {
+	        $('#tr_phitang_kh', frm).show();
+	        $('#tr_diengiai_kh', frm).show();
+	        $('#tbl_dsncc_check_ptr', frm).hide();
+	    }
+
+	    var checkbox_khoanphilq = function () {
+	        var frm = '#FrmGrid_grid_khoanphi';
+	        $('#check_chhet', frm).off('change');
+	        $('#check_chhet', frm).change(function () {
+	            var chk_ptr = $('#check_ptr', frm);
+	            var chk_ptrCBM = $('#check_ptrCBM', frm);
+	            if ($(this).prop('checked')) {
+	                chk_ptr.prop('checked', false);
+	                chk_ptrCBM.prop('checked', false);
+	                hide_dtkd_philqpo1(frm);
+	                $('#tbl_dsncc_check_chhet', frm).show();
+	            }
+	            else if (chk_ptr.prop('checked') == false & chk_ptrCBM.prop('checked') == false) {
+	                hide_dtkd_philqpo(frm);
+	            }
+	        });
+
+	        $('#check_ptr', frm).off('change');
+	        $('#check_ptr', frm).change(function () {
+	            var chk_het = $('#check_chhet', frm);
+	            var chk_ptrCBM = $('#check_ptrCBM', frm);
+	            if ($(this).prop('checked')) {
+	                chk_het.prop('checked', false);
+	                chk_ptrCBM.prop('checked', false);
+	                hide_dtkd_philqpo1(frm);
+	                $('#tbl_dsncc_check_ptr', frm).show();
+	            }
+	            else if (chk_het.prop('checked') == false & chk_ptrCBM.prop('checked') == false) {
+	                hide_dtkd_philqpo(frm);
+	            }
+	        });
+
+	        $('#check_ptrCBM', frm).off('change');
+	        $('#check_ptrCBM', frm).change(function () {
+	            var chk_ptr = $('#check_ptr', frm);
+	            var chk_het = $('#check_chhet', frm);
+	            if ($(this).prop('checked')) {
+	                chk_ptr.prop('checked', false);
+	                chk_het.prop('checked', false);
+	                hide_dtkd_philqpo1(frm);
+	            }
+	            else if (chk_ptr.prop('checked') == false & chk_het.prop('checked') == false) {
+	                hide_dtkd_philqpo(frm);
+	            }
+	        });
+
+	        $('#tracho_ncc', frm).off('change');
+	        $('#tracho_ncc', frm).change(function () {
+	            var chk_ptr = $('#check_ptr', frm);
+	            var chk_het = $('#check_chhet', frm);
+	            var chk_ptrCBM = $('#check_ptrCBM', frm);
+	            if ($(this).prop('checked')) {
+	                if (chk_het.prop('checked')) {
+	                    hide_dtkd_philqpo1();
+	                }
+	                else if (chk_ptr.prop('checked') | chk_ptrCBM.prop('checked')) {
+	                    hide_dtkd_philqpo1();
+	                }
+	                else {
+	                    hide_dtkd_philqpo();
+	                }
+	                $('#tr_header_ncc', frm).show();
+	                $('#tr_check_chhet', frm).show();
+	                $('#tr_check_ptr', frm).show();
+	                $('#tr_check_ptrCBM', frm).show();
+	                $('.row_detail', frm).show();
+	                //$('#editmodgrid_khoanphi').css('width', '410px');
+	            }
+	            else {
+	                $('#tr_header_ncc', frm).hide();
+	                $('#tr_phitang_kh', frm).hide();
+	                $('#tr_diengiai_kh', frm).hide();
+	                $('#tr_check_chhet', frm).hide();
+	                $('#tr_check_ptr', frm).hide();
+	                $('#tr_check_ptrCBM', frm).hide();
+	                $('#tr_header_ncc', frm).hide();
+	                $('#check_chhet', frm).prop('checked', false);
+	                $('#check_ptrCBM', frm).prop('checked', false);
+	                $('#check_ptr', frm).prop('checked', false);
+	                $('.row_detail', frm).hide();
+
+	                //$('#editmodgrid_khoanphi').css('width', '300px');
+	            }
+	        });
+
+	        $('#phitang', frm).off('change');
+	        $('#phitang', frm).change(function () {
+	            var phitang_kh = $('#phitang_kh', frm);
+	            phitang_kh.prop('checked', $(this).prop('checked'));
+	        });
+	    };
+
+	    var header_phidongpo = function () {
+	        var frm = '#FrmGrid_grid_khoanphi';
+	        $('#tr_header_kh', frm).show();
+	        $('#tr_header_kh .CaptionTD', frm).attr('colspan', 2).css({ 'font-size': '20px', 'background-color': '#FFF' });
+	        $('#tr_header_kh .DataTD', frm).remove();
+	        $('#tr_header_ncc', frm).show();
+	        $('#tr_header_ncc .CaptionTD', frm).attr('colspan', 2).css({ 'font-size': '20px', 'border-top': '6px solid #383838', 'background-color': '#FFF' });
+	        $('#tr_header_ncc .DataTD', frm).remove();
+
+	        $('#tr_dsncc_check_ptr', frm).hide();
+	        $('#tr_dsncc_check_chhet', frm).hide();
+	        $('#tr_md_doitackinhdoanh_id', frm).hide();
+
+	        $('#check_ptrCBM', frm).change();
+	        $('#check_chhet', frm).change();
+	        $('#tracho_ncc', frm).change();
+
+	        show_selectoption_dsphi();
+	        show_congthuc_giamua();
+	        show_chuyenhetNCC();
+	        //'<tr rowpos="3" class="FormData"><td colspan=2></td>Khách hàng</tr>'.insertBefore($('#tr_phi'));
+	    };
+
+	    var show_selectoption_dsphi = function () {
+	        var frm = '#FrmGrid_grid_khoanphi';
+	        var myVar = setInterval(function () {
+	            var options = $('#md_doitackinhdoanh_id', frm).children('option');
+	            if (options.length > 0) {
+	                clearInterval(myVar);
+	                var c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
+	                var allow = '';
+	                var txt_sel = $('#md_doitackinhdoanh_id', frm).children('option:selected').text();
+	                $.getJSON('Controllers/DonHangController.ashx?action=get_dsncc&c_donhang_id=' + c_donhang_id, function (result) {
+	                    for (var i in result) {
+	                        var row = result[i];
+	                        allow += row['ma_dtkd'] + ',';
+	                    }
+	                    allow = allow.split(',');
+	                    var ii = 0;
+	                    options.each(function () {
+	                        if (allow.indexOf($(this).text()) > -1) {
+	                            $(this).show();
+	                            if (allow.indexOf(txt_sel) <= -1) {
+	                                if (ii == 0) { $(this).prop('selected', true); }
+	                                ii++;
+	                            }
+	                        }
+	                        else {
+	                            $(this).hide();
+	                        }
+	                    });
+	                });
+	            }
+	        }, 1000);
+	    }
+	    var show_chuyenhetNCC = function () {
+	        show_congthuc_giamua('chncc');
+	    };
+
+	    var show_congthuc_giamua = function (chncc) {
+	        var frm = '#FrmGrid_grid_khoanphi';
+	        var ava_chk = 'check_ptr';
+	        if (chncc != null & chncc != '') {
+	            ava_chk = 'check_chhet';
+	        }
+	        var dsncc_check_ptr = $('#dsncc_' + ava_chk, frm);
+
+	        var c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
+	        var tbl_edit_dsncc = JSON.parse('[{"id":"","ma_dtkd":"","tien":"0"}]');
+	        try {
+	            tbl_edit_dsncc = JSON.parse(dsncc_check_ptr.val());
+	        }
+	        catch (r) {
+	            //alert(r);
+	        }
+
+	        $('#tbl_dsncc_' + ava_chk, frm).remove();
+	        $.getJSON('Controllers/DonHangController.ashx?action=get_dsncc&c_donhang_id=' + c_donhang_id, function (result) {
+	            var tbl = '<tr id="tbl_dsncc_' + ava_chk + '"><td style="padding-top: 6px;" colspan="2"><table>';
+	            for (var i in result) {
+	                var row = result[i];
+	                tbl +=
 					`<tr class="row_detail">
-						<td style="display:none">`+ row['id'] +`</td>
-						<td style="color: blue">`+ row['ma_dtkd'] +`</td>
+						<td style="display:none">`+ row['id'] + `</td>
+						<td style="color: blue">`+ row['ma_dtkd'] + `</td>
 						<td style="width:20px"></td>
-						<td><input type="text" value="`  + row['tien'] +`"/></td>
+						<td><input type="text" value="`  + row['tien'] + `"/></td>
 					</tr>`;
-				}
-				tbl += '</table></tr>';
-				
-				$(tbl).insertAfter(dsncc_check_ptr.parent().parent());
-				var chk_ptr = $('#'+ava_chk, frm);
-				if(chk_ptr.prop('checked') != true) {
-					$('#tbl_dsncc_' + ava_chk, frm).hide();
-				}
-				
-				for(var i in tbl_edit_dsncc) {
-					var row = tbl_edit_dsncc[i];
-					$('#tbl_dsncc_'+ ava_chk, frm).children('td').find('.row_detail').each(function() {
-						var id = $(this).children('td:eq(0)').html();
-						if(row['id'] == id) {
-							$(this).children('td:eq(3)').find('input').val(row['tien']);
-						}
-					});
-				}
-			});
-		}
-		
-		var get_dsncc_check_chhet = function() {
-			return get_dsncc_check_ptr('chncc');
-		};
-		var get_dsncc_check_ptr = function(chncc) {
-			var frm = '#FrmGrid_grid_khoanphi';
-			var ava_chk = 'dsncc_check_ptr';
-			if(chncc != null & chncc != '') {
-				ava_chk = 'dsncc_check_chhet';
-			}
-	
-			var dsncc_check_ptr = $('#'+ava_chk, frm);
-			var check_ptr = $('#check_ptr', frm);
-			var check_chhet = $('#check_chhet', frm);
-			var phi = $('#phi', frm);
-			var result = '', tongtien = 0, tongphi = 0;
-			try { tongphi = Number(phi.val()); } catch(r) { }
-			$('#tbl_'+ava_chk, frm).children('td').find('.row_detail').each(function() {
-				var tien = $(this).children('td:eq(3)').find('input').val();
-				result += "{";
-				result += '"id":"' + $(this).children('td:eq(0)').html() + '",';
-				result += '"ma_dtkd":"' + $(this).children('td:eq(1)').html() + '",';
-				result += '"tien":"' + tien + '"';
-				result += "},";
-				
-				tongtien += Number(tien);
-				
-			});
-			if(result != '') {
-				result = '[' + result.substring(0, result.length - 1) + ']';
-			}
-			
-			var msg = '';
-			if(check_ptr.prop('checked') | check_chhet.prop('checked')) {
-				if(tongtien <= tongphi) {
-					dsncc_check_ptr.val(result);
-					msg = dsncc_check_ptr.val();
-				}
-				else {
-					msg = 'error';
-				}
-			}
-			else {
-				dsncc_check_ptr.val('');
-				msg = dsncc_check_ptr.val();
-			}
-			return msg;
-		}
+	            }
+	            tbl += '</table></tr>';
+
+	            $(tbl).insertAfter(dsncc_check_ptr.parent().parent());
+	            var chk_ptr = $('#' + ava_chk, frm);
+	            if (chk_ptr.prop('checked') != true) {
+	                $('#tbl_dsncc_' + ava_chk, frm).hide();
+	            }
+
+	            for (var i in tbl_edit_dsncc) {
+	                var row = tbl_edit_dsncc[i];
+	                $('#tbl_dsncc_' + ava_chk, frm).children('td').find('.row_detail').each(function () {
+	                    var id = $(this).children('td:eq(0)').html();
+	                    if (row['id'] == id) {
+	                        $(this).children('td:eq(3)').find('input').val(row['tien']);
+	                    }
+	                });
+	            }
+	        });
+	    }
+
+	    var get_dsncc_check_chhet = function () {
+	        return get_dsncc_check_ptr('chncc');
+	    };
+	    var get_dsncc_check_ptr = function (chncc) {
+	        var frm = '#FrmGrid_grid_khoanphi';
+	        var ava_chk = 'dsncc_check_ptr';
+	        if (chncc != null & chncc != '') {
+	            ava_chk = 'dsncc_check_chhet';
+	        }
+
+	        var dsncc_check_ptr = $('#' + ava_chk, frm);
+	        var check_ptr = $('#check_ptr', frm);
+	        var check_chhet = $('#check_chhet', frm);
+	        var phi = $('#phi', frm);
+	        var result = '', tongtien = 0, tongphi = 0;
+	        try { tongphi = Number(phi.val()); } catch (r) { }
+	        $('#tbl_' + ava_chk, frm).children('td').find('.row_detail').each(function () {
+	            var tien = $(this).children('td:eq(3)').find('input').val();
+	            result += "{";
+	            result += '"id":"' + $(this).children('td:eq(0)').html() + '",';
+	            result += '"ma_dtkd":"' + $(this).children('td:eq(1)').html() + '",';
+	            result += '"tien":"' + tien + '"';
+	            result += "},";
+
+	            tongtien += Number(tien);
+
+	        });
+	        if (result != '') {
+	            result = '[' + result.substring(0, result.length - 1) + ']';
+	        }
+
+	        var msg = '';
+	        if (check_ptr.prop('checked') | check_chhet.prop('checked')) {
+	            if (tongtien <= tongphi) {
+	                dsncc_check_ptr.val(result);
+	                msg = dsncc_check_ptr.val();
+	            }
+	            else {
+	                msg = 'error';
+	            }
+	        }
+	        else {
+	            dsncc_check_ptr.val('');
+	            msg = dsncc_check_ptr.val();
+	        }
+	        return msg;
+	    }
 	</script>
 </DIV>
     
