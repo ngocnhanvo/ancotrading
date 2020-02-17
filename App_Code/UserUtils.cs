@@ -31,66 +31,68 @@ public static class UserUtils
             getptr = 2;
 
         decimal gianhap = -1;
-        string[] arr1 = new string[] { "ANBINH", "ANCO1", "ANCO2" };
-        //Neu doi tac la VINHGIA
-        if (("VINHGIA").Contains(ma_dtkd_select))
+        //Neu doi tac la ANBINH, ANCO2, NAMAN
+        if (new string[] { "ANBINH", "ANCO2", "NAMAN" }.Contains(ma_dtkd_select))
         {
-            decimal tygia = /*23300*/1;
-            decimal discountVNN = decimal.Parse("0.82");
-            decimal gianhaptam = gia_fob - (gia_fob * discount_vinhgia) / 100;
-            gianhap = gianhaptam * discountVNN;
-            gianhap = gianhap * tygia;
-
+            decimal tygia = 23300;
+            decimal discountVNN = decimal.Parse("0.80");
+            //Lay discount dac biet
             if (getptr == 1)
             {
-                gianhap = 1;
-                gianhap = gianhap * discountVNN;
+                gianhap = discountVNN;
             }
+            //Lay ty gia
             else if (getptr == 2)
             {
                 gianhap = tygia;
             }
+            //Lay gia mua từ NCC
             else
             {
-                if (tygia > 1)
-                {
-                    gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
-                }
+                gianhap = -1;
             }
         }
-        //Neu doi tac la ANBINH, ANCO1, ANCO2 tỷ giá mua theo ngay tạo
-        else if (arr1.Contains(ma_dtkd_select))
+        //Neu doi tac là ANCO1
+        else if (new string[] { "ANCO1" }.Contains(ma_dtkd_select))
         {
             decimal tygia = 23000;
             decimal discountVNN = decimal.Parse("0.80");
-            decimal gianhaptam = gia_fob - (gia_fob * discount) / 100;
-            gianhap = gianhaptam * discountVNN;
-            gianhap = gianhap * tygia;
+            //Lay discount dac biet
             if (getptr == 1)
             {
-                gianhap = 1;
-                gianhap = gianhap * discountVNN;
+                gianhap = discountVNN;
             }
+            //Lay ty gia
             else if (getptr == 2)
             {
-                //var db = new LinqDBDataContext();
-                //var tgm = db.md_tygiamuas.Where(s => s.ngayapdung <= DateTime.Now & s.ngayketthuc >= DateTime.Now).FirstOrDefault();
-                //tygia = (decimal)tgm.nhan_voi.Value;
                 gianhap = tygia;
             }
+            //Lay gia mua từ NCC
             else
             {
-                if (ma_dtkd_select == "ANCO1")
-                {
-                    if (tygia > 1)
-                    {
-                        gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
-                    }
-                }
-                else
-                {
-                    gianhap = -1;
-                }
+                //Công thức: giá mua = (FOB –Discount)*0.8*23.000 
+                gianhap = (gia_fob - (gia_fob * discount) / 100) * discountVNN * tygia;
+            }
+        }
+        //Neu doi tac la VINHGIA
+        else if (("VINHGIA").Contains(ma_dtkd_select))
+        {
+            decimal tygia = 1;
+            //Lay discount dac biet
+            if (getptr == 1)
+            {
+                gianhap = decimal.Parse("0.82");
+            }
+            //Lay ty gia
+            else if (getptr == 2)
+            {
+                gianhap = tygia;
+            }
+            //Lay gia mua từ NCC
+            else
+            {
+                //Công thức: giá mua = FOB
+                gianhap = gia_fob;
             }
         }
         //Neu doi tac la TITAN
@@ -98,24 +100,21 @@ public static class UserUtils
         {
             decimal tygia = 22200;
             decimal discountVNN = decimal.Parse("0.95");
-            decimal gianhaptam = gia_fob - (gia_fob * discount) / 100;
-            gianhap = gianhaptam * discountVNN;
-            gianhap = gianhap * tygia;
+            //Lay discount dac biet
             if (getptr == 1)
             {
-                gianhap = 1;
-                gianhap = gianhap * discountVNN;
+                gianhap = discountVNN;
             }
+            //Lay ty gia
             else if (getptr == 2)
             {
                 gianhap = tygia;
             }
+            //Lay gia mua từ NCC
             else
             {
-                if (tygia > 1)
-                {
-                    gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
-                }
+                //Công thức: giá mua = FOB
+                gianhap = gia_fob - (gia_fob * discount) / 100 * discountVNN * tygia;
             }
         }
         return gianhap;
@@ -358,14 +357,26 @@ public static class UserUtils
             decimal gianhap = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp", "@md_sanpham_id", sp.md_sanpham_id, "@md_doitackinhdoanh_id", nhacungung, "@loai_bg", 0, "@ngaytinhgia", DateTime.Now);
 
             //Neu doi tac la VINHGIA
-            if (maNCC == "VINHGIA")
-                gianhap = ddonhang.giafob.GetValueOrDefault(0);
-			else {
-				decimal gianhap2 = UserUtils.get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.Value, 0);
-				if(gianhap2 > -1) {
-					gianhap = gianhap2;
-				}
-			}
+            
+			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.Value, 0);
+            decimal tygia = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.Value, 2);
+
+            if (gianhap2 > -1) {
+				gianhap = gianhap2;
+                if (maNCC != "VINHGIA")
+                {
+                    gianhap = jqGridHelper.Utils.Round3(gianhap + (ddonhang.phi.GetValueOrDefault(0) * tygia), -2);
+                }
+                else
+                {
+                    gianhap = gianhap + ddonhang.phi.GetValueOrDefault(0);
+                }
+            }
+            else
+            {
+                gianhap = gianhap + ddonhang.phi.GetValueOrDefault(0) * tygia;
+            }
+
             var ddsdh = new c_dongdsdh();
 
             ddsdh.c_dongdsdh_id = ImportUtils.getNEWID();
