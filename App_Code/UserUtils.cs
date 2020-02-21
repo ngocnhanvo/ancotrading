@@ -359,7 +359,7 @@ public static class UserUtils
             //Neu doi tac la VINHGIA
             
 			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.Value, 0);
-            decimal tygia = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.Value, 2);
+            decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2);
 
             if (gianhap2 > -1) {
 				gianhap = gianhap2;
