@@ -34,7 +34,7 @@ public static class UserUtils
         //Neu doi tac la ANBINH, ANCO2, NAMAN
         if (new string[] { "ANBINH", "ANCO2", "NAMAN" }.Contains(ma_dtkd_select))
         {
-            decimal tygia = 23300;
+            decimal tygia = 23000;
             decimal discountVNN = decimal.Parse("0.80");
             //Lay discount dac biet
             if (getptr == 1)
