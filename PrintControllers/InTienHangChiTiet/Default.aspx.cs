@@ -393,9 +393,6 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
                     AND cnx.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
                     AND cnx.ngay_giaonhan BETWEEN @startdate AND @enddate
                     {2}
-                ORDER BY dtkd.ma_dtkd,
-                         cnx.sophieu,
-                         sp.ma_sanpham
 
                 declare @tblCC table (
 	                tongtiencc decimal(18,2),
@@ -422,6 +419,9 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
                 (select top 1 b.tongdongiacc from @tblCC b) as tongdongiacc,
                 (select top 1 b.tongsoluongcc from @tblCC b) as tongsoluongcc
                 from @tbl a
+                ORDER BY a.ma_dtkd,
+                         a.sophieu,
+                         a.ma_sanpham
             ",
             dateFrom.ToString("dd/MM/yyyy"), 
             dateTo.ToString("dd/MM/yyyy"),
