@@ -20,8 +20,8 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
 
         rpt_tienhangdanhapchitiet report = new rpt_tienhangdanhapchitiet();
         String sql = this.CreateSql(dateFrom, dateTo, datenow, md_doitackinhdoanh_id);
-        //this.viewReport(report, sql);
-        Response.Write(sql);
+        this.viewReport(report, sql);
+        //Response.Write(sql);
     }
 
      public void viewReport(XtraReport report, String SqlQuery)
