@@ -390,6 +390,7 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
                     AND cdgh.c_dongdonhang_id = cdnx.c_dongdonhang_id
                     AND cdgh.c_donhang_id = dh.c_donhang_id
                     AND cnx.md_loaichungtu_id = 'NK'
+                    AND cnx.md_trangthai_id = 'HIEULUC'
                     AND cnx.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
                     AND cnx.ngay_giaonhan BETWEEN @startdate AND @enddate
                     {2}
