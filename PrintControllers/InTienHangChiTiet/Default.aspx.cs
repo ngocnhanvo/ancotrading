@@ -439,9 +439,11 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
                 (select b.tongtien from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongtien,
                 (select b.tongdongia from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongdongia,
                 (select b.tongsoluong from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongsoluong,
+                (select b.tongfob from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongfob,
                 (select top 1 b.tongtiencc from @tblCC b) as tongtiencc,
                 (select top 1 b.tongdongiacc from @tblCC b) as tongdongiacc,
-                (select top 1 b.tongsoluongcc from @tblCC b) as tongsoluongcc
+                (select top 1 b.tongsoluongcc from @tblCC b) as tongsoluongcc,
+                (select top 1 b.tongfobcc from @tblCC b) as tongfobcc
                 from @tbl a
                 ORDER BY a.ma_dtkd,
                             a.sophieu,
