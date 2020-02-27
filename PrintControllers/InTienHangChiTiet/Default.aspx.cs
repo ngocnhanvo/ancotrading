@@ -370,6 +370,7 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
 	                today datetime,
 	                discount numeric(18,2),
 	                giafob numeric(18,2),
+                    thanhtienfob decimal(18,2),
 	                so_inv nvarchar(MAX)
                 )
 
@@ -390,6 +391,7 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
                         GETDATE() AS today,
                         cnx.discount,
                         cdgh.giafob,
+                        convert(decimal(18,2),(cdnx.slthuc_nhapxuat * cdgh.giafob) - (cdnx.slthuc_nhapxuat * cdgh.giafob)*cnx.discount/100) AS thanhtienfob,
 		                (
 			                SELECT
 		                        (select top 1 so_inv from c_packinginvoice where c_packinginvoice_id = cdiv5.c_packinginvoice_id)
@@ -420,30 +422,48 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
 	                tongtiencc decimal(18,2),
 	                tongdongiacc decimal(18,2),
 	                tongsoluongcc decimal(18,4),
-                    tongfobcc decimal(18,2)
+                    tongfobcc decimal(18,2),
+                    tongtienfobcc decimal(18,2)
                 )
                 insert into @tblCC
-                select sum(isnull(thanhtien, 0)), sum(isnull(dongia, 0)), SUM(isnull(slthuc_nhapxuat,0)), SUM(isnull(giafob,0)) from @tbl
+                select 
+                    sum(isnull(thanhtien, 0)), 
+                    sum(isnull(dongia, 0)), 
+                    SUM(isnull(slthuc_nhapxuat,0)), 
+                    SUM(isnull(giafob,0)),
+                    SUM(isnull(thanhtienfob,0)) 
+                from @tbl
 
                 declare @tbltheoNCC table (
 	                ma_dtkd nvarchar(32),
 	                tongtien decimal(18,2),
 	                tongdongia decimal(18,2),
 	                tongsoluong decimal(18,4),
-                    tongfob decimal(18,2)
+                    tongfob decimal(18,2),
+                    tongtienfob decimal(18,2)
                 )
                 insert into @tbltheoNCC
-                select ma_dtkd, sum(isnull(thanhtien, 0)), sum(isnull(dongia, 0)), SUM(isnull(slthuc_nhapxuat,0)), SUM(isnull(giafob,0)) from @tbl group by ma_dtkd
+                select 
+                    ma_dtkd, 
+                    sum(isnull(thanhtien, 0)), 
+                    sum(isnull(dongia, 0)), 
+                    SUM(isnull(slthuc_nhapxuat,0)), 
+                    SUM(isnull(giafob,0)),
+                    SUM(isnull(thanhtienfob,0))
+                from @tbl 
+                group by ma_dtkd
 
                 select a.*, 
-                (select b.tongtien from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongtien,
-                (select b.tongdongia from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongdongia,
-                (select b.tongsoluong from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongsoluong,
-                (select b.tongfob from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongfob,
-                (select top 1 b.tongtiencc from @tblCC b) as tongtiencc,
-                (select top 1 b.tongdongiacc from @tblCC b) as tongdongiacc,
-                (select top 1 b.tongsoluongcc from @tblCC b) as tongsoluongcc,
-                (select top 1 b.tongfobcc from @tblCC b) as tongfobcc
+                    (select b.tongtien from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongtien,
+                    (select b.tongdongia from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongdongia,
+                    (select b.tongsoluong from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongsoluong,
+                    (select b.tongfob from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongfob,
+                    (select b.tongtienfob from @tbltheoNCC b where b.ma_dtkd = a.ma_dtkd) as tongtienfob,
+                    (select top 1 b.tongtiencc from @tblCC b) as tongtiencc,
+                    (select top 1 b.tongdongiacc from @tblCC b) as tongdongiacc,
+                    (select top 1 b.tongsoluongcc from @tblCC b) as tongsoluongcc,
+                    (select top 1 b.tongfobcc from @tblCC b) as tongfobcc,
+                    (select top 1 b.tongtienfobcc from @tblCC b) as tongtienfobcc
                 from @tbl a
                 ORDER BY a.ma_dtkd,
                             a.sophieu,
