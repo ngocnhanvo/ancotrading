@@ -396,7 +396,7 @@
       <Column Name="hoatdong" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
       <Column Name="diachigiaohang" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="grandtotal" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
-      <Column Name="discount" Type="System.Decimal" DbType="Decimal(18,0)" CanBeNull="true" />
+      <Column Name="discount" Type="System.Decimal" DbType="Decimal(18,6)" CanBeNull="true" />
       <Column Name="ngay_tigia" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
       <Column Name="trangthai" Type="System.String" DbType="NVarChar(32)" CanBeNull="true" />
       <Column Name="vinhgia_vnd" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
@@ -1430,6 +1430,7 @@
       <Column Name="md_phienbangia_id" Type="System.String" DbType="NVarChar(32)" CanBeNull="true" />
       <Column Name="md_sanpham_id" Type="System.String" DbType="NVarChar(32)" CanBeNull="true" />
       <Column Name="gia" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="phi" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
       <Column Name="ngaytao" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
       <Column Name="nguoitao" Type="System.String" DbType="NVarChar(32)" CanBeNull="true" />
       <Column Name="ngaycapnhat" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />

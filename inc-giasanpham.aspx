@@ -445,6 +445,19 @@
             },
             {
                 fixed: true
+                , name: 'phi'
+                , index: 'gsp.phi'
+                , label: 'Phí'
+                , width: 100
+                , edittype: 'text'
+                , editable:true
+                , editrules: { required:true, number:true, minValue:0 }
+                , align:'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+            },
+            {
+                fixed: true
                 , name: 'ngaytao'
                 , label: 'Ngày Tạo'
                 , index: 'gsp.ngaytao'

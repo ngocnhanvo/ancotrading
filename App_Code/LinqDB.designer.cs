@@ -21,7 +21,7 @@ using System.Reflection;
 
 
 
-[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="ancotradingTest2018ver2")]
+[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="ancotrading2019")]
 public partial class LinqDBDataContext : System.Data.Linq.DataContext
 {
 	
@@ -9789,7 +9789,7 @@ public partial class c_danhsachdathang : INotifyPropertyChanging, INotifyPropert
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_discount", DbType="Decimal(18,0)")]
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_discount", DbType="Decimal(18,6)")]
 	public System.Nullable<decimal> discount
 	{
 		get
@@ -31938,6 +31938,8 @@ public partial class md_giasanpham : INotifyPropertyChanging, INotifyPropertyCha
 	
 	private System.Nullable<decimal> _gia;
 	
+	private System.Nullable<decimal> _phi;
+	
 	private System.Nullable<System.DateTime> _ngaytao;
 	
 	private string _nguoitao;
@@ -31964,6 +31966,8 @@ public partial class md_giasanpham : INotifyPropertyChanging, INotifyPropertyCha
     partial void Onmd_sanpham_idChanged();
     partial void OngiaChanging(System.Nullable<decimal> value);
     partial void OngiaChanged();
+    partial void OnphiChanging(System.Nullable<decimal> value);
+    partial void OnphiChanged();
     partial void OnngaytaoChanging(System.Nullable<System.DateTime> value);
     partial void OnngaytaoChanged();
     partial void OnnguoitaoChanging(string value);
@@ -32061,6 +32065,26 @@ public partial class md_giasanpham : INotifyPropertyChanging, INotifyPropertyCha
 				this._gia = value;
 				this.SendPropertyChanged("gia");
 				this.OngiaChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_phi", DbType="Decimal(18,2)")]
+	public System.Nullable<decimal> phi
+	{
+		get
+		{
+			return this._phi;
+		}
+		set
+		{
+			if ((this._phi != value))
+			{
+				this.OnphiChanging(value);
+				this.SendPropertyChanging();
+				this._phi = value;
+				this.SendPropertyChanged("phi");
+				this.OnphiChanged();
 			}
 		}
 	}

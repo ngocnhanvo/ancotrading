@@ -87,7 +87,10 @@ public class DongDonHangController : IHttpHandler
         string c_donhang_id = context.Request.QueryString["c_donhang_id"];
         string md_sanpham_id = context.Request.QueryString["md_sanpham_id"];
         var itemJS = UserUtils.get_giasanpham(context, c_donhang_id, md_sanpham_id, db);
-        context.Response.Write(itemJS["gia"].ToString());
+
+         var entries = itemJS.Select(d =>
+            string.Format("\"{0}\": [{1}]", d.Key, string.Join(",", d.Value)));
+        context.Response.Write("{" + string.Join(",", entries) + "}");
     }
 
     public void getSelectOption(HttpContext context)

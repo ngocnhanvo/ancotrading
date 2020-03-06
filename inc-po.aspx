@@ -21,15 +21,18 @@
     }
 
     function updateGiaSanPhamPO_CallBack(c_donhang_id, md_sanpham_id) {
-        var frm = "#FrmGrid_grid_ds_chitietpo";
-        var giafob = $('#giafob', frm);
-        var docquyen = $('#docquyen', frm);
+        let frm = "#FrmGrid_grid_ds_chitietpo";
+        let giafob = $('#giafob', frm);
+        let phifob = $('#phi', frm);
+        let docquyen = $('#docquyen', frm);
         giafob.val('Đang tải...');
         $.ajax({
             url: "Controllers/DongDonHangController.ashx?action=getgiasanpham&c_donhang_id=" + c_donhang_id + "&md_sanpham_id=" + md_sanpham_id,
             type: "GET",
             success: function (data) {
-                giafob.val(data);
+                data = JSON.parse(data);
+                giafob.val(data.gia[0]);
+                phifob.val(data.phi[0]);
                 updateMoTaGiaPO_CallBack(c_donhang_id, md_sanpham_id);
             }
         });
@@ -80,24 +83,30 @@
 
     // This function gets called whenever an edit dialog is opened
     function populatePackingPO() {
-        var frm = "#FrmGrid_grid_ds_chitietpo";
+        let frm = "#FrmGrid_grid_ds_chitietpo";
         // first of all update the city based on the country
         updatePackingPO_CallBack($("#sanpham_id", frm).val());
         updateNhaCungUngPO_CallBack($("#sanpham_id", frm).val());
 
-        var id_sel = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
+        let id_sel = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
         celgia_db = $('#grid_ds_po').jqGrid('getCell', id_sel, 'gia_db');
         //--
-        var giafob = $('#giafob', frm);
-        var docquyen = $('#tr_docquyen', frm);
+        let giafob = $('#giafob', frm);
+        let phifob = $('#phi', frm);
+        let docquyen = $('#tr_docquyen', frm);
         if (celgia_db == 'True') {
             giafob.prop('disabled', true);
+            phifob.prop('disabled', true);
         }
         else {
-            if (vnnIsAdmin == 'True')
+            if (vnnIsAdmin == 'True') {
                 giafob.prop('disabled', false);
-            else
+                phifob.prop('disabled', false);
+            }
+            else {
                 giafob.prop('disabled', true);
+                phifob.prop('disabled', true);
+            }
         }
         docquyen.hide();
         //$("#md_donggoi_id").bind("change", function(e) { updatePackingPO_CallBack($("#sanpham_id").val()); });

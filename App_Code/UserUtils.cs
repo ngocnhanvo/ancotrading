@@ -125,6 +125,7 @@ public static class UserUtils
         var itemJS = new Dictionary<string, object>();
         itemJS["gia"] = "-1";
         itemJS["barcode"] = "";
+        itemJS["phi"] = "";
 
         var baogia = db.c_baogias.Where(d => d.c_baogia_id.Equals(c_baogia_id)).
             Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, ngaybaogia = s.ngaybaogia }).FirstOrDefault();
@@ -158,6 +159,7 @@ public static class UserUtils
                     var items = mdbc.GetDataFromProcedure("getGiaMuaSp_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", md_doitackinhdoanh_id, "@ngaytinhgia", baogia.ngaybaogia);
                     itemJS["gia"] = items.Rows[0]["gia"].ToString();
                     itemJS["barcode"] = items.Rows[0]["barcode"].ToString();
+                    itemJS["phi"] = items.Rows[0]["phi"].ToString();
                 }
                 //Lấy theo giá chuẩn
                 else
@@ -165,6 +167,7 @@ public static class UserUtils
                     decimal gia_sp = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", baogia.md_doitackinhdoanh_id, "@loai_bg", true, "@ngaytinhgia", baogia.ngaybaogia);
                     itemJS["gia"] = gia_sp + "";
                     itemJS["barcode"] = "";
+                    itemJS["phi"] = 0 + "";
                 }
             }
         }
