@@ -46,6 +46,8 @@ public class DanhSachDatHangReport
 							, ddsdh.ma_sanpham_khach, ddsdh.mota_tiengviet, dvt.ma_edi
                             , ddsdh.sl_dathang
 							, ddsdh.gianhap
+                            , isnull(ddsdh.giachuan, ddsdh.gianhap) as giachuan
+                            , (ddsdh.gianhap - isnull(ddsdh.giachuan, ddsdh.gianhap)) as phi
 							, dsdh.huongdanlamhang
 							, dsdh.huongdanlamhangchung
 							, ddsdh.huongdan_dathang
@@ -73,7 +75,7 @@ public class DanhSachDatHangReport
 							left join md_donggoi dg on ddsdh.md_donggoi_id = dg.md_donggoi_id
                         where
 	                        dsdh.c_danhsachdathang_id = N'{0}' order by sp.ma_sanpham asc"
-							, c_danhsachdathang_id == null ? "" : c_danhsachdathang_id
+                            , c_danhsachdathang_id == null ? "" : c_danhsachdathang_id
 						);
 
         DataTable dt = mdbc.GetData(select);
@@ -215,7 +217,7 @@ public class DanhSachDatHangReport
 		int row = 0;
 		//set A1 - A4
 		string[] a = { "ANCO COMPANY LIMITED","3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam","Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com","ĐƠN ĐẶT HÀNG"};
-		for(int i = 0; i < a.Count(); i++)
+		for(int i = 0; i < a.Length; i++)
 		{		
 			s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
 			s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 9));
@@ -264,14 +266,28 @@ public class DanhSachDatHangReport
 		// set A13 - All
 		// -- Header
 		int cell = 0;
-		string[] d = { "STT","Mã số","Hình ảnh","Mã khách hàng"
-		,"Mô tả","ĐVT"
-		,"Cbm","SL"
-		,"Giá","Thành tiền","Hướng dẫn làm hàng"
-		,"Đóng gói Inner","Đóng gói Outer","Trọng lượng","Xác nhận kích thước" };
+		string[] d = {
+            "STT",
+            "Mã số",
+            "Hình ảnh",
+            "Mã khách hàng",
+            "Mô tả",
+            "ĐVT",
+            "Cbm",
+            "SL",
+            "Giá",
+            "Thành tiền",
+            "Hướng dẫn làm hàng",
+            "Đóng gói Inner",
+            "Đóng gói Outer",
+            "Trọng lượng",
+            "Xác nhận kích thước",
+            "Giá gốc",
+            "Phí"
+        };
 		IRow rowColumnHeader = s1.CreateRow(row);
 		rowColumnHeader.HeightInPoints = 47;
-		for(int i = 0; i < d.Count(); i++)
+		for(int i = 0; i < d.Length; i++)
 		{		
 			int with = 5000;
 			rowColumnHeader.CreateCell(cell).SetCellValue(d[i]);
@@ -279,8 +295,8 @@ public class DanhSachDatHangReport
 			if( i == 4) {
 				with = 7000;
 			}
-			else if( i == 9) {
-				with = 3000;
+			else if(i == 8 | i == 9) {
+				with = 5000;
 			}
 			else if( i == 10 | i == 14 | i == 10) {
 				with = 0;
@@ -288,7 +304,11 @@ public class DanhSachDatHangReport
 
             if ((i == 8 | i == 9) & guiNCC == true)
                 with = 0;
-			s1.SetColumnWidth(cell,with);
+
+            if (i == 15 | i == 16)
+                with = 0;
+
+            s1.SetColumnWidth(cell,with);
 			cell++;
 		}
 		row ++;
@@ -296,8 +316,25 @@ public class DanhSachDatHangReport
 		int count_row = 1;
         for (int i = 0; i < dt.Rows.Count; i++)
         {
-			string[] e_value = {"no","ma_sanpham","","ma_sanpham_khach","mota_tiengviet","ma_edi","v2","sl_dathang"
-			,"gianhap","thanhtien","huongdan_dathang","dginner","dgouter","trongluong","ghichu" };
+			string[] e_value = {
+                "no",
+                "ma_sanpham",
+                "",
+                "ma_sanpham_khach",
+                "mota_tiengviet",
+                "ma_edi",
+                "v2",
+                "sl_dathang",
+                "gianhap",
+                "thanhtien",
+                "huongdan_dathang",
+                "dginner",
+                "dgouter",
+                "trongluong",
+                "ghichu",
+                "giachuan",
+                "phi"
+            };
             //
 			IRow row_t = s1.CreateRow(row); row_t.HeightInPoints = 80;
             row_t.CreateCell(2);
@@ -338,7 +375,7 @@ public class DanhSachDatHangReport
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
 					cel_row_t.CellStyle = border_number0;
 				}
-				else if( e_value[j] == "gianhap") {
+				else if(e_value[j] == "gianhap" | e_value[j] == "giachuan" | e_value[j] == "phi") {
                     if (guiNCC == false)
                         cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
                     cel_row_t.CellStyle = border_number2;

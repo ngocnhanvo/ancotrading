@@ -530,6 +530,7 @@
       <Column Name="vl" Type="System.Decimal" DbType="Decimal(18,1)" CanBeNull="true" />
       <Column Name="ghichu_vachngan" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="sl_huy" Type="System.Decimal" DbType="Decimal(18,0)" CanBeNull="true" />
+      <Column Name="giachuan" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.c_dongkhxh" Member="c_dongkhxhs">

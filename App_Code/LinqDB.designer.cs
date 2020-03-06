@@ -11968,6 +11968,8 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
 	
 	private System.Nullable<decimal> _sl_huy;
 	
+	private System.Nullable<decimal> _giachuan;
+	
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -12048,6 +12050,8 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
     partial void Onghichu_vachnganChanged();
     partial void Onsl_huyChanging(System.Nullable<decimal> value);
     partial void Onsl_huyChanged();
+    partial void OngiachuanChanging(System.Nullable<decimal> value);
+    partial void OngiachuanChanged();
     #endregion
 	
 	public c_dongdsdh()
@@ -12811,6 +12815,26 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
 				this._sl_huy = value;
 				this.SendPropertyChanged("sl_huy");
 				this.Onsl_huyChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_giachuan", DbType="Decimal(18,2)")]
+	public System.Nullable<decimal> giachuan
+	{
+		get
+		{
+			return this._giachuan;
+		}
+		set
+		{
+			if ((this._giachuan != value))
+			{
+				this.OngiachuanChanging(value);
+				this.SendPropertyChanging();
+				this._giachuan = value;
+				this.SendPropertyChanged("giachuan");
+				this.OngiachuanChanged();
 			}
 		}
 	}

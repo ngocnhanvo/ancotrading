@@ -358,7 +358,7 @@ public static class UserUtils
             var ddonhang = db.c_dongdonhangs.FirstOrDefault(p => p.c_dongdonhang_id.Equals(item.c_dongdonhang_id));
             string nhacungung = ddonhang.nhacungungid;
             decimal gianhap = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp", "@md_sanpham_id", sp.md_sanpham_id, "@md_doitackinhdoanh_id", nhacungung, "@loai_bg", 0, "@ngaytinhgia", DateTime.Now);
-
+            decimal giachuan = gianhap;
             //Neu doi tac la VINHGIA
             
 			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.Value, 0);
@@ -366,6 +366,7 @@ public static class UserUtils
 
             if (gianhap2 > -1) {
 				gianhap = gianhap2;
+                giachuan = jqGridHelper.Utils.Round3(gianhap2, -2);
                 if (maNCC != "VINHGIA")
                 {
                     gianhap = jqGridHelper.Utils.Round3(gianhap + (ddonhang.phi.GetValueOrDefault(0) * tygia), -2);
@@ -418,6 +419,7 @@ public static class UserUtils
             ddsdh.nguoitao = getUser(context);
             ddsdh.nguoicapnhat = getUser(context);
             ddsdh.hoatdong = true;
+            ddsdh.giachuan = giachuan;
 
             lstDongDonDatHang.Add(ddsdh);
         }
