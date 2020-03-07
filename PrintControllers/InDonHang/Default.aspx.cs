@@ -200,6 +200,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 						, ddh.soluong
                         , dvt.ten_dvt as dvt_sp
                         , (ddh.giafob + isnull(ddh.phi, 0)) as giafob
+                        , ddh.giafob as giachuan
+                        , isnull(ddh.phi, 0) as phi
 						, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch
                         , convert(varchar, dh.shipmenttime, 106) as shipmenttime
                         , cb.ten_cangbien
@@ -338,7 +340,12 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         IPicture signaturePicturelogo = patriarchlogo.CreatePicture(anchorlogo, indexlogo);
         //
         //set A1 - A4
-        string[] a = { "ANCO COMPANY LIMITED", "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam", "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com", "PROFORMA INVOICE" };
+        string[] a = {
+            "ANCO COMPANY LIMITED", "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam",
+            "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com",
+            "PROFORMA INVOICE"
+        };
+
         for (int i = 0; i < a.Count(); i++)
         {
             s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
@@ -436,9 +443,13 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , "ANCO Item No."
             , "Picture - Only for shape ref."
             , "Customer Item No."
-            , "Description","Packing inner/master",""
-            , "Nbr of Packs","Quantity (sets/pcs)",""
-            , "FOB price (USD)","CBM","Amount (USD)"
+            , "Description"
+            , "Packing inner/master",""
+            , "Nbr of Packs"
+            , "Quantity (sets/pcs)",""
+            , "FOB price (USD)"
+            , "CBM"
+            , "Amount (USD)"
             , "Master Packing size (LxWxH)" + dt.Rows[0]["ten_kichthuoc"].ToString()
             , ""
             , ""
@@ -458,6 +469,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , ""
             , ""
             , "Barcode"
+            , "FOB gốc"
+            , "Phí"
         };
 
         string[] e_value = {
@@ -493,6 +506,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , "w_inch"
             , "h_inch"
             , "barcode"
+            , "giachuan"
+            , "phi"
         };
 
         IRow rowColumnHeader = s1.CreateRow(row);
@@ -620,7 +635,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
                     cel_row_t.CellStyle = border_number0;
                 }
-                else if (e_value[j] == "giafob")
+                else if (new string[] { "giafob", "giachuan", "phi" }.Contains(e_value[j]))
                 {
                     cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
                     cel_row_t.CellStyle = border_number2;
