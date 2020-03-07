@@ -366,13 +366,14 @@ public static class UserUtils
 
             if (gianhap2 > -1) {
 				gianhap = gianhap2;
-                giachuan = jqGridHelper.Utils.Round3(gianhap2, -2);
                 if (maNCC != "VINHGIA")
                 {
+                    giachuan = jqGridHelper.Utils.Round3(gianhap, -2);
                     gianhap = jqGridHelper.Utils.Round3(gianhap + (ddonhang.phi.GetValueOrDefault(0) * tygia), -2);
                 }
                 else
                 {
+                    giachuan = gianhap;
                     gianhap = gianhap + ddonhang.phi.GetValueOrDefault(0);
                 }
             }
