@@ -1692,11 +1692,11 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
 			                if($('#grid_ds_chitietquotation').jqGrid('getGridParam','records') &gt; 0 )
 			                {
 			                    var fileName = $(this).jqGrid('getCell', ids, 'url') + '';
-			                    $('#product-view-quotation').attr('src','images/products/fullsize/' + fileName );
+			                    $('#product-view-quotation').attr('src','images/products/mausac/' + fileName );
 				            } 
 				        } else {
 				                var fileName = $(this).jqGrid('getCell', ids, 'url') + '';
-				                $('#product-view-quotation').attr('src','images/products/fullsize/' + fileName );
+				                $('#product-view-quotation').attr('src','images/products/mausac/' + fileName );
 		                } }"
                 AddFormOptions="
                 afterSubmit: function(rs, postdata){

@@ -27,7 +27,7 @@ public partial class PrintControllers_InBaoGia_Default : System.Web.UI.Page
         {
             String c_baogia_id = Request.QueryString["c_baogia_id"];
             String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "anco_logo_print.png");
-            String imgPath = Server.MapPath("~/images/products/fullsize/");
+            String imgPath = Public.imgProducts;
 			String userName = "";
 			//--
 			nhanvien nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(UserUtils.getUser(Context)));

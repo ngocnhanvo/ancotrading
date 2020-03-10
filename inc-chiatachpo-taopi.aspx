@@ -2,6 +2,8 @@
 
 <%@ Register Src="jqGrid.ascx" TagName="jqGrid" TagPrefix="uc1" %>
 <script>
+    var idsDachonVNN = [];
+
     $(document).ready(function () {
         $('#layout-center-chiatachpo').parent().layout({
             north: {
@@ -40,16 +42,17 @@
 
         $(".btn-active").button().css({ 'width': '100%', 'height': '25%' });
 
+        
+
         $('#add-all-chiatachpo').click(function () {
             let idExist = jQuery("#grid_ds_dachon_chiatachpo").jqGrid('getDataIDs');
-            console.log(idExist);
             let gridData = jQuery("#grid_ds_chitietpo_chiatachpo");
             let ids = gridData.jqGrid('getDataIDs');
             let idsL = ids.length;
             if (idsL > 0) {
                 for (let idIndex = 0; idIndex < idsL; idIndex++) {
                     let id = ids[idIndex];
-                    if (idExist.lastIndexOf(id) <= -1) {
+                    if (idExist.lastIndexOf(id) <= -1 & idsDachonVNN.lastIndexOf(id) <= -1) {
                         let ret = gridData.jqGrid('getRowData', id, true);
                         let datarow = {
                             c_dongdonhang_id: ret.c_dongdonhang_id
@@ -81,7 +84,7 @@
             if (idsL > 0) {
                 for (let idIndex = 0; idIndex < idsL; idIndex++) {
                     let id = ids[idIndex];
-                    if (idExist.lastIndexOf(id) <= -1) {
+                    if (idExist.lastIndexOf(id) <= -1 & idsDachonVNN.lastIndexOf(id) <= -1) {
                         let ret = jQuery("#grid_ds_chitietpo_chiatachpo").jqGrid('getRowData', id);
                         let datarow = {
                             c_dongdonhang_id: ret.c_dongdonhang_id
@@ -114,22 +117,25 @@
             let idsL = ids.length;
             for (let idIndex = 0; idIndex < idsL; idIndex++) {
                 let id = ids[idIndex];
-                let ret = gridData.jqGrid('getRowData', id, true);
 
-                let datarow = {
-                    c_dongdonhang_id: ret.c_dongdonhang_id
-                        , c_donhang_id: ret.c_donhang_id
-                        , sanpham_id: ret.sanpham_id
-                        , ma_sanpham: ret.ma_sanpham
-                        , ma_sanpham_khach: ret.ma_sanpham_khach
-                        , md_doitackinhdoanh_id: ret.md_doitackinhdoanh_id
-                        , soluong: ret.soluong
-                        , soluong_dadat_old: ret.soluong_dadat
-                        , soluong_dadat: ret.soluong_conlai
-                        , soluong_conlai: ret.soluong_conlai
-                };
+                if (idsDachonVNN.lastIndexOf(id) <= -1) {
+                    let ret = gridData.jqGrid('getRowData', id, true);
 
-                $(`#${id}`, '#grid_ds_chitietpo_chiatachpo').show();
+                    let datarow = {
+                        c_dongdonhang_id: ret.c_dongdonhang_id
+                            , c_donhang_id: ret.c_donhang_id
+                            , sanpham_id: ret.sanpham_id
+                            , ma_sanpham: ret.ma_sanpham
+                            , ma_sanpham_khach: ret.ma_sanpham_khach
+                            , md_doitackinhdoanh_id: ret.md_doitackinhdoanh_id
+                            , soluong: ret.soluong
+                            , soluong_dadat_old: ret.soluong_dadat
+                            , soluong_dadat: ret.soluong_conlai
+                            , soluong_conlai: ret.soluong_conlai
+                    };
+
+                    $(`#${id}`, '#grid_ds_chitietpo_chiatachpo').show();
+                }
             }
 
             for (let idIndex = idsL - 1; idIndex >= 0; idIndex--) {
@@ -142,25 +148,26 @@
             let gridData = jQuery("#grid_ds_dachon_chiatachpo");
             let id = gridData.jqGrid('getGridParam', 'selrow');
             if (id) {
-                let ret = gridData.jqGrid('getRowData', id);
+                if (idsDachonVNN.lastIndexOf(id) <= -1) {
+                    let ret = gridData.jqGrid('getRowData', id);
 
-                let datarow = {
-                    c_dongdonhang_id: ret.c_dongdonhang_id
-                        , c_donhang_id: ret.c_donhang_id
-                        , sanpham_id: ret.sanpham_id
-                        , ma_sanpham: ret.ma_sanpham
-                        , ma_sanpham_khach: ret.ma_sanpham_khach
-                        , md_doitackinhdoanh_id: ret.md_doitackinhdoanh_id
-                        , soluong: ret.soluong
-                        , soluong_dadat_old: ret.soluong_dadat
-                        , soluong_dadat: ret.soluong_conlai
-                        , soluong_conlai: ret.soluong_conlai
-                };
+                    let datarow = {
+                        c_dongdonhang_id: ret.c_dongdonhang_id
+                            , c_donhang_id: ret.c_donhang_id
+                            , sanpham_id: ret.sanpham_id
+                            , ma_sanpham: ret.ma_sanpham
+                            , ma_sanpham_khach: ret.ma_sanpham_khach
+                            , md_doitackinhdoanh_id: ret.md_doitackinhdoanh_id
+                            , soluong: ret.soluong
+                            , soluong_dadat_old: ret.soluong_dadat
+                            , soluong_dadat: ret.soluong_conlai
+                            , soluong_conlai: ret.soluong_conlai
+                    };
 
-                //jQuery("#grid_ds_chitietpo_chiatachpo").jqGrid('addRowData', id, datarow);
-                $(`#${id}`, '#grid_ds_chitietpo_chiatachpo').show();
-                gridData.jqGrid('delRowData', id);
-
+                    //jQuery("#grid_ds_chitietpo_chiatachpo").jqGrid('addRowData', id, datarow);
+                    $(`#${id}`, '#grid_ds_chitietpo_chiatachpo').show();
+                    gridData.jqGrid('delRowData', id);
+                }
             } else { alert("Please select row"); }
         });
     });
@@ -170,7 +177,7 @@
         let msg = "";
         let gridData = jQuery("#grid_ds_dachon_chiatachpo")
         let ids = gridData.jqGrid('getDataIDs');
-
+        console.log(ids);
         if (ids.length == 0) {
             msg = "Hãy chọn danh sách sản phẩm mà bạn muốn tạo PI.!";
             // append dialog-taoky to body
@@ -239,11 +246,12 @@
                                     let type = eval($(rs).find("type").text());
                                     let message = $(rs).find("message").text();
                                     $('#dialog-create-pi').find('#dialog-caution').html(message);
-                                    var ids = gridData.jqGrid('getDataIDs');
-
+                                    ids = gridData.jqGrid('getDataIDs');
                                     for (let i = 0, il = ids.length; i < il; i++) {
+                                        idsDachonVNN.push(ids[i]);
                                         jQuery("#grid_ds_dachon_chiatachpo").jqGrid('delRowData', ids[i]);
                                     }
+                                    console.log(idsDachonVNN);
                                 }
                             });
                         }
@@ -538,9 +546,8 @@
             }
             ]"
         GridComplete="var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
-        OnSelectRow="function(ids) {
-                        
-                        
+        OnSelectRow="function(ids) { 
+                        idsDachonVNN= [];
 		                if(ids == null) {
 			                ids=0;
 			                if($('#grid_ds_chitietpo_chiatachpo').jqGrid('getGridParam','records') &gt; 0 )
