@@ -128,7 +128,7 @@ public class MainHub : Hub
             string msLink = "images/products/mausac/";
             string cl = ma_sanpham.Substring(0, 2);
             string dt = ma_sanpham.Substring(6, 8);
-            string ms = ma_sanpham.Substring(10, 12);
+            string ms = ma_sanpham.Substring(9, 11);
             var context = HttpContext.Current;
             string image = context.Server.MapPath(ms);
             if (File.Exists(image + ma_sanpham + ".jpg"))
@@ -140,6 +140,7 @@ public class MainHub : Hub
 
             response["Success"] = true;
             response["Message"] = msLink;
+            response["Color"] = ms;
         }
         catch (Exception ex)
         {
