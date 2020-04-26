@@ -103,7 +103,7 @@ public class MainHub : Hub
             response["Success"] = true;
             response["Message"] = JsonConvert.SerializeObject(json);
         }
-        catch(Exception) { }
+        catch (Exception ex) { response["Message"] = ma_sanpham + ":" + ex.Message; }
         Clients.Caller.SizeInfo(response);
     }
 
