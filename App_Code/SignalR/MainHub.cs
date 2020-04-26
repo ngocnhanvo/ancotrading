@@ -140,7 +140,9 @@ public class MainHub : Hub
 
             response["Success"] = true;
             response["Message"] = msLink;
-            response["Color"] = ms;
+            response["CL"] = cl;
+            response["DT"] = dt;
+            response["MS"] = ms;
             response["Input"] = ma_sanpham;
         }
         catch (Exception ex)
