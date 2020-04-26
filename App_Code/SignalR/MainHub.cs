@@ -117,10 +117,6 @@ public class MainHub : Hub
 
     public void ColorInfo(string ma_sanpham)
     {
-        string msLink = "images/products/mausac/";
-        string cl = ma_sanpham.Substring(0, 2);
-        string dt = ma_sanpham.Substring(6, 8);
-        string ms = ma_sanpham.Substring(10, 12);
         var response = new Dictionary<string, object>()
         {
             { "Success", false },
@@ -129,6 +125,10 @@ public class MainHub : Hub
 
         try
         {
+            string msLink = "images/products/mausac/";
+            string cl = ma_sanpham.Substring(0, 2);
+            string dt = ma_sanpham.Substring(6, 8);
+            string ms = ma_sanpham.Substring(10, 12);
             var context = HttpContext.Current;
             string image = context.Server.MapPath(ms);
             if (File.Exists(image + ma_sanpham + ".jpg"))
