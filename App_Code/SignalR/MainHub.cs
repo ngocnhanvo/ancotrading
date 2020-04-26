@@ -104,7 +104,7 @@ public class MainHub : Hub
             response["Message"] = JsonConvert.SerializeObject(json);
         }
         catch(Exception) { }
-        Clients.Caller.ProductInfo(response);
+        Clients.Caller.SizeInfo(response);
     }
 
     public void ProductInfo(string ma_sanpham)
