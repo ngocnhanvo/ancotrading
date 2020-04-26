@@ -145,7 +145,7 @@ public class MainHub : Hub
         {
             response["Message"] = ma_sanpham + ":" + ex;
         }
-        Clients.Caller.SizeInfo(response);
+        Clients.Caller.ColorInfo(response);
     }
 
     public void ProductInfo(string ma_sanpham)
