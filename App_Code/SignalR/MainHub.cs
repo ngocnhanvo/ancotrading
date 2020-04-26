@@ -130,7 +130,7 @@ public class MainHub : Hub
             string dt = ma_sanpham.Substring(6, 2);
             string ms = ma_sanpham.Substring(9, 2);
             var context = HttpContext.Current;
-            string image = context.Server.MapPath(msLink).Replace("signalr/","");
+            string image = context.Server.MapPath(msLink).Replace("signalr\\","");
             if (File.Exists(image + ma_sanpham + ".jpg"))
                 msLink += ma_sanpham + ".jpg";
             else if (File.Exists(image + cl + dt + ms + ".jpg"))
