@@ -26,4 +26,25 @@ public static class ExcuteSignalRStatic
         strsql = string.Format(strsql, md_sanpham_id);
         return mdbc.GetData(strsql);
     }
+
+    public static DataTable getFOB(string md_sanpham_id)
+    {
+        string strsql =
+                @"
+				    select top 1 cb.ten_cangbien 
+                    from md_cangbien (nolock) cb 
+                    where cb.md_cangbien_id = (
+	                    select top 1
+		                    cxh.md_cangbien_id
+	                    FROM 
+		                    md_cangxuathang (nolock) cxh
+	                    WHERE 
+		                    cxh.md_sanpham_id = '{0}'
+		                    and cxh.macdinh = 1
+                    )
+                ";
+
+        strsql = string.Format(strsql, md_sanpham_id);
+        return mdbc.GetData(strsql);
+    }
 }
