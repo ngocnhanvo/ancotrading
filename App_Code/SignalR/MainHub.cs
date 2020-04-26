@@ -62,6 +62,7 @@ public class MainHub : Hub
             var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
             var json = new Dictionary<string, string>();
             json["dong6"] = ma_sanpham;
+            json["dong14"] = "";
             foreach (System.Data.DataRow row in dt.Rows)
             {
                 string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
@@ -103,7 +104,7 @@ public class MainHub : Hub
             response["Success"] = true;
             response["Message"] = JsonConvert.SerializeObject(json);
         }
-        catch (Exception ex) { response["Message"] = ma_sanpham + ":" + ex.Message; }
+        catch (Exception ex) { response["Message"] = ma_sanpham + ":" + ex; }
         Clients.Caller.SizeInfo(response);
     }
 
