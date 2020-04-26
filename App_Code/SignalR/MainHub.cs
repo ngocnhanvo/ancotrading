@@ -47,6 +47,66 @@ public class MainHub : Hub
         Clients.Caller.Login(response);
     }
 
+    public void SizeInfo(string ma_sanpham)
+    {
+        var response = new Dictionary<string, object>()
+        {
+            { "Success", false },
+            { "Message", "" }
+        };
+
+        try
+        {
+            var db = new LinqDBDataContext();
+            var sp = db.md_sanphams.Where(s => s.ma_sanpham.StartsWith(ma_sanpham) & s.trangthai == "DHD").FirstOrDefault();
+            var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
+            var json = new Dictionary<string, string>();
+            json["dong6"] = ma_sanpham;
+            foreach (System.Data.DataRow row in dt.Rows)
+            {
+                string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
+                string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
+                if (sl_inner != "0" & dvt_inner != "0" & sl_inner != "" & dvt_inner != "")
+                {
+                    json["dong10"] = sl_inner + " " + dvt_inner;
+                }
+                else
+                {
+                    json["dong10"] = " ";
+                }
+
+                if (sl_outer != "0" & dvt_outer != "0" & sl_outer != "" & dvt_outer != "")
+                {
+                    json["dong11"] = sl_outer + " " + dvt_outer;
+                }
+                else
+                {
+                    json["dong11"] = " ";
+                }
+
+                json["dong12"] = "L" + row["l2_mix"] + "xW" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
+                json["dong13"] = row["v2"].ToString();
+
+                string slc_20 = row["soluonggoi_ctn_20"].ToString();
+                string slc_40 = row["soluonggoi_ctn"].ToString();
+                string slc_40HC = row["soluonggoi_ctn_40hc"].ToString();
+
+                if (slc_40 != "" & slc_40 != "0")
+                {
+                    json["dong14"] += "\\n" + slc_40 + " pallets/40'";
+                }
+                if (json["dong14"] != "")
+                {
+                    json["dong14"] = json["dong14"].Substring(2);
+                }
+            }
+            response["Success"] = true;
+            response["Message"] = JsonConvert.SerializeObject(json);
+        }
+        catch(Exception) { }
+        Clients.Caller.ProductInfo(response);
+    }
+
     public void ProductInfo(string ma_sanpham)
     {
         var db = new LinqDBDataContext();
@@ -61,11 +121,13 @@ public class MainHub : Hub
             ma_sanpham = ma_sanpham.Split(new[] { '\r', '\n' }).FirstOrDefault();
             string unknown = "(Unknown)";
             string dong0 = unknown, dong1 = unknown, dong2 = unknown, dong3 = unknown, dong4 = unknown, dong5 = unknown, dong6 = unknown, dong7 = unknown,
-            dong8 = "", dong9 = "", dong10 = unknown, dong11 = unknown, dong12 = unknown, dong13 = unknown, dong14 = "", dong15 = unknown, dong16 = unknown, image = "";
+            dong8 = "", dong9 = "", dong10 = unknown, dong11 = unknown, dong12 = unknown, dong13 = unknown, dong14 = "", dong15 = unknown, dong16 = unknown,
+            image = "", size = "";
             string json = @"[{{ ""dong0"":""{0}"", ""dong1"":""{1}"", ""dong2"":""{2}"", ""dong3"":""{3}"", 
 			""dong4"":""{4}"", ""dong5"":""{5}"", ""dong6"":""{6}"", ""dong7"":""{7}"", ""dong8"":""{8}"", ""dong9"":""{9}"", 
 			""dong10"":""{10}"", ""dong11"":""{11}"", ""dong12"":""{12}"", ""dong13"":""{13}"", ""dong14"":""{14}"",
-			""dong15"":""{15}"", ""dong16"":""{16}"", ""image"":""{17}"", ""detai"":""{18}"", ""bientau"":""{19}"", ""mausac"":""{20}""}}]";
+			""dong15"":""{15}"", ""dong16"":""{16}"", ""image"":""{17}"", ""detai"":""{18}"", ""bientau"":""{19}"", 
+			""mausac"":""{20}"", ""size"":""{21}""}}]";
 
             var sp = db.md_sanphams.Where(s => s.ma_sanpham == ma_sanpham & s.trangthai == "DHD").FirstOrDefault();
             if (sp != null)
@@ -94,6 +156,7 @@ public class MainHub : Hub
                         arr_sanpham += ",'" + sanpham_add + "'";
                     }
                 }
+
                 string strsql =
                 @"    
                     declare @tblBG table (
@@ -196,21 +259,8 @@ public class MainHub : Hub
                         dong9 = "";
                     }
                 }
-                //dong 10, dong 11, dong 12, dong 13, dong 14
-                strsql =
-                @"
-				select dg.sl_inner, (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner) as dvtinner,
-				dg.sl_outer, (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer) as dvtouter,
-				dg.l1, dg.w1, dg.h1,
-				dg.l2_mix, dg.w2_mix, dg.h2_mix, convert(decimal(18,3), dg.v2 / dg.sl_outer) as v2, dg.sl_cont_mix, dg.soluonggoi_ctn_20, dg.soluonggoi_ctn, dg.soluonggoi_ctn_40hc
-				FROM md_donggoisanpham (nolock) dgsp, md_donggoi (nolock) dg
-				WHERE 
-				dgsp.md_sanpham_id = '{0}'
-				AND dgsp.md_donggoi_id = dg.md_donggoi_id
-				AND dgsp.macdinh = 1";
 
-                strsql = string.Format(strsql, sp.md_sanpham_id);
-                dt = mdbc.GetData(strsql);
+                dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
                 foreach (System.Data.DataRow row in dt.Rows)
                 {
                     string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
@@ -236,34 +286,18 @@ public class MainHub : Hub
                     dong12 = "L" + row["l2_mix"] + "xW" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
                     dong13 = row["v2"].ToString();
 
-                    // if(row["sl_cont_mix"].ToString() != "") {
-                    // dong14 = " " + row["sl_cont_mix"] + "/01'";
-                    // }
                     string slc_20 = row["soluonggoi_ctn_20"].ToString();
                     string slc_40 = row["soluonggoi_ctn"].ToString();
                     string slc_40HC = row["soluonggoi_ctn_40hc"].ToString();
-                    // if(slc_20 != "" & slc_20 != "0") {
-                    // dong14 += "\\n" + slc_20 + " pallets/20'";
-                    // }
+
                     if (slc_40 != "" & slc_40 != "0")
                     {
                         dong14 += "\\n" + slc_40 + " pallets/40'";
                     }
-                    // if(slc_40HC != "" & slc_40HC != "0") {
-                    // dong14 += "\\n" + slc_40HC + " pallets/40'HC";
-                    // }
                     if (dong14 != "")
                     {
                         dong14 = dong14.Substring(2);
                     }
-
-                    /*if (dong9 == "")
-                    {
-                        if (row["l1"].ToString() != "0.0" & row["w1"].ToString() != "0.0" & row["h1"].ToString() != "0.0")
-                        {
-                            dong9 = row["l1"] + "x" + row["w1"] + "xH" + row["h1"] + "cm";
-                        }
-                    }*/
                 }
                 //dong 15
                 strsql =
@@ -321,7 +355,8 @@ public class MainHub : Hub
                     A.todetai = '{0}'
                     order by A.detai, A.bientau, A.mausac
 				", msp.Substring(0, 6), chungloai);
-                System.Data.DataTable dt_detail = mdbc.GetData(sql_detail);
+
+                var dt_detail = mdbc.GetData(sql_detail);
                 foreach (System.Data.DataRow row_dt in dt_detail.Rows)
                 {
                     if (!detai_chk.Split(',').Contains(row_dt["detai"].ToString()))
@@ -338,6 +373,15 @@ public class MainHub : Hub
                     {
                         bientau_chk += detai_bientau + ",";
                         bientau_json += detai_bientau + ",";
+                    }
+
+                    var maBT = msp.Substring(0, 9) + row_dt["bientau"];
+                    var spBT = db.md_sanphams.Where(s => s.ma_sanpham.Contains(maBT)).FirstOrDefault();
+                    if (spBT != null)
+                    {
+                        string sizeVal = row_dt["bientau"] + ":" + spBT.l_cm + "x" + spBT.w_cm + "xH" + spBT.h_cm + "cm";
+                        if (!size.Split(',').Contains(sizeVal))
+                            size += sizeVal + ",";
                     }
 
                     string detai_bientau_mausac = row_dt["detai"] + " - " + row_dt["bientau"] + " - " + row_dt["mausac"];
@@ -365,7 +409,7 @@ public class MainHub : Hub
                 }
 
                 string kq_json = string.Format(json, dong0, dong1, dong2, dong3, dong4, dong5, dong6, dong7, dong8, dong9, dong10, dong11, dong12, dong13, dong14,
-                dong15, dong16, image, detai_json, bientau_json, mausac_json);
+                dong15, dong16, image, detai_json, bientau_json, mausac_json, size);
                 response["Success"] = true;
                 response["Message"] = kq_json;
             }
@@ -1110,7 +1154,7 @@ public class MainHub : Hub
             response["Success"] = true;
             msg = "[" + detail + "]";
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = ex.Message;
         }
