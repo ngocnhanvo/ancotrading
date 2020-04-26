@@ -5,6 +5,7 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Newtonsoft.Json;
 using System.IO;
+using System.Web;
 
 [HubName("mainhub")]
 public class MainHub : Hub
@@ -59,7 +60,7 @@ public class MainHub : Hub
         {
             var db = new LinqDBDataContext();
             var sp = db.md_sanphams.Where(s => s.ma_sanpham.StartsWith(ma_sanpham) & s.trangthai == "DHD").FirstOrDefault();
-            
+
             var json = new Dictionary<string, string>();
             json["dong6"] = ma_sanpham;
             json["dong9"] = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
@@ -111,6 +112,39 @@ public class MainHub : Hub
             response["Message"] = JsonConvert.SerializeObject(json);
         }
         catch (Exception ex) { response["Message"] = ma_sanpham + ":" + ex; }
+        Clients.Caller.SizeInfo(response);
+    }
+
+    public void ColorInfo(string ma_sanpham)
+    {
+        string msLink = "images/products/mausac/";
+        string cl = ma_sanpham.Substring(0, 2);
+        string dt = ma_sanpham.Substring(6, 8);
+        string ms = ma_sanpham.Substring(10, 12);
+        var response = new Dictionary<string, object>()
+        {
+            { "Success", false },
+            { "Message", "" }
+        };
+
+        try
+        {
+            var context = HttpContext.Current;
+            string image = context.Server.MapPath(ms);
+            if (File.Exists(image + ma_sanpham + ".jpg"))
+                msLink += ma_sanpham + ".jpg";
+            else if (File.Exists(image + cl + dt + ms + ".jpg"))
+                msLink += cl + dt + ms + ".jpg";
+            else
+                msLink = "images/products/fullsize/default.jpg";
+
+            response["Success"] = true;
+            response["Message"] = msLink;
+        }
+        catch (Exception ex)
+        {
+            response["Message"] = ma_sanpham + ":" + ex;
+        }
         Clients.Caller.SizeInfo(response);
     }
 
