@@ -59,12 +59,16 @@ public class MainHub : Hub
         {
             var db = new LinqDBDataContext();
             var sp = db.md_sanphams.Where(s => s.ma_sanpham.StartsWith(ma_sanpham) & s.trangthai == "DHD").FirstOrDefault();
-            var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
+            
             var json = new Dictionary<string, string>();
             json["dong6"] = ma_sanpham;
             json["dong9"] = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
             json["dong14"] = "";
 
+            var dtFOB = ExcuteSignalRStatic.getFOB(sp.md_sanpham_id);
+            json["dong15"] = dtFOB.Rows.Count > 0 ? dtFOB.Rows[0]["ten_cangbien"].ToString() : "";
+
+            var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
             foreach (System.Data.DataRow row in dt.Rows)
             {
                 string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
@@ -303,23 +307,7 @@ public class MainHub : Hub
                     }
                 }
                 //dong 15
-                strsql =
-                @"
-				    select top 1 cb.ten_cangbien 
-                    from md_cangbien (nolock) cb 
-                    where cb.md_cangbien_id = (
-	                    select top 1
-		                    cxh.md_cangbien_id
-	                    FROM 
-		                    md_cangxuathang (nolock) cxh
-	                    WHERE 
-		                    cxh.md_sanpham_id = '{0}'
-		                    and cxh.macdinh = 1
-                    )
-                ";
-
-                strsql = string.Format(strsql, sp.md_sanpham_id);
-                dt = mdbc.GetData(strsql);
+                dt = ExcuteSignalRStatic.getFOB(sp.md_sanpham_id);
                 foreach (System.Data.DataRow row in dt.Rows)
                 {
                     dong15 = row["ten_cangbien"] + "";
