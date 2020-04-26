@@ -62,7 +62,9 @@ public class MainHub : Hub
             var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
             var json = new Dictionary<string, string>();
             json["dong6"] = ma_sanpham;
+            json["dong9"] = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
             json["dong14"] = "";
+
             foreach (System.Data.DataRow row in dt.Rows)
             {
                 string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
