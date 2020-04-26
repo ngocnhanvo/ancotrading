@@ -143,6 +143,7 @@ public class MainHub : Hub
             response["CL"] = cl;
             response["DT"] = dt;
             response["MS"] = ms;
+            response["MSLink"] = image;
             response["Input"] = ma_sanpham;
         }
         catch (Exception ex)
