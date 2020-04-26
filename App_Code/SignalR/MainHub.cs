@@ -131,10 +131,11 @@ public class MainHub : Hub
             string ms = ma_sanpham.Substring(9, 2);
             var context = HttpContext.Current;
             string image = context.Server.MapPath(msLink).Replace("signalr\\","");
+            string clDTMS = string.Format(@"{0}-{1}-{2}.jpg", cl, dt, ms);
             if (File.Exists(image + ma_sanpham + ".jpg"))
                 msLink += ma_sanpham + ".jpg";
-            else if (File.Exists(image + cl + dt + ms + ".jpg"))
-                msLink += cl + dt + ms + ".jpg";
+            else if (File.Exists(image + clDTMS))
+                msLink += clDTMS;
             else
                 msLink = "images/products/fullsize/default.jpg";
 
@@ -143,7 +144,7 @@ public class MainHub : Hub
             response["CL"] = cl;
             response["DT"] = dt;
             response["MS"] = ms;
-            response["MSLink"] = image;
+            response["MSLink"] = image + clDTMS;
             response["Input"] = ma_sanpham;
         }
         catch (Exception ex)
