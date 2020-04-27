@@ -388,6 +388,7 @@ public class MainHub : Hub
 				", msp.Substring(0, 6), chungloai);
 
                 var dt_detail = mdbc.GetData(sql_detail);
+                var arrBienTau = new List<string>();
                 foreach (System.Data.DataRow row_dt in dt_detail.Rows)
                 {
                     if (!detai_chk.Split(',').Contains(row_dt["detai"].ToString()))
@@ -408,7 +409,7 @@ public class MainHub : Hub
 
                     var bientau = row_dt["bientau"] + "";
                     var maBT = msp.Substring(0, 9) + bientau;
-                    if (bientau.StartsWith("0") | bientau.StartsWith("F"))
+                    if ((bientau.StartsWith("0") | bientau.StartsWith("F")) & !arrBienTau.Contains(bientau))
                     {
                         var spBT = db.md_sanphams.Where(s => s.ma_sanpham.StartsWith(maBT)).FirstOrDefault();
                         if (spBT != null)
