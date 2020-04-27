@@ -150,4 +150,19 @@ public static class ExcuteSignalRStatic
 
         return response;
     }
+
+    public static string getImageProduct(string msp)
+    {
+        string image = "";
+        if (!msp.Contains("-F"))
+        {
+            image = msp.Substring(0, 8) + ".jpg";
+        }
+        else
+        {
+            image = msp.Substring(0, 11) + ".jpg";
+        }
+
+        return Public.imgProduct + image;
+    }
 }

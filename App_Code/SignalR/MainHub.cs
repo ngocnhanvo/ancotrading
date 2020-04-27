@@ -355,11 +355,7 @@ public class MainHub : Hub
                 }
 
                 string msp = sp.ma_sanpham;
-                if (!msp.Contains("-F"))
-                    image = msp.Substring(0, 8) + ".jpg";
-                else
-                    image = msp.Substring(0, 11) + ".jpg";
-                image = Public.imgProduct + image;
+                image = ExcuteSignalRStatic.getImageProduct(msp);
 
                 string detai_json = "", bientau_json = "", mausac_json = "", detai_chk = "", bientau_chk = "", mausac_chk = "";
                 string chungloai = msp.Substring(0, 2);
@@ -1095,15 +1091,10 @@ public class MainHub : Hub
             string detail = "";
             foreach (System.Data.DataRow row in dt.Rows)
             {
-                string msp = row["ma_sanpham"].ToString(), image = "", spId = row["md_sanpham_id"].ToString();
-                if (!msp.Contains("-F"))
-                {
-                    image = msp.Substring(0, 8) + ".jpg";
-                }
-                else
-                {
-                    image = msp.Substring(0, 11) + ".jpg";
-                }
+                string msp = row["ma_sanpham"].ToString(), 
+                    image = ExcuteSignalRStatic.getImageProduct(msp), 
+                    spId = row["md_sanpham_id"].ToString();
+
                 string detai_json = "", bientau_json = "", mausac_json = "", detai_chk = "", bientau_chk = "", mausac_chk = "", v2 = "";
                 string chungloai = msp.Substring(0, 2);
 
