@@ -140,7 +140,7 @@ public class MainHub : Hub
         Clients.Caller.ColorInfo(response);
     }
 
-    public void PreviewAllInfo(dynamic arrSP)
+    public void PreviewAll(dynamic arrSP)
     {
         var response = new Dictionary<string, object>()
         {
@@ -214,7 +214,7 @@ public class MainHub : Hub
         {
             response["Message"] =  ex;
         }
-        Clients.Caller.PreviewAllInfo(response);
+        Clients.Caller.PreviewAll(response);
     }
 
     public void ProductInfo(string ma_sanpham)
