@@ -359,7 +359,7 @@ public class MainHub : Hub
                     image = msp.Substring(0, 8) + ".jpg";
                 else
                     image = msp.Substring(0, 11) + ".jpg";
-                image = "images/products/fullsize/" + image;
+                image = Public.imgProduct + image;
 
                 string detai_json = "", bientau_json = "", mausac_json = "", detai_chk = "", bientau_chk = "", mausac_chk = "";
                 string chungloai = msp.Substring(0, 2);
@@ -483,6 +483,14 @@ public class MainHub : Hub
             var rs = new Dictionary<string, object>();
             rs["ma_sanpham"] = ma_sanpham;
             rs["spcu"] = spchanged;
+
+            string msp = ma_sanpham, image = "";
+            if (!msp.Contains("-F"))
+                image = msp.Substring(0, 8) + ".jpg";
+            else
+                image = msp.Substring(0, 11) + ".jpg";
+            image = Public.imgProduct + image;
+            rs["image"] = image; 
             rs["gia"] = "(unknown)";
             foreach (System.Data.DataRow row in dt.Rows)
             {
