@@ -356,13 +356,10 @@ public class MainHub : Hub
 
                 string msp = sp.ma_sanpham;
                 if (!msp.Contains("-F"))
-                {
                     image = msp.Substring(0, 8) + ".jpg";
-                }
                 else
-                {
                     image = msp.Substring(0, 11) + ".jpg";
-                }
+                image = "images/products/fullsize/" + image;
 
                 string detai_json = "", bientau_json = "", mausac_json = "", detai_chk = "", bientau_chk = "", mausac_chk = "";
                 string chungloai = msp.Substring(0, 2);
