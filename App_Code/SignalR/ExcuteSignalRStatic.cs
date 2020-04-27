@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Web;
 
@@ -46,5 +47,107 @@ public static class ExcuteSignalRStatic
 
         strsql = string.Format(strsql, md_sanpham_id);
         return mdbc.GetData(strsql);
+    }
+
+    public static DataTable getPrice(string arrMSP)
+    {
+        string strsql =
+                @"    
+                    declare @tblBG table (
+	                    bgid nvarchar(32)
+	                    , tenbg nvarchar(MAX)
+	                    , bgban bit
+	                    , pbgid nvarchar(32)
+	                    , ngayhl datetime
+	                    , dongtien nvarchar(32)
+                    )
+                    insert into @tblBG
+                    select bg.md_banggia_id, bg.ten_banggia, bg.banggiaban, pbg.md_phienbangia_id, pbg.ngay_hieuluc, dt.ma_iso
+                    from md_banggia (nolock) bg
+                    inner join md_phienbangia (nolock) pbg on bg.md_banggia_id = pbg.md_banggia_id
+                    inner join md_dongtien (nolock) dt on bg.md_dongtien_id = dt.md_dongtien_id
+                    where 
+	                    1=1
+	                    and bg.banggiaban = 1
+	                    AND substring(bg.ten_banggia, 0, 5) = 'FOB-' 
+
+                    declare @tblGia table (
+	                    spid nvarchar(32)
+	                    , ma_sanpham nvarchar(MAX)
+	                    , l_cm decimal(18,1)
+	                    , w_cm decimal(18,1)
+	                    , h_cm decimal(18,1)
+	                    , gia decimal(18,2)
+	                    , pbgid nvarchar(32)
+                    )
+                    insert into @tblGia
+                    select 
+		                    sp.*
+		                    , gsp.gia
+		                    ,gsp.md_phienbangia_id
+	                    from (
+		                    select sp.md_sanpham_id, sp.ma_sanpham, sp.l_cm, sp.w_cm, sp.h_cm
+		                    FROM 
+			                    md_sanpham (nolock) sp
+		                    WHERE 
+			                    1=1
+			                    AND sp.ma_sanpham in ({0})
+	                    ) sp
+	                    inner join md_giasanpham (nolock) gsp on gsp.md_sanpham_id = sp.md_sanpham_id
+	                    where
+		                    1=1
+		                    AND gsp.hoatdong = 1 
+
+                    select 
+	                    T.* 
+                    from (
+	                    select 
+		                    gia.*
+		                    , row_number() over(partition by gia.ma_sanpham order by bg.ngayhl desc) as rn
+	                    from 
+		                    @tblGia gia
+		                    inner join @tblBG bg on bg.pbgid = gia.pbgid
+	                )T
+                    where T.rn = 1 order by T.ma_sanpham
+                ";
+
+        strsql = string.Format(strsql, arrMSP);
+        return mdbc.GetData(strsql);
+    }
+
+    public static dynamic getImage(string ma_sanpham)
+    {
+        var response = new Dictionary<string, object>()
+        {
+            { "cl", "" },
+            { "dt", "" },
+            { "ms", "" },
+            { "msLink", "images/products/fullsize/default.jpg" }
+        };
+
+        try
+        {
+            string msLink = "images/products/mausac/";
+            string cl = ma_sanpham.Substring(0, 2);
+            string dt = ma_sanpham.Substring(6, 2);
+            string ms = ma_sanpham.Substring(9, 2);
+            var context = HttpContext.Current;
+            string image = context.Server.MapPath(msLink).Replace("signalr\\", "");
+            string clDTMS = string.Format(@"{0}-{1}-{2}.jpg", cl, dt, ms);
+            if (File.Exists(image + ma_sanpham + ".jpg"))
+                msLink += ma_sanpham + ".jpg";
+            else if (File.Exists(image + clDTMS))
+                msLink += clDTMS;
+            else
+                msLink = "images/products/fullsize/default.jpg";
+
+            response["cl"] = cl;
+            response["dt"] = dt;
+            response["ms"] = dt;
+            response["msLink"] = msLink;
+        }
+        catch { }
+
+        return response;
     }
 }
