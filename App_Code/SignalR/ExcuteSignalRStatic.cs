@@ -143,7 +143,7 @@ public static class ExcuteSignalRStatic
 
             response["cl"] = cl;
             response["dt"] = dt;
-            response["ms"] = dt;
+            response["ms"] = ms;
             response["msLink"] = msLink;
         }
         catch { }
