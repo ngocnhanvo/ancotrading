@@ -407,13 +407,13 @@ public class MainHub : Hub
                     }
 
                     var maBT = msp.Substring(0, 9) + row_dt["bientau"];
-                    var spBT = db.md_sanphams.Where(s => s.ma_sanpham.StartsWith(maBT)).FirstOrDefault();
-                    if (spBT != null)
-                    {
-                        string sizeVal = row_dt["bientau"] + ":" + spBT.l_cm + "x" + spBT.w_cm + "xH" + spBT.h_cm + "cm";
-                        if (!size.Split(',').Contains(sizeVal))
-                            size += sizeVal + ",";
-                    }
+                    //var spBT = db.md_sanphams.Where(s => s.ma_sanpham.StartsWith(maBT)).FirstOrDefault();
+                    //if (spBT != null)
+                    //{
+                    //    string sizeVal = row_dt["bientau"] + ":" + spBT.l_cm + "x" + spBT.w_cm + "xH" + spBT.h_cm + "cm";
+                    //    if (!size.Split(',').Contains(sizeVal))
+                    //        size += sizeVal + ",";
+                    //}
 
                     string detai_bientau_mausac = row_dt["detai"] + " - " + row_dt["bientau"] + " - " + row_dt["mausac"];
                     if (!mausac_chk.Split(',').Contains(detai_bientau_mausac))
