@@ -362,23 +362,29 @@ public class MainHub : Hub
 
                 string sql_detail = string.Format(@"
 					select 
-	                    A.detai, A.bientau, A.mausac, dtai.ta_ngan as detai_ta, A.bientau as bientau_ta, msac.ta_ngan as mausac_ta 
+	                    A.detai, 
+                        A.bientau, 
+                        A.mausac, 
+                        dtai.ta_ngan as detai_ta, 
+                        A.bientau as bientau_ta, 
+                        msac.ta_ngan as mausac_ta
                     from (
 	                    select distinct 
-	                    substring(sp.ma_sanpham, 0, 7) as todetai, 
-	                    substring(sp.ma_sanpham, 10, 2) as bientau,
-	                    substring(sp.ma_sanpham, 7, 2) as detai,
-	                    substring(sp.ma_sanpham, 13, 2) as mausac
+	                        substring(sp.ma_sanpham, 0, 7) as todetai, 
+	                        substring(sp.ma_sanpham, 10, 2) as bientau,
+	                        substring(sp.ma_sanpham, 7, 2) as detai,
+	                        substring(sp.ma_sanpham, 13, 2) as mausac
 	                    from md_sanpham (nolock) sp
 	                    where 1=1
-	                    and sp.hoatdong = 1 
-	                    and sp.trangthai = 'DHD'
+	                        and sp.hoatdong = 1 
+	                        and sp.trangthai = 'DHD'
+                            and substring(sp.ma_sanpham, 0, 7) = '{0}'
                     ) A
                     left join md_detai (nolock) dtai on dtai.code_cl = '{1}' and dtai.code_dt = A.detai
                     left join md_mausac (nolock) msac on msac.code_cl = '{1}' and msac.code_dt = A.detai and msac.code_mau = A.mausac
                     where 
-                    A.todetai = '{0}'
-                    order by A.detai, A.bientau, A.mausac
+                        A.todetai = '{0}'
+                        order by A.detai, A.bientau, A.mausac
 				", msp.Substring(0, 6), chungloai);
 
                 var dt_detail = mdbc.GetData(sql_detail);
@@ -401,7 +407,7 @@ public class MainHub : Hub
                     }
 
                     var maBT = msp.Substring(0, 9) + row_dt["bientau"];
-                    var spBT = db.md_sanphams.Where(s => s.ma_sanpham.Contains(maBT)).FirstOrDefault();
+                    var spBT = db.md_sanphams.Where(s => s.ma_sanpham.StartsWith(maBT)).FirstOrDefault();
                     if (spBT != null)
                     {
                         string sizeVal = row_dt["bientau"] + ":" + spBT.l_cm + "x" + spBT.w_cm + "xH" + spBT.h_cm + "cm";
