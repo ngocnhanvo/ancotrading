@@ -200,7 +200,7 @@ public class MainHub : Hub
                         }
                         if (rowSP.slcont != "")
                         {
-                            rowSP.slcont = (rowSP.slcont + "").Substring(2);
+                            //rowSP.slcont = (rowSP.slcont + "").Substring(2);
                         }
                     }
 
