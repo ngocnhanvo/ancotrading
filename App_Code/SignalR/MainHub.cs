@@ -125,26 +125,12 @@ public class MainHub : Hub
 
         try
         {
-            string msLink = "images/products/mausac/";
-            string cl = ma_sanpham.Substring(0, 2);
-            string dt = ma_sanpham.Substring(6, 2);
-            string ms = ma_sanpham.Substring(9, 2);
-            var context = HttpContext.Current;
-            string image = context.Server.MapPath(msLink).Replace("signalr\\","");
-            string clDTMS = string.Format(@"{0}-{1}-{2}.jpg", cl, dt, ms);
-            if (File.Exists(image + ma_sanpham + ".jpg"))
-                msLink += ma_sanpham + ".jpg";
-            else if (File.Exists(image + clDTMS))
-                msLink += clDTMS;
-            else
-                msLink = "images/products/fullsize/default.jpg";
-
+            var img = ExcuteSignalRStatic.getImage(ma_sanpham);
             response["Success"] = true;
-            response["Message"] = msLink;
-            response["CL"] = cl;
-            response["DT"] = dt;
-            response["MS"] = ms;
-            response["MSLink"] = image + clDTMS;
+            response["Message"] = img["msLink"];
+            response["CL"] = img["cl"];
+            response["DT"] = img["dt"];
+            response["MS"] = img["ms"];
             response["Input"] = ma_sanpham;
         }
         catch (Exception ex)
@@ -152,6 +138,83 @@ public class MainHub : Hub
             response["Message"] = ma_sanpham + ":" + ex;
         }
         Clients.Caller.ColorInfo(response);
+    }
+
+    public void PreviewAllInfo(dynamic arrSP)
+    {
+        var response = new Dictionary<string, object>()
+        {
+            { "Success", false },
+            { "Message", "" }
+        };
+
+        var db = new LinqDBDataContext();
+
+        try
+        {
+            for(var i=0; i < arrSP.Count; i++)
+            {
+                var rowSP = arrSP[i];
+                string msp = rowSP.ma_sanpham;
+                var sp = db.md_sanphams.Where(s => s.ma_sanpham == msp & s.trangthai == "DHD").FirstOrDefault();
+                if (sp != null)
+                {
+                    rowSP.kichthuoc = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
+                    var dtFOB = ExcuteSignalRStatic.getFOB(sp.md_sanpham_id);
+                    rowSP.fob = dtFOB.Rows.Count > 0 ? dtFOB.Rows[0]["ten_cangbien"].ToString() : "";
+                    var dtPrice = ExcuteSignalRStatic.getPrice("'" +sp.ma_sanpham + "'");
+                    rowSP.price = dtPrice.Rows.Count > 0 ? dtPrice.Rows[0]["gia"].ToString() : "";
+                    var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
+                    foreach (System.Data.DataRow row in dt.Rows)
+                    {
+                        string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
+                        string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
+                        if (sl_inner != "0" & dvt_inner != "0" & sl_inner != "" & dvt_inner != "")
+                        {
+                            rowSP.inner = sl_inner + " " + dvt_inner;
+                        }
+                        else
+                        {
+                            rowSP.inner = " ";
+                        }
+
+                        if (sl_outer != "0" & dvt_outer != "0" & sl_outer != "" & dvt_outer != "")
+                        {
+                            rowSP.master = sl_outer + " " + dvt_outer;
+                        }
+                        else
+                        {
+                            rowSP.master = " ";
+                        }
+
+                        rowSP.kichthuocDG = "L" + row["l2_mix"] + "xW" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
+                        rowSP.CBM = row["v2"].ToString();
+
+                        string slc_20 = row["soluonggoi_ctn_20"].ToString();
+                        string slc_40 = row["soluonggoi_ctn"].ToString();
+                        string slc_40HC = row["soluonggoi_ctn_40hc"].ToString();
+
+                        if (slc_40 != "" & slc_40 != "0")
+                        {
+                            rowSP.slcont += "\\n" + slc_40 + " pallets/40'";
+                        }
+                        if (rowSP.slcont != "")
+                        {
+                            rowSP.slcont = rowSP.slcont.Substring(2);
+                        }
+                    }
+
+                    var img = ExcuteSignalRStatic.getImage(sp.ma_sanpham);
+                    rowSP.image = img["msLink"];
+                }
+            }
+            response["Message"] = arrSP;
+        }
+        catch (Exception ex)
+        {
+            response["Message"] =  ex;
+        }
+        Clients.Caller.PreviewAllInfo(response);
     }
 
     public void ProductInfo(string ma_sanpham)
@@ -204,75 +267,12 @@ public class MainHub : Hub
                     }
                 }
 
-                string strsql =
-                @"    
-                    declare @tblBG table (
-	                    bgid nvarchar(32)
-	                    , tenbg nvarchar(MAX)
-	                    , bgban bit
-	                    , pbgid nvarchar(32)
-	                    , ngayhl datetime
-	                    , dongtien nvarchar(32)
-                    )
-                    insert into @tblBG
-                    select bg.md_banggia_id, bg.ten_banggia, bg.banggiaban, pbg.md_phienbangia_id, pbg.ngay_hieuluc, dt.ma_iso
-                    from md_banggia (nolock) bg
-                    inner join md_phienbangia (nolock) pbg on bg.md_banggia_id = pbg.md_banggia_id
-                    inner join md_dongtien (nolock) dt on bg.md_dongtien_id = dt.md_dongtien_id
-                    where 
-	                    1=1
-	                    and bg.banggiaban = 1
-	                    AND substring(bg.ten_banggia, 0, 5) = 'FOB-' 
-
-                    declare @tblGia table (
-	                    spid nvarchar(32)
-	                    , ma_sanpham nvarchar(MAX)
-	                    , l_cm decimal(18,1)
-	                    , w_cm decimal(18,1)
-	                    , h_cm decimal(18,1)
-	                    , gia decimal(18,2)
-	                    , pbgid nvarchar(32)
-                    )
-                    insert into @tblGia
-                    select 
-		                    sp.*
-		                    , gsp.gia
-		                    ,gsp.md_phienbangia_id
-	                    from (
-		                    select sp.md_sanpham_id, sp.ma_sanpham, sp.l_cm, sp.w_cm, sp.h_cm
-		                    FROM 
-			                    md_sanpham (nolock) sp
-		                    WHERE 
-			                    1=1
-			                    AND sp.ma_sanpham in ({0})
-	                    ) sp
-	                    inner join md_giasanpham (nolock) gsp on gsp.md_sanpham_id = sp.md_sanpham_id
-	                    where
-		                    1=1
-		                    AND gsp.hoatdong = 1 
-
-                    select 
-	                    T.* 
-                    from (
-	                    select 
-		                    gia.*
-		                    , row_number() over(partition by gia.ma_sanpham order by bg.ngayhl desc) as rn
-	                    from 
-		                    @tblGia gia
-		                    inner join @tblBG bg on bg.pbgid = gia.pbgid
-	                )T
-                    where T.rn = 1 order by T.ma_sanpham
-                ";
-
-                strsql = string.Format(strsql, arr_sanpham);
-                System.Data.DataTable dt = mdbc.GetData(strsql);
-
+                var dt = ExcuteSignalRStatic.getPrice(arr_sanpham);
                 string kichthuoc_9 = "";
                 foreach (System.Data.DataRow row in dt.Rows)
                 {
                     if (row["ma_sanpham"].ToString() != ma_sanpham)
                     {
-                        //dong8 += "$" + row["gia"].ToString() + " / ";
                         if (row["l_cm"].ToString() != "0.0" & row["w_cm"].ToString() != "0.0" & row["h_cm"].ToString() != "0.0")
                         {
                             dong9 += row["l_cm"] + "x" + row["w_cm"] + "xH" + row["h_cm"] + "/ \\n          ";
