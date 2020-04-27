@@ -130,7 +130,7 @@ public static class ExcuteSignalRStatic
             string msLink = "images/products/mausac/";
             string cl = ma_sanpham.Substring(0, 2);
             string dt = ma_sanpham.Substring(6, 2);
-            string ms = ma_sanpham.Substring(9, 2);
+            string ms = ma_sanpham.Substring(12, 2);
             var context = HttpContext.Current;
             string image = context.Server.MapPath(msLink).Replace("signalr\\", "");
             string clDTMS = string.Format(@"{0}-{1}-{2}.jpg", cl, dt, ms);
