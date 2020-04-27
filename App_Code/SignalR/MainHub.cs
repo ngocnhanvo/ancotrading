@@ -152,7 +152,7 @@ public class MainHub : Hub
 
         try
         {
-            for (var i = 0; i < arrSP.Count; i++)
+            for(var i=0; i < arrSP.Count; i++)
             {
                 var rowSP = arrSP[i];
                 string msp = rowSP.ma_sanpham;
@@ -162,7 +162,7 @@ public class MainHub : Hub
                     rowSP.kichthuoc = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
                     var dtFOB = ExcuteSignalRStatic.getFOB(sp.md_sanpham_id);
                     rowSP.fob = dtFOB.Rows.Count > 0 ? dtFOB.Rows[0]["ten_cangbien"].ToString() : "";
-                    var dtPrice = ExcuteSignalRStatic.getPrice("'" + sp.ma_sanpham + "'");
+                    var dtPrice = ExcuteSignalRStatic.getPrice("'" +sp.ma_sanpham + "'");
                     rowSP.price = dtPrice.Rows.Count > 0 ? dtPrice.Rows[0]["gia"].ToString() : "";
                     var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
                     foreach (System.Data.DataRow row in dt.Rows)
@@ -213,7 +213,7 @@ public class MainHub : Hub
         }
         catch (Exception ex)
         {
-            response["Message"] = ex;
+            response["Message"] =  ex;
         }
         Clients.Caller.PreviewAll(response);
     }
@@ -388,6 +388,7 @@ public class MainHub : Hub
 				", msp.Substring(0, 6), chungloai);
 
                 var dt_detail = mdbc.GetData(sql_detail);
+                var arrBienTau = new List<string>();
                 foreach (System.Data.DataRow row_dt in dt_detail.Rows)
                 {
                     if (!detai_chk.Split(',').Contains(row_dt["detai"].ToString()))
@@ -406,11 +407,18 @@ public class MainHub : Hub
                         bientau_json += detai_bientau + ",";
                     }
 
-                    var maBT = msp.Substring(0, 9) + row_dt["bientau"];
-
-                    string sizeVal = row_dt["bientau"] + "";
-                    if (!size.Split(',').Contains(sizeVal))
-                        size += sizeVal + ",";
+                    var bientau = row_dt["bientau"] + "";
+                    var maBT = msp.Substring(0, 9) + bientau;
+                    if ((bientau.StartsWith("0") | bientau.StartsWith("F")) & !arrBienTau.Contains(bientau))
+                    {
+                        var spBT = db.md_sanphams.Where(s => s.ma_sanpham.StartsWith(maBT)).FirstOrDefault();
+                        if (spBT != null)
+                        {
+                            string sizeVal = row_dt["bientau"] + ":" + spBT.l_cm + "x" + spBT.w_cm + "xH" + spBT.h_cm + "cm";
+                            if (!size.Split(',').Contains(sizeVal))
+                                size += sizeVal + ",";
+                        }
+                    }
 
                     string detai_bientau_mausac = row_dt["detai"] + " - " + row_dt["bientau"] + " - " + row_dt["mausac"];
                     if (!mausac_chk.Split(',').Contains(detai_bientau_mausac))
@@ -489,7 +497,7 @@ public class MainHub : Hub
             else
                 image = msp.Substring(0, 11) + ".jpg";
             image = Public.imgProduct + image;
-            rs["image"] = image;
+            rs["image"] = image; 
             rs["gia"] = "(unknown)";
             foreach (System.Data.DataRow row in dt.Rows)
             {
@@ -1094,8 +1102,8 @@ public class MainHub : Hub
             string detail = "";
             foreach (System.Data.DataRow row in dt.Rows)
             {
-                string msp = row["ma_sanpham"].ToString(),
-                    image = ExcuteSignalRStatic.getImageProduct(msp),
+                string msp = row["ma_sanpham"].ToString(), 
+                    image = ExcuteSignalRStatic.getImageProduct(msp), 
                     spId = row["md_sanpham_id"].ToString();
 
                 string detai_json = "", bientau_json = "", mausac_json = "", detai_chk = "", bientau_chk = "", mausac_chk = "", v2 = "";
