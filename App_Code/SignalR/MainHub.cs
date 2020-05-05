@@ -555,7 +555,7 @@ public class MainHub : Hub
         }
         Clients.Caller.PartnerInfo(response);
     }
-
+	
     public void CreateQO(dynamic parrams)
     {
         var response = new Dictionary<string, object>()
@@ -681,11 +681,10 @@ public class MainHub : Hub
                         var ms = new MemoryStream();
                         // Lấy thông tin smtp
                         md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
-                        var context = System.Web.HttpContext.Current;
-                        String path = context.Server.MapPath("~/FileSendMail/");
+                        string path = ExcuteSignalRStatic.mapPathSignalR("~/FileSendMail/");
                         String fileNameXLS = nv.manv + "-Quotation-" + DateTime.Now.ToString("mmhh-dd-MM-yyyy") + ".xls";
-                        String logoPath = context.Server.MapPath("~/images/anco_logo_print.png");
-                        String productImagePath = context.Server.MapPath("~/images/products/fullsize/");
+                        String logoPath = ExcuteSignalRStatic.mapPathSignalR("~/images/anco_logo_print.png");
+                        String productImagePath = ExcuteSignalRStatic.mapPathSignalR("~/images/products/fullsize/");
                         var rptQO = new Objects.BaoGiaMauReport_QRCode(db, mnu.c_baogia_id, logoPath, productImagePath, "qr");
 
                         NPOI.HSSF.UserModel.HSSFWorkbook wb = rptQO.CreateWBQuotation();
@@ -955,7 +954,7 @@ public class MainHub : Hub
                 }
                 catch (Exception ex)
                 {
-                    msg = ex.Message;
+                    msg = ex + "";
                 }
             }
         }

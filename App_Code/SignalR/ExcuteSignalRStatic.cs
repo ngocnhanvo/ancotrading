@@ -165,4 +165,9 @@ public static class ExcuteSignalRStatic
 
         return Public.imgProduct + image;
     }
+	
+	public static string mapPathSignalR(string path)
+    {
+        return System.Web.Hosting.HostingEnvironment.MapPath(path);
+    }
 }
