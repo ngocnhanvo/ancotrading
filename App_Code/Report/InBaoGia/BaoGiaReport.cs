@@ -579,7 +579,7 @@ public class BaoGiaReport
                 s1.GetRow(12 + detailsCount + curLine * 8 + i * 8).CreateCell(4 + curCell * 3).SetCellValue(items[j]["mau"].ToString());
                 try
                 {
-                    String imgPath = System.IO.Path.Combine(productImagePath, items[j]["url"].ToString());
+                    var imgPath = Path.Combine(Public.imgColors, items[j]["url"].ToString());
                     System.Drawing.Image image = System.Drawing.Image.FromFile(imgPath);
                     MemoryStream ms = new MemoryStream();
                     image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);

@@ -189,7 +189,18 @@ public class DanhSachDatHangController : IHttpHandler
             }
         }
     }
-
+	
+	public string EncodeHTML_DSDH(string a) {
+		if(a == null) {
+			a = "";
+		}
+		a = a.Replace("&", "%26");
+		a = a.Replace("+", "%2B");
+		a = a.Replace("&", "%26");
+		a = a.Replace("+", "%2B");
+		return a;
+	}
+	
     public void guidonhang(HttpContext context)
     {
         var db = new LinqDBDataContext();
@@ -222,18 +233,14 @@ public class DanhSachDatHangController : IHttpHandler
                     dsdh.trangthai = "DAGUI";
                     var dsdh2 = new c_danhsachdathang();
                     dsdh.CopyPropertiesTo(dsdh2);
-                    dsdh2.sochungtu = dsdh2.sochungtu.Replace("&", "%26");
-                    dsdh2.sochungtu = dsdh2.sochungtu.Replace("+", "%2B");
-                    dsdh2.so_po = dsdh2.so_po.Replace("&", "%26");
-                    dsdh2.so_po = dsdh2.so_po.Replace("+", "%2B");
+                    dsdh2.sochungtu = EncodeHTML_DSDH(dsdh2.sochungtu);
+                    dsdh2.so_po = EncodeHTML_DSDH(dsdh2.so_po);
                     if (string.IsNullOrEmpty(dsdh2.huongdanlamhang))
                         dsdh2.huongdanlamhang = "";
-                    dsdh2.huongdanlamhang = dsdh2.huongdanlamhang.Replace("&", "%26");
-                    dsdh2.huongdanlamhang = dsdh2.huongdanlamhang.Replace("+", "%2B");
+                    dsdh2.huongdanlamhang = EncodeHTML_DSDH(dsdh2.huongdanlamhang);
                     if (string.IsNullOrEmpty(dsdh2.huongdanlamhangchung))
                         dsdh2.huongdanlamhangchung = "";
-                    dsdh2.huongdanlamhangchung = dsdh2.huongdanlamhangchung.Replace("&", "%26");
-                    dsdh2.huongdanlamhangchung = dsdh2.huongdanlamhangchung.Replace("+", "%2B");
+                    dsdh2.huongdanlamhangchung = EncodeHTML_DSDH(dsdh2.huongdanlamhangchung);
 
                     if (string.IsNullOrEmpty(dsdh2.diachigiaohang))
                         dsdh2.diachigiaohang = "";
@@ -252,7 +259,7 @@ public class DanhSachDatHangController : IHttpHandler
                                 x.vl,
                                 x.vd,
                                 x.v2,
-                                x.tem_dan,
+                                tem_dan = EncodeHTML_DSDH(x.tem_dan),
                                 x.sothutu,
                                 x.sl_inner,
                                 dvt_inner = db.md_donvitinhs.FirstOrDefault(t => t.md_donvitinh_id == db.md_donggois.FirstOrDefault(tt => tt.md_donggoi_id == x.md_donggoi_id).dvt_inner).ten_dvt,
@@ -263,18 +270,18 @@ public class DanhSachDatHangController : IHttpHandler
                                 x.sl_dagiao,
                                 x.sl_cont,
                                 x.sl_conlai,
-                                x.mota,
+                                mota = EncodeHTML_DSDH(x.mota),
                                 md_sanpham_id = db.md_sanphams.Where(t => t.md_sanpham_id == x.md_sanpham_id).Select(t => t.ma_sanpham).FirstOrDefault(),
                                 x.md_donggoi_id,
                                 x.md_doitackinhdoanh_id,
-                                x.ma_sanpham_khach,
+                                ma_sanpham_khach = EncodeHTML_DSDH(x.ma_sanpham_khach),
                                 x.l2,
                                 x.l1,
-                                x.huongdan_dathang,
+                                huongdan_dathang = EncodeHTML_DSDH(x.huongdan_dathang),
                                 x.h2,
                                 x.h1,
                                 x.gianhap,
-                                x.ghichu_vachngan,
+                                ghichu_vachngan = EncodeHTML_DSDH(x.ghichu_vachngan),
                                 x.c_dongdsdh_id,
                                 x.c_dongdonhang_id,
                                 x.c_danhsachdathang_id
@@ -287,7 +294,7 @@ public class DanhSachDatHangController : IHttpHandler
                         {
                             x.sotien,
                             x.isphicong,
-                            x.mota,
+                            mota = EncodeHTML_DSDH(x.mota),
                             x.c_phidathang_id,
                             x.c_danhsachdathang_id
                         })

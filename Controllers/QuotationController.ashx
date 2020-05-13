@@ -70,60 +70,113 @@ public class QuotationController : IHttpHandler
 	
 	public void createColor(HttpContext context)
     {
-        try
+        //try
         {
-            String qoId = context.Request.QueryString["qoId"];
-            c_baogia bg = db.c_baogias.Single(p => p.c_baogia_id.Equals(qoId));
-			string mm = "";
+            var qoId = context.Request.QueryString["qoId"];
+            var bg = db.c_baogias.Where(p => p.c_baogia_id.Equals(qoId)).FirstOrDefault();
             if (bg != null)
             {
-                string sql = string.Format("select ma_sanpham from md_sanpham sp left join c_chitietbaogia ctbg on ctbg.md_sanpham_id = sp.md_sanpham_id where sp.md_sanpham_id = ctbg.md_sanpham_id and ctbg.c_baogia_id = '{0}'", qoId);
-                DataTable dtSP = mdbc.GetData(sql);
-                foreach (DataRow sp in dtSP.Rows)
+                var ctbgSpIds = db.c_chitietbaogias.Where(s => s.c_baogia_id == bg.c_baogia_id).Select(s => s.md_sanpham_id).ToList();
+                var sps = db.md_sanphams.Where(s =>
+                    ctbgSpIds.Contains(s.md_sanpham_id)
+                ).Select(s => new { s.ma_sanpham }).ToList();
+
+                db.md_color_references.DeleteAllOnSubmit(db.md_color_references.Where(s => s.c_baogia_id == bg.c_baogia_id));
+
+                foreach (var sp in sps)
                 {
-                    string color_rf = sp[0].ToString().Substring(0, 2);
-					mm = color_rf;
-                    string sqlColor = string.Format(@"select distinct
-									ta_ngan, url, filter, code_cl 
-								from (
-									select ms.ta_ngan, tmp.url, tmp.filter, tmp.code_cl
-									from(
-										select url, substring(filter, 1, 5) as filter,  SUBSTRING(filter, 1, 2) as code_cl, SUBSTRING(filter, 4, 2) as code_mau
-										from md_anhsanpham where url like '%.jp%'
-									) as tmp, md_mausac ms
-									where tmp.code_cl = ms.code_cl
-									and tmp.code_mau = ms.code_mau
-								) as re
-                                where re.code_cl = '{0}'", color_rf);
-                    DataTable dtColor = mdbc.GetData(sqlColor);
-                    foreach (DataRow c in dtColor.Rows)
+                    string cl = sp.ma_sanpham.Substring(0, 2);
+                    string dt = sp.ma_sanpham.Substring(6, 2);
+                    string ms = sp.ma_sanpham.Substring(12, 2);
+
+                    string filter = cl + "-" + dt + "-" + ms;
+                    var mausacs = db.md_mausacs.Where(s =>
+                        s.code_cl == cl
+                    ).ToList();
+
+                    foreach (var mausac in mausacs)
                     {
-                        string sqlFilter = string.Format("select count(filter) from md_color_reference where c_baogia_id = '{0}' and filter = '{1}'", qoId, c["filter"]);
-                        int filterCount = (int)mdbc.ExecuteScalar(sqlFilter);
-                        if (filterCount == 0)
+                        var filterMS = mausac.code_cl + "-" + mausac.code_dt + "-" + mausac.code_mau;
+                        var url = filterMS + ".jpg";
+                        var chk = db.md_color_references.Where(s => s.c_baogia_id == bg.c_baogia_id & s.filter == filterMS).FirstOrDefault();
+
+                        var macdinh = filterMS == filter ? true : false;
+                        if (chk == null)
                         {
-                            string filter = sp[0].ToString().Substring(0, 2) + "-" + sp[0].ToString().Substring(sp[0].ToString().LastIndexOf('-') + 1, 2);
-                            string sqlInsert = string.Format(@"INSERT INTO [dbo].[md_color_reference]
-				                                       ([md_color_reference_id],[c_baogia_id],[mau],[url],[filter]
-				                                       ,[ngaytao],[nguoitao],[ngaycapnhat],[nguoicapnhat]
-				                                       ,[mota],[hoatdong])
-				                                    VALUES
-				                                       (REPLACE(NEWID(),'-',''),'{0}', '{1}', '{2}', '{3}'
-				                                       ,getdate(),'admin',getdate(),'admin','',{4})", qoId, c["ta_ngan"], c["url"], c["filter"], 0);
-                            mdbc.ExcuteNonQuery(sqlInsert);
-                            
+                            chk = new md_color_reference
+                            {
+                                md_color_reference_id = Guid.NewGuid().ToString().Replace("-", ""),
+                                c_baogia_id = bg.c_baogia_id,
+                                filter = filterMS,
+                                mau = mausac.ta_ngan,
+                                hoatdong = macdinh,
+                                mota = "",
+                                ngaycapnhat = DateTime.Now,
+                                ngaytao = DateTime.Now,
+                                nguoicapnhat = "admin",
+                                nguoitao = "admin",
+                                url = url
+                            };
+                            db.md_color_references.InsertOnSubmit(chk);
+                        }
+                        else
+                        {
+                            chk.hoatdong = chk.hoatdong == true ? true : macdinh;
+                            chk.ngaycapnhat = DateTime.Now;
+                            chk.nguoicapnhat = "admin";
+                            chk.url = url;
                         }
                     }
-                    string selFilter = string.Format("select (substring(sp.ma_sanpham, 1, 2) + '-' + substring(sp.ma_sanpham, len(sp.ma_sanpham)-1, 2)) from md_sanpham sp, c_chitietbaogia ctbg where sp.md_sanpham_id = ctbg.md_sanpham_id and ctbg.c_baogia_id = '{0}'", qoId);
-                    string updateDetault = string.Format("update md_color_reference set hoatdong = 1 where c_baogia_id = '{0}' and filter IN(" + selFilter + ")", qoId);
-                    mdbc.ExcuteNonQuery(updateDetault);
+                    db.SubmitChanges();
                 }
+
+                //        string sql = string.Format("select ma_sanpham from md_sanpham sp left join c_chitietbaogia ctbg on ctbg.md_sanpham_id = sp.md_sanpham_id where sp.md_sanpham_id = ctbg.md_sanpham_id and ctbg.c_baogia_id = '{0}'", qoId);
+                //        DataTable dtSP = mdbc.GetData(sql);
+                //        foreach (DataRow sp in dtSP.Rows)
+                //        {
+                //            string color_rf = sp[0].ToString().Substring(0, 2);
+                //            mm = color_rf;
+                //            string sqlColor = string.Format(@"select distinct
+                //	ta_ngan, url, filter, code_cl 
+                //from (
+                //	select ms.ta_ngan, tmp.url, tmp.filter, tmp.code_cl
+                //	from(
+                //		select url, substring(filter, 1, 5) as filter,  SUBSTRING(filter, 1, 2) as code_cl, SUBSTRING(filter, 4, 2) as code_mau
+                //		from md_anhsanpham where url like '%.jp%'
+                //	) as tmp, md_mausac ms
+                //	where tmp.code_cl = ms.code_cl
+                //	and tmp.code_mau = ms.code_mau
+                //) as re
+                //                        where re.code_cl = '{0}'", color_rf);
+                //            DataTable dtColor = mdbc.GetData(sqlColor);
+                //            foreach (DataRow c in dtColor.Rows)
+                //            {
+                //                string sqlFilter = string.Format("select count(filter) from md_color_reference where c_baogia_id = '{0}' and filter = '{1}'", qoId, c["filter"]);
+                //                int filterCount = (int)mdbc.ExecuteScalar(sqlFilter);
+                //                if (filterCount == 0)
+                //                {
+                //                    string filter = sp[0].ToString().Substring(0, 2) + "-" + sp[0].ToString().Substring(sp[0].ToString().LastIndexOf('-') + 1, 2);
+                //                    string sqlInsert = string.Format(@"INSERT INTO [dbo].[md_color_reference]
+                //                                   ([md_color_reference_id],[c_baogia_id],[mau],[url],[filter]
+                //                                   ,[ngaytao],[nguoitao],[ngaycapnhat],[nguoicapnhat]
+                //                                   ,[mota],[hoatdong])
+                //                                VALUES
+                //                                   (REPLACE(NEWID(),'-',''),'{0}', '{1}', '{2}', '{3}'
+                //                                   ,getdate(),'admin',getdate(),'admin','',{4})", qoId, c["ta_ngan"], c["url"], c["filter"], 0);
+                //                    mdbc.ExcuteNonQuery(sqlInsert);
+
+                //                }
+                //            }
+                //            string selFilter = string.Format("select (substring(sp.ma_sanpham, 1, 2) + '-' + substring(sp.ma_sanpham, len(sp.ma_sanpham)-1, 2)) from md_sanpham sp, c_chitietbaogia ctbg where sp.md_sanpham_id = ctbg.md_sanpham_id and ctbg.c_baogia_id = '{0}'", qoId);
+                //            string updateDetault = string.Format("update md_color_reference set hoatdong = 1 where c_baogia_id = '{0}' and filter IN(" + selFilter + ")", qoId);
+                //            mdbc.ExcuteNonQuery(updateDetault);
+                //        }
                 context.Response.Write("Tạo Color References cho Quotation thành công!");
             }
         }
-        catch (Exception ex)
+        //catch (Exception ex)
         {
-            context.Response.Write("Lỗi: " + ex.Message);
+            //context.Response.Write("Lỗi: " + ex.Message);
         }
     }
 
