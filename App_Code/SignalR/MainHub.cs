@@ -416,7 +416,10 @@ public class MainHub : Hub
                         {
                             string sizeVal = row_dt["bientau"] + ":" + spBT.l_cm + "x" + spBT.w_cm + "xH" + spBT.h_cm + "cm";
                             if (!size.Split(',').Contains(sizeVal)) {
-                                size += sizeVal + ",";
+                                size += sizeVal + ",";								
+							}
+							
+							if (!sizeSel.Split(',').Contains(sizeVal)) {
 								if(arr_sanpham.Contains(msp))
 									sizeSel += sizeVal + ",";
 							}
