@@ -267,6 +267,8 @@ public class MainHub : Hub
                         arr_sanpham += ",'" + sanpham_add + "'";
                     }
                 }
+				
+				sizeSel = arr_sanpham;
 
                 var dt = ExcuteSignalRStatic.getPrice(arr_sanpham);
                 string kichthuoc_9 = "";
@@ -419,10 +421,10 @@ public class MainHub : Hub
                                 size += sizeVal + ",";								
 							}
 							
-							if (!sizeSel.Split(',').Contains(sizeVal)) {
-								if(arr_sanpham.Contains(msp))
-									sizeSel += sizeVal + ",";
-							}
+							// if (!sizeSel.Split(',').Contains(sizeVal)) {
+								// if(arr_sanpham.Contains(msp))
+									// sizeSel += sizeVal + ",";
+							// }
                         }
                     }
 
