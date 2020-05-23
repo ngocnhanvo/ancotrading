@@ -268,7 +268,10 @@ public class MainHub : Hub
                     }
                 }
 				
-				sizeSel = arr_sanpham;
+				var arrSps = arr_sanpham.Split(',');
+				for(var i=0; i < arrSps.Length; i++) {
+					sizeSel += arrSps[i].Substring(10, 2);
+				}
 
                 var dt = ExcuteSignalRStatic.getPrice(arr_sanpham);
                 string kichthuoc_9 = "";
