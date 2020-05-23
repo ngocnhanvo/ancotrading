@@ -233,12 +233,12 @@ public class MainHub : Hub
             string unknown = "(Unknown)";
             string dong0 = unknown, dong1 = unknown, dong2 = unknown, dong3 = unknown, dong4 = unknown, dong5 = unknown, dong6 = unknown, dong7 = unknown,
             dong8 = "", dong9 = "", dong10 = unknown, dong11 = unknown, dong12 = unknown, dong13 = unknown, dong14 = "", dong15 = unknown, dong16 = unknown,
-            image = "", size = "";
+            image = "", size = "", sizeSel = "";
             string json = @"[{{ ""dong0"":""{0}"", ""dong1"":""{1}"", ""dong2"":""{2}"", ""dong3"":""{3}"", 
 			""dong4"":""{4}"", ""dong5"":""{5}"", ""dong6"":""{6}"", ""dong7"":""{7}"", ""dong8"":""{8}"", ""dong9"":""{9}"", 
 			""dong10"":""{10}"", ""dong11"":""{11}"", ""dong12"":""{12}"", ""dong13"":""{13}"", ""dong14"":""{14}"",
 			""dong15"":""{15}"", ""dong16"":""{16}"", ""image"":""{17}"", ""detai"":""{18}"", ""bientau"":""{19}"", 
-			""mausac"":""{20}"", ""size"":""{21}""}}]";
+			""mausac"":""{20}"", ""size"":""{21}"", ""sizeSel"":""{22}""}}]";
 
             var sp = db.md_sanphams.Where(s => s.ma_sanpham == ma_sanpham & s.trangthai == "DHD").FirstOrDefault();
             if (sp != null)
@@ -415,8 +415,11 @@ public class MainHub : Hub
                         if (spBT != null)
                         {
                             string sizeVal = row_dt["bientau"] + ":" + spBT.l_cm + "x" + spBT.w_cm + "xH" + spBT.h_cm + "cm";
-                            if (!size.Split(',').Contains(sizeVal))
+                            if (!size.Split(',').Contains(sizeVal)) {
                                 size += sizeVal + ",";
+								if(arr_sanpham.Contains(msp))
+									sizeSel += sizeVal + ",";
+							}
                         }
                     }
 
@@ -445,7 +448,7 @@ public class MainHub : Hub
                 }
 
                 string kq_json = string.Format(json, dong0, dong1, dong2, dong3, dong4, dong5, dong6, dong7, dong8, dong9, dong10, dong11, dong12, dong13, dong14,
-                dong15, dong16, image, detai_json, bientau_json, mausac_json, size);
+                dong15, dong16, image, detai_json, bientau_json, mausac_json, size, sizeSel);
                 response["Success"] = true;
                 response["Message"] = kq_json;
             }
