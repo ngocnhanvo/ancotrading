@@ -270,8 +270,10 @@ public class MainHub : Hub
 				
 				var arrSps = arr_sanpham.Split(',');
 				for(var i=0; i < arrSps.Length; i++) {
-					sizeSel += arrSps[i].Substring(10, 2);
+					sizeSel += arrSps[i].Substring(10, 2) + ",";
 				}
+				
+				sizeSel = sizeSel.Length > 0 ? sizeSel.Substring(0, sizeSel.Length - 1) : "";
 
                 var dt = ExcuteSignalRStatic.getPrice(arr_sanpham);
                 string kichthuoc_9 = "";
