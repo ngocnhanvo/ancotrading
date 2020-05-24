@@ -1001,6 +1001,7 @@ public class MainHub : Hub
             string nguoilienhe = parrams.nguoilienhe + "";
             string note = parrams.note + "";
             string json_data = parrams.json_data + "";
+            string preview = parrams.preview + "";
             var d = JsonConvert.DeserializeObject<List<Objects.Json_product>>(json_data);
 
             md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
@@ -1063,10 +1064,16 @@ public class MainHub : Hub
                 body += string.Format(html_span, "Kind Regards,");
                 body += "<br>";
                 body += string.Format(html_span, nguoilienhe);
-
-                mail.Send(nv.email, email.Trim(), emailcc, subject, body, "");
+                if (preview == "true")
+                {
+                    msg = body;
+                }
+                else
+                {
+                    mail.Send(nv.email, email.Trim(), emailcc, subject, body, "");
+                    msg = parrams.success;
+                }
                 response["Success"] = true;
-                msg = parrams.success;
             }
         }
         catch (Exception ex)
