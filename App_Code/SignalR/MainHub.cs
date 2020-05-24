@@ -1066,7 +1066,7 @@ public class MainHub : Hub
                 body += string.Format(html_span, nguoilienhe);
                 if (preview == "true")
                 {
-                    msg = string.Format("<b style='font-size: 120%'>{0}</b><br><br>", subject, body);
+                    msg = string.Format("<b style='font-size: 110%'>{0}</b><br><br> {1}", subject, body);
                 }
                 else
                 {
