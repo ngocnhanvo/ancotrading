@@ -1083,7 +1083,7 @@ public class MainHub : Hub
         response["Message"] = msg;
         response["data_bk"] = parrams.data_bk;
         if (preview == "true")
-            Clients.Caller.PreviewEmailComplete(response);
+            Clients.Caller.PreviewEmail(response);
         else
             Clients.Caller.QOPOexcute(response);
     }
