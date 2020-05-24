@@ -1085,7 +1085,7 @@ public class MainHub : Hub
         if (preview == "true")
             Clients.Caller.PreviewEmail(response);
         else
-            Clients.Caller.QOPOexcute(response);
+            Clients.Caller.SendEmail(response);
     }
 
     public void searchProduct(string _params)
