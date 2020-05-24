@@ -911,7 +911,7 @@ public class MainHub : Hub
             }
             else if (ten_dtkd == "" | ten_dtkd == null)
             {
-                msg = "Customer Name is not empty.";
+                msg = "Company Name is not empty.";
             }
             else if (email == "" | email == null)
             {
@@ -1066,7 +1066,7 @@ public class MainHub : Hub
                 body += string.Format(html_span, nguoilienhe);
                 if (preview == "true")
                 {
-                    msg = body;
+                    msg = string.Format("<b style='font-size: 120%'>{0}</b><br><br>", subject, body);
                 }
                 else
                 {
