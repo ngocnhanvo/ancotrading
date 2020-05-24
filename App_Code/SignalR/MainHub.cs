@@ -988,6 +988,7 @@ public class MainHub : Hub
             { "Message", "" }
         };
         string msg = "";
+        string preview = parrams.preview + "";
         try
         {
             var db = new LinqDBDataContext();
@@ -1001,7 +1002,6 @@ public class MainHub : Hub
             string nguoilienhe = parrams.nguoilienhe + "";
             string note = parrams.note + "";
             string json_data = parrams.json_data + "";
-            string preview = parrams.preview + "";
             var d = JsonConvert.DeserializeObject<List<Objects.Json_product>>(json_data);
 
             md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
@@ -1082,7 +1082,10 @@ public class MainHub : Hub
         }
         response["Message"] = msg;
         response["data_bk"] = parrams.data_bk;
-        Clients.Caller.QOPOexcute(response);
+        if (preview == "true")
+            Clients.Caller.PreviewEmailComplete(response);
+        else
+            Clients.Caller.QOPOexcute(response);
     }
 
     public void searchProduct(string _params)
