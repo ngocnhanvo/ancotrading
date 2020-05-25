@@ -580,7 +580,7 @@ public class Objects
             s1.CreateRow(4).CreateCell(0).SetCellValue("CUSTOMER NAME:");
             s1.GetRow(4).GetCell(0).CellStyle = cellBold;
 
-            s1.GetRow(4).CreateCell(1).SetCellValue(dtDetails.Rows[0]["tenKH"].ToString());
+            s1.GetRow(4).CreateCell(1).SetCellValue(customer);
             s1.GetRow(4).GetCell(1).CellStyle = cellBold;
 
 
