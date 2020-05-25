@@ -467,15 +467,15 @@ public class Objects
             string sql = string.Format(@"
                 select 
                     A.*,
-                    cast(A.sl_inner as nvarchar(32)) + ' ' + dvtinner as inner,
-                    cast(A.sl_outer as nvarchar(32)) + ' ' + dvtouter as master
+                    cast(A.sl_inner as nvarchar(32)) + ' ' + A.dvtinner as [inner],
+                    cast(A.sl_outer as nvarchar(32)) + ' ' + A.dvtouter as [master]
                 from (
                     select 
                         sp.ma_sanpham,
                         sp.mota_tienganh,
                         dg.sl_inner, 
                         (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner) as dvtinner,
-				        dg.sl_outer, 
+                        dg.sl_outer, 
                         (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer) as dvtouter,
                         dg.soluonggoi_ctn as nopack,
                         cb.ten_cangbien,
