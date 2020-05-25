@@ -482,7 +482,7 @@ public class Objects
                         substring(sp.ma_sanpham, 0, 9) as kd,
                         substring(sp.ma_sanpham, 9, 3) as dt,
                         substring(sp.ma_sanpham, 12, 3) as ms,
-                        case when  SUBSTRING(sp.ma_sanpham,10,1) != 'F' then SUBSTRING(sp.ma_sanpham, 0, 9) else SUBSTRING(sp.ma_sanpham, 0, 12) end) as pic
+                        (case when SUBSTRING(sp.ma_sanpham, 10, 1) != 'F' then SUBSTRING(sp.ma_sanpham, 0, 9) else SUBSTRING(sp.ma_sanpham, 0, 12) end) as pic
                     from md_sanpham (nolock) sp
                         left join md_donggoisanpham (nolock) dgsp on dgsp.md_sanpham_id = sp.md_sanpham_id
                         left join md_donggoi (nolock) dg on dg.md_donggoi_id = dgsp.md_donggoi_id
