@@ -1029,12 +1029,6 @@ public class MainHub : Hub
                 String fileNameXLS = nv.manv + "-Inquiry-" + DateTime.Now.ToString("mmhh-dd-MM-yyyy") + ".xls";
                 String logoPath = ExcuteSignalRStatic.mapPathSignalR("~/images/anco_logo_print.png");
                 String productImagePath = ExcuteSignalRStatic.mapPathSignalR("~/images/products/fullsize/");
-                var rptQO = new Objects.Inquiry_QRCode(db, d, logoPath, productImagePath, ten_dtkd, address, phone, "");
-
-                NPOI.HSSF.UserModel.HSSFWorkbook wb = rptQO.CreateWBQuotation();
-                wb.Write(ms);
-                File.WriteAllBytes(path + fileNameXLS, ms.ToArray());
-                ms.Close();
 
                 string html_span = "<span style=\"font-size: 11.0pt; font-family: 'Calibri','sans-serif'\">{0}</span>";
                 GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.Value);
@@ -1082,6 +1076,12 @@ public class MainHub : Hub
                 }
                 else
                 {
+                    var rptQO = new Objects.Inquiry_QRCode(db, d, logoPath, productImagePath, ten_dtkd, address, phone, "");
+                    NPOI.HSSF.UserModel.HSSFWorkbook wb = rptQO.CreateWBQuotation();
+                    wb.Write(ms);
+                    File.WriteAllBytes(path + fileNameXLS, ms.ToArray());
+                    ms.Close();
+
                     mail.Send(nv.email, email.Trim(), emailcc, subject, body, path + fileNameXLS);
                     msg = parrams.success;
                 }
