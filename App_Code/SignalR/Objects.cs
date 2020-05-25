@@ -509,8 +509,6 @@ public class Objects
 
         private HSSFWorkbook CreateHSSFWorkbook(DataTable dtDetails)
         {
-            string tenkt = dtDetails.Rows[0]["ten_kichthuoc"].ToString().ToLower();
-            string tentl = dtDetails.Rows[0]["ten_trongluong"].ToString().ToLower();
             HSSFWorkbook hssfworkbook = new HSSFWorkbook();
             ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
             System.Drawing.Image logo = System.Drawing.Image.FromFile(logoPath);
