@@ -495,7 +495,7 @@ public class Objects
                 )A
                 order by A.kd, A.ms, A.dt
             ", strSps);
-            DataTable dtDetails = mdbc.GetData("");
+            DataTable dtDetails = mdbc.GetData(sql);
             if (dtDetails.Rows.Count != 0)
             {
                 HSSFWorkbook hssfworkbook = this.CreateHSSFWorkbook(dtDetails);
