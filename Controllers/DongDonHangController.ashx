@@ -88,8 +88,8 @@ public class DongDonHangController : IHttpHandler
         string md_sanpham_id = context.Request.QueryString["md_sanpham_id"];
         var itemJS = UserUtils.get_giasanpham(context, c_donhang_id, md_sanpham_id, db);
 
-         var entries = itemJS.Select(d =>
-            string.Format("\"{0}\": [{1}]", d.Key, string.Join(",", d.Value)));
+        var entries = itemJS.Select(d =>
+           string.Format("\"{0}\": [{1}]", d.Key, string.Join(",", d.Value)));
         context.Response.Write("{" + string.Join(",", entries) + "}");
     }
 
@@ -283,17 +283,12 @@ public class DongDonHangController : IHttpHandler
                           select new { hdq.md_hanghoadocquyen_id }).Count();
 
         // kiem tra tinh hop le doi voi ma hang co 2 nha cung ung
-        bool checkncu_cb = false;
         string ncu_line = sanpham.nhacungung;
         var nhacungung = db.md_doitackinhdoanhs.FirstOrDefault(nc => nc.md_doitackinhdoanh_id.Equals(sanpham.nhacungung));
         string ncc_cangbien = "", dh_cangbien = "";
         try { ncc_cangbien = nhacungung.md_cangbien_id; } catch { }
         try { dh_cangbien = donhang.md_cangbien_id; } catch { }
-        if (ncc_cangbien == dh_cangbien)
-        {
-            checkncu_cb = true;
-        }
-        else
+        if (ncc_cangbien != dh_cangbien)
         {
             int count_donghang = (from ddh in db.c_dongdonhangs
                                   where ddh.c_donhang_id.Equals(c_donhang_id)
@@ -308,13 +303,8 @@ public class DongDonHangController : IHttpHandler
             }
 
             DataTable dbcb = mdbc.GetData(sql_cb);
-            if (dbcb.Rows.Count == 0)
+            if (dbcb.Rows.Count != 0)
             {
-                checkncu_cb = false;
-            }
-            else
-            {
-                checkncu_cb = true;
                 ncu_line = dbcb.Rows[0][0].ToString();
             }
         }
@@ -397,6 +387,16 @@ public class DongDonHangController : IHttpHandler
             mnu.ma_sanpham_khach = context.Request.Form["ma_sanpham_khach"];
             mnu.sothutu = maxLine + 10;
             mnu.giafob = gia_sp;
+            mnu.giachuan = mnu.giafob;
+            mnu.discount = 0;
+            
+            if(donhang.discount_hehang.GetValueOrDefault(false) == true)
+            {
+                var t = Public.DiscountHehangValue(donhang.discount_hehang_value, mnu, db);
+                mnu.giafob = t.giafob;
+                mnu.discount = t.discount;
+            }
+
             string phi = context.Request.Form["phi"];
             mnu.phi = decimal.Parse(string.IsNullOrEmpty(phi) ? "0" : phi);
             mnu.soluong = decimal.Parse(context.Request.Form["soluong"]);

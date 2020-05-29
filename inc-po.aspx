@@ -872,6 +872,55 @@
             ShowPBGCu();
         });
         ShowPBGCu();
+
+        let discount_hehang_val = function (result, type) {
+            let json = JSON.parse(result);
+            let table = '';
+            for (let i in json) {
+                let row = json[i];
+                table += `
+                <tr>
+                    <td style="color: blue">${row['hehang']}</td>
+                    <td style="width:20px"></td>
+                    <td><input type="number" ${type == 1 ? "disabled" : ""} value="${row['giatri']}"></td>
+                </tr>`;
+            }
+            table = `
+            <table class="tbl_discount_hehang_value" style="display: inline;">
+                ${table}
+            </table>
+            `;
+
+            $('.tbl_discount_hehang_value').remove();
+            $('#discount_hehang_value').parent().append(table);
+        };
+
+        if ($('#discount_hehang_value').parent().attr('colspan') != '2') {
+            $('#discount_hehang_value').parent().prev().remove();
+            $('#discount_hehang_value').parent().attr('colspan', '2').attr('rowspan', '10');
+        }
+        $('#discount_hehang_value').hide();
+        let c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
+        $('#discount_hehang').off('change');
+        $('#discount_hehang').change(function () {
+            let val = $('#discount_hehang_value').val();
+            if ($(this).prop('checked') == true) {
+                if (!val.replace(/ /g, '')) {
+                    $.get("Controllers/SelectOption/ApDungDisCountHeHang.ashx",
+                        { "action": "DiscountHH", "c_donhang_id": c_donhang_id },
+                        function (result) {
+                            discount_hehang_val(result);
+                        });
+                }
+                else
+                    discount_hehang_val(val, 1);
+            }
+            else {
+                $('.tbl_discount_hehang_value').remove();
+            }
+        });
+        $('#discount_hehang').prop('disabled', $('#discount_hehang').prop('checked'));
+        $('#discount_hehang').change();
     }
 </script>
 <DIV class="ui-layout-center ui-widget-content" id="lay-center-po" style="padding:0;">
@@ -899,7 +948,7 @@
 				, 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật'
                 , 'Consingnee', 'Hoạt động', 'Giá đặc biệt'
                 , 'Giá FOB phiên bản cũ', 'Phiên bản giá cũ'
-                , 'Ghi chú']"
+                , 'Ghi chú', 'Discount Hệ Hàng', 'discount_hehang_value']"
             RowNumbers="true"
             OndblClickRow = "function(rowid) { 
 				/*$(this).jqGrid('editGridRow', rowid, {
@@ -951,7 +1000,7 @@
                  , fixed:true 
                  , width: 120
                  , edittype: 'select'
-                 , editoptions: { dataUrl: 'Controllers/PartnerController.ashx?action=getoption&isncc=0' }
+                 , editoptions: { style: 'max-width:160px', dataUrl: 'Controllers/PartnerController.ashx?action=getoption&isncc=0' }
                  , formoptions: { label:'Khách Hàng ' + ip_fd(), colpos: 1, rowpos: 4 }
                  , search: true
                  , stype: 'select'
@@ -981,7 +1030,7 @@
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'select'
-                 , editoptions: { dataUrl: 'Controllers/QuotationController.ashx?action=getSelectOption_cb' }
+                 , editoptions: { style: 'max-width:160px', dataUrl: 'Controllers/QuotationController.ashx?action=getSelectOption_cb' }
                  , formoptions: { label:'Cảng Biển ' + ip_fd(), colpos: 1, rowpos: 6 }
             },
 			{
@@ -1053,7 +1102,7 @@
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'select'
-                 , editoptions: { dataUrl: 'Controllers/PaymentTermController.ashx?action=getoption' }
+                 , editoptions: { style: 'max-width:160px', dataUrl: 'Controllers/PaymentTermController.ashx?action=getoption' }
                  , formoptions: { label:'Paymentterm ' + ip_fd(), colpos: 1, rowpos: 11 }
             },
             {
@@ -1461,6 +1510,29 @@
                 , edittype: 'textarea'
                 , hidden: false 
                 , editrules:{ edithidden : true }
+            },
+            {
+                fixed: true, name: 'discount_hehang'
+                , hidden: true
+                , editrules:{
+                    edithidden:true
+                }
+                , editable: true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions: { value:'True:False', defaultValue: 'False' }
+                , formatter: 'checkbox'
+                , formoptions: { colpos: 2, rowpos: 11 }
+            },
+            {
+                fixed: true, name: 'discount_hehang_value'
+                , hidden: true
+                , editrules:{
+                    edithidden:true
+                }
+                , editable: true
+                , align: 'center'
+                , formoptions: { colpos: 2, rowpos: 12 }
             }
             ]"
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
@@ -1526,6 +1598,7 @@
                     ShowPBGCu_grid_ds_po(frmID);
                     disableSelOption('#md_cangbien_id', frmID, false);
                     disableSelOption('#phienbangiacu', frmID, false);
+                    $('#discount_hehang').prop('disabled', true);
                 }
                 , errorTextFormat:function(data) { 
                     return 'Lỗi: ' + data.responseText 
@@ -1533,11 +1606,11 @@
                 , afterShowForm: createOnchange
                 "
             EditFormOptions ="
-		        width: 700
-                , afterSubmit: function(rs, postdata){
+		        width: 700, 
+                afterSubmit: function(rs, postdata){
                     return showMsgDialog(rs);
-                }
-                , beforeShowForm: function (formid) {
+                }, 
+                beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter();
 					var frmID = '#' + formid.attr('id');
                     $('#gia_db', frmID).prop('disabled', true);
@@ -1546,8 +1619,18 @@
                     ShowPBGCu_grid_ds_po(frmID);
                     disableSelOption('#md_cangbien_id', frmID, true);
                     disableSelOption('#phienbangiacu', frmID, true);
-                }
-                , errorTextFormat:function(data) { 
+                }, 
+                beforeSubmit:function(postdata, formid) {
+                    let json = [];
+                    $('.tbl_discount_hehang_value tr').each(function(){
+                        let td0 = $(this).find('td:eq(0)').text();
+                        let td2 = $(this).find('td:eq(2)').children('input').val();
+                        json.push({ 'hehang': td0, 'giatri': td2 });
+                    });
+                    postdata.discount_hehang_value = JSON.stringify(json);
+                    return [true,''];
+                }, 
+                errorTextFormat:function(data) { 
                     return 'Lỗi: ' + data.responseText 
                 }
                 , afterShowForm: createOnchange

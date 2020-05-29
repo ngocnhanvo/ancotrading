@@ -85,7 +85,8 @@ public class DonHangController : IHttpHandler
 
     public void CopyDonHang(HttpContext context)
     {
-        try{
+        try
+        {
             string msg = "";
             string id = context.Request.QueryString["poId"];
             c_donhang dh = db.c_donhangs.Where(p => p.c_donhang_id.Equals(id)).FirstOrDefault();
@@ -94,14 +95,16 @@ public class DonHangController : IHttpHandler
             string sqlCount = @"select count(b.trangthai) as count from c_dongdonhang a left join md_sanpham b on a.md_sanpham_id = b.md_sanpham_id where a.c_donhang_id  = '" + id + @"' and b.trangthai != 'DHD'";
 
             int count = (int)mdbc.ExecuteScalar(sqlCount);
-            if(dh == null) {
+            if (dh == null)
+            {
                 msg = "<div style='color:red'>Lỗi: Không tìm thấy PO đã chọn.</div>";
             }
-            else if(count > 0)
+            else if (count > 0)
             {
                 msg = "<div style='color:red'>Lỗi: PO có chứa mã hàng không hoạt động.</div>";
             }
-            else {
+            else
+            {
                 string id_new = ImportUtils.getNEWID();
                 c_donhang dh_new = Clone(dh);
                 dh_new.c_donhang_id = id_new;
@@ -116,7 +119,7 @@ public class DonHangController : IHttpHandler
                 dh_new.ngaycapnhat = DateTime.Now;
                 dh_new.nguoicapnhat = UserUtils.getUser(context);
 
-                foreach(c_dongdonhang ddh in db.c_dongdonhangs.Where(s=>s.c_donhang_id == dh.c_donhang_id))
+                foreach (c_dongdonhang ddh in db.c_dongdonhangs.Where(s => s.c_donhang_id == dh.c_donhang_id))
                 {
                     c_dongdonhang ddh_new = Clone(ddh);
                     ddh_new.c_dongdonhang_id = ImportUtils.getNEWID();
@@ -132,7 +135,7 @@ public class DonHangController : IHttpHandler
                     db.c_dongdonhangs.InsertOnSubmit(ddh_new);
                 }
 
-                foreach(c_phidonhang pdh in db.c_phidonhangs.Where(s=>s.c_donhang_id == dh.c_donhang_id))
+                foreach (c_phidonhang pdh in db.c_phidonhangs.Where(s => s.c_donhang_id == dh.c_donhang_id))
                 {
                     c_phidonhang pdh_new = Clone(pdh);
                     pdh_new.c_phidonhang_id = ImportUtils.getNEWID();
@@ -147,7 +150,7 @@ public class DonHangController : IHttpHandler
 
                 db.c_donhangs.InsertOnSubmit(dh_new);
                 db.SubmitChanges();
-                msg = "<div style='color:blue'>Tạo mới PO \""+ sochungtu +"\" thành công.</div>";
+                msg = "<div style='color:blue'>Tạo mới PO \"" + sochungtu + "\" thành công.</div>";
             }
             context.Response.Write(msg);
         }
@@ -237,7 +240,8 @@ public class DonHangController : IHttpHandler
                             {
                                 lstKHXHXoa.Add(khxh);
                             }
-                            else if(khxh.md_trangthai_id.Equals("HIEULUC")) {
+                            else if (khxh.md_trangthai_id.Equals("HIEULUC"))
+                            {
                                 khxh.md_trangthai_id = "KETTHUC";
                             }
                         }
@@ -297,8 +301,10 @@ public class DonHangController : IHttpHandler
         }
     }
 
-    public void getDocument(HttpContext context){
-        try {
+    public void getDocument(HttpContext context)
+    {
+        try
+        {
             string doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
             string dh_mau = context.Request.Form["isdonhangmau"].ToLower();
             string ngaydonhang = context.Request.Form["ngaydonhang"];
@@ -310,9 +316,11 @@ public class DonHangController : IHttpHandler
             { isdh_mau = 1; }
 
             string sct = jqGridHelper.Utils.taoChungTuPO(doitackinhdoanh_id, isdh_mau, ngaydh.Year.ToString());
-            context.Response.Write("<root><value>"+sct+"</value></root>");
-        }catch (Exception e){
-            context.Response.Write("<root><value>"+e.Message+"</value></root>");
+            context.Response.Write("<root><value>" + sct + "</value></root>");
+        }
+        catch (Exception e)
+        {
+            context.Response.Write("<root><value>" + e.Message + "</value></root>");
         }
     }
 
@@ -372,7 +380,7 @@ public class DonHangController : IHttpHandler
     public void viewCapacity(HttpContext context)
     {
         String poId = context.Request.QueryString["poId"];
-        var donhang = db.c_donhangs.FirstOrDefault(dh=>dh.c_donhang_id.Equals(poId));
+        var donhang = db.c_donhangs.FirstOrDefault(dh => dh.c_donhang_id.Equals(poId));
         String result = "";
         if (donhang.isdonhangtmp.Equals(true))
         {
@@ -458,7 +466,8 @@ public class DonHangController : IHttpHandler
                     {
                         result = "<div style=\"padding:15px; border:1px solid red; background:#ffadad;\"><h3>Năng lực nhà cung ứng không đáp ứng được đơn hàng này.!</h3>Năng lực Cung Ứng: " + slCanDat + ", CBM Đơn Hàng: " + slTongCanDat + "</div>" + result;
                     }
-                    else {
+                    else
+                    {
                         if (check == 0 && slCanDat >= slTongCanDat)
                         {
                             result = "<div style=\"padding:15px; border:1px sold green; background:#b9fdbf;\"><h3>Năng lực nhà cung ứng đáp ứng được đơn hàng này.!</h3>Năng lực Cung Ứng: " + slCanDat + ", CBM Đơn Hàng: " + slTongCanDat + "</div>" + result;
@@ -470,7 +479,7 @@ public class DonHangController : IHttpHandler
 
                             if (slCanDat >= sl_chk_lai_TongCanDat)
                             {
-                                result = "<div style=\"padding:15px; border:1px solid green; background:#b9fdbf;\"><h3>Năng lực nhà cung ứng đáp ứng được đơn hàng này.!</h3>" + ( slCanDat >= slTongCanDat) + "</div>" + result;
+                                result = "<div style=\"padding:15px; border:1px solid green; background:#b9fdbf;\"><h3>Năng lực nhà cung ứng đáp ứng được đơn hàng này.!</h3>" + (slCanDat >= slTongCanDat) + "</div>" + result;
                             }
                             else
                             {
@@ -532,7 +541,7 @@ public class DonHangController : IHttpHandler
                 }
                 else
                 {
-                    String getTongSoLuongConLai= "select count(*) from c_dongdonhang where soluong_conlai < 1 AND c_donhang_id = @c_donhang_id";
+                    String getTongSoLuongConLai = "select count(*) from c_dongdonhang where soluong_conlai < 1 AND c_donhang_id = @c_donhang_id";
                     int sum = (int)mdbc.ExecuteScalar(getTongSoLuongConLai, "@c_donhang_id", donhang.c_donhang_id);
                     if (sum == 0)
                     {
@@ -584,7 +593,7 @@ public class DonHangController : IHttpHandler
                         break;
                     case "SOANTHAO":
 
-                        if(donhang.cont20 <= 0 & donhang.cont40 <= 0 & donhang.cont40hc <= 0 & donhang.cont45 <= 0 & donhang.contle <= 0)
+                        if (donhang.cont20 <= 0 & donhang.cont40 <= 0 & donhang.cont40hc <= 0 & donhang.cont45 <= 0 & donhang.contle <= 0)
                         {
                             result += "Hiệu lực đơn hàng thất bại! Phải có ít nhất 1 cont lớn hơn 0. <br/>";
                         }
@@ -592,7 +601,8 @@ public class DonHangController : IHttpHandler
                         {
                             result += "Ngày lập PO không thể lớn hơn shipmenttime hoặc shipmentdate! <br/>";
                         }
-                        else if(donhang.shipmentdate <= donhang.shipmenttime){
+                        else if (donhang.shipmentdate <= donhang.shipmenttime)
+                        {
                             result += "Ngày Shipmentdate phải lớn hơn ngày Shipmenttime! <br/>";
                         }
                         else if (donhang.isdonhangtmp.Equals(true) | donhang.donhang_mau.Equals(true))
@@ -721,7 +731,8 @@ public class DonHangController : IHttpHandler
             decimal mnu_contle = 0;
             try { mnu_contle = decimal.Parse(context.Request.Form["contle"]); } catch { }
 
-            if(chkPBGCu_str != null) {
+            if (chkPBGCu_str != null)
+            {
                 chkPBGCu_str = chkPBGCu_str.ToLower();
                 if (chkPBGCu_str.Equals("on") || chkPBGCu_str.Equals("true"))
                 { chkPBGCu = true; }
@@ -740,11 +751,12 @@ public class DonHangController : IHttpHandler
             {
                 dagui_mail = "true";
             }
-            else {
+            else
+            {
                 dagui_mail = "false";
             }
 
-            int countsct = (from dh in db.c_donhangs where dh.sochungtu.Equals(context.Request.Form["sochungtu"]) select new { dh.sochungtu}).Count();
+            int countsct = (from dh in db.c_donhangs where dh.sochungtu.Equals(context.Request.Form["sochungtu"]) select new { dh.sochungtu }).Count();
             if (countsct > 0)
             {
                 jqGridHelper.Utils.writeResult(0, "Số chứng từ đã tồn tại.");
@@ -753,7 +765,8 @@ public class DonHangController : IHttpHandler
             {
                 jqGridHelper.Utils.writeResult(0, "Tạo đơn hàng thất bại! chỉ được chọn hoặc đơn hàng tmp hoặt đơn hàng mẫu.");
             }
-            else if(mnu_cont20 <= 0 & mnu_cont40 <= 0 & mnu_cont40hc <= 0 & mnu_cont45 <= 0 & mnu_contle <= 0) {
+            else if (mnu_cont20 <= 0 & mnu_cont40 <= 0 & mnu_cont40hc <= 0 & mnu_cont45 <= 0 & mnu_contle <= 0)
+            {
                 jqGridHelper.Utils.writeResult(0, "Tạo đơn hàng thất bại! Phải có ít nhất 1 cont lớn hơn 0.");
             }
             else
@@ -815,45 +828,52 @@ public class DonHangController : IHttpHandler
                     mnu.nguoicapnhat = UserUtils.getUser(context);
 
                     md_doitackinhdoanh doitac = db.md_doitackinhdoanhs.FirstOrDefault(p => p.md_doitackinhdoanh_id.Equals(mnu.md_doitackinhdoanh_id));
-                    md_banggia bga = db.md_banggias.Where(s => s.ten_banggia.Contains(doitac.ma_dtkd+"-FOB")).FirstOrDefault();
-                    if(bga == null & isgiadb == true)
+                    md_banggia bga = db.md_banggias.Where(s => s.ten_banggia.Contains(doitac.ma_dtkd + "-FOB")).FirstOrDefault();
+                    if (bga == null & isgiadb == true)
                     {
-                        msg =  "Khách hàng " + doitac.ma_dtkd + " không có bảng giá đặc biệt";
+                        msg = "Khách hàng " + doitac.ma_dtkd + " không có bảng giá đặc biệt";
                         check++;
                     }
-                    else if(mnu.ngaylap >= mnu.shipmentdate || mnu.ngaylap >= mnu.shipmenttime){
+                    else if (mnu.ngaylap >= mnu.shipmentdate || mnu.ngaylap >= mnu.shipmenttime)
+                    {
                         check++;
                         msg = "Ngày lập PO không được phép lớn hơn shipmenttime hoặc shipmentdate!";
                     }
-                    else if(mnu.shipmentdate <= mnu.shipmenttime){
+                    else if (mnu.shipmentdate <= mnu.shipmenttime)
+                    {
                         check++;
                         msg = "Ngày Shipmentdate phải lớn hơn Shipmenttime!";
                     }
-                    else if(dtkd.ma_dtkd == "")
+                    else if (dtkd.ma_dtkd == "")
                     {
                         msg = "Khách Hàng không được để trống!";
                         check++;
                     }
                     else if (chkPBGCu == true & String.IsNullOrEmpty(phienbangiacu))
                     {
-                        msg =  "\"Phiên bảng giá cũ\" không thể bỏ trống.";
+                        msg = "\"Phiên bảng giá cũ\" không thể bỏ trống.";
                         check++;
                     }
 
-                    if(check ==0){
+                    if (check == 0)
+                    {
                         db.c_donhangs.InsertOnSubmit(mnu);
                         db.SubmitChanges();
                         jqGridHelper.Utils.writeResult(1, "Thêm mới thành công!");
-                    }else{
+                    }
+                    else
+                    {
                         jqGridHelper.Utils.writeResult(0, msg);
                     }
                 }
-                else{
+                else
+                {
                     jqGridHelper.Utils.writeResult(0, "Hãy chọn một cảng biển!");
                 }
             }
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             jqGridHelper.Utils.writeResult(0, ex.Message);
         }
     }
@@ -910,12 +930,16 @@ public class DonHangController : IHttpHandler
                 m.ghichu = context.Request.Form["ghichu"];
                 db.SubmitChanges();
             }
-            else if(mnu_cont20 <= 0 & mnu_cont40 <= 0 & mnu_cont40hc <= 0 & mnu_cont45 <= 0 & mnu_contle <= 0) {
+            else if (mnu_cont20 <= 0 & mnu_cont40 <= 0 & mnu_cont40hc <= 0 & mnu_cont45 <= 0 & mnu_contle <= 0)
+            {
                 jqGridHelper.Utils.writeResult(0, "Tạo đơn hàng thất bại! Phải có ít nhất 1 cont lớn hơn 0.");
             }
-            else{
+            else
+            {
                 if (cb != null)
                 {
+                    m.discount_hehang = context.Request.Form["discount_hehang"] == "True";
+                    m.discount_hehang_value = context.Request.Form["discount_hehang_value"];
                     m.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
                     m.sochungtu = context.Request.Form["sochungtu"];
                     m.ngaylap = DateTime.ParseExact(context.Request.Form["ngaylap"], "dd/MM/yyyy", null);
@@ -952,7 +976,7 @@ public class DonHangController : IHttpHandler
                         m.ngaydieuchinh = DateTime.ParseExact(context.Request.Form["ngaydieuchinh"], "dd/MM/yyyy", null);
                     }
 
-                    int countsct = (from dh in db.c_donhangs where dh.sochungtu.Equals(context.Request.Form["sochungtu"]) && !dh.c_donhang_id.Equals(m.c_donhang_id) select new { dh.sochungtu}).Count();
+                    int countsct = (from dh in db.c_donhangs where dh.sochungtu.Equals(context.Request.Form["sochungtu"]) && !dh.c_donhang_id.Equals(m.c_donhang_id) select new { dh.sochungtu }).Count();
 
                     m.mota = context.Request.Form["mota"];
                     m.hoatdong = true;
@@ -971,12 +995,13 @@ public class DonHangController : IHttpHandler
                         check++;
                     }
 
-                    if(m.shipmentdate <= m.shipmenttime){
+                    if (m.shipmentdate <= m.shipmenttime)
+                    {
                         msg = "Ngày Shipmentdate phải lớn hơn ngày Shipmenttime!";
                         check++;
                     }
 
-                    if(dtkd.ma_dtkd == "")
+                    if (dtkd.ma_dtkd == "")
                     {
                         msg = "Khách Hàng không được để trống!";
                         check++;
@@ -991,18 +1016,35 @@ public class DonHangController : IHttpHandler
                     if (check == 0)
                     {
                         db.SubmitChanges();
+
+                        if (m.discount_hehang.GetValueOrDefault(false) == true)
+                        {
+                            foreach (var cdh in db.c_dongdonhangs.Where(s => s.c_donhang_id == m.c_donhang_id).ToList())
+                            {
+
+                                var t = Public.DiscountHehangValue(m.discount_hehang_value, cdh, db);
+                                cdh.giafob = t.giafob;
+                                cdh.discount = t.discount;
+                            }
+                        }
+
+                        db.SubmitChanges();
                         jqGridHelper.Utils.writeResult(1, "Cập nhật thành công!");
                     }
-                    else {
+                    else
+                    {
                         jqGridHelper.Utils.writeResult(0, msg);
                     }
-                }else
+                }
+                else
                 {
                     jqGridHelper.Utils.writeResult(0, "Hãy chọn một cảng biển!");
                 }
             }
-        }catch(Exception ex){
-            jqGridHelper.Utils.writeResult(0, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            jqGridHelper.Utils.writeResult(0, ex + "");
         }
     }
 
@@ -1166,6 +1208,8 @@ public class DonHangController : IHttpHandler
             dh.chkPBGCu,
             dh.phienbangiacu,
             dh.ghichu,
+            dh.discount_hehang,
+            dh.discount_hehang_value,
             ROW_NUMBER() OVER (ORDER BY {2} {3}) as RowNum 
             FROM c_donhang dh with (nolock)
 			left join md_doitackinhdoanh dtkd with (nolock) on dh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
@@ -1208,7 +1252,7 @@ public class DonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaylap"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoilap"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["shipmentdate"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + ((!row["ngaydieuchinh"].ToString().Equals("")) ?DateTime.Parse(row["ngaydieuchinh"].ToString()).ToString("dd/MM/yyyy"): "") + "]]></cell>";
+            xml += "<cell><![CDATA[" + ((!row["ngaydieuchinh"].ToString().Equals("")) ? DateTime.Parse(row["ngaydieuchinh"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["donhang_mau"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["isdonhangtmp"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_trongluong"] + "]]></cell>";
@@ -1234,6 +1278,8 @@ public class DonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["chkPBGCu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phienbangiacu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["discount_hehang"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["discount_hehang_value"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";
@@ -1241,7 +1287,8 @@ public class DonHangController : IHttpHandler
     }
     #endregion
 
-    public void get_dsncc(HttpContext context) {
+    public void get_dsncc(HttpContext context)
+    {
         string json = "[";
         string c_donhang_id = context.Request.QueryString["c_donhang_id"];
         var dtkds = from a in db.c_dongdonhangs
@@ -1249,11 +1296,12 @@ public class DonHangController : IHttpHandler
                     where a.c_donhang_id == c_donhang_id
                     select new { b.md_doitackinhdoanh_id, b.ma_dtkd };
 
-        foreach(var row in dtkds.Distinct().OrderBy(s=>s.ma_dtkd))
+        foreach (var row in dtkds.Distinct().OrderBy(s => s.ma_dtkd))
         {
             json += string.Format(@"{{""id"":""{0}"", ""ma_dtkd"":""{1}"", ""tien"":""{2}""}},", row.md_doitackinhdoanh_id, row.ma_dtkd, 0);
         }
-        if(json != "[") {
+        if (json != "[")
+        {
             json = json.Substring(0, json.Length - 1);
         }
         json += "]";
