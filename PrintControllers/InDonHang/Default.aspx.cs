@@ -587,6 +587,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         double discount = 0, discount1 = 0, startRowHH = -1;
         var lstHH = new List<int>();
         var lstAmountHH = new List<string>();
+        var lstCBMHH = new List<string>();
         // create detail row
         for (int i = 0; i < dt.Rows.Count; i++)
         {
@@ -718,6 +719,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     rowHeHang.CreateCell(12).CellFormula = string.Format("{0}*L{1}/100", fmlSum, row + 1);
                     rowHeHang.GetCell(12).CellStyle = rightBold;
                     lstAmountHH.Add(fmlSum);
+                    lstCBMHH.Add(string.Format(@"SUM(L{0}:L{1})", startRowHH + 1, row));
 
                     row++;
                     count_row++;
@@ -765,10 +767,18 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 sumAmount += string.Format("{0}+", i);
             }
             sumAmount += "0";
+
+            string sumCBM = "";
+            foreach (var i in lstCBMHH)
+            {
+                sumCBM += string.Format("{0}+", i);
+            }
+            sumCBM += "0";
+
             s1.GetRow(row).CreateCell(7).CellFormula = String.Format("SUM(H{0}:H{1})", m, row - 2);
             s1.GetRow(row).CreateCell(8).CellFormula = String.Format("SUM(I{0}:I{1})", m, row - 2);
-            s1.GetRow(row).CreateCell(11).CellFormula = String.Format("SUM(L{0}:L{1})", m, row - 2);
-            s1.GetRow(row).CreateCell(12).CellFormula = String.Format("{0} - M{1}", sumAmount, row);
+            s1.GetRow(row).CreateCell(11).CellFormula = sumCBM;
+            s1.GetRow(row).CreateCell(12).CellFormula = string.Format("{0} - M{1}", sumAmount, row);
         }
         else
         {
