@@ -56,7 +56,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         giam = pGiam == null ? 0 : pGiam.Value;
 
         double totalVNN = double.Parse(mdbc.ExecuteScalar(@"select sum(soluong * (isnull(giachuan, giafob) - isnull(phi, 0) - isnull(giachuan, giafob) * isnull(discount, 0) / 100)) from c_dongdonhang where c_donhang_id = @c_donhang_id", "@c_donhang_id", c_donhang_id) + "");
-        decimal total = decimal.Round((decimal)(totalVNN - totalVNN * (double)dh.discount.GetValueOrDefault(0) / 100), 2);
+        decimal total = decimal.Parse(totalVNN.ToString());
         total = total + tang - giam;
 
         String totalWord = MoneyToWord.ConvertMoneyToText(total.ToString());
