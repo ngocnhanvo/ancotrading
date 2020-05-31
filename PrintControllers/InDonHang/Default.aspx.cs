@@ -568,6 +568,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //
         double discount = 0, discount1 = 0, startRowHH = -1;
         var lstHH = new List<int>();
+        var lstAmountHH = new List<string>();
         // create detail row
         for (int i = 0; i < dt.Rows.Count; i++)
         {
@@ -695,9 +696,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     rowHeHang.CreateCell(11).SetCellValue(double.Parse(gthh));
                     rowHeHang.GetCell(11).CellStyle = rightBold;
 
-                    rowHeHang.CreateCell(12).CellFormula = string.Format("SUM(M{0}:M{1})*L{2}/100", startRowHH + 1, row, row + 1);
+                    string fmlSum = string.Format(@"SUM(M{0}:M{1})", startRowHH + 1, row);
+                    rowHeHang.CreateCell(12).CellFormula = string.Format("{0}*L{1}/100", fmlSum, row + 1);
                     rowHeHang.GetCell(12).CellStyle = rightBold;
-                    
+                    lstAmountHH.Add(fmlSum);
+
                     row++;
                     count_row++;
                     startRowHH = row;
@@ -737,7 +740,14 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             count_row++;
             sub++;
             s1.CreateRow(row).CreateCell(4).SetCellValue("Sub Total:");
-            s1.GetRow(row).CreateCell(7).CellFormula = String.Format("SUM(H{0}:H{1})", m, row - 2);
+
+            string sumAmount = "";
+            foreach (var i in lstAmountHH)
+            {
+                sumAmount += string.Format("{0}+", i);
+            }
+            sumAmount += "0";
+            s1.GetRow(row).CreateCell(7).CellFormula = sumAmount;
             s1.GetRow(row).CreateCell(8).CellFormula = String.Format("SUM(I{0}:I{1})", m, row - 2);
             s1.GetRow(row).CreateCell(11).CellFormula = String.Format("SUM(L{0}:L{1})", m, row - 2);
             s1.GetRow(row).CreateCell(12).CellFormula = String.Format("SUM(M{0}:M{1}) - M{2}", m, row - 2, row);
