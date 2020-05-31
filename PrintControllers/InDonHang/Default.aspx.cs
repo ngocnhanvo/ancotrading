@@ -55,8 +55,26 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         tang = pTang == null ? 0 : pTang.Value;
         giam = pGiam == null ? 0 : pGiam.Value;
 
-        double totalVNN = double.Parse(mdbc.ExecuteScalar(@"select sum(soluong * (isnull(giachuan, giafob) - isnull(phi, 0) - isnull(giachuan, giafob) * isnull(discount, 0) / 100)) from c_dongdonhang where c_donhang_id = @c_donhang_id", "@c_donhang_id", c_donhang_id) + "");
-        decimal total = decimal.Parse(totalVNN.ToString());
+        decimal total = decimal.Parse(
+            mdbc.ExecuteScalar(@"
+                select 
+                    cast(A.amount - (A.amount * @discount / 100) as decimal(18, 2))
+                from (
+                    select 
+                        sum(soluong * (isnull(giachuan, giafob) - isnull(phi, 0) - isnull(giachuan, giafob) * isnull(discount, 0) / 100)) as amount 
+                    from 
+                        c_dongdonhang 
+                    where 
+                        c_donhang_id = @c_donhang_id
+                )A
+                "
+                , "@c_donhang_id"
+                , c_donhang_id
+                , "@discount"
+                , dh.discount.GetValueOrDefault(0)
+            ) + ""
+        );
+
         total = total + tang - giam;
 
         String totalWord = MoneyToWord.ConvertMoneyToText(total.ToString());
@@ -257,7 +275,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 			where B.c_donhang_id = N'{0}' 
             order by B.ma_sanpham asc"
             , c_donhang_id == null ? "" : c_donhang_id
-            , totalWord
+            , total.ToString()
             , pTang
             , pGiam
             , diengiaicong
