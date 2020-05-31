@@ -387,14 +387,12 @@ public class DongDonHangController : IHttpHandler
             mnu.ma_sanpham_khach = context.Request.Form["ma_sanpham_khach"];
             mnu.sothutu = maxLine + 10;
             mnu.giafob = gia_sp;
-            mnu.giachuan = mnu.giafob;
+            mnu.giachuan = null;
             mnu.discount = 0;
-            
+
             if(donhang.discount_hehang.GetValueOrDefault(false) == true)
             {
-                var t = Public.DiscountHehangValue(donhang.discount_hehang_value, mnu, db);
-                mnu.giafob = t.giafob;
-                mnu.discount = t.discount;
+                mnu = Public.DiscountHehangValue(donhang.discount_hehang_value, mnu, db);
             }
 
             string phi = context.Request.Form["phi"];

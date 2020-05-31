@@ -61,7 +61,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     cast(A.amount - (A.amount * @discount / 100) as decimal(18, 2))
                 from (
                     select 
-                        sum(soluong * (isnull(giachuan, giafob) - isnull(phi, 0) - isnull(giachuan, giafob) * isnull(discount, 0) / 100)) as amount 
+                        sum(soluong * (isnull(giachuan, giafob) + isnull(phi, 0) - isnull(giachuan, giafob) * isnull(discount, 0) / 100)) as amount 
                     from 
                         c_dongdonhang 
                     where 
