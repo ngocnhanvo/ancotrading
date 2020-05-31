@@ -275,7 +275,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 			where B.c_donhang_id = N'{0}' 
             order by B.ma_sanpham asc"
             , c_donhang_id == null ? "" : c_donhang_id
-            , total.ToString()
+            , totalWord
             , pTang
             , pGiam
             , diengiaicong
