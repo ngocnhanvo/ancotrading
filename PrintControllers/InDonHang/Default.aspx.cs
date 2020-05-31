@@ -750,7 +750,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             s1.GetRow(row).CreateCell(7).CellFormula = String.Format("SUM(H{0}:H{1})", m, row - 2);
             s1.GetRow(row).CreateCell(8).CellFormula = String.Format("SUM(I{0}:I{1})", m, row - 2);
             s1.GetRow(row).CreateCell(11).CellFormula = String.Format("SUM(L{0}:L{1})", m, row - 2);
-            s1.GetRow(row).CreateCell(12).CellFormula = String.Format("{0} - M{1}", sumAmount, row - 2);
+            s1.GetRow(row).CreateCell(12).CellFormula = String.Format("{0} - M{1}", sumAmount, row);
         }
         else
         {
