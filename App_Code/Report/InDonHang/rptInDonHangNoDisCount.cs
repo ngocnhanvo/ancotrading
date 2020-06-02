@@ -281,7 +281,7 @@ public class rptInDonHangNoDisCount : DevExpress.XtraReports.UI.XtraReport
         xrSummary1.Func = DevExpress.XtraReports.UI.SummaryFunc.RecordNumber;
         xrSummary1.Running = DevExpress.XtraReports.UI.SummaryRunning.Report;
         this.xrTableCell4.Summary = xrSummary1;
-        this.xrTableCell4.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
+        this.xrTableCell4.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
         this.xrTableCell4.Weight = 0.12767027633541475D;
         // 
         // xrTableCell5
