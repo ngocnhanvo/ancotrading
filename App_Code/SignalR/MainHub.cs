@@ -462,9 +462,10 @@ public class MainHub : Hub
                 response["Message"] = kq_json;
             }
         }
-        catch
+        catch(Exception ex)
         {
-
+            response["Success"] = false;
+            response["Message"] = ex + "";
         }
         Clients.Caller.ProductInfo(response);
     }
