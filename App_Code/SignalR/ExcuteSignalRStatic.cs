@@ -170,28 +170,25 @@ public static class ExcuteSignalRStatic
     {
         string packingText = "1", sizeText = "2";
 
-        if (inner.LastIndexOf("bun") > -1)
+        if (inner.LastIndexOf("/bun") > -1 | outer.LastIndexOf("/bun") > -1)
         {
             packingText = "Packing in bundle";
             sizeText = "Pallet size";
         }
-        else if (inner.LastIndexOf("ctn") > -1)
+        else if (inner.LastIndexOf("/ctn") > -1 | outer.LastIndexOf("/ctn") > -1)
         {
             packingText = "Packing in carton";
             sizeText = "Carton size";
         }
-        else if (inner.LastIndexOf("Crate") > -1)
+        else if (inner.LastIndexOf("/Crate") > -1 | outer.LastIndexOf("/Crate") > -1)
         {
             packingText = "Packing in wooden crate";
             sizeText = "Crate size";
         }
 
-        inner = inner.Replace("/bun", "/bundle").Replace("/ctn", "/carton");
-        outer = outer.Replace("/pal", "/pallet").Replace("/ctn", "/carton");
-
-        packingText = inner;
-        sizeText = inner.LastIndexOf("ctn") + "";
-
+        inner = inner.Replace("/bun", "/bundle").Replace("/pal", "/pallet").Replace("/ctn", "/carton");
+        outer = outer.Replace("/bun", "/bundle").Replace("/pal", "/pallet").Replace("/ctn", "/carton");
+        
         if (slinner != "0" & inner != "0" & slinner != "" & inner != "")
             inner = slinner + " " + inner;
         else

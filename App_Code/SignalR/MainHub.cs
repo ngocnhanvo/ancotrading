@@ -334,8 +334,8 @@ public class MainHub : Hub
                     var dDVT = ExcuteSignalRStatic.getTextFromInner(dvt_inner, dvt_outer, sl_inner, sl_outer);
                     dong10 = dDVT.inner;
                     dong11 = dDVT.outer;
-                    packingText = dvt_inner;
-                    sizeText = dong10;
+                    packingText = dDVT.packingText;
+                    sizeText = dDVT.sizeText;
 
                     dong12 = "L" + row["l2_mix"] + "xW" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
                     dong13 = row["v2"].ToString();
