@@ -168,19 +168,19 @@ public static class ExcuteSignalRStatic
 
     public static dynamic getTextFromInner(string inner, string outer, string slinner, string slouter)
     {
-        string packingText = "", sizeText = "";
+        string packingText = "1", sizeText = "2";
 
-        if (inner.LastIndexOf("/bun") > -1)
+        if (inner.LastIndexOf("bun") > -1)
         {
             packingText = "Packing in bundle";
             sizeText = "Pallet size";
         }
-        else if(inner.LastIndexOf("/ctn") > -1)
+        else if(inner.LastIndexOf("ctn") > -1)
         {
             packingText = "Packing in carton";
             sizeText = "Carton size";
         }
-        else if (inner.LastIndexOf("/Crate") > -1)
+        else if (inner.LastIndexOf("Crate") > -1)
         {
             packingText = "Packing in wooden crate";
             sizeText = "Crate size";
