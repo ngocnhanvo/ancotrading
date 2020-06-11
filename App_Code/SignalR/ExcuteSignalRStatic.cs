@@ -187,8 +187,8 @@ public static class ExcuteSignalRStatic
         }
         else
         {
-            packingText = "3";
-            sizeText = "4";
+            packingText = inner;
+            sizeText = inner.LastIndexOf("ctn") + "";
         }
 
         inner = inner.Replace("/bun", "/bundle").Replace("/ctn", "/carton");
