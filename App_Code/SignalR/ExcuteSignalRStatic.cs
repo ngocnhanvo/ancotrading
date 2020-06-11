@@ -170,17 +170,17 @@ public static class ExcuteSignalRStatic
     {
         string packingText = "", sizeText = "";
 
-        if (inner.Contains("/bun"))
+        if (inner.LastIndexOf("/bun") > -1)
         {
             packingText = "Packing in bundle";
             sizeText = "Pallet size";
         }
-        else if(inner.Contains("/ctn"))
+        else if(inner.LastIndexOf("/ctn") > -1)
         {
             packingText = "Packing in carton";
             sizeText = "Carton size";
         }
-        else if (inner.Contains("/Crate"))
+        else if (inner.LastIndexOf("/Crate") > -1)
         {
             packingText = "Packing in wooden crate";
             sizeText = "Crate size";
