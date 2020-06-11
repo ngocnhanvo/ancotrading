@@ -168,43 +168,43 @@ public static class ExcuteSignalRStatic
 
     public static dynamic getTextFromInner(string inner, string outer, string slinner, string slouter)
     {
-        dynamic d = new {
-            packingText = "",
-            sizeText = "",
-            inner = "",
-            outer = "",
-        };
+        string packingText = "", sizeText = "";
 
         if (inner.Contains("/bun"))
         {
-            d.packingText = "Packing in bundle";
-            d.sizeText = "Pallet size";
+            packingText = "Packing in bundle";
+            sizeText = "Pallet size";
         }
         else if(inner.Contains("/ctn"))
         {
-            d.packingText = "Packing in carton";
-            d.sizeText = "Carton size";
+            packingText = "Packing in carton";
+            sizeText = "Carton size";
         }
         else if (inner.Contains("/Crate"))
         {
-            d.packingText = "Packing in wooden crate";
-            d.sizeText = "Crate size";
+            packingText = "Packing in wooden crate";
+            sizeText = "Crate size";
         }
 
         inner = inner.Replace("/bun", "/bundle").Replace("/ctn", "/carton");
         outer = outer.Replace("/pal", "/pallet").Replace("/ctn", "/carton");
 
         if (slinner != "0" & inner != "0" & slinner != "" & inner != "")
-            d.inner = slinner + " " + inner;
+            inner = slinner + " " + inner;
         else
-            d.inner = " ";
+            inner = " ";
 
         if (slouter != "0" & outer != "0" & slouter != "" & outer != "")
-            d.outer = slouter + " " + outer;
+            outer = slouter + " " + outer;
         else
-            d.outer = " ";
+            outer = " ";
 
-        return d;
+        return new {
+            packingText,
+            sizeText,
+            inner,
+            outer
+        };
     }
 	
 	public static string mapPathSignalR(string path)
