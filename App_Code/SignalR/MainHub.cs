@@ -74,23 +74,11 @@ public class MainHub : Hub
             {
                 string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
                 string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
-                if (sl_inner != "0" & dvt_inner != "0" & sl_inner != "" & dvt_inner != "")
-                {
-                    json["dong10"] = sl_inner + " " + dvt_inner;
-                }
-                else
-                {
-                    json["dong10"] = " ";
-                }
-
-                if (sl_outer != "0" & dvt_outer != "0" & sl_outer != "" & dvt_outer != "")
-                {
-                    json["dong11"] = sl_outer + " " + dvt_outer;
-                }
-                else
-                {
-                    json["dong11"] = " ";
-                }
+                var dDVT = ExcuteSignalRStatic.getTextFromInner(dvt_inner, dvt_outer, sl_inner, sl_outer);
+                json["dong10"] = dDVT.inner;
+                json["dong11"] = dDVT.outer;
+                json["packingText"] = dDVT.packingText;
+                json["sizeText"] = dDVT.sizeText;
 
                 json["dong12"] = "L" + row["l2_mix"] + "xW" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
                 json["dong13"] = row["v2"].ToString();
