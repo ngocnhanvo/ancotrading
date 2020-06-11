@@ -168,7 +168,13 @@ public static class ExcuteSignalRStatic
 
     public static dynamic getTextFromInner(string inner, string outer, string slinner, string slouter)
     {
-        dynamic d = new { };
+        dynamic d = new {
+            packingText = "",
+            sizeText = "",
+            inner = "",
+            outer = "",
+        };
+
         if (inner.Contains("/bun"))
         {
             d.packingText = "Packing in bundle";
