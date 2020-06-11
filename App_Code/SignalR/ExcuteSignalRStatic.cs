@@ -185,14 +185,12 @@ public static class ExcuteSignalRStatic
             packingText = "Packing in wooden crate";
             sizeText = "Crate size";
         }
-        else
-        {
-            packingText = inner;
-            sizeText = inner.LastIndexOf("ctn") + "";
-        }
 
         inner = inner.Replace("/bun", "/bundle").Replace("/ctn", "/carton");
         outer = outer.Replace("/pal", "/pallet").Replace("/ctn", "/carton");
+
+        packingText = inner;
+        sizeText = inner.LastIndexOf("ctn") + "";
 
         if (slinner != "0" & inner != "0" & slinner != "" & inner != "")
             inner = slinner + " " + inner;
