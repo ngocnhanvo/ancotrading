@@ -169,23 +169,11 @@ public class MainHub : Hub
                     {
                         string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
                         string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
-                        if (sl_inner != "0" & dvt_inner != "0" & sl_inner != "" & dvt_inner != "")
-                        {
-                            rowSP.inner = sl_inner + " " + dvt_inner;
-                        }
-                        else
-                        {
-                            rowSP.inner = " ";
-                        }
-
-                        if (sl_outer != "0" & dvt_outer != "0" & sl_outer != "" & dvt_outer != "")
-                        {
-                            rowSP.master = sl_outer + " " + dvt_outer;
-                        }
-                        else
-                        {
-                            rowSP.master = " ";
-                        }
+                        var dDVT = ExcuteSignalRStatic.getTextFromInner(dvt_inner, dvt_outer, sl_inner, sl_outer);
+                        rowSP.inner = dDVT.inner;
+                        rowSP.master = dDVT.outer;
+                        rowSP.packingText = dDVT.packingText;
+                        rowSP.sizeText = dDVT.sizeText;
 
                         rowSP.kichthuocDG = "L" + row["l2_mix"] + "xW" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
                         rowSP.CBM = row["v2"].ToString();
@@ -233,12 +221,34 @@ public class MainHub : Hub
             string unknown = "(Unknown)";
             string dong0 = unknown, dong1 = unknown, dong2 = unknown, dong3 = unknown, dong4 = unknown, dong5 = unknown, dong6 = unknown, dong7 = unknown,
             dong8 = "", dong9 = "", dong10 = unknown, dong11 = unknown, dong12 = unknown, dong13 = unknown, dong14 = "", dong15 = unknown, dong16 = unknown,
-            image = "", size = "", sizeSel = "";
-            string json = @"[{{ ""dong0"":""{0}"", ""dong1"":""{1}"", ""dong2"":""{2}"", ""dong3"":""{3}"", 
-			""dong4"":""{4}"", ""dong5"":""{5}"", ""dong6"":""{6}"", ""dong7"":""{7}"", ""dong8"":""{8}"", ""dong9"":""{9}"", 
-			""dong10"":""{10}"", ""dong11"":""{11}"", ""dong12"":""{12}"", ""dong13"":""{13}"", ""dong14"":""{14}"",
-			""dong15"":""{15}"", ""dong16"":""{16}"", ""image"":""{17}"", ""detai"":""{18}"", ""bientau"":""{19}"", 
-			""mausac"":""{20}"", ""size"":""{21}"", ""sizeSel"":""{22}""}}]";
+            image = "", size = "", sizeSel = "", packingText = "", sizeText = "";
+            string json = @"[{{ 
+                ""dong0"":""{0}""
+                , ""dong1"":""{1}""
+                , ""dong2"":""{2}""
+                , ""dong3"":""{3}""
+                , ""dong4"":""{4}""
+                , ""dong5"":""{5}""
+                , ""dong6"":""{6}""
+                , ""dong7"":""{7}""
+                , ""dong8"":""{8}""
+                , ""dong9"":""{9}""
+                , ""dong10"":""{10}""
+                , ""dong11"":""{11}""
+                , ""dong12"":""{12}""
+                , ""dong13"":""{13}""
+                , ""dong14"":""{14}""
+                , ""dong15"":""{15}""
+                , ""dong16"":""{16}""
+                , ""image"":""{17}""
+                , ""detai"":""{18}""
+                , ""bientau"":""{19}""
+                , ""mausac"":""{20}""
+                , ""size"":""{21}""
+                , ""sizeSel"":""{22}""
+                , ""packingText"":""{23}""
+                , ""sizeText"":""{24}""
+            }}]";
 
             var sp = db.md_sanphams.Where(s => s.ma_sanpham == ma_sanpham & s.trangthai == "DHD").FirstOrDefault();
             if (sp != null)
@@ -320,23 +330,12 @@ public class MainHub : Hub
                 {
                     string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
                     string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
-                    if (sl_inner != "0" & dvt_inner != "0" & sl_inner != "" & dvt_inner != "")
-                    {
-                        dong10 = sl_inner + " " + dvt_inner;
-                    }
-                    else
-                    {
-                        dong10 = " ";
-                    }
 
-                    if (sl_outer != "0" & dvt_outer != "0" & sl_outer != "" & dvt_outer != "")
-                    {
-                        dong11 = sl_outer + " " + dvt_outer;
-                    }
-                    else
-                    {
-                        dong11 = " ";
-                    }
+                    var dDVT = ExcuteSignalRStatic.getTextFromInner(dvt_inner, dvt_outer, sl_inner, sl_outer);
+                    dong10 = dDVT.inner;
+                    dong11 = dDVT.outer;
+                    packingText = dDVT.packingText;
+                    sizeText = dDVT.sizeText;
 
                     dong12 = "L" + row["l2_mix"] + "xW" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
                     dong13 = row["v2"].ToString();
@@ -458,7 +457,7 @@ public class MainHub : Hub
                 }
 
                 string kq_json = string.Format(json, dong0, dong1, dong2, dong3, dong4, dong5, dong6, dong7, dong8, dong9, dong10, dong11, dong12, dong13, dong14,
-                dong15, dong16, image, detai_json, bientau_json, mausac_json, size, sizeSel);
+                dong15, dong16, image, detai_json, bientau_json, mausac_json, size, sizeSel, packingText, sizeText);
                 response["Success"] = true;
                 response["Message"] = kq_json;
             }

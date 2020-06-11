@@ -165,6 +165,41 @@ public static class ExcuteSignalRStatic
 
         return Public.imgProduct + image;
     }
+
+    public static dynamic getTextFromInner(string inner, string outer, string slinner, string slouter)
+    {
+        dynamic d = new { };
+        if (inner.Contains("/bun"))
+        {
+            d.packingText = "Packing in bundle";
+            d.sizeText = "Pallet size";
+        }
+        else if(inner.Contains("/ctn"))
+        {
+            d.packingText = "Packing in carton";
+            d.sizeText = "Carton size";
+        }
+        else if (inner.Contains("/Crate"))
+        {
+            d.packingText = "Packing in wooden crate";
+            d.sizeText = "Crate size";
+        }
+
+        inner = inner.Replace("/bun", "/bundle").Replace("/ctn", "/carton");
+        outer = outer.Replace("/pal", "/pallet").Replace("/ctn", "/carton");
+
+        if (slinner != "0" & inner != "0" & slinner != "" & inner != "")
+            d.inner = slinner + " " + inner;
+        else
+            d.inner = " ";
+
+        if (slouter != "0" & outer != "0" & slouter != "" & outer != "")
+            d.outer = slouter + " " + outer;
+        else
+            d.outer = " ";
+
+        return d;
+    }
 	
 	public static string mapPathSignalR(string path)
     {
