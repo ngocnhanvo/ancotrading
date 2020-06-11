@@ -175,7 +175,7 @@ public static class ExcuteSignalRStatic
             packingText = "Packing in bundle";
             sizeText = "Pallet size";
         }
-        else if(inner.LastIndexOf("ctn") > -1)
+        else if (inner.LastIndexOf("ctn") > -1)
         {
             packingText = "Packing in carton";
             sizeText = "Carton size";
@@ -184,6 +184,11 @@ public static class ExcuteSignalRStatic
         {
             packingText = "Packing in wooden crate";
             sizeText = "Crate size";
+        }
+        else
+        {
+            packingText = "3";
+            sizeText = "4";
         }
 
         inner = inner.Replace("/bun", "/bundle").Replace("/ctn", "/carton");
