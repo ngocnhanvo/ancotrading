@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Data;
 using Newtonsoft.Json;
+using System.Linq;
 
 public class ApDungDisCountHeHang : IHttpHandler
 {
@@ -23,6 +24,11 @@ public class ApDungDisCountHeHang : IHttpHandler
     public void load(HttpContext context)
     {
         string id = context.Request.QueryString["c_donhang_id"];
+        var dis = db.c_donhangs.Where(s => s.c_donhang_id == id).Select(s => s.discount_hehang_value).FirstOrDefault();
+        List<Dictionary<string, object>> nnl = null;
+        if(!string.IsNullOrEmpty(dis))
+            nnl = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(dis);
+
         var hh_ddh = string.Format(@"
             select cl.code_cl
             from c_dongdonhang ddh 
@@ -36,12 +42,17 @@ public class ApDungDisCountHeHang : IHttpHandler
         var tbl = new List<Dictionary<string, object>>();
         foreach(DataRow row in dt.Rows)
         {
+            string code_cl = row["code_cl"] + "";
+            string gthh = nnl == null ? "0" : nnl.Where(s => s["hehang"].ToString() == code_cl).Select(s => s["giatri"].ToString()).FirstOrDefault();
+            gthh = string.IsNullOrEmpty(gthh) ? "0" : gthh;
+
             tbl.Add(new Dictionary<string, object>()
             {
-                { "hehang", row["code_cl"] },
-                { "giatri", "0" }
+                { "hehang", code_cl },
+                { "giatri",  gthh }
             });
         }
+
         context.Response.Write(JsonConvert.SerializeObject(tbl));
     }
 

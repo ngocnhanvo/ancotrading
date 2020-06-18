@@ -550,8 +550,13 @@ public class PackingInvoiceController : IHttpHandler
             jqGridHelper.Utils.writeResult(0,"Giá Trị Trừ PO không thể lớn hơn giá trị cũ!!");
         }*/
         string ngayMTK = context.Request.Form["ngay_motokhai"];
-        DateTime dateNMTK = DateTime.ParseExact(ngayMTK, "dd/MM/yyyy", null);
-        md_tygiamua tgm = db.md_tygiamuas.Where(s => s.ngayapdung <= dateNMTK & s.ngayketthuc >= dateNMTK & s.trangthai == "HIEULUC").FirstOrDefault();
+        DateTime? dateNMTK = null;
+        md_tygiamua tgm = null;
+        if (!string.IsNullOrEmpty(ngayMTK))
+        {
+            dateNMTK = DateTime.ParseExact(ngayMTK, "dd/MM/yyyy", null);
+            tgm = db.md_tygiamuas.Where(s => s.ngayapdung <= dateNMTK & s.ngayketthuc >= dateNMTK & s.trangthai == "HIEULUC").FirstOrDefault();
+        }
         //if (tgm == null)
         //{
         //    loi = 1;
@@ -594,11 +599,7 @@ public class PackingInvoiceController : IHttpHandler
             m.giatritru_po = giatritru_po.Equals("") ? 0 : decimal.Parse(giatritru_po);
             m.giatricong_po = giatricong_po.Equals("") ? 0 : decimal.Parse(giatricong_po);
             m.commodityvn = context.Request.Form["commodityvn"];
-            if (context.Request.Form["ngay_motokhai"] != "")
-            {
-                m.ngay_motokhai = DateTime.ParseExact(context.Request.Form["ngay_motokhai"], "dd/MM/yyyy", null);
-                //m.ngay_phaitt = DateTime.ParseExact(context.Request.Form["ngay_phaitt"], "dd/MM/yyyy", null);
-            }
+            m.ngay_motokhai = dateNMTK;
 
             decimal totalGross = (m.totalnet.Value - m.totaldis.Value) + m.giatri_cong.Value - m.giatri_tru.Value + m.giatricong_po.Value - m.giatritru_po.Value;
             m.totalgross = totalGross;

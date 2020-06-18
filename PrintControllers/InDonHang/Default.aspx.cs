@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+
 using System.IO;
 using NPOI.HSSF.UserModel;
-using NPOI.HPSF;
-using NPOI.POIFS.FileSystem;
+
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System.Data;
@@ -71,7 +68,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 , "@c_donhang_id"
                 , c_donhang_id
                 , "@discount"
-                , dh.discount.GetValueOrDefault(0)
+                , dh.discount_hehang.GetValueOrDefault(false) ? 0 :dh.discount.GetValueOrDefault(0)
             ) + ""
         );
 
@@ -249,9 +246,10 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 						, dvt_inner.ten_dvt as dvt_inner
 						, (ddh.l2 + ddh.w2) * (ddh.w2 * ddh.h2) / 5400 as t_thung_outer
 						, (ddh.l1 + ddh.w1) * (ddh.w1 * ddh.h1) / 5400 as t_thung_inner
-						, case when dh.md_trongluong_id is not null then dg.sl_outer * (SELECT dbo.f_convertKgToPounds(sp.trongluong, dh.md_trongluong_id)) else 0 end as n_w_master
-						, case when dh.md_trongluong_id is not null then dg.sl_inner * (SELECT dbo.f_convertKgToPounds(sp.trongluong, dh.md_trongluong_id)) else 0 end as n_w_inner
+						, case when dh.md_trongluong_id is not null then dg.sl_outer * sp.trongluong else 0 end as n_w_master
+						, case when dh.md_trongluong_id is not null then dg.sl_inner * sp.trongluong else 0 end as n_w_inner
 						, kt.ten_kichthuoc
+                        , tl.ten_trongluong
                         , ddh.barcode
                         , dh.discount_hehang_value
 					from
@@ -306,7 +304,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
     public HSSFWorkbook CreateWorkBookPO(DataTable dt)
     {
-        string discount_hehang_value = dt.Rows[0]["discount_hehang_value"].ToString();
+        string discount_hehang_value = dt.Rows[0]["discount_hehang_value"] + "";
+        string tenKT = dt.Rows[0]["ten_kichthuoc"] + "";
+        string tenTL = dt.Rows[0]["ten_trongluong"] + "";
         var nnl = string.IsNullOrEmpty(discount_hehang_value) ? null : JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(discount_hehang_value);
 
 
@@ -324,6 +324,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         ICellStyle celltext = ex_fm.getcell(12, false, true, "", "L", "T");
         //--
         ICellStyle rightBold = ex_fm.getcell(12, true, false, "", "R", "T");
+        var bottomLeftBold = ex_fm.getcell(12, true, false, "B", "L", "T");
+
         ICellStyle rightBold0 = ex_fm.getcell2(12, true, false, "", "R", "T", fmt0);
         ICellStyle rightBold3 = ex_fm.getcell2(12, true, false, "", "R", "T", fmt0i000);
         //--
@@ -481,13 +483,13 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , "FOB price (USD)"
             , "CBM"
             , "Amount (USD)"
-            , "Master Packing size (LxWxH)" + dt.Rows[0]["ten_kichthuoc"].ToString()
+            , string.Format(@"Master Packing size (LxWxH){0}", tenKT)
             , ""
             , ""
             , "HS CODE"
-            , "Weight(kgs)"
-            , "N.W/master (kgs)"
-            , "G.W/master (kgs)"
+            , string.Format(@"Weight({0}s)", tenTL)
+            , string.Format(@"N.W/master ({0}s)", tenTL)
+            , string.Format(@"G.W/master ({0}s)", tenTL)
             , "Master packing"
             , "Inner packing"
             , "Inner Packing size (LxWxH)"
@@ -586,12 +588,34 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //
         double discount = 0, discount1 = 0, startRowHH = -1;
         var lstHH = new List<int>();
-        var lstAmountHH = new List<string>();
-        var lstCBMHH = new List<string>();
+        var lstAmountHH = new List<int>();
         // create detail row
         for (int i = 0; i < dt.Rows.Count; i++)
         {
             var msp = dt.Rows[i]["ma_sanpham"].ToString();
+            var mota = dt.Rows[i]["mota_tienganh"] + "";
+            var masterSize = new List<string>();
+            masterSize.Add(dt.Rows[i]["l2"] + "");
+            masterSize.Add(dt.Rows[i]["w2"] + "");
+            masterSize.Add(dt.Rows[i]["h2"] + "");
+
+            var cmInch = Public.convertCmToInch(mota, masterSize, tenKT);
+            dt.Rows[i]["mota_tienganh"] = cmInch["mota"];
+            masterSize = cmInch["masterSize"] as List<string>;
+            dt.Rows[i]["l2"] = masterSize[0];
+            dt.Rows[i]["w2"] = masterSize[1];
+            dt.Rows[i]["h2"] = masterSize[2];
+
+            var kgPound = Public.convertKgToPound(
+                dt.Rows[i]["trongluong"] + ""
+                , dt.Rows[i]["n_w_master"] + ""
+                , dt.Rows[i]["g_w_master"] + ""
+                , tenTL
+                );
+            dt.Rows[i]["trongluong"] = kgPound["weight"];
+            dt.Rows[i]["n_w_master"] = kgPound["NWmaster"];
+            dt.Rows[i]["g_w_master"] = kgPound["GWmaster"];
+
             var chungloai = msp.Substring(0, 2);
             var chungloaiTT = i == dt.Rows.Count - 1 ? chungloai : dt.Rows[i + 1]["ma_sanpham"].ToString().Substring(0, 2);
 
@@ -705,21 +729,41 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             {
                 if (chungloai != chungloaiTT | i == dt.Rows.Count - 1)
                 {
-                    var rowHeHang = s1.CreateRow(row);
-                    rowHeHang.HeightInPoints = 30;
-                    rowHeHang.CreateCell(0).SetCellValue("Discount:");
-                    rowHeHang.GetCell(0).CellStyle = rightBold;
-                    s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 10));
-
                     string gthh = nnl == null ? "0" : nnl.Where(s => s["hehang"].ToString() == chungloai).Select(s => s["giatri"].ToString()).FirstOrDefault();
-                    rowHeHang.CreateCell(11).SetCellValue(double.Parse(gthh));
-                    rowHeHang.GetCell(11).CellStyle = rightBold;
 
+                    var rowToTalHeHang = s1.CreateRow(row);
+                    //rowToTalHeHang.HeightInPoints = 25;
+                    rowToTalHeHang.CreateCell(4).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
+                    var range1_3 = new CellRangeAddress(row, row, 1, 3);
+                    var range4_10 = new CellRangeAddress(row, row, 4, 10);
+                    s1.AddMergedRegion(range1_3);
+                    s1.AddMergedRegion(range4_10);
+                    RegionUtil.SetBorderBottom((int)BorderStyle.Thin, range1_3, s1, hssfworkbook);
+                    RegionUtil.SetBorderBottom((int)BorderStyle.Thin, range4_10, s1, hssfworkbook);
+                    rowToTalHeHang.GetCell(4).CellStyle = bottomLeftBold;
                     string fmlSum = string.Format(@"SUM(M{0}:M{1})", startRowHH + 1, row);
-                    rowHeHang.CreateCell(12).CellFormula = string.Format("{0}*L{1}/100", fmlSum, row + 1);
-                    rowHeHang.GetCell(12).CellStyle = rightBold;
-                    lstAmountHH.Add(fmlSum);
-                    lstCBMHH.Add(string.Format(@"SUM(L{0}:L{1})", startRowHH + 1, row));
+                    rowToTalHeHang.CreateCell(12).CellFormula = string.Format("{0}", fmlSum, row + 1);
+                    rowToTalHeHang.GetCell(12).CellStyle = rightBold;
+                    row++;
+                    
+                    var rowDisHeHang = s1.CreateRow(row);
+                    //rowDisHeHang.HeightInPoints = 25;
+                    rowDisHeHang.CreateCell(4).SetCellValue(string.Format(@"Discount ({0}%):", gthh));
+                    rowDisHeHang.GetCell(4).CellStyle = leftBold;
+                    s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
+                    rowDisHeHang.CreateCell(12).CellFormula = string.Format("M{0}*{1}/100", row, gthh);
+                    rowDisHeHang.GetCell(12).CellStyle = rightBold;
+                    row++;
+
+                    var rowTotalHeHang = s1.CreateRow(row);
+                    //rowTotalHeHang.HeightInPoints = 25;
+                    rowTotalHeHang.CreateCell(4).SetCellValue(string.Format("Total ({0}):", lstHH.Count + 1));
+                    rowTotalHeHang.GetCell(4).CellStyle = leftBold;
+                    s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
+                    rowTotalHeHang.CreateCell(12).CellFormula = string.Format("M{0} - M{1}", row - 1, row);
+                    rowTotalHeHang.GetCell(12).CellStyle = rightBold;
+
+                    lstAmountHH.Add(row);
 
                     row++;
                     count_row++;
@@ -730,55 +774,25 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         }
 
         //vi tri row dau tien
-        int m = row - count_row + 2;
+        int m = row - count_row;
         int sub = row + 1;
 
+        string sumAmount = "", sumTotalAmount = "";
         if (nnl != null)
-        {
-            string ttDC = "", ttDCVal = "";
-            foreach(var i in lstHH)
-            {
-                ttDC += string.Format("L{0}+", i);
-                ttDCVal += string.Format("M{0}+", i);
-            }
-            ttDC += "0";
-            ttDCVal += "0";
-
-            var rowHeHangTT = s1.CreateRow(row);
-            rowHeHangTT.HeightInPoints = 30;
-            rowHeHangTT.CreateCell(0).SetCellValue("Total Discount:");
-            rowHeHangTT.GetCell(0).CellStyle = rightBold;
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 10));
-
-            rowHeHangTT.CreateCell(11).CellFormula = ttDC;
-            rowHeHangTT.GetCell(11).CellStyle = rightBold;
-
-            rowHeHangTT.CreateCell(12).CellFormula = ttDCVal;
-            rowHeHangTT.GetCell(12).CellStyle = rightBold;
-
-            row++;
-            count_row++;
-            sub++;
+        {   
             s1.CreateRow(row).CreateCell(4).SetCellValue("Sub Total:");
-
-            string sumAmount = "";
             foreach (var i in lstAmountHH)
             {
-                sumAmount += string.Format("{0}+", i);
+                sumAmount += string.Format("M{0}+", i - 1);
+                sumTotalAmount += string.Format("M{0}+", i + 1);
             }
             sumAmount += "0";
+            sumTotalAmount += "0";
 
-            string sumCBM = "";
-            foreach (var i in lstCBMHH)
-            {
-                sumCBM += string.Format("{0}+", i);
-            }
-            sumCBM += "0";
-
-            s1.GetRow(row).CreateCell(7).CellFormula = String.Format("SUM(H{0}:H{1})", m, row - 2);
-            s1.GetRow(row).CreateCell(8).CellFormula = String.Format("SUM(I{0}:I{1})", m, row - 2);
-            s1.GetRow(row).CreateCell(11).CellFormula = sumCBM;
-            s1.GetRow(row).CreateCell(12).CellFormula = string.Format("{0} - M{1}", sumAmount, row);
+            s1.GetRow(row).CreateCell(7).CellFormula = string.Format("SUM(H{0}:H{1})", m, row - 3);
+            s1.GetRow(row).CreateCell(8).CellFormula = string.Format("SUM(I{0}:I{1})", m, row - 3);
+            s1.GetRow(row).CreateCell(11).CellFormula = string.Format("SUM(L{0}:L{1})", m, row - 3);
+            s1.GetRow(row).CreateCell(12).CellFormula = string.Format("{0}", sumAmount);
         }
         else
         {
@@ -813,32 +827,37 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         row++;
         //end
         //start giam gia
-        int dis = row + 1;
-        s1.CreateRow(row).CreateCell(4).SetCellValue("Discount (" + discount1 + "%):");
 
-        string str_dsc1 = discount.ToString();
-        string funcDiscount = "";
-        if (str_dsc1.Contains("."))
+        int dis = row + 1;
+        if (nnl == null)
         {
-            string dot1 = str_dsc1.Split('.')[1];
-            if (dot1.Length > 2)
+            s1.CreateRow(row).CreateCell(4).SetCellValue("Discount (" + discount1 + "%):");
+
+            string str_dsc1 = discount.ToString();
+            string funcDiscount = "";
+            if (str_dsc1.Contains("."))
             {
-                funcDiscount = "M{0}*U{0}/100";
+                string dot1 = str_dsc1.Split('.')[1];
+                if (dot1.Length > 2)
+                {
+                    funcDiscount = "M{0}*U{0}/100";
+                }
+                else
+                {
+                    funcDiscount = "ROUND(M{0}*U{0}/100,2)";
+                }
             }
             else
             {
                 funcDiscount = "ROUND(M{0}*U{0}/100,2)";
             }
+            s1.GetRow(row).CreateCell(12).CellFormula = String.Format(funcDiscount, row, row);
+            s1.GetRow(row).GetCell(4).CellStyle = leftBold;
+            s1.GetRow(row).GetCell(12).CellStyle = rightBold;
+            s1.GetRow(row).GetCell(12).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+            row++;
         }
-        else
-        {
-            funcDiscount = "ROUND(M{0}*U{0}/100,2)";
-        }
-        s1.GetRow(row).CreateCell(12).CellFormula = String.Format(funcDiscount, row, row);
-        s1.GetRow(row).GetCell(4).CellStyle = leftBold;
-        s1.GetRow(row).GetCell(12).CellStyle = rightBold;
-        s1.GetRow(row).GetCell(12).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
-        row++;
+
         //end
         int cong = row + 1;
         s1.CreateRow(row).CreateCell(4).SetCellValue("(+) " + dt.Rows[0]["diengiaicong"].ToString());
@@ -858,8 +877,17 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         s1.GetRow(row).GetCell(12).CellStyle = rightBold;
         row++;
         //
-        s1.CreateRow(row).CreateCell(4).SetCellValue("Total:");
-        s1.GetRow(row).CreateCell(12).CellFormula = String.Format("M{0} - M{1} + M{2} - M{3}", sub, dis, cong, tru);
+        string totalTxt = "";
+        for (var i = 0; i < lstAmountHH.Count; i++)
+            totalTxt += string.Format("({0})+", i+1);
+        totalTxt = totalTxt.Length > 0 ? totalTxt.Substring(0, totalTxt.Length - 1) : "";
+        string txtTotal = nnl == null ? "Total:" : string.Format("Total {0}:", totalTxt);
+        s1.CreateRow(row).CreateCell(4).SetCellValue(txtTotal);
+        s1.GetRow(row).CreateCell(12).CellFormula = String.Format("{0} - {1} + M{2} - M{3}"
+            , nnl == null ? "M" + sub : sumTotalAmount
+            , nnl == null ? "M" + dis : "0"
+            , cong
+            , tru);
         s1.GetRow(row).GetCell(4).CellStyle = leftBold;
         s1.GetRow(row).GetCell(12).CellStyle = rightBold;
         s1.GetRow(row).GetCell(12).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");

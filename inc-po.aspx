@@ -905,21 +905,25 @@
         $('#discount_hehang').change(function () {
             let val = $('#discount_hehang_value').val();
             if ($(this).prop('checked') == true) {
-                if (!val.replace(/ /g, '')) {
-                    $.get("Controllers/SelectOption/ApDungDisCountHeHang.ashx",
-                        { "action": "DiscountHH", "c_donhang_id": c_donhang_id },
-                        function (result) {
-                            discount_hehang_val(result);
-                        });
-                }
-                else
-                    discount_hehang_val(val, 1);
+                $.get("Controllers/SelectOption/ApDungDisCountHeHang.ashx",
+                    { "action": "DiscountHH", "c_donhang_id": c_donhang_id },
+                    function (result) {
+                        discount_hehang_val(result);
+                    });
             }
             else {
                 $('.tbl_discount_hehang_value').remove();
             }
         });
-        $('#discount_hehang').prop('disabled', $('#discount_hehang').prop('checked'));
+
+        let idDH = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
+        let ttDH = $('#grid_ds_po').jqGrid('getCell', idDH, 'md_trangthai_id') + '';
+        
+        if (ttDH.lastIndexOf('SOANTHAO') > -1)
+            $('#discount_hehang').prop('disabled', false);
+        else
+            $('#discount_hehang').prop('disabled', true);
+
         $('#discount_hehang').change();
     }
 </script>

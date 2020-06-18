@@ -939,7 +939,7 @@ public class DonHangController : IHttpHandler
                 if (cb != null)
                 {
                     m.discount_hehang = context.Request.Form["discount_hehang"] == "True";
-                    m.discount_hehang_value = context.Request.Form["discount_hehang_value"];
+                    m.discount_hehang_value = m.discount_hehang.GetValueOrDefault(false) ? context.Request.Form["discount_hehang_value"] : "";
                     m.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
                     m.sochungtu = context.Request.Form["sochungtu"];
                     m.ngaylap = DateTime.ParseExact(context.Request.Form["ngaylap"], "dd/MM/yyyy", null);
@@ -1017,14 +1017,25 @@ public class DonHangController : IHttpHandler
                     {
                         db.SubmitChanges();
 
-                        if (m.discount_hehang.GetValueOrDefault(false) == true)
+                        if (m.md_trangthai_id == "SOANTHAO")
                         {
-                            foreach (var cdh in db.c_dongdonhangs.Where(s => s.c_donhang_id == m.c_donhang_id).ToList())
+                            if (m.discount_hehang.GetValueOrDefault(false))
                             {
 
-                                var t = Public.DiscountHehangValue(m.discount_hehang_value, cdh, db);
-                                cdh.giafob = t.giafob;
-                                cdh.discount = t.discount;
+                                foreach (var cdh in db.c_dongdonhangs.Where(s => s.c_donhang_id == m.c_donhang_id).ToList())
+                                {
+                                    var t = Public.DiscountHehangValue(m.discount_hehang_value, cdh, db);
+                                    cdh.giafob = t.giafob;
+                                    cdh.discount = t.discount;
+                                }
+                            }
+                            else
+                            {
+                                foreach (var cdh in db.c_dongdonhangs.Where(s => s.c_donhang_id == m.c_donhang_id).ToList())
+                                {
+                                    cdh.giafob = cdh.giachuan == null ? cdh.giafob : cdh.giachuan;
+                                    cdh.discount = 0;
+                                }
                             }
                         }
 
