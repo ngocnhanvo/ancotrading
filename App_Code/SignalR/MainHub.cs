@@ -89,8 +89,9 @@ public class MainHub : Hub
 
                 if (slc_40 != "" & slc_40 != "0")
                 {
-                    json["dong14"] += "\\n" + slc_40 + " pallets/40'";
+                    json["dong14"] += "\\n" + slc_40 + " " + dDVT.quantity + "/40'";
                 }
+
                 if (json["dong14"] != "")
                 {
                     json["dong14"] = json["dong14"].Substring(2);
@@ -172,8 +173,9 @@ public class MainHub : Hub
 
                         if (slc_40 != "" & slc_40 != "0")
                         {
-                            rowSP.slcont += "\\n" + slc_40 + " pallets/40'";
+                            rowSP.slcont += "\\n" + slc_40 + " " + dDVT.quantity + "/40'";
                         }
+
                         if (rowSP.slcont != "")
                         {
                             string slcont = (rowSP.slcont + "");
@@ -334,7 +336,7 @@ public class MainHub : Hub
 
                     if (slc_40 != "" & slc_40 != "0")
                     {
-                        dong14 += "\\n" + slc_40 + " pallets/40'";
+                        dong14 += "\\n" + slc_40 + " " + dDVT.quantity + "/40'";
                     }
                     if (dong14 != "")
                     {

@@ -168,7 +168,7 @@ public static class ExcuteSignalRStatic
 
     public static dynamic getTextFromInner(string inner, string outer, string slinner, string slouter)
     {
-        string packingText = "1", sizeText = "2";
+        string packingText = "1", sizeText = "2", quantity = "";
 
         if (inner.LastIndexOf("/bun") > -1)
         {
@@ -201,7 +201,10 @@ public static class ExcuteSignalRStatic
 
         inner = inner.Replace("/bun", "/bundle").Replace("/pal", "/pallet").Replace("/ctn", "/carton").Replace("/crt", "/crate");
         outer = outer.Replace("/bun", "/bundle").Replace("/pal", "/pallet").Replace("/ctn", "/carton").Replace("/crt", "/crate");
-        
+
+        int iq = outer.LastIndexOf("/");
+        quantity = outer.Substring(iq + 1) + "s";
+
         if (slinner != "0" & inner != "0" & slinner != "" & inner != "")
             inner = slinner + " " + inner;
         else
@@ -216,7 +219,8 @@ public static class ExcuteSignalRStatic
             packingText,
             sizeText,
             inner,
-            outer
+            outer,
+            quantity
         };
     }
 	
