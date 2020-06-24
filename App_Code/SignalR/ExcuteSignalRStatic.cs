@@ -173,20 +173,20 @@ public static class ExcuteSignalRStatic
         if (inner.LastIndexOf("/bun") > -1)
         {
             packingText = "Packing in bundle";
-            //sizeText = "Pallet size";
+            sizeText = "Pallet size";
         }
         else if (inner.LastIndexOf("/ctn") > -1)
         {
             packingText = "Packing in carton";
-            //sizeText = "Carton size";
+            sizeText = "Carton size";
         }
-        else if (inner.LastIndexOf("/Crate") > -1)
+        else if (inner.LastIndexOf("/crt") > -1)
         {
             packingText = "Packing in wooden crate";
-            //sizeText = "Crate size";
+            sizeText = "Crate size";
         }
 
-        if (outer.LastIndexOf("/bun") > -1)
+        if (outer.LastIndexOf("/pal") > -1)
         {
             sizeText = "Pallet size";
         }
@@ -194,13 +194,13 @@ public static class ExcuteSignalRStatic
         {
             sizeText = "Carton size";
         }
-        else if (outer.LastIndexOf("/Crate") > -1)
+        else if (outer.LastIndexOf("/crt") > -1)
         {
             sizeText = "Crate size";
         }
 
-        inner = inner.Replace("/bun", "/bundle").Replace("/pal", "/pallet").Replace("/ctn", "/carton");
-        outer = outer.Replace("/bun", "/bundle").Replace("/pal", "/pallet").Replace("/ctn", "/carton");
+        inner = inner.Replace("/bun", "/bundle").Replace("/pal", "/pallet").Replace("/ctn", "/carton").Replace("/crt", "/crate");
+        outer = outer.Replace("/bun", "/bundle").Replace("/pal", "/pallet").Replace("/ctn", "/carton").Replace("/crt", "/crate");
         
         if (slinner != "0" & inner != "0" & slinner != "" & inner != "")
             inner = slinner + " " + inner;
