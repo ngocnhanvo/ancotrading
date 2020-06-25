@@ -168,7 +168,7 @@ public static class ExcuteSignalRStatic
 
     public static dynamic getTextFromInner(string inner, string outer, string slinner, string slouter)
     {
-        string packingText = "1", sizeText = "2", quantity = "";
+        string packingText = "", sizeText = "", quantity = "";
 
         if (inner.LastIndexOf("/bun") > -1)
         {
@@ -233,7 +233,7 @@ public static class ExcuteSignalRStatic
 
         if(kd == "ROU")
         {
-            kichthuoc = "D" + kichthuoc.Split('x')[0] + kichthuoc.Split('x')[2];
+            kichthuoc = "D" + kichthuoc.Split('x')[0] + "x" + kichthuoc.Split('x')[2];
         }
 
         return kichthuoc;
