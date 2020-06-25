@@ -43,7 +43,7 @@ public class UploadFile : IHttpHandler
                 var rgxSanPhamF = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-F[0-9]$");
                 var rgxDeTai = new Regex("^[0-9][0-9]-[0-9][0-9]$");
                 var rgxMauSac = new Regex("^[0-9][0-9]-[0-9][0-9]-[0-9][0-9]$");
-                var rgxMauSac2 = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-[a-Z][0-9]-[0-9][0-9]$");
+                var rgxMauSac2 = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-[A-Z][0-9]-[0-9][0-9]$");
                 if (rgxDeTai.IsMatch(filterName))
                 {
                     files[i - 1].SaveAs(Public.imgPatterns + files[i - 1].FileName);
