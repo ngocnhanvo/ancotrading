@@ -61,9 +61,10 @@ public class MainHub : Hub
             var db = new LinqDBDataContext();
             var sp = db.md_sanphams.Where(s => s.ma_sanpham.StartsWith(ma_sanpham) & s.trangthai == "DHD").FirstOrDefault();
 
+            string kt = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
             var json = new Dictionary<string, string>();
             json["dong6"] = ma_sanpham;
-            json["dong9"] = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
+            json["dong9"] = ExcuteSignalRStatic.getSizeRectOrRound(db,sp, kt);
             json["dong14"] = "";
 
             var dtFOB = ExcuteSignalRStatic.getFOB(sp.md_sanpham_id);
@@ -80,7 +81,7 @@ public class MainHub : Hub
                 json["packingText"] = dDVT.packingText;
                 json["sizeText"] = dDVT.sizeText;
 
-                json["dong12"] = "L" + row["l2_mix"] + "xW" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
+                json["dong12"] = "" + row["l2_mix"] + "x" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
                 json["dong13"] = row["v2"].ToString();
 
                 string slc_20 = row["soluonggoi_ctn_20"].ToString();
@@ -148,7 +149,8 @@ public class MainHub : Hub
                 var sp = db.md_sanphams.Where(s => s.ma_sanpham == msp & s.trangthai == "DHD").FirstOrDefault();
                 if (sp != null)
                 {
-                    rowSP.kichthuoc = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
+                    string kt = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
+                    rowSP.kichthuoc = ExcuteSignalRStatic.getSizeRectOrRound(db, sp, kt);
                     var dtFOB = ExcuteSignalRStatic.getFOB(sp.md_sanpham_id);
                     rowSP.fob = dtFOB.Rows.Count > 0 ? dtFOB.Rows[0]["ten_cangbien"].ToString() : "";
                     var dtPrice = ExcuteSignalRStatic.getPrice("'" +sp.ma_sanpham + "'");
@@ -164,7 +166,7 @@ public class MainHub : Hub
                         rowSP.packingText = dDVT.packingText;
                         rowSP.sizeText = dDVT.sizeText;
 
-                        rowSP.kichthuocDG = "L" + row["l2_mix"] + "xW" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
+                        rowSP.kichthuocDG = "" + row["l2_mix"] + "x" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
                         rowSP.CBM = row["v2"].ToString();
 
                         string slc_20 = row["soluonggoi_ctn_20"].ToString();
@@ -279,11 +281,14 @@ public class MainHub : Hub
                 string kichthuoc_9 = "";
                 foreach (System.Data.DataRow row in dt.Rows)
                 {
-                    if (row["ma_sanpham"].ToString() != ma_sanpham)
+                    var msp2 = row["ma_sanpham"].ToString();
+                    var sp2 = db.md_sanphams.Where(s => s.ma_sanpham == msp2).FirstOrDefault();
+                    if (msp2 != ma_sanpham)
                     {
                         if (row["l_cm"].ToString() != "0.0" & row["w_cm"].ToString() != "0.0" & row["h_cm"].ToString() != "0.0")
                         {
-                            dong9 += row["l_cm"] + "x" + row["w_cm"] + "xH" + row["h_cm"] + "/ \\n          ";
+                            string kt = row["l_cm"] + "x" + row["w_cm"] + "xH" + row["h_cm"];
+                            dong9 += ExcuteSignalRStatic.getSizeRectOrRound(db, sp2, kt) + "/ \\n          ";
                         }
                     }
                     else
@@ -291,7 +296,8 @@ public class MainHub : Hub
                         dong7 = "$" + row["gia"].ToString();
                         if (row["l_cm"].ToString() != "0.0" & row["w_cm"].ToString() != "0.0" & row["h_cm"].ToString() != "0.0")
                         {
-                            kichthuoc_9 = row["l_cm"] + "x" + row["w_cm"] + "xH" + row["h_cm"];
+                            string kt = row["l_cm"] + "x" + row["w_cm"] + "xH" + row["h_cm"];
+                            kichthuoc_9 = ExcuteSignalRStatic.getSizeRectOrRound(db, sp2, kt);
                         }
                     }
                 }
@@ -410,7 +416,8 @@ public class MainHub : Hub
                         var spBT = db.md_sanphams.Where(s => s.ma_sanpham.StartsWith(maBT)).FirstOrDefault();
                         if (spBT != null)
                         {
-                            string sizeVal = row_dt["bientau"] + ":" + spBT.l_cm + "x" + spBT.w_cm + "xH" + spBT.h_cm + "cm";
+                            string kt = spBT.l_cm + "x" + spBT.w_cm + "xH" + spBT.h_cm + "cm";
+                            string sizeVal = row_dt["bientau"] + ":" + ExcuteSignalRStatic.getSizeRectOrRound(db, spBT, kt);
                             if (!size.Split(',').Contains(sizeVal)) {
                                 size += sizeVal + ",";								
 							}

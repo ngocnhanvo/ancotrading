@@ -223,6 +223,18 @@ public static class ExcuteSignalRStatic
             quantity
         };
     }
+
+    public static string getSizeRectOrRound(LinqDBDataContext db, md_sanpham sp, string kichthuoc)
+    {
+        var kd = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.md_kieudang_id).Select(s => s.ma_kieudang).FirstOrDefault();
+
+        if(kd == "ROU")
+        {
+
+        }
+
+        return kichthuoc;
+    }
 	
 	public static string mapPathSignalR(string path)
     {
