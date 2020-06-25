@@ -20,35 +20,36 @@ public class UploadFile : IHttpHandler
                 string fileName = files[i - 1].FileName;
                 string filterName = fileName.Substring(0, fileName.LastIndexOf("."));
                 string jpg = fileName.Substring(fileName.LastIndexOf("."));
-                if (filterName.Length == 14)
-                {
-                    try
-                    {
-                        if (filterName.ElementAt(9).ToString().ToLower().Equals("f"))
-                        {
-                            filterName = filterName.Substring(0, 11);
-                        }
-                        else
-                        {
-                            filterName = filterName.Substring(0, 8);
-                        }
-                    }
-                    catch
-                    {
-                        filterName = filterName.Substring(0, 8);
-                    }
-                }
+                //if (filterName.Length == 14)
+                //{
+                //    try
+                //    {
+                //        if (filterName.ElementAt(9).ToString().ToLower().Equals("f"))
+                //        {
+                //            filterName = filterName.Substring(0, 11);
+                //        }
+                //        else
+                //        {
+                //            filterName = filterName.Substring(0, 8);
+                //        }
+                //    }
+                //    catch
+                //    {
+                //        filterName = filterName.Substring(0, 8);
+                //    }
+                //}
 
                 var rgxSanPham = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]$");
                 var rgxSanPhamF = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-F[0-9]$");
                 var rgxDeTai = new Regex("^[0-9][0-9]-[0-9][0-9]$");
                 var rgxMauSac = new Regex("^[0-9][0-9]-[0-9][0-9]-[0-9][0-9]$");
+                var rgxMauSac2 = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-[a-Z][0-9]-[0-9][0-9]$");
                 if (rgxDeTai.IsMatch(filterName))
                 {
                     files[i - 1].SaveAs(Public.imgPatterns + files[i - 1].FileName);
                     context.Response.Write(Public.imgPatterns + files[i - 1].FileName);
                 }
-                else if (rgxMauSac.IsMatch(filterName))
+                else if (rgxMauSac.IsMatch(filterName) | rgxMauSac2.IsMatch(filterName))
                 {
                     files[i - 1].SaveAs(Public.imgColors + files[i - 1].FileName);
                     context.Response.Write(Public.imgColors + files[i - 1].FileName);
