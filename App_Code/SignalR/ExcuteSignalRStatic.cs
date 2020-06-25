@@ -188,14 +188,17 @@ public static class ExcuteSignalRStatic
 
         if (outer.LastIndexOf("/pal") > -1)
         {
+            packingText = string.IsNullOrEmpty(packingText) ? "Packing in bundle" : packingText;
             sizeText = "Pallet size";
         }
         else if (outer.LastIndexOf("/ctn") > -1)
         {
+            packingText = string.IsNullOrEmpty(packingText) ? "Packing in carton" : packingText;
             sizeText = "Carton size";
         }
         else if (outer.LastIndexOf("/crt") > -1)
         {
+            packingText = string.IsNullOrEmpty(packingText) ? "Packing in wooden crate" : packingText;
             sizeText = "Crate size";
         }
 
@@ -230,7 +233,7 @@ public static class ExcuteSignalRStatic
 
         if(kd == "ROU")
         {
-
+            kichthuoc = "D" + kichthuoc.Split('x')[0] + kichthuoc.Split('x')[2];
         }
 
         return kichthuoc;
