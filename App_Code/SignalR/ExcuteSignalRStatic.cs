@@ -127,13 +127,13 @@ public static class ExcuteSignalRStatic
 
         try
         {
-            string msLink = "~/images/products/mausac/";
+            string msLink = "images/products/mausac/";
             string cl = ma_sanpham.Substring(0, 2);
             string dt = ma_sanpham.Substring(6, 2);
             string ms = ma_sanpham.Substring(12, 2);
             string kd = ma_sanpham.Substring(0, 9);
             var context = HttpContext.Current;
-            string image = mapPathSignalR(msLink);
+            string image = mapPathSignalR("~/" + msLink);
             string clDTMS = string.Format(@"{0}-{1}-{2}.jpg", cl, dt, ms);
             if (File.Exists(image + kd + ms + ".jpg"))
                 msLink += kd + ms + ".jpg";
