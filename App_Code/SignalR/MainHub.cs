@@ -985,9 +985,10 @@ public class MainHub : Hub
             { "Message", "" }
         };
         string msg = "";
-        string preview = parrams.preview + "";
+        string preview = "";
         try
         {
+			preview = parrams.preview + "";
             var db = new LinqDBDataContext();
             var exec = new ExcuteSignalR();
             string username = parrams.username + "";
