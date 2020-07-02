@@ -1088,9 +1088,14 @@ public class MainHub : Hub
         catch (Exception ex)
         {
             msg = ex + "";
-        }
+        
+		}
         response["Message"] = msg;
-        response["data_bk"] = parrams.data_bk;
+		try {
+			response["data_bk"] = parrams.data_bk;
+		}
+		catch(Exception ex) { }
+		
         if (preview == "true")
             Clients.Caller.PreviewEmail(response);
         else
