@@ -436,7 +436,7 @@ namespace XtraReportSerialization
             // discountPO
             // 
             this.discountPO.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
-            new DevExpress.XtraReports.UI.XRBinding("Text", null, "discountPO")});
+            new DevExpress.XtraReports.UI.XRBinding("Text", null, "discountPO", "{0:#,#0.######}")});
             this.discountPO.Dpi = 100F;
             this.discountPO.Name = "discountPO";
             this.discountPO.StylePriority.UseTextAlignment = false;
