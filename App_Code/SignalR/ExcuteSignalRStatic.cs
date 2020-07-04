@@ -132,7 +132,6 @@ public static class ExcuteSignalRStatic
             string dt = ma_sanpham.Substring(6, 2);
             string ms = ma_sanpham.Substring(12, 2);
             string kd = ma_sanpham.Substring(0, 9);
-            var context = HttpContext.Current;
             string image = mapPathSignalR("~/" + msLink);
             string clDTMS = string.Format(@"{0}-{1}-{2}.jpg", cl, dt, ms);
             if (File.Exists(image + kd + ms + ".jpg"))
@@ -154,17 +153,30 @@ public static class ExcuteSignalRStatic
 
     public static string getImageProduct(string msp)
     {
-        string image = "";
-        if (!msp.Contains("-F"))
-        {
-            image = msp.Substring(0, 8) + ".jpg";
-        }
+        string msLink = "images/products/mausac/";
+        string cl = msp.Substring(0, 2);
+        string dt = msp.Substring(6, 2);
+        string ms = msp.Substring(12, 2);
+        string kd = msp.Substring(0, 9);
+        string image = mapPathSignalR("~/" + msLink);
+
+        if (File.Exists(image + kd + ms + ".jpg"))
+            msLink += kd + ms + ".jpg";
         else
         {
-            image = msp.Substring(0, 11) + ".jpg";
+            if (!msp.Contains("-F"))
+            {
+                image = msp.Substring(0, 8) + ".jpg";
+            }
+            else
+            {
+                image = msp.Substring(0, 11) + ".jpg";
+            }
+
+            image = Public.imgProduct + image;
         }
 
-        return Public.imgProduct + image;
+        return image;
     }
 
     public static dynamic getTextFromInner(string inner, string outer, string slinner, string slouter)
