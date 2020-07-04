@@ -161,7 +161,7 @@ public static class ExcuteSignalRStatic
         string image = mapPathSignalR("~/" + msLink);
 
         if (File.Exists(image + kd + ms + ".jpg"))
-            msLink += kd + ms + ".jpg";
+            image = msLink + kd + ms + ".jpg";
         else
         {
             if (!msp.Contains("-F"))
