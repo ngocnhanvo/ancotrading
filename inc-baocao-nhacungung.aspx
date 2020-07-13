@@ -131,7 +131,8 @@
         var qstring = getQueryString();
         
         if (reportid == 1) {
-            window.open("ReportWizard/Rpt_NCC/rpt_tienhangdanhap.aspx" + qstring);
+            //window.open("ReportWizard/Rpt_NCC/rpt_tienhangdanhap.aspx" + qstring);
+            window.open("PrintControllers/InTienHangChiTiet/rpt_tienhangdanhap.aspx" + qstring);
         } 
 		else if (reportid == 2) {
             window.open("PrintControllers/InTienHangChiTiet/"+ qstring);
