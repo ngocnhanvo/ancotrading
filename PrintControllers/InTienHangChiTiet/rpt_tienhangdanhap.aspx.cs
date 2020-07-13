@@ -89,7 +89,7 @@ public partial class PrintControllers_InTienHangChiTiet_rpt_tienhangdanhap : Sys
             sumPhiTruNCC.DataBindings[0].FormatString =
             sumThanhTienNCC.DataBindings[0].FormatString =
             sumDatraNCC.DataBindings[0].FormatString =
-            sumConLaiNCC.DataBindings[0].FormatString = "{0:#,#0.00}";
+            sumConLaiNCC.DataBindings[0].FormatString = "{0:#,#0.##}";
 
             for (int i = 0; i < tbl.Rows.Count; i++)
             {
