@@ -576,6 +576,7 @@ public class Objects
             s1.AddMergedRegion(new CellRangeAddress(1, 1, 0, 6));
             s1.AddMergedRegion(new CellRangeAddress(2, 2, 0, 6));
             s1.AddMergedRegion(new CellRangeAddress(3, 3, 0, 6));
+            s1.AddMergedRegion(new CellRangeAddress(4, 4, 0, 6));
 
             var rowTT = 5;
             s1.CreateRow(rowTT).CreateCell(0).SetCellValue("CUSTOMER NAME:");
@@ -614,8 +615,8 @@ public class Objects
             s1.GetRow(rowTT).CreateCell(6).SetCellValue(DateTime.Now.ToString("dd/MMM/yyyy"));
             s1.GetRow(rowTT).GetCell(6).CellStyle = cellBold;
 
-            IRow headerColumn = s1.CreateRow(rowTT + 2);
-            IRow headerColumn2 = s1.CreateRow(rowTT + 3);
+            IRow headerColumn = s1.CreateRow(rowTT + 3);
+            IRow headerColumn2 = s1.CreateRow(rowTT + 4);
 
             headerColumn.HeightInPoints = 40;
             headerColumn2.HeightInPoints = 40;
@@ -707,7 +708,7 @@ public class Objects
                 catch
                 { }
 
-                var rowTTDT = rowTT + 4 + i;
+                var rowTTDT = rowTT + 5 + i;
                 s1.CreateRow(rowTTDT).CreateCell(0).SetCellValue(dtDetails.Rows[i]["ma_sanpham"].ToString());
                 s1.GetRow(rowTTDT).HeightInPoints = 50;
                 s1.GetRow(rowTTDT).CreateCell(1).SetCellValue("");
@@ -724,7 +725,7 @@ public class Objects
 
             for (int i = 0; i < dtDetails.Rows.Count; i++)
             {
-                var rowTTDT = rowTT + 4 + i;
+                var rowTTDT = rowTT + 5 + i;
                 for (int j = 0; j <= 6; j++)
                 {
                     if (j == 2)
