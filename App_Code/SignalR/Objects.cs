@@ -615,8 +615,10 @@ public class Objects
             s1.GetRow(rowTT).CreateCell(6).SetCellValue(DateTime.Now.ToString("dd/MMM/yyyy"));
             s1.GetRow(rowTT).GetCell(6).CellStyle = cellBold;
 
-            IRow headerColumn = s1.CreateRow(rowTT + 3);
-            IRow headerColumn2 = s1.CreateRow(rowTT + 4);
+            var rowTTH1 = rowTT + 3;
+            var rowTTH2 = rowTT + 4;
+            IRow headerColumn = s1.CreateRow(rowTTH1);
+            IRow headerColumn2 = s1.CreateRow(rowTTH2);
 
             headerColumn.HeightInPoints = 40;
             headerColumn2.HeightInPoints = 40;
@@ -637,25 +639,25 @@ public class Objects
             }
 
             headerColumn.GetCell(0).SetCellValue("Item No");
-            s1.AddMergedRegion(new CellRangeAddress(6, 7, 0, 0));
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH2, 0, 0));
 
             headerColumn.GetCell(1).SetCellValue("Picture - Only for shape ref.");
-            s1.AddMergedRegion(new CellRangeAddress(6, 7, 1, 1));
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH2, 1, 1));
 
             headerColumn.GetCell(2).SetCellValue("Description");
-            s1.AddMergedRegion(new CellRangeAddress(6, 7, 2, 2));
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH2, 2, 2));
 
             headerColumn.GetCell(3).SetCellValue("Packing");
-            s1.AddMergedRegion(new CellRangeAddress(6, 6, 3, 4));
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH1, 3, 4));
 
             headerColumn2.GetCell(3).SetCellValue("Inner");
             headerColumn2.GetCell(4).SetCellValue("Master");  
 
             headerColumn.GetCell(5).SetCellValue("No. of master packages per 40'' container");
-            s1.AddMergedRegion(new CellRangeAddress(6, 7, 5, 5));
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH2, 5, 5));
 
             headerColumn.GetCell(6).SetCellValue("Port of loading");
-            s1.AddMergedRegion(new CellRangeAddress(6, 7, 6, 6));
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH2, 6, 6));
 
             HSSFSheet hssfsheet = (HSSFSheet)s1;
 
@@ -691,6 +693,7 @@ public class Objects
             int detailsCount = dtDetails.Rows.Count;
             for (int i = 0; i < detailsCount; i++)
             {
+                var rowTTDT = rowTT + 5 + i;
                 try
                 {
                     String imgPath = Path.Combine(productImagePath, dtDetails.Rows[i]["pic"].ToString() + ".jpg");
@@ -699,7 +702,7 @@ public class Objects
                     image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
                     IDrawing patriarch = s1.CreateDrawingPatriarch();
-                    HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, 1, 8 + i, 2, 9 + i);
+                    HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, 1, rowTTDT, 2, rowTTDT + 1);
                     anchor.AnchorType = 2;
 
                     int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
@@ -708,7 +711,7 @@ public class Objects
                 catch
                 { }
 
-                var rowTTDT = rowTT + 5 + i;
+                
                 s1.CreateRow(rowTTDT).CreateCell(0).SetCellValue(dtDetails.Rows[i]["ma_sanpham"].ToString());
                 s1.GetRow(rowTTDT).HeightInPoints = 50;
                 s1.GetRow(rowTTDT).CreateCell(1).SetCellValue("");
