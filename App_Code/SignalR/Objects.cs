@@ -523,17 +523,15 @@ public class Objects
             int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
             IPicture signaturePicturelogo = patriarchlogo.CreatePicture(anchorlogo, indexlogo);
 
-            // set A1
             s1.CreateRow(0).CreateCell(0).SetCellValue("ANCO COMPANY LIMITED");
 
-            // set A2
             s1.CreateRow(1).CreateCell(0).SetCellValue("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
 
-            // set A3
             s1.CreateRow(2).CreateCell(0).SetCellValue("Tel.: (84-274) 3740 973   Fax:  (84–274) 3740 621  Email: anco@ancopottery.com");
+            
+            s1.CreateRow(3).CreateCell(0).SetCellValue("QUOTATION REQUEST");
 
-            // set A4
-            s1.CreateRow(3).CreateCell(0).SetCellValue("INQUIRY");
+            s1.CreateRow(4).CreateCell(0).SetCellValue("Please send us a quotation for the below-mentioned items through our following contact:");
 
             IFont fontBold = hssfworkbook.CreateFont();
             fontBold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
@@ -572,21 +570,23 @@ public class Objects
             s1.GetRow(1).GetCell(0).CellStyle = cellStyleInfomation;
             s1.GetRow(2).GetCell(0).CellStyle = cellStyleInfomationUnderline;
             s1.GetRow(3).GetCell(0).CellStyle = cellStyleTitle;
+            s1.GetRow(4).GetCell(0).CellStyle = cellStyleInfomation;
 
             s1.AddMergedRegion(new CellRangeAddress(0, 0, 0, 6));
             s1.AddMergedRegion(new CellRangeAddress(1, 1, 0, 6));
             s1.AddMergedRegion(new CellRangeAddress(2, 2, 0, 6));
             s1.AddMergedRegion(new CellRangeAddress(3, 3, 0, 6));
 
-            s1.CreateRow(4).CreateCell(0).SetCellValue("CUSTOMER NAME:");
-            s1.GetRow(4).GetCell(0).CellStyle = cellBold;
+            var rowTT = 5;
+            s1.CreateRow(rowTT).CreateCell(0).SetCellValue("CUSTOMER NAME:");
+            s1.GetRow(rowTT).GetCell(0).CellStyle = cellBold;
 
-            s1.GetRow(4).CreateCell(1).SetCellValue(customer);
-            s1.GetRow(4).GetCell(1).CellStyle = cellBold;
+            s1.GetRow(rowTT).CreateCell(1).SetCellValue(customer);
+            s1.GetRow(rowTT).GetCell(1).CellStyle = cellBold;
 
 
-            s1.CreateRow(5).CreateCell(0).SetCellValue("ADDRESS:");
-            s1.GetRow(5).GetCell(0).CellStyle = cellBold;
+            s1.CreateRow(rowTT + 1).CreateCell(0).SetCellValue("ADDRESS:");
+            s1.GetRow(rowTT + 1).GetCell(0).CellStyle = cellBold;
 
             string val51 = "";
             if (!string.IsNullOrEmpty(address))
@@ -606,16 +606,16 @@ public class Objects
                 val51 += " Fax: " + tel;
             }
 
-            s1.GetRow(5).CreateCell(1).SetCellValue(val51);
+            s1.GetRow(rowTT + 1).CreateCell(1).SetCellValue(val51);
             s1.AddMergedRegion(new CellRangeAddress(5, 5, 1, 3));
-            s1.GetRow(5).GetCell(1).CellStyle = cellBold;
+            s1.GetRow(rowTT + 1).GetCell(1).CellStyle = cellBold;
 
-            s1.GetRow(4).CreateCell(5).SetCellValue("Date:");
-            s1.GetRow(4).CreateCell(6).SetCellValue(DateTime.Now.ToString("dd/MMM/yyyy"));
-            s1.GetRow(4).GetCell(6).CellStyle = cellBold;
+            s1.GetRow(rowTT).CreateCell(5).SetCellValue("Date:");
+            s1.GetRow(rowTT).CreateCell(6).SetCellValue(DateTime.Now.ToString("dd/MMM/yyyy"));
+            s1.GetRow(rowTT).GetCell(6).CellStyle = cellBold;
 
-            IRow headerColumn = s1.CreateRow(6);
-            IRow headerColumn2 = s1.CreateRow(7);
+            IRow headerColumn = s1.CreateRow(rowTT + 2);
+            IRow headerColumn2 = s1.CreateRow(rowTT + 3);
 
             headerColumn.HeightInPoints = 40;
             headerColumn2.HeightInPoints = 40;
@@ -707,31 +707,33 @@ public class Objects
                 catch
                 { }
 
-                s1.CreateRow(8 + i).CreateCell(0).SetCellValue(dtDetails.Rows[i]["ma_sanpham"].ToString());
-                s1.GetRow(8 + i).HeightInPoints = 50;
-                s1.GetRow(8 + i).CreateCell(1).SetCellValue("");
-                s1.GetRow(8 + i).CreateCell(2).SetCellValue(dtDetails.Rows[i]["mota_tienganh"].ToString());
+                var rowTTDT = rowTT + 4 + i;
+                s1.CreateRow(rowTTDT).CreateCell(0).SetCellValue(dtDetails.Rows[i]["ma_sanpham"].ToString());
+                s1.GetRow(rowTTDT).HeightInPoints = 50;
+                s1.GetRow(rowTTDT).CreateCell(1).SetCellValue("");
+                s1.GetRow(rowTTDT).CreateCell(2).SetCellValue(dtDetails.Rows[i]["mota_tienganh"].ToString());
 
-                s1.GetRow(8 + i).CreateCell(3).SetCellValue(dtDetails.Rows[i]["inner"].ToString());
-                s1.GetRow(8 + i).CreateCell(4).SetCellValue(dtDetails.Rows[i]["master"].ToString());
+                s1.GetRow(rowTTDT).CreateCell(3).SetCellValue(dtDetails.Rows[i]["inner"].ToString());
+                s1.GetRow(rowTTDT).CreateCell(4).SetCellValue(dtDetails.Rows[i]["master"].ToString());
 
-                s1.GetRow(8 + i).CreateCell(5).SetCellValue(double.Parse(dtDetails.Rows[i]["nopack"].ToString()));
-                s1.GetRow(8 + i).GetCell(5).SetCellType(CellType.Numeric);
+                s1.GetRow(rowTTDT).CreateCell(5).SetCellValue(double.Parse(dtDetails.Rows[i]["nopack"].ToString()));
+                s1.GetRow(rowTTDT).GetCell(5).SetCellType(CellType.Numeric);
 
-                s1.GetRow(8 + i).CreateCell(6).SetCellValue(dtDetails.Rows[i]["ten_cangbien"].ToString());
+                s1.GetRow(rowTTDT).CreateCell(6).SetCellValue(dtDetails.Rows[i]["ten_cangbien"].ToString());
             }
 
             for (int i = 0; i < dtDetails.Rows.Count; i++)
             {
+                var rowTTDT = rowTT + 4 + i;
                 for (int j = 0; j <= 6; j++)
                 {
                     if (j == 2)
                     {
-                        s1.GetRow(8 + i).GetCell(j).CellStyle = cellStyleLeft;
+                        s1.GetRow(rowTTDT).GetCell(j).CellStyle = cellStyleLeft;
                     }
                     else
                     {
-                        s1.GetRow(8 + i).GetCell(j).CellStyle = cellStyleCenter;
+                        s1.GetRow(rowTTDT).GetCell(j).CellStyle = cellStyleCenter;
                     }
                 }
             }
