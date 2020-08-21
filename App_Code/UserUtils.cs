@@ -364,22 +364,24 @@ public static class UserUtils
 			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.Value, 0);
             decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2);
 
-            if (gianhap2 > -1) {
-				gianhap = gianhap2;
+            var phiDiscount = ddonhang.phi.GetValueOrDefault(0) - (ddonhang.phi.GetValueOrDefault(0) * (decimal)ddonhang.discount.GetValueOrDefault(0) / 100);
+            if (gianhap2 > -1)
+            {
+                gianhap = gianhap2;
                 if (maNCC != "VINHGIA")
                 {
                     giachuan = jqGridHelper.Utils.Round3(gianhap, -2);
-                    gianhap = jqGridHelper.Utils.Round3(gianhap + (ddonhang.phi.GetValueOrDefault(0) * tygia), -2);
+                    gianhap = jqGridHelper.Utils.Round3(gianhap + (phiDiscount * tygia), -2);
                 }
                 else
                 {
                     giachuan = gianhap;
-                    gianhap = gianhap + ddonhang.phi.GetValueOrDefault(0);
+                    gianhap = gianhap + phiDiscount;
                 }
             }
             else
             {
-                gianhap = gianhap + ddonhang.phi.GetValueOrDefault(0) * tygia;
+                gianhap = gianhap + phiDiscount * tygia;
             }
 
             var ddsdh = new c_dongdsdh();
