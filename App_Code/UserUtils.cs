@@ -364,7 +364,7 @@ public static class UserUtils
 			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.Value, 0);
             decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2);
 
-            var phiDiscount = ddonhang.phi.GetValueOrDefault(0) - (ddonhang.phi.GetValueOrDefault(0) * (decimal)ddonhang.discount.GetValueOrDefault(0) / 100);
+            var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
             if (gianhap2 > -1)
             {
                 gianhap = gianhap2;
