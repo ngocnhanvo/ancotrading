@@ -713,7 +713,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
                     rowToTalHeHang.CreateCell(3).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "D"));
                     rowToTalHeHang.GetCell(3).CellStyle = styleNumber012Bold;
                     rowToTalHeHang.CreateCell(4).SetCellValue("pcs/sets");
-                    rowToTalHeHang.GetCell(4).CellStyle = styleNumber012Bold;
+                    rowToTalHeHang.GetCell(4).CellStyle = style12Bold;
                     rowToTalHeHang.CreateCell(6).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "G"));
                     rowToTalHeHang.GetCell(6).CellStyle = styleNumber0i0012Bold;
                     r++;
