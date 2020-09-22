@@ -817,8 +817,8 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
             sumToTalPO += string.Format(@"H{0}+", row);
         }
         sumToTalPO += "0";
-        s1.GetRow(r).CreateCell(6).CellFormula = string.Format("{0} + H{1} - H{2} + H{3} - H{4}", sumToTalPO, r - 3, r - 2, r - 1, r);
-        s1.GetRow(r).GetCell(6).CellStyle = styleNumber0i0012Bold;
+        s1.GetRow(r).CreateCell(7).CellFormula = string.Format("{0} + H{1} - H{2} + H{3} - H{4}", sumToTalPO, r - 3, r - 2, r - 1, r);
+        s1.GetRow(r).GetCell(7).CellStyle = styleNumber0i0012Bold;
 
 
 
@@ -826,7 +826,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         CellValue cValue = formula.Evaluate(s1.GetRow(r).GetCell(6));
         double doctien = cValue.NumberValue;
 
-        s1.GetRow(rDiscount).GetCell(6).SetCellFormula(string.Format(funcDiscount, rDiscount));
+        s1.GetRow(rDiscount).GetCell(7).SetCellFormula(string.Format(funcDiscount, rDiscount));
 
         s1.GetRow(r).HeightInPoints = 0;
 
