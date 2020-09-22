@@ -823,7 +823,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
 
 
         HSSFFormulaEvaluator formula = new HSSFFormulaEvaluator(hssfworkbook);
-        CellValue cValue = formula.Evaluate(s1.GetRow(r).GetCell(6));
+        CellValue cValue = formula.Evaluate(s1.GetRow(r).GetCell(7));
         double doctien = cValue.NumberValue;
 
         s1.GetRow(rDiscount).GetCell(7).SetCellFormula(string.Format(funcDiscount, rDiscount));
