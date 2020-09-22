@@ -381,7 +381,7 @@ public static class UserUtils
             }
             else
             {
-                gianhap = gianhap + phiDiscount * tygia;
+                gianhap = jqGridHelper.Utils.Round3(gianhap + phiDiscount * tygia, -2);
             }
 
             var ddsdh = new c_dongdsdh();
