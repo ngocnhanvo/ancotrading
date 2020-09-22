@@ -714,7 +714,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
             s1.GetRow(r).CreateCell(7).CellFormula = String.Format(funcDiscount, r);
             s1.GetRow(r).GetCell(7).CellStyle = styleNumber0i0012Bold;
 
-            s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
+            //s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
             lstDiscount.Add(r + 1);
 
             sumDiscount += double.Parse(discountPO);
