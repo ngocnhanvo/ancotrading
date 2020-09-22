@@ -806,8 +806,8 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         }
         fSalary = fSalary.Substring(1);
 
-        s1.GetRow(r).CreateCell(3).SetCellFormula(fQuantity);
-        s1.GetRow(r).GetCell(3).CellStyle = styleNumber012Bold;
+        s1.GetRow(r).CreateCell(4).SetCellFormula(fQuantity);
+        s1.GetRow(r).GetCell(4).CellStyle = styleNumber012Bold;
 
         //s1.GetRow(r).CreateCell(6).SetCellFormula(String.Format("({0}) - ({1}) + G{2} - G{3} + G{4} - G{5}", fSalary, fDiscount, r - 3, r - 2, r - 1, r));
         string sumToTalPO = "";
