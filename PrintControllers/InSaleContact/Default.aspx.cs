@@ -622,7 +622,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
                     rowToTalHeHang.CreateCell(4).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "E"));
                     rowToTalHeHang.GetCell(4).CellStyle = styleNumber012Bold;
                     rowToTalHeHang.CreateCell(5).SetCellValue("pcs/sets");
-                    rowToTalHeHang.GetCell(5).CellStyle = styleNumber012Bold;
+                    rowToTalHeHang.GetCell(5).CellStyle = style12Bold;
                     rowToTalHeHang.CreateCell(7).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "H"));
                     rowToTalHeHang.GetCell(7).CellStyle = styleNumber0i0012Bold;
                     r++;
@@ -690,7 +690,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
 
             var discountPO = g_it["discount"].ToString() + "";
             discountPO = discountPO.Replace(".00", "");
-            s1.CreateRow(r).CreateCell(3).SetCellValue(String.Format("Discount({0}%):", discountPO));
+            s1.CreateRow(r).CreateCell(3).SetCellValue(String.Format("Discount ({0}%):", discountPO));
             s1.GetRow(r).GetCell(3).CellStyle = style12Bold;
 
             if (str_dsc1.Contains("."))
