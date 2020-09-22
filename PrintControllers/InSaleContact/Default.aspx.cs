@@ -690,8 +690,8 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
 
             var discountPO = g_it["discount"].ToString() + "";
             discountPO = discountPO.Replace(".00", "");
-            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Discount({0}%):", discountPO));
-            s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
+            s1.CreateRow(r).CreateCell(3).SetCellValue(String.Format("Discount({0}%):", discountPO));
+            s1.GetRow(r).GetCell(3).CellStyle = style12Bold;
 
             if (str_dsc1.Contains("."))
             {
@@ -711,8 +711,8 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
             }
 
             rDiscount = r;
-            s1.GetRow(r).CreateCell(6).CellFormula = String.Format(funcDiscount, r);
-            s1.GetRow(r).GetCell(6).CellStyle = styleNumber0i0012Bold;
+            s1.GetRow(r).CreateCell(7).CellFormula = String.Format(funcDiscount, r);
+            s1.GetRow(r).GetCell(7).CellStyle = styleNumber0i0012Bold;
 
             s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
             lstDiscount.Add(r + 1);
@@ -722,17 +722,17 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
             if (double.Parse(discountPO) == 0) s1.GetRow(r).HeightInPoints = 0;
 
             r++;
-            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Total PO {0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
-            s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
+            s1.CreateRow(r).CreateCell(3).SetCellValue(String.Format("Total PO {0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
+            s1.GetRow(r).GetCell(3).CellStyle = style12Bold;
 
-            s1.GetRow(r).CreateCell(6).CellFormula = String.Format("H{0}-H{1}", r - 1, r);
-            s1.GetRow(r).GetCell(6).CellStyle = styleNumber0i0012Bold;
+            s1.GetRow(r).CreateCell(7).CellFormula = String.Format("H{0}-H{1}", r - 1, r);
+            s1.GetRow(r).GetCell(7).CellStyle = styleNumber0i0012Bold;
 
-            s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
+            //s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
 
             // total quantity
-            s1.GetRow(r).CreateCell(3).CellFormula = String.Format("E{0}", r - 1);
-            s1.GetRow(r).GetCell(3).CellStyle = styleNumber012Bold;
+            s1.GetRow(r).CreateCell(4).CellFormula = String.Format("E{0}", r - 1);
+            s1.GetRow(r).GetCell(4).CellStyle = styleNumber012Bold;
 
             r++;
             count++;
