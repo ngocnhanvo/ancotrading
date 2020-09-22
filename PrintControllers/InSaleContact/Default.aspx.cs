@@ -615,8 +615,8 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
                     r++;
                     var rowToTalHeHang = s1.CreateRow(r);
                     rowToTalHeHang.HeightInPoints = rowHeight;
-                    rowToTalHeHang.CreateCell(2).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
-                    rowToTalHeHang.GetCell(2).CellStyle = style12Bold;
+                    rowToTalHeHang.CreateCell(3).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
+                    rowToTalHeHang.GetCell(3).CellStyle = style12Bold;
                     s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 2));
                     string fmlSum = string.Format(@"SUM(VNN{0}:VNN{1})", startRowHH + 1, r);
                     rowToTalHeHang.CreateCell(4).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "E"));
@@ -641,8 +641,8 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
                     rowTotalHeHang.CreateCell(3).SetCellValue(string.Format("Total ({0}):", lstHH.Count + 1));
                     rowTotalHeHang.GetCell(3).CellStyle = style12Bold;
                     s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 2));
-                    rowTotalHeHang.CreateCell(3).CellFormula = string.Format("E{0}", r - 1);
-                    rowTotalHeHang.GetCell(3).CellStyle = styleNumber012Bold;
+                    rowTotalHeHang.CreateCell(4).CellFormula = string.Format("E{0}", r - 1);
+                    rowTotalHeHang.GetCell(4).CellStyle = styleNumber012Bold;
                     rowTotalHeHang.CreateCell(7).CellFormula = string.Format("H{0} - H{1}", r - 1, r);
                     rowTotalHeHang.GetCell(7).CellStyle = styleNumber0i0012Bold;
 
