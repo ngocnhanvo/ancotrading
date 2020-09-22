@@ -497,6 +497,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
             select distinct 
                 c_donhang_id
                 , sodh
+                , discount_hehang_value
                 , container
                 , soseal
                 , ten_cangbien
