@@ -66,6 +66,7 @@ public class TaoPackingListController : IHttpHandler {
             p.hoatdong = true;
             p.noidi = md_cangbien_id;
 
+            double discountHH = 0;
             foreach (DataRow item in dt.Rows)
             {
 
@@ -88,6 +89,7 @@ public class TaoPackingListController : IHttpHandler {
                 line.ma_sanpham_khach = dongdonhang.ma_sanpham_khach;
                 line.soluong = decimal.Parse(item["slthuc_nhapxuat"].ToString());
                 line.gia = dongnx.dongia;
+                discountHH += (double)dongdonhang.giafob.GetValueOrDefault(0) * dongdonhang.discount.GetValueOrDefault(0) / 100;
                 line.thanhtien = dongnx.slthuc_nhapxuat * dongnx.dongia;
                 line.nhacungungid = dongdonhang.nhacungungid;
                 line.v2 = dongdonhang.v2;
@@ -158,7 +160,8 @@ public class TaoPackingListController : IHttpHandler {
             p.giatritru_po = phi_giam;
             p.diengiaicong_po = diendai_phitang;
             p.diengiaitru_po = diendai_phigiam;
-
+            
+            totaldiscount = totaldiscount + (decimal)discountHH;
             p.totaldis = Math.Round(totaldiscount, 2);
             p.totalnet = Math.Round(totalnet, 2);
             p.totalgross = p.totalnet - p.totaldis + (p.giatri_cong + p.giatricong_po) - (p.giatri_tru + p.giatritru_po);
