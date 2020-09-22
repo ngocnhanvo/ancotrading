@@ -89,7 +89,7 @@ public class TaoPackingListController : IHttpHandler {
                 line.ma_sanpham_khach = dongdonhang.ma_sanpham_khach;
                 line.soluong = decimal.Parse(item["slthuc_nhapxuat"].ToString());
                 line.gia = dongnx.dongia;
-                discountHH += (double)dongdonhang.giafob.GetValueOrDefault(0) * dongdonhang.discount.GetValueOrDefault(0) / 100;
+                discountHH += (double)dongdonhang.giafob.GetValueOrDefault(0) * dongdonhang.discount.GetValueOrDefault(0) / 100 * (double)dongnx.slthuc_nhapxuat.GetValueOrDefault(0);
                 line.thanhtien = dongnx.slthuc_nhapxuat * dongnx.dongia;
                 line.nhacungungid = dongdonhang.nhacungungid;
                 line.v2 = dongdonhang.v2;
