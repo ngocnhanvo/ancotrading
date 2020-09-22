@@ -739,36 +739,36 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
             lstPO.Add(r);
         }
 
-        s1.CreateRow(r).CreateCell(2).SetCellValue("(+)" + pdkInvoice.diengiai_cong + ":");
-        s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
+        s1.CreateRow(r).CreateCell(3).SetCellValue("(+)" + pdkInvoice.diengiai_cong + ":");
+        s1.GetRow(r).GetCell(3).CellStyle = style12Bold;
 
-        s1.GetRow(r).CreateCell(6).SetCellValue(double.Parse(pdkInvoice.giatri_cong.Value.ToString()));
-        s1.GetRow(r).GetCell(6).CellStyle = styleNumber0i0012Bold;
+        s1.GetRow(r).CreateCell(7).SetCellValue(double.Parse(pdkInvoice.giatri_cong.Value.ToString()));
+        s1.GetRow(r).GetCell(7).CellStyle = styleNumber0i0012Bold;
 
         if (pdkInvoice.giatri_cong.Value == 0) s1.GetRow(r).HeightInPoints = 0;
 
         r++;
-        s1.CreateRow(r).CreateCell(2).SetCellValue("(-)" + pdkInvoice.diengiai_tru + ":");
-        s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
+        s1.CreateRow(r).CreateCell(3).SetCellValue("(-)" + pdkInvoice.diengiai_tru + ":");
+        s1.GetRow(r).GetCell(3).CellStyle = style12Bold;
 
-        s1.GetRow(r).CreateCell(6).SetCellValue(double.Parse(pdkInvoice.giatri_tru.Value.ToString()));
-        s1.GetRow(r).GetCell(6).CellStyle = styleNumber0i0012Bold;
+        s1.GetRow(r).CreateCell(7).SetCellValue(double.Parse(pdkInvoice.giatri_tru.Value.ToString()));
+        s1.GetRow(r).GetCell(7).CellStyle = styleNumber0i0012Bold;
         if (pdkInvoice.giatri_tru.Value == 0) s1.GetRow(r).HeightInPoints = 0;
 
         r++;
-        s1.CreateRow(r).CreateCell(2).SetCellValue(pdkInvoice.diengiaicong_po + ":");
-        s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
+        s1.CreateRow(r).CreateCell(3).SetCellValue(pdkInvoice.diengiaicong_po + ":");
+        s1.GetRow(r).GetCell(3).CellStyle = style12Bold;
 
-        s1.GetRow(r).CreateCell(6).SetCellValue(double.Parse(pdkInvoice.giatricong_po.Value.ToString()));
-        s1.GetRow(r).GetCell(6).CellStyle = styleNumber0i0012Bold;
+        s1.GetRow(r).CreateCell(7).SetCellValue(double.Parse(pdkInvoice.giatricong_po.Value.ToString()));
+        s1.GetRow(r).GetCell(7).CellStyle = styleNumber0i0012Bold;
         if (pdkInvoice.giatricong_po.Value == 0) s1.GetRow(r).HeightInPoints = 0;
 
         r++;
-        s1.CreateRow(r).CreateCell(2).SetCellValue(pdkInvoice.diengiaitru_po + ":");
-        s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
+        s1.CreateRow(r).CreateCell(3).SetCellValue(pdkInvoice.diengiaitru_po + ":");
+        s1.GetRow(r).GetCell(3).CellStyle = style12Bold;
 
-        s1.GetRow(r).CreateCell(6).SetCellValue(double.Parse(pdkInvoice.giatritru_po.Value.ToString()));
-        s1.GetRow(r).GetCell(6).CellStyle = styleNumber0i0012Bold;
+        s1.GetRow(r).CreateCell(7).SetCellValue(double.Parse(pdkInvoice.giatritru_po.Value.ToString()));
+        s1.GetRow(r).GetCell(7).CellStyle = styleNumber0i0012Bold;
         if (pdkInvoice.giatritru_po.Value == 0) s1.GetRow(r).HeightInPoints = 0;
 
         r++;
@@ -779,8 +779,8 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         }
         strCount = strCount.Substring(2);
 
-        s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Total{0}:", countDonHang > 1 ? " (" + strCount + ")" : ""));
-        s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
+        s1.CreateRow(r).CreateCell(3).SetCellValue(String.Format("Total{0}:", countDonHang > 1 ? " (" + strCount + ")" : ""));
+        s1.GetRow(r).GetCell(3).CellStyle = style12Bold;
 
         // total quantity
         string fQuantity = "", fSalary = "", fDiscount = "";
