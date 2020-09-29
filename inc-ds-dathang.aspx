@@ -532,9 +532,10 @@
             {
                  fixed: true, name: 'hangiaohang_po'
                  , label: 'Ngày xong hàng'
+                 , align: 'center'
                  , index: 'dsdh.hangiaohang_po'
                  , editable: true
-                 , width: 100
+                 , width: 90
                  , edittype: 'text'
                  , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
                  , formoptions: { colpos: 1, rowpos: 7 }
@@ -576,9 +577,10 @@
 			{
                  fixed: true, name: 'ngaylap'
                  , label: 'Ngày Lập'
+                 , align: 'center'
                  , index: 'dsdh.ngaylap'
                  , editable: true
-                 , width: 100
+                 , width: 90
                  , edittype: 'text'
                  , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
                  , formoptions: { colpos: 1, rowpos: 6 }
