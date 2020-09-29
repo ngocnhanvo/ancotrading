@@ -123,7 +123,8 @@ public class DanhSachDatHangReport
 			string textMoney = "";
 			double? totalUSD = total - (double)totalDiscount + (double)phitang.GetValueOrDefault(0) - (double)phigiam.GetValueOrDefault(0);
 			var ma_dtkd = tbl.Rows[0]["ma_dtkd"].ToString();
-			if(new string[]{ "VINHGIA" }.Contains(ma_dtkd)) {
+
+            if (new string[]{ "VINHGIA" }.Contains(ma_dtkd)) {
 				string m = MoneyToWord.ConvertMoneyToText(totalUSD.ToString()).Replace("Dollars", "");			
 				int j =  m.LastIndexOf("and");
 			
@@ -140,7 +141,8 @@ public class DanhSachDatHangReport
 			else {
 				textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)totalUSD.GetValueOrDefault(0));
 			}
-			tbl.Rows[0]["money"] = tbl.Rows[lastRow]["money"] = textMoney;
+
+			tbl.Rows[0]["money"] = tbl.Rows[lastRow]["money"] = totalUSD;
 			tbl.Rows[0]["tongtiendatru"] = tbl.Rows[lastRow]["tongtiendatru"] = totalUSD;
 			
 			string diengiai_cong = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 1 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
