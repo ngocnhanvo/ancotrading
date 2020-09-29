@@ -277,7 +277,7 @@ public class DanhSachDatHangReport
             "SL",
             "Giá mua",
             "Phí",
-            "Giá",
+            "Tổng đơn giá",
             "Thành tiền",
             "Hướng dẫn làm hàng",
             "Đóng gói Inner",
@@ -287,6 +287,7 @@ public class DanhSachDatHangReport
             "Giá gốc",
             "Phí"
         };
+
 		IRow rowColumnHeader = s1.CreateRow(row);
 		rowColumnHeader.HeightInPoints = 47;
 		for(int i = 0; i < d.Length; i++)
@@ -416,9 +417,9 @@ public class DanhSachDatHangReport
         s1.GetRow(row).GetCell(6).CellStyle = cellModel.CreateCellStyle();
 
         if (guiNCC == true)
-            s1.GetRow(row).CreateCell(9).SetCellValue("");
+            s1.GetRow(row).CreateCell(11).SetCellValue("");
         else
-            s1.GetRow(row).CreateCell(9).SetCellFormula(String.Format("SUM(J{0}:J{1})", m, row));
+            s1.GetRow(row).CreateCell(11).SetCellFormula(String.Format("SUM(J{0}:J{1})", m, row));
         cellModel.FormatData = "#,##0";
         s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
 		row++;
@@ -428,7 +429,7 @@ public class DanhSachDatHangReport
         s1.CreateRow(row).CreateCell(1).SetCellValue("(+):" + dt.Rows[0]["mota_cong"].ToString());
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(9).SetCellValue(double.Parse(phitang == null ? "0" : phitang.Value.ToString()));
+            s1.GetRow(row).CreateCell(11).SetCellValue(double.Parse(phitang == null ? "0" : phitang.Value.ToString()));
             cellModel.BorderAll = false;
             cellModel.FormatData = "#,##0";
             cellModel.HorizontalAlignment = HorizontalAlignment.Right;
@@ -446,7 +447,7 @@ public class DanhSachDatHangReport
         s1.CreateRow(row).CreateCell(1).SetCellValue("(-):" + dt.Rows[0]["mota_tru"].ToString());
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(9).SetCellValue(double.Parse(phigiam == null ? "0" : phigiam.Value.ToString()));
+            s1.GetRow(row).CreateCell(11).SetCellValue(double.Parse(phigiam == null ? "0" : phigiam.Value.ToString()));
             cellModel.BorderAll = false;
             cellModel.FormatData = "#,##0";
             cellModel.HorizontalAlignment = HorizontalAlignment.Right;
@@ -463,7 +464,7 @@ public class DanhSachDatHangReport
         s1.CreateRow(row).CreateCell(1).SetCellValue(String.Format("Discount ({0}%)", dt.Rows[0]["discountdecimal"].ToString()));
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(9).SetCellValue(double.Parse(dt.Rows[0]["discount"].ToString()));
+            s1.GetRow(row).CreateCell(11).SetCellValue(double.Parse(dt.Rows[0]["discount"].ToString()));
             cellModel.BorderAll = false;
             cellModel.FormatData = "#,##0";
             cellModel.HorizontalAlignment = HorizontalAlignment.Right;
@@ -474,7 +475,7 @@ public class DanhSachDatHangReport
 		s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng đã trừ:");
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(9).SetCellFormula(String.Format("J{0} + J{1} - J{2} - J{3}", sub, cong, tru, dis));
+            s1.GetRow(row).CreateCell(11).SetCellFormula(String.Format("J{0} + J{1} - J{2} - J{3}", sub, cong, tru, dis));
             cellModel.FormatData = "#,##0";
             s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
         }
