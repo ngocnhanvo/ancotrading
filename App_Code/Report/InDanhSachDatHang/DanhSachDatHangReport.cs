@@ -419,7 +419,7 @@ public class DanhSachDatHangReport
         if (guiNCC == true)
             s1.GetRow(row).CreateCell(11).SetCellValue("");
         else
-            s1.GetRow(row).CreateCell(11).SetCellFormula(String.Format("SUM(J{0}:J{1})", m, row));
+            s1.GetRow(row).CreateCell(11).SetCellFormula(String.Format("SUM(L{0}:L{1})", m, row));
         cellModel.FormatData = "#,##0";
         s1.GetRow(row).GetCell(11).CellStyle = cellModel.CreateCellStyle();
 		row++;
@@ -475,7 +475,7 @@ public class DanhSachDatHangReport
 		s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng đã trừ:");
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(11).SetCellFormula(String.Format("J{0} + J{1} - J{2} - J{3}", sub, cong, tru, dis));
+            s1.GetRow(row).CreateCell(11).SetCellFormula(String.Format("L{0} + L{1} - L{2} - L{3}", sub, cong, tru, dis));
             cellModel.FormatData = "#,##0";
             s1.GetRow(row).GetCell(11).CellStyle = cellModel.CreateCellStyle();
         }
