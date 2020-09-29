@@ -157,13 +157,21 @@ public class DongDanhSachDatHangController : IHttpHandler
 		
         String poId = context.Request.QueryString["poId"];
 
-        String sqlCount = "SELECT COUNT(*) AS count " +
-            " FROM c_dongdsdh ddsdh, c_danhsachdathang dsdh, " +
-            " md_sanpham sp, md_doitackinhdoanh dtkd " +
-            " WHERE ddsdh.c_danhsachdathang_id = dsdh.c_danhsachdathang_id " +
-            " AND ddsdh.md_sanpham_id = sp.md_sanpham_id " +
-            " AND ddsdh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " +
-            " AND ddsdh.c_danhsachdathang_id = N'{0}' " + filter;
+        String sqlCount = string.Format(@"
+            SELECT 
+                COUNT(1) AS count
+            FROM 
+                c_dongdsdh ddsdh
+                , c_danhsachdathang dsdh
+                , md_sanpham sp
+                , md_doitackinhdoanh dtkd
+            WHERE 
+                ddsdh.c_danhsachdathang_id = dsdh.c_danhsachdathang_id
+                AND ddsdh.md_sanpham_id = sp.md_sanpham_id
+                AND ddsdh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
+                AND ddsdh.c_danhsachdathang_id = N'{{0}}'
+                {0}
+        ", filter);
         
         if (poId != null)
         {
@@ -200,33 +208,44 @@ public class DongDanhSachDatHangController : IHttpHandler
             sidx = "c_dongdsdh_id";
         }
 
-        string strsql = "select * from( " +
-               " select " +
-               "     ddsdh.c_dongdsdh_id , dsdh.c_danhsachdathang_id, sp.trangthai, ddsdh.sothutu as ddsdhline " +
-               "     , sp.md_sanpham_id, sp.ma_sanpham , ddsdh.mota_tiengviet " +
-               "     , dtkd.ma_dtkd, huongdan_dathang " +
-               "     , han_giaohang, tem_dan, ddsdh.sl_dathang, ddsdh.gianhap, ddsdh.sl_dagiao, ddsdh.sl_conlai " +
-               "     , ddsdh.ngaytao, ddsdh.nguoitao, ddsdh.ngaycapnhat, ddsdh.nguoicapnhat, ddsdh.mota, ddsdh.hoatdong " +
-               "     , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-               " FROM " +
-               "     c_dongdsdh ddsdh, c_danhsachdathang dsdh " +
-               "     , md_sanpham sp " +
-               "     , md_doitackinhdoanh dtkd " +
-               " WHERE " +
-               "     ddsdh.c_danhsachdathang_id = dsdh.c_danhsachdathang_id " +
-               "     AND ddsdh.md_sanpham_id = sp.md_sanpham_id " +
-               "     AND ddsdh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " +
-               "     AND ddsdh.c_danhsachdathang_id = N'{0}' " + filter +
-               " )P  WHERE RowNum > @start AND RowNum < @end";
-        
-        if (poId != null)
-        {
-            strsql = string.Format(strsql, poId);
-        }
-        else
-        {
-            strsql = string.Format(strsql, 0);
-        }
+        string strsql = string.Format(@"
+            select * from(
+               select
+                   ddsdh.c_dongdsdh_id
+                   , dsdh.c_danhsachdathang_id
+                   , sp.trangthai
+                   , ddsdh.sothutu as ddsdhline 
+                   , sp.md_sanpham_id
+                   , sp.ma_sanpham
+                   , ddsdh.mota_tiengviet 
+                   , dtkd.ma_dtkd
+                   , huongdan_dathang 
+                   , han_giaohang
+                   , tem_dan
+                   , ddsdh.sl_dathang
+                   , ddsdh.giachuan
+                   , ddsdh.gianhap - ddsdh.giachuan as phi
+                   , ddsdh.gianhap
+                   , ddsdh.sl_dagiao
+                   , ddsdh.sl_conlai 
+                   , ddsdh.ngaytao, ddsdh.nguoitao, ddsdh.ngaycapnhat, ddsdh.nguoicapnhat, ddsdh.mota, ddsdh.hoatdong 
+                   , ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum
+               FROM
+                    c_dongdsdh ddsdh
+                    , c_danhsachdathang dsdh
+                    , md_sanpham sp 
+                    , md_doitackinhdoanh dtkd 
+               WHERE 
+                    ddsdh.c_danhsachdathang_id = dsdh.c_danhsachdathang_id 
+                    AND ddsdh.md_sanpham_id = sp.md_sanpham_id 
+                    AND ddsdh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id 
+                    AND ddsdh.c_danhsachdathang_id = N'{2}' {3}
+            )P  WHERE RowNum > @start AND RowNum < @end"
+            , sidx
+            , sord
+            , poId != null ? poId : "0"
+            , filter
+        );
         
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
@@ -237,27 +256,29 @@ public class DongDanhSachDatHangController : IHttpHandler
         foreach (System.Data.DataRow row in dt.Rows)
         {
             xml += "<row>";
-            xml += "<cell><![CDATA[" + row[0] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[1] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[2] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[3] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[4] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[5] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[6] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[7] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[9].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[10] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[11] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[12] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[13] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[14] + "]]></cell>";            
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[15].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[16] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[17].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[18] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[19] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[20] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["c_dongdsdh_id"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["c_danhsachdathang_id"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["trangthai"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["ddsdhline"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["md_sanpham_id"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["ma_sanpham"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["mota_tiengviet"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["huongdan_dathang"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row["han_giaohang"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tem_dan"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["sl_dathang"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["giachuan"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["gianhap"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["sl_dagiao"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["sl_conlai"] + "]]></cell>";        
+            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["nguoicapnhat"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

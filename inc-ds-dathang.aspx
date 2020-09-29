@@ -951,6 +951,32 @@
                 , editrules: { required:true, number: true, minValue:0 }
                 , align:'right'
             },
+            {
+                fixed: true, name: 'giachuan'
+                , label: 'Giá mua'
+                , index: 'ddsdh.giachuan'
+                , width: 100
+                , edittype: 'text'
+                , editable: xemgiaDSDH == 'True'
+				, hidden: xemgiaDSDH == 'False'
+                , editrules: { required:true, number: true, minValue:1 }
+                , align:'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+            },
+            {
+                fixed: true, name: 'phi'
+                , label: 'Phí'
+                , index: 'ddsdh.gianhap - ddsdh.giachuan'
+                , width: 100
+                , edittype: 'text'
+                , editable: xemgiaDSDH == 'True'
+				, hidden: xemgiaDSDH == 'False'
+                , editrules: { required:true, number: true, minValue:1 }
+                , align:'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+            },
 			{
                 fixed: true, name: 'gianhap'
                 , label: 'Giá nhập'
