@@ -275,6 +275,8 @@ public class DanhSachDatHangReport
             "ĐVT",
             "Cbm",
             "SL",
+            "Giá mua",
+            "Phí",
             "Giá",
             "Thành tiền",
             "Hướng dẫn làm hàng",
@@ -295,17 +297,17 @@ public class DanhSachDatHangReport
 			if( i == 4) {
 				with = 7000;
 			}
-			else if(i == 8 | i == 9) {
+			else if(i == 10 | i == 11) {
 				with = 5000;
 			}
-			else if( i == 10 | i == 14 | i == 10) {
+			else if( i == 12 | i == 16) {
 				with = 0;
 			}
 
-            if ((i == 8 | i == 9) & guiNCC == true)
+            if ((i == 10 | i == 11) & guiNCC == true)
                 with = 0;
 
-            if (i == 15 | i == 16)
+            if (i == 17 | i == 18)
                 with = 0;
 
             s1.SetColumnWidth(cell,with);
@@ -325,6 +327,8 @@ public class DanhSachDatHangReport
                 "ma_edi",
                 "v2",
                 "sl_dathang",
+                "giachuan",
+                "phi",
                 "gianhap",
                 "thanhtien",
                 "huongdan_dathang",
