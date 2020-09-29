@@ -142,7 +142,7 @@ public class DanhSachDatHangReport
 				textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)totalUSD.GetValueOrDefault(0));
 			}
 
-			tbl.Rows[0]["money"] = tbl.Rows[lastRow]["money"] = strSumThanhTien;
+			tbl.Rows[0]["money"] = tbl.Rows[lastRow]["money"] = textMoney;
 			tbl.Rows[0]["tongtiendatru"] = tbl.Rows[lastRow]["tongtiendatru"] = totalUSD;
 			
 			string diengiai_cong = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 1 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
@@ -371,7 +371,7 @@ public class DanhSachDatHangReport
 				}
 				else if(e_value[j] == "thanhtien") {
                     if (guiNCC == false)
-                        cel_row_t.CellFormula = String.Format("H{0}*I{0}",row + 1);
+                        cel_row_t.CellFormula = String.Format("H{0}*K{0}",row + 1);
 					cel_row_t.CellStyle = border_number1;
 				}
 				else if(e_value[j] == "trongluong"){
