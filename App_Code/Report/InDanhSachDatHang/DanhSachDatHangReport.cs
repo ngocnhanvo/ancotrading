@@ -421,7 +421,7 @@ public class DanhSachDatHangReport
         else
             s1.GetRow(row).CreateCell(11).SetCellFormula(String.Format("SUM(J{0}:J{1})", m, row));
         cellModel.FormatData = "#,##0";
-        s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
+        s1.GetRow(row).GetCell(11).CellStyle = cellModel.CreateCellStyle();
 		row++;
 		//start +
 		int cong = row + 1;
