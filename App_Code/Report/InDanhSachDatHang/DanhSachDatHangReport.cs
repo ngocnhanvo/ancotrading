@@ -142,7 +142,7 @@ public class DanhSachDatHangReport
 				textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)totalUSD.GetValueOrDefault(0));
 			}
 
-			tbl.Rows[0]["money"] = tbl.Rows[lastRow]["money"] = totalUSD;
+			tbl.Rows[0]["money"] = tbl.Rows[lastRow]["money"] = strSumThanhTien;
 			tbl.Rows[0]["tongtiendatru"] = tbl.Rows[lastRow]["tongtiendatru"] = totalUSD;
 			
 			string diengiai_cong = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 1 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
