@@ -433,7 +433,7 @@ public class DanhSachDatHangReport
             cellModel.BorderAll = false;
             cellModel.FormatData = "#,##0";
             cellModel.HorizontalAlignment = HorizontalAlignment.Right;
-            s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
+            s1.GetRow(row).GetCell(11).CellStyle = cellModel.CreateCellStyle();
         }
 
         if (phitang == null)
@@ -451,7 +451,7 @@ public class DanhSachDatHangReport
             cellModel.BorderAll = false;
             cellModel.FormatData = "#,##0";
             cellModel.HorizontalAlignment = HorizontalAlignment.Right;
-            s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
+            s1.GetRow(row).GetCell(11).CellStyle = cellModel.CreateCellStyle();
         }
 
         if (phigiam == null)
@@ -468,7 +468,7 @@ public class DanhSachDatHangReport
             cellModel.BorderAll = false;
             cellModel.FormatData = "#,##0";
             cellModel.HorizontalAlignment = HorizontalAlignment.Right;
-            s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
+            s1.GetRow(row).GetCell(11).CellStyle = cellModel.CreateCellStyle();
         }
 		row++;
 		// start tổng cộng đã trừ
@@ -477,7 +477,7 @@ public class DanhSachDatHangReport
         {
             s1.GetRow(row).CreateCell(11).SetCellFormula(String.Format("J{0} + J{1} - J{2} - J{3}", sub, cong, tru, dis));
             cellModel.FormatData = "#,##0";
-            s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
+            s1.GetRow(row).GetCell(11).CellStyle = cellModel.CreateCellStyle();
         }
 		row++;
 		// start viet bang chu
