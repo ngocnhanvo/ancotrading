@@ -718,6 +718,9 @@ public class DonHangController : IHttpHandler
             string chkPBGCu_str = context.Request.Form["chkPBGCu"];
             string phienbangiacu = context.Request.Form["phienbangiacu"];
 
+            string phanbodiscountStr = (context.Request.Form["phanbodiscount"] + "").ToLower();
+            var phanbodiscount = phanbodiscountStr.Equals("on") || phanbodiscountStr.Equals("true");
+
             bool isdh_mau, isdonhang_tmp, isgiadb, chkPBGCu = false;
             isdh_mau = isdonhang_tmp = isgiadb = false;
             decimal mnu_cont20 = 0;
@@ -730,6 +733,7 @@ public class DonHangController : IHttpHandler
             try { mnu_cont45 = decimal.Parse(context.Request.Form["cont45"]); } catch { }
             decimal mnu_contle = 0;
             try { mnu_contle = decimal.Parse(context.Request.Form["contle"]); } catch { }
+
 
             if (chkPBGCu_str != null)
             {
@@ -820,6 +824,7 @@ public class DonHangController : IHttpHandler
                     mnu.md_banggia_id = context.Request.Form["md_banggia_id"];
                     mnu.sochungtu = jqGridHelper.Utils.taoChungTuPO(context.Request.Form["md_doitackinhdoanh_id"], donhangmau_, mnu.ngaylap.Value.Year.ToString());
 
+                    mnu.phanbodiscount = phanbodiscount;
                     mnu.mota = context.Request.Form["mota"];
                     mnu.hoatdong = true;
                     mnu.ngaytao = DateTime.Now;
@@ -888,6 +893,9 @@ public class DonHangController : IHttpHandler
             String dh_mau = context.Request.Form["donhang_mau"].ToLower();
             String dagui_mail = context.Request.Form["dagui_mail"].ToLower();
             String donhang_tmp = context.Request.Form["isdonhangtmp"].ToLower();
+            string phanbodiscountStr = (context.Request.Form["phanbodiscount"] + "").ToLower();
+            var phanbodiscount = phanbodiscountStr.Equals("on") || phanbodiscountStr.Equals("true");
+
             decimal mnu_cont20 = 0;
             try { mnu_cont20 = decimal.Parse(context.Request.Form["cont20"]); } catch { }
             decimal mnu_cont40 = 0;
@@ -979,6 +987,7 @@ public class DonHangController : IHttpHandler
                     int countsct = (from dh in db.c_donhangs where dh.sochungtu.Equals(context.Request.Form["sochungtu"]) && !dh.c_donhang_id.Equals(m.c_donhang_id) select new { dh.sochungtu }).Count();
 
                     m.mota = context.Request.Form["mota"];
+                    m.phanbodiscount = phanbodiscount;
                     m.hoatdong = true;
                     m.ngaycapnhat = DateTime.Now;
                     m.nguoicapnhat = UserUtils.getUser(context);
@@ -1219,6 +1228,7 @@ public class DonHangController : IHttpHandler
             dh.chkPBGCu,
             dh.phienbangiacu,
             dh.ghichu,
+            dh.phanbodiscount,
             dh.discount_hehang,
             dh.discount_hehang_value,
             ROW_NUMBER() OVER (ORDER BY {2} {3}) as RowNum 
@@ -1289,6 +1299,7 @@ public class DonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["chkPBGCu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phienbangiacu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["phanbodiscount"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount_hehang"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount_hehang_value"] + "]]></cell>";
             xml += "</row>";

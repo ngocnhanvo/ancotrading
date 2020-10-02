@@ -9,6 +9,10 @@
 	background: #e3d000 !important;
 }
 
+.hidden {
+    display: none;
+}
+
 img{
 	border:0;
 }

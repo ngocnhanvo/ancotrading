@@ -504,7 +504,7 @@ public class DanhSachDatHangController : IHttpHandler
                         );
         return select;
     }
-
+        
     public void getPiInformation(HttpContext context)
     {
         context.Response.ContentType = "text/plain";
@@ -558,21 +558,21 @@ public class DanhSachDatHangController : IHttpHandler
 					    <label for='new'>Danh Sách Đặt Hàng mới:</label>
 					    <!-- -->
 					    <table class='t_new' style='width:100%; padding-left: 50px; border: 1px solid;'>
-						    <tr> 
+						    <tr class='hidden'> 
 							    <td colspan='2'>
 								    <input id='newKcs' value='newKcs' name='newKcs' type='checkbox' class='new_toAll' >
 								    <label for='newKcs'>Gửi cho KCS</label>
 							    </td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi từ:</td>
 							    <td>{0}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi cho:</td>
 							    <td>{3}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Cc:</td>
 							    <td>{2}</td>
 						    </tr>
@@ -620,21 +620,21 @@ public class DanhSachDatHangController : IHttpHandler
 					    <input id='plus' value='toAllPlus' name='rdType' type='radio'/>
 					    <label for='plus'>Bổ Sung Danh Sách Đặt Hàng:</label>
 					    <table class='t_plus' style='width:100%; padding-left: 50px; border: 1px solid;'>
-						    <tr> 
+						    <tr class='hidden'> 
 							    <td colspan='2'>
 								    <input id='Kcs' value='Kcs' name='Kcs' type='checkbox' class='new_toAllPlus'>
 								    <label for='Kcs'>Gửi cho KCS</label>
 							    </td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi từ:</td>
 							    <td>{0}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi cho:</td>
 							    <td>{3}{4}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Cc:</td>
 							    <td>{2}</td>
 						    </tr>

@@ -14,7 +14,7 @@ public static class UserUtils
     }
 
     //Mail KCS
-    public static string mailKCS = "quality@ancopottery.com";
+    public static string mailKCS = "";
     //Mail Ke Toan NCU
     public static string mailKeToanNCU = "ketoanTEST@ancometal.com";
 

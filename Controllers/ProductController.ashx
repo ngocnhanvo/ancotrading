@@ -626,7 +626,7 @@ public class ProductController : IHttpHandler
 	            , cn.ma_chucnang as ma_cn
 	            , dvt.ten_dvt as tendvt
 	            , sp.mota_tiengviet,  sp.mota_tienganh
-	            , sp.L_inch, sp.W_inch, sp.H_inch, sp.L_cm, sp.W_cm, sp.H_cm, sp.Trongluong, sp.dientich
+	            , sp.L_inch, sp.W_inch, sp.H_inch, sp.L_cm, sp.W_cm, sp.H_cm, sp.Trongluong, sp.dientich, sp.thetich
 	            , (nnl.hehang + '('+ nnl.nhom +')') as nangluc
 	            , cl.code_cl, sp.ghichu, ncc.ma_dtkd
 	            , cb.ten_cangbien as cangbien, hscode.ma_hscode, hscode.hscode, sp.chucnangsp, sp.ngayxacnhan, sp.hinhthucban
@@ -677,6 +677,7 @@ public class ProductController : IHttpHandler
             xml += "<cell><![CDATA[" + row["H_cm"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["trongluong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["dientich"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["thetich"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nangluc"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["code_cl"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";

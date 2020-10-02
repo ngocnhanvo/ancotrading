@@ -496,22 +496,17 @@ public class DongDonHangController : IHttpHandler
 
         string poId = context.Request.QueryString["poId"];
 
-        string sqlCount = "SELECT COUNT(*) AS count " +
-            " FROM c_dongdonhang ddh, c_donhang dh, md_sanpham sp, md_donggoi dg, md_doitackinhdoanh dtkd " +
-            " WHERE ddh.c_donhang_id = dh.c_donhang_id " +
-            " AND ddh.md_sanpham_id = sp.md_sanpham_id " +
-            " AND ddh.md_donggoi_id = dg.md_donggoi_id " +
-            "    AND ddh.nhacungungid = dtkd.md_doitackinhdoanh_id " +
-            " AND dh.c_donhang_id = N'{0}' " + filter;
-
-        if (poId != null)
-        {
-            sqlCount = string.Format(sqlCount, poId);
-        }
-        else
-        {
-            sqlCount = string.Format(sqlCount, 0);
-        }
+        string sqlCount = string.Format(@"
+            SELECT COUNT(*) AS count
+            FROM c_dongdonhang ddh, c_donhang dh, md_sanpham sp, md_donggoi dg, md_doitackinhdoanh dtkd
+            WHERE ddh.c_donhang_id = dh.c_donhang_id
+            AND ddh.md_sanpham_id = sp.md_sanpham_id
+            AND ddh.md_donggoi_id = dg.md_donggoi_id
+            AND ddh.nhacungungid = dtkd.md_doitackinhdoanh_id
+            AND dh.c_donhang_id = N'{0}' {1}",
+            poId != null ? poId : "0",
+            filter
+        );
 
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
@@ -551,6 +546,8 @@ public class DongDonHangController : IHttpHandler
                         , ddh.ma_sanpham_khach
                         , ddh.giafob
                         , isnull(ddh.phi, 0) as phi
+                        , isnull(ddh.discount, 0) as discount
+                        , (ddh.giafob + isnull(ddh.phi, 0)) - (ddh.giafob + isnull(ddh.phi, 0)) * isnull(ddh.discount, 0) / 100 as giahopdong
                         , ddh.soluong
                         , dg.ten_donggoi
                         , ddh.sl_inner
@@ -600,6 +597,8 @@ public class DongDonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["ma_sanpham_khach"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["giafob"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["discount"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["giahopdong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["soluong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_donggoi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sl_inner"] + "]]></cell>";

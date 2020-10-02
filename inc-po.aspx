@@ -394,22 +394,17 @@
                         id: "btn-active",
                         text: "Có",
                         click: function () {
-                            $("#dialog-caution").ajaxStart(function () {
-                                $("#wait").css("display", "block");
-                                $("#btn-active").button("disable");
-                                $("#btn-close").button("disable");
-                            });
-
-                            $("#dialog-caution").ajaxComplete(function () {
-                                $("#wait").css("display", "none");
-                                $("#btn-close span").text("Thoát");
-                                $("#btn-close").button("enable");
-                            });
+                            $("#wait").css("display", "block");
+                            $("#btn-active").button("disable");
+                            $("#btn-close").button("disable");
 
                             $.get("Controllers/DonHangController.ashx?action=createpi&poId=" + id, function (result) {
                                 //$('#dialog-caution').css({ 'color': 'green' });
                                 $('#dialog-create-pi').find('#dialog-caution').html(result);
                                 $('#grid_ds_po').jqGrid().trigger('reloadGrid');
+                                $("#wait").css("display", "none");
+                                $("#btn-close span").text("Thoát");
+                                $("#btn-close").button("enable");
                             });
                         }
                     },
@@ -942,17 +937,7 @@
             FuncKetThuc = "KetThucDonHang"
 			FuncCopyDonHang="CopyDonHang"
 			MultiSelect="true"
-            ColNames="['c_donhang_id', '', 'Khách Hàng', 'Số Chứng Từ', 'Customer Order No', 'Cảng Biển'
-                , 'Shipment Time', 'Total CBM', 'Amount', 'Discount(%)'
-                , 'Paymentterm', 'Thông tin ngân hàng', 'Hoa hồng(%)', 'Người hưởng HH','Ngày Lập', 'Người Lập'
-                , 'Shipment Date', 'Ngày điều chỉnh', 'ĐH Mẫu SR', 'ĐH Mẫu TI'
-                , 'Tr.Lượng', 'Đồng Tiền', 'Kích Thước', 'Payer', 'PortDischarge'
-                , 'Total CBF', 'Cont 20', 'Cont 40', 'Cont 40HC', 'Cont 45HC', 'Cont lẻ' 
-				, 'Đã Gửi Mail', 'Make PI'
-				, 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật'
-                , 'Consingnee', 'Hoạt động', 'Giá đặc biệt'
-                , 'Giá FOB phiên bản cũ', 'Phiên bản giá cũ'
-                , 'Ghi chú', 'Discount Hệ Hàng', 'discount_hehang_value']"
+           
             RowNumbers="true"
             OndblClickRow = "function(rowid) { 
 				/*$(this).jqGrid('editGridRow', rowid, {
@@ -977,6 +962,7 @@
             ColModel = "[
             {
                 name: 'c_donhang_id'
+                , label: 'c_donhang_id'
                 , index: 'c_donhang_id'
                 , fixed:true , width: 100
                 , hidden: true 
@@ -987,6 +973,7 @@
             },
             {
                  name: 'md_trangthai_id'
+                 , label: 'TT'
                  , index: 'md_trangthai_id'
                  , editable: false
                  , fixed:true , width: 100
@@ -999,6 +986,7 @@
             },
 			{
                  name: 'md_doitackinhdoanh_id'
+                 , label: 'Khách Hàng'
                  , index: 'dtkd.md_doitackinhdoanh_id'
                  , editable: true
                  , fixed:true 
@@ -1012,6 +1000,7 @@
             },
             {
                  name: 'sochungtu'
+                 , label: 'Số chứng từ'
                  , index: 'sochungtu'
                  , editable: true
                  , fixed:true 
@@ -1021,6 +1010,7 @@
             },
             {
                  name: 'customer_order_no'
+                 , label: 'Customer Order No'
                  , index: 'customer_order_no'
                  , editable: true
                  , fixed:true 
@@ -1030,6 +1020,7 @@
             },
 			{
                  name: 'md_cangbien_id'
+                 , label: 'Cảng biển'
                  , index: 'cbien.ten_cangbien'
                  , editable: true
                  , fixed:true , width: 50
@@ -1039,6 +1030,7 @@
             },
 			{
                  name: 'shipmenttime'
+                 , label: 'Shipment Time'
                  , index: 'shipmenttime'
                  , editable: true
                  , fixed:true , width: 50
@@ -1073,6 +1065,7 @@
             },
 			{
                  name: 'totalcbm'
+                 , label: 'Total CBM'
                  , index: 'totalcbm'
                  , editable: false
                  , fixed:true , width: 50
@@ -1081,6 +1074,7 @@
             },
 			{
                  name: 'amount'
+                 , label: 'Amount'
                  , index: 'amount'
                  , editable: false
                  , fixed:true , width: 50
@@ -1091,6 +1085,7 @@
             },
 			{
                  name: 'discount'
+                 , label: 'Discount(%)'
                  , index: 'discount'
                  , editable: true
                  , fixed:true , width: 50
@@ -1102,6 +1097,7 @@
             },
 			{
                  name: 'md_paymentterm_id'
+                 , label: 'Paymentterm'
                  , index: 'pmt.ten_paymentterm'
                  , editable: true
                  , fixed:true , width: 50
@@ -1111,6 +1107,7 @@
             },
             {
                  name: 'md_nganhang_id'
+                 , label: 'Thông tin ngân hàng'
                  , index: 'ngh.ma_nganhang'
                  , editable: true
                  , fixed:true , width: 50
@@ -1120,6 +1117,7 @@
             },
 			{
                  name: 'hoahong'
+                 , label: 'Hoa hồng(%)'
                  , index: 'hoahong'
                  , editable: true
                  , fixed:true , width: 50
@@ -1130,6 +1128,7 @@
             },
             {
                  name: 'md_nguoilienhe_id'
+                 , label: 'Người hưởng HH'
                  , index: 'md_nguoilienhe_id'
                  , editable: true
                  , fixed:true , width: 50
@@ -1141,6 +1140,7 @@
             },
             {
                  name: 'ngaylap'
+                 , label: 'Ngày lập'
                  , index: 'ngaylap'
                  , editable: true
                  , fixed:true , width: 50
@@ -1175,6 +1175,7 @@
             },
             {
                  name: 'nguoilap'
+                 , label: 'Người lập'
                  , index: 'dh.nguoilap'
                  , editable: false
                  , fixed:true , width: 50
@@ -1182,6 +1183,7 @@
             },
             {
                  name: 'shipmentdate'
+                 , label: 'Shipment Date'
                  , index: 'shipmentdate'
                  , editable: true
                  , hidden: true
@@ -1217,6 +1219,7 @@
             },
             {
                  name: 'ngaydieuchinh'
+                 , label: 'Ngày điều chỉnh'
                  , index: 'ngaydieuchinh'
                  , editable: true
                  , hidden:true
@@ -1228,6 +1231,7 @@
             
 			{
                  name: 'donhang_mau'
+                 , label: 'ĐH Mẫu SR'
                  , index: 'donhang_mau'
                  , editable: true
                  , fixed:true 
@@ -1240,6 +1244,7 @@
             },
             {
                  name: 'isdonhangtmp'   
+                 , label: 'ĐH Mẫu TI'
                  , align: 'center'
                  , index: 'isdonhangtmp'
                  , editable: true
@@ -1252,6 +1257,7 @@
             },
 			{
                  name: 'md_trongluong_id'
+                 , label: 'Tr.Lượng'
                  , index: 'tl.ten_trongluong'
                  , editable: true
                  , fixed:true , width: 50
@@ -1264,6 +1270,7 @@
             },
             {
                  name: 'md_dongtien_id'
+                 , label: 'Đồng Tiền'
                  , index: 'dtien.ma_iso'
                  , editable: true
                  , fixed:true , width: 50
@@ -1276,6 +1283,7 @@
             },
             {
                  name: 'md_kichthuoc_id'
+                 , label: 'Kích Thước'
                  , index: 'kt.ten_kichthuoc'
                  , editable: true
                  , fixed:true , width: 50
@@ -1288,6 +1296,7 @@
             },
             {
                  name: 'payer'
+                 , label: 'Payer'
                  , index: 'payer'
                  , editable: true
                  , fixed:true , width: 50
@@ -1298,6 +1307,7 @@
             },
             {
                  name: 'portdischarge'
+                 , label: 'PortDischarge'
                  , index: 'portdischarge'
                  , editable: true
                  , fixed:true , width: 50
@@ -1308,6 +1318,7 @@
             },
             {
                  name: 'totalcbf'
+                 , label: 'Total CBF'
                  , index: 'totalcbf'
                  , editable: false
                  , fixed:true , width: 50
@@ -1318,6 +1329,7 @@
             {
                  fixed:true
                  , name: 'cont20'
+                 , label: 'Cont 20'
                  , index: 'cont20'
                  , editable: true
                  , width: 50
@@ -1332,6 +1344,7 @@
             {
                  fixed:true
                  , name: 'cont40'
+                 , label: 'Cont 40'
                  , index: 'cont40'
                  , editable: true
                  , width: 50
@@ -1346,6 +1359,7 @@
             {
                  fixed:true
                  , name: 'cont40hc'
+                 , label: 'Cont 40HC'
                  , index: 'cont40hc'
                  , editable: true
                  , width: 50
@@ -1360,6 +1374,7 @@
 			{
                  fixed:true
                  , name: 'cont45'
+                 , label: 'Cont 45'
                  , index: 'cont45'
                  , editable: true
                  , width: 50
@@ -1374,6 +1389,7 @@
             {
                  fixed:true
                  , name: 'contle'
+                 , label: 'Cont lẻ'
                  , index: 'contle'
                  , editable: true
                  , width: 50
@@ -1387,6 +1403,7 @@
             },
             {
                  name: 'dagui_mail'   
+                 , label: 'Đã Gửi Mail'
                  , index: 'dagui_mail'
                  , align: 'center'
                  , editable: true
@@ -1400,6 +1417,7 @@
             },
             {
                  name: 'ismakepi'   
+                 , label: 'Make PI'
                  , align: 'center'
                  , index: 'ismakepi'
                  , editable: true
@@ -1412,6 +1430,7 @@
             },
             {
                 name: 'ngaytao'
+                , label: 'Ngày tạo'
                 , index: 'ngaytao'
                 , fixed:true , width: 50
                 , editable:false
@@ -1421,6 +1440,7 @@
             },
             {
                 name: 'nguoitao'
+                , label: 'Người tạo'
                 , index: 'nguoitao'
                 , fixed:true , width: 50
                 , editable:false
@@ -1429,6 +1449,7 @@
             },
             {
                 name: 'ngaycapnhat'
+                , label: 'Ngày cập nhật'
                 , index: 'ngaycapnhat'
                 , fixed:true , width: 50
                 , editable:false
@@ -1437,6 +1458,7 @@
             },
             {
                 name: 'nguoicapnhat'
+                , label: 'Người cập nhật'
                 , index: 'nguoicapnhat'
                 , fixed:true , width: 50
                 , editable:false
@@ -1445,6 +1467,7 @@
             },
             {
                 name: 'mota'
+                , label: 'Mô tả'
                 , index: 'mota'
                 , fixed:true , width: 50
                 , editable:true
@@ -1455,6 +1478,7 @@
             },
             {
                 name: 'hoatdong'
+                , label: 'Hoạt động'
                 , hidden: true
                 , index: 'hoatdong'
                 , width: 30
@@ -1467,6 +1491,7 @@
             },		
 			{
                  name: 'gia_db'   
+                 , label: 'Giá ĐB'
                  , align: 'center'
                  , index: 'gia_db'
                  , editable: true
@@ -1479,6 +1504,7 @@
             {
                 fixed: true
                 , name: 'chkPBGCu'
+                , label: 'Giá FOB phiên bản cũ'
                 , hidden: true
                 , editrules:{
                     edithidden:true
@@ -1494,6 +1520,7 @@
 			{
                 fixed: true
                 , name: 'phienbangiacu'
+                 , label: 'Phiên bản giá cũ'
                 , hidden: true
                 , editrules:{
                     edithidden:true
@@ -1508,6 +1535,7 @@
             },
 			{
                 fixed: true, name: 'ghichu'
+                , label: 'Ghi chú'
                 , index: 'ghichu'
                 , width: 100
                 , editable:true
@@ -1516,7 +1544,8 @@
                 , editrules:{ edithidden : true }
             },
             {
-                fixed: true, name: 'discount_hehang'
+                fixed: true, name: 'phanbodiscount'
+                , label: 'Đưa discount vào giá H.Đồng'
                 , hidden: true
                 , editrules:{
                     edithidden:true
@@ -1529,14 +1558,29 @@
                 , formoptions: { colpos: 2, rowpos: 11 }
             },
             {
+                fixed: true, name: 'discount_hehang'
+                , label: 'Discount Hệ Hàng'
+                , hidden: true
+                , editrules:{
+                    edithidden:true
+                }
+                , editable: true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions: { value:'True:False', defaultValue: 'False' }
+                , formatter: 'checkbox'
+                , formoptions: { colpos: 2, rowpos: 12 }
+            },
+            {
                 fixed: true, name: 'discount_hehang_value'
+                , label: 'discount_hehang_value'
                 , hidden: true
                 , editrules:{
                     edithidden:true
                 }
                 , editable: true
                 , align: 'center'
-                , formoptions: { colpos: 2, rowpos: 12 }
+                , formoptions: { colpos: 2, rowpos: 13 }
             }
             ]"
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
@@ -1816,7 +1860,7 @@
             },
 			{
 				name: 'giafob'
-				, label: 'Giá'
+				, label: 'Giá gốc'
 				, index: 'ddh.giafob'
 				, fixed:true , width: 100
 				, edittype: 'text'
@@ -1827,13 +1871,39 @@
 				, formatter:'currency'
 				, formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
 			},
-                {
+            {
 				name: 'phi'
 				, label: 'Phí'
 				, index: 'ddh.phi'
 				, fixed:true , width: 100
 				, edittype: 'text'
 				, editable: true
+				, editrules: { required:true, number: true }
+				, editoptions:{ defaultValue: '0' }
+				, align: 'right'
+				, formatter:'currency'
+				, formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+			},
+            {
+				name: 'discount'
+				, label: 'Discount(%)'
+				, index: 'ddh.discount'
+				, fixed:true , width: 100
+				, edittype: 'text'
+				, editable: false
+				, editrules: { required:true, number: true }
+				, editoptions:{ defaultValue: '0' }
+				, align: 'right'
+				, formatter:'currency'
+				, formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+			},
+            {
+				name: 'giahopdong'
+				, label: 'Giá H.Đồng'
+				, index: 'ddh.giahopdong'
+				, fixed:true , width: 100
+				, edittype: 'text'
+				, editable: false
 				, editrules: { required:true, number: true }
 				, editoptions:{ defaultValue: '0' }
 				, align: 'right'

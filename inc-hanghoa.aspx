@@ -206,14 +206,6 @@
             SortOrder ="asc"
             UrlFileAction="Controllers/ProductController.ashx" 
 			BtnPrint="funcPrintSP"
-            ColNames="[
-						'md_sanpham_id', 'TT', 'H/A', 'Mã SP', 'Tên KD', 'Mã KD'
-                      , 'Tên CN', 'Mã CN', 'Mô Tả TV', 'Mô Tả TA', 'ĐVT', 'L(inch)', 'W(inch)'
-                      , 'H(inch)', 'L(cm)', 'W(cm)', 'H(cm)', 'Tr.Lượng', 'D.Tich', 'Nhóm NL'
-                      , 'Loại SP', 'NCU', 'Cảng Biển', 'HSCode', 'HSCode(số)', 'Nhóm chức năng'
-                      , 'Ngày xác nhận', 'Hình thức bán', 'Ghi Chú'
-                      , 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động'
-					  ]"
             RowNumbers="true"
             OndblClickRow = "dupHangHoa"
             FuncChangeStatus="ChangeStatus"
@@ -221,6 +213,7 @@
             ColModel = "[
             {
                 fixed: true, name: 'md_sanpham_id'
+                , label: 'md_sanpham_id'
                 , index: 'sp.md_sanpham_id'
                 , width: 100
                 , hidden: true 
@@ -230,6 +223,7 @@
             },
             {
                 fixed: true, name: 'trangthai'
+                , label: 'TT'
                 , index: 'sp.trangthai'
                 , width: 100
                 , editable:false
@@ -242,6 +236,7 @@
             },
             {
                 fixed: true, name: 'picture'
+                , label: 'H/A'
                 , index: 'sp.picture'
                 , width: 50
                 , editable:false
@@ -254,6 +249,7 @@
             },
             {
                  fixed: true, name: 'ma_sanpham'
+                 , label: 'Mã SP'
                  , index: 'sp.ma_sanpham'
                  , width: 100
                  , edittype: 'text'
@@ -262,6 +258,7 @@
             },
             {
                 fixed: true, name: 'md_kieudang_id'
+                , label: 'Tên KD'
                 , index: 'kd.ten_tv'
                 , width: 50
                 , edittype: 'select'
@@ -271,6 +268,7 @@
             },
 			{
                 fixed: true, name: 'ma_kieudang'
+                , label: 'Mã KD'
                 , index: 'kd.ma_kieudang'
                 , width: 50
                 , edittype: 'text'
@@ -279,6 +277,7 @@
             },
             {
                 fixed: true, name: 'md_chucnang_id'
+                , label: 'Tên CN'
                 , index: 'cn.ten_tv'
                 , width: 50
                 , edittype: 'select'
@@ -288,6 +287,7 @@
             },
 			{
                 fixed: true, name: 'ma_chucnang'
+                , label: 'Mã CN'
                 , index: 'cn.ma_chucnang'
                 , width: 50
                 , edittype: 'text'
@@ -296,6 +296,7 @@
             },
             {
                 fixed: true, name: 'mota_tiengviet'
+                , label: 'Mô tả TV'
                 , index: 'sp.mota_tiengviet'
                 , width: 100
                 , edittype: 'textarea'
@@ -303,6 +304,7 @@
             },
             {
                 fixed: true, name: 'mota_tienganh'
+                , label: 'Mô tả TA'
                 , index: 'sp.mota_tienganh'
                 , width: 100
                 , edittype: 'textarea'
@@ -310,6 +312,7 @@
             },
             {
                 fixed: true, name: 'tendvt'
+                , label: 'ĐVT'
                 , index: 'dvt.ten_dvt'
                 , width: 50
                 , align: 'center'
@@ -322,6 +325,7 @@
             },
             {
                 fixed: true, name: 'l_inch'
+                , label: 'L (inch)'
                 , index: 'sp.l_inch'
                 , width: 50
                 , edittype: 'text'
@@ -331,6 +335,7 @@
             },
             {
                 fixed: true, name: 'w_inch'
+                , label: 'W (inch)'
                 , index: 'sp.w_inch'
                 , width: 50
                 , edittype: 'text'
@@ -340,6 +345,7 @@
             },
             {
                 fixed: true, name: 'h_inch'
+                , label: 'H (inch)'
                 , index: 'sp.h_inch'
                 , width: 50
                 , edittype: 'text'
@@ -349,6 +355,7 @@
             },
             {
                 fixed: true, name: 'l_cm'
+                , label: 'L (cm)'
                 , index: 'sp.l_cm'
                 , width: 50
                 , align: 'right'
@@ -359,6 +366,7 @@
             },
             {
                 fixed: true, name: 'w_cm'
+                , label: 'W (cm)'
                 , index: 'sp.w_cm'
                 , width: 50
                 , align: 'right'
@@ -369,6 +377,7 @@
             },
             {
                 fixed: true, name: 'h_cm'
+                , label: 'H (cm)'
                 , index: 'sp.h_cm'
                 , width: 50
                 , align: 'right'
@@ -379,6 +388,7 @@
             },
             {
                 fixed: true, name: 'trongluong'
+                , label: 'Trọng lượng'
                 , index: 'sp.trongluong'
                 , width: 50
                 , align: 'right'
@@ -389,6 +399,7 @@
             },
             {
                 fixed: true, name: 'dientich'
+                , label: 'Diện tích'
                 , index: 'sp.dientich'
                 , width: 50
                 , align: 'right'
@@ -398,7 +409,19 @@
                 , editoptions:{ defaultValue: '0' }
             },
             {
+                fixed: true, name: 'thetich'
+                , label: 'Thể tích'
+                , index: 'sp.thetich'
+                , width: 50
+                , align: 'right'
+                , edittype: 'text'
+                , editable:true
+                , editrules : { required:true, number:true }
+                , editoptions:{ defaultValue: '0' }
+            },
+            {
                 fixed: true, name: 'md_nhomnangluc_id'
+                , label: 'Nhóm NL'
                 , index: 'nnl.hehang'
                 , width: 50
                 , edittype: 'select'
@@ -409,6 +432,7 @@
             },
             {
                 fixed: true, name: 'md_chungloai_id'
+                , label: 'Loại SP'
                 , index: 'cl.code_cl'
                 , width: 50
                 , edittype: 'select'
@@ -419,6 +443,7 @@
             },
             {
                 fixed: true, name: 'tenncc'
+                , label: 'NCU'
                 , index: 'ncc.ma_dtkd'
                 , width: 50
                 , edittype: 'select'
@@ -429,6 +454,7 @@
             },
             {
                 fixed: true, name: 'md_cangbien_id'
+                , label: 'Cảng biển'
                 , index: 'cb.ten_cangbien'
                 , width: 50
                 , edittype: 'select'
@@ -438,6 +464,7 @@
             },
             {
                 fixed: true, name: 'md_hscode_id'
+                , label: 'HSCode'
                 , index: 'cb.ma_hscode'
                 , width: 50
                 , edittype: 'select'
@@ -447,6 +474,7 @@
             },
 			{
                 fixed: true, name: 'hscode_val'
+                , label: 'HSCode (số)'
                 , index: 'cb.ma_hscode'
                 , width: 100
                 , editable: false
@@ -454,6 +482,7 @@
             },
             {
                 fixed: true, name: 'chucnangsp'
+                , label: 'Nhóm CN'
                 , index: 'sp.chucnangsp'
                 , width: 100
                 , editable: false
@@ -461,6 +490,7 @@
             },
 			{
                 fixed: true, name: 'ngayxacnhan'
+                , label: 'Ngày xác nhận'
                 , index: 'sp.ngayxacnhan'
                 , width: 100
                 , editable: true
@@ -470,6 +500,7 @@
             },
 			{
 				fixed: true, name: 'hinhthucban'
+                , label: 'Hình thức bán'
 				, index: 'sp.hinhthucban'
 				, width: 100
 				, edittype: 'select'
@@ -479,6 +510,7 @@
 			},
             {
                 fixed: true, name: 'ghichu'
+                , label: 'Ghi chú'
                 , index: 'sp.ghichu'
                 , width: 100
                 , edittype: 'textarea'
@@ -488,6 +520,7 @@
             },
             {
                 fixed: true, name: 'ngaytao'
+                , label: 'Ngày tạo'
                 , index: 'sp.ngaytao'
                 , width: 50
                 , editable:false
@@ -496,6 +529,7 @@
             },
             {
                 fixed: true, name: 'nguoitao'
+                , label: 'Người tạo'
                 , index: 'sp.nguoitao'
                 , width: 50
                 , editable:false
@@ -504,6 +538,7 @@
             },
             {
                 fixed: true, name: 'ngaycapnhat'
+                , label: 'Ngày cập nhật'
                 , index: 'sp.ngaycapnhat'
                 , width: 50
                 , editable:false
@@ -512,6 +547,7 @@
             },
             {
                 fixed: true, name: 'nguoicapnhat'
+                , label: 'Người cập nhật'
                 , index: 'sp.nguoicapnhat'
                 , width: 50
                 , editable:false
@@ -520,6 +556,7 @@
             },
             {
                 fixed: true, name: 'mota'
+                , label: 'Mô tả'
                 , index: 'sp.mota'
                 , width: 50
                 , editable:true
@@ -529,6 +566,7 @@
             },
             {
                 fixed: true, name: 'hoatdong', hidden: true
+                , label: 'Hoạt động'
                 , index: 'sp.hoatdong'
                 , width: 50
                 , editable:true

@@ -224,7 +224,7 @@ public class DongDanhSachDatHangController : IHttpHandler
                    , tem_dan
                    , ddsdh.sl_dathang
                    , ddsdh.giachuan
-                   , ddsdh.gianhap - isnull(ddsdh.giachuan, dsdh.gianhap) as phi
+                   , ddsdh.gianhap - isnull(ddsdh.giachuan, ddsdh.gianhap) as phi
                    , ddsdh.gianhap
                    , ddsdh.sl_dagiao
                    , ddsdh.sl_conlai 
