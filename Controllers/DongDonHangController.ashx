@@ -497,7 +497,7 @@ public class DongDonHangController : IHttpHandler
         string poId = context.Request.QueryString["poId"];
 
         string sqlCount = string.Format(@"
-            SELECT COUNT(*) AS count
+            SELECT COUNT(1) AS count
             FROM c_dongdonhang ddh, c_donhang dh, md_sanpham sp, md_donggoi dg, md_doitackinhdoanh dtkd
             WHERE ddh.c_donhang_id = dh.c_donhang_id
             AND ddh.md_sanpham_id = sp.md_sanpham_id
@@ -535,7 +535,10 @@ public class DongDonHangController : IHttpHandler
         }
 
         string strsql = @"
-                select * from(
+                select 
+                    P.* 
+                    , (P.giafob + P.phi) - (P.giafob + P.phi) * P.discount / 100 as giahopdong
+                from(
                     select
                         ddh.c_dongdonhang_id
                         , dh.c_donhang_id
@@ -546,8 +549,8 @@ public class DongDonHangController : IHttpHandler
                         , ddh.ma_sanpham_khach
                         , ddh.giafob
                         , isnull(ddh.phi, 0) as phi
-                        , isnull(ddh.discount, 0) as discount
-                        , (ddh.giafob + isnull(ddh.phi, 0)) - (ddh.giafob + isnull(ddh.phi, 0)) * isnull(ddh.discount, 0) / 100 as giahopdong
+                        , (case when dh.phanbodiscount = 1 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discount
+                        
                         , ddh.soluong
                         , dg.ten_donggoi
                         , ddh.sl_inner

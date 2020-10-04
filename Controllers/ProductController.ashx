@@ -93,18 +93,18 @@ public class ProductController : IHttpHandler
         {
             res += "|Pallet:" + donggoi.l2_mix + "x" + donggoi.w2_mix + "x" + donggoi.h2_mix + "cm \n";
         }
-        
+
         res += "|Quantity/40': " + donggoi.soluonggoi_ctn + " " + quantity+ " \n";
-        
+
         context.Response.Write(res);
 
     }
-    
+
     public void UpdateStatus(HttpContext context)
     {
         String msg = "";
         try
-        {   
+        {
             String id = context.Request.QueryString["md_sanpham_id"];
             String trangthai = context.Request.QueryString["trangthai"].ToUpper();
             md_sanpham sp = db.md_sanphams.FirstOrDefault(p => p.md_sanpham_id.Equals(id));
@@ -152,10 +152,10 @@ public class ProductController : IHttpHandler
                     switch (trangthai)
                     {
                         case "DHD":
-							msg = UserUtils.checkHieuLucProduct(context, sp, db);	
-							next = string.IsNullOrEmpty(msg) ? true : false;
-							msg = string.IsNullOrEmpty(msg) ? "Đã chuyển trạng thái sản phẩm thành Đang hoạt động!" : msg;
-							break;
+                            msg = UserUtils.checkHieuLucProduct(context, sp, db);
+                            next = string.IsNullOrEmpty(msg) ? true : false;
+                            msg = string.IsNullOrEmpty(msg) ? "Đã chuyển trạng thái sản phẩm thành Đang hoạt động!" : msg;
+                            break;
                         case "NHD":
                             msg = "Đã chuyển trạng thái sản phẩm thành Ngưng hoạt động!";
                             break;
@@ -182,9 +182,9 @@ public class ProductController : IHttpHandler
                             mdbc.ExcuteNonQuery(update);
                         }
                         else
-                        {	
-							if(trangthai == "NHD")
-								sp.ngayngunghd = DateTime.Now;
+                        {
+                            if(trangthai == "NHD")
+                                sp.ngayngunghd = DateTime.Now;
                             sp.trangthai = trangthai;
                             db.SubmitChanges();
                         }
@@ -207,26 +207,26 @@ public class ProductController : IHttpHandler
     public void getSinglePicture(HttpContext context)
     {
         String ma_sanpham = context.Request.QueryString["ma_sanpham"];
-		String selImage="";
-		try
-		{
-			if (ma_sanpham.ElementAt(9).ToString().ToLower().Equals("f"))
-			{
-				selImage = String.Format("select url from md_anhsanpham where filter = N'{0}' ", ma_sanpham.Substring(0, 11));		
-			}
-			else
-			{
-				selImage = String.Format("select url from md_anhsanpham where filter = N'{0}' ", ma_sanpham.Substring(0, 8));
-			}
-		}
-		catch
-		{
-			selImage = String.Format("select url from md_anhsanpham where filter = N'{0}' ", ma_sanpham.Substring(0, 8));
-		}
+        String selImage="";
+        try
+        {
+            if (ma_sanpham.ElementAt(9).ToString().ToLower().Equals("f"))
+            {
+                selImage = String.Format("select url from md_anhsanpham where filter = N'{0}' ", ma_sanpham.Substring(0, 11));
+            }
+            else
+            {
+                selImage = String.Format("select url from md_anhsanpham where filter = N'{0}' ", ma_sanpham.Substring(0, 8));
+            }
+        }
+        catch
+        {
+            selImage = String.Format("select url from md_anhsanpham where filter = N'{0}' ", ma_sanpham.Substring(0, 8));
+        }
         String img = (String)mdbc.ExecuteScalar(selImage);
         if (img != null)
         {
-			context.Response.Write("images/products/fullsize/" + img);
+            context.Response.Write("images/products/fullsize/" + img);
         }
         else {
             context.Response.Write("images/products/fullsize/default.jpg");
@@ -241,7 +241,7 @@ public class ProductController : IHttpHandler
 
         String getMaSP = "select ma_sanpham from md_sanpham where md_sanpham_id = @md_sanpham_id  ";
         ma_sanpham = (String)mdbc.ExecuteScalar(getMaSP, "@md_sanpham_id", md_sanpham_id);
-        
+
         String result = "";
 
         String getImage = "";
@@ -259,10 +259,10 @@ public class ProductController : IHttpHandler
         }
         catch
         {
-			getImage = String.Format("select url from md_anhsanpham where filter LIKE N'{0}%' ", ma_sanpham.Substring(0, 8));
+            getImage = String.Format("select url from md_anhsanpham where filter LIKE N'{0}%' ", ma_sanpham.Substring(0, 8));
         }
-		
-		System.Data.SqlClient.SqlDataReader rd = mdbc.ExecuteReader(getImage);
+
+        System.Data.SqlClient.SqlDataReader rd = mdbc.ExecuteReader(getImage);
         if (rd.HasRows)
         {
             result += "[";
@@ -298,7 +298,7 @@ public class ProductController : IHttpHandler
     {
         context.Response.ContentType = "text/plain";
         string soanthao = context.Request.QueryString["soanthao"];
-		soanthao = "1";
+        soanthao = "1";
         if (soanthao != "" & soanthao != null)
         {
             soanthao = "and trangthai != 'SOANTHAO'";
@@ -383,20 +383,20 @@ public class ProductController : IHttpHandler
 
         context.Response.Write(json);
     }
-    
+
     public void getSelectOption(HttpContext context)
     {
         String sql = "select md_sanpham_id, mota_tiengviet from md_sanpham where hoatdong = 1 and trangthai != 'NHD' ";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
+
     public void edit(HttpContext context)
     {
         try
         {
             String h;
-			string nxn = context.Request.Form["ngayxacnhan"];
+            string nxn = context.Request.Form["ngayxacnhan"];
             h = context.Request.Form["hoatdong"].ToLower();
 
             bool hd;
@@ -427,11 +427,11 @@ public class ProductController : IHttpHandler
             m.l_cm = l_;
             m.w_cm = w_;
             m.h_cm = h_;
-			if(!string.IsNullOrEmpty(nxn))
-				m.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
-			else
-				m.ngayxacnhan = null;
-			m.hinhthucban = context.Request.Form["hinhthucban"];
+            if(!string.IsNullOrEmpty(nxn))
+                m.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
+            else
+                m.ngayxacnhan = null;
+            m.hinhthucban = context.Request.Form["hinhthucban"];
             m.trongluong = decimal.Parse(context.Request.Form["trongluong"]);
             m.dientich = decimal.Parse(context.Request.Form["dientich"]);
             m.md_nhomnangluc_id = context.Request.Form["md_nhomnangluc_id"];
@@ -441,14 +441,14 @@ public class ProductController : IHttpHandler
             m.md_chungloai_id = context.Request.Form["md_chungloai_id"];
             m.ghichu = context.Request.Form["ghichu"];
             m.nhacungung = context.Request.Form["tenncc"];
-			m.mota = context.Request.Form["mota"];
+            m.mota = context.Request.Form["mota"];
 
 
             m.hoatdong = hd;
             m.ngaycapnhat = DateTime.Now;
             int check = (from sp in db.md_sanphams
                          where sp.ma_sanpham.Equals(context.Request.Form["ma_sanpham"]) && !sp.md_sanpham_id.Equals(context.Request.Form["id"])
-                        select new { sp.ma_sanpham }).Count();
+                         select new { sp.ma_sanpham }).Count();
             if (check == 0)
             {
                 db.SubmitChanges();
@@ -479,7 +479,7 @@ public class ProductController : IHttpHandler
             l_ = decimal.Parse(context.Request.Form["l_cm"]);
             w_ = decimal.Parse(context.Request.Form["w_cm"]);
             h_ = decimal.Parse(context.Request.Form["h_cm"]);
-			string nxn = context.Request.Form["ngayxacnhan"];
+            string nxn = context.Request.Form["ngayxacnhan"];
             md_sanpham mnu = new md_sanpham
             {
                 md_sanpham_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
@@ -487,7 +487,7 @@ public class ProductController : IHttpHandler
                 //ma_sanphamcu = context.Request.Form["ma_sanphamcu"],
                 //mota_tiengviet = context.Request.Form["mota_tiengviet"],
                 //mota_tienganh = context.Request.Form["mota_tienganh"],
-                
+
                 //ma_vach = context.Request.Form["ma_vach"],
                 md_donvitinhsanpham_id = context.Request.Form["tendvt"],
                 l_inch = l_ == 0 ? 0 : decimal.Multiply(l_, Convert.ToDecimal(0.393700787)),
@@ -509,17 +509,17 @@ public class ProductController : IHttpHandler
                 vattu = false,
                 ban_thanhpham = false,
                 sanpham = true,
-				hinhthucban = context.Request.Form["hinhthucban"],
+                hinhthucban = context.Request.Form["hinhthucban"],
                 mota = context.Request.Form["mota"],
                 hoatdong = hd,
                 ngaytao = DateTime.Now,
                 ngaycapnhat = DateTime.Now
             };
-			if(!string.IsNullOrEmpty(nxn))
-				mnu.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
+            if(!string.IsNullOrEmpty(nxn))
+                mnu.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
             int check = (from sp in db.md_sanphams
-                        where sp.ma_sanpham.Equals(context.Request.Form["ma_sanpham"])
-                        select new { sp.ma_sanpham}).Count();
+                         where sp.ma_sanpham.Equals(context.Request.Form["ma_sanpham"])
+                         select new { sp.ma_sanpham}).Count();
             if (check == 0)
             {
                 db.md_sanphams.InsertOnSubmit(mnu);
@@ -529,7 +529,7 @@ public class ProductController : IHttpHandler
             else {
                 jqGridHelper.Utils.writeResult(0, "Đã tồn tại mã hàng này!");
             }
-            
+
         }catch(Exception ex){
             jqGridHelper.Utils.writeResult(0, ex.Message);
         }
@@ -562,7 +562,7 @@ public class ProductController : IHttpHandler
     {
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
-        
+
         //// filter
         String filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
@@ -572,11 +572,13 @@ public class ProductController : IHttpHandler
             Filter f = Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
-        
-        String sqlCount = @"SELECT COUNT(*) AS count 
+
+
+        String sqlCount = string.Format(@"
+            SELECT COUNT(1) AS count 
             FROM 
-	            md_sanpham sp left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id
+	            md_sanpham sp 
+                left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id
 	            left join md_doitackinhdoanh ncc on sp.nhacungung = ncc.md_doitackinhdoanh_id
 	            left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
 	            left join md_nhomnangluc nnl on sp.md_nhomnangluc_id = nnl.md_nhomnangluc_id
@@ -585,12 +587,12 @@ public class ProductController : IHttpHandler
 	            left join md_kieudang kd on sp.md_kieudang_id = kd.md_kieudang_id
                 left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id
             WHERE 
-	            1=1 " +
-                " {0} " +
-                " AND sp.hoatdong = 1 AND sp.trangthai not in ('NHD', 'HHT', 'SOANTHAO')";
+	            1=1
+                {0}
+                AND sp.hoatdong = 1 AND sp.trangthai not in ('NHD', 'HHT', 'SOANTHAO')"
+            , filter
+        );
 
-        sqlCount = String.Format(sqlCount, filter);
-        
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -616,40 +618,44 @@ public class ProductController : IHttpHandler
         {
             sidx = "sp.ma_sanpham";
         }
-        
-        string strsql = @"select * from( 
-            SELECT
-	            sp.md_sanpham_id, sp.trangthai, sp.ma_sanpham
-	            , kd.ten_tv as ten_kd
-	            , kd.ma_kieudang as ma_kd
-	            , cn.ten_tv as ten_cn
-	            , cn.ma_chucnang as ma_cn
-	            , dvt.ten_dvt as tendvt
-	            , sp.mota_tiengviet,  sp.mota_tienganh
-	            , sp.L_inch, sp.W_inch, sp.H_inch, sp.L_cm, sp.W_cm, sp.H_cm, sp.Trongluong, sp.dientich, sp.thetich
-	            , (nnl.hehang + '('+ nnl.nhom +')') as nangluc
-	            , cl.code_cl, sp.ghichu, ncc.ma_dtkd
-	            , cb.ten_cangbien as cangbien, hscode.ma_hscode, hscode.hscode, sp.chucnangsp, sp.ngayxacnhan, sp.hinhthucban
-	            , sp.ngaytao, sp.nguoitao, sp.ngaycapnhat, sp.nguoicapnhat, sp.mota, sp.hoatdong
-	            , ROW_NUMBER() OVER (ORDER BY {0} {1} ) as RowNum 
-            FROM 
-	            md_sanpham sp left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id
-	            left join md_doitackinhdoanh ncc on sp.nhacungung = ncc.md_doitackinhdoanh_id
-	            left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
-	            left join md_nhomnangluc nnl on sp.md_nhomnangluc_id = nnl.md_nhomnangluc_id
-	            left join md_cangbien cb on sp.md_cangbien_id = cb.md_cangbien_id
-	            left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
-	            left join md_kieudang kd on sp.md_kieudang_id = kd.md_kieudang_id                     
-                left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id	            
-            WHERE 
-	           1=1 " +
-            " {2} " +
-            " AND sp.hoatdong = 1 AND sp.trangthai not in ('NHD', 'HHT', 'SOANTHAO')" +
-            " )P WHERE RowNum > @start AND RowNum < @end";
-        
-        strsql = String.Format(strsql, sidx, sord, filter);
 
-        System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
+        string strsql = string.Format(@"
+            select * from( 
+                SELECT
+	                sp.md_sanpham_id, sp.trangthai, sp.ma_sanpham
+	                , kd.ten_tv as ten_kd
+	                , kd.ma_kieudang as ma_kd
+	                , cn.ten_tv as ten_cn
+	                , cn.ma_chucnang as ma_cn
+	                , dvt.ten_dvt as tendvt
+	                , sp.mota_tiengviet,  sp.mota_tienganh
+	                , sp.L_inch, sp.W_inch, sp.H_inch, sp.L_cm, sp.W_cm, sp.H_cm, sp.Trongluong, sp.dientich, sp.thetich
+	                , (nnl.hehang + '('+ nnl.nhom +')') as nangluc
+	                , cl.code_cl, sp.ghichu, ncc.ma_dtkd
+	                , cb.ten_cangbien as cangbien, hscode.ma_hscode, hscode.hscode, sp.chucnangsp, sp.ngayxacnhan, sp.hinhthucban
+	                , sp.ngaytao, sp.nguoitao, sp.ngaycapnhat, sp.nguoicapnhat, sp.mota, sp.hoatdong
+	                , ROW_NUMBER() OVER (ORDER BY {0} {1} ) as RowNum 
+                FROM 
+	                md_sanpham sp 
+                    left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id
+	                left join md_doitackinhdoanh ncc on sp.nhacungung = ncc.md_doitackinhdoanh_id
+	                left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
+	                left join md_nhomnangluc nnl on sp.md_nhomnangluc_id = nnl.md_nhomnangluc_id
+	                left join md_cangbien cb on sp.md_cangbien_id = cb.md_cangbien_id
+	                left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
+	                left join md_kieudang kd on sp.md_kieudang_id = kd.md_kieudang_id                     
+                    left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id	            
+                WHERE 
+	                1=1 {2}
+                    AND sp.hoatdong = 1 
+                    AND sp.trangthai not in ('NHD', 'HHT', 'SOANTHAO')
+            )P WHERE RowNum > @start AND RowNum < @end"
+            , sidx
+            , sord
+            , filter
+        );
+
+        var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
         xml += "<page>" + page + "</page>";
@@ -685,17 +691,23 @@ public class ProductController : IHttpHandler
             xml += "<cell><![CDATA[" + row["ma_hscode"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hscode"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["chucnangsp"] + "]]></cell>";
-			if(!string.IsNullOrEmpty(row["ngayxacnhan"] + ""))
-				xml += "<cell><![CDATA[" + DateTime.Parse(row["ngayxacnhan"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-			else
-				xml += "<cell><![CDATA[]]></cell>";
-			
+            
+            var nxn = row["ngayxacnhan"] + "";
+            xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", string.IsNullOrEmpty(nxn) ? "" : DateTime.Parse(nxn).ToString("dd/MM/yyyy"));
+            
             xml += "<cell><![CDATA[" + row["hinhthucban"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+
+            var ngaytao = row["ngaytao"] + "";
+            xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", string.IsNullOrEmpty(ngaytao) ? "" : DateTime.Parse(ngaytao).ToString("dd/MM/yyyy"));
+
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+
+            var ngaycapnhat = row["ngaycapnhat"] + "";
+            xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", string.IsNullOrEmpty(ngaycapnhat) ? "" : DateTime.Parse(ngaycapnhat).ToString("dd/MM/yyyy"));
+
             xml += "<cell><![CDATA[" + row["nguoicapnhat"] + "]]></cell>";
+
             xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
             xml += "</row>";
