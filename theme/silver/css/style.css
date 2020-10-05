@@ -239,7 +239,11 @@ table.view-capacity tr td
 	text-align:center;
 	}
 
-
+input:disabled {
+    /* color: gray; */
+    opacity: 0.7;
+    border-color: rgba(118, 118, 118, 0.3);
+}
 
 
 

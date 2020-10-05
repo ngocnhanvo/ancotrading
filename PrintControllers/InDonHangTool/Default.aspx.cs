@@ -235,7 +235,10 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
                         case 
                             when isnull(dh.phanbodiscount, 0) = 0
                             then ddh.giafob + isnull(ddh.phi, 0)
-                            else (ddh.giafob + isnull(ddh.phi, 0)) - (ddh.giafob + isnull(ddh.phi, 0)) * dh.discount / 100
+                            else (ddh.giafob + isnull(ddh.phi, 0)) - (ddh.giafob + isnull(ddh.phi, 0)) * 
+                                (
+                                    case when dh.discount > 0 then dh.discount else ddh.discount end
+                                ) / 100
                         end
                     ) as giafob
 					, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch , dh.shipmenttime, cb.ten_cangbien, pmt.ten_paymentterm, (' In favor of ANCO COMPANY LTD. Account No. : ' + replace(ngh.thongtin,'''','''''')) as mota

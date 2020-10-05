@@ -898,8 +898,10 @@
         let c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
         $('#discount_hehang').off('change');
         $('#discount_hehang').change(function () {
+
             let val = $('#discount_hehang_value').val();
             if ($(this).prop('checked') == true) {
+                $('#discount').val('0').prop('disabled', true);
                 $.get("Controllers/SelectOption/ApDungDisCountHeHang.ashx",
                     { "action": "DiscountHH", "c_donhang_id": c_donhang_id },
                     function (result) {
@@ -907,6 +909,7 @@
                     });
             }
             else {
+                $('#discount').prop('disabled', false);
                 $('.tbl_discount_hehang_value').remove();
             }
         });
@@ -1085,14 +1088,15 @@
             },
 			{
                  name: 'discount'
+                 , hidden: true
                  , label: 'Discount(%)'
                  , index: 'discount'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'text'
                  , formoptions: { colpos: 1, rowpos: 7 }
-                 , editoptions:{ defaultValue: '0' }
-                 , editrules: { required:true, number:true, minValue: 0 }
+                 , editoptions:{ defaultValue: '0'}
+                 , editrules: { required:true, number:true, minValue: 0, edithidden: true }
                  , align: 'right'
             },
 			{
@@ -1909,6 +1913,19 @@
 				, align: 'right'
 				, formatter:'currency'
 				, formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+			},
+            {
+				name: 'phanbodiscount'
+                , hidden: false
+                , fixed:true
+				, label: 'Phân bổ discount'
+				, index: 'dh.phanbodiscount'
+                , width: 100
+                , editable: false
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions:{ value:'True:False', defaultValue: 'True' }
+                , formatter: 'checkbox'
 			},
             {
                 name: 'soluong'

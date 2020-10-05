@@ -549,8 +549,8 @@ public class DongDonHangController : IHttpHandler
                         , ddh.ma_sanpham_khach
                         , ddh.giafob
                         , isnull(ddh.phi, 0) as phi
-                        , (case when dh.phanbodiscount = 1 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discount
-                        
+                        , (case when isnull(dh.discount, 0) > 0 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discount
+                        , dh.phanbodiscount
                         , ddh.soluong
                         , dg.ten_donggoi
                         , ddh.sl_inner
@@ -602,6 +602,7 @@ public class DongDonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["giahopdong"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["phanbodiscount"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["soluong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_donggoi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sl_inner"] + "]]></cell>";
