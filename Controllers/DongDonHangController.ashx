@@ -544,7 +544,7 @@ public class DongDonHangController : IHttpHandler
                             then (P.giafob + P.phi) * P.discount / 100
                             else 0 
                         end
-`   `               )
+                    )
                     as giahopdong
                 from(
                     select
