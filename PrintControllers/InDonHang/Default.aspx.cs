@@ -301,17 +301,24 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , no_cont
         );
 
-        DataTable dt = mdbc.GetData(select);
+        try
+        {
+            DataTable dt = mdbc.GetData(select);
 
-        if (dt.Rows.Count != 0)
-        {
-            HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt);
-            String saveAsFileName = String.Format("DonHang-{0}.xls", DateTime.Now);
-            this.SaveFile(hssfworkbook, saveAsFileName);
+            if (dt.Rows.Count != 0)
+            {
+                HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt);
+                String saveAsFileName = String.Format("DonHang-{0}.xls", DateTime.Now);
+                this.SaveFile(hssfworkbook, saveAsFileName);
+            }
+            else
+            {
+                Response.Write("<h3>Đơn hàng không có dữ liệu</h3>");
+            }
         }
-        else
+        catch
         {
-            Response.Write("<h3>Đơn hàng không có dữ liệu</h3>");
+            Response.Write(select);
         }
         //}
         //catch (Exception ex)
