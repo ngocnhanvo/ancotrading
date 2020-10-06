@@ -206,6 +206,15 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
                 A.*
                 , convert(decimal(18,2), N'{9}') as total
                 , A.giafob * A.soluong as amount
+                
+                , (select dbo.get_commodity(N'{0}') )  + ' products' as commodity
+                , '{1}' as money
+                , '{4}' as diengiaicong
+                , '{5}' as diengiaitru
+                , isnull('{6}',0) as phicong
+                , isnull('{7}',0) as phitru
+                , N'{8}' as no_cont
+
                 , CASE
 			        WHEN A.dvt_inner like N'%bun%'
 			        THEN A.n_w_inner + 0.5
@@ -238,16 +247,16 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
                                 ) / 100
                         end
                     ) as giafob
+                    , isnull('{2}', 0) as dis
+                    , N'{3}' as discount_hehang_value
 					, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch , dh.shipmenttime, cb.ten_cangbien, pmt.ten_paymentterm, (' In favor of ANCO COMPANY LTD. Account No. : ' + replace(ngh.thongtin,'''','''''')) as mota
 					, ddh.v2 as cbm, (sp.trongluong * ddh.soluong) as trongluong
                     ,(case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
 					, N'{8}' as no_cont
 					, (case dg.sl_inner when 0 then ' ' else (cast(dg.sl_inner as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as sl_inner_
-					, dh.portdischarge , (select dbo.get_commodity(N'{0}') )  + ' products' as commodity
-					, dh.discount as dis
+					, dh.portdischarge
 					, dh.amount as amountTT
-					, '{1}' as money
-					, '{2}' as phicong, '{3}' as phitru, '{4}' as diengiaicong, '{5}' as diengiaitru, isnull(dh.hoahong, 0) as hoahong
+					, isnull(dh.hoahong, 0) as hoahong
 					, (case when md_nguoilienhe_id is null then '' else (select ma_dtkd from md_doitackinhdoanh where md_doitackinhdoanh_id = dh.md_nguoilienhe_id) end) as nguoinhan
 					, ddh.l1, ddh.w1, ddh.h1 , ddh.l2, ddh.w2, ddh.h2, hs.ma_hscode
 					, dvt_outer.ten_dvt as dvt_outer
@@ -276,9 +285,9 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
         )B
 		where B.c_donhang_id = N'{0}' order by B.ma_sanpham asc",
         dh.c_donhang_id, 
-		totalWord, 
-        pTang, 
-        pGiam, 
+		totalWord,
+        dh.discount.GetValueOrDefault(0),
+        dh.discount_hehang_value,
         diengiaicong.Replace("'","''"), 
         diengiaitru.Replace("'","''"), 
         tang, 
