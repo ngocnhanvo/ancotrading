@@ -193,6 +193,15 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 SELECT 
                     A.*
                     , A.giafob * A.soluong as amount
+                    
+                    , (select dbo.get_commodity(N'{0}') )  + ' products' as commodity
+                    , '{1}' as money
+                    , '{4}' as diengiaicong
+                    , '{5}' as diengiaitru
+                    , isnull('{6}',0) as phicong
+                    , isnull('{7}',0) as phitru
+                    
+                    , N'{8}' as no_cont
                     , CASE
 					    WHEN A.dvt_inner like N'%bun%'
 					    THEN A.n_w_inner + 0.5
@@ -241,16 +250,10 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 						, ddh.v2 as cbm
                         , (sp.trongluong * ddh.soluong) as trongluong
                         , (case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
-						, N'{8}' as no_cont
 						, (case dg.sl_inner when 0 then ' ' else (cast(dg.sl_inner as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as sl_inner_
 						, dh.portdischarge
-                        , (select dbo.get_commodity(N'{0}') )  + ' products' as commodity
 						, dh.discount as dis
 						, convert(decimal(18,2) ,dh.discount) as dis1
-						, isnull('{6}',0) as phicong
-                        , isnull('{7}',0) as phitru
-                        , '{4}' as diengiaicong
-                        , '{5}' as diengiaitru
                         , CASE WHEN dh.hoahong is null THEN 0 ELSE dh.hoahong END as hoahong
 						, (case when md_nguoilienhe_id is null then '' else (select ma_dtkd from md_doitackinhdoanh where md_doitackinhdoanh_id = dh.md_nguoilienhe_id) end) as nguoinhan
 						, ddh.l1, ddh.w1, ddh.h1 , ddh.l2, ddh.w2, ddh.h2, hs.hscode as ma_hscode
