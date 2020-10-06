@@ -21,6 +21,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //{
         var c_donhang_id = Request.QueryString["c_donhang_id"];
         var dh = db.c_donhangs.Where(s => s.c_donhang_id == c_donhang_id).FirstOrDefault();
+        if (dh.discount.GetValueOrDefault(0) > 0)
+        {
+            dh.discount = dh.phanbodiscount.GetValueOrDefault(false) == true ? 0 : dh.discount;
+        }
+
         var pTang = (from p in db.c_phidonhangs where p.c_donhang_id.Equals(c_donhang_id) && p.phitang.Equals(true) select p.phi).Sum();
         var pGiam = (from p in db.c_phidonhangs where p.c_donhang_id.Equals(c_donhang_id) && p.phitang.Equals(false) select p.phi).Sum();
 
@@ -68,7 +73,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 , "@c_donhang_id"
                 , c_donhang_id
                 , "@discount"
-                , dh.discount_hehang.GetValueOrDefault(false) ? 0 :dh.discount.GetValueOrDefault(0)
+                , dh.discount_hehang.GetValueOrDefault(false) ? 0 : dh.discount.GetValueOrDefault(0)
             ) + ""
         );
 
@@ -187,6 +192,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 			(
                 SELECT 
                     A.*
+                    , A.giafob * A.soluong as amount
                     , CASE
 					    WHEN A.dvt_inner like N'%bun%'
 					    THEN A.n_w_inner + 0.5
@@ -215,7 +221,16 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 						, (case ddh.sl_outer when 0 then ' ' else (cast(ddh.sl_outer as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) end) as ten_donggoi
 						, ddh.soluong
                         , dvt.ten_dvt as dvt_sp
-                        , (isnull(ddh.giachuan, ddh.giafob) + isnull(ddh.phi, 0)) as giafob
+                        , (
+                            case 
+                                when isnull(dh.phanbodiscount, 0) = 0
+                                then ddh.giafob + isnull(ddh.phi, 0)
+                                else (ddh.giafob + isnull(ddh.phi, 0)) - (ddh.giafob + isnull(ddh.phi, 0)) * 
+                                    (
+                                        case when dh.discount > 0 then dh.discount else ddh.discount end
+                                    ) / 100
+                            end
+                        ) as giafob
                         , isnull(ddh.giachuan, ddh.giafob) as giachuan
                         , isnull(ddh.phi, 0) as phi
 						, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch
@@ -225,7 +240,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         , (' In favor of ANCO COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
 						, ddh.v2 as cbm
                         , (sp.trongluong * ddh.soluong) as trongluong
-						, (ddh.soluong * (isnull(ddh.giachuan, ddh.giafob) + isnull(ddh.phi, 0))) as amount
                         , (case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
 						, N'{8}' as no_cont
 						, (case dg.sl_inner when 0 then ' ' else (cast(dg.sl_inner as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as sl_inner_
@@ -233,8 +247,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         , (select dbo.get_commodity(N'{0}') )  + ' products' as commodity
 						, dh.discount as dis
 						, convert(decimal(18,2) ,dh.discount) as dis1
-						, (dh.amount * dh.discount / 100) as discount
-                        , (dh.amount + {6} - {7}) - (dh.amount * dh.discount / 100) as total, '{1}' as money
 						, isnull('{6}',0) as phicong
                         , isnull('{7}',0) as phitru
                         , '{4}' as diengiaicong
