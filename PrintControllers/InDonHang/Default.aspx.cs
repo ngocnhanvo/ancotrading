@@ -24,6 +24,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         if (dh.discount.GetValueOrDefault(0) > 0)
         {
             dh.discount = dh.phanbodiscount.GetValueOrDefault(false) == true ? 0 : dh.discount;
+            dh.discount_hehang_value = "";
         }
 
         var pTang = (from p in db.c_phidonhangs where p.c_donhang_id.Equals(c_donhang_id) && p.phitang.Equals(true) select p.phi).Sum();
@@ -240,6 +241,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                                     ) / 100
                             end
                         ) as giafob
+                        
+                        , {1} as dis
+						, convert(decimal(18,2) , {1}) as dis1
+                        , N'{2}' as discount_hehang_value
+
                         , isnull(ddh.giachuan, ddh.giafob) as giachuan
                         , isnull(ddh.phi, 0) as phi
 						, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch
@@ -252,8 +258,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         , (case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
 						, (case dg.sl_inner when 0 then ' ' else (cast(dg.sl_inner as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as sl_inner_
 						, dh.portdischarge
-						, dh.discount as dis
-						, convert(decimal(18,2) ,dh.discount) as dis1
                         , CASE WHEN dh.hoahong is null THEN 0 ELSE dh.hoahong END as hoahong
 						, (case when md_nguoilienhe_id is null then '' else (select ma_dtkd from md_doitackinhdoanh where md_doitackinhdoanh_id = dh.md_nguoilienhe_id) end) as nguoinhan
 						, ddh.l1, ddh.w1, ddh.h1 , ddh.l2, ddh.w2, ddh.h2, hs.hscode as ma_hscode
@@ -266,7 +270,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 						, kt.ten_kichthuoc
                         , tl.ten_trongluong
                         , ddh.barcode
-                        , dh.discount_hehang_value
 					from
 						c_donhang dh
 						left join c_dongdonhang ddh on dh.c_donhang_id = ddh.c_donhang_id
@@ -289,8 +292,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             order by B.ma_sanpham asc"
             , c_donhang_id == null ? "" : c_donhang_id
             , totalWord
-            , pTang
-            , pGiam
+            , dh.discount.GetValueOrDefault(0)
+            , dh.discount_hehang_value
             , diengiaicong
             , diengiaitru
             , tang
