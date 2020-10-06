@@ -243,7 +243,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         ) as giafob
                         
                         , isnull('{1}', 0) as dis
-						, convert(decimal(18,2) , isnull('{1}', 0)) as dis1
+						, cast('{1}' as decimal(18,2)) as dis1
                         , N'{2}' as discount_hehang_value
 
                         , isnull(ddh.giachuan, ddh.giafob) as giachuan
