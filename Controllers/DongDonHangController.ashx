@@ -537,7 +537,15 @@ public class DongDonHangController : IHttpHandler
         string strsql = @"
                 select 
                     P.* 
-                    , (P.giafob + P.phi) - (P.giafob + P.phi) * P.discount / 100 as giahopdong
+                    , (P.giafob + P.phi) - 
+                    (
+                        case 
+                            when isnull(dh.phanbodiscount, 0) = 1
+                            then (P.giafob + P.phi) * P.discount / 100
+                            else 0 
+                        end
+`   `               )
+                    as giahopdong
                 from(
                     select
                         ddh.c_dongdonhang_id
