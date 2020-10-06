@@ -15,14 +15,11 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
     {
         String c_donhang_id = Request.QueryString["c_donhang_id"].Substring(0,32);
         var dh = db.c_donhangs.Where(p => p.c_donhang_id.Equals(c_donhang_id)).FirstOrDefault();
-        decimal discount = dh.discount.GetValueOrDefault(0);
-        if(discount > 0)
-        {
-            discount = dh.phanbodiscount.GetValueOrDefault(false) == true ? 0 : discount;
-        }
+        dh.discount = dh.phanbodiscount.GetValueOrDefault(false) == true ? 0 : dh.discount;
+        dh.discount_hehang_value = dh.phanbodiscount.GetValueOrDefault(false) == true ? "" : dh.discount_hehang_value;
 
-		String sql = "";
-        if (discount > 0)
+        String sql = "";
+        if (dh.discount.GetValueOrDefault(0) > 0)
         {
             rptInDonHang report = new rptInDonHang();
             sql = this.CreateSql(dh);

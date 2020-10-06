@@ -21,11 +21,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //{
         var c_donhang_id = Request.QueryString["c_donhang_id"];
         var dh = db.c_donhangs.Where(s => s.c_donhang_id == c_donhang_id).FirstOrDefault();
-        if (dh.discount.GetValueOrDefault(0) > 0)
-        {
-            dh.discount = dh.phanbodiscount.GetValueOrDefault(false) == true ? 0 : dh.discount;
-            dh.discount_hehang_value = "";
-        }
+
+        dh.discount = dh.phanbodiscount.GetValueOrDefault(false) == true ? 0 : dh.discount;
+        dh.discount_hehang_value = dh.phanbodiscount.GetValueOrDefault(false) == true ? "" : dh.discount_hehang_value;
 
         var pTang = (from p in db.c_phidonhangs where p.c_donhang_id.Equals(c_donhang_id) && p.phitang.Equals(true) select p.phi).Sum();
         var pGiam = (from p in db.c_phidonhangs where p.c_donhang_id.Equals(c_donhang_id) && p.phitang.Equals(false) select p.phi).Sum();
