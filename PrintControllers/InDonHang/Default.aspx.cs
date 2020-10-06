@@ -880,6 +880,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             s1.GetRow(row).GetCell(4).CellStyle = leftBold;
             s1.GetRow(row).GetCell(12).CellStyle = rightBold;
             s1.GetRow(row).GetCell(12).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+            if (discount1 <= 0)
+                s1.GetRow(row).HeightInPoints = 0;
             row++;
         }
 
