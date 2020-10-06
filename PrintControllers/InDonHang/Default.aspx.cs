@@ -201,8 +201,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     , '{5}' as diengiaitru
                     , isnull('{6}',0) as phicong
                     , isnull('{7}',0) as phitru
-                    
                     , N'{8}' as no_cont
+
                     , CASE
 					    WHEN A.dvt_inner like N'%bun%'
 					    THEN A.n_w_inner + 0.5
@@ -242,8 +242,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                             end
                         ) as giafob
                         
-                        , {1} as dis
-						, convert(decimal(18,2) , {1}) as dis1
+                        , isnull('{1}', 0) as dis
+						, convert(decimal(18,2) , isnull('{1}', 0)) as dis1
                         , N'{2}' as discount_hehang_value
 
                         , isnull(ddh.giachuan, ddh.giafob) as giachuan
