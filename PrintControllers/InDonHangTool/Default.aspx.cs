@@ -252,7 +252,6 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
 					, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch , dh.shipmenttime, cb.ten_cangbien, pmt.ten_paymentterm, (' In favor of ANCO COMPANY LTD. Account No. : ' + replace(ngh.thongtin,'''','''''')) as mota
 					, ddh.v2 as cbm, (sp.trongluong * ddh.soluong) as trongluong
                     ,(case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
-					, N'{8}' as no_cont
 					, (case dg.sl_inner when 0 then ' ' else (cast(dg.sl_inner as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as sl_inner_
 					, dh.portdischarge
 					, dh.amount as amountTT
