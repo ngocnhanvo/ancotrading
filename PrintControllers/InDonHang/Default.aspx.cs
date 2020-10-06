@@ -242,9 +242,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                             end
                         ) as giafob
                         
-                        , isnull('{1}', 0) as dis
-						, cast('{1}' as decimal(18,2)) as dis1
-                        , N'{2}' as discount_hehang_value
+                        , isnull('{2}', 0) as dis
+						, cast('{2}' as decimal(18,2)) as dis1
+                        , N'{3}' as discount_hehang_value
 
                         , isnull(ddh.giachuan, ddh.giafob) as giachuan
                         , isnull(ddh.phi, 0) as phi
