@@ -198,8 +198,10 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
 			    WHEN B.sl_inner = 0 and B.dvt_outer like N'%pal%'
 			    THEN B.g_w_inner + 25
 			ELSE 0 END as g_w_master,
-            convert(decimal(18,2),(B.amount * B.dis / 100)) as discount,
-			B.total * B.hoahong / 100 as total_hoahong
+            
+            convert(decimal(18,2),(B.total * B.dis / 100)) as discount,
+			
+            B.total * B.hoahong / 100 as total_hoahong
 		FROM
 		(
             SELECT 
@@ -247,7 +249,7 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
                                 ) / 100
                         end
                     ) as giafob
-                    , isnull('{2}', 0) as dis
+                    , cast('{2}' as decimal(18,2)) as dis
                     , N'{3}' as discount_hehang_value
 					, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch , dh.shipmenttime, cb.ten_cangbien, pmt.ten_paymentterm, (' In favor of ANCO COMPANY LTD. Account No. : ' + replace(ngh.thongtin,'''','''''')) as mota
 					, ddh.v2 as cbm, (sp.trongluong * ddh.soluong) as trongluong
