@@ -84,7 +84,7 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
 								ddh.soluong *
 								(
 									case 
-										when isnull(dh.phanbodiscount, 0) = 0
+										when isnull(@phanbodiscount, 0) = 0
 										then ddh.giafob + isnull(ddh.phi, 0)
 										else (ddh.giafob + isnull(ddh.phi, 0)) - (ddh.giafob + isnull(ddh.phi, 0)) * 
 											(
@@ -94,7 +94,7 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
 								)
                             ) as amount  
                         from 
-                            c_dongdonhang 
+                            c_dongdonhang ddh
                         where 
                             c_donhang_id = @c_donhang_id
                     )A
@@ -103,6 +103,8 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
                 , dh.c_donhang_id
                 , "@discount"
                 , dh.discount_hehang.GetValueOrDefault(false) ? 0 : dh.discount.GetValueOrDefault(0)
+				, "@phanbodiscount"
+				, dh.phanbodiscount
             ) + ""
         );
 
