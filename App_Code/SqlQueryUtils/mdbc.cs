@@ -256,9 +256,9 @@ public static class mdbc
 	private static SqlCommand createParramsSQL(SqlCommand cmd, string parram, string type, object valueP)
 	{
 		int i1 = type.LastIndexOf("("), i2 = type.LastIndexOf(")");
-		var type1 = i1 > -1 ? type.Substring(0, i1-1) : type;
-		var type2 = i1 > -1 & i2 > -1 ? type.Substring(i1+1, i2-1) : "";
-		if(type1 == "nvarchar") 
+        var type1 = i1 > -1 ? type.Substring(0, i1) : type;
+        var type2 = i1 > -1 & i2 > -1 ? type.Substring(i1 + 1, i2 - i1 - 1) : "";
+        if (type1 == "nvarchar") 
 		{
 			var number = type2 == "max" ? -1 : int.Parse(type2);
 			cmd.Parameters.Add(parram, SqlDbType.NVarChar, number);
