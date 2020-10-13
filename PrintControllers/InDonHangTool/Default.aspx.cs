@@ -11,10 +11,12 @@ using System.Data;
 public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
 {
     LinqDBDataContext db = new LinqDBDataContext();
+	decimal discountPO = 0;
     protected void Page_Load(object sender, EventArgs e)
     {
         String c_donhang_id = Request.QueryString["c_donhang_id"].Substring(0,32);
         var dh = db.c_donhangs.Where(p => p.c_donhang_id.Equals(c_donhang_id)).FirstOrDefault();
+		discountPO = dh.discount.GetValueOrDefault(0);
         dh.discount = dh.phanbodiscount.GetValueOrDefault(false) == true ? 0 : dh.discount;
 		dh.discount_hehang = dh.phanbodiscount.GetValueOrDefault(false) == true ? false : dh.discount_hehang;
         dh.discount_hehang_value = dh.phanbodiscount.GetValueOrDefault(false) == true ? "" : dh.discount_hehang_value;
@@ -102,7 +104,7 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
                 , "@c_donhang_id"
                 , dh.c_donhang_id
                 , "@discount"
-                , dh.discount_hehang.GetValueOrDefault(false) ? 0 : dh.discount.GetValueOrDefault(0)
+                , dh.discount_hehang.GetValueOrDefault(false) ? 0 : discountPO
 				, "@phanbodiscount"
 				, dh.phanbodiscount.GetValueOrDefault(false) ? 1 : 0
             ) + ""
