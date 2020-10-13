@@ -140,6 +140,17 @@ public static class mdbc
         }
         return Command;
     }
+	
+	public static SqlCommand CreateCommand2(String sql, params object[] nameValue)
+    {
+        SqlCommand Command = new SqlCommand(sql, mdbc.GetConnection);
+        Command.CommandType = CommandType.Text;
+        for (int i = 0; i < nameValue.Length; i+=3)
+        {
+            Command.Parameters.AddWithValue(nameValue[i].ToString(), nameValue[i + 1].ToString(), nameValue[i + 2].ToString());
+        }
+        return Command;
+    }
 
     public static SqlCommand CreateCommand(String sql, bool procdure, params object[] nameValue)
     {
@@ -214,6 +225,16 @@ public static class mdbc
     public static object ExecuteScalar(String sql, params object[] parameters)
     {
         SqlCommand cmd = CreateCommand(sql, parameters);
+        cmd.CommandTimeout = 50000;
+        cmd.Connection.Open();
+        object value = cmd.ExecuteScalar();
+        cmd.Connection.Close();
+        return value;
+    }
+	
+	public static object ExecuteScalar2(String sql, params object[] parameters)
+    {
+        SqlCommand cmd = CreateCommand2(sql, parameters);
         cmd.CommandTimeout = 50000;
         cmd.Connection.Open();
         object value = cmd.ExecuteScalar();
