@@ -147,7 +147,7 @@ public static class mdbc
         Command.CommandType = CommandType.Text;
         for (int i = 0; i < nameValue.Length; i+=3)
         {
-            Command.Parameters.AddWithValue(nameValue[i].ToString(), nameValue[i + 1].ToString(), nameValue[i + 2].ToString());
+			Command = createParramsSQL(nameValue[i].ToString(), nameValue[i + 1].ToString(), nameValue[i + 2]);
         }
         return Command;
     }
@@ -252,4 +252,37 @@ public static class mdbc
         cmd.Connection.Close();
         return value;
     }
+	
+	private SqlCommand createParramsSQL(SqlCommand cmd, string parram, string type, object valueP)
+	{
+		int i1 = type.LastIndexOf("("), i2 = type.LastIndexOf("(");
+		var type1 = i1 > -1 ? type.Substring(0, i1-1) : type;
+		var type2 = i1 > -1 & i2 > -1 ? type.Substring(i1+1, i2-1) : "";
+		if(type1 == "nvarchar") 
+		{
+			var number = type2 == "max" ? -1 : int.Parse(type2);
+			cmd.Parameters.Add(parram, SqlDbType.NVarChar, number);
+		}
+		else if(type1 == "decimal") 
+		{
+			var decs = type2.Split(',');
+			var number1 = int.Parse(decs[0]);
+			var number2 = int.Parse(decs[1]);
+			cmd.Parameters.Add(new SqlParameter(parram, SqlDbType.Decimal) { Precision = number1, Scale = number2 });
+		}
+		else if(type1 == "decimal") 
+		{
+			var decs = type2.Split(',');
+			var number1 = int.Parse(decs[0]);
+			var number2 = int.Parse(decs[1]);
+			cmd.Parameters.Add(new SqlParameter(parram, SqlDbType.Decimal) { Precision = number1, Scale = number2 });
+		}
+		else if(type1 == "bit") 
+		{
+			cmd.Parameters.Add(new SqlParameter(parram, SqlDbType.Bit);
+		}
+		
+		cmd.Parameters[parram].Value = valueP;
+		return cmd;
+	}
 }
