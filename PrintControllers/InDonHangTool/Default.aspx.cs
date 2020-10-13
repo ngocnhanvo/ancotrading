@@ -105,8 +105,8 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
 				, "nvarchar(32)"
                 , dh.c_donhang_id
                 , "@discount"
-				, "decimal(18, 6)"
-                , dh.discount_hehang.GetValueOrDefault(false) ? 0.00 : discountPO
+				, "decimal(18,6)"
+                , dh.discount_hehang.GetValueOrDefault(false) ? 0 : discountPO
 				, "@phanbodiscount"
 				, "bit"
 				, dh.phanbodiscount.GetValueOrDefault(false)
