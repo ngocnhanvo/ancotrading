@@ -16,6 +16,7 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
         String c_donhang_id = Request.QueryString["c_donhang_id"].Substring(0,32);
         var dh = db.c_donhangs.Where(p => p.c_donhang_id.Equals(c_donhang_id)).FirstOrDefault();
         dh.discount = dh.phanbodiscount.GetValueOrDefault(false) == true ? 0 : dh.discount;
+		dh.discount_hehang = dh.phanbodiscount.GetValueOrDefault(false) == true ? false : dh.discount_hehang;
         dh.discount_hehang_value = dh.phanbodiscount.GetValueOrDefault(false) == true ? "" : dh.discount_hehang_value;
 
         String sql = "";
