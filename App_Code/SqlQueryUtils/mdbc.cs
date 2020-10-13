@@ -147,7 +147,7 @@ public static class mdbc
         Command.CommandType = CommandType.Text;
         for (int i = 0; i < nameValue.Length; i+=3)
         {
-			Command = createParramsSQL(nameValue[i].ToString(), nameValue[i + 1].ToString(), nameValue[i + 2]);
+			Command = createParramsSQL(Command, nameValue[i].ToString(), nameValue[i + 1].ToString(), nameValue[i + 2]);
         }
         return Command;
     }
