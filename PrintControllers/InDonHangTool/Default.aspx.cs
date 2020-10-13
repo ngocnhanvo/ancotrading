@@ -83,17 +83,7 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
                     from (
                         select
 							sum(
-								ddh.soluong *
-								(
-									case 
-										when isnull(@phanbodiscount, 0) = 0
-										then ddh.giafob + isnull(ddh.phi, 0)
-										else (ddh.giafob + isnull(ddh.phi, 0)) - (ddh.giafob + isnull(ddh.phi, 0)) * 
-											(
-												case when @discount > 0 then @discount else ddh.discount end
-											) / 100
-									end
-								)
+								ddh.soluong * (ddh.giafob + isnull(ddh.phi, 0)) - (ddh.giafob + isnull(ddh.phi, 0)) * ddh.discount / 100
                             ) as amount  
                         from 
                             c_dongdonhang ddh
@@ -105,6 +95,9 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
 				, "nvarchar(32)"
                 , dh.c_donhang_id
                 , "@discount"
+				, "decimal(18,6)"
+                , dh.discount_hehang.GetValueOrDefault(false) ? 0 : discountPO
+				, "@discount"
 				, "decimal(18,6)"
                 , dh.discount_hehang.GetValueOrDefault(false) ? 0 : discountPO
 				, "@phanbodiscount"
