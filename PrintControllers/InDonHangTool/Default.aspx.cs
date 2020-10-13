@@ -77,7 +77,7 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
         giam = pGiam == null ? 0 : pGiam.Value;
 
         decimal total = decimal.Parse(
-            mdbc.ExecuteScalar(@"
+            mdbc.ExecuteScalar2(@"
                     select 
                         cast(A.amount - (A.amount * @discount / 100) as decimal(18, 2))
                     from (
