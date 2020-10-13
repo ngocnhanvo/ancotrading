@@ -266,15 +266,8 @@ public static class mdbc
 		else if(type1 == "decimal") 
 		{
 			var decs = type2.Split(',');
-			var number1 = int.Parse(decs[0]);
-			var number2 = int.Parse(decs[1]);
-			cmd.Parameters.Add(new SqlParameter(parram, SqlDbType.Decimal) { Precision = number1, Scale = number2 });
-		}
-		else if(type1 == "decimal") 
-		{
-			var decs = type2.Split(',');
-			var number1 = int.Parse(decs[0]);
-			var number2 = int.Parse(decs[1]);
+			var number1 = byte.Parse(decs[0]);
+			var number2 = byte.Parse(decs[1]);
 			cmd.Parameters.Add(new SqlParameter(parram, SqlDbType.Decimal) { Precision = number1, Scale = number2 });
 		}
 		else if(type1 == "bit") 
