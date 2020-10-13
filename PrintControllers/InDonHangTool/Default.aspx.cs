@@ -104,7 +104,7 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
                 , "@discount"
                 , dh.discount_hehang.GetValueOrDefault(false) ? 0 : dh.discount.GetValueOrDefault(0)
 				, "@phanbodiscount"
-				, dh.phanbodiscount
+				, dh.phanbodiscount.GetValueOrDefault(false) ? 1 : 0
             ) + ""
         );
 
