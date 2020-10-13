@@ -279,7 +279,7 @@ public static class mdbc
 		}
 		else if(type1 == "bit") 
 		{
-			cmd.Parameters.Add(new SqlParameter(parram, SqlDbType.Bit);
+			cmd.Parameters.Add(new SqlParameter(parram, SqlDbType.Bit));
 		}
 		
 		cmd.Parameters[parram].Value = valueP;
