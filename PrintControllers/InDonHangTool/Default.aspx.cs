@@ -88,7 +88,7 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
 										then ddh.giafob + isnull(ddh.phi, 0)
 										else (ddh.giafob + isnull(ddh.phi, 0)) - (ddh.giafob + isnull(ddh.phi, 0)) * 
 											(
-												case when dh.discount > 0 then dh.discount else ddh.discount end
+												case when dh.discount > 0 then @discount else ddh.discount end
 											) / 100
 									end
 								)
