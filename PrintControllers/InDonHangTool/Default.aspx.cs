@@ -78,19 +78,17 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
 
         decimal total = decimal.Parse(
             mdbc.ExecuteScalar2(@"
+                select 
+                    cast(A.amount - (A.amount * @discount / 100) as decimal(18, 2))
+                from (
                     select 
-                        cast(A.amount - (A.amount * @discount / 100) as decimal(18, 2))
-                    from (
-                        select
-							sum(
-								ddh.soluong * (ddh.giafob + isnull(ddh.phi, 0)) - (ddh.giafob + isnull(ddh.phi, 0)) * ddh.discount / 100
-                            ) as amount  
-                        from 
-                            c_dongdonhang ddh
-                        where 
-                            c_donhang_id = @c_donhang_id
-                    )A
-                    "
+                        sum(soluong * ((giafob + isnull(phi, 0)) - (giafob + isnull(phi, 0)) * isnull(discount, 0) / 100)) as amount 
+                    from 
+                        c_dongdonhang 
+                    where 
+                        c_donhang_id = @c_donhang_id
+                )A
+                "
                 , "@c_donhang_id"
 				, "nvarchar(32)"
                 , dh.c_donhang_id
