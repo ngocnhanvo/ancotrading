@@ -237,7 +237,7 @@
         /* Hieu luc Nhap Kho */
         $("#<%=ID%>").jqGrid('navButtonAdd','#<%=ID%>-pager',{
             caption:""
-            , title: "<%= _funcActiveNhapKho.Contains("Xuất") ? "Hiệu lực xuất kho" : "Hiệu lực nhập kho" %>"
+            , title: "<%= _funcActiveNhapKho.Contains("XuatKho") ? "Hiệu lực xuất kho" : "Hiệu lực nhập kho" %>"
             , buttonicon: "icon-active-qo"
             , onClickButton : <%= _funcActiveNhapKho %>
         });
@@ -249,7 +249,7 @@
         /* Soan thao Nhap Kho */
         $("#<%=ID%>").jqGrid('navButtonAdd','#<%=ID%>-pager',{
             caption:""
-            , title:"Chuyển trạng thái \"Soạn thảo\" phiếu nhập kho"
+            , title: "<%= _funcActiveNhapKho.Contains("XuatKho") ? "Chuyển trạng thái \"Soạn thảo\" phiếu xuất kho" : "Chuyển trạng thái \"Soạn thảo\" phiếu nhập kho" %>"
             , buttonicon: "icon-deactive-qo"
             , onClickButton : <%= _funcDeactiveNhapKho %>
         });
