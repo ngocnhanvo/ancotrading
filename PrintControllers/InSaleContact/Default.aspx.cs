@@ -479,11 +479,10 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
                 , cnx.c_nhapxuat_id
             from c_dongpklinv dpk
                 , c_packinginvoice cpk
-                , c_donhang dh
+                , c_donhang dh outer APPLY (select * from dbo.ftbl_getInfoPO(dh.phanbodiscount, dh.discount, null, dh.discount_hehang_value)) as po
                 , c_dongnhapxuat dnx
                 , c_nhapxuat cnx
                 , md_cangbien cb
-            outer APPLY (select * from dbo.ftbl_getInfoPO(dh.phanbodiscount, dh.discount, null, dh.discount_hehang_value)) as po
             where dpk.c_packinginvoice_id = '{0}'
                 and dpk.c_donhang_id = dh.c_donhang_id
 		        and dpk.c_dongnhapxuat_id = dnx.c_dongnhapxuat_id
