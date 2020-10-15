@@ -672,6 +672,15 @@ public static class UserUtils
         return string.Format("Đã tạo đơn đặt hàng thành công với số chứng từ {0}.!", sochungtu);
     }
 
+    public static decimal getGiaHopDongPO(c_donhang dh, c_dongdonhang ddh)
+    {
+        var giaFOBvaPhi = ddh.giafob.GetValueOrDefault(0) + ddh.phi.GetValueOrDefault(0);
+        var discount = dh.discount.GetValueOrDefault(0) > 0 ? dh.discount.GetValueOrDefault(0) : (decimal)ddh.discount.GetValueOrDefault(0);
+        var phanBoDiscountVaoGia = dh.phanbodiscount.GetValueOrDefault(false) ? giaFOBvaPhi * discount / 100 : 0;
+        var giaHopDong = giaFOBvaPhi - phanBoDiscountVaoGia;
+        return giaHopDong;
+    }
+
     private class dsncc_ptr
     {
         public string id;
