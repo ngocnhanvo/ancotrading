@@ -237,7 +237,7 @@
         /* Hieu luc Nhap Kho */
         $("#<%=ID%>").jqGrid('navButtonAdd','#<%=ID%>-pager',{
             caption:""
-            , title:<%= _funcActiveNhapKho.Contains("Xuất") ? "Hiệu lực xuất kho" : "Hiệu lực nhập kho" %> 
+            , title: "<%= _funcActiveNhapKho.Contains("Xuất") ? "Hiệu lực xuất kho" : "Hiệu lực nhập kho" %>"
             , buttonicon: "icon-active-qo"
             , onClickButton : <%= _funcActiveNhapKho %>
         });
