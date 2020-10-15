@@ -504,9 +504,9 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         string sql_group = string.Format(@"
             select distinct 
                 dpk.c_donhang_id, 
+                dh.sochungtu as sodh,
                 po.discountPO as discount,
                 po.hehang_value as discount_hehang_value,
-                dh.discount, 
                 cnx.container, 
                 cnx.soseal, cb.ten_cangbien, cnx.c_nhapxuat_id,
                 isnull(cnx.loaicont, 0) as loaicont
