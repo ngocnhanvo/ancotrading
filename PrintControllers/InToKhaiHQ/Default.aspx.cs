@@ -449,16 +449,29 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         s1.AddMergedRegion(new CellRangeAddress(12, 12, 3, 4));
 
 
-        string sql_group = @"select distinct dpk.c_donhang_id, cdh.sochungtu as sodh, convert(decimal(18,2),cdh.discount) as discount, 
-		cdh.discount as discount1,
-		cnx.container, cnx.soseal, cb.ten_cangbien, cnx.c_nhapxuat_id
-                            from c_dongpklinv dpk, c_packinginvoice cpk, c_donhang cdh, c_dongnhapxuat dnx, c_nhapxuat cnx, md_cangbien cb
-                            where dpk.c_packinginvoice_id = '" + c_pkivn_id + "'" + //c_pkivn_id
-                                    @"and dpk.c_donhang_id = cdh.c_donhang_id
-		                            and dpk.c_dongnhapxuat_id = dnx.c_dongnhapxuat_id
-		                            and dnx.c_nhapxuat_id = cnx.c_nhapxuat_id
-                                    and dpk.c_packinginvoice_id = cpk.c_packinginvoice_id
-		                            and cpk.noidi = cb.md_cangbien_id";
+        string sql_group = string.Format(@"
+            select distinct 
+                dpk.c_donhang_id, 
+                dh.sochungtu as sodh, 
+                convert(decimal(18,2), po.discountPO) as discount, 
+		        po.discountPO as discount1,
+		        cnx.container, 
+                cnx.soseal, 
+                cb.ten_cangbien, 
+                cnx.c_nhapxuat_id
+            from c_dongpklinv dpk, 
+                c_packinginvoice cpk, 
+                c_donhang dh outer APPLY (select * from dbo.ftbl_getInfoPO(dh.phanbodiscount, dh.discount, null, dh.discount_hehang_value)) as po, 
+                c_dongnhapxuat dnx, 
+                c_nhapxuat cnx, 
+                md_cangbien cb
+            where dpk.c_packinginvoice_id = '{0}'
+                and dpk.c_donhang_id = dh.c_donhang_id
+		        and dpk.c_dongnhapxuat_id = dnx.c_dongnhapxuat_id
+		        and dnx.c_nhapxuat_id = cnx.c_nhapxuat_id
+                and dpk.c_packinginvoice_id = cpk.c_packinginvoice_id
+		        and cpk.noidi = cb.md_cangbien_id"
+        , c_pkivn_id);
         DataTable dt_g = mdbc.GetData(sql_group);
 
         string dh_ = @"select distinct c_donhang_id, sodh, container, soseal , discount, discount1, c_nhapxuat_id, ten_cangbien from (" + sql_group + ") as tmp order by container asc, sodh asc";
