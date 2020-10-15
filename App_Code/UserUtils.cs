@@ -681,6 +681,20 @@ public static class UserUtils
         return giaHopDong;
     }
 
+    public static decimal getDiscountgPO(c_donhang dh, c_dongdonhang ddh)
+    {
+        decimal discount = 0;
+        if (ddh == null)
+        {
+            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : dh.discount.GetValueOrDefault(0);
+        }
+        else
+        {
+            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : (decimal)ddh.discount.GetValueOrDefault(0);
+        }
+        return discount;
+    }
+
     private class dsncc_ptr
     {
         public string id;

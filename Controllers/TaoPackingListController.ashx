@@ -55,7 +55,7 @@ public class TaoPackingListController : IHttpHandler {
             p.giatri_tru = decimal.Parse(txtGiaTriTruLai);
             p.md_trangthai_id = "SOANTHAO";
             p.thanhtoanxong = false;
-            p.discount = db.c_donhangs.FirstOrDefault(dh => dh.c_donhang_id.Equals(c_donhang_id)).discount;
+            p.discount = UserUtils.getDiscountgPO(db.c_donhangs.FirstOrDefault(dh => dh.c_donhang_id.Equals(c_donhang_id)), null);
             p.totaldis = totalnet * p.discount / 100;
             p.ngay_phaitt = DateTime.Now;
 
@@ -89,17 +89,20 @@ public class TaoPackingListController : IHttpHandler {
                 line.ma_sanpham_khach = dongdonhang.ma_sanpham_khach;
                 line.soluong = decimal.Parse(item["slthuc_nhapxuat"].ToString());
                 line.gia = dongnx.dongia;
-                
+
                 line.thanhtien = dongnx.slthuc_nhapxuat * dongnx.dongia;
-                discountHH += (double)line.thanhtien.GetValueOrDefault(0) * dongdonhang.discount.GetValueOrDefault(0) / 100;
+
+                var discountHH_DH = (double)UserUtils.getDiscountgPO(donhang, dongdonhang);
+                discountHH += (double)line.thanhtien.GetValueOrDefault(0) * discountHH_DH / 100;
 
                 line.nhacungungid = dongdonhang.nhacungungid;
                 line.v2 = dongdonhang.v2;
                 line.soluong_ddh = dongdonhang.soluong;
                 line.c_nhapxuat_id = dongnx.c_nhapxuat_id;
                 line.c_danhsachdathang_id = c_danhsachdathang_id;
-
-                totaldiscount += (line.thanhtien.Value * donhang.discount.Value) / 100;
+                
+                var discountPO = UserUtils.getDiscountgPO(donhang, null);
+                totaldiscount += (line.thanhtien.Value * discountPO) / 100;
                 totalnet += line.thanhtien.Value;
 
                 line.line = sothutu;
@@ -162,7 +165,7 @@ public class TaoPackingListController : IHttpHandler {
             p.giatritru_po = phi_giam;
             p.diengiaicong_po = diendai_phitang;
             p.diengiaitru_po = diendai_phigiam;
-            
+
             totaldiscount = totaldiscount + (decimal)discountHH;
             p.totaldis = Math.Round(totaldiscount, 2);
             p.totalnet = Math.Round(totalnet, 2);
