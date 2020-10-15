@@ -470,21 +470,22 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         string sql_group = string.Format(@"
             select distinct 
                 dpk.c_donhang_id
-                , cdh.sochungtu as sodh
-                , cdh.discount
-                , cdh.discount_hehang_value
+                , dh.sochungtu as sodh
+                , po.discountPO as discount
+                , po.hehang_value as discount_hehang_value
                 , cnx.container
                 , cnx.soseal
                 , cb.ten_cangbien
                 , cnx.c_nhapxuat_id
             from c_dongpklinv dpk
                 , c_packinginvoice cpk
-                , c_donhang cdh
+                , c_donhang dh
                 , c_dongnhapxuat dnx
                 , c_nhapxuat cnx
                 , md_cangbien cb
+            outer APPLY (select * from dbo.ftbl_getInfoPO(dh.phanbodiscount, dh.discount, null, dh.discount_hehang_value)) as po
             where dpk.c_packinginvoice_id = '{0}'
-                and dpk.c_donhang_id = cdh.c_donhang_id
+                and dpk.c_donhang_id = dh.c_donhang_id
 		        and dpk.c_dongnhapxuat_id = dnx.c_dongnhapxuat_id
 		        and dnx.c_nhapxuat_id = cnx.c_nhapxuat_id
                 and dpk.c_packinginvoice_id = cpk.c_packinginvoice_id
