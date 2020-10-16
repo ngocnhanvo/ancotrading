@@ -898,10 +898,11 @@
         let c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
         $('#discount_hehang').off('change');
         $('#discount_hehang').change(function () {
-
             let val = $('#discount_hehang_value').val();
             if ($(this).prop('checked') == true) {
                 $('#discount').val('0').prop('disabled', true);
+                $('#phanbodiscount').prop('disabled', true);
+                $('#phanbodiscount').prop('checked', false);
                 $.get("Controllers/SelectOption/ApDungDisCountHeHang.ashx",
                     { "action": "DiscountHH", "c_donhang_id": c_donhang_id },
                     function (result) {
@@ -910,8 +911,18 @@
             }
             else {
                 $('#discount').prop('disabled', false);
+                $('#phanbodiscount').prop('disabled', false);
                 $('.tbl_discount_hehang_value').remove();
             }
+
+            $('#phanbodiscount').change(function () {
+                if ($(this).prop('checked') == true) {
+                    $('#discount_hehang').prop('disabled', true);
+                    $('#discount_hehang').prop('checked', false).change();
+                }
+                else
+                    $('#discount_hehang').prop('disabled', false);
+            });
         });
 
         let idDH = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
