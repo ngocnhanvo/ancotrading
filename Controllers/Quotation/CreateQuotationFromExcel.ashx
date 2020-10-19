@@ -120,13 +120,11 @@ public class CreateQuotationFromExcel : IHttpHandler
 
                     if (String.IsNullOrEmpty(msg))
                     {
-                        db.c_baogias.InsertOnSubmit(mnu);
-                        db.SubmitChanges();
-
                         msg = ReadExCel(context);
-
                         if (String.IsNullOrEmpty(msg))
                         {
+                            db.c_baogias.InsertOnSubmit(mnu);
+                            db.SubmitChanges();
                             msg = string.Format(@"Đã tạo thành công báo giá ""{0}""", sochungtu);
                         }
                     }
@@ -142,6 +140,7 @@ public class CreateQuotationFromExcel : IHttpHandler
         {
             msg = ex.Message;
         }
+
         context.Response.Write(msg);
     }
 
@@ -286,7 +285,7 @@ public class CreateQuotationFromExcel : IHttpHandler
             }
         }
 
-        db.SubmitChanges();
+        //db.SubmitChanges();
     }
 
     public string check_hanghoadocquyen(string md_sanpham_id, string md_doitackinhdoanh_id) {
