@@ -976,7 +976,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         cellUn.VerticalAlignment = VerticalAlignment.Top;
         s1.GetRow(2).GetCell(0).CellStyle = cellUn;
 
-        var config = new ExportExcel(hssfworkbook, 0, 12);
+        var config = new ExportExcel(hssfworkbook, 0, 16);
         s1 = config.PrintExcel((HSSFSheet)s1, row);
         return hssfworkbook;
     }
