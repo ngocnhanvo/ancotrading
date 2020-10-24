@@ -1001,9 +1001,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
             workbook.Dispose();
 
-            File.Delete(url);
+            //File.Delete(url);
 
-            Response.Redirect(urlPDF);
+            //Response.Redirect(urlPDF);
         }
         else
         {
