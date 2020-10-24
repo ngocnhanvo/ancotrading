@@ -654,9 +654,10 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             discount1 = double.Parse(dt.Rows[i]["dis1"].ToString());
 
             //
+
+            string imagesPath = Path.Combine(Server.MapPath("~"), "");
             try
             {
-                string imagesPath = Path.Combine(Server.MapPath("~"), "");
                 //grab the image file
                 string anhhienthi = ExcuteSignalRStatic.getImageProduct(msp);
 
@@ -690,7 +691,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 var cel_row_t = row_t.CreateCell(j);
                 if (e_value[j] == "no")
                 {
-                    cel_row_t.SetCellValue(count_row);
+                    cel_row_t.SetCellValue(imagesPath);
                     cel_row_t.CellStyle = border_center;
                 }
                 else if (e_value[j] == "ofpack")
