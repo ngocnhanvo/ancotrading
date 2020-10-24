@@ -1003,9 +1003,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
             File.Delete(url);
 
-            var uri = new Uri(urlPDF);
-            urlPDF = uri.Authority.Replace("PrintControllers\\InDonHang\\", "");
-            Response.Write(urlPDF);
+            Response.Redirect(string.Format("../../ReportPdf/{0}.pdf", fileName));
         }
         else
         {
