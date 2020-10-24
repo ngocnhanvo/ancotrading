@@ -656,7 +656,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             //
             try
             {
-                string imagesPath = Path.Combine(Server.MapPath("~"), "images/products/fullsize");
+                string imagesPath = Path.Combine(Server.MapPath("~"), "");
                 //grab the image file
                 string anhhienthi = ExcuteSignalRStatic.getImageProduct(msp);
 
