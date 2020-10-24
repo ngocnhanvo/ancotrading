@@ -1005,7 +1005,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
             var uri = new Uri(urlPDF);
             urlPDF = uri.AbsolutePath.Replace("PrintControllers\\InDonHang\\", "");
-            Response.Redirect(urlPDF);
+            Response.Write(urlPDF);
         }
         else
         {
