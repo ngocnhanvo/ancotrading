@@ -669,9 +669,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 IDrawing patriarch = s1.CreateDrawingPatriarch();
                 //store the coordinates of which cell and where in the cell the image goes
                 int intx1 = 2;
-                int inty1 = 13 + row;
+                int inty1 = row;
                 int intx2 = 3;
-                int inty2 = 14 + row;
+                int inty2 = 1 + row;
 
                 HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
                 //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
