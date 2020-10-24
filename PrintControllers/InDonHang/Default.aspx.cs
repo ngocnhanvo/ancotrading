@@ -661,7 +661,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 //grab the image file
                 string anhhienthi = ExcuteSignalRStatic.getImageProduct(msp);
 
-                imagesPath = Path.Combine(imagesPath, anhhienthi + ".jpg");
+                imagesPath = Path.Combine(imagesPath, anhhienthi);
                 System.Drawing.Image image = System.Drawing.Image.FromFile(imagesPath);
                 MemoryStream ms = new MemoryStream();
                 //pull the memory stream from the image (I need this for the byte array later)
