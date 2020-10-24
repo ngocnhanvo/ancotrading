@@ -16,11 +16,14 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
     public LinqDBDataContext db = new LinqDBDataContext();
     private String fmt0 = "#,##0", fmt0i0 = "#,##0.0", fmt0i00 = "#,##0.00", fmt0i000 = "#,##0.000";
     decimal discountPO = 0;
+    string type = "excel";
+    string c_donhang_id = "";
     protected void Page_Load(object sender, EventArgs e)
     {
         //try
         //{
-        var c_donhang_id = Request.QueryString["c_donhang_id"];
+        c_donhang_id = Request.QueryString["c_donhang_id"];
+        type = Request.QueryString["type"];
         var dh = db.c_donhangs.Where(s => s.c_donhang_id == c_donhang_id).FirstOrDefault();
         discountPO = dh.discount_hehang.GetValueOrDefault(false) ? 0 : dh.discount.GetValueOrDefault(0);
         dh.discount = dh.phanbodiscount.GetValueOrDefault(false) == true ? 0 : dh.discount;
@@ -983,13 +986,35 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
     public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName)
     {
-        MemoryStream exportData = new MemoryStream();
-        hsswb.Write(exportData);
+        if (type == "pdf")
+        {
+            var fileName = "PO_" + c_donhang_id;
+            string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
+            url = url.Replace("PrintControllers\\InDonHang\\", "");
+            var file = new FileStream(url, FileMode.Create);
+            hsswb.Write(file);
+            file.Close();
 
-        Response.ContentType = "application/vnd.ms-excel";
-        Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
-        Response.Clear();
-        Response.BinaryWrite(exportData.GetBuffer());
-        Response.End();
+            var workbook = new Spire.Xls.Workbook();
+            workbook.LoadFromFile(url);
+            var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
+            workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
+            workbook.Dispose();
+
+            File.Delete(url);
+
+            Response.Redirect(urlPDF);
+        }
+        else
+        {
+            MemoryStream exportData = new MemoryStream();
+            hsswb.Write(exportData);
+
+            Response.ContentType = "application/vnd.ms-excel";
+            Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
+            Response.Clear();
+            Response.BinaryWrite(exportData.GetBuffer());
+            Response.End();
+        }
     }
 }

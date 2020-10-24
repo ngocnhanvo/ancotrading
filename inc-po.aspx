@@ -586,14 +586,16 @@
                         } else if (printType == 'printPoDetails') {
                             if (poId != null) {
                                 printURL += "InDonHang/";
-                                window.open(printURL + "?c_donhang_id=" + poId, "In Chiết Xuất Đơn Hàng", windowSize);
+                                window.open(printURL + "?c_donhang_id=" + poId + "&type=xls", "In Chiết Xuất Đơn Hàng", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         } else if (printType == 'printPo') {
                             if (poId != null) {
-                                printURL += "InDonHangTool/";
-                                window.open(printURL + "?c_donhang_id=" + poId, "In Đơn Hàng", windowSize);
+                                printURL += "InDonHang/";
+                                window.open(printURL + "?c_donhang_id=" + poId + "&type=pdf", "In Chiết Xuất Đơn Hàng", windowSize);
+                                //printURL += "InDonHangTool/";
+                                //window.open(printURL + "?c_donhang_id=" + poId, "In Đơn Hàng", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
