@@ -484,21 +484,22 @@ public class DanhSachDatHangReport
 		//start +
 		int cong = row + 1;
         //s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["diengiaitang"].ToString() + "(+):");
+        var cellR01 = s1.CreateRow(row).CreateCell(1);
+        cellR01.SetCellValue("(+):" + dt.Rows[0]["mota_cong"].ToString());
+        cellR01.CellStyle = celltext;
 
-        s1.CreateRow(row).CreateCell(1).SetCellValue("(+):" + dt.Rows[0]["mota_cong"].ToString());
-        
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
+        var cellR10 = s1.GetRow(row).CreateCell(10);
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(10).SetCellValue(double.Parse(phitang == null ? "0" : phitang.Value.ToString()));
-            s1.GetRow(row).GetCell(10).CellStyle = number;
+            cellR10.SetCellValue(double.Parse(phitang == null ? "0" : phitang.Value.ToString()));
+            cellR10.CellStyle = number;
         }
 
         if (phitang == null)
         {
-            //s1.GetRow(row).HeightInPoints = 0;
-            //if (type == "pdf")
             s1.GetRow(row).ZeroHeight = true;
+            s1.GetRow(row).RemoveCell(cellR01);
+            s1.GetRow(row).RemoveCell(cellR10);
         }
         else
             s1.GetRow(row).HeightInPoints = 30;
@@ -507,11 +508,11 @@ public class DanhSachDatHangReport
 		//start -
 		int tru = row + 1;
         //s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["diengiaigiam"].ToString() + " (-):");
-        var cellR01 = s1.CreateRow(row).CreateCell(1);
+        cellR01 = s1.CreateRow(row).CreateCell(1);
         cellR01.SetCellValue("(-):" + dt.Rows[0]["mota_tru"].ToString());
         cellR01.CellStyle = celltext;
 
-        var cellR10 = s1.GetRow(row).CreateCell(10);
+        cellR10 = s1.GetRow(row).CreateCell(10);
         if (guiNCC == false)
         {
             cellR10.SetCellValue(double.Parse(phigiam == null ? "0" : phigiam.Value.ToString()));
@@ -522,8 +523,8 @@ public class DanhSachDatHangReport
         {
             //s1.GetRow(row).HeightInPoints = 0;
             s1.GetRow(row).ZeroHeight = true;
-            //s1.GetRow(row).RemoveCell(s1.GetRow(row).Cells[1]);
-            //s1.GetRow(row).RemoveCell(s1.GetRow(row).Cells[10]);
+            s1.GetRow(row).RemoveCell(cellR01);
+            s1.GetRow(row).RemoveCell(cellR10);
         }
         else
             s1.GetRow(row).HeightInPoints = 30;
