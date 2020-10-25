@@ -139,6 +139,7 @@ public class DanhSachDatHangReport
 
     public HSSFWorkbook CreateHSSFWorkbook(DataTable dt, Nullable<decimal> phitang, Nullable<decimal> phigiam)
     {
+        var config = new ExportExcel(hssfworkbook, 0, 16);
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
         ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
 		HSSFSheet hssfsheet = (HSSFSheet)s1;
@@ -324,7 +325,7 @@ public class DanhSachDatHangReport
 				with = 0;
 			}
 
-            if ((new int[] { 7, 8, 9 }.Contains(i)))
+            if ((new int[] { 7, 8, 9, 10 }.Contains(i)))
             {
                 if (guiNCC)
                     with = 0;
@@ -634,9 +635,12 @@ public class DanhSachDatHangReport
 		// start cac huong dan khac
 		s1.CreateRow(row).CreateCell(1).SetCellValue("2. Các hướng dẫn khác:");
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
-        HSSFRichTextString rich_khac = new HSSFRichTextString(dt.Rows[0]["huongdanlamhangchung"].ToString());
+        string mota = dt.Rows[0]["huongdanlamhangchung"].ToString();
+        var rich_khac = new HSSFRichTextString(mota);
         s1.GetRow(row).CreateCell(2).SetCellValue(rich_khac);
-        s1.GetRow(row).HeightInPoints = 45;
+
+        float heightMAX = config.MeasureTextHeight(mota, 38000);
+        s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 		
 		cellModel.VerticalAlignment = VerticalAlignment.Top;
 		cellModel.HorizontalAlignment = HorizontalAlignment.Left;
@@ -696,7 +700,6 @@ public class DanhSachDatHangReport
         cellUn.VerticalAlignment = VerticalAlignment.Top;
         s1.GetRow(2).GetCell(0).CellStyle = cellUn;
 
-        var config = new ExportExcel(hssfworkbook, 0, 16);
         s1 = config.PrintExcel((HSSFSheet)s1, row);
         s1.PrintSetup.Landscape = true;
 
