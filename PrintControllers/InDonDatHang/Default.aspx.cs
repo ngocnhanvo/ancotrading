@@ -26,7 +26,9 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
             String imgPath = Server.MapPath("~/images/products/fullsize/");
             DanhSachDatHangReport rptDSDH = new DanhSachDatHangReport(c_danhsachdathang_id, logoPath, imgPath);
 			rptDSDH.guiNCC = Request.QueryString["DSDHG"] == "False";
+            rptDSDH.TypePrint = type;
             HSSFWorkbook wb = rptDSDH.CreateWBPI();
+
             this.SaveFile(wb, "Danh-Sach-Dat-Hang-" + DateTime.Now.ToString() + ".xls");
         }
         catch (Exception ex)

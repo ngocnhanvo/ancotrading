@@ -14,7 +14,7 @@ using NPOI.SS.Util;
 public class DanhSachDatHangReport
 {
     LinqDBDataContext db = new LinqDBDataContext();
-    private String c_danhsachdathang_id, logoPath, productImagePath;
+    private String c_danhsachdathang_id, logoPath, productImagePath, type;
 
     public String LogoPath
     {
@@ -26,6 +26,12 @@ public class DanhSachDatHangReport
     {
         get { return productImagePath; }
         set { productImagePath = value; }
+    }
+
+    public String TypePrint
+    {
+        get { return type; }
+        set { type = value; }
     }
 
     public HSSFWorkbook CreateWBPI()
@@ -199,14 +205,14 @@ public class DanhSachDatHangReport
 		//--
 		ICellStyle left = ex_fm.getcell(12, false, false, "", "L", "T");
         //--
-        ICellStyle border_number = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0####");
+        ICellStyle border_number = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", type =="pdf"? "#,##0.####" : "#,##0.0####");
         ICellStyle border_number0 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0");
 		ICellStyle border_number1 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0");
 		ICellStyle border_number2 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.00");
 		ICellStyle border_number3 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.000");
 		ICellStyle border_number4 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0000");
 
-        var number = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0####");
+        var number = ex_fm.getcell2(12, false, true, "", "R", "T", type == "pdf" ? "#,##0.####" : "#,##0.0####");
         var number0 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0");
         var number1 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0");
         var number2 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.00");
