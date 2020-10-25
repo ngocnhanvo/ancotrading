@@ -311,7 +311,16 @@ public class DanhSachDatHangReport
 			int with = 5000;
 			rowColumnHeader.CreateCell(cell).SetCellValue(d[i]);
 			rowColumnHeader.GetCell(i).CellStyle = borderWrap;
-			if( i == 4) {
+
+            if (i == 0)
+            {
+                with = 1000;
+            }
+            else if (i == 1)
+            {
+                with = 5500;
+            }
+            else if ( i == 4) {
 				with = 7000;
 			}
             else if (i == 5)
@@ -395,42 +404,50 @@ public class DanhSachDatHangReport
 			for (int j = 0; j < e_value.Length; j++)
 			{
 				var cel_row_t = row_t.CreateCell(j);
-				if(e_value[j] == "stt") {
+				if(e_value[j] == "stt")
+                {
 					cel_row_t.SetCellValue(count_row);
 					cel_row_t.CellStyle = border_center; 
 				}
-                else if (e_value[j] == "dvt")
+                else if (new string[] { "dvt", "maSo" }.Contains(e_value[j]))
                 {
                     cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString());
                     cel_row_t.CellStyle = border_center;
                 }
-                else if(e_value[j] == "thanhTien") {
+                else if(e_value[j] == "thanhTien")
+                {
                     if (guiNCC == false)
                         cel_row_t.CellFormula = String.Format("J{0}*F{0}",row + 1);
 					cel_row_t.CellStyle = border_number;
 				}
-				else if(e_value[j] == "trongluong"){
+				else if(e_value[j] == "trongluong")
+                {
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
 					cel_row_t.CellStyle = border_number1;
 				}
-				else if(e_value[j] == "soLuong") {
+				else if(e_value[j] == "soLuong")
+                {
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
 					cel_row_t.CellStyle = border_number0;
 				}
-				else if (new string[] { "giaMua", "tongDonGiaMua", "phi" }.Contains(e_value[j])) {
+				else if (new string[] { "giaMua", "tongDonGiaMua", "phi" }.Contains(e_value[j]))
+                {
                     if (guiNCC == false)
                         cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
                     cel_row_t.CellStyle = border_number;
                 }
-				else if( new string[] { "cbm", "soKienInner", "soKienOuter" }.Contains(e_value[j])) {
+				else if( new string[] { "cbm", "soKienInner", "soKienOuter" }.Contains(e_value[j]))
+                {
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
 					cel_row_t.CellStyle = border_number2;
 				}
-				else if( e_value[j] == "") {
+				else if( e_value[j] == "")
+                {
 					cel_row_t.SetCellValue("");
 					cel_row_t.CellStyle = border;
 				}
-				else {
+				else
+                {
 					cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString());
 					cel_row_t.CellStyle = border;
 				}
