@@ -206,7 +206,7 @@ public class DanhSachDatHangReport
 		ICellStyle border_number3 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.000");
 		ICellStyle border_number4 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0000");
 
-        var number = ex_fm.getcell2(12, false, true, "", "R", "T", "#,####");
+        var number = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.####");
         var number0 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0");
         var number1 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0");
         var number2 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.00");
