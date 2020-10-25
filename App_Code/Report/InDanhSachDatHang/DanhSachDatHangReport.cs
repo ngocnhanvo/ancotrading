@@ -486,7 +486,7 @@ public class DanhSachDatHangReport
         //s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["diengiaitang"].ToString() + "(+):");
 
         s1.CreateRow(row).CreateCell(1).SetCellValue("(+):" + dt.Rows[0]["mota_cong"].ToString());
-        s1.GetRow(row).HeightInPoints = 30;
+        
         s1.GetRow(row).GetCell(1).CellStyle = celltext;
         if (guiNCC == false)
         {
@@ -500,7 +500,10 @@ public class DanhSachDatHangReport
             //if (type == "pdf")
             s1.GetRow(row).ZeroHeight = true;
         }
-		row++;
+        else
+            s1.GetRow(row).HeightInPoints = 30;
+
+        row++;
 		//start -
 		int tru = row + 1;
         //s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["diengiaigiam"].ToString() + " (-):");
