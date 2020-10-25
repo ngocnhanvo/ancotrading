@@ -380,7 +380,7 @@ public class DanhSachDatHangReport
 				}
 				else if(e_value[j] == "thanhTien") {
                     if (guiNCC == false)
-                        cel_row_t.CellFormula = String.Format("H{0}*K{0}",row + 1);
+                        cel_row_t.CellFormula = String.Format("J{0}*F{0}",row + 1);
 					cel_row_t.CellStyle = border_number1;
 				}
 				else if(e_value[j] == "trongluong"){
@@ -417,22 +417,24 @@ public class DanhSachDatHangReport
 		int sub = row + 1;
 		//start tong cong 1
         s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng:");
-        s1.GetRow(row).CreateCell(7).SetCellFormula(String.Format("SUM(H{0}:H{1})", m, row));
+
+        s1.GetRow(row).CreateCell(5).SetCellFormula(String.Format("SUM(F{0}:F{1})", m, row));
+        cellModel.FormatData = "#,##0.000";
+        s1.GetRow(row).GetCell(5).CellStyle = cellModel.CreateCellStyle();
+
+        if (guiNCC == true)
+            s1.GetRow(row).CreateCell(10).SetCellValue("");
+        else
+            s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("SUM(K{0}:K{1})", m, row));
+        cellModel.FormatData = "#,##0";
+        s1.GetRow(row).GetCell(10).CellStyle = cellModel.CreateCellStyle();
+
+        s1.GetRow(row).CreateCell(15).SetCellFormula(String.Format("SUM(P{0}:P{1})", m, row));
         cellModel.BorderAll = false;
         cellModel.FormatData = "#,##0";
         cellModel.HorizontalAlignment = HorizontalAlignment.Right;
-        s1.GetRow(row).GetCell(7).CellStyle = cellModel.CreateCellStyle();
+        s1.GetRow(row).GetCell(15).CellStyle = cellModel.CreateCellStyle();
 
-        s1.GetRow(row).CreateCell(6).SetCellFormula(String.Format("SUM(G{0}:G{1})", m, row));
-        cellModel.FormatData = "#,##0.000";
-        s1.GetRow(row).GetCell(6).CellStyle = cellModel.CreateCellStyle();
-
-        if (guiNCC == true)
-            s1.GetRow(row).CreateCell(11).SetCellValue("");
-        else
-            s1.GetRow(row).CreateCell(11).SetCellFormula(String.Format("SUM(L{0}:L{1})", m, row));
-        cellModel.FormatData = "#,##0";
-        s1.GetRow(row).GetCell(11).CellStyle = cellModel.CreateCellStyle();
 		row++;
 		//start +
 		int cong = row + 1;
