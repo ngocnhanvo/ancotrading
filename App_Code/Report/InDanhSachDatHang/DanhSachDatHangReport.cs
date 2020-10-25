@@ -466,7 +466,7 @@ public class DanhSachDatHangReport
 		int sub = row + 1;
 		//start tong cong 1
         s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng:");
-
+        s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).CreateCell(5).SetCellFormula(String.Format("SUM(F{0}:F{1})", m, row));
         s1.GetRow(row).GetCell(5).CellStyle = number0;
 
@@ -483,7 +483,9 @@ public class DanhSachDatHangReport
 		//start +
 		int cong = row + 1;
         //s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["diengiaitang"].ToString() + "(+):");
+
         s1.CreateRow(row).CreateCell(1).SetCellValue("(+):" + dt.Rows[0]["mota_cong"].ToString());
+        s1.GetRow(row).HeightInPoints = 30;
         if (guiNCC == false)
         {
             s1.GetRow(row).CreateCell(10).SetCellValue(double.Parse(phitang == null ? "0" : phitang.Value.ToString()));
@@ -499,6 +501,7 @@ public class DanhSachDatHangReport
 		int tru = row + 1;
         //s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["diengiaigiam"].ToString() + " (-):");
         s1.CreateRow(row).CreateCell(1).SetCellValue("(-):" + dt.Rows[0]["mota_tru"].ToString());
+        s1.GetRow(row).HeightInPoints = 30;
         if (guiNCC == false)
         {
             s1.GetRow(row).CreateCell(10).SetCellValue(double.Parse(phigiam == null ? "0" : phigiam.Value.ToString()));
@@ -514,6 +517,7 @@ public class DanhSachDatHangReport
 		int dis = row + 1;
         var ds2so = decimal.Parse(dt.Rows[0]["discountdecimal"].ToString()).ToString("#,#0.##");
         s1.CreateRow(row).CreateCell(1).SetCellValue(String.Format("Discount ({0}%)", ds2so));
+        s1.GetRow(row).HeightInPoints = 30;
         if (guiNCC == false)
         {
             s1.GetRow(row).CreateCell(10).SetCellValue(double.Parse(dt.Rows[0]["discount"].ToString()));
@@ -522,6 +526,7 @@ public class DanhSachDatHangReport
 		row++;
 		// start tổng cộng đã trừ
 		s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng đã trừ:");
+        s1.GetRow(row).HeightInPoints = 30;
         if (guiNCC == false)
         {
             s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("K{0} + K{1} - K{2} - K{3}", sub, cong, tru, dis));
@@ -530,6 +535,7 @@ public class DanhSachDatHangReport
 		row++;
 		// start viet bang chu
         s1.CreateRow(row).CreateCell(1).SetCellValue("Viết bằng chữ:");
+        s1.GetRow(row).HeightInPoints = 30;
         if (guiNCC == false)
         {
             s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["money"].ToString());
@@ -538,6 +544,7 @@ public class DanhSachDatHangReport
 		row++;
 		// start ghi chu
         s1.CreateRow(row).CreateCell(1).SetCellValue("Ghi chú:");
+        s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["mota"].ToString());
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
 		s1.GetRow(row).HeightInPoints = 45;
@@ -549,17 +556,20 @@ public class DanhSachDatHangReport
 		row++;
 		// Ngay xong hang
         s1.CreateRow(row).CreateCell(1).SetCellValue("Ngày xong hàng:");
+        s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).CreateCell(2).SetCellValue(DateTime.Parse(dt.Rows[0]["hangiaohang_po"].ToString()).ToString("dd/MM/yyyy"));
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
 		row++;
 		// Dia diem xuat hang
         s1.CreateRow(row).CreateCell(1).SetCellValue("Địa điểm xuất hàng:");
+        s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["diachigiaohang"].ToString());
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
 		row++;
 		//Huong dan lam hang
         s1.CreateRow(row).CreateCell(1).SetCellValue("Hướng dẫn làm hàng:");
-		row++;
+        s1.GetRow(row).HeightInPoints = 30;
+        row++;
 		// start dac diem hang hoa
 		s1.CreateRow(row).CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
@@ -586,6 +596,7 @@ public class DanhSachDatHangReport
 		row++;
 		//--
         s1.CreateRow(row).CreateCell(1).SetCellValue("* Khi cơ sở nhận được đơn đặt hàng này vui lòng ký xác nhận và gửi lại.");
+        s1.GetRow(row).HeightInPoints = 30;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 9));
 		row++;
         ICellStyle cCenter = hssfworkbook.CreateCellStyle();
