@@ -325,7 +325,7 @@ public class DanhSachDatHangReport
 			}
             else if (i == 5)
             {
-                with = 4000;
+                with = 3000;
             }
             else if (i == 6)
             {
@@ -335,7 +335,7 @@ public class DanhSachDatHangReport
             {
                 with = 3000;
             }
-            else if(new int[] { 13, 14}.Contains(i)) {
+            else if(new int[] { 14, 15}.Contains(i)) {
 				with = 4000;
 			}
 			else if( i >= 17) {
