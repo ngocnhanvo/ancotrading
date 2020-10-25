@@ -313,7 +313,7 @@ public class DanhSachDatHangReport
             else if(i == 11 | i == 12) {
 				with = 5000;
 			}
-			else if( i >= 16) {
+			else if( i >= 17) {
 				with = 0;
 			}
 
@@ -340,12 +340,12 @@ public class DanhSachDatHangReport
                 "phi",
                 "tongDonGiaMua",
                 "thanhTien",
+                "huongdan_dathang",
                 "dginner",
                 "dgouter",
                 "soKienInner",
                 "soKienOuter",
                 "cbm",
-                "huongdan_dathang",
                 "trongluong",
                 "ghichu",
                 "giaMua",
@@ -381,7 +381,7 @@ public class DanhSachDatHangReport
 				else if(e_value[j] == "thanhTien") {
                     if (guiNCC == false)
                         cel_row_t.CellFormula = String.Format("J{0}*F{0}",row + 1);
-					cel_row_t.CellStyle = border_number1;
+					cel_row_t.CellStyle = border_number2;
 				}
 				else if(e_value[j] == "trongluong"){
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
@@ -419,21 +419,16 @@ public class DanhSachDatHangReport
         s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng:");
 
         s1.GetRow(row).CreateCell(5).SetCellFormula(String.Format("SUM(F{0}:F{1})", m, row));
-        cellModel.FormatData = "#,##0.000";
-        s1.GetRow(row).GetCell(5).CellStyle = cellModel.CreateCellStyle();
+        s1.GetRow(row).GetCell(5).CellStyle = border_number0;
 
         if (guiNCC == true)
             s1.GetRow(row).CreateCell(10).SetCellValue("");
         else
             s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("SUM(K{0}:K{1})", m, row));
-        cellModel.FormatData = "#,##0";
-        s1.GetRow(row).GetCell(10).CellStyle = cellModel.CreateCellStyle();
+        s1.GetRow(row).GetCell(10).CellStyle = border_number2;
 
         s1.GetRow(row).CreateCell(15).SetCellFormula(String.Format("SUM(P{0}:P{1})", m, row));
-        cellModel.BorderAll = false;
-        cellModel.FormatData = "#,##0";
-        cellModel.HorizontalAlignment = HorizontalAlignment.Right;
-        s1.GetRow(row).GetCell(15).CellStyle = cellModel.CreateCellStyle();
+        s1.GetRow(row).GetCell(15).CellStyle = border_number2;
 
 		row++;
 		//start +
