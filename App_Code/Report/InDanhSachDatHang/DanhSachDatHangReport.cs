@@ -217,7 +217,7 @@ public class DanhSachDatHangReport
 
         s1.CreateRow(4).CreateCell(1).SetCellValue("Số chứng từ:");
         s1.GetRow(4).GetCell(1).CellStyle = celltext10;
-        s1.GetRow(4).HeightInPoints = 30;
+        s1.GetRow(4).HeightInPoints = 20;
         s1.GetRow(4).CreateCell(2).SetCellValue(dt.Rows[0]["sochungtu"].ToString());
         s1.GetRow(4).GetCell(2).CellStyle = celltext10;
 
@@ -229,7 +229,7 @@ public class DanhSachDatHangReport
 
         s1.CreateRow(5).CreateCell(1).SetCellValue("Ngày lập:");
         s1.GetRow(5).GetCell(1).CellStyle = celltext10;
-        s1.GetRow(5).HeightInPoints = 30;
+        s1.GetRow(5).HeightInPoints = 20;
         s1.GetRow(5).CreateCell(2).SetCellValue(DateTime.Parse(dt.Rows[0]["ngaylap"].ToString()).ToString("dd/MM/yyyy"));
         s1.GetRow(5).GetCell(2).CellStyle = celltext10;
 
@@ -240,11 +240,11 @@ public class DanhSachDatHangReport
 
         s1.CreateRow(6).CreateCell(1).SetCellValue("Công ty AnCơ kính đề nghị Quý Công ty/Đơn vị: " + dt.Rows[0]["ten_dtkd"].ToString());
         s1.GetRow(6).GetCell(1).CellStyle = celltext10;
-        s1.GetRow(6).HeightInPoints = 30;
+        s1.GetRow(6).HeightInPoints = 20;
 
         s1.CreateRow(7).CreateCell(1).SetCellValue("Điện thoại");
         s1.GetRow(7).GetCell(1).CellStyle = celltext10;
-        s1.GetRow(7).HeightInPoints = 30;
+        s1.GetRow(7).HeightInPoints = 20;
         s1.GetRow(7).CreateCell(2).SetCellValue(dt.Rows[0]["tel"].ToString());
         s1.GetRow(7).GetCell(2).CellStyle = celltext10;
 
@@ -256,7 +256,7 @@ public class DanhSachDatHangReport
 
         s1.CreateRow(10).CreateCell(1).SetCellValue("Cung cấp cho công ty chúng tôi các mặt hàng với chi tiết:");
         s1.GetRow(10).GetCell(1).CellStyle = celltext10;
-        s1.GetRow(10).HeightInPoints = 30;
+        s1.GetRow(10).HeightInPoints = 20;
 
         row = 11;
 		// set A13 - All
