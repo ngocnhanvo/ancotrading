@@ -1006,7 +1006,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
             File.Delete(url);
 
-            Response.Redirect(string.Format("../../ReportPdf/{0}.pdf", fileName));
+            Response.Redirect(string.Format("../../ReportPdf/{0}.pdf?{1}", fileName, Guid.NewGuid().ToString()));
         }
         else
         {

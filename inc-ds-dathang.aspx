@@ -173,7 +173,9 @@
                             if (printType == "printRequired") {
                                 if (piId != null) {
                                     printURL += "InDonDatHang/";
-									let params_ = "&DSDHG=" + xemgiaDSDH;
+                                    let params_ = '';
+                                    params += "&DSDHG=" + xemgiaDSDH;
+                                    params += "&type=excel";
                                     window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "In Đơn Đặt Hàng", windowSize);
                                 } else {
                                 alert('Bạn chưa chọn đơn đặt hàng cần in!');
@@ -195,7 +197,9 @@
                             } else if (printType == 'printDSDH') {
                                 if (piId != null) {
                                     printURL += "InDonDatHangTool/";
-									let params_ = "&DSDHG=" + xemgiaDSDH;
+                                    let params_ = '';
+                                    params += "&DSDHG=" + xemgiaDSDH;
+                                    params += "&type=pdf";
                                     window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "In Danh sách đặt hàng", windowSize);
                                 } else {
                                     alert('Bạn chưa chọn danh sách đặt hàng cần in.!');

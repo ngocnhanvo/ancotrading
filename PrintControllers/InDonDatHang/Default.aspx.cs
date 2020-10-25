@@ -15,34 +15,57 @@ using System.Data;
 public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
 {
     LinqDBDataContext db = new LinqDBDataContext();
-
+    string type = "", c_danhsachdathang_id = "";
     protected void Page_Load(object sender, EventArgs e)
     {
-        //try
-        //{
-            String c_danhsachdathang_id = Request.QueryString["c_danhsachdathang_id"];
+        try
+        {
+            type = Request.QueryString["type"];
+            c_danhsachdathang_id = Request.QueryString["c_danhsachdathang_id"];
             String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "anco_logo_print.png");
             String imgPath = Server.MapPath("~/images/products/fullsize/");
             DanhSachDatHangReport rptDSDH = new DanhSachDatHangReport(c_danhsachdathang_id, logoPath, imgPath);
 			rptDSDH.guiNCC = Request.QueryString["DSDHG"] == "False";
             HSSFWorkbook wb = rptDSDH.CreateWBPI();
             this.SaveFile(wb, "Danh-Sach-Dat-Hang-" + DateTime.Now.ToString() + ".xls");
-        //}
-        //catch (Exception ex)
-        //{
-            //Response.Write(ex.Message);
-        //}
+        }
+        catch (Exception ex)
+        {
+            Response.Write(ex.Message);
+        }
     }
 
     public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName)
     {
-        MemoryStream exportData = new MemoryStream();
-        hsswb.Write(exportData);
+        if (type == "pdf")
+        {
+            var fileName = "DSDH_" + c_danhsachdathang_id;
+            string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
+            url = url.Replace("PrintControllers\\InDonDatHang\\", "");
+            var file = new FileStream(url, FileMode.Create);
+            hsswb.Write(file);
+            file.Close();
 
-        Response.ContentType = "application/vnd.ms-excel";
-        Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
-        Response.Clear();
-        Response.BinaryWrite(exportData.GetBuffer());
-        Response.End();
+            var workbook = new Spire.Xls.Workbook();
+            workbook.LoadFromFile(url);
+            var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
+            workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
+            workbook.Dispose();
+
+            File.Delete(url);
+
+            Response.Redirect(string.Format("../../ReportPdf/{0}.pdf?{1}", fileName, Guid.NewGuid().ToString()));
+        }
+        else
+        {
+            MemoryStream exportData = new MemoryStream();
+            hsswb.Write(exportData);
+
+            Response.ContentType = "application/vnd.ms-excel";
+            Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
+            Response.Clear();
+            Response.BinaryWrite(exportData.GetBuffer());
+            Response.End();
+        }
     }
 }
