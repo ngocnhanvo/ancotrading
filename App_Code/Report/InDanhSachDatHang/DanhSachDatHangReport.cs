@@ -517,6 +517,8 @@ public class DanhSachDatHangReport
         {
             //s1.GetRow(row).HeightInPoints = 0;
             s1.GetRow(row).ZeroHeight = true;
+            s1.GetRow(row).RemoveCell(s1.GetRow(row).Cells[1]);
+            s1.GetRow(row).RemoveCell(s1.GetRow(row).Cells[10]);
         }
 		row++;
 		// start discount
