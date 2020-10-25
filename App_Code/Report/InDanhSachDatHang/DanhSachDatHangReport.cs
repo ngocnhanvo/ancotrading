@@ -504,23 +504,28 @@ public class DanhSachDatHangReport
 		//start -
 		int tru = row + 1;
         //s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["diengiaigiam"].ToString() + " (-):");
-        s1.CreateRow(row).CreateCell(1).SetCellValue("(-):" + dt.Rows[0]["mota_tru"].ToString());
-        s1.GetRow(row).HeightInPoints = 30;
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
+        var cellR01 = s1.CreateRow(row).CreateCell(1);
+        cellR01.SetCellValue("(-):" + dt.Rows[0]["mota_tru"].ToString());
+        cellR01.CellStyle = celltext;
+
+        var cellR10 = s1.GetRow(row).CreateCell(10);
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(10).SetCellValue(double.Parse(phigiam == null ? "0" : phigiam.Value.ToString()));
-            s1.GetRow(row).GetCell(10).CellStyle = number;
+            cellR10.SetCellValue(double.Parse(phigiam == null ? "0" : phigiam.Value.ToString()));
+            cellR10.CellStyle = number;
         }
 
         if (phigiam == null)
         {
             //s1.GetRow(row).HeightInPoints = 0;
             s1.GetRow(row).ZeroHeight = true;
-            s1.GetRow(row).RemoveCell(s1.GetRow(row).Cells[1]);
-            s1.GetRow(row).RemoveCell(s1.GetRow(row).Cells[10]);
+            //s1.GetRow(row).RemoveCell(s1.GetRow(row).Cells[1]);
+            //s1.GetRow(row).RemoveCell(s1.GetRow(row).Cells[10]);
         }
-		row++;
+        else
+            s1.GetRow(row).HeightInPoints = 30;
+
+        row++;
 		// start discount
 		int dis = row + 1;
         var ds2so = decimal.Parse(dt.Rows[0]["discountdecimal"].ToString()).ToString("#,#0.##");
