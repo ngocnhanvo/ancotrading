@@ -314,7 +314,7 @@ public class DanhSachDatHangReport
 
             if (i == 0)
             {
-                with = 1300;
+                with = 1500;
             }
             else if (i == 1)
             {
