@@ -104,57 +104,12 @@ public class DanhSachDatHangReport
             //Footer
             int lastRow = tbl.Rows.Count - 1;
 
-            var strSumThanhTien = tbl.Compute("Sum(thanhtien)", string.Empty).ToString();
-			double? total = 0;
-			if (!string.IsNullOrEmpty(strSumThanhTien))
-                total = double.Parse(strSumThanhTien);
-			
-			var strDiscount = tbl.Rows[0]["discountdecimal"].ToString();
-			double? discount = 0;
-			if (!string.IsNullOrEmpty(strDiscount))
-                discount = double.Parse(strDiscount);
-            
-			var totalDiscount = total.GetValueOrDefault(0) * discount.GetValueOrDefault(0) / 100;
-			tbl.Rows[0]["discount"] = tbl.Rows[lastRow]["discount"] = totalDiscount;
-			
 			var phitang = (from t in db.c_phidathangs where t.isphicong.Equals(true) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
 			tbl.Rows[0]["giatritang"] = tbl.Rows[lastRow]["giatritang"] = phitang.GetValueOrDefault(0);
 			
 			var phigiam = (from t in db.c_phidathangs where t.isphicong.Equals(false) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
 			tbl.Rows[0]["giatrigiam"] = tbl.Rows[lastRow]["giatrigiam"] = phigiam.GetValueOrDefault(0);
-			
-			var varTang = db.c_phidathangs.FirstOrDefault(tg => tg.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && tg.isphicong.Equals(true));
-			var varGiam = db.c_phidathangs.FirstOrDefault(gi => gi.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && gi.isphicong.Equals(false));
-
-			string dgTang, dgGiam;
-			dgTang = varTang == null ? "" : varTang.mota;
-			dgGiam = varGiam == null ? "" : varGiam.mota;
-			
-			string textMoney = "";
-			double? totalUSD = total - (double)totalDiscount + (double)phitang.GetValueOrDefault(0) - (double)phigiam.GetValueOrDefault(0);
-			var ma_dtkd = tbl.Rows[0]["ma_dtkd"].ToString();
-
-            if (new string[]{ "VINHGIA" }.Contains(ma_dtkd)) {
-				string m = MoneyToWord.ConvertMoneyToText(totalUSD.ToString()).Replace("Dollars", "");			
-				int j =  m.LastIndexOf("and");
-			
-				if (m.Contains("Cents") | m.Contains("Cent"))
-				{
-					m = m.Replace("Cents", "").Replace("Cent", "");
-					m = m.Insert(m.Length, "cents");
-				}
-				else {
-					m = m.Replace("Cents", "").Replace("Cent", "");
-				}
-				textMoney = m;
-			}
-			else {
-				textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)totalUSD.GetValueOrDefault(0));
-			}
-
-			tbl.Rows[0]["money"] = tbl.Rows[lastRow]["money"] = textMoney;
-			tbl.Rows[0]["tongtiendatru"] = tbl.Rows[lastRow]["tongtiendatru"] = totalUSD;
-			
+            
 			string diengiai_cong = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 1 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
 			DataTable cong = mdbc.GetData(diengiai_cong);
 			var mota_cong = new List<string>();
@@ -364,6 +319,7 @@ public class DanhSachDatHangReport
 		row ++;
 		//thu tu tong cong // dem so dong hang cua tung sochungtu
 		int count_row = 1;
+        double sumThanhTien = 0;
         for (int i = 0; i < dt.Rows.Count; i++)
         {
 			string[] e_value = {
@@ -412,6 +368,7 @@ public class DanhSachDatHangReport
             var soLuong = double.Parse(dt.Rows[i]["soluong"].ToString());
             var tongDonGiaMua = double.Parse(dt.Rows[i]["tongDonGiaMua"].ToString());
             var thanhtien = soLuong * tongDonGiaMua;
+            sumThanhTien += thanhtien;
 
             for (int j = 0; j < e_value.Length; j++)
 			{
@@ -475,8 +432,11 @@ public class DanhSachDatHangReport
 			row++;
 			count_row++;
 		}
-		//vi tri row dau tien
-		int m = row - count_row + 2;
+        var discountP = double.Parse(dt.Rows[0]["discountdecimal"].ToString());
+        var discount = sumThanhTien * discountP / 100;
+
+        //vi tri row dau tien
+        int m = row - count_row + 2;
 		int sub = row + 1;
 		//start tong cong 1
         s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng:");
@@ -489,6 +449,12 @@ public class DanhSachDatHangReport
             s1.GetRow(row).CreateCell(10).SetCellValue("");
         else
             s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("SUM(K{0}:K{1})", m, row));
+
+        if (sumThanhTien.ToString().LastIndexOf(".") <= -1)
+            s1.GetRow(row).GetCell(10).CellStyle = type == "pdf" ? number0 : number;
+        else
+            s1.GetRow(row).GetCell(10).CellStyle = number;
+
         s1.GetRow(row).GetCell(10).CellStyle = number;
 
         s1.GetRow(row).CreateCell(16).SetCellFormula(String.Format("SUM(Q{0}:Q{1})", m, row));
@@ -503,10 +469,15 @@ public class DanhSachDatHangReport
         cellR01.CellStyle = celltext10;
 
         var cellR10 = s1.GetRow(row).CreateCell(10);
+        var phiTangVal = double.Parse(phitang == null ? "0" : phitang.Value.ToString());
         if (guiNCC == false)
         {
-            cellR10.SetCellValue(double.Parse(phitang == null ? "0" : phitang.Value.ToString()));
-            cellR10.CellStyle = number;
+            cellR10.SetCellValue(phiTangVal);
+
+            if (phiTangVal.ToString().LastIndexOf(".") <= -1)
+                cellR10.CellStyle = type == "pdf" ? number0 : number;
+            else
+                cellR10.CellStyle = number;
         }
 
         if (phitang == null)
@@ -531,10 +502,15 @@ public class DanhSachDatHangReport
         cellR01.CellStyle = celltext10;
 
         cellR10 = s1.GetRow(row).CreateCell(10);
+        var phiGiamVal = double.Parse(phigiam == null ? "0" : phigiam.Value.ToString());
         if (guiNCC == false)
         {
-            cellR10.SetCellValue(double.Parse(phigiam == null ? "0" : phigiam.Value.ToString()));
-            cellR10.CellStyle = number;
+            cellR10.SetCellValue(phiGiamVal);
+
+            if (phiGiamVal.ToString().LastIndexOf(".") <= -1)
+                cellR10.CellStyle = type == "pdf" ? number0 : number;
+            else
+                cellR10.CellStyle = number;
         }
 
         if (phigiam == null)
@@ -553,24 +529,33 @@ public class DanhSachDatHangReport
         row++;
 		// start discount
 		int dis = row + 1;
-        var ds2so = decimal.Parse(dt.Rows[0]["discountdecimal"].ToString()).ToString("#,#0.##");
+        var ds2so = discountP.ToString("#,#0.##");
         s1.CreateRow(row).CreateCell(1).SetCellValue(String.Format("Discount ({0}%)", ds2so));
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        cellR10 = s1.GetRow(row).CreateCell(10);
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(10).SetCellValue(double.Parse(dt.Rows[0]["discount"].ToString()));
-            s1.GetRow(row).GetCell(10).CellStyle = number;
+            cellR10.SetCellValue(discount);
+            if (discount.ToString().LastIndexOf(".") <= -1)
+                cellR10.CellStyle = type == "pdf" ? number0 : number;
+            else
+                cellR10.CellStyle = number;
         }
 		row++;
 		// start tổng cộng đã trừ
 		s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng đã trừ:");
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        cellR10 = s1.GetRow(row).CreateCell(10);
+        var tongCongDaTru = sumThanhTien + phiTangVal - phiGiamVal - discount;
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("K{0} + K{1} - K{2} - K{3}", sub, cong, tru, dis));
-            s1.GetRow(row).GetCell(10).CellStyle = number;
+            cellR10.SetCellFormula(String.Format("K{0} + K{1} - K{2} - K{3}", sub, cong, tru, dis));
+            if(tongCongDaTru.ToString().LastIndexOf(".") <= -1)
+                cellR10.CellStyle = type == "pdf" ? number0 : number;
+            else
+                cellR10.CellStyle = number;
         }
 		row++;
 		// start viet bang chu
@@ -579,7 +564,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).HeightInPoints = 30;
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["money"].ToString());
+            s1.GetRow(row).CreateCell(2).SetCellValue(MoneyToWord.ConvertMoneyToTextVND((decimal)tongCongDaTru, dt.Rows[0]["ma_dtkd"].ToString()));
             s1.GetRow(row).GetCell(2).CellStyle = celltext10;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
         }
