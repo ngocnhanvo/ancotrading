@@ -207,6 +207,7 @@ public class DanhSachDatHangReport
 		ICellStyle left = ex_fm.getcell(12, false, false, "", "L", "T");
         //--
         ICellStyle border_number = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0####");
+        ICellStyle border_number_ = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.####");
         ICellStyle border_number0 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0");
 		ICellStyle border_number1 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0");
 		ICellStyle border_number2 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.00");
@@ -408,7 +409,11 @@ public class DanhSachDatHangReport
             catch
             { }
 
-			for (int j = 0; j < e_value.Length; j++)
+            var soLuong = double.Parse(dt.Rows[i]["soluong"].ToString());
+            var tongDonGiaMua = double.Parse(dt.Rows[i]["tongDonGiaMua"].ToString());
+            var thanhtien = soLuong * tongDonGiaMua;
+
+            for (int j = 0; j < e_value.Length; j++)
 			{
 				var cel_row_t = row_t.CreateCell(j);
 				if(e_value[j] == "stt")
@@ -425,8 +430,11 @@ public class DanhSachDatHangReport
                 {
                     if (guiNCC == false)
                         cel_row_t.CellFormula = String.Format("J{0}*F{0}",row + 1);
-					cel_row_t.CellStyle = border_number;
-				}
+                    if (thanhtien.ToString().LastIndexOf(".") <= -1)
+                        cel_row_t.CellStyle = type == "pdf" ? border_number0 : border_number;
+                    else
+                        cel_row_t.CellStyle = border_number;
+                }
 				else if(e_value[j] == "trongluong")
                 {
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
@@ -439,9 +447,14 @@ public class DanhSachDatHangReport
 				}
 				else if (new string[] { "giaMua", "tongDonGiaMua", "phi" }.Contains(e_value[j]))
                 {
+                    var val = double.Parse(dt.Rows[i][e_value[j]].ToString());
                     if (guiNCC == false)
-                        cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
-                    cel_row_t.CellStyle = border_number;
+                        cel_row_t.SetCellValue(val);
+
+                    if(val.ToString().LastIndexOf(".") <= -1)
+                        cel_row_t.CellStyle = type == "pdf" ? border_number0 : border_number;
+                    else
+                        cel_row_t.CellStyle = border_number;
                 }
 				else if( new string[] { "cbm", "soKienInner", "soKienOuter" }.Contains(e_value[j]))
                 {
