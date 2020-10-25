@@ -41,12 +41,14 @@ public class DanhSachDatHangReport
 							, dtkd.ten_dtkd
 							, dtkd.tel
 							, dtkd.fax
-	                        , sp.ma_sanpham
+	                        , sp.ma_sanpham as maSo
 							, (case when  SUBSTRING(sp.ma_sanpham,10,1) != 'F' then SUBSTRING(sp.ma_sanpham,0,9) else SUBSTRING(sp.ma_sanpham,0,12) end) as pic
-							, ddsdh.ma_sanpham_khach, ddsdh.mota_tiengviet, dvt.ma_edi
-                            , ddsdh.sl_dathang
-							, ddsdh.gianhap
-                            , isnull(ddsdh.giachuan, ddsdh.gianhap) as giachuan
+							, ddsdh.ma_sanpham_khach as maKhachHang
+                            , ddsdh.mota_tiengviet as moTa
+                            , dvt.ma_edi as dvt
+                            , ddsdh.sl_dathang as soLuong
+							, ddsdh.gianhap as tongDonGiaMua
+                            , isnull(ddsdh.giachuan, ddsdh.gianhap) as giaMua
                             , (ddsdh.gianhap - isnull(ddsdh.giachuan, ddsdh.gianhap)) as phi
 							, dsdh.huongdanlamhang
 							, dsdh.huongdanlamhangchung
@@ -55,9 +57,11 @@ public class DanhSachDatHangReport
 							, dh.sl_cont
 							, dh.loai_cont
 							, dsdh.discount as discountdecimal
-							, ddsdh.v2
+							, ddsdh.v2 as cbm
                             , (case ddsdh.sl_inner when 0 then ' ' else (cast(ddsdh.sl_inner as nvarchar) + ' ' + (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as dginner
                             , (cast(ddsdh.sl_outer as nvarchar) + ' ' + (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) as dgouter
+                            , ddsdh.sl_dathang / ddsdh.sl_inner as soKienInner
+                            , ddsdh.sl_dathang / ddsdh.sl_outer as soKienOuter
                             , (select hoten from nhanvien where manv = dsdh.nguoitao) as nguoitao
 							, sp.trongluong
 							, sp.mota as ghichu
@@ -274,16 +278,18 @@ public class DanhSachDatHangReport
             "Hình ảnh",
             "Mã khách hàng",
             "Mô tả",
-            "ĐVT",
-            "Cbm",
             "SL",
+            "ĐVT",
             "Giá mua",
             "Phí",
-            "Tổng đơn giá",
+            "Tổng đơn giá mua",
             "Thành tiền",
-            "Hướng dẫn làm hàng",
             "Đóng gói Inner",
             "Đóng gói Outer",
+            "Số kiện Inner",
+            "Số kiện Outer",
+            "Cbm",
+            "Hướng dẫn làm hàng",
             "Trọng lượng",
             "Xác nhận kích thước",
             "Giá gốc",
@@ -300,17 +306,18 @@ public class DanhSachDatHangReport
 			if( i == 4) {
 				with = 7000;
 			}
-			else if(i == 10 | i == 11) {
+            else if (i == 6)
+            {
+                with = 2000;
+            }
+            else if(i == 11 | i == 12) {
 				with = 5000;
 			}
-			else if( i == 12 | i == 16) {
+			else if( i >= 16) {
 				with = 0;
 			}
 
-            if ((i == 10 | i == 11) & guiNCC == true)
-                with = 0;
-
-            if (i == 17 | i == 18)
+            if ((new int[] { 7, 8, 9 }.Contains(i)) & guiNCC == true)
                 with = 0;
 
             s1.SetColumnWidth(cell,with);
@@ -322,21 +329,23 @@ public class DanhSachDatHangReport
         for (int i = 0; i < dt.Rows.Count; i++)
         {
 			string[] e_value = {
-                "no",
-                "ma_sanpham",
+                "stt",
+                "maSo",
                 "",
-                "ma_sanpham_khach",
-                "mota_tiengviet",
-                "ma_edi",
-                "v2",
-                "sl_dathang",
-                "giachuan",
+                "maKhachHang",
+                "moTa",
+                "soLuong",
+                "dvt",
+                "giaMua",
                 "phi",
-                "gianhap",
-                "thanhtien",
-                "huongdan_dathang",
+                "tongDonGiaMua",
+                "thanhTien",
                 "dginner",
                 "dgouter",
+                "soKienInner",
+                "soKienOuter",
+                "cbm",
+                "huongdan_dathang",
                 "trongluong",
                 "ghichu",
                 "giachuan",
