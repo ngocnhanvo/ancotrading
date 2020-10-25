@@ -206,7 +206,7 @@ public class DanhSachDatHangReport
 		ICellStyle border_number3 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.000");
 		ICellStyle border_number4 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0000");
 
-        var number = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.####");
+        var number = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0####");
         var number0 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0");
         var number1 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0");
         var number2 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.00");
@@ -435,8 +435,8 @@ public class DanhSachDatHangReport
             s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("SUM(K{0}:K{1})", m, row));
         s1.GetRow(row).GetCell(10).CellStyle = number;
 
-        s1.GetRow(row).CreateCell(15).SetCellFormula(String.Format("SUM(P{0}:P{1})", m, row));
-        s1.GetRow(row).GetCell(15).CellStyle = number2;
+        s1.GetRow(row).CreateCell(16).SetCellFormula(String.Format("SUM(Q{0}:Q{1})", m, row));
+        s1.GetRow(row).GetCell(16).CellStyle = number2;
 
 		row++;
 		//start +
