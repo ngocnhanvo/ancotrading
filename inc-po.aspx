@@ -593,6 +593,7 @@
                         } else if (printType == 'printPo') {
                             if (poId != null) {
                                 printURL += "InDonHang/";
+                                windowSize = "top=0, left=0, width=" + window.outerWidth + ", height=" + window.outerHeight;
                                 window.open(printURL + "?c_donhang_id=" + poId + "&type=pdf", "In Chiết Xuất Đơn Hàng", windowSize);
                                 //printURL += "InDonHangTool/";
                                 //window.open(printURL + "?c_donhang_id=" + poId, "In Đơn Hàng", windowSize);
