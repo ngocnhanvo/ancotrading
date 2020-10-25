@@ -628,7 +628,12 @@ public class DanhSachDatHangReport
         cellUn.Alignment = HorizontalAlignment.Center;
         cellUn.VerticalAlignment = VerticalAlignment.Top;
         s1.GetRow(2).GetCell(0).CellStyle = cellUn;
-		return hssfworkbook;
+
+        var config = new ExportExcel(hssfworkbook, 0, 16);
+        s1 = config.PrintExcel((HSSFSheet)s1, row);
+        s1.PrintSetup.Landscape = true;
+
+        return hssfworkbook;
     }
 
     public String C_baogia_id
