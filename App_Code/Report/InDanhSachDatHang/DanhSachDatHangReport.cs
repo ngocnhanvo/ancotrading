@@ -497,6 +497,8 @@ public class DanhSachDatHangReport
         if (phitang == null)
         {
             s1.GetRow(row).HeightInPoints = 0;
+            if (type == "pdf")
+                s1.GetRow(row).ZeroHeight = true;
         }
 		row++;
 		//start -
