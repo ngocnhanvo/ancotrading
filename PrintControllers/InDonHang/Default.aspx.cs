@@ -890,6 +890,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             {
                 s1.GetRow(row).HeightInPoints = 0;
                 s1.GetRow(row).ZeroHeight = true;
+                if (type == "pdf")
+                {
+                    s1.GetRow(row).RemoveCell(s1.GetRow(row).GetCell(4));
+                    s1.GetRow(row).RemoveCell(s1.GetRow(row).GetCell(12));
+                }
             }
             row++;
         }
