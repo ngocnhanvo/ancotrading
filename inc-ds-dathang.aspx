@@ -196,7 +196,7 @@
                                 }
                             } else if (printType == 'printDSDH') {
                                 if (piId != null) {
-                                    printURL += "InDonDatHangTool/";
+                                    printURL += "InDonDatHang/";
                                     let params_ = '';
                                     params_ += "&DSDHG=" + xemgiaDSDH;
                                     params_ += "&type=pdf";
