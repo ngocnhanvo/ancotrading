@@ -197,7 +197,7 @@ public class DanhSachDatHangReport
 		for(int i = 0; i < a.Length; i++)
 		{		
 			s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
-			s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 9));
+			s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 16));
 			s1.GetRow(row).HeightInPoints = heigh;
 			if(i == 0 | i == 3)
 			{
