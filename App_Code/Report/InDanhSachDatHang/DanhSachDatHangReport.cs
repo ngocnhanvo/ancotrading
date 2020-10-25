@@ -205,14 +205,14 @@ public class DanhSachDatHangReport
 		//--
 		ICellStyle left = ex_fm.getcell(12, false, false, "", "L", "T");
         //--
-        ICellStyle border_number = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", type =="pdf"? "#,##0.####" : "#,##0.0####");
+        ICellStyle border_number = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0####");
         ICellStyle border_number0 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0");
 		ICellStyle border_number1 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0");
 		ICellStyle border_number2 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.00");
 		ICellStyle border_number3 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.000");
 		ICellStyle border_number4 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0000");
 
-        var number = ex_fm.getcell2(12, false, true, "", "R", "T", type == "pdf" ? "#,##0.####" : "#,##0.0####");
+        var number = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0####");
         var number0 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0");
         var number1 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0");
         var number2 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.00");
@@ -517,7 +517,7 @@ public class DanhSachDatHangReport
         if (guiNCC == false)
         {
             s1.GetRow(row).CreateCell(10).SetCellValue(double.Parse(dt.Rows[0]["discount"].ToString()));
-            s1.GetRow(row).GetCell(10).CellStyle = number0;
+            s1.GetRow(row).GetCell(10).CellStyle = number;
         }
 		row++;
 		// start tổng cộng đã trừ
