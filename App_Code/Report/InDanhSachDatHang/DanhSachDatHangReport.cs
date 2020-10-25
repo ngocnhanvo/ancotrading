@@ -199,7 +199,7 @@ public class DanhSachDatHangReport
 		//--
 		ICellStyle left = ex_fm.getcell(12, false, false, "", "L", "T");
         //--
-        ICellStyle border_number = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.####");
+        ICellStyle border_number = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0####");
         ICellStyle border_number0 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0");
 		ICellStyle border_number1 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0");
 		ICellStyle border_number2 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.00");
@@ -314,9 +314,17 @@ public class DanhSachDatHangReport
 			if( i == 4) {
 				with = 7000;
 			}
+            else if (i == 5)
+            {
+                with = 4000;
+            }
             else if (i == 6)
             {
                 with = 2000;
+            }
+            else if (i == 16)
+            {
+                with = 3000;
             }
             else if(i == 11 | i == 12) {
 				with = 5000;
@@ -325,8 +333,13 @@ public class DanhSachDatHangReport
 				with = 0;
 			}
 
-            if ((new int[] { 7, 8, 9 }.Contains(i)) & guiNCC == true)
-                with = 0;
+            if ((new int[] { 7, 8, 9 }.Contains(i)))
+            {
+                if (guiNCC)
+                    with = 0;
+                else
+                    with = 3000;
+            }
 
             s1.SetColumnWidth(cell,with);
 			cell++;
@@ -386,7 +399,12 @@ public class DanhSachDatHangReport
 					cel_row_t.SetCellValue(count_row);
 					cel_row_t.CellStyle = border_center; 
 				}
-				else if(e_value[j] == "thanhTien") {
+                if (e_value[j] == "dvt")
+                {
+                    cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString());
+                    cel_row_t.CellStyle = border_center;
+                }
+                else if(e_value[j] == "thanhTien") {
                     if (guiNCC == false)
                         cel_row_t.CellFormula = String.Format("J{0}*F{0}",row + 1);
 					cel_row_t.CellStyle = border_number;
