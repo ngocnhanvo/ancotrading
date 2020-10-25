@@ -644,9 +644,12 @@ public class DanhSachDatHangReport
 		
 		cellModel.VerticalAlignment = VerticalAlignment.Top;
 		cellModel.HorizontalAlignment = HorizontalAlignment.Left;
-        s1.GetRow(row).GetCell(1).CellStyle = cellModel.CreateCellStyle();
-        s1.GetRow(row).GetCell(2).CellStyle = cellModel.CreateCellStyle();
-		row++;
+        var cellStyleMd = cellModel.CreateCellStyle();
+        cellStyleMd.WrapText = true;
+        s1.GetRow(row).GetCell(1).CellStyle = cellStyleMd;
+        s1.GetRow(row).GetCell(2).CellStyle = cellStyleMd;
+
+        row++;
 		//--
         s1.CreateRow(row).CreateCell(1).SetCellValue("* Khi cơ sở nhận được đơn đặt hàng này vui lòng ký xác nhận và gửi lại.");
         s1.GetRow(row).HeightInPoints = 30;
