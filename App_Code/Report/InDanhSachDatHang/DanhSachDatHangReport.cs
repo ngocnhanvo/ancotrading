@@ -198,13 +198,15 @@ public class DanhSachDatHangReport
 		ICellStyle leftBold = ex_fm.getcell(12, true, false, "", "L", "T");
 		//--
 		ICellStyle left = ex_fm.getcell(12, false, false, "", "L", "T");
-		//--
-		ICellStyle border_number0 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0");
+        //--
+        ICellStyle border_number = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.####");
+        ICellStyle border_number0 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0");
 		ICellStyle border_number1 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0");
 		ICellStyle border_number2 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.00");
 		ICellStyle border_number3 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.000");
 		ICellStyle border_number4 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0000");
 
+        var number = ex_fm.getcell2(12, false, true, "", "R", "T", "#,####");
         var number0 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0");
         var number1 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0");
         var number2 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.00");
@@ -387,7 +389,7 @@ public class DanhSachDatHangReport
 				else if(e_value[j] == "thanhTien") {
                     if (guiNCC == false)
                         cel_row_t.CellFormula = String.Format("J{0}*F{0}",row + 1);
-					cel_row_t.CellStyle = border_number2;
+					cel_row_t.CellStyle = border_number;
 				}
 				else if(e_value[j] == "trongluong"){
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
@@ -431,7 +433,7 @@ public class DanhSachDatHangReport
             s1.GetRow(row).CreateCell(10).SetCellValue("");
         else
             s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("SUM(K{0}:K{1})", m, row));
-        s1.GetRow(row).GetCell(10).CellStyle = number2;
+        s1.GetRow(row).GetCell(10).CellStyle = number;
 
         s1.GetRow(row).CreateCell(15).SetCellFormula(String.Format("SUM(P{0}:P{1})", m, row));
         s1.GetRow(row).GetCell(15).CellStyle = number2;
@@ -444,7 +446,7 @@ public class DanhSachDatHangReport
         if (guiNCC == false)
         {
             s1.GetRow(row).CreateCell(10).SetCellValue(double.Parse(phitang == null ? "0" : phitang.Value.ToString()));
-            s1.GetRow(row).GetCell(10).CellStyle = number0;
+            s1.GetRow(row).GetCell(10).CellStyle = number;
         }
 
         if (phitang == null)
@@ -459,7 +461,7 @@ public class DanhSachDatHangReport
         if (guiNCC == false)
         {
             s1.GetRow(row).CreateCell(10).SetCellValue(double.Parse(phigiam == null ? "0" : phigiam.Value.ToString()));
-            s1.GetRow(row).GetCell(10).CellStyle = number0;
+            s1.GetRow(row).GetCell(10).CellStyle = number;
         }
 
         if (phigiam == null)
@@ -469,7 +471,7 @@ public class DanhSachDatHangReport
 		row++;
 		// start discount
 		int dis = row + 1;
-        var ds2so = decimal.Parse(dt.Rows[0]["discountdecimal"].ToString()).ToString("#,#0.00");
+        var ds2so = decimal.Parse(dt.Rows[0]["discountdecimal"].ToString()).ToString("#,#0.##");
         s1.CreateRow(row).CreateCell(1).SetCellValue(String.Format("Discount ({0}%)", ds2so));
         if (guiNCC == false)
         {
@@ -482,7 +484,7 @@ public class DanhSachDatHangReport
         if (guiNCC == false)
         {
             s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("K{0} + K{1} - K{2} - K{3}", sub, cong, tru, dis));
-            s1.GetRow(row).GetCell(10).CellStyle = number0;
+            s1.GetRow(row).GetCell(10).CellStyle = number;
         }
 		row++;
 		// start viet bang chu
@@ -498,7 +500,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["mota"].ToString());
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
 		s1.GetRow(row).HeightInPoints = 45;
-		
+        cellModel.BorderAll = false;
         cellModel.VerticalAlignment = VerticalAlignment.Top;
 		cellModel.HorizontalAlignment = HorizontalAlignment.Left;
 		s1.GetRow(row).GetCell(1).CellStyle = cellModel.CreateCellStyle();
