@@ -199,13 +199,13 @@ public class DanhSachDatHangReport
 		//--
 		ICellStyle left = ex_fm.getcell(12, false, false, "", "L", "T");
 		//--
-		ICellStyle border_number0 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##");
+		ICellStyle border_number0 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0");
 		ICellStyle border_number1 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0");
 		ICellStyle border_number2 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.00");
 		ICellStyle border_number3 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.000");
 		ICellStyle border_number4 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0000");
 
-        var number0 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##");
+        var number0 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0");
         var number1 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0");
         var number2 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.00");
         var number3 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.000");
@@ -481,7 +481,7 @@ public class DanhSachDatHangReport
 		s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng đã trừ:");
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("L{0} + L{1} - L{2} - L{3}", sub, cong, tru, dis));
+            s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("K{0} + K{1} - K{2} - K{3}", sub, cong, tru, dis));
             s1.GetRow(row).GetCell(10).CellStyle = number0;
         }
 		row++;
