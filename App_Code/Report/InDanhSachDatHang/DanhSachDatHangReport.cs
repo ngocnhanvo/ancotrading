@@ -496,9 +496,9 @@ public class DanhSachDatHangReport
 
         if (phitang == null)
         {
-            s1.GetRow(row).HeightInPoints = 0;
-            if (type == "pdf")
-                s1.GetRow(row).ZeroHeight = true;
+            //s1.GetRow(row).HeightInPoints = 0;
+            //if (type == "pdf")
+            s1.GetRow(row).ZeroHeight = true;
         }
 		row++;
 		//start -
@@ -515,7 +515,8 @@ public class DanhSachDatHangReport
 
         if (phigiam == null)
         {
-            s1.GetRow(row).HeightInPoints = 0;
+            //s1.GetRow(row).HeightInPoints = 0;
+            s1.GetRow(row).ZeroHeight = true;
         }
 		row++;
 		// start discount
