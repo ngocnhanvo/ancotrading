@@ -623,29 +623,37 @@ public class DanhSachDatHangReport
 		// start dac diem hang hoa
 		s1.CreateRow(row).CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
-        HSSFRichTextString rich = new HSSFRichTextString(dt.Rows[0]["huongdanlamhang"].ToString());
+        string mota = dt.Rows[0]["huongdanlamhang"].ToString();
+        HSSFRichTextString rich = new HSSFRichTextString(mota);
         s1.GetRow(row).CreateCell(2).SetCellValue(rich);
-        s1.GetRow(row).HeightInPoints = 45;
-		
-		cellModel.VerticalAlignment = VerticalAlignment.Top;
+
+        float heightMAX = config.MeasureTextHeight(mota, 38000);
+        s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
+
+        cellModel.VerticalAlignment = VerticalAlignment.Top;
 		cellModel.HorizontalAlignment = HorizontalAlignment.Left;
-		s1.GetRow(row).GetCell(1).CellStyle = cellModel.CreateCellStyle();
-        s1.GetRow(row).GetCell(2).CellStyle = cellModel.CreateCellStyle();
+        var cellStyleMd = cellModel.CreateCellStyle();
+        cellStyleMd.WrapText = true;
+
+        s1.GetRow(row).GetCell(1).CellStyle = cellStyleMd;
+        s1.GetRow(row).GetCell(2).CellStyle = cellStyleMd;
+
 		row++;
 		// start cac huong dan khac
 		s1.CreateRow(row).CreateCell(1).SetCellValue("2. Các hướng dẫn khác:");
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
-        string mota = dt.Rows[0]["huongdanlamhangchung"].ToString();
+        mota = dt.Rows[0]["huongdanlamhangchung"].ToString();
         var rich_khac = new HSSFRichTextString(mota);
         s1.GetRow(row).CreateCell(2).SetCellValue(rich_khac);
 
-        float heightMAX = config.MeasureTextHeight(mota, 38000);
+        heightMAX = config.MeasureTextHeight(mota, 38000);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 		
 		cellModel.VerticalAlignment = VerticalAlignment.Top;
 		cellModel.HorizontalAlignment = HorizontalAlignment.Left;
-        var cellStyleMd = cellModel.CreateCellStyle();
+        cellStyleMd = cellModel.CreateCellStyle();
         cellStyleMd.WrapText = true;
+
         s1.GetRow(row).GetCell(1).CellStyle = cellStyleMd;
         s1.GetRow(row).GetCell(2).CellStyle = cellStyleMd;
 
