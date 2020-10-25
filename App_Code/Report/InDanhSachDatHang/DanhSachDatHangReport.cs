@@ -335,8 +335,8 @@ public class DanhSachDatHangReport
             {
                 with = 3000;
             }
-            else if(i == 11 | i == 12) {
-				with = 5000;
+            else if(new int[] { 13, 14}.Contains(i)) {
+				with = 4000;
 			}
 			else if( i >= 17) {
 				with = 0;
