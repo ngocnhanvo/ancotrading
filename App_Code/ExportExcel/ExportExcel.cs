@@ -150,8 +150,8 @@ public class ExportExcel
         s1.SetMargin(MarginType.BottomMargin, 0.75);
         s1.SetMargin(MarginType.LeftMargin, 0.23);
         s1.SetMargin(MarginType.RightMargin, 0.23);
-        s1.SetMargin(MarginType.HeaderMargin, 0.31);
-        s1.SetMargin(MarginType.FooterMargin, 0.31);
+        s1.SetMargin(MarginType.HeaderMargin, 0);
+        s1.SetMargin(MarginType.FooterMargin, 0);
         hssfworkbook.SetPrintArea(
             hssfworkbook.GetSheetIndex(s1.SheetName), //sheet index
             0, //start column
