@@ -498,8 +498,12 @@ public class DanhSachDatHangReport
         if (phitang == null)
         {
             s1.GetRow(row).ZeroHeight = true;
-            s1.GetRow(row).RemoveCell(cellR01);
-            s1.GetRow(row).RemoveCell(cellR10);
+
+            if (type == "pdf")
+            {
+                s1.GetRow(row).RemoveCell(cellR01);
+                s1.GetRow(row).RemoveCell(cellR10);
+            }
         }
         else
             s1.GetRow(row).HeightInPoints = 30;
@@ -523,8 +527,11 @@ public class DanhSachDatHangReport
         {
             //s1.GetRow(row).HeightInPoints = 0;
             s1.GetRow(row).ZeroHeight = true;
-            s1.GetRow(row).RemoveCell(cellR01);
-            s1.GetRow(row).RemoveCell(cellR10);
+            if (type == "pdf")
+            {
+                s1.GetRow(row).RemoveCell(cellR01);
+                s1.GetRow(row).RemoveCell(cellR10);
+            }
         }
         else
             s1.GetRow(row).HeightInPoints = 30;
