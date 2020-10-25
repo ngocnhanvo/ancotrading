@@ -146,8 +146,8 @@ public class ExportExcel
         s1.FitToPage = true;
         s1.PrintSetup.FitWidth = 1;
         s1.PrintSetup.FitHeight = 0;
-        s1.SetMargin(MarginType.TopMargin, 0);
-        s1.SetMargin(MarginType.BottomMargin, 0);
+        s1.SetMargin(MarginType.TopMargin, 0.25);
+        s1.SetMargin(MarginType.BottomMargin, 0.25);
         s1.SetMargin(MarginType.LeftMargin, 0.23);
         s1.SetMargin(MarginType.RightMargin, 0.23);
         s1.SetMargin(MarginType.HeaderMargin, 0.31);
