@@ -399,7 +399,7 @@ public class DanhSachDatHangReport
 					cel_row_t.SetCellValue(count_row);
 					cel_row_t.CellStyle = border_center; 
 				}
-                if (e_value[j] == "dvt")
+                else if (e_value[j] == "dvt")
                 {
                     cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString());
                     cel_row_t.CellStyle = border_center;
