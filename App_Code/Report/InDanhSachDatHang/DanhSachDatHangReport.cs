@@ -374,7 +374,7 @@ public class DanhSachDatHangReport
 			for (int j = 0; j < e_value.Length; j++)
 			{
 				var cel_row_t = row_t.CreateCell(j);
-				if(e_value[j] == "no") {
+				if(e_value[j] == "stt") {
 					cel_row_t.SetCellValue(count_row);
 					cel_row_t.CellStyle = border_center; 
 				}
