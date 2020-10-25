@@ -216,30 +216,49 @@ public class DanhSachDatHangReport
 
 
         s1.CreateRow(4).CreateCell(1).SetCellValue("Số chứng từ:");
+        s1.GetRow(4).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(4).HeightInPoints = 30;
         s1.GetRow(4).CreateCell(2).SetCellValue(dt.Rows[0]["sochungtu"].ToString());
+        s1.GetRow(4).GetCell(2).CellStyle = celltext10;
 
         s1.GetRow(4).CreateCell(4).SetCellValue("Theo P/O số:");
+        s1.GetRow(4).GetCell(4).CellStyle = celltext10;
         s1.GetRow(4).CreateCell(5).SetCellValue(dt.Rows[0]["so_po"].ToString());
+        s1.GetRow(4).GetCell(5).CellStyle = celltext10;
         s1.AddMergedRegion(new CellRangeAddress(4, 4, 5, 7));
 
         s1.CreateRow(5).CreateCell(1).SetCellValue("Ngày lập:");
+        s1.GetRow(5).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(5).HeightInPoints = 30;
         s1.GetRow(5).CreateCell(2).SetCellValue(DateTime.Parse(dt.Rows[0]["ngaylap"].ToString()).ToString("dd/MM/yyyy"));
+        s1.GetRow(5).GetCell(2).CellStyle = celltext10;
 
         s1.GetRow(5).CreateCell(4).SetCellValue("Customer Order No:");
+        s1.GetRow(5).GetCell(4).CellStyle = celltext10;
         s1.GetRow(5).CreateCell(5).SetCellValue(dt.Rows[0]["customer_order_no"].ToString());
+        s1.GetRow(5).GetCell(5).CellStyle = celltext10;
 
         s1.CreateRow(6).CreateCell(1).SetCellValue("Công ty AnCơ kính đề nghị Quý Công ty/Đơn vị: " + dt.Rows[0]["ten_dtkd"].ToString());
+        s1.GetRow(6).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(6).HeightInPoints = 30;
 
         s1.CreateRow(7).CreateCell(1).SetCellValue("Điện thoại");
+        s1.GetRow(7).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(7).HeightInPoints = 30;
         s1.GetRow(7).CreateCell(2).SetCellValue(dt.Rows[0]["tel"].ToString());
+        s1.GetRow(7).GetCell(2).CellStyle = celltext10;
 
         s1.GetRow(7).CreateCell(4).SetCellValue("Fax");
+        s1.GetRow(7).GetCell(4).CellStyle = celltext10;
         s1.GetRow(7).CreateCell(5).SetCellValue(dt.Rows[0]["fax"].ToString());
+        s1.GetRow(7).GetCell(5).CellStyle = celltext10;
         s1.AddMergedRegion(new CellRangeAddress(7, 7, 5, 7));
 
         s1.CreateRow(10).CreateCell(1).SetCellValue("Cung cấp cho công ty chúng tôi các mặt hàng với chi tiết:");
+        s1.CreateRow(10).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(10).HeightInPoints = 30;
 
-		row = 11;
+        row = 11;
 		// set A13 - All
 		// -- Header
 		int cell = 0;
