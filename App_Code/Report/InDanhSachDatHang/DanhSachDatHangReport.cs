@@ -338,7 +338,7 @@ public class DanhSachDatHangReport
                 if (guiNCC)
                     with = 0;
                 else
-                    with = 3000;
+                    with = 4000;
             }
 
             s1.SetColumnWidth(cell,with);
@@ -417,10 +417,10 @@ public class DanhSachDatHangReport
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
 					cel_row_t.CellStyle = border_number0;
 				}
-				else if(e_value[j] == "giaMua" | e_value[j] == "tongDonGiaMua" | e_value[j] == "phi") {
+				else if (new string[] { "giaMua", "tongDonGiaMua", "phi" }.Contains(e_value[j])) {
                     if (guiNCC == false)
                         cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
-                    cel_row_t.CellStyle = border_number2;
+                    cel_row_t.CellStyle = border_number;
                 }
 				else if( new string[] { "cbm", "soKienInner", "soKienOuter" }.Contains(e_value[j])) {
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
