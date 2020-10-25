@@ -348,7 +348,7 @@ public class DanhSachDatHangReport
                 "huongdan_dathang",
                 "trongluong",
                 "ghichu",
-                "giachuan",
+                "giaMua",
                 "phi"
             };
             //
@@ -378,7 +378,7 @@ public class DanhSachDatHangReport
 					cel_row_t.SetCellValue(count_row);
 					cel_row_t.CellStyle = border_center; 
 				}
-				else if(e_value[j] == "thanhtien") {
+				else if(e_value[j] == "thanhTien") {
                     if (guiNCC == false)
                         cel_row_t.CellFormula = String.Format("H{0}*K{0}",row + 1);
 					cel_row_t.CellStyle = border_number1;
@@ -387,16 +387,16 @@ public class DanhSachDatHangReport
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
 					cel_row_t.CellStyle = border_number1;
 				}
-				else if(e_value[j] == "sl_dathang") {
+				else if(e_value[j] == "soLuong") {
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
 					cel_row_t.CellStyle = border_number0;
 				}
-				else if(e_value[j] == "gianhap" | e_value[j] == "giachuan" | e_value[j] == "phi") {
+				else if(e_value[j] == "giaMua" | e_value[j] == "tongDonGiaMua" | e_value[j] == "phi") {
                     if (guiNCC == false)
                         cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
                     cel_row_t.CellStyle = border_number2;
                 }
-				else if( e_value[j] == "v2") {
+				else if( new string[] { "cbm", "soKienInner", "soKienOuter" }.Contains(e_value[j])) {
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
 					cel_row_t.CellStyle = border_number2;
 				}
