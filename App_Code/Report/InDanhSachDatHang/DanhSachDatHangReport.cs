@@ -255,7 +255,7 @@ public class DanhSachDatHangReport
         s1.AddMergedRegion(new CellRangeAddress(7, 7, 5, 7));
 
         s1.CreateRow(10).CreateCell(1).SetCellValue("Cung cấp cho công ty chúng tôi các mặt hàng với chi tiết:");
-        s1.CreateRow(10).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(10).GetCell(1).CellStyle = celltext10;
         s1.GetRow(10).HeightInPoints = 30;
 
         row = 11;
