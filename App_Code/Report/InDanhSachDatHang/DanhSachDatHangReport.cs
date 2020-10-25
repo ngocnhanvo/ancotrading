@@ -197,7 +197,7 @@ public class DanhSachDatHangReport
 		for(int i = 0; i < a.Length; i++)
 		{		
 			s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
-			s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 16));
+			s1.AddMergedRegion(new CellRangeAddress(row, row, 0, type == "pdf" ? 16 : 9));
 			s1.GetRow(row).HeightInPoints = heigh;
 			if(i == 0 | i == 3)
 			{
@@ -242,13 +242,13 @@ public class DanhSachDatHangReport
         s1.GetRow(6).GetCell(1).CellStyle = celltext10;
         s1.GetRow(6).HeightInPoints = 20;
 
-        s1.CreateRow(7).CreateCell(1).SetCellValue("Điện thoại");
+        s1.CreateRow(7).CreateCell(1).SetCellValue("Điện thoại:");
         s1.GetRow(7).GetCell(1).CellStyle = celltext10;
         s1.GetRow(7).HeightInPoints = 20;
         s1.GetRow(7).CreateCell(2).SetCellValue(dt.Rows[0]["tel"].ToString());
         s1.GetRow(7).GetCell(2).CellStyle = celltext10;
 
-        s1.GetRow(7).CreateCell(4).SetCellValue("Fax");
+        s1.GetRow(7).CreateCell(4).SetCellValue("Fax:");
         s1.GetRow(7).GetCell(4).CellStyle = celltext10;
         s1.GetRow(7).CreateCell(5).SetCellValue(dt.Rows[0]["fax"].ToString());
         s1.GetRow(7).GetCell(5).CellStyle = celltext10;
