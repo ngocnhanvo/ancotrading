@@ -139,12 +139,12 @@ public class DanhSachDatHangReport
 
     public HSSFWorkbook CreateHSSFWorkbook(DataTable dt, Nullable<decimal> phitang, Nullable<decimal> phigiam)
     {
-        var config = new ExportExcel(hssfworkbook, 0, 16);
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
         ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
 		HSSFSheet hssfsheet = (HSSFSheet)s1;
-		
-		Excel_Format ex_fm = new Excel_Format(hssfworkbook); 
+        var config = new ExportExcel(hssfworkbook, 0, 16);
+
+        Excel_Format ex_fm = new Excel_Format(hssfworkbook); 
         ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
 		//-- 
 		ICellStyle cellHeader = ex_fm.getcell(18, true, true, "", "C", "T");
