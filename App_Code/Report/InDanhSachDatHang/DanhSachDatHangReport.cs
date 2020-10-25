@@ -474,8 +474,6 @@ public class DanhSachDatHangReport
         else
             s1.GetRow(row).GetCell(10).CellStyle = number;
 
-        s1.GetRow(row).GetCell(10).CellStyle = number;
-
         s1.GetRow(row).CreateCell(16).SetCellFormula(String.Format("SUM(Q{0}:Q{1})", m, row));
         s1.GetRow(row).GetCell(16).CellStyle = number2;
 
