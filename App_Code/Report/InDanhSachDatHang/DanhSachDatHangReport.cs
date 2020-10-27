@@ -142,7 +142,7 @@ public class DanhSachDatHangReport
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
         ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
 		HSSFSheet hssfsheet = (HSSFSheet)s1;
-        var config = new ExportExcel(hssfworkbook, 0, 16);
+        var config = new ExportExcel(hssfworkbook, 0, 15);
 
         Excel_Format ex_fm = new Excel_Format(hssfworkbook); 
         ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
@@ -275,12 +275,12 @@ public class DanhSachDatHangReport
             "Phí",
             "Tổng đơn giá mua",
             "Thành tiền",
-            "Hướng dẫn làm hàng",
             "Đóng gói Inner",
             "Đóng gói Outer",
             "Số kiện Inner",
             "Số kiện Outer",
             "Cbm",
+            "Hướng dẫn làm hàng",
             "Trọng lượng",
             "Xác nhận kích thước",
             "Giá gốc",
@@ -301,22 +301,23 @@ public class DanhSachDatHangReport
             }
             else if (i == 1)
             {
-                with = 5500;
+                with = 7000;
             }
-            else if ( i == 4) {
+            else if ( i == 4)
+            {
 				with = 7000;
 			}
             else if (i == 5)
             {
-                with = 3000;
+                with = 2500;
             }
             else if (i == 6)
             {
                 with = 2000;
             }
-            else if (i == 16)
+            else if (i == 15)
             {
-                with = 3000;
+                with = 2500;
             }
             else if (i == 11)
             {
@@ -358,12 +359,12 @@ public class DanhSachDatHangReport
                 "phi",
                 "tongDonGiaMua",
                 "thanhTien",
-                "huongdan_dathang",
                 "dginner",
                 "dgouter",
                 "soKienInner",
                 "soKienOuter",
                 "cbm",
+                 "huongdan_dathang",
                 "trongluong",
                 "ghichu",
                 "giaMua",
@@ -489,6 +490,8 @@ public class DanhSachDatHangReport
         var cellR01 = s1.CreateRow(row).CreateCell(1);
         cellR01.SetCellValue("(+):" + dt.Rows[0]["mota_cong"].ToString());
         cellR01.CellStyle = cellBold;
+        var cellRange1to5v1 = new CellRangeAddress(row, row, 1, 9);
+        s1.AddMergedRegion(cellRange1to5v1);
 
         var cellR10 = s1.GetRow(row).CreateCell(10);
         var phiTangVal = double.Parse(phitang == null ? "0" : phitang.Value.ToString());
@@ -522,6 +525,8 @@ public class DanhSachDatHangReport
         cellR01 = s1.CreateRow(row).CreateCell(1);
         cellR01.SetCellValue("(-):" + dt.Rows[0]["mota_tru"].ToString());
         cellR01.CellStyle = cellBold;
+        var cellRange1to5v2 = new CellRangeAddress(row, row, 1, 9);
+        s1.AddMergedRegion(cellRange1to5v2);
 
         cellR10 = s1.GetRow(row).CreateCell(10);
         var phiGiamVal = double.Parse(phigiam == null ? "0" : phigiam.Value.ToString());
@@ -587,7 +592,7 @@ public class DanhSachDatHangReport
         if (guiNCC == false)
         {
             s1.GetRow(row).CreateCell(2).SetCellValue(MoneyToWord.ConvertMoneyToTextVND((decimal)tongCongDaTru, dt.Rows[0]["ma_dtkd"].ToString()));
-            s1.GetRow(row).GetCell(2).CellStyle = cellBold;
+            s1.GetRow(row).GetCell(2).CellStyle = celltext;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
         }
 		row++;
