@@ -318,6 +318,10 @@ public class DanhSachDatHangReport
             {
                 with = 3000;
             }
+            else if (i == 11)
+            {
+                with = 0;
+            }
             else if(new int[] { 14, 15}.Contains(i)) {
 				with = 3400;
 			}
@@ -461,7 +465,7 @@ public class DanhSachDatHangReport
 		//start tong cong 1
         s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng:");
         s1.GetRow(row).HeightInPoints = 30;
-        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.GetRow(row).CreateCell(5).SetCellFormula(String.Format("SUM(F{0}:F{1})", m, row));
         s1.GetRow(row).GetCell(5).CellStyle = number0;
 
@@ -484,7 +488,7 @@ public class DanhSachDatHangReport
         //s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["diengiaitang"].ToString() + "(+):");
         var cellR01 = s1.CreateRow(row).CreateCell(1);
         cellR01.SetCellValue("(+):" + dt.Rows[0]["mota_cong"].ToString());
-        cellR01.CellStyle = celltext10;
+        cellR01.CellStyle = cellBold;
 
         var cellR10 = s1.GetRow(row).CreateCell(10);
         var phiTangVal = double.Parse(phitang == null ? "0" : phitang.Value.ToString());
@@ -517,7 +521,7 @@ public class DanhSachDatHangReport
         //s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["diengiaigiam"].ToString() + " (-):");
         cellR01 = s1.CreateRow(row).CreateCell(1);
         cellR01.SetCellValue("(-):" + dt.Rows[0]["mota_tru"].ToString());
-        cellR01.CellStyle = celltext10;
+        cellR01.CellStyle = cellBold;
 
         cellR10 = s1.GetRow(row).CreateCell(10);
         var phiGiamVal = double.Parse(phigiam == null ? "0" : phigiam.Value.ToString());
@@ -550,7 +554,7 @@ public class DanhSachDatHangReport
         var ds2so = discountP.ToString("#,#0.##");
         s1.CreateRow(row).CreateCell(1).SetCellValue(String.Format("Discount ({0}%)", ds2so));
         s1.GetRow(row).HeightInPoints = 30;
-        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         cellR10 = s1.GetRow(row).CreateCell(10);
         if (guiNCC == false)
         {
@@ -564,7 +568,7 @@ public class DanhSachDatHangReport
 		// start tổng cộng đã trừ
 		s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng đã trừ:");
         s1.GetRow(row).HeightInPoints = 30;
-        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         cellR10 = s1.GetRow(row).CreateCell(10);
         var tongCongDaTru = sumThanhTien + phiTangVal - phiGiamVal - discount;
         if (guiNCC == false)
@@ -578,12 +582,12 @@ public class DanhSachDatHangReport
 		row++;
 		// start viet bang chu
         s1.CreateRow(row).CreateCell(1).SetCellValue("Viết bằng chữ:");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.GetRow(row).HeightInPoints = 30;
         if (guiNCC == false)
         {
             s1.GetRow(row).CreateCell(2).SetCellValue(MoneyToWord.ConvertMoneyToTextVND((decimal)tongCongDaTru, dt.Rows[0]["ma_dtkd"].ToString()));
-            s1.GetRow(row).GetCell(2).CellStyle = celltext10;
+            s1.GetRow(row).GetCell(2).CellStyle = cellBold;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
         }
 		row++;
@@ -602,23 +606,23 @@ public class DanhSachDatHangReport
 		// Ngay xong hang
         s1.CreateRow(row).CreateCell(1).SetCellValue("Ngày xong hàng:");
         s1.GetRow(row).HeightInPoints = 30;
-        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.GetRow(row).CreateCell(2).SetCellValue(DateTime.Parse(dt.Rows[0]["hangiaohang_po"].ToString()).ToString("dd/MM/yyyy"));
-        s1.GetRow(row).GetCell(2).CellStyle = celltext10;
+        s1.GetRow(row).GetCell(2).CellStyle = celltext;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
 		row++;
 		// Dia diem xuat hang
         s1.CreateRow(row).CreateCell(1).SetCellValue("Địa điểm xuất hàng:");
         s1.GetRow(row).HeightInPoints = 30;
-        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["diachigiaohang"].ToString());
-        s1.GetRow(row).GetCell(2).CellStyle = celltext10;
+        s1.GetRow(row).GetCell(2).CellStyle = celltext;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
 		row++;
 		//Huong dan lam hang
         s1.CreateRow(row).CreateCell(1).SetCellValue("Hướng dẫn làm hàng:");
         s1.GetRow(row).HeightInPoints = 30;
-        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         row++;
 		// start dac diem hang hoa
 		s1.CreateRow(row).CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
