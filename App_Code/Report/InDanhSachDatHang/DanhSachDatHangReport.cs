@@ -649,7 +649,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(rich);
         s1.GetRow(row).GetCell(2).CellStyle = celltext10Top;
 
-        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9);
+        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", 10);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
 		row++;
@@ -658,10 +658,12 @@ public class DanhSachDatHangReport
         s1.GetRow(row).GetCell(1).CellStyle = cellBold10Top;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
         mota = dt.Rows[0]["huongdanlamhangchung"].ToString();
-        var rich_khac = new HSSFRichTextString(mota);
-        s1.GetRow(row).CreateCell(2).SetCellValue(rich_khac);
+        //var rich_khac = new HSSFRichTextString(mota);
+        s1.GetRow(row).CreateCell(2).SetCellValue(mota);
         s1.GetRow(row).GetCell(2).CellStyle = celltext10Top;
-        s1.GetRow(row).Height = 0;
+
+        heightMAX = config.MeasureTextHeight(mota, sumWidth2to9);
+        s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
         row++;
 		//--
