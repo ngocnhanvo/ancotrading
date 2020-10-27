@@ -311,7 +311,7 @@ public class DanhSachDatHangReport
             {
                 with = 7000;
             }
-            else if(new int[] {2, 3 }.Contains(i))
+            else if(new int[] { 2, 3 }.Contains(i))
             {
                 sumWidth2to9 += with;
             }
@@ -649,7 +649,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(mota);
         s1.GetRow(row).GetCell(2).CellStyle = celltext10Top;
 
-        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", 10);
+        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
 		row++;
@@ -662,9 +662,8 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(mota);
         s1.GetRow(row).GetCell(2).CellStyle = celltext10Top;
 
-        heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", 20);
+        heightMAX = config.MeasureTextHeight(mota, sumWidth2to9)*(float)1.1;
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
-        s1.GetRow(row).HeightInPoints = s1.DefaultRowHeightInPoints;
         row++;
 		//--
         s1.CreateRow(row).CreateCell(1).SetCellValue("* Khi cơ sở nhận được đơn đặt hàng này vui lòng ký xác nhận và gửi lại.");
