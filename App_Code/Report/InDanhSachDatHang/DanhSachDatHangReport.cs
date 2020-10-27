@@ -147,7 +147,7 @@ public class DanhSachDatHangReport
         Excel_Format ex_fm = new Excel_Format(hssfworkbook); 
         ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
         ICellStyle cellBold10 = ex_fm.getcell(10, true, true, "", "L", "T");
-        ICellStyle cellBold10Top = ex_fm.getcell(10, true, true, "", "L", "C");
+        ICellStyle cellBold10Top = ex_fm.getcell(10, true, true, "", "L", "B");
         //-- 
         ICellStyle cellHeader = ex_fm.getcell(18, true, true, "", "C", "T");
 		//-- 
@@ -155,7 +155,7 @@ public class DanhSachDatHangReport
 		//--
 		ICellStyle celltext = ex_fm.getcell(12, false, true, "", "L", "T");
         ICellStyle celltext10 = ex_fm.getcell(10, false, true, "", "L", "T");
-        ICellStyle celltext10Top = ex_fm.getcell(10, false, true, "", "L", "C");
+        ICellStyle celltext10Top = ex_fm.getcell(10, false, true, "", "L", "B");
         ICellStyle cellTextCenter = ex_fm.getcell(12, false, true, "", "C", "T");
         //--
         ICellStyle rightBold = ex_fm.getcell(12, true, false, "", "R", "T");
