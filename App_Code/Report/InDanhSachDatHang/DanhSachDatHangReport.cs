@@ -146,8 +146,9 @@ public class DanhSachDatHangReport
 
         Excel_Format ex_fm = new Excel_Format(hssfworkbook); 
         ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
-		//-- 
-		ICellStyle cellHeader = ex_fm.getcell(18, true, true, "", "C", "T");
+        ICellStyle cellBold10 = ex_fm.getcell(10, true, true, "", "L", "T");
+        //-- 
+        ICellStyle cellHeader = ex_fm.getcell(18, true, true, "", "C", "T");
 		//-- 
 		ICellStyle cellHeader_n = ex_fm.getcell(12, false, true, "", "C", "T");
 		//--
@@ -639,27 +640,27 @@ public class DanhSachDatHangReport
         row++;
 		// start dac diem hang hoa
 		s1.CreateRow(row).CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
-        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold10;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
         string mota = dt.Rows[0]["huongdanlamhang"].ToString();
         HSSFRichTextString rich = new HSSFRichTextString(mota);
         s1.GetRow(row).CreateCell(2).SetCellValue(rich);
-        s1.GetRow(row).GetCell(2).CellStyle = celltext;
+        s1.GetRow(row).GetCell(2).CellStyle = celltext10;
 
-        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9);
+        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", 10);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
 		row++;
 		// start cac huong dan khac
 		s1.CreateRow(row).CreateCell(1).SetCellValue("2. Các hướng dẫn khác:");
-        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold10;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
         mota = dt.Rows[0]["huongdanlamhangchung"].ToString();
         var rich_khac = new HSSFRichTextString(mota);
         s1.GetRow(row).CreateCell(2).SetCellValue(rich_khac);
-        s1.GetRow(row).GetCell(2).CellStyle = celltext;
+        s1.GetRow(row).GetCell(2).CellStyle = celltext10;
 
-        heightMAX = config.MeasureTextHeight(mota, sumWidth2to9) + 10;
+        heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", 10);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
         row++;
