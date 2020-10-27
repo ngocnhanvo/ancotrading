@@ -153,6 +153,7 @@ public class DanhSachDatHangReport
 		//--
 		ICellStyle celltext = ex_fm.getcell(12, false, true, "", "L", "T");
         ICellStyle celltext10 = ex_fm.getcell(10, false, true, "", "L", "T");
+        ICellStyle cellTextCenter = ex_fm.getcell(12, false, true, "", "C", "T");
         //--
         ICellStyle rightBold = ex_fm.getcell(12, true, false, "", "R", "T");
 		//--
@@ -645,7 +646,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(rich);
         s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
-        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9);
+        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", 13);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
 		row++;
@@ -658,40 +659,37 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(rich_khac);
         s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
-        heightMAX = config.MeasureTextHeight(mota, sumWidth2to9);
+        heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", 13)
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
         row++;
 		//--
         s1.CreateRow(row).CreateCell(1).SetCellValue("* Khi cơ sở nhận được đơn đặt hàng này vui lòng ký xác nhận và gửi lại.");
         s1.GetRow(row).HeightInPoints = 30;
-        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 9));
 		row++;
-        ICellStyle cCenter = hssfworkbook.CreateCellStyle();
-        cCenter.Alignment = HorizontalAlignment.Center;
-        cCenter.VerticalAlignment = VerticalAlignment.Top;
 		//--
         s1.CreateRow(row).CreateCell(1).SetCellValue("Người lập phiếu");
-        s1.GetRow(row).GetCell(1).CellStyle = cCenter;
+        s1.GetRow(row).GetCell(1).CellStyle = cellTextCenter;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 		//
 		s1.GetRow(row).CreateCell(8).SetCellValue("Nhà cung ứng");
-        s1.GetRow(row).GetCell(8).CellStyle = cCenter;
+        s1.GetRow(row).GetCell(8).CellStyle = cellTextCenter;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
 		row++;
 		//--
         s1.CreateRow(row).CreateCell(1).SetCellValue("Ký và ghi rõ họ tên");
-        s1.GetRow(row).GetCell(1).CellStyle = cCenter;
+        s1.GetRow(row).GetCell(1).CellStyle = cellTextCenter;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 		//--
 		s1.GetRow(row).CreateCell(8).SetCellValue("Ký và ghi rõ họ tên");
-        s1.GetRow(row).GetCell(8).CellStyle = cCenter;
+        s1.GetRow(row).GetCell(8).CellStyle = cellTextCenter;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
 		row = row + 3;
 		//
         s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["nguoitao"].ToString());
-        s1.GetRow(row).GetCell(1).CellStyle = cCenter;
+        s1.GetRow(row).GetCell(1).CellStyle = cellTextCenter;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 		row++;
         //s1.GetRow(row).CreateCell(4).SetCellValue("Trưởng phòng");
