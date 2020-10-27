@@ -664,7 +664,7 @@ public class DanhSachDatHangReport
 
         heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", 20);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
-
+        s1.GetRow(row).HeightInPoints = s1.DefaultRowHeightInPoints;
         row++;
 		//--
         s1.CreateRow(row).CreateCell(1).SetCellValue("* Khi cơ sở nhận được đơn đặt hàng này vui lòng ký xác nhận và gửi lại.");
