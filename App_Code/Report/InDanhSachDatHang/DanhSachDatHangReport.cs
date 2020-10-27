@@ -627,7 +627,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         row++;
 		// start dac diem hang hoa
-		s1.CreateRow(row).CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");\
+		s1.CreateRow(row).CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
         string mota = dt.Rows[0]["huongdanlamhang"].ToString();
