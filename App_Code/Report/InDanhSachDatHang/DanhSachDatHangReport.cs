@@ -175,6 +175,9 @@ public class DanhSachDatHangReport
         var number1 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0");
         var number2 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.00");
         var number3 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.000");
+        var numberBold = ex_fm.getcell2(12, true, true, "", "R", "T", "#,##0.0####");
+        var numberBold0 = ex_fm.getcell2(12, true, true, "", "R", "T", "#,##0");
+        var numberBold2 = ex_fm.getcell2(12, true, true, "", "R", "T", "#,##0.00");
 
         ICellStyle border = ex_fm.getcell(12, false, true, "LRBT", "L", "T");
 		ICellStyle border_center = ex_fm.getcell(12, false, true, "LRBT", "C", "T");
@@ -468,7 +471,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.GetRow(row).CreateCell(5).SetCellFormula(String.Format("SUM(F{0}:F{1})", m, row));
-        s1.GetRow(row).GetCell(5).CellStyle = number0;
+        s1.GetRow(row).GetCell(5).CellStyle = numberBold0;
 
         if (guiNCC == true)
             s1.GetRow(row).CreateCell(10).SetCellValue("");
@@ -476,12 +479,12 @@ public class DanhSachDatHangReport
             s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("SUM(K{0}:K{1})", m, row));
 
         if (sumThanhTien.ToString().LastIndexOf(".") <= -1)
-            s1.GetRow(row).GetCell(10).CellStyle = type == "pdf" ? number0 : number;
+            s1.GetRow(row).GetCell(10).CellStyle = type == "pdf" ? numberBold0 : numberBold;
         else
-            s1.GetRow(row).GetCell(10).CellStyle = number;
+            s1.GetRow(row).GetCell(10).CellStyle = numberBold;
 
-        s1.GetRow(row).CreateCell(16).SetCellFormula(String.Format("SUM(Q{0}:Q{1})", m, row));
-        s1.GetRow(row).GetCell(16).CellStyle = number2;
+        s1.GetRow(row).CreateCell(15).SetCellFormula(String.Format("SUM(Q{0}:Q{1})", m, row));
+        s1.GetRow(row).GetCell(15).CellStyle = numberBold2;
 
 		row++;
 		//start +
@@ -535,9 +538,9 @@ public class DanhSachDatHangReport
             cellR10.SetCellValue(phiGiamVal);
 
             if (phiGiamVal.ToString().LastIndexOf(".") <= -1)
-                cellR10.CellStyle = type == "pdf" ? number0 : number;
+                cellR10.CellStyle = type == "pdf" ? numberBold0 : numberBold;
             else
-                cellR10.CellStyle = number;
+                cellR10.CellStyle = numberBold;
         }
 
         if (phigiam == null)
@@ -565,9 +568,9 @@ public class DanhSachDatHangReport
         {
             cellR10.SetCellValue(discount);
             if (discount.ToString().LastIndexOf(".") <= -1)
-                cellR10.CellStyle = type == "pdf" ? number0 : number;
+                cellR10.CellStyle = type == "pdf" ? numberBold0 : numberBold;
             else
-                cellR10.CellStyle = number;
+                cellR10.CellStyle = numberBold;
         }
 		row++;
 		// start tổng cộng đã trừ
@@ -580,9 +583,9 @@ public class DanhSachDatHangReport
         {
             cellR10.SetCellFormula(String.Format("K{0} + K{1} - K{2} - K{3}", sub, cong, tru, dis));
             if(tongCongDaTru.ToString().LastIndexOf(".") <= -1)
-                cellR10.CellStyle = type == "pdf" ? number0 : number;
+                cellR10.CellStyle = type == "pdf" ? numberBold0 : numberBold;
             else
-                cellR10.CellStyle = number;
+                cellR10.CellStyle = numberBold;
         }
 		row++;
 		// start viet bang chu
@@ -601,7 +604,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["mota"].ToString());
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
+        s1.GetRow(row).GetCell(2).CellStyle = celltext;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
 		s1.GetRow(row).HeightInPoints = 45;;
 		row++;
