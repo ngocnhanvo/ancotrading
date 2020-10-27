@@ -646,7 +646,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(rich);
         s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
-        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", 13);
+        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9) * (float)1.1;
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
 		row++;
@@ -659,7 +659,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(rich_khac);
         s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
-        heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", 20);
+        heightMAX = config.MeasureTextHeight(mota, sumWidth2to9) * (float)1.1;
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
         row++;
