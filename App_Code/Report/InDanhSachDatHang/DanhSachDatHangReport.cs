@@ -322,14 +322,10 @@ public class DanhSachDatHangReport
             {
                 with = 2500;
             }
-            else if (i == 11)
-            {
-                with = 0;
-            }
             else if(new int[] { 14, 15}.Contains(i)) {
 				with = 3400;
 			}
-			else if( i >= 17) {
+			else if( i >= 16) {
 				with = 0;
 			}
 
@@ -639,8 +635,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
         float heightMAX = config.MeasureTextHeight(mota, 38000) + 5;
-        if(heightMAX < 45)
-            s1.GetRow(row).HeightInPoints = 45;
+        s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
 		row++;
 		// start cac huong dan khac
@@ -653,8 +648,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
         heightMAX = config.MeasureTextHeight(mota, 38000) + 5;
-        if (heightMAX < 45)
-            s1.GetRow(row).HeightInPoints = 45;
+        s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
         row++;
 		//--
