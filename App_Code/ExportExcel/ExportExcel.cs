@@ -227,6 +227,22 @@ public class ExportExcel
         return (float)Math.Min(Convert.ToDouble(size.Height) * 72 / 96, 409) + 5;
     }
 
+    public float MeasureTextHeight(string text, int width, string font, int fontSize)
+    {
+        double width2 = width * 0.003756;
+        width2 = width2 * 7.5;
+        if (string.IsNullOrEmpty(text)) return (float)0.0;
+        var bitmap = new Bitmap(1, 1);
+        var graphics = Graphics.FromImage(bitmap);
+
+        var pixelWidth = Convert.ToInt32(width * 7.5);  //7.5 pixels per excel column width
+        var drawingFont = new Font(font, fontSize);
+        var size = graphics.MeasureString(text, drawingFont, (int)width2);
+
+        //72 DPI and 96 points per inch.  Excel height in points with max of 409 per Excel requirements.
+        return (float)Math.Min(Convert.ToDouble(size.Height) * 72 / 96, 409) + 5;
+    }
+
     public void set_borderThin(CellRangeAddress cellRange, string border, HSSFSheet hssfsheet)
     {
         ex_fm.set_border(cellRange, border, hssfsheet);

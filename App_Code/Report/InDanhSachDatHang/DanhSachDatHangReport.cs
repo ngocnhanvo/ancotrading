@@ -292,6 +292,7 @@ public class DanhSachDatHangReport
 
 		IRow rowColumnHeader = s1.CreateRow(row);
 		rowColumnHeader.HeightInPoints = 47;
+        var sumWidth2to9 = 0;
 		for(int i = 0; i < d.Length; i++)
 		{		
 			int with = 5000;
@@ -306,17 +307,24 @@ public class DanhSachDatHangReport
             {
                 with = 7000;
             }
+            else if(new int[] {2, 3 }.Contains(i))
+            {
+                sumWidth2to9 += with;
+            }
             else if ( i == 4)
             {
 				with = 7000;
-			}
+                sumWidth2to9 += with;
+            }
             else if (i == 5)
             {
                 with = 2500;
+                sumWidth2to9 += with;
             }
             else if (i == 6)
             {
                 with = 2000;
+                sumWidth2to9 += with;
             }
             else if (i == 15)
             {
@@ -335,6 +343,9 @@ public class DanhSachDatHangReport
                     with = 0;
                 else
                     with = 4000;
+
+                if (i != 10)
+                    sumWidth2to9 += with;
             }
 
             s1.SetColumnWidth(cell,with);
@@ -634,7 +645,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(rich);
         s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
-        float heightMAX = config.MeasureTextHeight(mota, 38000) + 20;
+        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
 		row++;
@@ -647,7 +658,7 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(rich_khac);
         s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
-        heightMAX = config.MeasureTextHeight(mota, 38000) + 20;
+        heightMAX = config.MeasureTextHeight(mota, sumWidth2to9);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
         row++;
