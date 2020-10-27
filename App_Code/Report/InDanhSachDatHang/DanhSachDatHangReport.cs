@@ -661,7 +661,7 @@ public class DanhSachDatHangReport
         var rich_khac = new HSSFRichTextString(mota);
         s1.GetRow(row).CreateCell(2).SetCellValue(rich_khac);
         s1.GetRow(row).GetCell(2).CellStyle = celltext10Top;
-        s1.GetRow(row).Height = -1;
+        s1.GetRow(row).Height = 0;
 
         row++;
 		//--
