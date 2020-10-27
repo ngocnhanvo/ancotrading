@@ -503,9 +503,9 @@ public class DanhSachDatHangReport
             cellR10.SetCellValue(phiTangVal);
 
             if (phiTangVal.ToString().LastIndexOf(".") <= -1)
-                cellR10.CellStyle = type == "pdf" ? number0 : number;
+                cellR10.CellStyle = type == "pdf" ? numberBold0 : numberBold;
             else
-                cellR10.CellStyle = number;
+                cellR10.CellStyle = numberBold;
         }
 
         if (phitang == null)
@@ -638,8 +638,9 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(rich);
         s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
-        float heightMAX = config.MeasureTextHeight(mota, 38000);
-        s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
+        float heightMAX = config.MeasureTextHeight(mota, 38000) + 5;
+        if(heightMAX < 45)
+            s1.GetRow(row).HeightInPoints = 45;
 
 		row++;
 		// start cac huong dan khac
@@ -651,8 +652,9 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(2).SetCellValue(rich_khac);
         s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
-        heightMAX = config.MeasureTextHeight(mota, 38000);
-        s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
+        heightMAX = config.MeasureTextHeight(mota, 38000) + 5;
+        if (heightMAX < 45)
+            s1.GetRow(row).HeightInPoints = 45;
 
         row++;
 		//--
