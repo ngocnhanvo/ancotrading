@@ -227,7 +227,7 @@ public class ExportExcel
         return (float)Math.Min(Convert.ToDouble(size.Height) * 72 / 96, 409) + 5;
     }
 
-    public float MeasureTextHeight(string text, int width, string font, int fontSize)
+    public float MeasureTextHeight(string text, int width, string font, System.Int32 fontSize)
     {
         double width2 = width * 0.003756;
         width2 = width2 * 7.5;
