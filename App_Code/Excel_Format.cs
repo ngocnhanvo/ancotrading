@@ -72,7 +72,7 @@ public class Excel_Format
 		}
 		
 		if(VerAlign == "B") {
-            cell.VerticalAlignment = VerticalAlignment.Justify;
+            cell.VerticalAlignment = VerticalAlignment.Distributed;
         }
 		else if(VerAlign == "T") {
 			cell.VerticalAlignment = VerticalAlignment.Top;
