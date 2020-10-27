@@ -598,15 +598,12 @@ public class DanhSachDatHangReport
 		row++;
 		// start ghi chu
         s1.CreateRow(row).CreateCell(1).SetCellValue("Ghi chú:");
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["mota"].ToString());
+        s1.GetRow(row).GetCell(1).CellStyle = celltext;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
-		s1.GetRow(row).HeightInPoints = 45;
-        cellModel.BorderAll = false;
-        cellModel.VerticalAlignment = VerticalAlignment.Top;
-		cellModel.HorizontalAlignment = HorizontalAlignment.Left;
-		s1.GetRow(row).GetCell(1).CellStyle = cellModel.CreateCellStyle();
-        s1.GetRow(row).GetCell(2).CellStyle = cellModel.CreateCellStyle();
+		s1.GetRow(row).HeightInPoints = 45;;
 		row++;
 		// Ngay xong hang
         s1.CreateRow(row).CreateCell(1).SetCellValue("Ngày xong hàng:");
@@ -630,41 +627,29 @@ public class DanhSachDatHangReport
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         row++;
 		// start dac diem hang hoa
-		s1.CreateRow(row).CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
+		s1.CreateRow(row).CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");\
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
         string mota = dt.Rows[0]["huongdanlamhang"].ToString();
         HSSFRichTextString rich = new HSSFRichTextString(mota);
         s1.GetRow(row).CreateCell(2).SetCellValue(rich);
+        s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
         float heightMAX = config.MeasureTextHeight(mota, 38000);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
-        cellModel.VerticalAlignment = VerticalAlignment.Top;
-		cellModel.HorizontalAlignment = HorizontalAlignment.Left;
-        var cellStyleMd = cellModel.CreateCellStyle();
-        cellStyleMd.WrapText = true;
-
-        s1.GetRow(row).GetCell(1).CellStyle = cellStyleMd;
-        s1.GetRow(row).GetCell(2).CellStyle = cellStyleMd;
-
 		row++;
 		// start cac huong dan khac
 		s1.CreateRow(row).CreateCell(1).SetCellValue("2. Các hướng dẫn khác:");
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
         mota = dt.Rows[0]["huongdanlamhangchung"].ToString();
         var rich_khac = new HSSFRichTextString(mota);
         s1.GetRow(row).CreateCell(2).SetCellValue(rich_khac);
+        s1.GetRow(row).GetCell(2).CellStyle = celltext;
 
         heightMAX = config.MeasureTextHeight(mota, 38000);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
-		
-		cellModel.VerticalAlignment = VerticalAlignment.Top;
-		cellModel.HorizontalAlignment = HorizontalAlignment.Left;
-        cellStyleMd = cellModel.CreateCellStyle();
-        cellStyleMd.WrapText = true;
-
-        s1.GetRow(row).GetCell(1).CellStyle = cellStyleMd;
-        s1.GetRow(row).GetCell(2).CellStyle = cellStyleMd;
 
         row++;
 		//--
