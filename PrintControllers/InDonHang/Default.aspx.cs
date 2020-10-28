@@ -471,10 +471,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             if (i == 0)
             {
                 heigh = 95;
+                s1.GetRow(row).GetCell(1).CellStyle = cellBoldTop;
                 s1.GetRow(row).CreateCell(2).SetCellValue(rich);
                 s1.GetRow(row).GetCell(2).CellStyle = cellBoldTop;
-                s1.GetRow(row).GetCell(1).CellStyle = cellBoldTop;
-
                 s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
             }
             else
