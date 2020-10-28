@@ -944,7 +944,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     string gthh = nnl == null ? "0" : nnl.Where(s => s["hehang"].ToString() == chungloai).Select(s => s["giatri"].ToString()).FirstOrDefault();
 
                     var rowToTalHeHang = s1.CreateRow(row);
-                    rowTotalHeHang.HeightInPoints = heigh;
+                    rowToTalHeHang.HeightInPoints = heigh;
                     rowToTalHeHang.CreateCell(4).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
                     var range1_3 = new CellRangeAddress(row, row, 1, 3);
                     var range4_10 = new CellRangeAddress(row, row, 4, 10);
@@ -959,7 +959,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     row++;
                     
                     var rowDisHeHang = s1.CreateRow(row);
-                    rowTotalHeHang.HeightInPoints = heigh;
+                    rowDisHeHang.HeightInPoints = heigh;
                     rowDisHeHang.CreateCell(4).SetCellValue(string.Format(@"Discount ({0}%):", gthh));
                     rowDisHeHang.GetCell(4).CellStyle = leftBold;
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
