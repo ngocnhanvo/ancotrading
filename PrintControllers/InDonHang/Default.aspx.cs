@@ -743,7 +743,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             if (new int[] { 0, 1 }.Contains(i))
             {
                 rich_text = i == 1 ? dt.Rows[0][c_value[i]].ToString() : rich_text;
-                s1.GetRow(row).GetCell(1).CellStyle = cellBoldTop;
+                s1.GetRow(row).GetCell(1).CellStyle = i == 1 ? cellBold : cellBoldTop;
                 s1.GetRow(row).CreateCell(2).SetCellValue(rich_text);
                 float heightMax = config.MeasureTextHeight(rich_text, width02to12) + 5;
                 heigh = heightMax < 25 ? 25 : (int)heightMax;
