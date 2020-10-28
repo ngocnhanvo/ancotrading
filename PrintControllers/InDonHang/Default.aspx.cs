@@ -320,9 +320,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 Response.Write("<h3>Đơn hàng không có dữ liệu</h3>");
             }
         }
-        catch
+        catch(Exception ex)
         {
-            Response.Write(select);
+            Response.Write(ex + "");
         }
         //}
         //catch (Exception ex)
