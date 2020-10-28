@@ -1046,7 +1046,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 var row = int.Parse(item["row"]) + 1;
                 var column = int.Parse(item["column"]);
                 var width = int.Parse(item["width"]);
-                var height = int.Parse(item["height"]) * 2;
+                var height = int.Parse(item["height"]) * 1.332;
                 var widthR = int.Parse(item["widthR"]);
                 var heightR = int.Parse(item["heightR"]);
                 double percent = (double)height / (double)heightR;
