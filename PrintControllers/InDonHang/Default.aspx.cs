@@ -604,7 +604,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
             if(type=="pdf")
             {
-                if (i >= 12)
+                if (i > 12)
                     with = 0;
             }
 
