@@ -1015,7 +1015,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         {
             foreach (var item in lstimage)
             {
-                var row = int.Parse(item["row"]) + 1;
+                var row = int.Parse(item["row"]);
                 var column = int.Parse(item["column"]);
                 var link = item["link"];
                 var image = System.Drawing.Image.FromFile(link);
@@ -1026,9 +1026,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 //the drawing patriarch will hold the anchor and the master information
                 IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
                 //store the coordinates of which cell and where in the cell the image goes
-                int intx1 = 2;
+                int intx1 = column - 1;
                 int inty1 = row;
-                int intx2 = 3;
+                int intx2 = column;
                 int inty2 = 1 + row;
 
                 HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
