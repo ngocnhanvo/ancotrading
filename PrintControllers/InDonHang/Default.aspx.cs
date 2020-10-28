@@ -1228,7 +1228,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             hsswb.Write(file);
             file.Close();
 
-            workbook.LoadFromFile(url);
+            workbook.LoadFromFile(url, Spire.Xls.ExcelVersion.Version97to2003);
 
             foreach (var item in lstimage)
             {
