@@ -1009,6 +1009,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
     public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName)
     {
+        var workbook = new Spire.Xls.Workbook();
+        //xuất Excel không áp dụng Spire.Xls
         if (type != "pdf")
         {
             foreach (var item in lstimage)
@@ -1036,7 +1038,18 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 int index = hsswb.AddPicture(ms.ToArray(), PictureType.JPEG);
                 IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
             }
+
+            MemoryStream exportData = new MemoryStream();
+            hsswb.Write(exportData);
+            hsswb.Clear();
+
+            Response.ContentType = "application/vnd.ms-excel";
+            Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
+            Response.Clear();
+            Response.BinaryWrite(exportData.GetBuffer());
+            Response.End();
         }
+        //xuất Excel có áp dụng Spire.Xls
         else
         {
             var fileName = "PO_" + c_donhang_id;
@@ -1046,7 +1059,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             hsswb.Write(file);
             file.Close();
 
-            var workbook = new Spire.Xls.Workbook();
             workbook.LoadFromFile(url);
 
             foreach (var item in lstimage)
