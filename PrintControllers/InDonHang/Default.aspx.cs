@@ -256,7 +256,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         , convert(varchar, dh.shipmenttime, 106) as shipmenttime
                         , cb.ten_cangbien
                         , pmt.ten_paymentterm
-                        , (' In favor of ANCO COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
+                        , ('In favor of ANCO COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
 						, ddh.v2 as cbm
                         , (sp.trongluong * ddh.soluong) as trongluong
                         , (case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
@@ -454,7 +454,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , ""
             , "The Payer:"
             , "ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:"
-            , "Customer's order no.:"
+            , "Customer's order no:"
             , "Commodity:"
             , "Item nos., description, packing, quantity, unit price and amount:"
         };
@@ -1137,14 +1137,14 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         for (int i = 0; i < f.Count(); i++)
         {
             s1.CreateRow(row).CreateCell(1).SetCellValue(f[i]);
-            s1.GetRow(row).CreateCell(3).SetCellValue(dt.Rows[0][f_value[i]].ToString());
+            s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0][f_value[i]].ToString());
             heigh = 22;
             if (i == 5)
                 heigh = 95;
             s1.GetRow(row).GetCell(1).CellStyle = celltext;
             s1.GetRow(row).GetCell(3).CellStyle = celltext;
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 3, 12));
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 1));
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
             s1.GetRow(row).HeightInPoints = heigh;
             row++;
         }
