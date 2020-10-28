@@ -341,7 +341,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
         HSSFSheet hssfsheet = (HSSFSheet)s1;
 
-        var config = new ExportExcel(hssfworkbook, 0, 16);
+        var config = new ExportExcel(hssfworkbook, 0, type == "pdf"? 12 : 16);
 
         Excel_Format ex_fm = new Excel_Format(hssfworkbook);
         ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
@@ -1001,10 +1001,10 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         if (type == "pdf")
         {
             s1.PrintSetup.Landscape = false;
-            s1.SetColumnHidden(13, true);
-            s1.SetColumnHidden(14, true);
-            s1.SetColumnHidden(15, true);
-            s1.SetColumnHidden(16, true);
+            //s1.SetColumnHidden(13, true);
+            //s1.SetColumnHidden(14, true);
+            //s1.SetColumnHidden(15, true);
+            //s1.SetColumnHidden(16, true);
         }
         else
             s1.PrintSetup.Landscape = true;
