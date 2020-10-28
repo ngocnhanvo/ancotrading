@@ -1001,7 +1001,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         if (type == "pdf")
         {
             s1.PrintSetup.Landscape = false;
-            //s1.SetColumnHidden(13, true);
+            s1.SetColumnWidth(4, 12000);
             //s1.SetColumnHidden(14, true);
             //s1.SetColumnHidden(15, true);
             //s1.SetColumnHidden(16, true);
