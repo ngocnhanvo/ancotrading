@@ -1052,13 +1052,14 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 double percent = height / heightR;
                 var link = item["link"];
                 var picture = workbook.ActiveSheet.Pictures.Add(row, column, link);
-                picture.Width = (int)(widthR * percent) - 8;
+                //picture.Width = (int)(widthR * percent) - 8;
+                picture.Width = 113;
                 picture.Height = (int)(heightR * percent) - 8;
                 double widthColumn = width / 72;
                 Response.Write("picture.Width:"+ picture.Width);
                 Response.Write("widthColumn:" + widthColumn);
                 var rateColumnAndPicture = (widthColumn - picture.Width) / 2; 
-                picture.LeftColumnOffset = (int)rateColumnAndPicture;
+                //picture.LeftColumnOffset = (int)rateColumnAndPicture;
                 picture.TopRowOffset = 5;
             }
             workbook.Save();
