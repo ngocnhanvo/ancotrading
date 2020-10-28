@@ -583,9 +583,13 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             {
                 with = 2000;
             }
+            else if (i == 1)
+            {
+                with = type == "pdf" ? 6000 : with;
+            }
             else if (i == 4)
             {
-                with = 10000;
+                with = type == "pdf" ? 12000 : 10000;
             }
             else if (i == 5 | i == 6)
             {
@@ -727,12 +731,12 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
                     cel_row_t.CellStyle = border_number2;
                 }
-                else if (e_value[j] == "l2" | e_value[j] == "w2" | e_value[j] == "h2")
+                else if (new string[] { "l2", "w2", "h2" }.Contains(e_value[j]))
                 {
                     cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
                     cel_row_t.CellStyle = border_number2;
                 }
-                else if (e_value[j] == "ma_hscode")
+                else if (new string[] { "ma_hscode", "ma_sanpham" }.Contains(e_value[j]))
                 {
                     cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString());
                     cel_row_t.CellStyle = border_center;
@@ -1001,8 +1005,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         if (type == "pdf")
         {
             s1.PrintSetup.Landscape = false;
-            s1.SetColumnWidth(1, 6000);
-            s1.SetColumnWidth(4, 12000);
             //s1.SetColumnHidden(14, true);
             //s1.SetColumnHidden(15, true);
             //s1.SetColumnHidden(16, true);
