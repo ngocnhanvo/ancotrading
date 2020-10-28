@@ -944,7 +944,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     string gthh = nnl == null ? "0" : nnl.Where(s => s["hehang"].ToString() == chungloai).Select(s => s["giatri"].ToString()).FirstOrDefault();
 
                     var rowToTalHeHang = s1.CreateRow(row);
-                    //rowToTalHeHang.HeightInPoints = 25;
+                    rowTotalHeHang.HeightInPoints = heigh;
                     rowToTalHeHang.CreateCell(4).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
                     var range1_3 = new CellRangeAddress(row, row, 1, 3);
                     var range4_10 = new CellRangeAddress(row, row, 4, 10);
@@ -959,7 +959,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     row++;
                     
                     var rowDisHeHang = s1.CreateRow(row);
-                    //rowDisHeHang.HeightInPoints = 25;
+                    rowTotalHeHang.HeightInPoints = heigh;
                     rowDisHeHang.CreateCell(4).SetCellValue(string.Format(@"Discount ({0}%):", gthh));
                     rowDisHeHang.GetCell(4).CellStyle = leftBold;
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
@@ -968,7 +968,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     row++;
 
                     var rowTotalHeHang = s1.CreateRow(row);
-                    //rowTotalHeHang.HeightInPoints = 25;
+                    rowTotalHeHang.HeightInPoints = heigh;
                     rowTotalHeHang.CreateCell(4).SetCellValue(string.Format("Total ({0}):", lstHH.Count + 1));
                     rowTotalHeHang.GetCell(4).CellStyle = leftBold;
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
@@ -993,6 +993,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         if (nnl != null)
         {   
             s1.CreateRow(row).CreateCell(4).SetCellValue("Sub Total:");
+            s1.GetRow(row).HeightInPoints = heigh;
             foreach (var i in lstAmountHH)
             {
                 sumAmount += string.Format("M{0}+", i - 1);
@@ -1009,6 +1010,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         else
         {
             s1.CreateRow(row).CreateCell(4).SetCellValue("Sub Total:");
+            s1.GetRow(row).HeightInPoints = heigh;
             s1.GetRow(row).CreateCell(7).CellFormula = String.Format("SUM(H{0}:H{1})", m, row);
             s1.GetRow(row).CreateCell(8).CellFormula = String.Format("SUM(I{0}:I{1})", m, row);
             s1.GetRow(row).CreateCell(11).CellFormula = String.Format("SUM(L{0}:L{1})", m, row);
@@ -1077,13 +1079,15 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     s1.GetRow(row).RemoveCell(s1.GetRow(row).GetCell(12));
                 }
             }
+            else
+                s1.GetRow(row).HeightInPoints = heigh;
             row++;
         }
 
         //end
         int cong = row + 1;
         s1.CreateRow(row).CreateCell(4).SetCellValue("(+) " + dt.Rows[0]["diengiaicong"].ToString());
-        //s1.GetRow(row).CreateCell(12).SetCellValue(dt.Rows[0]["phicong"].ToString());
+        s1.GetRow(row).HeightInPoints = heigh;
         s1.GetRow(row).CreateCell(12).CellFormula = String.Format("Value(\"{0}\")", dt.Rows[0]["phicong"].ToString());
         // style
         s1.GetRow(row).GetCell(4).CellStyle = leftBold;
@@ -1092,7 +1096,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //
         int tru = row + 1;
         s1.CreateRow(row).CreateCell(4).SetCellValue("(-) " + dt.Rows[0]["diengiaitru"].ToString());
-        //s1.GetRow(row).CreateCell(12).SetCellValue(dt.Rows[0]["phitru"].ToString());
+        s1.GetRow(row).HeightInPoints = heigh;
         s1.GetRow(row).CreateCell(12).CellFormula = String.Format("Value(\"{0}\")", dt.Rows[0]["phitru"].ToString());
         // style
         s1.GetRow(row).GetCell(4).CellStyle = leftBold;
@@ -1116,11 +1120,13 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         row++;
         //
         s1.CreateRow(row).CreateCell(0).SetCellValue("Say: " + dt.Rows[0]["money"].ToString());
+        s1.GetRow(row).HeightInPoints = heigh;
         s1.GetRow(row).GetCell(0).CellStyle = rightBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
         row++;
         //
         s1.CreateRow(row).CreateCell(0).SetCellValue("(10% more or less in quantity and amount are acceptable).");
+        s1.GetRow(row).HeightInPoints = heigh;
         s1.GetRow(row).GetCell(0).CellStyle = rightBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
         row++;
@@ -1143,21 +1149,25 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         }
         //
         s1.CreateRow(row).CreateCell(1).SetCellValue("This agreement comes into effect from the signing date.:");
+        s1.GetRow(row).HeightInPoints = heigh;
         s1.GetRow(row).GetCell(1).CellStyle = left;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 12));
         row++;
         row++;
         //
         s1.CreateRow(row).CreateCell(0).SetCellValue("CONFIRMED BY THE BUYER");
+        s1.GetRow(row).HeightInPoints = heigh;
         s1.GetRow(row).GetCell(0).CellStyle = signBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 4));
         //
         s1.GetRow(row).CreateCell(5).SetCellValue("ANCO COMPANY LTD.");
+        s1.GetRow(row).HeightInPoints = heigh;
         s1.GetRow(row).GetCell(5).CellStyle = signBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 12));
         row++;
         //
         s1.CreateRow(row).CreateCell(5).SetCellValue("(Signed)");
+        s1.GetRow(row).HeightInPoints = heigh;
         s1.GetRow(row).GetCell(5).CellStyle = signBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 12));
         row++;
