@@ -1086,11 +1086,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
         //New Width
 
-        int destWidth = (int)(sourceWidth * nPercent);
+        int destWidth = (int)(sourceWidth * nPercentH);
 
         //New Height
 
-        int destHeight = (int)(sourceHeight * nPercent);
+        int destHeight = (int)(sourceHeight * nPercentH);
 
 
 
