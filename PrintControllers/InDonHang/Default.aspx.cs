@@ -602,6 +602,12 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             else if (i > 16)
                 with = 0;
 
+            if(type=="pdf")
+            {
+                if (i >= 12)
+                    with = 0;
+            }
+
             s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 6));
             s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
             s1.AddMergedRegion(new CellRangeAddress(row, row, 13, 15));
@@ -991,7 +997,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         s1.GetRow(2).GetCell(0).CellStyle = cellUn;
 
         s1 = config.PrintExcel((HSSFSheet)s1, row);
-        s1.PrintSetup.Landscape = true;
+
+        if(type == "pdf")
+            s1.PrintSetup.Landscape = false;
+        else
+            s1.PrintSetup.Landscape = true;
         return hssfworkbook;
     }
 
