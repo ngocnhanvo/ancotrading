@@ -18,6 +18,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
     decimal discountPO = 0;
     string type = "excel";
     string c_donhang_id = "";
+    List<Dictionary<string, string>> lstimage = new List<Dictionary<string, string>>();
     protected void Page_Load(object sender, EventArgs e)
     {
         //try
@@ -675,25 +676,33 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 //grab the image file
                 string anhhienthi = ExcuteSignalRStatic.getImageProduct(msp);
 
-                imagesPath = Path.Combine(imagesPath, anhhienthi);
-                System.Drawing.Image image = System.Drawing.Image.FromFile(imagesPath);
-                MemoryStream ms = new MemoryStream();
-                //pull the memory stream from the image (I need this for the byte array later)
-                image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                //the drawing patriarch will hold the anchor and the master information
-                IDrawing patriarch = s1.CreateDrawingPatriarch();
-                //store the coordinates of which cell and where in the cell the image goes
-                int intx1 = 2;
-                int inty1 = row;
-                int intx2 = 3;
-                int inty2 = 1 + row;
+                lstimage.Add(new Dictionary<string, string>() {
+                    { "row", row + "" },
+                    { "column", 3 + "" },
+                    { "link", imagesPath },
+                    { "height", row_t.HeightInPoints + "" },
+                    { "width", 4500 + "" }
+                });
 
-                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
-                //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
-                anchor.AnchorType = type == "pdf" ? 3 : 0;
-                //add the byte array and encode it for the excel file
-                int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
-                IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+                //imagesPath = Path.Combine(imagesPath, anhhienthi);
+                //System.Drawing.Image image = System.Drawing.Image.FromFile(imagesPath);
+                //MemoryStream ms = new MemoryStream();
+                ////pull the memory stream from the image (I need this for the byte array later)
+                //image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                ////the drawing patriarch will hold the anchor and the master information
+                //IDrawing patriarch = s1.CreateDrawingPatriarch();
+                ////store the coordinates of which cell and where in the cell the image goes
+                //int intx1 = 2;
+                //int inty1 = row;
+                //int intx2 = 3;
+                //int inty2 = 1 + row;
+
+                //HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
+                ////types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
+                //anchor.AnchorType = type == "pdf" ? 3 : 0;
+                ////add the byte array and encode it for the excel file
+                //int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
+                //IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
             }
             catch { }
             //
@@ -1028,16 +1037,19 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             var workbook = new Spire.Xls.Workbook();
             workbook.LoadFromFile(url);
 
-            string imagesPath = Path.Combine(Server.MapPath("~"), "");
-            //grab the image file
-            string anhhienthi = ExcuteSignalRStatic.getImageProduct("62-01800-01-02");
-            imagesPath = Path.Combine(imagesPath, anhhienthi);
-
-            var picture = workbook.ActiveSheet.Pictures.Add(1, 2, imagesPath);
-            picture.Width = 100;
-            picture.Height = 100;
-            picture.LeftColumnOffset = 50;
-            picture.TopRowOffset = 50;
+            foreach(var item in lstimage)
+            {
+                var row = int.Parse(item["row"]);
+                var column = int.Parse(item["column"]);
+                var width = int.Parse(item["width"]);
+                var height = int.Parse(item["height"]);
+                var link = item["link"];
+                var picture = workbook.ActiveSheet.Pictures.Add(row, column, link);
+                picture.Width = width - 5;
+                picture.Height = height - 5;
+                picture.LeftColumnOffset = 1;
+                picture.TopRowOffset = 1;
+            }
             workbook.Save();
 
             var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
