@@ -1033,7 +1033,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             string anhhienthi = ExcuteSignalRStatic.getImageProduct("62-01800-01-02");
             imagesPath = Path.Combine(imagesPath, anhhienthi);
 
-            workbook.ActiveSheet.Pictures.Add(imagesPath);
+            workbook.ActiveSheet.Pictures.Add(1, 1, imagesPath);
             workbook.Save();
 
             var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
