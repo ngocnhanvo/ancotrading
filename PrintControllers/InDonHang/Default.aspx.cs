@@ -676,17 +676,20 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 //grab the image file
                 string anhhienthi = ExcuteSignalRStatic.getImageProduct(msp);
                 imagesPath = Path.Combine(imagesPath, anhhienthi);
+                var image = System.Drawing.Image.FromFile(imagesPath);
 
                 lstimage.Add(new Dictionary<string, string>() {
                     { "row", row + "" },
                     { "column", 3 + "" },
                     { "link", imagesPath },
                     { "height", row_t.HeightInPoints + "" },
-                    { "width", 4500 + "" }
+                    { "width", 4500 + "" },
+                    { "heightR", image.Height + "" },
+                    { "widthR", image.Width + "" }
                 });
 
                
-                //System.Drawing.Image image = System.Drawing.Image.FromFile(imagesPath);
+                
                 //MemoryStream ms = new MemoryStream();
                 ////pull the memory stream from the image (I need this for the byte array later)
                 //image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
@@ -1040,14 +1043,17 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
             foreach(var item in lstimage)
             {
-                var row = int.Parse(item["row"]);
+                var row = int.Parse(item["row"]) + 1;
                 var column = int.Parse(item["column"]);
                 var width = int.Parse(item["width"]);
                 var height = int.Parse(item["height"]);
+                var widthR = int.Parse(item["widthR"]);
+                var heightR = int.Parse(item["heightR"]);
+                var percent = height / heightR;
                 var link = item["link"];
                 var picture = workbook.ActiveSheet.Pictures.Add(row, column, link);
-                //picture.Width = width - 5;
-                //picture.Height = height - 5;
+                picture.Width = widthR * percent;
+                picture.Height = heightR * percent;
                 //picture.LeftColumnOffset = 1;
                 //picture.TopRowOffset = 1;
             }
