@@ -347,6 +347,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         Excel_Format ex_fm = new Excel_Format(hssfworkbook);
         ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
         ICellStyle cellBoldTop = ex_fm.getcell(12, true, true, "", "L", "B");
+        ICellStyle cellBoldJustify = ex_fm.getcell(12, true, true, "", "L", "J");
         //-- 
         ICellStyle cellHeader = ex_fm.getcell(18, true, true, "", "C", "T");
         //-- 
@@ -748,7 +749,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 float heightMax = config.MeasureTextHeight(rich_text, width02to12) + 5;
                 heigh = heightMax < 25 ? 25 : (int)heightMax;
 
-                s1.GetRow(row).GetCell(2).CellStyle = i > 0 ? celltext : cellBoldTop;
+                s1.GetRow(row).GetCell(2).CellStyle = i > 0 ? celltext : cellBoldJustify;
                 s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
             }
             else

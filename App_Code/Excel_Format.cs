@@ -80,7 +80,11 @@ public class Excel_Format
 		else if(VerAlign == "C") {
 			cell.VerticalAlignment = VerticalAlignment.Center;
 		}
-		return cell;
+        else if (VerAlign == "J")
+        {
+            cell.VerticalAlignment = VerticalAlignment.Justify;
+        }
+        return cell;
 	}
 	
 	public ICellStyle getcell2(short size, bool bold, bool wraptext, string border, string HorAlign, string VerAlign, string dataFormat) 
