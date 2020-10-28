@@ -482,7 +482,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 {
                     s1.GetRow(row).CreateCell(3).SetCellValue(dt.Rows[0][c_value[i]].ToString());
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 3, 12));
-                    s1.GetRow(row).GetCell(3).CellStyle = celltext;
                 }
                 else
                 {
@@ -492,8 +491,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 if (i == 3)
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
                 heigh = 22;
+                s1.GetRow(row).GetCell(1).CellStyle = celltext;
             }
-            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            
             s1.GetRow(row).HeightInPoints = heigh;
             row++;
         }
