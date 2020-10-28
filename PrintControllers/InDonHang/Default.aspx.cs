@@ -693,12 +693,12 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 
                 //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
                 anchor.AnchorType = 3;
-                anchor.Dx2 = -10000;
-                anchor.Dy2 = -10000;
+                anchor.Dx2 = 10000;
+                anchor.Dy2 = 10000;
                 //add the byte array and encode it for the excel file
                 int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
                 IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
-                signaturePicture.Resize();
+                //signaturePicture.Resize();
             }
             catch { }
             //
