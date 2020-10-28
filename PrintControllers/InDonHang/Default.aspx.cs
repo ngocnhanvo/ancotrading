@@ -686,7 +686,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 //store the coordinates of which cell and where in the cell the image goes
                 int intx1 = 2;
                 int inty1 = row;
-                int intx2 = 3;
+                int intx2 = 2;
                 int inty2 = 1 + row;
 
                 HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 10, 10, intx1, inty1, intx2, inty2);
