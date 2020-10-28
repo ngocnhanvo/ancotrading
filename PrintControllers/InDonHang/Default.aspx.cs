@@ -1029,43 +1029,42 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
     public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName)
     {
+        var fileName = "PO_" + c_donhang_id;
+        string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
+        url = url.Replace("PrintControllers\\InDonHang\\", "");
+        var file = new FileStream(url, FileMode.Create);
+        hsswb.Write(file);
+        file.Close();
+
+        var workbook = new Spire.Xls.Workbook();
+        workbook.LoadFromFile(url);
+
+        foreach (var item in lstimage)
+        {
+            var row = int.Parse(item["row"]) + 1;
+            var column = int.Parse(item["column"]);
+            var width = int.Parse(item["width"]) * 0.0273;
+            double height = int.Parse(item["height"]) * 1.332;
+            var widthR = int.Parse(item["widthR"]);
+            var heightR = int.Parse(item["heightR"]);
+            double percent = height / heightR;
+            var link = item["link"];
+            var picture = workbook.ActiveSheet.Pictures.Add(row, column, link);
+            picture.Width = (int)(widthR * percent) - 8;
+            picture.Height = (int)(heightR * percent) - 5;
+            Response.Write("picture.Width:" + picture.Width);
+            Response.Write("widthColumn:" + width);
+            var rateColumnAndPicture = (width - picture.Width) / 2 * 8;
+            picture.LeftColumnOffset = (int)rateColumnAndPicture;
+            picture.TopRowOffset = 5;
+        }
+        workbook.Save();
+
         if (type == "pdf")
         {
-            var fileName = "PO_" + c_donhang_id;
-            string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
-            url = url.Replace("PrintControllers\\InDonHang\\", "");
-            var file = new FileStream(url, FileMode.Create);
-            hsswb.Write(file);
-            file.Close();
-
-            var workbook = new Spire.Xls.Workbook();
-            workbook.LoadFromFile(url);
-
-            foreach(var item in lstimage)
-            {
-                var row = int.Parse(item["row"]) + 1;
-                var column = int.Parse(item["column"]);
-                var width = int.Parse(item["width"]) * 0.0273;
-                double height = int.Parse(item["height"]) * 1.332;
-                var widthR = int.Parse(item["widthR"]);
-                var heightR = int.Parse(item["heightR"]);
-                double percent = height / heightR;
-                var link = item["link"];
-                var picture = workbook.ActiveSheet.Pictures.Add(row, column, link);
-                picture.Width = (int)(widthR * percent) - 8;
-                picture.Height = (int)(heightR * percent) - 5;
-                Response.Write("picture.Width:"+ picture.Width);
-                Response.Write("widthColumn:" + width);
-                var rateColumnAndPicture = (width - picture.Width) / 2 * 8; 
-                picture.LeftColumnOffset = (int)rateColumnAndPicture;
-                picture.TopRowOffset = 5;
-            }
-            workbook.Save();
-
             var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
             workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
             workbook.Dispose();
-
             File.Delete(url);
 
             Response.Redirect(string.Format("../../ReportPdf/{0}.pdf?{1}", fileName, Guid.NewGuid().ToString()));
@@ -1073,7 +1072,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         else
         {
             MemoryStream exportData = new MemoryStream();
-            hsswb.Write(exportData);
+            workbook.SaveToStream(exportData);
+            workbook.Dispose();
+            File.Delete(url);
 
             Response.ContentType = "application/vnd.ms-excel";
             Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
