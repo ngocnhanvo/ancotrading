@@ -1085,7 +1085,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 picture.TopRowOffset = 5;
             }
             workbook.Save();
-            et
+
             if (type == "pdf")
             {
                 var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
