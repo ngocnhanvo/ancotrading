@@ -690,6 +690,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 //add the byte array and encode it for the excel file
                 int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
                 IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+
+                signaturePicture.Resize(0.5);
             }
             catch { }
             //
