@@ -1109,6 +1109,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         totalTxt = totalTxt.Length > 0 ? totalTxt.Substring(0, totalTxt.Length - 1) : "";
         string txtTotal = nnl == null ? "Total:" : string.Format("Total {0}:", totalTxt);
         s1.CreateRow(row).CreateCell(4).SetCellValue(txtTotal);
+        s1.GetRow(row).HeightInPoints = heigh;
         s1.GetRow(row).CreateCell(12).CellFormula = String.Format("{0} - {1} + M{2} - M{3}"
             , nnl == null ? "M" + sub : sumTotalAmount
             , nnl == null ? "M" + dis : "0"
