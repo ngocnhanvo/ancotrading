@@ -1051,7 +1051,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             var link = item["link"];
             var picture = workbook.ActiveSheet.Pictures.Add(row, column, link);
             picture.Width = (int)(widthR * percent) - 8;
-            picture.Height = (int)(heightR * percent) - 5;
+            picture.Height = (int)(heightR * percent) - 2;
             Response.Write("picture.Width:" + picture.Width);
             Response.Write("widthColumn:" + width);
             var rateColumnAndPicture = (width - picture.Width) / 2 * 8;
