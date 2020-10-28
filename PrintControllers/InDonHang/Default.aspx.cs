@@ -746,7 +746,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
             var rich_text = "";
             rich_text = i == 0 ? "{0}" : (i == 1 ? "Address: {1}" : (i == 2 ? "Tel: {2}                          Fax: {3}" : "{4}"));
-            rich_text = string.Format(rich_text, dt.Rows[0]["ten_dtkd"], dt.Rows[0]["diachi"], dt.Rows[0]["tel"], dt.Rows[0]["fax"], dt.Rows[0][c_value[i]]);
+            rich_text = string.Format(rich_text, dt.Rows[0]["ten_dtkd"], dt.Rows[0]["diachi"], dt.Rows[0]["tel"], dt.Rows[0]["fax"], c_value[i] == "" ? "" : dt.Rows[0][c_value[i]]);
             s1.CreateRow(row).CreateCell(2).SetCellValue(rich_text);
             s1.GetRow(row).GetCell(2).CellStyle = i > 2 ? celltext : cellBold;
 
