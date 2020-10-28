@@ -479,7 +479,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             text = "ANCO Item No.",
             value = "ma_sanpham",
             columnAt = 1,
-            width = type == "pdf" ? 6000 : width
+            width = 6000
         });
 
         columnHeaders.Add(new columnHeader()
