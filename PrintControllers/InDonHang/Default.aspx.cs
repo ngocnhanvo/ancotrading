@@ -1056,8 +1056,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 picture.Height = (int)(heightR * percent) - 5;
                 Response.Write("picture.Width:"+ picture.Width);
                 Response.Write("widthColumn:" + width);
-                var rateColumnAndPicture = (width - picture.Width); 
-                picture.LeftColumnOffset = 100;
+                var rateColumnAndPicture = (width - picture.Width) / 2 * 8; 
+                picture.LeftColumnOffset = (int)rateColumnAndPicture;
                 picture.TopRowOffset = 5;
             }
             workbook.Save();
