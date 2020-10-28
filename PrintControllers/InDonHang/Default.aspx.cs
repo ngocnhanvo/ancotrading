@@ -463,16 +463,291 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , "commodity"
             , ""
         };
+
+        var columnHeaders = new List<columnHeader>();
+        int width = 4500;
+        #region columnHeaders
+        columnHeaders.Add(new columnHeader() {
+            text = "No.",
+            value = "no",
+            columnAt = 0,
+            width = 2000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "ANCO Item No.",
+            value = "ma_sanpham",
+            columnAt = 1,
+            width = type == "pdf" ? 6000 : width
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Picture - Only for shape ref.",
+            value = "",
+            columnAt = 2,
+            width = width
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Customer Item No.",
+            value = "ma_sanpham_khach",
+            columnAt = 3,
+            width = width
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Description",
+            value = "mota_tienganh",
+            columnAt = 4,
+            width = type == "pdf" ? 12000 : 10000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Packing inner/master",
+            value = "ten_donggoi_inner",
+            columnAt = 5,
+            width = 3000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "ten_donggoi_outer",
+            columnAt = 6,
+            width = 3000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Nbr of Packs",
+            value = "ofpack",
+            columnAt = 7,
+            width = width
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Quantity (sets/pcs)",
+            value = "soluong",
+            columnAt = 8,
+            width = 3000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "dvt_sp",
+            columnAt = 9,
+            width = 3000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "FOB price (USD)",
+            value = "giafob",
+            columnAt = 10,
+            width = width
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "CBM",
+            value = "cbm",
+            columnAt = 11,
+            width = width
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Amount (USD)",
+            value = "amount",
+            columnAt = 12,
+            width = width
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = string.Format(@"Master Packing size (LxWxH){0}", tenKT),
+            value = "l2",
+            columnAt = 13,
+            width = type == "pdf" ? 0 : 3000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "w2",
+            columnAt = 14,
+            width = type == "pdf" ? 0 : 3000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "h2",
+            columnAt = 15,
+            width = type == "pdf" ? 0 : 3000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "HS CODE",
+            value = "ma_hscode",
+            columnAt = 16,
+            width = type == "pdf" ? 0 : width
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = string.Format(@"Weight({0}s)", tenTL),
+            value = "trongluong",
+            columnAt = 17,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = string.Format(@"N.W/master ({0}s)", tenTL),
+            value = "n_w_master",
+            columnAt = 18,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = string.Format(@"G.W/master ({0}s)", tenTL),
+            value = "g_w_master",
+            columnAt = 19,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Master packing",
+            value = "sl_outer",
+            columnAt = 20,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Inner packing",
+            value = "sl_inner",
+            columnAt = 21,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Inner Packing size (LxWxH)",
+            value = "l1",
+            columnAt = 22,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "h1",
+            columnAt = 23,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Product size (LxWxH) cm",
+            value = "l_cm",
+            columnAt = 24,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "w_cm",
+            columnAt = 25,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "h_cm",
+            columnAt = 26,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Product size (LxWxH) inch",
+            value = "l_inch",
+            columnAt = 27,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "w_inch",
+            columnAt = 28,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "h_inch",
+            columnAt = 29,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Barcode",
+            value = "barcode",
+            columnAt = 30,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Giá gốc",
+            value = "giachuan",
+            columnAt = 31,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Phí",
+            value = "phi",
+            columnAt = 32,
+            width = 0
+        });
+
+        var width02to12 = columnHeaders.Where(s => s.columnAt >= 2 & s.columnAt <= 12).Select(s => s.width).Sum();
+
+        #endregion columnHeaders
+
         for (int i = 0; i < c.Length; i++)
         {
             s1.CreateRow(row).CreateCell(1).SetCellValue(c[i]);
-            string rich_text = "{0} \n {1} \n Tel:{2} \n Fax{3}";
-            HSSFRichTextString rich = new HSSFRichTextString(String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString()));
+            string rich_text = "{0}\nAddress:{1}\nTel:{2}\t\tFax:{3}";
+            rich_text = String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString());
+            //HSSFRichTextString rich = new HSSFRichTextString(String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString()));
             if (i == 0)
             {
-                heigh = 95;
+                
                 s1.GetRow(row).GetCell(1).CellStyle = cellBoldTop;
-                s1.GetRow(row).CreateCell(2).SetCellValue(rich);
+                s1.GetRow(row).CreateCell(2).SetCellValue(rich_text);
+                float heightMax = config.MeasureTextHeight(rich_text, width02to12);
+                heigh = heightMax < 60 ? 60 : (int)heightMax;
+
                 s1.GetRow(row).GetCell(2).CellStyle = cellBoldTop;
                 s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
             }
@@ -500,118 +775,12 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
         // set A13 - All
         // -- Header
-        int cell = 0;
-        string[] d = {
-            "No."
-            , "ANCO Item No."
-            , "Picture - Only for shape ref."
-            , "Customer Item No."
-            , "Description"
-            , "Packing inner/master",""
-            , "Nbr of Packs"
-            , "Quantity (sets/pcs)",""
-            , "FOB price (USD)"
-            , "CBM"
-            , "Amount (USD)"
-            , string.Format(@"Master Packing size (LxWxH){0}", tenKT)
-            , ""
-            , ""
-            , "HS CODE"
-            , string.Format(@"Weight({0}s)", tenTL)
-            , string.Format(@"N.W/master ({0}s)", tenTL)
-            , string.Format(@"G.W/master ({0}s)", tenTL)
-            , "Master packing"
-            , "Inner packing"
-            , "Inner Packing size (LxWxH)"
-            , ""
-            , ""
-            , "Product size (LxWxH) cm"
-            , ""
-            , ""
-            , "Product size (LxWxH) inch"
-            , ""
-            , ""
-            , "Barcode"
-            , "Giá gốc"
-            , "Phí"
-        };
-
-        string[] e_value = {
-            "no"
-            , "ma_sanpham"
-            , ""
-            , "ma_sanpham_khach"
-            , "mota_tienganh"
-            , "ten_donggoi_inner"
-            , "ten_donggoi_outer"
-            , "ofpack"
-            , "soluong"
-            , "dvt_sp"
-            , "giafob"
-            , "cbm"
-            , "amount"
-            , "l2"
-            , "w2"
-            , "h2"
-            , "ma_hscode"
-            , "trongluong"
-            , "n_w_master"
-            , "g_w_master"
-            , "sl_outer"
-            , "sl_inner"
-            , "l1"
-            , "w1"
-            , "h1"
-            , "l_cm"
-            , "w_cm"
-            , "h_cm"
-            , "l_inch"
-            , "w_inch"
-            , "h_inch"
-            , "barcode"
-            , "giachuan"
-            , "phi"
-        };
-
         IRow rowColumnHeader = s1.CreateRow(row);
         rowColumnHeader.HeightInPoints = 47;
-        for (int i = 0; i < d.Length; i++)
+        foreach(var columnHeader in columnHeaders.OrderBy(s=>s.columnAt))
         {
-            int with = 4500;
-            rowColumnHeader.CreateCell(cell).SetCellValue(d[i]);
-            rowColumnHeader.GetCell(i).CellStyle = borderWrap;
-            if (i == 0)
-            {
-                with = 2000;
-            }
-            else if (i == 1)
-            {
-                with = type == "pdf" ? 6000 : with;
-            }
-            else if (i == 4)
-            {
-                with = type == "pdf" ? 12000 : 10000;
-            }
-            else if (i == 5 | i == 6)
-            {
-                with = 3000;
-            }
-            else if (i == 8 | i == 9)
-            {
-                with = 3000;
-            }
-            else if (i == 13 | i == 14 | i == 15)
-            {
-                with = 3000;
-            }
-            else if (i > 16)
-                with = 0;
-
-            if(type=="pdf")
-            {
-                if (i > 12)
-                    with = 0;
-            }
+            rowColumnHeader.CreateCell(columnHeader.columnAt).SetCellValue(columnHeader.text);
+            rowColumnHeader.GetCell(columnHeader.columnAt).CellStyle = borderWrap;
 
             s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 6));
             s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
@@ -619,8 +788,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             s1.AddMergedRegion(new CellRangeAddress(row, row, 22, 24));
             s1.AddMergedRegion(new CellRangeAddress(row, row, 25, 27));
             s1.AddMergedRegion(new CellRangeAddress(row, row, 28, 30));
-            s1.SetColumnWidth(cell, with);
-            cell++;
+            s1.SetColumnWidth(columnHeader.columnAt, columnHeader.width);
         }
         row++;
         // -- Details
@@ -691,61 +859,61 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             catch { }
             //
 
-            for (int j = 0; j < e_value.Length; j++)
+            foreach (var columnHeader in columnHeaders.OrderBy(s => s.columnAt))
             {
-                var cel_row_t = row_t.CreateCell(j);
-                if (e_value[j] == "no")
+                var cel_row_t = row_t.CreateCell(columnHeader.columnAt);
+                if (new string[] { "no" }.Contains(columnHeader.value))
                 {
                     cel_row_t.SetCellValue(count_row);
                     cel_row_t.CellStyle = border_center;
                 }
-                else if (e_value[j] == "ofpack")
+                else if (new string[] { "ofpack" }.Contains(columnHeader.value))
                 {
                     cel_row_t.CellFormula = String.Format("I{0}/U{0}", row + 1);
                     cel_row_t.CellStyle = border_number2;
                 }
-                else if (e_value[j] == "cbm")
+                else if (new string[] { "cbm" }.Contains(columnHeader.value))
                 {
                     cel_row_t.CellFormula = String.Format("((N{0}*O{0}*P{0})*H{0})/1000000", row + 1);
                     cel_row_t.CellStyle = border_number3;
                 }
-                else if (e_value[j] == "amount")
+                else if (new string[] { "amount" }.Contains(columnHeader.value))
                 {
                     cel_row_t.CellFormula = String.Format("IF(K{0}*I{0}<>0,K{0}*I{0},0)", row + 1);
                     cel_row_t.CellStyle = border_number2;
                 }
-                else if (e_value[j] == "soluong")
+                else if (new string[] { "soluong" }.Contains(columnHeader.value))
                 {
-                    cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
+                    cel_row_t.SetCellValue(double.Parse(dt.Rows[i][columnHeader.value].ToString()));
                     cel_row_t.CellStyle = border_number0;
                 }
-                else if (new string[] { "giafob", "giachuan", "phi" }.Contains(e_value[j]))
+                else if (new string[] { "giafob", "giachuan", "phi" }.Contains(columnHeader.value))
                 {
-                    cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
+                    cel_row_t.SetCellValue(double.Parse(dt.Rows[i][columnHeader.value].ToString()));
                     cel_row_t.CellStyle = border_number2;
                 }
-                else if (new string[] { "l2", "w2", "h2" }.Contains(e_value[j]))
+                else if (new string[] { "l2", "w2", "h2" }.Contains(columnHeader.value))
                 {
-                    cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
+                    cel_row_t.SetCellValue(double.Parse(dt.Rows[i][columnHeader.value].ToString()));
                     cel_row_t.CellStyle = border_number2;
                 }
-                else if (new string[] { "ma_hscode", "ma_sanpham" }.Contains(e_value[j]))
+                else if (new string[] { "ma_hscode", "ma_sanpham" }.Contains(columnHeader.value))
                 {
-                    cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString());
+                    cel_row_t.SetCellValue(dt.Rows[i][columnHeader.value].ToString());
                     cel_row_t.CellStyle = border_center;
                 }
                 // else if( e_value[j] == "ten_donggoi_inner") {
                 // cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString().Replace(" ","\n"));
                 // cel_row_t.CellStyle = border_center;
                 // }
-                else if (e_value[j] == "")
+                else if (columnHeader.value == "")
                 {
                     cel_row_t.SetCellValue("");
                     cel_row_t.CellStyle = border;
                 }
                 else
                 {
-                    cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString());
+                    cel_row_t.SetCellValue(dt.Rows[i][columnHeader.value].ToString());
                     cel_row_t.CellStyle = border;
                 }
                 //  table style
@@ -1060,8 +1228,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             file.Close();
 
             workbook.LoadFromFile(url);
-
-            workbook.ActiveSheet.AllocatedRange.AutoFitRows();
 
             foreach (var item in lstimage)
             {

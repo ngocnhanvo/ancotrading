@@ -268,12 +268,20 @@ public class ExportExcel
 
 public class ItemValue
 {
-    private int _width;
+    private int? _width;
     public string item { get; set; }
     public string value { get; set; }
     public int witdh
     {
-        get { return (_width == null ? 5000 : _width); }
+        get { return (_width == null ? 5000 : _width.GetValueOrDefault(0)); }
         set { _width = value; }
     }
+}
+
+public class columnHeader
+{
+    public string text { get; set; }
+    public string value { get; set; }
+    public int width { get; set; }
+    public int columnAt { get; set; }
 }
