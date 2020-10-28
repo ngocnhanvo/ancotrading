@@ -675,6 +675,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 string imagesPath = Path.Combine(Server.MapPath("~"), "");
                 //grab the image file
                 string anhhienthi = ExcuteSignalRStatic.getImageProduct(msp);
+                imagesPath = Path.Combine(imagesPath, anhhienthi);
 
                 lstimage.Add(new Dictionary<string, string>() {
                     { "row", row + "" },
@@ -684,7 +685,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     { "width", 4500 + "" }
                 });
 
-                //imagesPath = Path.Combine(imagesPath, anhhienthi);
+               
                 //System.Drawing.Image image = System.Drawing.Image.FromFile(imagesPath);
                 //MemoryStream ms = new MemoryStream();
                 ////pull the memory stream from the image (I need this for the byte array later)
