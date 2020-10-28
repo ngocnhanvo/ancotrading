@@ -689,7 +689,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 int intx2 = 3;
                 int inty2 = 1 + row;
 
-                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
+                HSSFClientAnchor anchor = new HSSFClientAnchor(1, 1, 1, 1, intx1, inty1, intx2, inty2);
                 //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
                 anchor.AnchorType = 0;
                 //add the byte array and encode it for the excel file
