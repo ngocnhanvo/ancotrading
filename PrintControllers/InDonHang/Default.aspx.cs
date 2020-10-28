@@ -346,6 +346,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
         Excel_Format ex_fm = new Excel_Format(hssfworkbook);
         ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
+        ICellStyle cellBoldTop = ex_fm.getcell(12, true, true, "", "L", "B");
         //-- 
         ICellStyle cellHeader = ex_fm.getcell(18, true, true, "", "C", "T");
         //-- 
@@ -471,8 +472,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             {
                 heigh = 95;
                 s1.GetRow(row).CreateCell(2).SetCellValue(rich);
-                s1.GetRow(row).GetCell(2).CellStyle = cellBold;
-                s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+                s1.GetRow(row).GetCell(2).CellStyle = cellBoldTop;
+                s1.GetRow(row).GetCell(1).CellStyle = cellBoldTop;
 
                 s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
             }
