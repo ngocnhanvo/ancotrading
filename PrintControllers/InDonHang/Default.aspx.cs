@@ -677,7 +677,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
                 imagesPath = Path.Combine(imagesPath, anhhienthi);
                 System.Drawing.Image image = System.Drawing.Image.FromFile(imagesPath);
-
+                image = resizeImage(image, 1000, 1000);
                 MemoryStream ms = new MemoryStream();
                 //pull the memory stream from the image (I need this for the byte array later)
                 image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
@@ -691,11 +691,10 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
                 HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
                 //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
-                anchor.AnchorType = 3;
+                anchor.AnchorType = 0;
                 //add the byte array and encode it for the excel file
                 int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
                 IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
-                signaturePicture.Resize();
             }
             catch { }
             //
@@ -1048,5 +1047,67 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             Response.BinaryWrite(exportData.GetBuffer());
             Response.End();
         }
+    }
+
+    private static System.Drawing.Image resizeImage(System.Drawing.Image imgToResize, float Width, float Height)
+    {
+
+        //Get the image current width
+
+        int sourceWidth = imgToResize.Width;
+
+        //Get the image current height
+
+        int sourceHeight = imgToResize.Height;
+
+
+
+        float nPercent = 0;
+
+        float nPercentW = 0;
+
+        float nPercentH = 0;
+
+        //Calulate  width with new desired size
+
+        nPercentW = (Width / sourceWidth);
+
+        //Calculate height with new desired size
+
+        nPercentH = (Height / sourceHeight);
+
+
+
+        if (nPercentH < nPercentW)
+
+            nPercent = nPercentH;
+
+        else
+
+            nPercent = nPercentW;
+
+        //New Width
+
+        int destWidth = (int)(sourceWidth * nPercent);
+
+        //New Height
+
+        int destHeight = (int)(sourceHeight * nPercent);
+
+
+
+        var b = new System.Drawing.Bitmap(destWidth, destHeight);
+
+        var g = System.Drawing.Graphics.FromImage((System.Drawing.Image)b);
+
+        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+        // Draw image with new width and height
+
+        g.DrawImage(imgToResize, 0, 0, destWidth, destHeight);
+
+        g.Dispose();
+
+        return b;
     }
 }
