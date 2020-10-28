@@ -1061,6 +1061,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
             workbook.LoadFromFile(url);
 
+            workbook.ActiveSheet.AutoFitRow(7);
+
             foreach (var item in lstimage)
             {
                 var row = int.Parse(item["row"]) + 1;
