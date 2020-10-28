@@ -746,7 +746,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 s1.GetRow(row).GetCell(1).CellStyle = cellBoldTop;
                 s1.GetRow(row).CreateCell(2).SetCellValue(rich_text);
                 float heightMax = config.MeasureTextHeight(rich_text, width02to12);
-                heigh = heightMax < 60 ? 60 : (int)heightMax;
+                heigh = heightMax < 25 ? 25 : (int)heightMax;
 
                 s1.GetRow(row).GetCell(2).CellStyle = cellBoldTop;
                 s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
