@@ -450,6 +450,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //set A7 - A11
         string[] c = {
             "The Buyer:"
+            , ""
+            , ""
             , "The Payer:"
             , "ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:"
             , "Customer's order no.:"
@@ -457,7 +459,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , "Item nos., description, packing, quantity, unit price and amount:"
         };
         string[] c_value = {
-            ""
+            "ten_dtkd"
+            , "diachi"
+            , ""
             , "payer"
             , ""
             , "customer_order_no"
@@ -738,18 +742,22 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         for (int i = 0; i < c.Length; i++)
         {
             s1.CreateRow(row).CreateCell(1).SetCellValue(c[i]);
-            string rich_text = "{0}\nAddress: {1}\nTel: {2}                          Fax: {3}";
-            rich_text = String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString());
-            //HSSFRichTextString rich = new HSSFRichTextString(String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString()));
-            if (new int[] { 0, 1, 3, 4 }.Contains(i))
-            {
-                rich_text = i > 0 ? dt.Rows[0][c_value[i]].ToString() : rich_text;
-                s1.GetRow(row).GetCell(1).CellStyle = i > 0 ? celltext : cellBoldTop;
-                s1.GetRow(row).CreateCell(2).SetCellValue(rich_text);
-                float heightMax = config.MeasureTextHeight(rich_text, width02to12) + 5;
-                heigh = heightMax < 25 ? 25 : (int)heightMax;
+            s1.GetRow(row).GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
 
-                s1.GetRow(row).GetCell(2).CellStyle = i > 0 ? celltext : cellBoldTop;
+            var rich_text = "";
+            rich_text = i == 0 ? "{0}" : (i == 1 ? "Address: {1}" : (i == 2 ? "Tel: {2}                          Fax: {3}" : "{4}"));
+            rich_text = string.Format(rich_text, dt.Rows[0]["ten_dtkd"], dt.Rows[0]["diachi"], dt.Rows[0]["tel"], dt.Rows[0]["fax"], dt.Rows[0][c_value[i]]);
+            s1.CreateRow(row).CreateCell(2).SetCellValue(rich_text);
+            s1.GetRow(row).GetCell(1).CellStyle = i > 2 ? celltext : cellBold;
+
+            //HSSFRichTextString rich = new HSSFRichTextString(String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString()));
+            if (new int[] { 0, 1, 2, 3, 5, 6 }.Contains(i))
+            {
+                //rich_text = i == "0" ? ""dt.Rows[0][c_value[i]].ToString();
+                //s1.GetRow(row).GetCell(1).CellStyle = i > 0 ? celltext : cellBoldTop;
+                //s1.GetRow(row).CreateCell(2).SetCellValue(rich_text);
+                //float heightMax = config.MeasureTextHeight(rich_text, width02to12) + 5;
+                //heigh = heightMax < 25 ? 25 : (int)heightMax;
                 s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
             }
             else
