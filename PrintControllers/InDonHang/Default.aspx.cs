@@ -1061,7 +1061,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
             workbook.LoadFromFile(url);
 
-            workbook.ActiveSheet.AutoFitRow(7);
+            workbook.ActiveSheet.Rows[7].SetRowHeight(-1, true);
 
             foreach (var item in lstimage)
             {
@@ -1085,7 +1085,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 picture.TopRowOffset = 5;
             }
             workbook.Save();
-
+            et
             if (type == "pdf")
             {
                 var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
