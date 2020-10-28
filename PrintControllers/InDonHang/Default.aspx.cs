@@ -737,7 +737,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         for (int i = 0; i < c.Length; i++)
         {
             s1.CreateRow(row).CreateCell(1).SetCellValue(c[i]);
-            string rich_text = "{0}\nAddress:{1}\nTel:{2}\t\tFax:{3}";
+            string rich_text = "{0}\nAddress: {1}\nTel: {2}                          Fax: {3}";
             rich_text = String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString());
             //HSSFRichTextString rich = new HSSFRichTextString(String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString()));
             if (i == 0)
