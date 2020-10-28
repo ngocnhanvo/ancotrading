@@ -677,7 +677,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
                 imagesPath = Path.Combine(imagesPath, anhhienthi);
                 System.Drawing.Image image = System.Drawing.Image.FromFile(imagesPath);
-                image = resizeImage(image, 100, 100);
+                image = resizeImage(image, 0, 100);
                 MemoryStream ms = new MemoryStream();
                 //pull the memory stream from the image (I need this for the byte array later)
                 image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
@@ -1052,7 +1052,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
     private static System.Drawing.Image resizeImage(System.Drawing.Image imgToResize, float Width, float Height)
     {
-
+        
         //Get the image current width
 
         int sourceWidth = imgToResize.Width;
@@ -1060,8 +1060,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //Get the image current height
 
         int sourceHeight = imgToResize.Height;
-
-
 
         float nPercent = 0;
 
@@ -1076,7 +1074,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //Calculate height with new desired size
 
         nPercentH = (Height / sourceHeight);
-
 
 
         if (nPercentH < nPercentW)
