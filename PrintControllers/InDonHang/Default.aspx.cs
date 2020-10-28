@@ -687,26 +687,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     { "heightR", image.Height + "" },
                     { "widthR", image.Width + "" }
                 });
-
-               
-                
-                //MemoryStream ms = new MemoryStream();
-                ////pull the memory stream from the image (I need this for the byte array later)
-                //image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                ////the drawing patriarch will hold the anchor and the master information
-                //IDrawing patriarch = s1.CreateDrawingPatriarch();
-                ////store the coordinates of which cell and where in the cell the image goes
-                //int intx1 = 2;
-                //int inty1 = row;
-                //int intx2 = 3;
-                //int inty2 = 1 + row;
-
-                //HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
-                ////types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
-                //anchor.AnchorType = type == "pdf" ? 3 : 0;
-                ////add the byte array and encode it for the excel file
-                //int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
-                //IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
             }
             catch { }
             //
@@ -1029,60 +1009,91 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
     public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName)
     {
-        var fileName = "PO_" + c_donhang_id;
-        string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
-        url = url.Replace("PrintControllers\\InDonHang\\", "");
-        var file = new FileStream(url, FileMode.Create);
-        hsswb.Write(file);
-        file.Close();
-
-        var workbook = new Spire.Xls.Workbook();
-        workbook.LoadFromFile(url);
-
-        foreach (var item in lstimage)
+        if (type != "pdf")
         {
-            var row = int.Parse(item["row"]) + 1;
-            var column = int.Parse(item["column"]);
-            var width = int.Parse(item["width"]) * 0.0273;
-            double height = int.Parse(item["height"]) * 1.332;
-            var widthR = int.Parse(item["widthR"]);
-            var heightR = int.Parse(item["heightR"]);
-            double percent = height / heightR;
-            var link = item["link"];
-            var picture = workbook.ActiveSheet.Pictures.Add(row, column, link);
-            if (type != "pdf")
-                picture.UpdatePositions = true;
-            picture.Width = (int)(widthR * percent) - 8;
-            picture.Height = (int)(heightR * percent) - 2;
-            Response.Write("picture.Width:" + picture.Width);
-            Response.Write("widthColumn:" + width);
-            var rateColumnAndPicture = (width - picture.Width) / 2 * 8;
-            picture.LeftColumnOffset = (int)rateColumnAndPicture;
-            picture.TopRowOffset = 5;
-        }
-        workbook.Save();
+            foreach (var item in lstimage)
+            {
+                var row = int.Parse(item["row"]) + 1;
+                var column = int.Parse(item["column"]);
+                var link = item["link"];
+                var image = System.Drawing.Image.FromFile(link);
 
-        if (type == "pdf")
-        {
-            var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
-            workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
-            workbook.Dispose();
-            File.Delete(url);
+                MemoryStream ms = new MemoryStream();
+                //pull the memory stream from the image (I need this for the byte array later)
+                image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                //the drawing patriarch will hold the anchor and the master information
+                IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
+                //store the coordinates of which cell and where in the cell the image goes
+                int intx1 = 2;
+                int inty1 = row;
+                int intx2 = 3;
+                int inty2 = 1 + row;
 
-            Response.Redirect(string.Format("../../ReportPdf/{0}.pdf?{1}", fileName, Guid.NewGuid().ToString()));
+                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
+                //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
+                anchor.AnchorType = 0;
+                //add the byte array and encode it for the excel file
+                int index = hsswb.AddPicture(ms.ToArray(), PictureType.JPEG);
+                IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+            }
         }
         else
         {
-            MemoryStream exportData = new MemoryStream();
-            workbook.SaveToStream(exportData);
-            workbook.Dispose();
-            File.Delete(url);
+            var fileName = "PO_" + c_donhang_id;
+            string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
+            url = url.Replace("PrintControllers\\InDonHang\\", "");
+            var file = new FileStream(url, FileMode.Create);
+            hsswb.Write(file);
+            file.Close();
 
-            Response.ContentType = "application/vnd.ms-excel";
-            Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
-            Response.Clear();
-            Response.BinaryWrite(exportData.GetBuffer());
-            Response.End();
+            var workbook = new Spire.Xls.Workbook();
+            workbook.LoadFromFile(url);
+
+            foreach (var item in lstimage)
+            {
+                var row = int.Parse(item["row"]) + 1;
+                var column = int.Parse(item["column"]);
+                var width = int.Parse(item["width"]) * 0.0273;
+                double height = int.Parse(item["height"]) * 1.332;
+                var widthR = int.Parse(item["widthR"]);
+                var heightR = int.Parse(item["heightR"]);
+                double percent = height / heightR;
+                var link = item["link"];
+                var picture = workbook.ActiveSheet.Pictures.Add(row, column, link);
+                if (type != "pdf")
+                    picture.UpdatePositions = true;
+                picture.Width = (int)(widthR * percent) - 8;
+                picture.Height = (int)(heightR * percent) - 2;
+                Response.Write("picture.Width:" + picture.Width);
+                Response.Write("widthColumn:" + width);
+                var rateColumnAndPicture = (width - picture.Width) / 2 * 8;
+                picture.LeftColumnOffset = (int)rateColumnAndPicture;
+                picture.TopRowOffset = 5;
+            }
+            workbook.Save();
+
+            if (type == "pdf")
+            {
+                var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
+                workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
+                workbook.Dispose();
+                File.Delete(url);
+
+                Response.Redirect(string.Format("../../ReportPdf/{0}.pdf?{1}", fileName, Guid.NewGuid().ToString()));
+            }
+            else
+            {
+                MemoryStream exportData = new MemoryStream();
+                workbook.SaveToStream(exportData);
+                workbook.Dispose();
+                File.Delete(url);
+
+                Response.ContentType = "application/vnd.ms-excel";
+                Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
+                Response.Clear();
+                Response.BinaryWrite(exportData.GetBuffer());
+                Response.End();
+            }
         }
     }
 }
