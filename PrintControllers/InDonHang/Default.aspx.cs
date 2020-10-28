@@ -740,9 +740,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             string rich_text = "{0}\nAddress: {1}\nTel: {2}                          Fax: {3}";
             rich_text = String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString());
             //HSSFRichTextString rich = new HSSFRichTextString(String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString()));
-            if (i == 0)
+            if (new int[] { 0, 1 }.Contains(i))
             {
-                
                 s1.GetRow(row).GetCell(1).CellStyle = cellBoldTop;
                 s1.GetRow(row).CreateCell(2).SetCellValue(rich_text);
                 float heightMax = config.MeasureTextHeight(rich_text, width02to12);
