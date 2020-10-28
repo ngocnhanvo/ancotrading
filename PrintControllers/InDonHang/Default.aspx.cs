@@ -466,7 +466,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         for (int i = 0; i < c.Length; i++)
         {
             s1.CreateRow(row).CreateCell(1).SetCellValue(c[i]);
-            string rich_text = " {0} \n {1} \n Tel:{2} \n Fax{3}";
+            string rich_text = "{0} \n {1} \n Tel:{2} \n Fax{3}";
             HSSFRichTextString rich = new HSSFRichTextString(String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString()));
             if (i == 0)
             {
