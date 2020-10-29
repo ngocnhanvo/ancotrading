@@ -1273,7 +1273,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //xuất Excel có áp dụng Spire.Xls
         else
         {
-            var fileName = "PO_" + c_donhang_id;
+            var fileName = "PO_" + c_donhang_id + "_" + Guid.NewGuid().ToString();
             string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
             url = url.Replace("PrintControllers\\InDonHang\\", "");
             var file = new FileStream(url, FileMode.Create);
@@ -1315,7 +1315,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 workbook.Dispose();
                 File.Delete(url);
 
-                Response.Redirect(string.Format("../../ReportPdf/{0}.pdf?{1}", fileName, Guid.NewGuid().ToString()));
+                Response.Redirect(string.Format("../../ReportPdf/{0}.pdf", fileName));
             }
             else
             {
