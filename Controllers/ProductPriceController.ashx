@@ -259,12 +259,13 @@ public class ProductPriceController : IHttpHandler
                     , sp.ma_sanpham as tensp
                     , gsp.gia
                     , isnull(gsp.phi, 0) as phi
+                    , (gsp.gia + isnull(gsp.phi, 0)) as tongGia
+                    , gsp.mota
+                    , gsp.barcode
                     , gsp.ngaytao
                     , gsp.nguoitao
                     , gsp.ngaycapnhat
                     , gsp.nguoicapnhat
-                    , gsp.mota
-                    , gsp.barcode
                     , gsp.hoatdong
                     , ROW_NUMBER() OVER (ORDER BY {1} {2}) as RowNum
                 FROM md_giasanpham gsp, md_sanpham sp
@@ -297,12 +298,13 @@ public class ProductPriceController : IHttpHandler
             xml += "<cell><![CDATA[" + row["tensp"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["gia"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tongGia"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["barcode"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoicapnhat"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["barcode"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
             xml += "</row>";
         }

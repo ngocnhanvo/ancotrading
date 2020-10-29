@@ -41,7 +41,7 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
     {
         if (type == "pdf")
         {
-            var fileName = "DSDH_" + c_danhsachdathang_id;
+            var fileName = "DSDH_" + c_danhsachdathang_id + "_" + Guid.NewGuid().ToString();
             string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
             url = url.Replace("PrintControllers\\InDonDatHang\\", "");
             var file = new FileStream(url, FileMode.Create);
@@ -56,7 +56,7 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
 
             File.Delete(url);
 
-            Response.Redirect(string.Format("../../ReportPdf/{0}.pdf?{1}", fileName, Guid.NewGuid().ToString()));
+            Response.Redirect(string.Format("../../ReportPdf/{0}.pdf", fileName));
         }
         else
         {
