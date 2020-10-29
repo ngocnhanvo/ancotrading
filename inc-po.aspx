@@ -575,26 +575,35 @@
                     var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-po').val();
                     var printURL = "PrintControllers/";
                     var windowSize = "width=700,height=700,scrollbars=yes";
+                    var win = null;
+                    let closeWin = function () {
+                        if (win != null)
+                            win.close();
+                    };
+
                     if (typeof printType != 'undefined') {
                         if (printType == "printRequired") {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InYeuCauXuatHang/";
-                                window.open(printURL + "?c_donhang_id=" + poId, "In Phiếu Xuất", windowSize);
+                                win = window.open(printURL + "?c_donhang_id=" + poId, "In Phiếu Xuất", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         } else if (printType == 'printPoDetails') {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InDonHang/";
-                                window.open(printURL + "?c_donhang_id=" + poId + "&type=xls", "In Chiết Xuất Đơn Hàng", windowSize);
+                                win = window.open(printURL + "?c_donhang_id=" + poId + "&type=xls", "In Chiết Xuất Đơn Hàng", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         } else if (printType == 'printPo') {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InDonHang/";
                                 windowSize = "top=0, left=0, width=" + window.outerWidth + ", height=" + window.outerHeight;
-                                window.open(printURL + "?c_donhang_id=" + poId + "&type=pdf", "In Chiết Xuất Đơn Hàng", windowSize);
+                                win = window.open(printURL + "?c_donhang_id=" + poId + "&type=pdf", "In Chiết Xuất Đơn Hàng", windowSize);
                                 //printURL += "InDonHangTool/";
                                 //window.open(printURL + "?c_donhang_id=" + poId, "In Đơn Hàng", windowSize);
                             } else {
@@ -602,80 +611,91 @@
                             }
                         } else if (printType == 'printxbb') {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InXacNhanBaoBi/";
-                                window.open(printURL + "?c_donhang_id=" + poId, "In Bao Bì", windowSize);
+                                win = window.open(printURL + "?c_donhang_id=" + poId, "In Bao Bì", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         } else if (printType == 'printPoTinhHinhXuLyPI') {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InTinhHinhXuLyPI/";
-                                window.open(printURL + "?c_donhang_id=" + poId, "In Tình Hình Xử Lý PI", windowSize);
+                                win = window.open(printURL + "?c_donhang_id=" + poId, "In Tình Hình Xử Lý PI", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         } else if (printType == 'printPoTem') {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InDonHangTem/";
-                                window.open(printURL + "?donhang_id=" + poId, "In Đơn Hàng Tem", windowSize);
+                                win = window.open(printURL + "?donhang_id=" + poId, "In Đơn Hàng Tem", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         } else if (printType == 'printBook') {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InBookcontainer/";
-                                window.open(printURL + "?donhang_id=" + poId, "In Bookcontainer", windowSize);
+                                win = window.open(printURL + "?donhang_id=" + poId, "In Bookcontainer", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         }
                         else if (printType == 'printToKhai') {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InPO/ToKhaiHQ.aspx";
-                                window.open(printURL + "?c_donhang_id=" + poId, "In Ctờ khai hải quan", windowSize);
+                                win = window.open(printURL + "?c_donhang_id=" + poId, "In Ctờ khai hải quan", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         }
                         else if (printType == 'printDanhMuc') {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InPO/DanhMucHQ.aspx";
-                                window.open(printURL + "?c_donhang_id=" + poId, "In danh mục khai hải quan", windowSize);
+                                win = window.open(printURL + "?c_donhang_id=" + poId, "In danh mục khai hải quan", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         }
                         else if (printType == 'printsale') {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InPO/SaleContract.aspx";
-                                window.open(printURL + "?c_donhang_id=" + poId, "In Sale Contract", windowSize);
+                                win = window.open(printURL + "?c_donhang_id=" + poId, "In Sale Contract", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         }
                         else if (printType == 'printInvoice') {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InPO/Invoice.aspx";
-                                window.open(printURL + "?c_donhang_id=" + poId, "In Invoice", windowSize);
+                                win = window.open(printURL + "?c_donhang_id=" + poId, "In Invoice", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         }
                         else if (printType == 'printPacking') {
                             if (poId != null) {
+                                closeWin();
                                 printURL += "InPO/PackingList.aspx";
-                                window.open(printURL + "?c_donhang_id=" + poId, "In Packing List", windowSize);
+                                win = window.open(printURL + "?c_donhang_id=" + poId, "In Packing List", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
                             }
                         }
                         else if (printType == 'printST_PO') {
+                            closeWin();
                             printURL += "InPO/printST_PO.aspx";
-                            window.open(printURL, "Chiết xuất tất cả các PO đang \"Soạn Thảo\"", windowSize);
+                            win = window.open(printURL, "Chiết xuất tất cả các PO đang \"Soạn Thảo\"", windowSize);
                         }
                         else {
+                            closeWin();
                             printURL += "InDSYeuCauXuatHang/";
-                            window.open(printURL, "In Danh Sách Phiếu Xuất", windowSize);
+                            win = window.open(printURL, "In Danh Sách Phiếu Xuất", windowSize);
                         }
                     } else {
                         alert('Hãy chọn cách in.!');
