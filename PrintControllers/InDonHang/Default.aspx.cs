@@ -1122,7 +1122,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         row++;
         //
         var hoaHongVal = double.Parse(dt.Rows[0]["hoahong"].ToString());
-        var hoaHongRow = string.Format(@"Hoa hồng: {0}%          Người nhận: {1}", hoaHongVal.ToString("{0:#,#0.00}"), dt.Rows[0]["nguoinhan"].ToString());
+        var hoaHongRow = string.Format(@"Hoa hồng: {0}%          Người nhận: {1}", hoaHongVal.ToString("#,#0.00"), dt.Rows[0]["nguoinhan"].ToString());
         s1.CreateRow(row).CreateCell(0).SetCellValue(hoaHongRow);
         if (hoaHongVal > 0)
             s1.GetRow(row).HeightInPoints = heigh;
@@ -1283,9 +1283,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     picture.UpdatePositions = true;
                 picture.Width = (int)(widthR * percent);
                 picture.Height = (int)(heightR * percent - 3.5);
-                Response.Write("picture.Width:" + picture.Width);
-                Response.Write("widthColumn:" + width);
+                Response.Write("\npercent:" + percent);
+                Response.Write("\npicture.Width:" + picture.Width);
+                Response.Write("\nwidthColumn:" + width);
                 var rateColumnAndPicture = (width - picture.Width) / 2 * 8;
+                rateColumnAndPicture = rateColumnAndPicture <= 0 ? 0 : rateColumnAndPicture;
                 picture.LeftColumnOffset = (int)rateColumnAndPicture;
                 picture.TopRowOffset = 5;
             }
