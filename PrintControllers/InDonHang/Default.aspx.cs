@@ -235,7 +235,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 						, (case ddh.sl_outer when 0 then ' ' else (cast(ddh.sl_outer as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) end) as ten_donggoi
 						, ddh.soluong
                         , dvt.ten_dvt as dvt_sp
-                        , (
+                        , convert((
                             case 
                                 when isnull(dh.phanbodiscount, 0) = 0
                                 then ddh.giafob + isnull(ddh.phi, 0)
@@ -244,7 +244,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                                         case when dh.discount > 0 then dh.discount else ddh.discount end
                                     ) / 100
                             end
-                        ) as giafob
+                        ) as decimal(18,2)) as giafob
                         
                         , isnull('{2}', 0) as dis
 						, cast('{2}' as decimal(18,2)) as dis1
