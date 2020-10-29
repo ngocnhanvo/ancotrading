@@ -1286,7 +1286,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 Response.Write("\npercent:" + percent);
                 Response.Write("\npicture.Width:" + picture.Width);
                 Response.Write("\nwidthColumn:" + width);
-                picture.Width = picture.Width > width ? (int)width : picture.Width;
+                picture.Width = picture.Width > width ? (int)(width - 1) : picture.Width;
                 var rateColumnAndPicture = (width - picture.Width) / 2 * 8;
                 rateColumnAndPicture = rateColumnAndPicture <= 0 ? 0 : rateColumnAndPicture;
                 picture.LeftColumnOffset = (int)rateColumnAndPicture;
