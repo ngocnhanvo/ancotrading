@@ -603,7 +603,7 @@
                                 closeWin();
                                 printURL += "InDonHang/";
                                 windowSize = "top=0, left=0, width=" + window.outerWidth + ", height=" + window.outerHeight;
-                                win = window.open(printURL + "?c_donhang_id=" + poId + "&type=pdf", "In Chiết Xuất Đơn Hàng", windowSize);
+                                win = window.open(printURL + "?c_donhang_id=" + poId + "&type=pdf", "In Đơn Hàng PDF", windowSize);
                                 //printURL += "InDonHangTool/";
                                 //window.open(printURL + "?c_donhang_id=" + poId, "In Đơn Hàng", windowSize);
                             } else {
