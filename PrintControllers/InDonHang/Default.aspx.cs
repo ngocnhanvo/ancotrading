@@ -1136,7 +1136,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         string[] f_value = { "no_cont", "ten_cangbien", "portdischarge", "shipmenttime", "ten_paymentterm", "mota" };
         for (int i = 0; i < f.Count(); i++)
         {
-            var text = dt.Rows[0][f_value[i]].ToString();
+            var text = dt.Rows[0][f_value[i]].ToString().Trim();
             s1.CreateRow(row).CreateCell(1).SetCellValue(f[i]);
             s1.GetRow(row).CreateCell(2).SetCellValue(text);
             heigh = 22;
