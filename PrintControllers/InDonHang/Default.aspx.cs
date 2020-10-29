@@ -256,7 +256,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         , convert(varchar, dh.shipmenttime, 106) as shipmenttime
                         , cb.ten_cangbien
                         , pmt.ten_paymentterm
-                        , dh.mota as ghichu
+                        , dh.ghichu
                         , ('In favor of ANCO COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
 						, ddh.v2 as cbm
                         , (sp.trongluong * ddh.soluong) as trongluong
@@ -1146,8 +1146,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 float maxHeight = config.MeasureTextHeight(text, width02to12);
                 heigh = maxHeight < heigh ? heigh : (int)maxHeight;
             }
-            s1.GetRow(row).GetCell(1).CellStyle = celltext;
-            s1.GetRow(row).GetCell(2).CellStyle = celltext;
+            s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+            s1.GetRow(row).GetCell(2).CellStyle = cellBold;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 1));
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
             s1.GetRow(row).HeightInPoints = heigh;
