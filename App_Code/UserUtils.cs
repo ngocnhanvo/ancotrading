@@ -681,6 +681,15 @@ public static class UserUtils
         return Math.Round(giaHopDong, 2);
     }
 
+    public static decimal getGiaHopDongPO(c_donhang dh, c_dongdonhang ddh, int? round)
+    {
+        var giaFOBvaPhi = ddh.giafob.GetValueOrDefault(0) + ddh.phi.GetValueOrDefault(0);
+        var discount = dh.discount.GetValueOrDefault(0) > 0 ? dh.discount.GetValueOrDefault(0) : (decimal)ddh.discount.GetValueOrDefault(0);
+        var phanBoDiscountVaoGia = dh.phanbodiscount.GetValueOrDefault(false) ? giaFOBvaPhi * discount / 100 : 0;
+        var giaHopDong = giaFOBvaPhi - phanBoDiscountVaoGia;
+        return round == null ? giaHopDong : Math.Round(giaHopDong, round.GetValueOrDefault(0));
+    }
+
     public static decimal getDiscountgPO(c_donhang dh, c_dongdonhang ddh)
     {
         decimal discount = 0;

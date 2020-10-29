@@ -1148,7 +1148,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
         row++;
         //set A6 - A12
-        string[] f = { "Note", "No. of Container(s):", "Port of loading:", "Port of discharge:", "Shipment Time:", "Payment term:", "Bank Details:" };
+        string[] f = { "Note:", "No. of Container(s):", "Port of loading:", "Port of discharge:", "Shipment Time:", "Payment term:", "Bank Details:" };
         string[] f_value = { "ghichu", "no_cont", "ten_cangbien", "portdischarge", "shipmenttime", "ten_paymentterm", "mota" };
         for (int i = 0; i < f.Count(); i++)
         {
