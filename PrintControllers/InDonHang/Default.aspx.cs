@@ -1153,11 +1153,19 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             s1.CreateRow(row).CreateCell(1).SetCellValue(f[i]);
             s1.GetRow(row).CreateCell(2).SetCellValue(text);
             heigh = 22;
+            cellBold.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.COLOR_NORMAL;
+            cellBold.FillPattern = FillPattern.NoFill;
             if (f_value[i] == "mota")
             {
                 float maxHeight = config.MeasureTextHeight(text, width02to12);
                 heigh = maxHeight < heigh ? heigh : (int)maxHeight;
             }
+            else if(f_value[i] == "no_cont")
+            {
+                cellBold.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
+                cellBold.FillPattern = FillPattern.SolidForeground;
+            }
+            
             s1.GetRow(row).GetCell(1).CellStyle = cellBold;
             s1.GetRow(row).GetCell(2).CellStyle = cellBold;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 1));
