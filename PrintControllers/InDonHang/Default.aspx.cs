@@ -1136,11 +1136,15 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         string[] f_value = { "no_cont", "ten_cangbien", "portdischarge", "shipmenttime", "ten_paymentterm", "mota" };
         for (int i = 0; i < f.Count(); i++)
         {
+            var text = dt.Rows[0][f_value[i]].ToString();
             s1.CreateRow(row).CreateCell(1).SetCellValue(f[i]);
-            s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0][f_value[i]].ToString());
+            s1.GetRow(row).CreateCell(2).SetCellValue(text);
             heigh = 22;
             if (i == 5)
-                heigh = 95;
+            {
+                float maxHeight = config.MeasureTextHeight(text, width02to12);
+                heigh = maxHeight < heigh ? heigh : (int)maxHeight;
+            }
             s1.GetRow(row).GetCell(1).CellStyle = celltext;
             s1.GetRow(row).GetCell(2).CellStyle = celltext;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 1));
@@ -1148,6 +1152,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             s1.GetRow(row).HeightInPoints = heigh;
             row++;
         }
+        heigh = 22;
         //
         s1.CreateRow(row).CreateCell(1).SetCellValue("This agreement comes into effect from the signing date.:");
         s1.GetRow(row).HeightInPoints = heigh;
