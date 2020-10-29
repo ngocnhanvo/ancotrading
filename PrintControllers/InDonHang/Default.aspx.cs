@@ -235,7 +235,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 						, (case ddh.sl_outer when 0 then ' ' else (cast(ddh.sl_outer as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) end) as ten_donggoi
 						, ddh.soluong
                         , dvt.ten_dvt as dvt_sp
-                        , convert((
+                        , cast((
                             case 
                                 when isnull(dh.phanbodiscount, 0) = 0
                                 then ddh.giafob + isnull(ddh.phi, 0)
