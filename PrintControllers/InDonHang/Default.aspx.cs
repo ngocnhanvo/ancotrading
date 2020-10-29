@@ -1163,7 +1163,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             else if(f_value[i] == "no_cont")
             {
                 cellBold.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
-                cellBold.FillPattern = FillPattern.SolidForeground;
+                cellBold.FillPattern = FillPattern.Squares;
             }
             
             s1.GetRow(row).GetCell(1).CellStyle = cellBold;
