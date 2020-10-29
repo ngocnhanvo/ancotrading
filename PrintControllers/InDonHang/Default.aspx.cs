@@ -1121,6 +1121,16 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         s1.GetRow(row).GetCell(12).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
         row++;
         //
+        s1.CreateRow(row).CreateCell(4).SetCellValue("Hoa hồng: " + dt.Rows[0]["hoahong"].ToString() + "%");
+        s1.GetRow(row).HeightInPoints = heigh;
+        s1.GetRow(row).GetCell(4).CellStyle = leftBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 7));
+
+        s1.GetRow(row).CreateCell(8).SetCellValue("Người nhận: " + dt.Rows[0]["nguoinhan"].ToString());
+        s1.GetRow(row).GetCell(8).CellStyle = leftBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 12));
+        row++;
+        //
         s1.CreateRow(row).CreateCell(0).SetCellValue("Say: " + dt.Rows[0]["money"].ToString());
         s1.GetRow(row).HeightInPoints = heigh;
         s1.GetRow(row).GetCell(0).CellStyle = rightBold;
