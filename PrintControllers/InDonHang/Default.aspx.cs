@@ -1153,8 +1153,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             s1.CreateRow(row).CreateCell(1).SetCellValue(f[i]);
             s1.GetRow(row).CreateCell(2).SetCellValue(text);
             heigh = 22;
-            cellBold.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.COLOR_NORMAL;
-            cellBold.FillPattern = FillPattern.NoFill;
+            //cellBold.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.COLOR_NORMAL;
+            //cellBold.FillPattern = FillPattern.NoFill;
             if (f_value[i] == "mota")
             {
                 float maxHeight = config.MeasureTextHeight(text, width02to12);
