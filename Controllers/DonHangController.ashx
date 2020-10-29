@@ -284,12 +284,11 @@ public class DonHangController : IHttpHandler
                 var ddh = from c in db.c_dongdonhangs where c.c_donhang_id.Equals(dh.c_donhang_id) select c;
                 var phiDH = from phi in db.c_phidonhangs where phi.c_donhang_id.Equals(dh.c_donhang_id) select phi;
                     
-                
                 totalQuantity = ddh.Sum(p => p.soluong).Value;
                 phicong = phiDH.Where(p => p.phitang.Equals(true)).Select(p => p.phi).Sum();
                 phitru = phiDH.Where(p => p.phitang.Equals(false)).Select(p => p.phi).Sum();
-                totalSalary = ddh.ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, null));
-                decimal discountVal = (totalSalary * UserUtils.getDiscountgPO(dh, null) / 100);
+                totalSalary = ddh.ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p)).DecRound(2);
+                decimal discountVal = (totalSalary * dh.discount.Value / 100).DecRound(2);
                 totalSalary = (totalSalary - discountVal) + (phicong == null ? 0 : phicong.Value) - (phitru == null ? 0 : phitru.Value);
                 totalCbm = dh.totalcbm.Value;
 
