@@ -256,6 +256,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         , convert(varchar, dh.shipmenttime, 106) as shipmenttime
                         , cb.ten_cangbien
                         , pmt.ten_paymentterm
+                        , dh.mota as ghichu
                         , ('In favor of ANCO COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
 						, ddh.v2 as cbm
                         , (sp.trongluong * ddh.soluong) as trongluong
@@ -1132,15 +1133,15 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
         row++;
         //set A6 - A12
-        string[] f = { "No. of Container(s):", "Port of loading:", "Port of discharge:", "Shipment Time:", "Payment term:", "Bank Details:" };
-        string[] f_value = { "no_cont", "ten_cangbien", "portdischarge", "shipmenttime", "ten_paymentterm", "mota" };
+        string[] f = { "Note", "No. of Container(s):", "Port of loading:", "Port of discharge:", "Shipment Time:", "Payment term:", "Bank Details:" };
+        string[] f_value = { "ghichu", "no_cont", "ten_cangbien", "portdischarge", "shipmenttime", "ten_paymentterm", "mota" };
         for (int i = 0; i < f.Count(); i++)
         {
             var text = dt.Rows[0][f_value[i]].ToString().Trim();
             s1.CreateRow(row).CreateCell(1).SetCellValue(f[i]);
             s1.GetRow(row).CreateCell(2).SetCellValue(text);
             heigh = 22;
-            if (i == 5)
+            if (f_value[i] == "mota")
             {
                 float maxHeight = config.MeasureTextHeight(text, width02to12);
                 heigh = maxHeight < heigh ? heigh : (int)maxHeight;
