@@ -361,7 +361,7 @@ public static class UserUtils
             decimal giachuan = gianhap;
             //Neu doi tac la VINHGIA
             
-			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.Value, 0);
+			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, 0, 0);
             decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2);
 
             var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
@@ -386,6 +386,7 @@ public static class UserUtils
             else
             {
                 gianhap = jqGridHelper.Utils.Round3(gianhap + phiDiscount * tygia, -2);
+                gianhap = 2222;
             }
 
             var ddsdh = new c_dongdsdh();

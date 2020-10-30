@@ -17,6 +17,7 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
     LinqDBDataContext db = new LinqDBDataContext();
     string type = "", c_danhsachdathang_id = "";
     List<Dictionary<string, string>> lstimage = new List<Dictionary<string, string>>();
+    List<Dictionary<string, string>> lstText = new List<Dictionary<string, string>>();
     protected void Page_Load(object sender, EventArgs e)
     {
         try
@@ -29,13 +30,14 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
 			rptDSDH.guiNCC = Request.QueryString["DSDHG"] == "False";
             rptDSDH.TypePrint = type;
             lstimage = rptDSDH.Lstimage;
+            lstText = rptDSDH.LstText;
             HSSFWorkbook wb = rptDSDH.CreateWBPI();
 
             this.SaveFile(wb, "Danh-Sach-Dat-Hang-" + DateTime.Now.ToString() + ".xls");
         }
         catch (Exception ex)
         {
-            Response.Write(ex.Message);
+            Response.Write(ex + "");
         }
     }
 
@@ -85,11 +87,28 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
             var fileName = "DSDH_" + c_danhsachdathang_id + "_" + Guid.NewGuid().ToString();
             string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
             url = url.Replace("PrintControllers\\InDonDatHang\\", "");
-            var file = new FileStream(url, FileMode.Create);
-            hsswb.Write(file);
-            file.Close();
 
-            workbook.LoadFromFile(url, Spire.Xls.ExcelVersion.Version97to2003);
+            var exportData = new MemoryStream();
+            hsswb.Write(exportData);
+            workbook.LoadFromStream(exportData);
+
+            foreach (var item in lstText)
+            {
+                var row = int.Parse(item["row"]) + 1;
+                var column = int.Parse(item["column"]);
+                var text = item["text"];
+
+                var textbox = workbook.ActiveSheet.TextBoxes.AddTextBox(row, column, 25, 200) as Spire.Xls.Core.Spreadsheet.Shapes.XlsTextBoxShape;
+                textbox.FillColor = System.Drawing.Color.Black;
+                textbox.Text = text;
+                textbox.Line.Weight = 0;
+                textbox.HasFill = true;
+                textbox.HAlignment = Spire.Xls.CommentHAlignType.Left;
+                textbox.VAlignment = Spire.Xls.CommentVAlignType.Center;
+                //textbox.LeftColumn = 0;
+                textbox.LeftColumnOffset = 400;
+                textbox.HasLineFormat = true;
+            }
 
             foreach (var item in lstimage)
             {
@@ -106,32 +125,28 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
                     picture.UpdatePositions = true;
                 picture.Width = (int)(widthR * percent);
                 picture.Height = (int)(heightR * percent - 3.5);
-                Response.Write("\npercent:" + percent);
-                Response.Write("\npicture.Width:" + picture.Width);
-                Response.Write("\nwidthColumn:" + width);
                 picture.Width = picture.Width > width ? (int)(width - 1) : picture.Width;
                 var rateColumnAndPicture = (width - picture.Width) / 2 * 8;
                 rateColumnAndPicture = rateColumnAndPicture <= 0 ? 0 : rateColumnAndPicture;
                 picture.LeftColumnOffset = (int)rateColumnAndPicture;
                 picture.TopRowOffset = 5;
             }
-            workbook.Save();
+            //workbook.Save();
 
             if (type == "pdf")
             {
                 var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
                 workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
                 workbook.Dispose();
-                File.Delete(url);
+                //File.Delete(url);
 
                 Response.Redirect(string.Format("../../ReportPdf/{0}.pdf", fileName));
             }
             else
             {
-                MemoryStream exportData = new MemoryStream();
                 workbook.SaveToStream(exportData);
                 workbook.Dispose();
-                File.Delete(url);
+                //File.Delete(url);
 
                 Response.ContentType = "application/vnd.ms-excel";
                 Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));

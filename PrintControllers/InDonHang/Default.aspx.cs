@@ -1276,11 +1276,10 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             var fileName = "PO_" + c_donhang_id + "_" + Guid.NewGuid().ToString();
             string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
             url = url.Replace("PrintControllers\\InDonHang\\", "");
-            var file = new FileStream(url, FileMode.Create);
-            hsswb.Write(file);
-            file.Close();
 
-            workbook.LoadFromFile(url, Spire.Xls.ExcelVersion.Version97to2003);
+            var exportData = new MemoryStream();
+            hsswb.Write(exportData);
+            workbook.LoadFromStream(exportData);
 
             foreach (var item in lstimage)
             {
@@ -1306,23 +1305,22 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 picture.LeftColumnOffset = (int)rateColumnAndPicture;
                 picture.TopRowOffset = 5;
             }
-            workbook.Save();
+            //workbook.Save();
 
             if (type == "pdf")
             {
                 var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
                 workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
                 workbook.Dispose();
-                File.Delete(url);
+                //File.Delete(url);
 
                 Response.Redirect(string.Format("../../ReportPdf/{0}.pdf", fileName));
             }
             else
             {
-                MemoryStream exportData = new MemoryStream();
                 workbook.SaveToStream(exportData);
                 workbook.Dispose();
-                File.Delete(url);
+                //File.Delete(url);
 
                 Response.ContentType = "application/vnd.ms-excel";
                 Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
