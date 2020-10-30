@@ -50,13 +50,16 @@
                             <td><asp:TextBox Width="280" ID="txtUserName" runat="server"></asp:TextBox></td>
                         </tr>
                         <tr>
+                            <td><div style="height: 6px;"></div></td>
+                        </tr>
+                        <tr>
                             <td>Mật Khẩu</td>
                         </tr>
                         <tr>
                             <td><asp:TextBox Width="280" ID="txtPassword" runat="server" TextMode="Password"></asp:TextBox></td>
                         </tr>
                         <tr>
-                            <td></td>
+                            <td><div style="height: 6px;"></div></td>
                         </tr>
                         <tr>
                             <td><asp:Button ID="btnLogin" OnClick='btnLogin_Click' runat="server" Text="Đăng Nhập" /></td>
