@@ -361,15 +361,15 @@ public static class UserUtils
             decimal giachuan = gianhap;
             //Neu doi tac la VINHGIA
             
-			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, 0, 0);
+			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, getGiaHopDongPO(donhang, ddonhang), 0, 0);
             var giaNhap2BD = gianhap2;
             decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2);
 
             var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
             if(donhang.discount.GetValueOrDefault(0) > 0)
                 phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + donhang.discount.GetValueOrDefault(0));
-
-            gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
+            
+            //gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
             if (giaNhap2BD > -1)
             {
                 gianhap = gianhap2;

@@ -245,7 +245,11 @@ public class DanhSachDatHangReport
         lstText.Add(new Dictionary<string, string>() {
             { "text", dt.Rows[0]["sochungtu"].ToString() },
             { "row", row.ToString() },
-            { "column", "2" }
+            { "column", "2" },
+            { "left", "420" },
+            { "top", "23" },
+            { "width", "0" },
+            { "height", "0" }
         });
         
         s1.GetRow(row).CreateCell(4).SetCellValue("Theo P/O số:");
@@ -256,20 +260,43 @@ public class DanhSachDatHangReport
         lstText.Add(new Dictionary<string, string>() {
             { "text", dt.Rows[0]["so_po"].ToString() },
             { "row", row.ToString() },
-            { "column", "5" }
+            { "column", "5" },
+            { "left", "420" },
+            { "top", "23" },
+            { "width", "0" },
+            { "height", "0" }
         });
         row++;
 
+        var ngayLapText = DateTime.Parse(dt.Rows[0]["ngaylap"].ToString()).ToString("dd/MM/yyyy");
         s1.CreateRow(row).CreateCell(1).SetCellValue("Ngày lập:");
         s1.GetRow(row).GetCell(1).CellStyle = celltext10;
         s1.GetRow(row).HeightInPoints = 20;
-        s1.GetRow(row).CreateCell(2).SetCellValue(DateTime.Parse(dt.Rows[0]["ngaylap"].ToString()).ToString("dd/MM/yyyy"));
+        s1.GetRow(row).CreateCell(2).SetCellValue(ngayLapText);
         s1.GetRow(row).GetCell(2).CellStyle = celltext10;
-        
+        lstText.Add(new Dictionary<string, string>() {
+            { "text", ngayLapText },
+            { "row", row.ToString() },
+            { "column", "2" },
+            { "left", "300" },
+            { "top", "23" },
+            { "width", "600" },
+            { "height", "0" }
+        });
+
         s1.GetRow(row).CreateCell(4).SetCellValue("Customer Order No:");
         s1.GetRow(row).GetCell(4).CellStyle = celltext10;
         s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["customer_order_no"].ToString());
         s1.GetRow(row).GetCell(5).CellStyle = celltext10;
+        lstText.Add(new Dictionary<string, string>() {
+            { "text", dt.Rows[0]["customer_order_no"].ToString() },
+            { "row", row.ToString() },
+            { "column", "5" },
+            { "left", "630" },
+            { "top", "23" },
+            { "width", "600" },
+            { "height", "0" }
+        });
         row++;
 
         s1.CreateRow(row).CreateCell(1).SetCellValue("Công ty AnCơ kính đề nghị Quý Công ty/Đơn vị: " + dt.Rows[0]["ten_dtkd"].ToString());
@@ -282,12 +309,30 @@ public class DanhSachDatHangReport
         s1.GetRow(row).HeightInPoints = 20;
         s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["tel"].ToString());
         s1.GetRow(row).GetCell(2).CellStyle = celltext10;
+        lstText.Add(new Dictionary<string, string>() {
+            { "text", dt.Rows[0]["tel"].ToString() },
+            { "row", row.ToString() },
+            { "column", "2" },
+            { "left", "340" },
+            { "top", "23" },
+            { "width", "300" },
+            { "height", "0" }
+        });
 
         s1.GetRow(row).CreateCell(4).SetCellValue("Fax:");
         s1.GetRow(row).GetCell(4).CellStyle = celltext10;
         s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["fax"].ToString());
         s1.GetRow(row).GetCell(5).CellStyle = celltext10;
         s1.AddMergedRegion(new CellRangeAddress(7, 7, 5, 7));
+        lstText.Add(new Dictionary<string, string>() {
+            { "text", dt.Rows[0]["fax"].ToString() },
+            { "row", row.ToString() },
+            { "column", "5" },
+            { "left", "150" },
+            { "top", "23" },
+            { "width", "600" },
+            { "height", "0" }
+        });
         row++;
         row++;
         row++;
