@@ -362,6 +362,7 @@ public static class UserUtils
             //Neu doi tac la VINHGIA
             
 			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, 0, 0);
+            var giaNhap2BD = gianhap2;
             decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2);
 
             var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
@@ -376,7 +377,7 @@ public static class UserUtils
                 {
                     giachuan = jqGridHelper.Utils.Round3(gianhap, -2);
                     gianhap = jqGridHelper.Utils.Round3(gianhap + (phiDiscount * tygia), -2);
-                    gianhap = 3333;
+                    gianhap = giaNhap2BD;
                 }
                 else
                 {
@@ -387,7 +388,6 @@ public static class UserUtils
             else
             {
                 gianhap = jqGridHelper.Utils.Round3(gianhap + phiDiscount * tygia, -2);
-                gianhap = 2222;
             }
 
             var ddsdh = new c_dongdsdh();
@@ -400,7 +400,7 @@ public static class UserUtils
             ddsdh.mota_tiengviet = sp.mota_tiengviet;
             ddsdh.mota_tienganh = sp.mota_tienganh;
             ddsdh.md_doitackinhdoanh_id = ddonhang.nhacungungid;
-            ddsdh.huongdan_dathang = "";
+            ddsdh.huongdan_dathang = ma_dtkd_select;
             ddsdh.han_giaohang = DateTime.Now;
             ddsdh.tem_dan = "Tem dáng";
             ddsdh.sl_dathang = item.soluong_dadat;
