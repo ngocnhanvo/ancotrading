@@ -370,14 +370,13 @@ public static class UserUtils
                 phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + donhang.discount.GetValueOrDefault(0));
 
             gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
-            if (gianhap2 > -1)
+            if (giaNhap2BD > -1)
             {
                 gianhap = gianhap2;
                 if (maNCC != "VINHGIA")
                 {
                     giachuan = jqGridHelper.Utils.Round3(gianhap, -2);
                     gianhap = jqGridHelper.Utils.Round3(gianhap + (phiDiscount * tygia), -2);
-                    gianhap = giaNhap2BD;
                 }
                 else
                 {
