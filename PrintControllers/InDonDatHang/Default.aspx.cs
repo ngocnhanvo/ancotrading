@@ -120,7 +120,8 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
                 font.Size = 10.25;
                 font.IsBold = false;
                 font.Color = System.Drawing.Color.Black;
-                (new Spire.Xls.RichText(textbox.RichText)).SetFont(0, textbox.Text.Length > 0 ? textbox.Text.Length - 1 : 0, font);
+                Response.Write(textbox.Text.Length);
+                (new Spire.Xls.RichText(textbox.RichText)).SetFont(0, textbox.Text.Length > 1 ? textbox.Text.Length - 1 : 1, font);
                 //set background color
                 //textbox.Fill.FillType = Spire.Xls.ShapeFillType.SolidColor;
                 //textbox.Fill.ForeKnownColor = Spire.Xls.ExcelColors.BlueGray;
