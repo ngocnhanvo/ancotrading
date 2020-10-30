@@ -104,29 +104,31 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
 
                 width = width == 0 ? 200 : width;
                 height = height == 0 ? 23 : width;
-
-                var textbox = workbook.ActiveSheet.TextBoxes.AddTextBox(row, column, height, width) as Spire.Xls.Core.Spreadsheet.Shapes.XlsTextBoxShape;
-                textbox.Text = text;
-                textbox.Line.Weight = 0;
-                textbox.Line.Visible = false;
-                textbox.IsTextLocked = true;
-                textbox.HasFill = false;
-                //textbox.LeftColumn = 0;
-                textbox.LeftColumnOffset = left;
-                textbox.TopRowOffset = top;
-                textbox.HasLineFormat = true;
-                var font = workbook.CreateFont();
-                font.FontName = "Arial";
-                font.Size = 10.25;
-                font.IsBold = false;
-                font.Color = System.Drawing.Color.Black;
-                Response.Write(textbox.Text.Length + "\n");
-                (new Spire.Xls.RichText(textbox.RichText)).SetFont(0, textbox.Text.Length > 1 ? textbox.Text.Length - 1 : 1, font);
-                //set background color
-                //textbox.Fill.FillType = Spire.Xls.ShapeFillType.SolidColor;
-                //textbox.Fill.ForeKnownColor = Spire.Xls.ExcelColors.BlueGray;
-                string NameColumn = ((char)(column + 65)).ToString() + row;
-                workbook.ActiveSheet.Range[NameColumn].Text = "";
+                if (text.Length > 0)
+                {
+                    var textbox = workbook.ActiveSheet.TextBoxes.AddTextBox(row, column, height, width) as Spire.Xls.Core.Spreadsheet.Shapes.XlsTextBoxShape;
+                    textbox.Text = text;
+                    textbox.Line.Weight = 0;
+                    textbox.Line.Visible = false;
+                    textbox.IsTextLocked = true;
+                    textbox.HasFill = false;
+                    //textbox.LeftColumn = 0;
+                    textbox.LeftColumnOffset = left;
+                    textbox.TopRowOffset = top;
+                    textbox.HasLineFormat = true;
+                    var font = workbook.CreateFont();
+                    font.FontName = "Arial";
+                    font.Size = 10.25;
+                    font.IsBold = false;
+                    font.Color = System.Drawing.Color.Black;
+                    Response.Write(textbox.Text.Length + "\n");
+                    (new Spire.Xls.RichText(textbox.RichText)).SetFont(0, textbox.Text.Length - 1, font);
+                    //set background color
+                    //textbox.Fill.FillType = Spire.Xls.ShapeFillType.SolidColor;
+                    //textbox.Fill.ForeKnownColor = Spire.Xls.ExcelColors.BlueGray;
+                    string NameColumn = ((char)(column + 65)).ToString() + row;
+                    workbook.ActiveSheet.Range[NameColumn].Text = "";
+                }
             }
 
             foreach (var item in lstimage)
