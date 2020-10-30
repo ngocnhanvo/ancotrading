@@ -376,6 +376,7 @@ public static class UserUtils
                 {
                     giachuan = jqGridHelper.Utils.Round3(gianhap, -2);
                     gianhap = jqGridHelper.Utils.Round3(gianhap + (phiDiscount * tygia), -2);
+                    gianhap = 3333;
                 }
                 else
                 {

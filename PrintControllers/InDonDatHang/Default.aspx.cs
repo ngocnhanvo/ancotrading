@@ -92,23 +92,23 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
             hsswb.Write(exportData);
             workbook.LoadFromStream(exportData);
 
-            foreach (var item in lstText)
-            {
-                var row = int.Parse(item["row"]) + 1;
-                var column = int.Parse(item["column"]);
-                var text = item["text"];
+            //foreach (var item in lstText)
+            //{
+            //    var row = int.Parse(item["row"]) + 1;
+            //    var column = int.Parse(item["column"]);
+            //    var text = item["text"];
 
-                var textbox = workbook.ActiveSheet.TextBoxes.AddTextBox(row, column, 25, 200) as Spire.Xls.Core.Spreadsheet.Shapes.XlsTextBoxShape;
-                textbox.FillColor = System.Drawing.Color.Black;
-                textbox.Text = text;
-                textbox.Line.Weight = 0;
-                textbox.HasFill = true;
-                textbox.HAlignment = Spire.Xls.CommentHAlignType.Left;
-                textbox.VAlignment = Spire.Xls.CommentVAlignType.Center;
-                //textbox.LeftColumn = 0;
-                textbox.LeftColumnOffset = 400;
-                textbox.HasLineFormat = true;
-            }
+            //    var textbox = workbook.ActiveSheet.TextBoxes.AddTextBox(row, column, 25, 200) as Spire.Xls.Core.Spreadsheet.Shapes.XlsTextBoxShape;
+            //    textbox.FillColor = System.Drawing.Color.Black;
+            //    textbox.Text = text;
+            //    textbox.Line.Weight = 0;
+            //    textbox.HasFill = true;
+            //    textbox.HAlignment = Spire.Xls.CommentHAlignType.Left;
+            //    textbox.VAlignment = Spire.Xls.CommentVAlignType.Center;
+            //    //textbox.LeftColumn = 0;
+            //    textbox.LeftColumnOffset = 400;
+            //    textbox.HasLineFormat = true;
+            //}
 
             foreach (var item in lstimage)
             {
