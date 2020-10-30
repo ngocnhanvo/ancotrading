@@ -375,13 +375,12 @@ public static class UserUtils
                 gianhap = gianhap2;
                 if (maNCC != "VINHGIA")
                 {
-                    giachuan = jqGridHelper.Utils.Round3(gianhap, -2);
-                    gianhap = jqGridHelper.Utils.Round3(gianhap + (phiDiscount * tygia), -2);
+                    gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
+                    giachuan = gianhap - jqGridHelper.Utils.Round3(phiDiscount *tygia, -2);
                 }
                 else
                 {
-                    giachuan = gianhap;
-                    gianhap = gianhap + phiDiscount;
+                    giachuan = gianhap - phiDiscount;
                 }
             }
             else
