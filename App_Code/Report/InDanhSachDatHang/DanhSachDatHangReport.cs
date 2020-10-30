@@ -81,7 +81,7 @@ public class DanhSachDatHangReport
                             , (case ddsdh.sl_inner when 0 then ' ' else (cast(ddsdh.sl_inner as nvarchar) + ' ' + (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as dginner
                             , (cast(ddsdh.sl_outer as nvarchar) + ' ' + (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) as dgouter
                             , (case ddsdh.sl_inner when 0 then 0 else ddsdh.sl_dathang / ddsdh.sl_inner end) as soKienInner
-                            , (case ddsdh.sl_inner when 0 then 0 else ddsdh.sl_dathang / ddsdh.sl_outer end) as soKienOuter
+                            , (case ddsdh.sl_outer when 0 then 0 else ddsdh.sl_dathang / ddsdh.sl_outer end) as soKienOuter
                             , (select hoten from nhanvien where manv = dsdh.nguoitao) as nguoitao
 							, sp.trongluong
 							, sp.mota as ghichu
