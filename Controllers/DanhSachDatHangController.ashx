@@ -504,12 +504,13 @@ public class DanhSachDatHangController : IHttpHandler
                         );
         return select;
     }
-        
+
     public void getPiInformation(HttpContext context)
     {
         context.Response.ContentType = "text/plain";
         context.Response.Charset = "UTF-8";
         string c_danhsachdathang_id = context.Request.QueryString["poId"];
+        string msg = "";
         try
         {
             decimal totalQuantity = 0, totalSalary = 0, totalCbm = 0;
@@ -529,13 +530,16 @@ public class DanhSachDatHangController : IHttpHandler
                 totalCbm = cbm == null ? 0 : cbm.Value;
                 totalQuantity = quantity == null ? 0 : quantity.Value;
 
-                context.Response.Write(string.Format("Đơn đặt hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dsdh.sochungtu, totalCbm, totalSalary, totalQuantity));
+                msg = string.Format("Đơn đặt hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dsdh.sochungtu, totalCbm, totalSalary, totalQuantity);
             }
+            else
+                msg = "Đơn đặt hàng này đã bị xóa, hãy làm mới dữ liệu";
         }
         catch (Exception e)
         {
-            context.Response.Write(e.Message);
+            msg = e.Message;
         }
+        context.Response.Write(msg);
     }
 
     public void startSendMail(HttpContext context)
