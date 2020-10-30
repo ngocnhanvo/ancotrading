@@ -368,6 +368,7 @@ public static class UserUtils
             if(donhang.discount.GetValueOrDefault(0) > 0)
                 phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + donhang.discount.GetValueOrDefault(0));
 
+            gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(null, ddonhang) / 100;
             if (gianhap2 > -1)
             {
                 gianhap = gianhap2;

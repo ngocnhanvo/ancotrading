@@ -15,6 +15,20 @@ public class DanhSachDatHangReport
 {
     LinqDBDataContext db = new LinqDBDataContext();
     private String c_danhsachdathang_id, logoPath, productImagePath, type;
+    private List<Dictionary<string, string>> lstimage = new List<Dictionary<string, string>>();
+    private List<Dictionary<string, string>> lstText = new List<Dictionary<string, string>>();
+
+    public List<Dictionary<string, string>> Lstimage
+    {
+        get { return lstimage; }
+        set { lstimage = value; }
+    }
+
+    public List<Dictionary<string, string>> LstText
+    {
+        get { return lstText; }
+        set { lstText = value; }
+    }
 
     public String LogoPath
     {
@@ -223,53 +237,67 @@ public class DanhSachDatHangReport
         s1.AddMergedRegion(new CellRangeAddress(10, 10, 1, 9));
 
 
-        s1.CreateRow(4).CreateCell(1).SetCellValue("Số chứng từ:");
-        s1.GetRow(4).GetCell(1).CellStyle = celltext10;
-        s1.GetRow(4).HeightInPoints = 20;
-        s1.GetRow(4).CreateCell(2).SetCellValue(dt.Rows[0]["sochungtu"].ToString());
-        s1.GetRow(4).GetCell(2).CellStyle = celltext10;
-
-        s1.GetRow(4).CreateCell(4).SetCellValue("Theo P/O số:");
-        s1.GetRow(4).GetCell(4).CellStyle = celltext10;
-        s1.GetRow(4).CreateCell(5).SetCellValue(dt.Rows[0]["so_po"].ToString());
-        s1.GetRow(4).GetCell(5).CellStyle = celltext10;
+        s1.CreateRow(row).CreateCell(1).SetCellValue("Số chứng từ:");
+        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["sochungtu"].ToString());
+        s1.GetRow(row).GetCell(2).CellStyle = celltext10;
+        lstText.Add(new Dictionary<string, string>() {
+            { "text", dt.Rows[0]["sochungtu"].ToString() },
+            { "row", row.ToString() },
+            { "column", "2" }
+        });
+        
+        s1.GetRow(row).CreateCell(4).SetCellValue("Theo P/O số:");
+        s1.GetRow(row).GetCell(4).CellStyle = celltext10;
+        s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["so_po"].ToString());
+        s1.GetRow(row).GetCell(5).CellStyle = celltext10;
         s1.AddMergedRegion(new CellRangeAddress(4, 4, 5, 7));
+        lstText.Add(new Dictionary<string, string>() {
+            { "text", dt.Rows[0]["so_po"].ToString() },
+            { "row", row.ToString() },
+            { "column", "5" }
+        });
+        row++;
 
-        s1.CreateRow(5).CreateCell(1).SetCellValue("Ngày lập:");
-        s1.GetRow(5).GetCell(1).CellStyle = celltext10;
-        s1.GetRow(5).HeightInPoints = 20;
-        s1.GetRow(5).CreateCell(2).SetCellValue(DateTime.Parse(dt.Rows[0]["ngaylap"].ToString()).ToString("dd/MM/yyyy"));
-        s1.GetRow(5).GetCell(2).CellStyle = celltext10;
+        s1.CreateRow(row).CreateCell(1).SetCellValue("Ngày lập:");
+        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.GetRow(row).CreateCell(2).SetCellValue(DateTime.Parse(dt.Rows[0]["ngaylap"].ToString()).ToString("dd/MM/yyyy"));
+        s1.GetRow(row).GetCell(2).CellStyle = celltext10;
+        
+        s1.GetRow(row).CreateCell(4).SetCellValue("Customer Order No:");
+        s1.GetRow(row).GetCell(4).CellStyle = celltext10;
+        s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["customer_order_no"].ToString());
+        s1.GetRow(row).GetCell(5).CellStyle = celltext10;
+        row++;
 
-        s1.GetRow(5).CreateCell(4).SetCellValue("Customer Order No:");
-        s1.GetRow(5).GetCell(4).CellStyle = celltext10;
-        s1.GetRow(5).CreateCell(5).SetCellValue(dt.Rows[0]["customer_order_no"].ToString());
-        s1.GetRow(5).GetCell(5).CellStyle = celltext10;
+        s1.CreateRow(row).CreateCell(1).SetCellValue("Công ty AnCơ kính đề nghị Quý Công ty/Đơn vị: " + dt.Rows[0]["ten_dtkd"].ToString());
+        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).HeightInPoints = 20;
+        row++;
 
-        s1.CreateRow(6).CreateCell(1).SetCellValue("Công ty AnCơ kính đề nghị Quý Công ty/Đơn vị: " + dt.Rows[0]["ten_dtkd"].ToString());
-        s1.GetRow(6).GetCell(1).CellStyle = celltext10;
-        s1.GetRow(6).HeightInPoints = 20;
+        s1.CreateRow(row).CreateCell(1).SetCellValue("Điện thoại:");
+        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["tel"].ToString());
+        s1.GetRow(row).GetCell(2).CellStyle = celltext10;
 
-        s1.CreateRow(7).CreateCell(1).SetCellValue("Điện thoại:");
-        s1.GetRow(7).GetCell(1).CellStyle = celltext10;
-        s1.GetRow(7).HeightInPoints = 20;
-        s1.GetRow(7).CreateCell(2).SetCellValue(dt.Rows[0]["tel"].ToString());
-        s1.GetRow(7).GetCell(2).CellStyle = celltext10;
-
-        s1.GetRow(7).CreateCell(4).SetCellValue("Fax:");
-        s1.GetRow(7).GetCell(4).CellStyle = celltext10;
-        s1.GetRow(7).CreateCell(5).SetCellValue(dt.Rows[0]["fax"].ToString());
-        s1.GetRow(7).GetCell(5).CellStyle = celltext10;
+        s1.GetRow(row).CreateCell(4).SetCellValue("Fax:");
+        s1.GetRow(row).GetCell(4).CellStyle = celltext10;
+        s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["fax"].ToString());
+        s1.GetRow(row).GetCell(5).CellStyle = celltext10;
         s1.AddMergedRegion(new CellRangeAddress(7, 7, 5, 7));
-
-        s1.CreateRow(10).CreateCell(1).SetCellValue("Cung cấp cho công ty chúng tôi các mặt hàng với chi tiết:");
-        s1.GetRow(10).GetCell(1).CellStyle = celltext10;
-        s1.GetRow(10).HeightInPoints = 20;
-
-        row = 11;
-		// set A13 - All
-		// -- Header
-		int cell = 0;
+        row++;
+        row++;
+        row++;
+        s1.CreateRow(row).CreateCell(1).SetCellValue("Cung cấp cho công ty chúng tôi các mặt hàng với chi tiết:");
+        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).HeightInPoints = 20;
+        row++;
+        // set A13 - All
+        // -- Header
+        int cell = 0;
 		string[] d = {
             "STT",
             "Mã số",
@@ -389,17 +417,18 @@ public class DanhSachDatHangReport
             row_t.CreateCell(2);
             try
             {
-                String imgPath = System.IO.Path.Combine(productImagePath, dt.Rows[i]["pic"].ToString() + ".jpg");
-                System.Drawing.Image image = System.Drawing.Image.FromFile(imgPath);
-                MemoryStream ms = new MemoryStream();
-                image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                var imgPath = System.IO.Path.Combine(productImagePath, dt.Rows[i]["pic"].ToString() + ".jpg");
+                var image = System.Drawing.Image.FromFile(imgPath);
 
-                IDrawing patriarch = s1.CreateDrawingPatriarch();
-                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, 2, 12 + i, 3, 13 + i);
-                anchor.AnchorType = 2;
-
-                int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
-                IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+                lstimage.Add(new Dictionary<string, string>() {
+                    { "row", row + "" },
+                    { "column", 3 + "" },
+                    { "link", imgPath },
+                    { "height", row_t.HeightInPoints + "" },
+                    { "width", 5000 + "" },
+                    { "heightR", image.Height + "" },
+                    { "widthR", image.Width + "" }
+                });
             }
             catch
             { }
@@ -743,4 +772,5 @@ public class DanhSachDatHangReport
         font.FontHeightInPoints = size;
         return font;
     }
+
 }

@@ -16,6 +16,7 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
 {
     LinqDBDataContext db = new LinqDBDataContext();
     string type = "", c_danhsachdathang_id = "";
+    List<Dictionary<string, string>> lstimage = new List<Dictionary<string, string>>();
     protected void Page_Load(object sender, EventArgs e)
     {
         try
@@ -27,6 +28,7 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
             DanhSachDatHangReport rptDSDH = new DanhSachDatHangReport(c_danhsachdathang_id, logoPath, imgPath);
 			rptDSDH.guiNCC = Request.QueryString["DSDHG"] == "False";
             rptDSDH.TypePrint = type;
+            lstimage = rptDSDH.Lstimage;
             HSSFWorkbook wb = rptDSDH.CreateWBPI();
 
             this.SaveFile(wb, "Danh-Sach-Dat-Hang-" + DateTime.Now.ToString() + ".xls");
@@ -39,7 +41,46 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
 
     public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName)
     {
-        if (type == "pdf")
+        var workbook = new Spire.Xls.Workbook();
+        if (type != "pdf")
+        {
+            foreach (var item in lstimage)
+            {
+                var row = int.Parse(item["row"]);
+                var column = int.Parse(item["column"]);
+                var link = item["link"];
+                var image = System.Drawing.Image.FromFile(link);
+
+                MemoryStream ms = new MemoryStream();
+                //pull the memory stream from the image (I need this for the byte array later)
+                image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                //the drawing patriarch will hold the anchor and the master information
+                IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
+                //store the coordinates of which cell and where in the cell the image goes
+                int intx1 = column - 1;
+                int inty1 = row;
+                int intx2 = column;
+                int inty2 = 1 + row;
+
+                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
+                //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
+                anchor.AnchorType = 0;
+                //add the byte array and encode it for the excel file
+                int index = hsswb.AddPicture(ms.ToArray(), PictureType.JPEG);
+                IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+            }
+
+            MemoryStream exportData = new MemoryStream();
+            hsswb.Write(exportData);
+            hsswb.Clear();
+
+            Response.ContentType = "application/vnd.ms-excel";
+            Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
+            Response.Clear();
+            Response.BinaryWrite(exportData.GetBuffer());
+            Response.End();
+        }
+        else 
         {
             var fileName = "DSDH_" + c_danhsachdathang_id + "_" + Guid.NewGuid().ToString();
             string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
@@ -48,26 +89,56 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
             hsswb.Write(file);
             file.Close();
 
-            var workbook = new Spire.Xls.Workbook();
-            workbook.LoadFromFile(url);
-            var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
-            workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
-            workbook.Dispose();
+            workbook.LoadFromFile(url, Spire.Xls.ExcelVersion.Version97to2003);
 
-            File.Delete(url);
+            foreach (var item in lstimage)
+            {
+                var row = int.Parse(item["row"]) + 1;
+                var column = int.Parse(item["column"]);
+                var width = int.Parse(item["width"]) * 0.0273;
+                double height = double.Parse(item["height"]) * 1.332;
+                var widthR = int.Parse(item["widthR"]);
+                var heightR = int.Parse(item["heightR"]);
+                double percent = height / heightR;
+                var link = item["link"];
+                var picture = workbook.ActiveSheet.Pictures.Add(row, column, link);
+                if (type != "pdf")
+                    picture.UpdatePositions = true;
+                picture.Width = (int)(widthR * percent);
+                picture.Height = (int)(heightR * percent - 3.5);
+                Response.Write("\npercent:" + percent);
+                Response.Write("\npicture.Width:" + picture.Width);
+                Response.Write("\nwidthColumn:" + width);
+                picture.Width = picture.Width > width ? (int)(width - 1) : picture.Width;
+                var rateColumnAndPicture = (width - picture.Width) / 2 * 8;
+                rateColumnAndPicture = rateColumnAndPicture <= 0 ? 0 : rateColumnAndPicture;
+                picture.LeftColumnOffset = (int)rateColumnAndPicture;
+                picture.TopRowOffset = 5;
+            }
+            workbook.Save();
 
-            Response.Redirect(string.Format("../../ReportPdf/{0}.pdf", fileName));
-        }
-        else
-        {
-            MemoryStream exportData = new MemoryStream();
-            hsswb.Write(exportData);
+            if (type == "pdf")
+            {
+                var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
+                workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
+                workbook.Dispose();
+                File.Delete(url);
 
-            Response.ContentType = "application/vnd.ms-excel";
-            Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
-            Response.Clear();
-            Response.BinaryWrite(exportData.GetBuffer());
-            Response.End();
+                Response.Redirect(string.Format("../../ReportPdf/{0}.pdf", fileName));
+            }
+            else
+            {
+                MemoryStream exportData = new MemoryStream();
+                workbook.SaveToStream(exportData);
+                workbook.Dispose();
+                File.Delete(url);
+
+                Response.ContentType = "application/vnd.ms-excel";
+                Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
+                Response.Clear();
+                Response.BinaryWrite(exportData.GetBuffer());
+                Response.End();
+            }
         }
     }
 }

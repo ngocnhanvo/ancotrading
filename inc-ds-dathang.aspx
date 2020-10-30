@@ -176,7 +176,7 @@
                                     let params_ = '';
                                     params_ += "&DSDHG=" + xemgiaDSDH;
                                     params_ += "&type=excel";
-                                    window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "In Đơn Đặt Hàng", windowSize);
+                                    window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "Chiết xuất Đơn Đặt Hàng", windowSize);
                                 } else {
                                 alert('Bạn chưa chọn đơn đặt hàng cần in!');
                                 }
@@ -202,7 +202,7 @@
                                     params_ += "&type=pdf";
 
                                     windowSize = "top=0, left=0, width=" + window.outerWidth + ", height=" + window.outerHeight;
-                                    window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "In Danh sách đặt hàng", windowSize);
+                                    window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "In Đơn Đặt Hàng", windowSize);
                                 } else {
                                     alert('Bạn chưa chọn danh sách đặt hàng cần in.!');
                                 }
