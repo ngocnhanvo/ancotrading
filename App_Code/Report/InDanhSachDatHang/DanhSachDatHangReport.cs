@@ -263,7 +263,7 @@ public class DanhSachDatHangReport
             { "column", "5" },
             { "left", "420" },
             { "top", "23" },
-            { "width", "0" },
+            { "width", "600" },
             { "height", "0" }
         });
         row++;
