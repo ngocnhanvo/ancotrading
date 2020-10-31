@@ -17,6 +17,7 @@
     <link rel="resource" type="application/l10n" href="locale/locale.properties">
     <script>
         let DEFAULT_URL = '<%=url_pdf%>';
+        var DEFAULT_ZOOM = '<%=Request.QueryString["zoom"]%>';
     </script>
     <script src="l10n.js"></script>
     <script src="build/pdf.js"></script>
@@ -205,7 +206,7 @@
                             </div>
                             <span id="scaleSelectContainer" class="dropdownToolbarButton">
                                 <select id="scaleSelect" title="Zoom" tabindex="23" data-l10n-id="zoom">
-                                    <option id="pageAutoOption" title="" value="auto" selected="selected" data-l10n-id="page_scale_auto">Automatic Zoom</option>
+                                    <option id="pageAutoOption" title="" value="auto" data-l10n-id="page_scale_auto">Automatic Zoom</option>
                                     <option id="pageActualOption" title="" value="page-actual" data-l10n-id="page_scale_actual">Actual Size</option>
                                     <option id="pageFitOption" title="" value="page-fit" data-l10n-id="page_scale_fit">Fit Page</option>
                                     <option id="pageWidthOption" title="" value="page-width" data-l10n-id="page_scale_width">Full Width</option>
@@ -363,6 +364,10 @@
     </div>
     <!-- outerContainer -->
     <div id="printContainer"></div>
+    <script type="text/javascript">
+        //let element = document.getElementById('scaleSelect');
+        //element.value = "page-width";
+    </script>
 </body>
 </html>
 

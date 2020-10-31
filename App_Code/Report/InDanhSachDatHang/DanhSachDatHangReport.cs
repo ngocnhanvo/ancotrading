@@ -247,7 +247,7 @@ public class DanhSachDatHangReport
             { "row", row.ToString() },
             { "column", "2" },
             { "left", "420" },
-            { "top", "23" },
+            { "top", "-1" },
             { "width", "0" },
             { "height", "0" }
         });
@@ -261,8 +261,8 @@ public class DanhSachDatHangReport
             { "text", dt.Rows[0]["so_po"].ToString() },
             { "row", row.ToString() },
             { "column", "5" },
-            { "left", "420" },
-            { "top", "23" },
+            { "left", "320" },
+            { "top", "-1" },
             { "width", "600" },
             { "height", "0" }
         });
@@ -278,8 +278,8 @@ public class DanhSachDatHangReport
             { "text", ngayLapText },
             { "row", row.ToString() },
             { "column", "2" },
-            { "left", "300" },
-            { "top", "23" },
+            { "left", "290" },
+            { "top", "-1" },
             { "width", "600" },
             { "height", "0" }
         });
@@ -289,11 +289,11 @@ public class DanhSachDatHangReport
         s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["customer_order_no"].ToString());
         s1.GetRow(row).GetCell(5).CellStyle = celltext10;
         lstText.Add(new Dictionary<string, string>() {
-            { "text", dt.Rows[0]["customer_order_no"].ToString() },
+            { "text", dt.Rows[0]["customer_order_no"].ToString() + " " },
             { "row", row.ToString() },
             { "column", "5" },
-            { "left", "630" },
-            { "top", "23" },
+            { "left", "520" },
+            { "top", "-1" },
             { "width", "600" },
             { "height", "0" }
         });
@@ -314,7 +314,7 @@ public class DanhSachDatHangReport
             { "row", row.ToString() },
             { "column", "2" },
             { "left", "340" },
-            { "top", "23" },
+            { "top", "-1" },
             { "width", "300" },
             { "height", "0" }
         });
@@ -328,8 +328,8 @@ public class DanhSachDatHangReport
             { "text", dt.Rows[0]["fax"].ToString() },
             { "row", row.ToString() },
             { "column", "5" },
-            { "left", "150" },
-            { "top", "23" },
+            { "left", "30" },
+            { "top", "-1" },
             { "width", "600" },
             { "height", "0" }
         });

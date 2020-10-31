@@ -90,7 +90,7 @@
 
 var pdfjsLib = __webpack_require__(1);
 var CSS_UNITS = 96.0 / 72.0;
-var DEFAULT_SCALE_VALUE = 'auto';
+var DEFAULT_SCALE_VALUE = DEFAULT_ZOOM;
 var DEFAULT_SCALE = 1.0;
 var MIN_SCALE = 0.25;
 var MAX_SCALE = 10.0;

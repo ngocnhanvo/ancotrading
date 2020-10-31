@@ -1311,7 +1311,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 workbook.Dispose();
                 //File.Delete(url);
 
-                Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=1", fileName));
+                Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=1&zoom=page-width", fileName));
             }
             else
             {
