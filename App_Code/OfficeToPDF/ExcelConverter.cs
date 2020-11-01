@@ -812,7 +812,7 @@ namespace OfficeToPDF
                 // Get the sheets
                 allSheets = workbook.Sheets;
                 var worksheet = (Microsoft.Office.Interop.Excel._Worksheet)workbook.ActiveSheet;
-                //worksheet.PageSetup.CenterHorizontally = true;
+                worksheet.PageSetup.CenterHorizontally = true;
                 //worksheet.PageSetup.FitToPagesWide = 1;
                 foreach (var image in lstImage)
                 {
