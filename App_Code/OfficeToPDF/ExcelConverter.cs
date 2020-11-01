@@ -875,7 +875,7 @@ namespace OfficeToPDF
                 // Try and avoid xls files raising a dialog
                 var temporaryStorageDir = Path.GetTempFileName();
                 File.Delete(temporaryStorageDir);
-                app.DisplayDocumentActionTaskPane = false;
+                //app.DisplayDocumentActionTaskPane = false;
                 app.EnableEvents = false;
                 workbook.SaveAs(inputFile, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing,
                    Type.Missing, Type.Missing);
