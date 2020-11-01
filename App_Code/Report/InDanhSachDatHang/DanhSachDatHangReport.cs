@@ -15,16 +15,16 @@ public class DanhSachDatHangReport
 {
     LinqDBDataContext db = new LinqDBDataContext();
     private String c_danhsachdathang_id, logoPath, productImagePath, type;
-    private List<Dictionary<string, string>> lstimage = new List<Dictionary<string, string>>();
-    private List<Dictionary<string, string>> lstText = new List<Dictionary<string, string>>();
+    private List<AvariablePrj.lstIamge> lstimage = new List<AvariablePrj.lstIamge>();
+    private List<AvariablePrj.lstText> lstText = new List<AvariablePrj.lstText>();
 
-    public List<Dictionary<string, string>> Lstimage
+    public List<AvariablePrj.lstIamge> Lstimage
     {
         get { return lstimage; }
         set { lstimage = value; }
     }
 
-    public List<Dictionary<string, string>> LstText
+    public List<AvariablePrj.lstText> LstText
     {
         get { return lstText; }
         set { lstText = value; }
@@ -232,7 +232,6 @@ public class DanhSachDatHangReport
 			}
 			row++;
 		}
-        s1.AddMergedRegion(new CellRangeAddress(5, 5, 5, 7));
         s1.AddMergedRegion(new CellRangeAddress(6, 6, 1, 9));
         s1.AddMergedRegion(new CellRangeAddress(10, 10, 1, 9));
 
@@ -242,29 +241,29 @@ public class DanhSachDatHangReport
         s1.GetRow(row).HeightInPoints = 20;
         s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["sochungtu"].ToString());
         s1.GetRow(row).GetCell(2).CellStyle = celltext10;
-        lstText.Add(new Dictionary<string, string>() {
-            { "text", dt.Rows[0]["sochungtu"].ToString() },
-            { "row", row.ToString() },
-            { "column", "2" },
-            { "left", "420" },
-            { "top", "-1" },
-            { "width", "0" },
-            { "height", "0" }
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 3));
+        lstText.Add(new AvariablePrj.lstText() {
+            value = "",
+            row = row,
+            columnF = 2,
+            columnT = 3,
+            left = 88,
+            top = (float)-0.2
         });
         
         s1.GetRow(row).CreateCell(4).SetCellValue("Theo P/O số:");
         s1.GetRow(row).GetCell(4).CellStyle = celltext10;
         s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["so_po"].ToString());
         s1.GetRow(row).GetCell(5).CellStyle = celltext10;
-        s1.AddMergedRegion(new CellRangeAddress(4, 4, 5, 7));
-        lstText.Add(new Dictionary<string, string>() {
-            { "text", dt.Rows[0]["so_po"].ToString() },
-            { "row", row.ToString() },
-            { "column", "5" },
-            { "left", "320" },
-            { "top", "-1" },
-            { "width", "600" },
-            { "height", "0" }
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 9));
+        lstText.Add(new AvariablePrj.lstText()
+        {
+            value = "",
+            row = row,
+            columnF = 5,
+            columnT = 9,
+            left = 87,
+            top = (float)-0.2
         });
         row++;
 
@@ -274,28 +273,30 @@ public class DanhSachDatHangReport
         s1.GetRow(row).HeightInPoints = 20;
         s1.GetRow(row).CreateCell(2).SetCellValue(ngayLapText);
         s1.GetRow(row).GetCell(2).CellStyle = celltext10;
-        lstText.Add(new Dictionary<string, string>() {
-            { "text", ngayLapText },
-            { "row", row.ToString() },
-            { "column", "2" },
-            { "left", "290" },
-            { "top", "-1" },
-            { "width", "600" },
-            { "height", "0" }
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 3));
+        lstText.Add(new AvariablePrj.lstText()
+        {
+            value = "",
+            row = row,
+            columnF = 2,
+            columnT = 3,
+            left = 105,
+            top = (float)-0.2
         });
 
         s1.GetRow(row).CreateCell(4).SetCellValue("Customer Order No:");
         s1.GetRow(row).GetCell(4).CellStyle = celltext10;
         s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["customer_order_no"].ToString());
         s1.GetRow(row).GetCell(5).CellStyle = celltext10;
-        lstText.Add(new Dictionary<string, string>() {
-            { "text", dt.Rows[0]["customer_order_no"].ToString() + " " },
-            { "row", row.ToString() },
-            { "column", "5" },
-            { "left", "520" },
-            { "top", "-1" },
-            { "width", "600" },
-            { "height", "0" }
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 9));
+        lstText.Add(new AvariablePrj.lstText()
+        {
+            value = "",
+            row = row,
+            columnF = 5,
+            columnT = 9,
+            left = 58,
+            top = (float)-0.2
         });
         row++;
 
@@ -309,29 +310,30 @@ public class DanhSachDatHangReport
         s1.GetRow(row).HeightInPoints = 20;
         s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["tel"].ToString());
         s1.GetRow(row).GetCell(2).CellStyle = celltext10;
-        lstText.Add(new Dictionary<string, string>() {
-            { "text", dt.Rows[0]["tel"].ToString() },
-            { "row", row.ToString() },
-            { "column", "2" },
-            { "left", "340" },
-            { "top", "-1" },
-            { "width", "300" },
-            { "height", "0" }
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 3));
+        lstText.Add(new AvariablePrj.lstText()
+        {
+            value = "",
+            row = row,
+            columnF = 2,
+            columnT = 3,
+            left = 100,
+            top = (float)-0.2
         });
 
         s1.GetRow(row).CreateCell(4).SetCellValue("Fax:");
         s1.GetRow(row).GetCell(4).CellStyle = celltext10;
         s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["fax"].ToString());
         s1.GetRow(row).GetCell(5).CellStyle = celltext10;
-        s1.AddMergedRegion(new CellRangeAddress(7, 7, 5, 7));
-        lstText.Add(new Dictionary<string, string>() {
-            { "text", dt.Rows[0]["fax"].ToString() },
-            { "row", row.ToString() },
-            { "column", "5" },
-            { "left", "30" },
-            { "top", "-1" },
-            { "width", "600" },
-            { "height", "0" }
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 9));
+        lstText.Add(new AvariablePrj.lstText()
+        {
+            value = "",
+            row = row,
+            columnF = 5,
+            columnT = 9,
+            left = 125,
+            top = (float)-0.2
         });
         row++;
         row++;
@@ -464,15 +466,12 @@ public class DanhSachDatHangReport
             {
                 var imgPath = System.IO.Path.Combine(productImagePath, dt.Rows[i]["pic"].ToString() + ".jpg");
                 var image = System.Drawing.Image.FromFile(imgPath);
-
-                lstimage.Add(new Dictionary<string, string>() {
-                    { "row", row + "" },
-                    { "column", 3 + "" },
-                    { "link", imgPath },
-                    { "height", row_t.HeightInPoints + "" },
-                    { "width", 5000 + "" },
-                    { "heightR", image.Height + "" },
-                    { "widthR", image.Width + "" }
+                lstimage.Add(new AvariablePrj.lstIamge() {
+                    row = row,
+                    column = 3,
+                    link = imgPath,
+                    heightCell = row_t.HeightInPoints,
+                    widthCell = 5000
                 });
             }
             catch

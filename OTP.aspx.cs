@@ -7,8 +7,6 @@ using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Web.Security;
 using System.Data;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
 
 public partial class OTP : System.Web.UI.Page
 {

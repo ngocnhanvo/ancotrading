@@ -1309,6 +1309,13 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
                 workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
                 workbook.Dispose();
+
+                var doc = new Spire.Pdf.PdfDocument();
+                doc.LoadFromFile(urlPDF);
+                doc.PageSettings.Margins.Bottom = 0;
+                doc.SaveToFile(urlPDF);
+                doc.Dispose();
+
                 //File.Delete(url);
 
                 Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=1&zoom=page-width", fileName));
