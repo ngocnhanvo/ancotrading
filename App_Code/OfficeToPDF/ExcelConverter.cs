@@ -564,7 +564,7 @@ namespace OfficeToPDF
                 }
                 else
                 {
-                    app.DisplayDocumentActionTaskPane = false;
+                    //app.DisplayDocumentActionTaskPane = false;
                     app.EnableEvents = false;
                     PrintDocument printFunc = delegate (string destination, string printer)
                     {
