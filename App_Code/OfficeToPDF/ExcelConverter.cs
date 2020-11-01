@@ -935,6 +935,7 @@ namespace OfficeToPDF
                     Directory.Delete(Path.GetDirectoryName(tmpFile));
                 }
             }
+            app.Quit();
             return "";
         }
 
