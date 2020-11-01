@@ -86,7 +86,7 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
             {
                 var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
 
-                var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstimage, lstText);
+                //var result = OfficeToPDF.ExcelConverter.ConvertBullZip(url, urlPDF, null, lstimage, lstText);
                 //File.Delete(url);
 
                 Response.Write("Server is not supported");
