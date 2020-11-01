@@ -677,7 +677,6 @@ namespace OfficeToPDF
             System.Object activeSheet = null;
             Microsoft.Office.Interop.Excel.Window activeWindow = null;
             Microsoft.Office.Interop.Excel.Windows wbWin = null;
-            Hashtable templatePageSetup = new Hashtable();
 
             String tmpFile = null;
             object oMissing = System.Reflection.Missing.Value;
@@ -723,26 +722,10 @@ namespace OfficeToPDF
                 //app.CommandBars.ExecuteMso("HideRibbon");
                 app.FeatureInstall = Microsoft.Office.Core.MsoFeatureInstall.msoFeatureInstallNone;
 
-                var onlyActiveSheet = false;
-                Boolean activeSheetOnMaxRows = false;
-                Boolean includeProps = !false;
-                Boolean skipRecalculation = true;
-                Boolean showHeadings = false;
-                Boolean showFormulas = false;
                 Boolean isHidden = false;
-                Boolean screenQuality = false;
                 Boolean updateLinks = !false;
-                var passWord = "";
-                var writepassword = "";
-                var fallback_printer = "";
-                var printerO = "";
-                int maxRows = 0;
-                int worksheetNum = 0;
-                int sheetForConversionIdx = 0;
                 activeWindow = app.ActiveWindow;
                 Sheets allSheets = null;
-                XlFileFormat fmt = XlFileFormat.xlOpenXMLWorkbook;
-                XlFixedFormatQuality quality = XlFixedFormatQuality.xlQualityStandard;
                 if (isHidden)
                 {
                     // Try and at least minimise it
@@ -750,52 +733,11 @@ namespace OfficeToPDF
                     app.Visible = false;
                 }
 
-                String readPassword = "";
-                if (!String.IsNullOrEmpty(passWord))
-                {
-                    readPassword = passWord;
-                }
-                Object oReadPass = (Object)readPassword;
-
-                String writePassword = "";
-                if (!String.IsNullOrEmpty(writepassword))
-                {
-                    writePassword = writepassword;
-                }
-                Object oWritePass = (Object)writePassword;
-
-                // Check for password protection and no password
-                if (Converter.IsPasswordProtected(inputFile) && String.IsNullOrEmpty(readPassword))
-                {
-                    Console.WriteLine("Unable to open password protected file");
-                    return Enum.GetName(typeof(ExitCode), ExitCode.PasswordFailure);
-                }
-
                 app.EnableEvents = false;
                 workbooks = app.Workbooks;
-                // If we have no write password and we're attempting to open for writing, we might be
-                // caught out by an unexpected write password
-                if (writePassword == "" && !nowrite)
-                {
-                    oWritePass = (Object)"FAKEPASSWORD";
-                    try
-                    {
-                        workbook = workbooks.Open(inputFile, updateLinks, nowrite, oMissing, oReadPass, oWritePass, true, oMissing, oMissing, oMissing, oMissing, oMissing, false, oMissing, oMissing);
-                    }
-                    catch (System.Runtime.InteropServices.COMException)
-                    {
-                        // Attempt to open it in read-only mode
-                        workbook = workbooks.Open(inputFile, updateLinks, true, oMissing, oReadPass, oWritePass, true, oMissing, oMissing, oMissing, oMissing, oMissing, false, oMissing, oMissing);
-                    }
-                }
-                else
-                {
-                    workbook = workbooks.Open(inputFile, updateLinks, nowrite, oMissing, oReadPass, oWritePass, true, oMissing, oMissing, oMissing, oMissing, oMissing, false, oMissing, oMissing);
-                }
-                // Add in a delay to let Excel sort itself out
-                //AddCOMDelay(options);
 
-                // Unable to open workbook
+                workbook = workbooks.Open(inputFile, updateLinks, nowrite, oMissing, oMissing, oMissing, true, oMissing, oMissing, oMissing, oMissing, oMissing, false, oMissing, oMissing);
+
                 if (workbook == null)
                 {
                     return Enum.GetName(typeof(ExitCode), ExitCode.FileOpenFailure);
@@ -812,8 +754,8 @@ namespace OfficeToPDF
                 // Get the sheets
                 allSheets = workbook.Sheets;
                 var worksheet = (Microsoft.Office.Interop.Excel._Worksheet)workbook.ActiveSheet;
-                //worksheet.PageSetup.CenterHorizontally = true;
-                //worksheet.PageSetup.FitToPagesWide = 1;
+                worksheet.PageSetup.CenterHorizontally = true;
+                worksheet.PageSetup.FitToPagesWide = 1;
                 foreach (var image in lstImage)
                 {
                     var oRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[image.row + 1, image.column];
@@ -872,18 +814,11 @@ namespace OfficeToPDF
                     //stringTextBox.Font.Size = 10.5;
                 }
 
-                // Try and avoid xls files raising a dialog
                 var temporaryStorageDir = Path.GetTempFileName();
                 File.Delete(temporaryStorageDir);
-                //app.DisplayDocumentActionTaskPane = false;
                 app.EnableEvents = false;
                 workbook.SaveAs(inputFile, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing,
                    Type.Missing, Type.Missing);
-                    
-
-                //ReleaseCOMObject(allSheets);
-                //ReleaseCOMObject(fmt);
-                //ReleaseCOMObject(quality);
             }
             catch (COMException ce)
             {
@@ -897,13 +832,6 @@ namespace OfficeToPDF
             {
                 if (workbook != null)
                 {
-                    //ReleaseCOMObject(activeSheet);
-                    //ReleaseCOMObject(activeWindow);
-                    //ReleaseCOMObject(wbWin);
-                    //GC.Collect();
-                    //GC.WaitForPendingFinalizers();
-                    // Excel sometimes needs a bit of a delay before we close in order to
-                    // let things get cleaned up
                     workbook.Saved = true;
                     CloseExcelWorkbook(workbook);
                 }
@@ -917,22 +845,8 @@ namespace OfficeToPDF
 
                     if (app != null)
                     {
-                        ((Microsoft.Office.Interop.Excel._Application)app).Quit();
+                        app.Quit();
                     }
-                }
-
-                // Clean all the COM leftovers
-                //ReleaseCOMObject(workbook);
-                //ReleaseCOMObject(workbooks);
-                //ReleaseCOMObject(app);
-                //GC.Collect();
-                //GC.WaitForPendingFinalizers();
-
-                if (tmpFile != null && File.Exists(tmpFile))
-                {
-                    System.IO.File.Delete(tmpFile);
-                    // Remove the temporary path to the temp file
-                    Directory.Delete(Path.GetDirectoryName(tmpFile));
                 }
             }
             app.Quit();
