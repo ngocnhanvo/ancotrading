@@ -708,7 +708,7 @@ namespace OfficeToPDF
                 }
                 if (tries == 0)
                 {
-                    ReleaseCOMObject(app);
+                    app.Quit();
                     return Enum.GetName(typeof(ExitCode), ExitCode.ApplicationError);
                 }
 
@@ -793,7 +793,7 @@ namespace OfficeToPDF
                     workbook = workbooks.Open(inputFile, updateLinks, nowrite, oMissing, oReadPass, oWritePass, true, oMissing, oMissing, oMissing, oMissing, oMissing, false, oMissing, oMissing);
                 }
                 // Add in a delay to let Excel sort itself out
-                AddCOMDelay(options);
+                //AddCOMDelay(options);
 
                 // Unable to open workbook
                 if (workbook == null)
@@ -807,7 +807,7 @@ namespace OfficeToPDF
                 }
 
                 // Get any template options
-                SetPageOptionsFromTemplate(app, workbooks, options, ref templatePageSetup);
+                //SetPageOptionsFromTemplate(app, workbooks, options, ref templatePageSetup);
 
                 // Get the sheets
                 allSheets = workbook.Sheets;
@@ -881,9 +881,9 @@ namespace OfficeToPDF
                    Type.Missing, Type.Missing);
                     
 
-                ReleaseCOMObject(allSheets);
-                ReleaseCOMObject(fmt);
-                ReleaseCOMObject(quality);
+                //ReleaseCOMObject(allSheets);
+                //ReleaseCOMObject(fmt);
+                //ReleaseCOMObject(quality);
             }
             catch (COMException ce)
             {
@@ -897,11 +897,11 @@ namespace OfficeToPDF
             {
                 if (workbook != null)
                 {
-                    ReleaseCOMObject(activeSheet);
-                    ReleaseCOMObject(activeWindow);
-                    ReleaseCOMObject(wbWin);
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
+                    //ReleaseCOMObject(activeSheet);
+                    //ReleaseCOMObject(activeWindow);
+                    //ReleaseCOMObject(wbWin);
+                    //GC.Collect();
+                    //GC.WaitForPendingFinalizers();
                     // Excel sometimes needs a bit of a delay before we close in order to
                     // let things get cleaned up
                     workbook.Saved = true;
@@ -922,11 +922,11 @@ namespace OfficeToPDF
                 }
 
                 // Clean all the COM leftovers
-                ReleaseCOMObject(workbook);
-                ReleaseCOMObject(workbooks);
-                ReleaseCOMObject(app);
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                //ReleaseCOMObject(workbook);
+                //ReleaseCOMObject(workbooks);
+                //ReleaseCOMObject(app);
+                //GC.Collect();
+                //GC.WaitForPendingFinalizers();
 
                 if (tmpFile != null && File.Exists(tmpFile))
                 {
@@ -1001,13 +1001,13 @@ namespace OfficeToPDF
                                     templatePageSetup[templateProperties[i]] = prop;
                                 }
                             }
-                            Converter.ReleaseCOMObject(firstItem);
+                            //Converter.ReleaseCOMObject(firstItem);
                         }
-                        ReleaseCOMObject(templateSheets);
+                        //ReleaseCOMObject(templateSheets);
                     }
                     CloseExcelWorkbook(template);
                 }
-                ReleaseCOMObject(template);
+                //ReleaseCOMObject(template);
             }
             finally
             {
