@@ -460,7 +460,11 @@ public class DanhSachDatHangReport
                 "phi"
             };
             //
-			IRow row_t = s1.CreateRow(row); row_t.HeightInPoints = 80;
+			IRow row_t = s1.CreateRow(row);
+            string moTa = dt.Rows[i]["moTa"].ToString();
+            var heighMoTatMAX = config.MeasureTextHeight(moTa, sumWidth2to9, "Arial", (float)11.25);
+            row_t.HeightInPoints = heighMoTatMAX < 80 ? 80 : heighMoTatMAX;
+
             row_t.CreateCell(2);
             try
             {
@@ -717,12 +721,12 @@ public class DanhSachDatHangReport
 		s1.CreateRow(row).CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
         s1.GetRow(row).GetCell(1).CellStyle = cellBold10Top;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
-        string mota = dt.Rows[0]["huongdanlamhang"].ToString();
-        //HSSFRichTextString rich = new HSSFRichTextString(mota);
-        s1.GetRow(row).CreateCell(2).SetCellValue(mota);
+        string huongdanlamhang = dt.Rows[0]["huongdanlamhang"].ToString();
+        //HSSFRichTextString rich = new HSSFRichTextString(huongdanlamhang);
+        s1.GetRow(row).CreateCell(2).SetCellValue(huongdanlamhang);
         s1.GetRow(row).GetCell(2).CellStyle = celltext10Top;
 
-        var heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", (float)11);
+        var heightMAX = config.MeasureTextHeight(huongdanlamhang, sumWidth2to9, "Arial", (float)11);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
 
 		row++;
@@ -730,12 +734,12 @@ public class DanhSachDatHangReport
 		s1.CreateRow(row).CreateCell(1).SetCellValue("2. Các hướng dẫn khác:");
         s1.GetRow(row).GetCell(1).CellStyle = cellBold10Top;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
-        mota = dt.Rows[0]["huongdanlamhangchung"].ToString();
-        //var rich_khac = new HSSFRichTextString(mota);
-        s1.GetRow(row).CreateCell(2).SetCellValue(mota);
+        var huongdanlamhangchung = dt.Rows[0]["huongdanlamhangchung"].ToString();
+        //var rich_khac = new HSSFRichTextString(huongdanlamhangchung);
+        s1.GetRow(row).CreateCell(2).SetCellValue(huongdanlamhangchung);
         s1.GetRow(row).GetCell(2).CellStyle = celltext10Top;
 
-        heightMAX = config.MeasureTextHeight(mota, sumWidth2to9, "Arial", (float)11);
+        heightMAX = config.MeasureTextHeight(huongdanlamhangchung, sumWidth2to9, "Arial", (float)11);
         s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
         row++;
 		//--
