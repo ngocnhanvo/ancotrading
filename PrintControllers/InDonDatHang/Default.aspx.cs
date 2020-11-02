@@ -86,12 +86,12 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
             {
                 var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
 
-                //var result = OfficeToPDF.ExcelConverter.ConvertBullZip(url, urlPDF, null, lstimage, lstText);
-                //File.Delete(url);
+                var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstimage, lstText);
+                File.Delete(url);
 
-                Response.Write("Server is not supported");
-                //if(result.Length <= 0)
-                //Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width", fileName));
+                //Response.Write("Server is not supported");
+                if(result.Length <= 0)
+                    Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width", fileName));
             }
         }
     }
