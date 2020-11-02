@@ -89,7 +89,7 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
                 var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstimage, lstText);
                 File.Delete(url);
 
-                //Response.Write("Server is not supported");
+                Response.Write(result);
                 if(result.Length <= 0)
                     Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width", fileName));
             }
