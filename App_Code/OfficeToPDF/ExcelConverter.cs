@@ -564,8 +564,8 @@ namespace OfficeToPDF
                 }
                 else
                 {
-                    app.DisplayDocumentActionTaskPane = false;
-                    app.EnableEvents = false;
+                    //app.DisplayDocumentActionTaskPane = false;
+                    //app.EnableEvents = false;
                     PrintDocument printFunc = delegate (string destination, string printer)
                     {
                         workbook.PrintOutEx(ActivePrinter: printer, PrintToFile: true, PrToFileName: destination);
