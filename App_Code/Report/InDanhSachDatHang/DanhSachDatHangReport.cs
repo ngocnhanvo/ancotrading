@@ -171,6 +171,7 @@ public class DanhSachDatHangReport
         ICellStyle celltext10 = ex_fm.getcell(10, false, true, "", "L", "T");
         ICellStyle celltext10Top = ex_fm.getcell(10, false, true, "", "L", "B");
         ICellStyle cellTextCenter = ex_fm.getcell(12, false, true, "", "C", "T");
+        ICellStyle cellText10Center = ex_fm.getcell(10, false, true, "", "C", "T");
         //--
         ICellStyle rightBold = ex_fm.getcell(12, true, false, "", "R", "T");
 		//--
@@ -262,7 +263,7 @@ public class DanhSachDatHangReport
             row = row,
             columnF = 5,
             columnT = 9,
-            left = 87,
+            left = 108,
             top = (float)-0.2
         });
         row++;
@@ -295,7 +296,7 @@ public class DanhSachDatHangReport
             row = row,
             columnF = 5,
             columnT = 9,
-            left = 58,
+            left = 78,
             top = (float)-0.2
         });
         row++;
@@ -317,7 +318,7 @@ public class DanhSachDatHangReport
             row = row,
             columnF = 2,
             columnT = 3,
-            left = 100,
+            left = 98,
             top = (float)-0.2
         });
 
@@ -332,7 +333,7 @@ public class DanhSachDatHangReport
             row = row,
             columnF = 5,
             columnT = 9,
-            left = 125,
+            left = 147,
             top = (float)-0.2
         });
         row++;
@@ -344,91 +345,186 @@ public class DanhSachDatHangReport
         row++;
         // set A13 - All
         // -- Header
-        int cell = 0;
-		string[] d = {
-            "STT",
-            "Mã số",
-            "Hình ảnh",
-            "Mã khách hàng",
-            "Mô tả",
-            "SL",
-            "ĐVT",
-            "Giá mua",
-            "Phí",
-            "Tổng đơn giá mua",
-            "Thành tiền",
-            "Đóng gói Inner",
-            "Đóng gói Outer",
-            "Số kiện Inner",
-            "Số kiện Outer",
-            "Cbm",
-            "Hướng dẫn làm hàng",
-            "Trọng lượng",
-            "Xác nhận kích thước",
-            "Giá gốc",
-            "Phí"
-        };
+        var columnHeaders = new List<columnHeader>();
+        int width = 5000;
+        #region columnHeaders
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 0,
+            text = "STT",
+            value = "stt",
+            width = 1500
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 1,
+            text = "Mã số",
+            value = "maSo",
+            width = 7000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 2,
+            text = "Hình ảnh",
+            value = "",
+            width = width
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 3,
+            text = "Mã khách hàng",
+            value = "maKhachHang",
+            width = width
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 4,
+            text = "Mô tả",
+            value = "moTa",
+            width = 8000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 5,
+            text = "SL",
+            value = "soLuong",
+            width = 2500
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 6,
+            text = "ĐVT",
+            value = "dvt",
+            width = 2000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 7,
+            text = "Giá mua",
+            value = "giaMua",
+            width = guiNCC ? 0 : 4000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 8,
+            text = "Phí",
+            value = "phi",
+            width = guiNCC ? 0 : 4000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 9,
+            text = "Tổng đơn giá mua",
+            value = "tongDonGiaMua",
+            width = guiNCC ? 0 : 4000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 10,
+            text = "Thành tiền",
+            value = "thanhTien",
+            width = guiNCC ? 0 : 5000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 11,
+            text = "Đóng gói Inner",
+            value = "dginner",
+            width = 4000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 12,
+            text = "Đóng gói Outer",
+            value = "dgouter",
+            width = 4000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 13,
+            text = "Số kiện Inner",
+            value = "soKienInner",
+            width = 3400
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 14,
+            text = "Số kiện Outer",
+            value = "soKienOuter",
+            width = 3400
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 15,
+            text = "Cbm",
+            value = "cbm",
+            width = 2500
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 16,
+            text = "Hướng dẫn làm hàng",
+            value = "huongdan_dathang",
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 17,
+            text = "Trọng lượng",
+            value = "trongluong",
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 18,
+            text = "Xác nhận kích thước",
+            value = "ghichu",
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 19,
+            text = "Giá gốc",
+            value = "giaMua",
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 20,
+            text = "Phí",
+            value = "phi",
+            width = 0
+        });
+        #endregion columnHeaders
 
 		IRow rowColumnHeader = s1.CreateRow(row);
 		rowColumnHeader.HeightInPoints = 47;
-        var sumWidth2to9 = 0;
-		for(int i = 0; i < d.Length; i++)
-		{		
-			int with = 5000;
-			rowColumnHeader.CreateCell(cell).SetCellValue(d[i]);
-			rowColumnHeader.GetCell(i).CellStyle = borderWrap;
-
-            if (i == 0)
-            {
-                with = 1500;
-            }
-            else if (i == 1)
-            {
-                with = 7000;
-            }
-            else if(new int[] { 2, 3 }.Contains(i))
-            {
-                sumWidth2to9 += with;
-            }
-            else if ( i == 4)
-            {
-				with = 7000;
-                sumWidth2to9 += with;
-            }
-            else if (i == 5)
-            {
-                with = 2500;
-                sumWidth2to9 += with;
-            }
-            else if (i == 6)
-            {
-                with = 2000;
-                sumWidth2to9 += with;
-            }
-            else if (i == 15)
-            {
-                with = 2500;
-            }
-            else if(new int[] { 13, 14}.Contains(i)) {
-				with = 3400;
-			}
-			else if( i >= 16) {
-				with = 0;
-			}
-
-            if ((new int[] { 7, 8, 9, 10 }.Contains(i)))
-            {
-                if (guiNCC)
-                    with = 0;
-                else
-                    with = 4000;
-
-                if (i != 10)
-                    sumWidth2to9 += with;
-            }
-
-            s1.SetColumnWidth(cell,with);
-			cell++;
+        var sumWidth2to9 = columnHeaders.Where(s=>s.columnAt >=2 & s.columnAt <= 9).Sum(s=>s.width);
+		foreach(var colHeader in columnHeaders)
+		{
+			rowColumnHeader.CreateCell(colHeader.columnAt).SetCellValue(colHeader.text);
+			rowColumnHeader.GetCell(colHeader.columnAt).CellStyle = borderWrap;
+            s1.SetColumnWidth(colHeader.columnAt, colHeader.width);
 		}
 		row ++;
 		//thu tu tong cong // dem so dong hang cua tung sochungtu
@@ -436,34 +532,11 @@ public class DanhSachDatHangReport
         double sumThanhTien = 0;
         for (int i = 0; i < dt.Rows.Count; i++)
         {
-			string[] e_value = {
-                "stt",
-                "maSo",
-                "",
-                "maKhachHang",
-                "moTa",
-                "soLuong",
-                "dvt",
-                "giaMua",
-                "phi",
-                "tongDonGiaMua",
-                "thanhTien",
-                "dginner",
-                "dgouter",
-                "soKienInner",
-                "soKienOuter",
-                "cbm",
-                 "huongdan_dathang",
-                "trongluong",
-                "ghichu",
-                "giaMua",
-                "phi"
-            };
             //
 			IRow row_t = s1.CreateRow(row);
             string moTa = dt.Rows[i]["moTa"].ToString();
-            var heighMoTatMAX = config.MeasureTextHeight(moTa, sumWidth2to9, "Arial", (float)11.25);
-            row_t.HeightInPoints = heighMoTatMAX < 80 ? 80 : heighMoTatMAX;
+            var heighMoTatMAX = config.MeasureTextHeight(moTa, 7000, "Arial", (float)12.25) + 4;
+            row_t.HeightInPoints = heighMoTatMAX < 70 ? 70 : heighMoTatMAX;
 
             row_t.CreateCell(2);
             try
@@ -486,20 +559,20 @@ public class DanhSachDatHangReport
             var thanhtien = soLuong * tongDonGiaMua;
             sumThanhTien += thanhtien;
 
-            for (int j = 0; j < e_value.Length; j++)
+            foreach (var colHeader in columnHeaders)
 			{
-				var cel_row_t = row_t.CreateCell(j);
-				if(e_value[j] == "stt")
+				var cel_row_t = row_t.CreateCell(colHeader.columnAt);
+				if(colHeader.value == "stt")
                 {
 					cel_row_t.SetCellValue(count_row);
 					cel_row_t.CellStyle = border_center; 
 				}
-                else if (new string[] { "dvt", "maSo" }.Contains(e_value[j]))
+                else if (new string[] { "dvt", "maSo" }.Contains(colHeader.value))
                 {
-                    cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString());
+                    cel_row_t.SetCellValue(dt.Rows[i][colHeader.value].ToString());
                     cel_row_t.CellStyle = border_center;
                 }
-                else if(e_value[j] == "thanhTien")
+                else if(colHeader.value == "thanhTien")
                 {
                     if (guiNCC == false)
                         cel_row_t.CellFormula = String.Format("J{0}*F{0}",row + 1);
@@ -508,19 +581,19 @@ public class DanhSachDatHangReport
                     else
                         cel_row_t.CellStyle = border_number;
                 }
-				else if(e_value[j] == "trongluong")
+				else if(colHeader.value == "trongluong")
                 {
-					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
+					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][colHeader.value].ToString()));
 					cel_row_t.CellStyle = border_number1;
 				}
-				else if(e_value[j] == "soLuong")
+				else if(colHeader.value == "soLuong")
                 {
-					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
+					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][colHeader.value].ToString()));
 					cel_row_t.CellStyle = border_number0;
 				}
-				else if (new string[] { "giaMua", "tongDonGiaMua", "phi" }.Contains(e_value[j]))
+				else if (new string[] { "giaMua", "tongDonGiaMua", "phi" }.Contains(colHeader.value))
                 {
-                    var val = double.Parse(dt.Rows[i][e_value[j]].ToString());
+                    var val = double.Parse(dt.Rows[i][colHeader.value].ToString());
                     if (guiNCC == false)
                         cel_row_t.SetCellValue(val);
 
@@ -529,22 +602,22 @@ public class DanhSachDatHangReport
                     else
                         cel_row_t.CellStyle = border_number;
                 }
-				else if( new string[] { "cbm", "soKienInner", "soKienOuter" }.Contains(e_value[j]))
+				else if( new string[] { "cbm", "soKienInner", "soKienOuter" }.Contains(colHeader.value))
                 {
-					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
+					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][colHeader.value].ToString()));
 					cel_row_t.CellStyle = border_number2;
 				}
-				else if( e_value[j] == "")
+				else if(colHeader.value == "")
                 {
 					cel_row_t.SetCellValue("");
 					cel_row_t.CellStyle = border;
 				}
 				else
                 {
-					cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString());
+					cel_row_t.SetCellValue(dt.Rows[i][colHeader.value].ToString());
 					cel_row_t.CellStyle = border;
 				}
-			}	
+			}
 			row++;
 			count_row++;
 		}
@@ -718,31 +791,86 @@ public class DanhSachDatHangReport
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         row++;
 		// start dac diem hang hoa
-		s1.CreateRow(row).CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
-        s1.GetRow(row).GetCell(1).CellStyle = cellBold10Top;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
         string huongdanlamhang = dt.Rows[0]["huongdanlamhang"].ToString();
-        //HSSFRichTextString rich = new HSSFRichTextString(huongdanlamhang);
-        s1.GetRow(row).CreateCell(2).SetCellValue(huongdanlamhang);
-        s1.GetRow(row).GetCell(2).CellStyle = celltext10Top;
+        if (type == "pdf")
+        {
+            string[] arrDDHHs = huongdanlamhang.Split(new string[] { "\n", "\r" }, StringSplitOptions.None);
+            for (var iHDK = 0; iHDK < arrDDHHs.Length; iHDK++)
+            {
+                var rowLineHDK = s1.CreateRow(row);
+                if (iHDK == 0)
+                {
+                    rowLineHDK.CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
+                    rowLineHDK.GetCell(1).CellStyle = cellBold10Top;
+                }
 
-        var heightMAX = config.MeasureTextHeight(huongdanlamhang, sumWidth2to9, "Arial", (float)11);
-        s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+                rowLineHDK.CreateCell(2).SetCellValue(arrDDHHs[iHDK]);
+                rowLineHDK.GetCell(2).CellStyle = celltext10Top;
 
-		row++;
-		// start cac huong dan khac
-		s1.CreateRow(row).CreateCell(1).SetCellValue("2. Các hướng dẫn khác:");
-        s1.GetRow(row).GetCell(1).CellStyle = cellBold10Top;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+                var heightMAX = config.MeasureTextHeight(arrDDHHs[iHDK], sumWidth2to9, "Arial", (float)10.25);
+                rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+                row++;
+            }
+            s1.CreateRow(row).HeightInPoints = 25;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 9));
+            row++;
+        }
+        else
+        {
+            var rowLineHDK = s1.CreateRow(row);
+            rowLineHDK.CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
+            rowLineHDK.GetCell(1).CellStyle = cellBold10Top;
+
+            rowLineHDK.CreateCell(2).SetCellValue(huongdanlamhang);
+            rowLineHDK.GetCell(2).CellStyle = celltext10Top;
+
+            var heightMAX = config.MeasureTextHeight(huongdanlamhang, sumWidth2to9, "Arial", (float)10.25);
+            rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+            row++;
+            s1.CreateRow(row).HeightInPoints = 25;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 9));
+            row++;
+        }
+        // start cac huong dan khac
         var huongdanlamhangchung = dt.Rows[0]["huongdanlamhangchung"].ToString();
-        //var rich_khac = new HSSFRichTextString(huongdanlamhangchung);
-        s1.GetRow(row).CreateCell(2).SetCellValue(huongdanlamhangchung);
-        s1.GetRow(row).GetCell(2).CellStyle = celltext10Top;
+        if (type == "pdf")
+        {
+            string[] arrHDKs = huongdanlamhangchung.Split(new string[] { "\n", "\r" }, StringSplitOptions.None);
+            for (var iHDK = 0; iHDK < arrHDKs.Length; iHDK++)
+            {
+                var rowLineHDK = s1.CreateRow(row);
+                if (iHDK == 0)
+                {
+                    rowLineHDK.CreateCell(1).SetCellValue("2. Các hướng dẫn khác:");
+                    rowLineHDK.GetCell(1).CellStyle = cellBold10Top;
+                }
 
-        heightMAX = config.MeasureTextHeight(huongdanlamhangchung, sumWidth2to9, "Arial", (float)11);
-        s1.GetRow(row).HeightInPoints = heightMAX < 45 ? 45 : heightMAX;
-        row++;
-		//--
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+                rowLineHDK.CreateCell(2).SetCellValue(arrHDKs[iHDK]);
+                rowLineHDK.GetCell(2).CellStyle = celltext10Top;
+
+                var heightMAX = config.MeasureTextHeight(arrHDKs[iHDK], sumWidth2to9, "Arial", (float)10.25);
+                rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+                row++;
+            }
+        }
+        else
+        {
+            var rowLineHDK = s1.CreateRow(row);
+            rowLineHDK.CreateCell(1).SetCellValue("2. Các hướng dẫn khác:");
+            rowLineHDK.GetCell(1).CellStyle = cellBold10Top;
+
+            rowLineHDK.CreateCell(2).SetCellValue(huongdanlamhangchung);
+            rowLineHDK.GetCell(2).CellStyle = celltext10Top;
+
+            var heightMAX = config.MeasureTextHeight(huongdanlamhangchung, sumWidth2to9, "Arial", (float)10.25);
+            rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+            row++;
+        }
+        //--
         s1.CreateRow(row).CreateCell(1).SetCellValue("* Khi cơ sở nhận được đơn đặt hàng này vui lòng ký xác nhận và gửi lại.");
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
@@ -750,6 +878,7 @@ public class DanhSachDatHangReport
 		row++;
 		//--
         s1.CreateRow(row).CreateCell(1).SetCellValue("Người lập phiếu");
+        s1.GetRow(row).HeightInPoints = 20;
         s1.GetRow(row).GetCell(1).CellStyle = cellTextCenter;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 		//
@@ -758,16 +887,18 @@ public class DanhSachDatHangReport
         s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
 		row++;
 		//--
-        s1.CreateRow(row).CreateCell(1).SetCellValue("Ký và ghi rõ họ tên");
-        s1.GetRow(row).GetCell(1).CellStyle = cellTextCenter;
+        s1.CreateRow(row).CreateCell(1).SetCellValue("(Ký và ghi rõ họ tên)");
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.GetRow(row).GetCell(1).CellStyle = cellText10Center;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 		//--
-		s1.GetRow(row).CreateCell(8).SetCellValue("Ký và ghi rõ họ tên");
-        s1.GetRow(row).GetCell(8).CellStyle = cellTextCenter;
+		s1.GetRow(row).CreateCell(8).SetCellValue("(Ký và ghi rõ họ tên)");
+        s1.GetRow(row).GetCell(8).CellStyle = cellText10Center;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
 		row = row + 3;
 		//
         s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["nguoitao"].ToString());
+        s1.GetRow(row).HeightInPoints = 20;
         s1.GetRow(row).GetCell(1).CellStyle = cellTextCenter;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 		row++;
