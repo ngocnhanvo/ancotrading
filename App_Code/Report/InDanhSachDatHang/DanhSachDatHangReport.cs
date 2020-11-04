@@ -913,6 +913,8 @@ public class DanhSachDatHangReport
         s1 = config.PrintExcel((HSSFSheet)s1, row);
         s1.PrintSetup.Landscape = true;
 
+        if (type == "pdf")
+            s1.PrintSetup.PaperSize = (short)PaperSize.A4;
         return hssfworkbook;
     }
 
