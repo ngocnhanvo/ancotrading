@@ -670,36 +670,19 @@
 					if(!chk_box.prop('checked')) { ids = null; }
 					if(ids == null) {
 						ids=0;
-						if($('#grid_ds_chitietpoqr').jqGrid('getGridParam','records') &gt; 0 )
-						{
-							$('#grid_ds_poqr').jqGrid('setCaption', 'Đơn Hàng');
-							// $.ajax({
-								// url: 'Controllers/DonHangQRController.ashx?action=getpoinformation&poId='+ids,
-								// beforeSend:function(){
-									// $('#grid_ds_poqr').jqGrid('setCaption','đang tải...');
-								// },
-								// success: function(data){
-									 // $('#grid_ds_poqr').jqGrid('setCaption', data);
-								// }
-							// });
-							
-							$('#grid_ds_chitietpoqr').jqGrid('setGridParam',{url:'Controllers/DongDonHangQRController.ashx?&poId='+ids,page:1});
-							$('#grid_ds_chitietpoqr').jqGrid().trigger('reloadGrid');	
-						} 
 					} else {
 						$.ajax({
-								url: 'Controllers/DonHangQRController.ashx?action=getpoinformation&poId='+ids,
-								beforeSend:function(){
-									$('#grid_ds_poqr').jqGrid('setCaption','đang tải...');
-								},
-								success: function(data){
-									 $('#grid_ds_poqr').jqGrid('setCaption', data);
-								}
-							});
-				
-						$('#grid_ds_chitietpoqr').jqGrid('setGridParam',{url:'Controllers/DongDonHangQRController.ashx?&poId='+ids,page:1});
-						$('#grid_ds_chitietpoqr').jqGrid().trigger('reloadGrid');		
-					} 
+							url: 'Controllers/DonHangQRController.ashx?action=getpoinformation&poId='+ids,
+							beforeSend:function(){
+								$('#grid_ds_poqr').jqGrid('setCaption','đang tải...');
+							},
+							success: function(data){
+								$('#grid_ds_poqr').jqGrid('setCaption', data);
+							}
+						});
+					}
+                    $('#grid_ds_chitietpoqr').jqGrid('getGridParam', 'postData').poId = ids;
+					$('#grid_ds_chitietpoqr')[0].triggerToolbar();
 				},10);
 			}"
 		    AddFormOptions=" 
@@ -1592,6 +1575,9 @@
                 title: "Chuyển thành PO",
                 cursor: "pointer"
             });
+
+        createRightPanel('grid_ds_poqr');
+        createRightPanel('grid_ds_chitietpoqr'); 
     </script>
 </DIV>
     

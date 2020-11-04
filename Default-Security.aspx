@@ -472,76 +472,104 @@
 		return today;
 	}
 </SCRIPT>
-<style>
-#page_header, #tabs-main,  #tab_buttons, #tab_panels, .tab-panel 
-{
-    border: none;
-    padding: 0 !important;
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-	height: 100%;
-}
+<style type="text/css">
+    #page_header, #tabs-main,  #tab_buttons, #tab_panels, .tab-panel 
+    {
+        border: none;
+        padding: 0 !important;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+	    height: 100%;
+    }
 
-#tab_buttons span.ui-icon {
-	margin-right: -7px;
-	vertical-align: middle;
-	display: inline-block;
-	cursor: pointer;
-}
+    #tab_buttons span.ui-icon {
+	    margin-right: -7px;
+	    vertical-align: middle;
+	    display: inline-block;
+	    cursor: pointer;
+    }
 
-#tab_buttons ul {
-	background: none;
-}
+    #tab_buttons ul {
+	    background: none;
+    }
 
-.tab-panel .ui-layout-north {
-	border-width: 0 0 1px;
-	overflow: hidden;
-}
+    .tab-panel .ui-layout-north {
+	    border-width: 0 0 1px;
+	    overflow: hidden;
+    }
 
-.tab-panel .ui-layout-center{
-	border-width: 1px 0 0;
-	padding: 0px;
-	overflow: hidden;
-}
+    .tab-panel .ui-layout-center{
+	    border-width: 1px 0 0;
+	    padding: 0px;
+	    overflow: hidden;
+    }
 
-#lay-south-sanpham
-{
-	padding:0 !important;
-	overflow:hidden !important;
-	width:100%;
-	height:100%;
+    #lay-south-sanpham
+    {
+	    padding:0 !important;
+	    overflow:hidden !important;
+	    width:100%;
+	    height:100%;
 	}
-.ui-tabs-panel
-{
-	padding:0 !important;
-	width:100%;
-	height:100%;
+    .ui-tabs-panel
+    {
+	    padding:0 !important;
+	    width:100%;
+	    height:100%;
 	}
 
-.ui-layout-center,
-.ui-layout-north,
-.ui-layout-south,
-.ui-layout-west,
-.ui-layout-east
-{
-	overflow: hidden !important;
-}
+    .ui-layout-center,
+    .ui-layout-north,
+    .ui-layout-south,
+    .ui-layout-west,
+    .ui-layout-east
+    {
+	    overflow: hidden !important;
+    }
 
+    /* Custom View Form */
+    div.ui-jqdialog-content td.form-view-data {
+        white-space: normal !important;
+        height: auto;
+        vertical-align: middle;
+        padding-top: 3px; padding-bottom: 3px
+    }
+    /* Custom View Form */
 
-/* Custom View Form */
-div.ui-jqdialog-content td.form-view-data {
-    white-space: normal !important;
-    height: auto;
-    vertical-align: middle;
-    padding-top: 3px; padding-bottom: 3px
-}
-/* Custom View Form */
-
-.ui-layout-east, .ui-layout-west
-{
-	overflow:hidden;
+    .ui-layout-east, .ui-layout-west
+    {
+	    overflow:hidden;
 	}
+
+    .custom-menu-vnn {
+        display: none;
+        z-index: 1000;
+        position: fixed;
+        overflow: auto;
+        border: 1px solid #CCC;
+        white-space: nowrap;
+        font-family: sans-serif;
+        background: #FFF;
+        color: #333;
+        border-radius: 5px;
+        padding: 0;
+        box-shadow: 1px 1px 4px 1px #4c4c4c;
+        max-height: 200px;
+    }
+
+    /* Each of the items in the list */
+    .custom-menu-vnn li {
+        padding: 8px 12px;
+        cursor: pointer;
+        list-style-type: none;
+        transition: all .3s ease;
+        user-select: none;
+    }
+
+    .custom-menu-vnn li:hover {
+        background-color: #DEF;
+    }
 </style>
 
 </head>
@@ -1036,7 +1064,64 @@ div.ui-jqdialog-content td.form-view-data {
 		chietxuatCNSP = '<%=chietxuatCNSP%>';
 		chietxuatDeTai = '<%=chietxuatDeTai%>';
 		chietxuatMauSac = '<%=chietxuatMauSac%>';
-		selectHinhThucBan = ':;Bán đại trà:Bán đại trà;Độc quyền:Độc quyền;Quản lý ngoài:Quản lý ngoài;Bán thử nghiệm:Bán thử nghiệm';
+	    selectHinhThucBan = ':;Bán đại trà:Bán đại trà;Độc quyền:Độc quyền;Quản lý ngoài:Quản lý ngoài;Bán thử nghiệm:Bán thử nghiệm';
+
+	    var createRightPanel = function (id) {
+	        let menu = $('#gbox_' + id + ' .ui-jqgrid-bdiv');
+
+	        menu.off('contextmenu');
+	        menu.contextmenu(function (event) {
+	            let leftFunc = $('#' + id + '-pager_left');
+	            leftFunc = leftFunc.find('.ui-pg-button');
+
+	            event.preventDefault();
+	            let selRowIds = $('#' + id).jqGrid('getGridParam', 'selarrrow');
+
+	            if (selRowIds.length <= 1)
+                    $(event.target).click();
+
+	            $(".custom-menu-vnn").remove();
+	            menu.parent().parent().parent().parent().prepend("<ul class='custom-menu-vnn'></ul>");
+	            
+	            leftFunc.each(function () {
+	                let thisLeftFunc = $(this);
+	                let text = thisLeftFunc.attr('title');
+	                let textIcon = thisLeftFunc.text()
+	                let icon = thisLeftFunc.html().replace(textIcon, '');
+	                if (text) {
+	                    let liAction = $("<li><table><tr><td>" + icon + "</td><td><div style='width:5px'></div></td><td>" + text + "</td><td><div style='width:5px'></div></table></li>").appendTo($('.custom-menu-vnn'));
+	                    liAction.off("click");
+	                    liAction.click(function () {
+	                        thisLeftFunc.click();
+	                        $(".custom-menu-vnn").fadeOut(300);
+	                    });
+	                }
+	            });
+
+	            let haveScroll = $(".custom-menu-vnn").height() < $(".custom-menu-vnn").scrollHeight;
+	            let footerHeight = $('#lay-footer').height();
+	            let innerHeight = window.innerHeight - footerHeight;
+	            let widthCTMN = $(".custom-menu-vnn").width() + (haveScroll ? 10 : 0);
+	            let maxWidth = event.clientX + widthCTMN;
+	            let maxHeight = event.clientY + $(".custom-menu-vnn").height();
+	            
+	            
+	            let xScreen = maxWidth > menu.width() ? event.clientX - $(".custom-menu-vnn").width() + (menu.width() - event.clientX - 10) : event.clientX;
+	            let yScreen = maxHeight > innerHeight ? event.clientY - $(".custom-menu-vnn").height() + (innerHeight - event.clientY - 10) : event.clientY;
+
+	            $(".custom-menu-vnn").fadeIn(300).css({
+	                top: yScreen + "px",
+	                left: xScreen + "px",
+	                width: widthCTMN
+	            });
+	        });
+	    };
+
+	    $(document).bind("mousedown", function (e) {
+	        if (!$(e.target).parents(".custom-menu-vnn").length > 0) {
+	            $(".custom-menu-vnn").fadeOut(300);
+	        }
+	    });
 	</script>
 </body>
 </html>

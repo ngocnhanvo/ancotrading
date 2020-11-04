@@ -30,7 +30,22 @@ public class ExportExcel
     HSSFWorkbook hssfworkbook = null;
     Excel_Format ex_fm = null;
     private int start = 0, end = 0;
+    public int? endHeader = null;
     private String fmt0 = "#,##0", fmt0i0 = "#,##0.0", fmt0i00 = "#,##0.00", fmt0i000 = "#,##0.000";
+    public Logoreport LogoRpt { get; set; } 
+    public partial class Logoreport
+    {
+        public string link { get; set; }
+        public int? dx1 { get; set; }
+        public int? dx2 { get; set; }
+        public int? dy1 { get; set; }
+        public int? dy2 { get; set; }
+        public int? cell1 { get; set; }
+        public int? row1 { get; set; }
+        public int? cell2 { get; set; }
+        public int? row2 { get; set; }
+        public bool? hasLogo { get; set; }
+    }
     #region cellStyle
     public ICellStyle cellHeader = null;
     public ICellStyle cellHeader_n = null;
@@ -142,7 +157,7 @@ public class ExportExcel
 
     public HSSFSheet PrintExcel(HSSFSheet s1, int row)
     {
-        s1.PrintSetup.PaperSize = (short)PaperSize.A4;
+        s1.PrintSetup.PaperSize = (short)PaperSize.A4_Small;
         s1.FitToPage = true;
         s1.PrintSetup.FitWidth = 1;
         s1.PrintSetup.FitHeight = 0;
@@ -264,6 +279,80 @@ public class ExportExcel
         context.Response.BinaryWrite(exportData.GetBuffer());
         context.Response.End();
     }
+
+    public int createHeader(NameHeaderReport name, ISheet s1, int row, int? height)
+    {
+        LogoRpt = LogoRpt == null ? new Logoreport() : LogoRpt;
+
+        if (name == NameHeaderReport.ANCO)
+        {
+            //Logo
+            if (LogoRpt.hasLogo.GetValueOrDefault(true))
+            {
+                string logoPath = Path.Combine(HttpContext.Current.Server.MapPath("~/images/"), "anco_logo_print.png");
+                //String productImagePath = Server.MapPath("~/images/products/fullsize/");
+                var logo = System.Drawing.Image.FromFile(logoPath);
+                var mslogo = new MemoryStream();
+                logo.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                var patriarchlogo = s1.CreateDrawingPatriarch();
+                var anchorLogo = new HSSFClientAnchor();
+                anchorLogo.Dx1 = LogoRpt.dx1.GetValueOrDefault(470);
+                anchorLogo.Dy1 = LogoRpt.dy1.GetValueOrDefault(10);
+                anchorLogo.Dx2 = LogoRpt.dx2.GetValueOrDefault(600);
+                anchorLogo.Dy2 = LogoRpt.dy2.GetValueOrDefault(253);
+                anchorLogo.Col1 = LogoRpt.cell1.GetValueOrDefault(4);
+                anchorLogo.Row1 = LogoRpt.row1.GetValueOrDefault(1);
+                anchorLogo.Col2 = LogoRpt.cell2.GetValueOrDefault(4);
+                anchorLogo.Row2 = LogoRpt.row2.GetValueOrDefault(1);
+
+                anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
+
+                int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
+                var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
+                //signaturePicturelogo.Resize();
+            }
+
+            string[] a = {
+                "ANCO COMPANY LIMITED",
+                "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam",
+                "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com",
+                "PROFORMA INVOICE"
+            };
+
+            s1.CreateRow(row);
+            row++;
+            for (int i = 0; i < a.Length; i++)
+            {
+                s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 0, endHeader.GetValueOrDefault(this.end)));
+
+                if (height != null)
+                    s1.GetRow(row).HeightInPoints = height.GetValueOrDefault(0);
+
+                if (new int[] { 0, 3 }.Contains(i))
+                {
+                    s1.GetRow(row).HeightInPoints = 30;
+                    s1.GetRow(row).GetCell(0).CellStyle = cellHeader;
+                }
+                else
+                {
+                    s1.GetRow(row).GetCell(0).CellStyle = cellHeader_n;
+                }
+                row++;
+            }
+        }
+        return row;
+    }
+}
+
+public enum NameHeaderReport
+{
+    ANCO,
+    ANCO1,
+    ANCO2,
+    ANBINH,
+    VINHGIA
 }
 
 public class ItemValue

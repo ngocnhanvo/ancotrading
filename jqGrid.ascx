@@ -60,6 +60,7 @@
             //ondblClickRow: function(rowid) { $("#<%=ID%>").jqGrid('editGridRow', rowid, prmEdit) },
             sortname: "<%= _sortName %>",
             sortorder: "<%= _sortOrder %>",
+            <%= _gridBeforeRequest == "" ? "" : "beforeRequest: function () { " + _gridBeforeRequest + " }," %> 
             <%= _gridComplete == "" ? "" : "gridComplete: function () { " + _gridComplete + " }," %> 
             <%= _loadError == "" ? "" : "loadError: function(xhr,st,err) { " + _loadError + " }," %>
             <%= _onSelectRow == "" ? "" : "onSelectRow: " + _onSelectRow + "," %>

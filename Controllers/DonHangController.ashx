@@ -274,6 +274,7 @@ public class DonHangController : IHttpHandler
         context.Response.ContentType = "text/plain";
         context.Response.Charset = "UTF-8";
         string c_donhang_id = context.Request.QueryString["poId"];
+        string msg = "";
         try
         {
             decimal totalQuantity = 0, totalSalary = 0, totalCbm = 0;
@@ -283,7 +284,7 @@ public class DonHangController : IHttpHandler
             {
                 var ddh = from c in db.c_dongdonhangs where c.c_donhang_id.Equals(dh.c_donhang_id) select c;
                 var phiDH = from phi in db.c_phidonhangs where phi.c_donhang_id.Equals(dh.c_donhang_id) select phi;
-                    
+
                 totalQuantity = ddh.Sum(p => p.soluong).Value;
                 phicong = phiDH.Where(p => p.phitang.Equals(true)).Select(p => p.phi).Sum();
                 phitru = phiDH.Where(p => p.phitang.Equals(false)).Select(p => p.phi).Sum();
@@ -292,13 +293,18 @@ public class DonHangController : IHttpHandler
                 totalSalary = (totalSalary - discountVal) + (phicong == null ? 0 : phicong.Value) - (phitru == null ? 0 : phitru.Value);
                 totalCbm = dh.totalcbm.Value;
 
-                context.Response.Write(string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dh.sochungtu, totalCbm, totalSalary, totalQuantity));
+                msg = string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dh.sochungtu, totalCbm, totalSalary, totalQuantity);
+            }
+            else
+            {
+                msg = "Đơn hàng này đã bị xóa, hãy thử làm mới dữ liệu.";
             }
         }
         catch (Exception e)
         {
-            context.Response.Write(e.Message);
+            msg = e.Message;
         }
+        context.Response.Write(msg);
     }
 
     public void getDocument(HttpContext context)

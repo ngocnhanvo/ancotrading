@@ -157,7 +157,7 @@ public class DanhSachDatHangReport
         ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
 		HSSFSheet hssfsheet = (HSSFSheet)s1;
         var config = new ExportExcel(hssfworkbook, 0, 15);
-
+        config.endHeader = type == "pdf" ? 16 : 9;
         Excel_Format ex_fm = new Excel_Format(hssfworkbook); 
         ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
         ICellStyle cellBold10 = ex_fm.getcell(10, true, true, "", "L", "T");
@@ -215,27 +215,13 @@ public class DanhSachDatHangReport
 		//IDataFormat dataFormatCustom = hssfworkbook.CreateDataFormat();
 		int heigh = 22;
 		int row = 0;
-		//set A1 - A4
-		string[] a = { "ANCO COMPANY LIMITED","3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam","Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com","ĐƠN ĐẶT HÀNG"};
-		for(int i = 0; i < a.Length; i++)
-		{		
-			s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
-			s1.AddMergedRegion(new CellRangeAddress(row, row, 0, type == "pdf" ? 16 : 9));
-			s1.GetRow(row).HeightInPoints = heigh;
-			if(i == 0 | i == 3)
-			{
-				s1.GetRow(row).HeightInPoints = 30;
-				s1.GetRow(row).GetCell(0).CellStyle = cellHeader;
-			}
-			else
-			{
-				s1.GetRow(row).GetCell(0).CellStyle = cellHeader_n;
-			}
-			row++;
-		}
-        s1.AddMergedRegion(new CellRangeAddress(6, 6, 1, 9));
-        s1.AddMergedRegion(new CellRangeAddress(10, 10, 1, 9));
-
+        //set A1 - A4
+        config.LogoRpt = new ExportExcel.Logoreport();
+        config.LogoRpt.cell1 = type == "pdf" ? 4: 3;
+        config.LogoRpt.cell2 = type == "pdf" ? 4 : 3;
+        config.LogoRpt.dx1 = type == "pdf" ? 1000 : 270;
+        config.LogoRpt.dx2 = type == "pdf" ? 1030 : 500;
+        row = config.createHeader(NameHeaderReport.ANCO, s1, row, heigh);
 
         s1.CreateRow(row).CreateCell(1).SetCellValue("Số chứng từ:");
         s1.GetRow(row).GetCell(1).CellStyle = celltext10;
@@ -249,7 +235,7 @@ public class DanhSachDatHangReport
             columnF = 2,
             columnT = 3,
             left = 88,
-            top = (float)-0.2
+            top = (float)-0.5
         });
         
         s1.GetRow(row).CreateCell(4).SetCellValue("Theo P/O số:");
@@ -264,7 +250,7 @@ public class DanhSachDatHangReport
             columnF = 5,
             columnT = 9,
             left = 108,
-            top = (float)-0.2
+            top = (float)-0.5
         });
         row++;
 
@@ -282,7 +268,7 @@ public class DanhSachDatHangReport
             columnF = 2,
             columnT = 3,
             left = 105,
-            top = (float)-0.2
+            top = (float)-0.5
         });
 
         s1.GetRow(row).CreateCell(4).SetCellValue("Customer Order No:");
@@ -297,13 +283,14 @@ public class DanhSachDatHangReport
             columnF = 5,
             columnT = 9,
             left = 78,
-            top = (float)-0.2
+            top = (float)-0.5
         });
         row++;
 
         s1.CreateRow(row).CreateCell(1).SetCellValue("Công ty AnCơ kính đề nghị Quý Công ty/Đơn vị: " + dt.Rows[0]["ten_dtkd"].ToString());
         s1.GetRow(row).GetCell(1).CellStyle = celltext10;
         s1.GetRow(row).HeightInPoints = 20;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 9));
         row++;
 
         s1.CreateRow(row).CreateCell(1).SetCellValue("Điện thoại:");
@@ -319,7 +306,7 @@ public class DanhSachDatHangReport
             columnF = 2,
             columnT = 3,
             left = 98,
-            top = (float)-0.2
+            top = (float)-0.5
         });
 
         s1.GetRow(row).CreateCell(4).SetCellValue("Fax:");
@@ -338,10 +325,10 @@ public class DanhSachDatHangReport
         });
         row++;
         row++;
-        row++;
         s1.CreateRow(row).CreateCell(1).SetCellValue("Cung cấp cho công ty chúng tôi các mặt hàng với chi tiết:");
         s1.GetRow(row).GetCell(1).CellStyle = celltext10;
         s1.GetRow(row).HeightInPoints = 20;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 9));
         row++;
         // set A13 - All
         // -- Header

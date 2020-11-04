@@ -753,46 +753,27 @@
 				var chk_box = $('#jqg_grid_ds_dathang_' + ids);
 				setTimeout(function() {
 					if(!chk_box.prop('checked')) { ids = null; }
-					if(ids == null) {
-						ids=0;
+					if(ids == null) 
+                    {
+						ids = 0;
 						$('#grid_ds_dathang').jqGrid('setCaption','Danh Sách Đặt Hàng');
-						if($('#grid_ds_chitietdathang').jqGrid('getGridParam','records') &gt; 0 )
-						{
-
-							// $.ajax({
-								// url: 'Controllers/DanhSachDatHangController.ashx?action=getpiinformation&poId='+ids,
-								// beforeSend:function(){
-									// $('#grid_ds_dathang').jqGrid('setCaption','đang tải...');
-								// },
-								// success: function(data){
-									 // $('#grid_ds_dathang').jqGrid('setCaption', data);
-								// }
-							// });
-						
-							$('#grid_ds_chitietdathang').jqGrid('setGridParam',{url:'Controllers/DongDanhSachDatHangController.ashx?&poId='+ids,page:1});
-							$('#grid_ds_chitietdathang').jqGrid().trigger('reloadGrid');
-							
-							$('#grid_phidathang').jqGrid('setGridParam',{url:'Controllers/PhiDatHangController.ashx?&poId='+ids,page:1});
-							$('#grid_phidathang').jqGrid().trigger('reloadGrid');	
-						} 
-					} else {
-					
+					} 
+                    else 
+                    {					
 						$.ajax({
 							url: 'Controllers/DanhSachDatHangController.ashx?action=getpiinformation&poId='+ids,
-							beforeSend:function(){
+							beforeSend:function() {
 								$('#grid_ds_dathang').jqGrid('setCaption','đang tải...');
 							},
-							success: function(data){
+							success: function(data) {
 								 $('#grid_ds_dathang').jqGrid('setCaption', data);
 							}
-						});
-					
-						$('#grid_ds_chitietdathang').jqGrid('setGridParam',{url:'Controllers/DongDanhSachDatHangController.ashx?&poId='+ids,page:1});
-						$('#grid_ds_chitietdathang').jqGrid().trigger('reloadGrid');
-						
-						$('#grid_phidathang').jqGrid('setGridParam',{url:'Controllers/PhiDatHangController.ashx?&poId='+ids,page:1});
-						$('#grid_phidathang').jqGrid().trigger('reloadGrid');			
-					} 
+						});			
+					}
+                    $('#grid_ds_chitietdathang').jqGrid('getGridParam', 'postData').poId = ids;
+                    $('#grid_phidathang').jqGrid('getGridParam', 'postData').poId = ids;
+                    $('#grid_ds_chitietdathang')[0].triggerToolbar();
+                    $('#grid_phidathang')[0].triggerToolbar();
 				},10);
 			}"
             runat="server" />
@@ -1082,7 +1063,6 @@
                 , formatter: 'checkbox'
             }
             ]"
-            Caption = "Danh sách sản phẩm"
             GridComplete = "let o = $(this).parent().parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 97);$(this).setGridWidth($(o).width())"
             FilterToolbar = "true"
             Height = "150"
@@ -1314,5 +1294,10 @@
 		}, 
 		title: "Làm mới trạng thái ĐĐH", 
 		cursor: "pointer"
-	});	
+	});
+
+	$('#grid_phidathang-pager_left').removeAttr('style');
+	createRightPanel('grid_ds_dathang');
+	createRightPanel('grid_ds_chitietdathang');
+	createRightPanel('grid_phidathang');
 </script>

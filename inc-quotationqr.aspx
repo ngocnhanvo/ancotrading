@@ -24,8 +24,8 @@
                     $("#grid_ds_chitietquotationqr").setGridWidth(o.width());
                     $("#grid_ds_color_referencesqr").setGridWidth(o.width());
 
-                    $("#grid_ds_chitietquotationqr").setGridHeight(o.height() - 77);
-                    $("#grid_ds_color_referencesqr").setGridHeight(o.height() - 77);
+                    $("#grid_ds_chitietquotationqr").setGridHeight(o.height() - 97);
+                    $("#grid_ds_color_referencesqr").setGridHeight(o.height() - 97);
                 }
             }
         });
@@ -519,25 +519,16 @@
                 afterSubmit: function(rs, postdata) {
                     return showMsgDialog(rs); 
             }"
-            OnSelectRow = "function(ids) {
-		                if(ids == null) {
-			                ids=0;
-			                if($('#grid_ds_chitietquotationqr').jqGrid('getGridParam','records') &gt; 0 )
-			                {
-			                    
-				                $('#grid_ds_chitietquotationqr').jqGrid('setGridParam',{url:'Controllers/QuotationQRDetailController.ashx?action=0&quotationId='+ids,page:1});
-				                $('#grid_ds_chitietquotationqr').jqGrid().trigger('reloadGrid');
-				                
-				                $('#grid_ds_color_referencesqr').jqGrid('setGridParam',{url:'Controllers/ColorReferencesController.ashx?quotationId=' + ids,page:1});
-				                $('#grid_ds_color_referencesqr').jqGrid().trigger('reloadGrid');
-				            } 
-				        } else {
-			                $('#grid_ds_chitietquotationqr').jqGrid('setGridParam',{url:'Controllers/QuotationQRDetailController.ashx?action=0&quotationId='+ids,page:1});
-			                $('#grid_ds_chitietquotationqr').jqGrid().trigger('reloadGrid');		
-			                
-			                $('#grid_ds_color_referencesqr').jqGrid('setGridParam',{url:'Controllers/ColorReferencesController.ashx?quotationId=' + ids,page:1});
-				            $('#grid_ds_color_referencesqr').jqGrid().trigger('reloadGrid');	
-		                } }"
+            OnSelectRow = "
+                function(ids) {
+		            if(ids == null) {
+			            ids=0; 
+				    }
+
+                    $('#grid_ds_chitietquotationqr').jqGrid('getGridParam', 'postData').quotationId = ids;
+					$('#grid_ds_chitietquotationqr')[0].triggerToolbar();
+                }
+            "
             runat="server" />
 </DIV> 
 
@@ -555,6 +546,7 @@
                 ColNames="['c_chitietbaogia_id', 'Báo Giá', 'TT', 'Trạng Thái', 'STT', 'Mã SP', 'Mã SP', 'HS Code', 'Mã SP Khách',  
 				'Giá FOB', 'Số Lượng',  'Đóng Gói', 'Đóng Gói Inner', 'L1', 'W1', 'H1', 'Đóng Gói Outer', 'L2', 'W2', 'H2','Weight', 'V2', 'SL Cont',  'Ghi Chú', 
 				'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt Động', 'Độc quyền']"
+                FilterToolbar="true"
                 RowNumbers="true"
                 OndblClickRow = "
 				function(rowid) { 
@@ -898,7 +890,7 @@
 					, editrules: { edithidden:true }
 				}
                 ]"
-                GridComplete = "var o = $(this).parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 77);"
+                GridComplete = "var o = $(this).parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 97);"
                 Height = "150"
                 OnSelectRow="function(ids) {
 		                if(ids == null) {
@@ -1192,13 +1184,16 @@
         };
 
         $("#grid_ds_quotationqr").jqGrid('navGrid', "#grid_ds_quotationqr-pager").jqGrid('navButtonAdd', "#grid_ds_quotationqr-pager",
-            {
-                caption: "",
-                buttonicon: "ui-icon-battery-3",
-                onClickButton: funcChuyenQRThanhQO,
-                title: "Chuyển thành QO",
-                cursor: "pointer"
-            });
+        {
+            caption: "",
+            buttonicon: "ui-icon-battery-3",
+            onClickButton: funcChuyenQRThanhQO,
+            title: "Chuyển thành QO",
+            cursor: "pointer"
+        });
+
+        createRightPanel('grid_ds_quotationqr');
+        createRightPanel('grid_ds_chitietquotationqr');
     </script>
 </DIV>
 

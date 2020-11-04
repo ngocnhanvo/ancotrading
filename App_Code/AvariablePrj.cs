@@ -18,5 +18,6 @@ public class AvariablePrj
         public string value { get; set; }
         public float left { get; set; }
         public float top { get; set; }
+        public bool? bold { get; set; }
     }
 }

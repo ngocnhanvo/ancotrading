@@ -1636,39 +1636,25 @@
 						ids=0;
 						if($('#grid_ds_chitietpo').jqGrid('getGridParam','records') &gt; 0 )
 						{
-							$('#grid_ds_po').jqGrid('setCaption', 'Đơn Hàng');
-							// $.ajax({
-								// url: 'Controllers/DonHangController.ashx?action=getpoinformation&poId='+ids,
-								// beforeSend:function(){
-									// $('#grid_ds_po').jqGrid('setCaption','đang tải...');
-								// },
-								// success: function(data){
-									 // $('#grid_ds_po').jqGrid('setCaption', data);
-								// }
-							// });
-							
-							$('#grid_ds_chitietpo').jqGrid('setGridParam',{url:'Controllers/DongDonHangController.ashx?&poId='+ids,page:1});
-							$('#grid_ds_chitietpo').jqGrid().trigger('reloadGrid');
-							
-							$('#grid_khoanphi').jqGrid('setGridParam',{url:'Controllers/PhiDonHangController.ashx?&poId='+ids,page:1});
-							$('#grid_khoanphi').jqGrid().trigger('reloadGrid');			
+							$('#grid_ds_po').jqGrid('setCaption', 'Đơn Hàng');	
 						} 
 					} else {
 						$.ajax({
-								url: 'Controllers/DonHangController.ashx?action=getpoinformation&poId='+ids,
-								beforeSend:function(){
-									$('#grid_ds_po').jqGrid('setCaption','đang tải...');
-								},
-								success: function(data){
-									 $('#grid_ds_po').jqGrid('setCaption', data);
-								}
-							});
-				
-						$('#grid_ds_chitietpo').jqGrid('setGridParam',{url:'Controllers/DongDonHangController.ashx?&poId='+ids,page:1});
-						$('#grid_ds_chitietpo').jqGrid().trigger('reloadGrid');	
-						$('#grid_khoanphi').jqGrid('setGridParam',{url:'Controllers/PhiDonHangController.ashx?&poId='+ids,page:1});
-						$('#grid_khoanphi').jqGrid().trigger('reloadGrid');			
-					} 
+							url: 'Controllers/DonHangController.ashx?action=getpoinformation&poId='+ids,
+							beforeSend:function(){
+								$('#grid_ds_po').jqGrid('setCaption','đang tải...');
+							},
+							success: function(data){
+									$('#grid_ds_po').jqGrid('setCaption', data);
+							}
+						});		
+					}
+
+                    $('#grid_ds_chitietpo').jqGrid('getGridParam', 'postData').poId = ids;
+                    $('#grid_khoanphi').jqGrid('getGridParam', 'postData').poId = ids;
+					$('#grid_ds_chitietpo')[0].triggerToolbar();
+                    $('#grid_khoanphi')[0].triggerToolbar();
+
 				},10);
 			}"
 		    AddFormOptions=" 
@@ -1748,7 +1734,6 @@
 		        title: "Hủy đơn hàng",
 		        onClickButton: HuyDonHang
 		    });
-
 	    });
     </script>
 	
@@ -2967,7 +2952,11 @@
 	            msg = dsncc_check_ptr.val();
 	        }
 	        return msg;
-	    }
+	    };
+
+	    createRightPanel('grid_ds_po');
+	    createRightPanel('grid_ds_chitietpo');
+	    createRightPanel('grid_khoanphi');
 	</script>
 </DIV>
     

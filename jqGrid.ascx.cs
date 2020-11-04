@@ -34,6 +34,7 @@ public partial class jqGrid : System.Web.UI.UserControl
         , _editFormOptions = ""
         , _delFormOptions = ""
         , _gridComplete = "" // $(this).setGridHeight($(window).height() - 220);
+         , _gridBeforeRequest = "" // $(this).setGridHeight($(window).height() - 220);
         , _loadError = "alert('error')" // alert('error')
         , _filterToolbar = ""
         , _onSelectRow = ""
@@ -381,6 +382,12 @@ public partial class jqGrid : System.Web.UI.UserControl
     {
         get { return _gridComplete; }
         set { _gridComplete = value; }
+    }
+
+    public String GridBeforeRequest
+    {
+        get { return _gridBeforeRequest; }
+        set { _gridBeforeRequest = value; }
     }
 
     public String Height

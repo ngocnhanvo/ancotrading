@@ -18,7 +18,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
     decimal discountPO = 0;
     string type = "excel";
     string c_donhang_id = "";
-    List<Dictionary<string, string>> lstimage = new List<Dictionary<string, string>>();
+    List<AvariablePrj.lstIamge> lstimage = new List<AvariablePrj.lstIamge>();
+    List<AvariablePrj.lstText> lstText = new List<AvariablePrj.lstText>();
     protected void Page_Load(object sender, EventArgs e)
     {
         //try
@@ -343,9 +344,12 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
         HSSFSheet hssfsheet = (HSSFSheet)s1;
 
-        var config = new ExportExcel(hssfworkbook, 0, type == "pdf"? 12 : 16);
+        var config = new ExportExcel(hssfworkbook, 0, type == "pdf" ? 12 : 16);
+        config.endHeader = 12;
 
         Excel_Format ex_fm = new Excel_Format(hssfworkbook);
+        
+        #region Style Cell
         ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
         ICellStyle cellBoldTop = ex_fm.getcell(12, true, true, "", "L", "B");
         ICellStyle cellBoldJustify = ex_fm.getcell(12, true, true, "", "L", "J");
@@ -388,95 +392,17 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         ICellStyle borderWrap = ex_fm.getcell(12, true, true, "LRBT", "C", "T");
         //--
         ICellStyle signBold = ex_fm.getcell(12, true, true, "", "C", "C");
-        //--
-        //IDataFormat dataFormatCustom = hssfworkbook.CreateDataFormat();
-        int heigh = 22;
+        #endregion Style Cell
+
         int row = 0;
-        //Logo
-        //private String logoPath, productImagePath;
-        String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "anco_logo_print.png");
-        //String productImagePath = Server.MapPath("~/images/products/fullsize/");
-        System.Drawing.Image logo = System.Drawing.Image.FromFile(logoPath);
-        MemoryStream mslogo = new MemoryStream();
-        logo.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-        IDrawing patriarchlogo = s1.CreateDrawingPatriarch();
-        HSSFClientAnchor anchorlogo = new HSSFClientAnchor(0, 0, 0, 0, 1, 0, 2, 3);
-        anchorlogo.AnchorType = 3;
-
-        int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
-        IPicture signaturePicturelogo = patriarchlogo.CreatePicture(anchorlogo, indexlogo);
         //
-        //set A1 - A4
-        string[] a = {
-            "ANCO COMPANY LIMITED",
-            "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam",
-            "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com",
-            "PROFORMA INVOICE"
-        };
-
-        for (int i = 0; i < a.Length; i++)
-        {
-            s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
-            s1.GetRow(row).HeightInPoints = heigh;
-            if (i == 0 | i == 3)
-            {
-                s1.GetRow(row).HeightInPoints = 30;
-                s1.GetRow(row).GetCell(0).CellStyle = cellHeader;
-            }
-            else
-            {
-                s1.GetRow(row).GetCell(0).CellStyle = cellHeader_n;
-            }
-            row++;
-        }
-        //--
-        //set J4 - F8
-        string[] b = { "Date:", "No.:" };
-        string[] b_value = { "ngaylap", "sochungtu" };
-        for (int i = 0; i < b.Count(); i++)
-        {
-            s1.CreateRow(row).CreateCell(9).SetCellValue(b[i]);
-            s1.GetRow(row).GetCell(9).CellStyle = cellBold;
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 10, 12));
-
-            if (i == 0)
-                s1.GetRow(row).CreateCell(10).SetCellValue(DateTime.Parse(dt.Rows[0][b_value[i]].ToString()).ToString("dd/MMM/yyyy"));
-            else if (b_value[i] != "")
-                s1.GetRow(row).CreateCell(10).SetCellValue(dt.Rows[0][b_value[i]].ToString());
-
-            s1.GetRow(row).GetCell(9).CellStyle = cellBold;
-            s1.GetRow(row).GetCell(10).CellStyle = cellBold;
-            s1.GetRow(row).HeightInPoints = heigh;
-            row++;
-        }
-        //set A7 - A11
-        string[] c = {
-            "The Buyer:"
-            , ""
-            , ""
-            , "The Payer:"
-            , "ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:"
-            , "Customer's order no:"
-            , "Commodity:"
-            , "Item nos., description, packing, quantity, unit price and amount:"
-        };
-        string[] c_value = {
-            "ten_dtkd"
-            , "diachi"
-            , ""
-            , "payer"
-            , ""
-            , "customer_order_no"
-            , "commodity"
-            , ""
-        };
-
         var columnHeaders = new List<columnHeader>();
         int width = 4500;
+        int height = 22;
+
         #region columnHeaders
-        columnHeaders.Add(new columnHeader() {
+        columnHeaders.Add(new columnHeader()
+        {
             text = "No.",
             value = "no",
             columnAt = 0,
@@ -742,6 +668,50 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         var width02to12 = columnHeaders.Where(s => s.columnAt >= 2 & s.columnAt <= 12).Select(s => s.width).Sum();
 
         #endregion columnHeaders
+        //
+        //set A1 - A4
+        row = config.createHeader(NameHeaderReport.ANCO, s1, row, height);
+        //--
+        //set J4 - F8
+        string[] b = { "Date:", "No.:" };
+        string[] b_value = { "ngaylap", "sochungtu" };
+        for (int i = 0; i < b.Count(); i++)
+        {
+            s1.CreateRow(row).CreateCell(9).SetCellValue(b[i]);
+            s1.GetRow(row).GetCell(9).CellStyle = cellBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 10, 12));
+
+            if (i == 0)
+                s1.GetRow(row).CreateCell(10).SetCellValue(DateTime.Parse(dt.Rows[0][b_value[i]].ToString()).ToString("dd/MMM/yyyy"));
+            else if (b_value[i] != "")
+                s1.GetRow(row).CreateCell(10).SetCellValue(dt.Rows[0][b_value[i]].ToString());
+
+            s1.GetRow(row).GetCell(9).CellStyle = cellBold;
+            s1.GetRow(row).GetCell(10).CellStyle = cellBold;
+            s1.GetRow(row).HeightInPoints = height;
+            row++;
+        }
+        //set A7 - A11
+        string[] c = {
+            "The Buyer:"
+            , ""
+            , ""
+            , "The Payer:"
+            , "ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:"
+            , "Customer's order no:"
+            , "Commodity:"
+            , "Item nos., description, packing, quantity, unit price and amount:"
+        };
+        string[] c_value = {
+            "ten_dtkd"
+            , "diachi"
+            , ""
+            , "payer"
+            , ""
+            , "customer_order_no"
+            , "commodity"
+            , ""
+        };
 
         for (int i = 0; i < c.Length; i++)
         {
@@ -755,35 +725,31 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             rowCreate.CreateCell(2).SetCellValue(rich_text);
             rowCreate.GetCell(2).CellStyle = i > 2 ? celltext : cellBold;
 
-            //HSSFRichTextString rich = new HSSFRichTextString(String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString()));
             if (new int[] { 0, 1, 2, 3, 5, 6 }.Contains(i))
             {
-                //rich_text = i == "0" ? ""dt.Rows[0][c_value[i]].ToString();
-                //s1.GetRow(row).GetCell(1).CellStyle = i > 0 ? celltext : cellBoldTop;
-                //s1.GetRow(row).CreateCell(2).SetCellValue(rich_text);
-                //float heightMax = config.MeasureTextHeight(rich_text, width02to12) + 5;
-                //heigh = heightMax < 25 ? 25 : (int)heightMax;
+                var int012 = new int[] { 0, 1, 2 }.Contains(i);
+                var int3 = new int[] { 3 }.Contains(i);
+                var int5 = new int[] { 5 }.Contains(i);
+                var int6 = new int[] { 6 }.Contains(i);
+
+                lstText.Add(new AvariablePrj.lstText() {
+                    columnF = 2,
+                    columnT = 12,
+                    left = int012 ? 60 : (int3 ? 60 : (int5 ? 15 : (int6 ? 60 : 0))),
+                    top = (float)-0.5,
+                    row = row,
+                    bold = int012 ? true : false
+                });
                 s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
             }
             else
             {
-                if (c_value[i] != "")
-                {
-                    s1.GetRow(row).CreateCell(3).SetCellValue(dt.Rows[0][c_value[i]].ToString());
-                    s1.AddMergedRegion(new CellRangeAddress(row, row, 3, 12));
-                }
-                else
-                {
-                    s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 12));
-                }
-
-                if (i == 3)
-                    s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
-                heigh = 22;
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 12));
+                height = 22;
                 rowCreate.GetCell(1).CellStyle = celltext;
             }
 
-            rowCreate.HeightInPoints = heigh;
+            rowCreate.HeightInPoints = height;
             row++;
         }
 
@@ -858,16 +824,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 //grab the image file
                 string anhhienthi = ExcuteSignalRStatic.getImageProduct(msp);
                 imagesPath = Path.Combine(imagesPath, anhhienthi);
-                var image = System.Drawing.Image.FromFile(imagesPath);
 
-                lstimage.Add(new Dictionary<string, string>() {
-                    { "row", row + "" },
-                    { "column", 3 + "" },
-                    { "link", imagesPath },
-                    { "height", row_t.HeightInPoints + "" },
-                    { "width", 4500 + "" },
-                    { "heightR", image.Height + "" },
-                    { "widthR", image.Width + "" }
+                lstimage.Add(new AvariablePrj.lstIamge {
+                    row = row,
+                    column = 3,
+                    link = imagesPath
                 });
             }
             catch { }
@@ -948,7 +909,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     string gthh = nnl == null ? "0" : nnl.Where(s => s["hehang"].ToString() == chungloai).Select(s => s["giatri"].ToString()).FirstOrDefault();
 
                     var rowToTalHeHang = s1.CreateRow(row);
-                    rowToTalHeHang.HeightInPoints = heigh;
+                    rowToTalHeHang.HeightInPoints = height;
                     rowToTalHeHang.CreateCell(4).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
                     var range1_3 = new CellRangeAddress(row, row, 1, 3);
                     var range4_10 = new CellRangeAddress(row, row, 4, 10);
@@ -963,7 +924,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     row++;
                     
                     var rowDisHeHang = s1.CreateRow(row);
-                    rowDisHeHang.HeightInPoints = heigh;
+                    rowDisHeHang.HeightInPoints = height;
                     rowDisHeHang.CreateCell(4).SetCellValue(string.Format(@"Discount ({0}%):", gthh));
                     rowDisHeHang.GetCell(4).CellStyle = leftBold;
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
@@ -972,7 +933,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     row++;
 
                     var rowTotalHeHang = s1.CreateRow(row);
-                    rowTotalHeHang.HeightInPoints = heigh;
+                    rowTotalHeHang.HeightInPoints = height;
                     rowTotalHeHang.CreateCell(4).SetCellValue(string.Format("Total ({0}):", lstHH.Count + 1));
                     rowTotalHeHang.GetCell(4).CellStyle = leftBold;
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
@@ -997,7 +958,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         if (nnl != null)
         {   
             s1.CreateRow(row).CreateCell(4).SetCellValue("Sub Total:");
-            s1.GetRow(row).HeightInPoints = heigh;
+            s1.GetRow(row).HeightInPoints = height;
             foreach (var i in lstAmountHH)
             {
                 sumAmount += string.Format("M{0}+", i - 1);
@@ -1014,7 +975,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         else
         {
             s1.CreateRow(row).CreateCell(4).SetCellValue("Sub Total:");
-            s1.GetRow(row).HeightInPoints = heigh;
+            s1.GetRow(row).HeightInPoints = height;
             s1.GetRow(row).CreateCell(7).CellFormula = String.Format("SUM(H{0}:H{1})", m, row);
             s1.GetRow(row).CreateCell(8).CellFormula = String.Format("SUM(I{0}:I{1})", m, row);
             s1.GetRow(row).CreateCell(11).CellFormula = String.Format("SUM(L{0}:L{1})", m, row);
@@ -1084,14 +1045,14 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 }
             }
             else
-                s1.GetRow(row).HeightInPoints = heigh;
+                s1.GetRow(row).HeightInPoints = height;
             row++;
         }
 
         //end
         int cong = row + 1;
         s1.CreateRow(row).CreateCell(4).SetCellValue("(+) " + dt.Rows[0]["diengiaicong"].ToString());
-        s1.GetRow(row).HeightInPoints = heigh;
+        s1.GetRow(row).HeightInPoints = height;
         s1.GetRow(row).CreateCell(12).CellFormula = String.Format("Value(\"{0}\")", dt.Rows[0]["phicong"].ToString());
         // style
         s1.GetRow(row).GetCell(4).CellStyle = leftBold;
@@ -1100,7 +1061,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //
         int tru = row + 1;
         s1.CreateRow(row).CreateCell(4).SetCellValue("(-) " + dt.Rows[0]["diengiaitru"].ToString());
-        s1.GetRow(row).HeightInPoints = heigh;
+        s1.GetRow(row).HeightInPoints = height;
         s1.GetRow(row).CreateCell(12).CellFormula = String.Format("Value(\"{0}\")", dt.Rows[0]["phitru"].ToString());
         // style
         s1.GetRow(row).GetCell(4).CellStyle = leftBold;
@@ -1113,7 +1074,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         totalTxt = totalTxt.Length > 0 ? totalTxt.Substring(0, totalTxt.Length - 1) : "";
         string txtTotal = nnl == null ? "Total:" : string.Format("Total {0}:", totalTxt);
         s1.CreateRow(row).CreateCell(4).SetCellValue(txtTotal);
-        s1.GetRow(row).HeightInPoints = heigh;
+        s1.GetRow(row).HeightInPoints = height;
         s1.GetRow(row).CreateCell(12).CellFormula = String.Format("{0} - {1} + M{2} - M{3}"
             , nnl == null ? "M" + sub : sumTotalAmount
             , nnl == null ? "M" + dis : "0"
@@ -1128,7 +1089,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         var hoaHongRow = string.Format(@"Hoa hồng: {0}%          Người nhận: {1}", hoaHongVal.ToString("#,#0.00"), dt.Rows[0]["nguoinhan"].ToString());
         s1.CreateRow(row).CreateCell(0).SetCellValue(hoaHongRow);
         if (hoaHongVal > 0)
-            s1.GetRow(row).HeightInPoints = heigh;
+            s1.GetRow(row).HeightInPoints = height;
         else
             s1.GetRow(row).ZeroHeight = true;
 
@@ -1137,13 +1098,13 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         row++;
         //
         s1.CreateRow(row).CreateCell(0).SetCellValue("Say: " + dt.Rows[0]["money"].ToString());
-        s1.GetRow(row).HeightInPoints = heigh;
+        s1.GetRow(row).HeightInPoints = height;
         s1.GetRow(row).GetCell(0).CellStyle = rightBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
         row++;
         //
         s1.CreateRow(row).CreateCell(0).SetCellValue("(10% more or less in quantity and amount are acceptable).");
-        s1.GetRow(row).HeightInPoints = heigh;
+        s1.GetRow(row).HeightInPoints = height;
         s1.GetRow(row).GetCell(0).CellStyle = rightBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
         row++;
@@ -1155,11 +1116,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             var text = dt.Rows[0][f_value[i]].ToString().Trim();
             s1.CreateRow(row).CreateCell(1).SetCellValue(f[i]);
             s1.GetRow(row).CreateCell(2).SetCellValue(text);
-            heigh = 22;
+            height = 22;
             if (f_value[i] == "mota")
             {
                 float maxHeight = config.MeasureTextHeight(text, width02to12);
-                heigh = maxHeight < heigh ? heigh : (int)maxHeight;
+                height = maxHeight < height ? height : (int)maxHeight;
             }
 
             if (f_value[i] == "no_cont")
@@ -1176,31 +1137,31 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             
             s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 1));
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
-            s1.GetRow(row).HeightInPoints = heigh;
+            s1.GetRow(row).HeightInPoints = height;
             row++;
         }
-        heigh = 22;
+        height = 22;
         //
         s1.CreateRow(row).CreateCell(1).SetCellValue("This agreement comes into effect from the signing date.:");
-        s1.GetRow(row).HeightInPoints = heigh;
+        s1.GetRow(row).HeightInPoints = height;
         s1.GetRow(row).GetCell(1).CellStyle = left;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 12));
         row++;
         row++;
         //
         s1.CreateRow(row).CreateCell(0).SetCellValue("CONFIRMED BY THE BUYER");
-        s1.GetRow(row).HeightInPoints = heigh;
+        s1.GetRow(row).HeightInPoints = height;
         s1.GetRow(row).GetCell(0).CellStyle = signBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 4));
         //
         s1.GetRow(row).CreateCell(5).SetCellValue("ANCO COMPANY LTD.");
-        s1.GetRow(row).HeightInPoints = heigh;
+        s1.GetRow(row).HeightInPoints = height;
         s1.GetRow(row).GetCell(5).CellStyle = signBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 12));
         row++;
         //
         s1.CreateRow(row).CreateCell(5).SetCellValue("(Signed)");
-        s1.GetRow(row).HeightInPoints = heigh;
+        s1.GetRow(row).HeightInPoints = height;
         s1.GetRow(row).GetCell(5).CellStyle = signBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 12));
         row++;
@@ -1219,12 +1180,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         if (type == "pdf")
         {
             s1.PrintSetup.Landscape = false;
-            //s1.SetColumnHidden(14, true);
-            //s1.SetColumnHidden(15, true);
-            //s1.SetColumnHidden(16, true);
+            s1.PrintSetup.PaperSize = (short)PaperSize.A4;
         }
         else
             s1.PrintSetup.Landscape = true;
+
         return hssfworkbook;
     }
 
@@ -1236,10 +1196,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         {
             foreach (var item in lstimage)
             {
-                var row = int.Parse(item["row"]);
-                var column = int.Parse(item["column"]);
-                var link = item["link"];
-                var image = System.Drawing.Image.FromFile(link);
+                var image = System.Drawing.Image.FromFile(item.link);
 
                 MemoryStream ms = new MemoryStream();
                 //pull the memory stream from the image (I need this for the byte array later)
@@ -1247,10 +1204,10 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 //the drawing patriarch will hold the anchor and the master information
                 IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
                 //store the coordinates of which cell and where in the cell the image goes
-                int intx1 = column - 1;
-                int inty1 = row;
-                int intx2 = column;
-                int inty2 = 1 + row;
+                int intx1 = item.column - 1;
+                int inty1 = item.row;
+                int intx2 = item.column;
+                int inty2 = 1 + item.row;
 
                 HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
                 //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
@@ -1277,60 +1234,21 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
             url = url.Replace("PrintControllers\\InDonHang\\", "");
 
-            var exportData = new MemoryStream();
-            hsswb.Write(exportData);
-            workbook.LoadFromStream(exportData);
-
-            foreach (var item in lstimage)
-            {
-                var row = int.Parse(item["row"]) + 1;
-                var column = int.Parse(item["column"]);
-                var width = int.Parse(item["width"]) * 0.0273;
-                double height = double.Parse(item["height"]) * 1.332;
-                var widthR = int.Parse(item["widthR"]);
-                var heightR = int.Parse(item["heightR"]);
-                double percent = height / heightR;
-                var link = item["link"];
-                var picture = workbook.ActiveSheet.Pictures.Add(row, column, link);
-                if (type != "pdf")
-                    picture.UpdatePositions = true;
-                picture.Width = (int)(widthR * percent);
-                picture.Height = (int)(heightR * percent - 3.5);
-                picture.Width = picture.Width > width ? (int)(width - 1) : picture.Width;
-                var rateColumnAndPicture = (width - picture.Width) / 2 * 8;
-                rateColumnAndPicture = rateColumnAndPicture <= 0 ? 0 : rateColumnAndPicture;
-                picture.LeftColumnOffset = (int)rateColumnAndPicture;
-                picture.TopRowOffset = 5;
-            }
-            //workbook.Save();
+            var xfile = new FileStream(url, FileMode.Create, System.IO.FileAccess.ReadWrite);
+            hsswb.Write(xfile);
+            xfile.Close();
+            xfile.Dispose();
 
             if (type == "pdf")
             {
                 var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
-                workbook.SaveToFile(urlPDF, Spire.Xls.FileFormat.PDF);
-                workbook.Dispose();
 
-                var doc = new Spire.Pdf.PdfDocument();
-                doc.LoadFromFile(urlPDF);
-                doc.PageSettings.Margins.Bottom = 0;
-                doc.SaveToFile(urlPDF);
-                doc.Dispose();
+                var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstimage, lstText);
+                File.Delete(url);
 
-                //File.Delete(url);
-
-                Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=1&zoom=page-width", fileName));
-            }
-            else
-            {
-                workbook.SaveToStream(exportData);
-                workbook.Dispose();
-                //File.Delete(url);
-
-                Response.ContentType = "application/vnd.ms-excel";
-                Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
-                Response.Clear();
-                Response.BinaryWrite(exportData.GetBuffer());
-                Response.End();
+                Response.Write(result);
+                if (result.Length <= 0)
+                    Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width", fileName));
             }
         }
     }

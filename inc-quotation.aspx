@@ -67,8 +67,8 @@
                     $("#grid_ds_chitietquotation").setGridWidth(o.width());
                     $("#grid_ds_color_references").setGridWidth(o.width());
 
-                    $("#grid_ds_chitietquotation").setGridHeight(o.height() - 77);
-                    $("#grid_ds_color_references").setGridHeight(o.height() - 77);
+                    $("#grid_ds_chitietquotation").setGridHeight(o.height() - 97);
+                    $("#grid_ds_color_references").setGridHeight(o.height() - 97);
                 }
             }
         });
@@ -624,21 +624,6 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
                     , 'Giá FOB phiên bản cũ', 'Phiên bản giá cũ', 'Đã ghép bộ']"
             RowNumbers="true"
             OndblClickRow = "function(rowid) { 
-								/*$(this).jqGrid('editGridRow', rowid, { 
-									errorTextFormat:function(data) { 
-										return 'Lỗi: ' + data.responseText 
-									}
-									, afterSubmit: function(rs, postdata){
-										return showMsgDialog(rs); 
-									}
-									, beforeShowForm: function (formid) {
-                                        var frmID = '#' + formid.attr('id');
-										$('#gia_db', frmID).prop('disabled', true);
-										$('#isform', frmID).prop('disabled', true);
-										disable_cangbien(frmID);
-										formid.closest('div.ui-jqdialog').dialogCenter(); 
-									}
-                                })*/
 								$('#edit_grid_ds_quotation').click();
                             }"
             FuncActiveQO = "funcActiveQO"
@@ -1018,25 +1003,18 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
                 afterSubmit: function(rs, postdata) {
                     return showMsgDialog(rs); 
             }"
-            OnSelectRow = "function(ids) {
-		                if(ids == null) {
-			                ids=0;
-			                if($('#grid_ds_chitietquotation').jqGrid('getGridParam','records') &gt; 0 )
-			                {
-			                    
-				                $('#grid_ds_chitietquotation').jqGrid('setGridParam',{url:'Controllers/QuotationDetailController.ashx?action=0&quotationId='+ids,page:1});
-				                $('#grid_ds_chitietquotation').jqGrid().trigger('reloadGrid');
-				                
-				                $('#grid_ds_color_references').jqGrid('setGridParam',{url:'Controllers/ColorReferencesController.ashx?quotationId=' + ids,page:1});
-				                $('#grid_ds_color_references').jqGrid().trigger('reloadGrid');
-				            } 
-				        } else {
-			                $('#grid_ds_chitietquotation').jqGrid('setGridParam',{url:'Controllers/QuotationDetailController.ashx?action=0&quotationId='+ids,page:1});
-			                $('#grid_ds_chitietquotation').jqGrid().trigger('reloadGrid');		
-			                
-			                $('#grid_ds_color_references').jqGrid('setGridParam',{url:'Controllers/ColorReferencesController.ashx?quotationId=' + ids,page:1});
-				            $('#grid_ds_color_references').jqGrid().trigger('reloadGrid');	
-		                } }"
+            OnSelectRow = "
+                function(ids) {
+		            if(ids == null) {
+			            ids=0;
+				    }
+
+                    $('#grid_ds_chitietquotation').jqGrid('getGridParam', 'postData').quotationId = ids;
+                    $('#grid_ds_color_references').jqGrid('getGridParam', 'postData').quotationId = ids;
+					$('#grid_ds_chitietquotation')[0].triggerToolbar();
+                    $('#grid_ds_color_references')[0].triggerToolbar();
+                }
+            "
             runat="server" />
 </DIV> 
 
@@ -1574,20 +1552,24 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
                 SortName="md_color_reference_id" 
                 UrlFileAction="Controllers/ColorReferencesController.ashx" 
                 ColNames="['md_color_reference_id', 'Số Báo Giá', 'Màu', 'Url', 'Filter', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô Tả', 'Mặc Định']"
+                FilterToolbar="true"
                 RowNumbers="true"
-                OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid,
-                                {
-                                    errorTextFormat:function(data) { 
-                                        return 'Lỗi: ' + data.responseText 
-                                    }
-                                    , afterSubmit: function(rs, postdata){
-                                        return showMsgDialog(rs);
-                                    }
-                                    , beforeShowForm: function (formid) {
-                                        formid.closest('div.ui-jqdialog').dialogCenter();
-                                    }
-                                }
-                                ); }"
+                OndblClickRow = "
+                    function(rowid) { 
+                        $(this).jqGrid('editGridRow', rowid,
+                        {
+                            errorTextFormat:function(data) { 
+                                return 'Lỗi: ' + data.responseText 
+                            }
+                            , afterSubmit: function(rs, postdata){
+                                return showMsgDialog(rs);
+                            }
+                            , beforeShowForm: function (formid) {
+                                formid.closest('div.ui-jqdialog').dialogCenter();
+                            }
+                        }); 
+                    }
+                "
                 ColModel = "[
                 {
                     fixed: true, name: 'md_color_reference_id'
@@ -1753,117 +1735,121 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
         </table>
     </div> 
 	<script type="text/javascript">
-            $("#grid_ds_quotation").jqGrid('navGrid', "#grid_ds_quotation-pager").jqGrid('navButtonAdd', "#grid_ds_quotation-pager", 
-			{
-                caption: "",
-                buttonicon: "ui-icon-battery-3",
-                onClickButton: TaoColorReferences, 
-				title: "Tạo Color References", 
-				cursor: "pointer"
-            });
+        $("#grid_ds_quotation").jqGrid('navGrid', "#grid_ds_quotation-pager").jqGrid('navButtonAdd', "#grid_ds_quotation-pager", 
+		{
+            caption: "",
+            buttonicon: "ui-icon-battery-3",
+            onClickButton: TaoColorReferences, 
+			title: "Tạo Color References", 
+			cursor: "pointer"
+        });
 			
-			$("#grid_ds_quotation").jqGrid('navGrid', "#grid_ds_quotation-pager").jqGrid('navButtonAdd', "#grid_ds_quotation-pager", 
-			{
-                caption: "",
-                buttonicon: "icon-ghepbo-qo",
-                onClickButton: function(){
+		$("#grid_ds_quotation").jqGrid('navGrid', "#grid_ds_quotation-pager").jqGrid('navButtonAdd', "#grid_ds_quotation-pager", 
+		{
+            caption: "",
+            buttonicon: "icon-ghepbo-qo",
+            onClickButton: function(){
+				var qoId = $('#grid_ds_quotation').jqGrid('getGridParam', 'selrow');
+				if (qoId == null) {
+					alert('Hãy chọn một báo giá');
+				} else {
 					var qoId = $('#grid_ds_quotation').jqGrid('getGridParam', 'selrow');
-					if (qoId == null) {
-						alert('Hãy chọn một báo giá');
-					} else {
-						var qoId = $('#grid_ds_quotation').jqGrid('getGridParam', 'selrow');
-						var name = 'dialog-ghepbo-qo';
-						var title = 'Ghép bộ';
-						var content = `
-							<table style="width:100%">
-								<tr>
-									<td  colspan=2>
-										<label style="font-weight: bold;font-size: 13px;">Bạn có chắc chắn muốn ghép bộ?</label>
+					var name = 'dialog-ghepbo-qo';
+					var title = 'Ghép bộ';
+					var content = `
+						<table style="width:100%">
+							<tr>
+								<td  colspan=2>
+									<label style="font-weight: bold;font-size: 13px;">Bạn có chắc chắn muốn ghép bộ?</label>
+									<br>
+									<label style="font-weight: bold;font-size: 13px; line-height: 2">Lưu ý:</label>
+									<br>
+									<label style="font-style:italic; color: blue; line-height: 2">
+										1. Chức năng này chỉ sử dụng được 1 lần.
 										<br>
-										<label style="font-weight: bold;font-size: 13px; line-height: 2">Lưu ý:</label>
-										<br>
-										<label style="font-style:italic; color: blue; line-height: 2">
-											1. Chức năng này chỉ sử dụng được 1 lần.
-											<br>
-											2. Nếu đã chắc chắn, hãy chọn 1 trong 2 tiêu chí bên dưới và nhấn "Đồng ý". 
-										</label>
-									</td>
-								</tr>
-								<tr>
-									<td style="height: 3px" colspan=2>
-									</td>
-								</tr>
-								<tr>
-									<td style="width:20px">
-										<input id="ghepbo-qo-chk1" type="radio" name="ghepbo-qo-chk1" value="0" />
-									</td>
-									<td>
-										Ghép bộ không xóa dữ liệu
-									</td>
-								</tr>
-								<tr>
-									<td style="height: 5px" colspan=2>
-									</td>
-								</tr>
-								<tr>
-									<td  style="width:20px">
-										<input id="ghepbo-qo-chk2" type="radio" name="ghepbo-qo-chk1" value="1" />
-									</td>
-									<td>
-										Ghép bộ xóa dữ liệu
-									</td>
-								</tr>
-							</table>`;
+										2. Nếu đã chắc chắn, hãy chọn 1 trong 2 tiêu chí bên dưới và nhấn "Đồng ý". 
+									</label>
+								</td>
+							</tr>
+							<tr>
+								<td style="height: 3px" colspan=2>
+								</td>
+							</tr>
+							<tr>
+								<td style="width:20px">
+									<input id="ghepbo-qo-chk1" type="radio" name="ghepbo-qo-chk1" value="0" />
+								</td>
+								<td>
+									Ghép bộ không xóa dữ liệu
+								</td>
+							</tr>
+							<tr>
+								<td style="height: 5px" colspan=2>
+								</td>
+							</tr>
+							<tr>
+								<td  style="width:20px">
+									<input id="ghepbo-qo-chk2" type="radio" name="ghepbo-qo-chk1" value="1" />
+								</td>
+								<td>
+									Ghép bộ xóa dữ liệu
+								</td>
+							</tr>
+						</table>`;
 
-						$('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
-						$('#' + name).dialog({
-							modal: true, 
-							open: function(event, ui) {
-								//hide close button.
-								$(this).parent().children().children('.ui-dialog-titlebar-close').hide();
-							}, 
-							buttons: [
-							{
-								id: "btn-ghepbo-ok",
-								text: "Đồng ý",
-								click: function() {
-									var printType = $('input[name=ghepbo-qo-chk1]:checked', '#' + name).val();									
-									if (printType == null) {
-										alert('Hãy chọn tiêu chí để ghép bộ.');
-									} else {
-										$("#btn-ghepbo-ok").button("disable");
-										$("#btn-ghepbo-close").button("disable");
-										$('#' + name).prepend('<div id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>');
-										$.post('Controllers/API_Android.ashx?oper=ESC_ghepbo', 
-										{ type: printType, c_baogia_id: qoId  }, function(res) {
-											res = res.split('#');
-											if(res[0] == 'true') {
-												$("#grid_ds_quotation").jqGrid('setCell', qoId, 'ghepbo', 'True');
-												$('#' + name).html(res[1]);
-												$('#grid_ds_chitietquotation').jqGrid().trigger('reloadGrid');
-											}
-											else {
-												$('#' + name).html('<div style="color:red">'+ res[1] +'</div>');
-											}
-											$("#btn-ghepbo-close").button("enable");
-										});
-									}
-								}
-							},
-							{
-								id: "btn-ghepbo-close",
-								text: "Thoát",
-								click: function() {
-									$(this).dialog("destroy").remove();
+					$('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
+					$('#' + name).dialog({
+						modal: true, 
+						open: function(event, ui) {
+							//hide close button.
+							$(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+						}, 
+						buttons: [
+						{
+							id: "btn-ghepbo-ok",
+							text: "Đồng ý",
+							click: function() {
+								var printType = $('input[name=ghepbo-qo-chk1]:checked', '#' + name).val();									
+								if (printType == null) {
+									alert('Hãy chọn tiêu chí để ghép bộ.');
+								} else {
+									$("#btn-ghepbo-ok").button("disable");
+									$("#btn-ghepbo-close").button("disable");
+									$('#' + name).prepend('<div id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>');
+									$.post('Controllers/API_Android.ashx?oper=ESC_ghepbo', 
+									{ type: printType, c_baogia_id: qoId  }, function(res) {
+										res = res.split('#');
+										if(res[0] == 'true') {
+											$("#grid_ds_quotation").jqGrid('setCell', qoId, 'ghepbo', 'True');
+											$('#' + name).html(res[1]);
+											$('#grid_ds_chitietquotation').jqGrid().trigger('reloadGrid');
+										}
+										else {
+											$('#' + name).html('<div style="color:red">'+ res[1] +'</div>');
+										}
+										$("#btn-ghepbo-close").button("enable");
+									});
 								}
 							}
-							]
-						});
-					}
-				}, 
-				title: "Ghép bộ", 
-				cursor: "pointer"
-            });
+						},
+						{
+							id: "btn-ghepbo-close",
+							text: "Thoát",
+							click: function() {
+								$(this).dialog("destroy").remove();
+							}
+						}
+						]
+					});
+				}
+			}, 
+			title: "Ghép bộ", 
+			cursor: "pointer"
+		});
+
+		createRightPanel('grid_ds_quotation');
+		createRightPanel('grid_ds_chitietquotation');
+		createRightPanel('grid_ds_color_references');
     </script>
 </DIV>
 

@@ -222,6 +222,9 @@ namespace OfficeToPDF
                 {
                     float leftText = 0, topText = 0, widthText = 0, heightText = 0;
                     string textRange = "";
+                    var hasBold = false;
+                    double fontSize = 12;
+                    string fontName = "Arial";
                     for (var iCl = textInLine.columnF; iCl <= textInLine.columnT; iCl++)
                     {
                         var oRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[textInLine.row + 1, iCl + 1];
@@ -234,6 +237,9 @@ namespace OfficeToPDF
                             heightText = (float)((double)oRange.Height);
                             textRange = (string)oRange.Value2;
                             oRange.Value2 = "";
+                            hasBold = (bool)oRange.Font.Bold;
+                            fontSize = (double)oRange.Font.Size;
+                            fontName = (string)oRange.Font.Name;
                         }
                     }
                     
@@ -247,8 +253,9 @@ namespace OfficeToPDF
                     textBox.Fill.Visible = Microsoft.Office.Core.MsoTriState.msoFalse;
                     var stringTextBox = textBox.TextFrame.Characters(Type.Missing, Type.Missing);
                     stringTextBox.Text = textRange;
-                    stringTextBox.Font.Name = "Arial";
-                    //stringTextBox.Font.Size = 10.5;
+                    stringTextBox.Font.Name = fontName;
+                    stringTextBox.Font.Bold = hasBold;
+                    stringTextBox.Font.Size = fontSize;
                 }
 
                 // Try and avoid xls files raising a dialog
