@@ -2169,9 +2169,9 @@
             ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
 			OnSelectRow = "
 				function(ids) {
-					let cellMSP = $('#grid_ds_chitietpo').jqGrid('getCell', ids, 'ma_sanpham') + '';
-					let hinhanh = cellMSP.lastIndexOf('F') > -1 ? cellMSP.substr(0, 11) : cellMSP.substr(0, 8) + '.jpg';
-					$('#product-view-po').attr('src','images/products/fullsize/' + hinhanh);
+					let ma_sanpham = $('#grid_ds_chitietpo').jqGrid('getCell', ids, 'ma_sanpham') + '';
+					$('#product-view-po').attr('src', '');
+                    $('#product-view-po').attr('src', 'Controllers/API_System.ashx?oper=loadImageProduct&msp=' + ma_sanpham + '&ver=' + uuidv4());
 				}
 			"
             AddFormOptions=" 
@@ -2677,7 +2677,7 @@
 			<table style="width:100%; height:100%">
 				<tr>
 					<td>
-						<img id="product-view-po" style="width:200px; height:150px" src="images/products/fullsize/default.jpg" />
+						<img id="product-view-po"class="loadingIMG" style="width:200px; height:150px" src="Controllers/API_System.ashx?oper=loadImageProduct&msp=default" />
 					</td>
 				</tr>
 			</table>

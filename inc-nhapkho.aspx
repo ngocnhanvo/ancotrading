@@ -853,3 +853,8 @@
             runat="server" />
 	</DIV> 
 
+<script type="text/javascript">
+    createRightPanel('grid_ds_nhapkho');
+    createRightPanel('grid_ds_chitietnhapkho');
+</script>
+

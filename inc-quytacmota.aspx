@@ -607,3 +607,9 @@
                 "
             runat="server" />
 </DIV>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_chungloai');
+    createRightPanel('grid_ds_detai');
+    createRightPanel('grid_ds_mausac');
+</script>

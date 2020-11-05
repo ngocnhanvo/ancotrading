@@ -608,3 +608,8 @@
             runat="server" />
             
 </DIV>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_doitackinhdoanh');
+    createRightPanel('grid_ds_nguoilienhe');
+</script>

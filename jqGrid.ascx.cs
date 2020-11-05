@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 public partial class jqGrid : System.Web.UI.UserControl
 {
     protected String _colNames /* example "['Id', 'No', 'Date']" */
+        , _toppager = "false"
         , _caption = ""
         , _urlFileAction
         , _autoWidth = "true"
@@ -80,6 +81,11 @@ public partial class jqGrid : System.Web.UI.UserControl
         , _InPhieuChi = "" //In Phieu Chi
         , _funcCopyDonHang = "" //Copy don hang po
 		;
+    public String Toppager
+    {
+        get { return Toppager; }
+        set { Toppager = value; }
+    }
 
     public String FuncPhanBoCocInv
     {

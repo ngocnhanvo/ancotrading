@@ -1362,9 +1362,9 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
                 Height = "150"
                 OnSelectRow = "
 					function(ids) {
-						let cellMSP = $('#grid_ds_chitietquotation').jqGrid('getCell', ids, 'ma_sanpham') + '';
-						let hinhanh = cellMSP.lastIndexOf('F') > -1 ? cellMSP.substr(0, 11) : cellMSP.substr(0, 8) + '.jpg';
-						$('#product-view-quotation').attr('src','images/products/fullsize/' + hinhanh);
+						let ma_sanpham = $('#grid_ds_chitietquotation').jqGrid('getCell', ids, 'ma_sanpham') + '';
+                        $('#product-view-quotation').attr('src', '');
+                        $('#product-view-quotation').attr('src', 'Controllers/API_System.ashx?oper=loadImageProduct&msp=' + ma_sanpham + '&ver=' + uuidv4());
 					}
 				"
                 AddFormOptions="
@@ -1668,18 +1668,16 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
                 ShowAdd ="<%$ Code: DaoRules.GetRuleAdd(Context).ToString().ToLower() %>"
                 ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
                 ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
-                OnSelectRow = "function(ids) {
+                OnSelectRow = "
+                    function(ids) {
 		                if(ids == null) {
 			                ids=0;
-			                if($('#grid_ds_chitietquotation').jqGrid('getGridParam','records') &gt; 0 )
-			                {
-			                    var fileName = $(this).jqGrid('getCell', ids, 'url') + '';
-			                    $('#product-view-quotation').attr('src','images/products/mausac/' + fileName );
-				            } 
-				        } else {
-				                var fileName = $(this).jqGrid('getCell', ids, 'url') + '';
-				                $('#product-view-quotation').attr('src','images/products/mausac/' + fileName );
-		                } }"
+				        }
+                         let ma_sanpham = $(this).jqGrid('getCell', ids, 'ma_sanpham');
+                        $('#img-product').attr('src', '');
+                        $('#img-product').attr('src', 'Controllers/API_System.ashx?oper=loadImageProduct&msp=' + ma_sanpham + '&ver=' + uuidv4());
+                     }
+                "
                 AddFormOptions="
                 afterSubmit: function(rs, postdata){
                     return showMsgDialog(rs);
@@ -1729,7 +1727,7 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
         <table style="width:100%; height:100%">
             <tr>
                 <td>
-                    <img id="product-view-quotation" style="width:200px; height:150px" src="images/products/fullsize/default.jpg" />
+                    <img id="product-view-quotation" class="loadingIMG" style="width:200px; height:150px" src="Controllers/API_System.ashx?oper=loadImageProduct&msp=default" />
                 </td>
             </tr>
         </table>

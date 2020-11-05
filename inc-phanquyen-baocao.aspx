@@ -338,3 +338,8 @@
             }"
             runat="server" />
 </div>  
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_baocao');
+    createRightPanel('grid_ds_phanquyen_baocao');
+</script>

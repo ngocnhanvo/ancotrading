@@ -314,4 +314,6 @@
 		var parent = $('#grid_ds_chungloai_hanghoa-pager_left');
 		parent.find('.ui-icon.ui-icon-print').parent().parent().remove();
 	}
+
+	createRightPanel('grid_ds_chungloai_hanghoa');
 </script>

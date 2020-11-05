@@ -666,11 +666,11 @@
 			                    $('#grid_ds_nhacungungmacdinh').jqGrid('setGridParam',{url:'Controllers/NhaCungUngMacDinhController.ashx?&productId='+ids,page:1});
 			                    $('#grid_ds_nhacungungmacdinh').jqGrid().trigger('reloadGrid');
 			                    
-			                    var ma_sanpham = $(this).jqGrid('getCell', ids, 'ma_sanpham');
-			                    $.get('Controllers/ProductController.ashx?action=getSinglePicture&ma_sanpham=' + ma_sanpham, function(data) {
-                                      $('#img-product').attr('src', data);
-                                });
-		                    } 
+			                    let ma_sanpham = $(this).jqGrid('getCell', ids, 'ma_sanpham');
+                                
+                                $('#img-product').attr('src', '');
+                                $('#img-product').attr('src', 'Controllers/API_System.ashx?oper=loadImageProduct&msp=' + ma_sanpham + '&ver=' + uuidv4());
+		                    }
 		                }"
             Height = "420"
             ShowAdd ="<%$ Code: DaoRules.GetRuleAdd(Context).ToString().ToLower() %>"
@@ -1454,21 +1454,30 @@
                                 postdata.md_sanpham_id = masterId;
                                 return [true,'']; 
                             }
-                        }"
+                        }
+                    "
                     EditFormOptions="
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
                         afterSubmit: function(rs, postdata){
                            return showMsgDialog(rs);
                         }
                     "
                     DelFormOptions="
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
                         afterSubmit: function(rs, postdata){
                            return showMsgDialog(rs);
                         }
                     "
-                    ViewFormOptions="width:900
-                                    , beforeShowForm: function (formid) {
-                                        formid.closest('div.ui-jqdialog').dialogCenter(); 
-                                    } "
+                    ViewFormOptions="
+                        width:500,
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        }
+                    "
                     runat="server" />
 		    </div>
 		    
@@ -1695,11 +1704,17 @@
                             }
                         }"
                     EditFormOptions="
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
                         afterSubmit: function(rs, postdata){
                            return showMsgDialog(rs);
                         }
                     "
                     DelFormOptions="
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
                         afterSubmit: function(rs, postdata){
                            return showMsgDialog(rs);
                         }
@@ -1717,7 +1732,7 @@
         <table style="width:100%; height:100%">
             <tr>
                 <td>
-                    <img id="img-product" style="width:200px; height:150px" src="images/products/fullsize/default.jpg" />
+                    <img id="img-product" class="loadingIMG" style="width:200px; height:150px" src="Controllers/API_System.ashx?oper=loadImageProduct&msp=default" />
                 </td>
             </tr>
         </table>
@@ -1742,6 +1757,14 @@
 		parent.find('.ui-icon.ui-icon-print').parent().parent().remove();
 	}
 	
+	createRightPanel('grid_ds_sanpham');
+	createRightPanel('grid_ds_quycachdonggoi');
+	createRightPanel('grid_ds_giafob');
+	createRightPanel('grid_ds_gianoi');
+	createRightPanel('grid_ds_khachhangdocquyen_sp');
+	createRightPanel('grid_ds_cangxuathang');
+	createRightPanel('grid_ds_bientau');
+	createRightPanel('grid_ds_nhacungungmacdinh');
 	$('#tab-product-details').tabs();
 </script>
 

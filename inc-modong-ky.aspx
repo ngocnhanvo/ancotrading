@@ -296,3 +296,7 @@
         cursor:wait
     }
 </style>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_modongky');
+</script>

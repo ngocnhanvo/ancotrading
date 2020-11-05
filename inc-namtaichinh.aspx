@@ -421,3 +421,8 @@
                 "
             runat="server" />
 </DIV>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_namtaichinh');
+    createRightPanel('grid_ds_kytrongnam');
+</script>

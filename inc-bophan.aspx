@@ -118,3 +118,9 @@
             ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
             ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
             runat="server" />
+
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_bophan');
+</script>
+

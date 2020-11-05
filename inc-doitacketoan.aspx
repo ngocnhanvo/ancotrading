@@ -590,3 +590,8 @@
             runat="server" />
             
 </DIV>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_doitackinhdoanhkt');
+    createRightPanel('grid_ds_nguoilienhekt');
+</script>

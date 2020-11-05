@@ -892,46 +892,17 @@
                 ]"
                 GridComplete = "var o = $(this).parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 97);"
                 Height = "150"
-                OnSelectRow="function(ids) {
+                OnSelectRow = "
+                    function(ids) {
 		                if(ids == null) {
 			                ids=0;
-			                if($('#grid_ds_chitietquotationqr').jqGrid('getGridParam','records') &gt; 0 )
-			                {
-			                    var fileName = $(this).jqGrid('getCell', ids, 'ma_sanpham');
-								if(fileName.length < 10)
-								{
-									$('#product-view-quotation').attr('src','images/products/fullsize/' + fileName.substring(0,8) + '.jpg' );
-								}
-								else
-								{
-									if(fileName[9] == 'F')
-									{
-										$('#product-view-quotation').attr('src','images/products/fullsize/' + fileName.substring(0,11) + '.jpg' );			
-									}
-									else
-									{
-										$('#product-view-quotation').attr('src','images/products/fullsize/' + fileName.substring(0,8) + '.jpg' );			
-									}
-								}
-				            } 
-				        } else {
-				                var fileName = $(this).jqGrid('getCell', ids, 'ma_sanpham');
-				                if(fileName.length < 10)
-								{
-									$('#product-view-quotation').attr('src','images/products/fullsize/' + fileName.substring(0,8) + '.jpg' );
-								}
-								else
-								{
-									if(fileName[9] == 'F')
-									{
-										$('#product-view-quotation').attr('src','images/products/fullsize/' + fileName.substring(0,11) + '.jpg' );			
-									}
-									else
-									{
-										$('#product-view-quotation').attr('src','images/products/fullsize/' + fileName.substring(0,8) + '.jpg' );			
-									}
-								}
-						} }"
+				        }
+                        let ma_sanpham = $(this).jqGrid('getCell', ids, 'ma_sanpham');
+                                
+                        $('#product-view-quotationqr').attr('src', '');
+                        $('#product-view-quotationqr').attr('src', 'Controllers/API_System.ashx?oper=loadImageProduct&msp=' + ma_sanpham + '&ver=' + uuidv4());
+                    }
+                "
                 AddFormOptions="
                     errorTextFormat:function(data) { 
                         return 'Lỗi: ' + data.responseText 
@@ -1111,7 +1082,7 @@
         <table style="width:100%; height:100%">
             <tr>
                 <td>
-                    <img id="product-view-quotation" style="width:200px; height:150px" src="images/products/fullsize/default.jpg" />
+                    <img id="product-view-quotationqr" class="loadingIMG" style="width:200px; height:150px" src="Controllers/API_System.ashx?oper=loadImageProduct&msp=default" />
                 </td>
             </tr>
         </table>

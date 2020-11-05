@@ -164,3 +164,7 @@
                 }
                 "
             runat="server" />
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_bocai');
+</script>

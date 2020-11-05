@@ -711,3 +711,8 @@
 		                } }"
             runat="server" />
 </div>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_phaithuphanbo');
+    createRightPanel('grid_ds_chitietphaithuphanbo');
+</script>

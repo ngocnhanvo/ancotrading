@@ -734,6 +734,34 @@
             MultiSelect = "false" 
             ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
             ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
+            EditFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                }
+                , afterSubmit: function(rs, postdata) {
+                    return showMsgDialog(rs);
+                }
+            "
+            ViewFormOptions="  
+                 beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                }
+                , afterSubmit: function(rs, postdata) {
+                    return showMsgDialog(rs);
+                }
+            "
+            DelFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                }
+                , afterSubmit: function(rs, postdata) {
+                    return showMsgDialog(rs);
+                }
+            "
             runat="server" />
 	</DIV> 
 
+<script type="text/javascript">
+    createRightPanel('grid_ds_xuatkho');
+    createRightPanel('grid_ds_chitietxuatkho');
+</script>

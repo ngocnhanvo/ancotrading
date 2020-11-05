@@ -805,3 +805,9 @@
                 "
         runat="server" />
 </DIV>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_banggia');
+    createRightPanel('grid_ds_phienbanggia');
+    createRightPanel('grid_ds_giasanpham');
+</script>

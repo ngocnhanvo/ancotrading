@@ -706,11 +706,11 @@
 								$('#grid_ds_nhacungung_nhd').jqGrid('setGridParam',{url:'Controllers/NhaCungUngMacDinhController.ashx?&productId='+ids,page:1});
 			                    $('#grid_ds_nhacungung_nhd').jqGrid().trigger('reloadGrid');
 								
-			                    var ma_sanpham = $(this).jqGrid('getCell', ids, 'ma_sanpham');
-			                    $.get('Controllers/ProductController.ashx?action=getSinglePicture&ma_sanpham=' + ma_sanpham, function(data) {
-                                      $('#img-product_nhd').attr('src', data);
-                                });
-		                    } 
+			                    let ma_sanpham = $(this).jqGrid('getCell', ids, 'ma_sanpham');
+
+                                $('#img-product_nhd').attr('src', '');
+                                $('#img-product_nhd').attr('src', 'Controllers/API_System.ashx?oper=loadImageProduct&msp=' + ma_sanpham + '&ver=' + uuidv4());
+		                    }
 		                }"
             Height = "420"
             
@@ -1469,7 +1469,7 @@
                            return showMsgDialog(rs);
                         }
                         , beforeShowForm: function (formid) {
-                            var masterId = $('#grid_ds_sanpham').jqGrid('getGridParam', 'selrow');
+                            var masterId = $('#grid_ds_sanpham_nhd').jqGrid('getGridParam', 'selrow');
                             var forId = 'md_sanpham_id';
                             if(masterId == null)
                             {
@@ -1482,7 +1482,7 @@
                             }
                         }
                         , beforeSubmit:function(postdata, formid){
-                            var masterId = $('#grid_ds_sanpham').jqGrid('getGridParam', 'selrow');
+                            var masterId = $('#grid_ds_sanpham_nhd').jqGrid('getGridParam', 'selrow');
                             var forId = 'md_sanpham_id';
                             if(masterId == null)
                             {
@@ -1492,21 +1492,30 @@
                                 postdata.c_baogia_id = masterId;
                                 return [true,'']; 
                             }
-                        }"
+                        }
+                    "
                     EditFormOptions="
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
                         afterSubmit: function(rs, postdata){
                            return showMsgDialog(rs);
                         }
                     "
                     DelFormOptions="
-                        afterSubmit: function(rs, postdata){
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
+                        afterSubmit: function(rs, postdata) {
                            return showMsgDialog(rs);
                         }
                     "
-                    ViewFormOptions="width:900
-                                    , beforeShowForm: function (formid) {
-                                        formid.closest('div.ui-jqdialog').dialogCenter(); 
-                                    } "
+                    ViewFormOptions="
+                        width:900, 
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter(); 
+                        } 
+                    "
                     runat="server" />
 		    </div>
 		    
@@ -1708,7 +1717,7 @@
                            return showMsgDialog(rs);
                         }
                         , beforeShowForm: function (formid) {
-                            var masterId = $('#grid_ds_sanpham').jqGrid('getGridParam', 'selrow');
+                            var masterId = $('#grid_ds_sanpham_nhd').jqGrid('getGridParam', 'selrow');
                             var forId = 'md_sanpham_id';
                             if(masterId == null)
                             {
@@ -1720,7 +1729,7 @@
                             }
                         }
                         , beforeSubmit:function(postdata, formid){
-                            var masterId = $('#grid_ds_sanpham').jqGrid('getGridParam', 'selrow');
+                            var masterId = $('#grid_ds_sanpham_nhd').jqGrid('getGridParam', 'selrow');
                             var forId = 'md_sanpham_id';
                             if(masterId == null)
                             {
@@ -1732,12 +1741,22 @@
                             }
                         }"
                     EditFormOptions="
-                        afterSubmit: function(rs, postdata){
+                        beforeShowForm: function (formid) 
+                        {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
+                        afterSubmit: function(rs, postdata)
+                        {
                            return showMsgDialog(rs);
                         }
                     "
                     DelFormOptions="
-                        afterSubmit: function(rs, postdata){
+                        beforeShowForm: function (formid) 
+                        {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
+                        afterSubmit: function(rs, postdata)
+                        {
                            return showMsgDialog(rs);
                         }
                     "
@@ -1756,7 +1775,7 @@
         <table style="width:100%; height:100%">
             <tr>
                 <td>
-                    <img id="img-product_nhd" style="width:200px; height:150px" src="images/products/fullsize/default.jpg" />
+                    <img id="img-product_nhd" class="loadingIMG" style="width:200px; height:150px" src="Controllers/API_System.ashx?oper=loadImageProduct&msp=default" />
                 </td>
             </tr>
         </table>
@@ -1776,5 +1795,14 @@
 		var parent = $('#grid_ds_sanpham_nhd-pager_left');
 		parent.find('.ui-icon.ui-icon-print').parent().parent().remove();
 	}
+
+	createRightPanel('grid_ds_sanpham_nhd');
+	createRightPanel('grid_ds_quycachdonggoi_nhd');
+	createRightPanel('grid_ds_giafob_nhd');
+	createRightPanel('grid_ds_gianoi_nhd');
+	createRightPanel('grid_ds_khachhangdocquyen_nhd');
+	createRightPanel('grid_ds_cangxuathang_nhd');
+	createRightPanel('grid_ds_bientau_nhd');
+	createRightPanel('grid_ds_nhacungung_nhd');
 	$('#tab-product-details_nhd').tabs();
 </script>
