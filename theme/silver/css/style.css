@@ -245,8 +245,10 @@ input:disabled {
     border-color: rgba(118, 118, 118, 0.3);
 }
 
-
-
+.ui-widget-overlay {
+    background: #000 50% 50% repeat-x !important;
+    opacity: .30 !important;
+}
 
 
 

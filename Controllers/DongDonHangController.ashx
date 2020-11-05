@@ -89,7 +89,7 @@ public class DongDonHangController : IHttpHandler
         var itemJS = UserUtils.get_giasanpham(context, c_donhang_id, md_sanpham_id, db);
 
         var entries = itemJS.Select(d =>
-           string.Format("\"{0}\": [{1}]", d.Key, string.Join(",", d.Value)));
+           string.Format("\"{0}\": [\"{1}\"]", d.Key, string.Join(",", d.Value).Replace("\"","\\\"")));
         context.Response.Write("{" + string.Join(",", entries) + "}");
     }
 
