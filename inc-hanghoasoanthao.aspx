@@ -1784,7 +1784,7 @@
         <table style="width:100%; height:100%">
             <tr>
                 <td>
-                    <img id="img-productSoanThao" class="loadingIMG" style="width:200px; height:150px" src="Controllers/API_System.ashx?oper=loadImageProduct&msp=default" />
+                    <img id="img-productSoanThao" class="loadingIMG" style="max-width:100%; margin: 0px auto; min-width: 40px;" src="Controllers/API_System.ashx?oper=loadImageProduct&msp=default" />
                 </td>
             </tr>
         </table>
