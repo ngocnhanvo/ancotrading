@@ -218,9 +218,9 @@ public class DanhSachDatHangReport
         //set A1 - A4
         config.LogoRpt = new ExportExcel.Logoreport();
         config.LogoRpt.cell1 = type == "pdf" ? 4: 3;
-        config.LogoRpt.cell2 = type == "pdf" ? 4 : 3;
-        config.LogoRpt.dx1 = type == "pdf" ? 1000 : 270;
-        config.LogoRpt.dx2 = type == "pdf" ? 1030 : 500;
+        config.LogoRpt.cell2 = type == "pdf" ? 5 : 3;
+        config.LogoRpt.dx1 = type == "pdf" ? 930 : 270;
+        config.LogoRpt.dx2 = type == "pdf" ? 300 : 500;
         row = config.createHeader(NameHeaderReport.ANCO, s1, row, heigh);
 
         s1.CreateRow(row).CreateCell(1).SetCellValue("Số chứng từ:");
