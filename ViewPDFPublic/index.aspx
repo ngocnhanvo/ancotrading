@@ -2,6 +2,7 @@
 
 <% 
     string url_pdf = "../Controllers/API_System.ashx?oper=loadPDF&urlPDF=" + Request.QueryString["urlpdf"] + "&remove=" + Request.QueryString["remove"];
+    url_pdf = Request.QueryString["urlpdf"];
     string ZoomPrint = Request.QueryString["zoomprint"];
 %>
 <!DOCTYPE html>
