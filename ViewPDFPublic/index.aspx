@@ -30,6 +30,9 @@
 			html {
 				zoom: <%=ZoomPrint%>;
 			}
+             body {
+                overflow: auto;
+            }
 		}
 	</style>
 </head>
