@@ -320,8 +320,8 @@ public class ExportExcel
                 "PROFORMA INVOICE"
             };
 
-            //s1.CreateRow(row);
-            //row++;
+            s1.CreateRow(row);
+            row++;
             for (int i = 0; i < a.Length; i++)
             {
                 s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
