@@ -19,11 +19,9 @@
         let DEFAULT_URL = '<%=url_pdf%>';
         var DEFAULT_ZOOM = '<%=Request.QueryString["zoom"]%>';
     </script>
-    <script src="l10n.js"></script>
-    <script src="build/pdf.js"></script>
-    <script src="viewer.js"></script>
-    <script src="/Scripts/jquery-1.9.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+    <script src="l10n.js?ver=1"></script>
+    <script src="build/pdf.js?ver=1"></script>
+    <script src="viewer.js?ver=1"></script>=
     <style>
 		@media print {
 			html {
