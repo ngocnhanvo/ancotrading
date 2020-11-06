@@ -1,7 +1,7 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" %>
 
 <% 
-    string url_pdf = Request.QueryString["urlpdf"];
+    string url_pdf = "../Controllers/API_System.ashx?oper=loadPDF&urlPDF=" + Request.QueryString["urlpdf"] + "&remove=" + Request.QueryString["remove"];
     string ZoomPrint = Request.QueryString["zoomprint"];
 %>
 <!DOCTYPE html>

@@ -1248,7 +1248,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
                 Response.Write(result);
                 if (result.Length <= 0)
-                    Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width", fileName));
+                    Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width&remove=true", fileName));
             }
         }
     }
