@@ -1,8 +1,7 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" %>
-
 <% 
     string url_pdf = "../Controllers/API_System.ashx?oper=loadPDF&urlPDF=" + Request.QueryString["urlpdf"] + "&remove=" + Request.QueryString["remove"];
-    url_pdf = Request.QueryString["urlpdf"];
+    //url_pdf = Request.QueryString["urlpdf"];
     string ZoomPrint = Request.QueryString["zoomprint"];
 %>
 <!DOCTYPE html>
@@ -17,30 +16,23 @@
     <!-- This snippet is used in production (included from viewer.html) -->
     <link rel="resource" type="application/l10n" href="locale/locale.properties">
     <script>
-        let DEFAULT_URL = '<%=url_pdf%>';
+        var DEFAULT_URL = '<%=url_pdf%>';
         var DEFAULT_ZOOM = '<%=Request.QueryString["zoom"]%>';
     </script>
     <script src="l10n.js?ver=1"></script>
     <script src="build/pdf.js?ver=1"></script>
-    <script src="viewer.js?ver=1"></script>=
+    <script src="viewer.js?ver=1"></script>
     <style type="text/css">
-        body {
-            overflow: hidden;
-        }
 		@media print {
 			html {
 				zoom: <%=ZoomPrint%>;
 			}
-             body {
-                overflow: auto;
-            }
 		}
 	</style>
 </head>
 
 <body tabindex="1" class="loadingInProgress">
     <div id="outerContainer">
-
         <div id="sidebarContainer">
             <div id="toolbarSidebar">
                 <div class="splitToolbarButton toggled">
@@ -369,10 +361,6 @@
     </div>
     <!-- outerContainer -->
     <div id="printContainer"></div>
-    <script type="text/javascript">
-        //let element = document.getElementById('scaleSelect');
-        //element.value = "page-width";
-    </script>
 </body>
 </html>
 

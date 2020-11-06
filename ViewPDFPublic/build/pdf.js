@@ -2811,7 +2811,6 @@ var PDFWorker = function PDFWorkerClosure() {
           if (!isSameOrigin(window.location.href, workerSrc)) {
             workerSrc = createCDNWrapper(new URL(workerSrc, window.location).href);
             }
-            console.error(workerSrc);
             workerSrc = 'build/pdf.worker.js';
           var worker = new Worker(workerSrc);
           var messageHandler = new MessageHandler('main', 'worker', worker);
