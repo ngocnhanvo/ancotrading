@@ -22,7 +22,10 @@
     <script src="l10n.js?ver=1"></script>
     <script src="build/pdf.js?ver=1"></script>
     <script src="viewer.js?ver=1"></script>=
-    <style>
+    <style type="text/css">
+        body {
+            overflow: hidden;
+        }
 		@media print {
 			html {
 				zoom: <%=ZoomPrint%>;
