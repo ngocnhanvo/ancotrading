@@ -169,6 +169,7 @@ public class BaoGiaReport
         var config = new ExportExcel(hssfworkbook, 0, 23);
         var ex_fm = new Excel_Format(hssfworkbook);
         var celltext = ex_fm.getcell(10, false, true, "", "L", "T");
+        var cellTextCenter = ex_fm.getcell(10, false, true, "", "C", "T");
 
         config.title = "QUOTATION";
 
@@ -418,6 +419,7 @@ public class BaoGiaReport
             { }
             
             s1.CreateRow(rowDt).CreateCell(0).SetCellValue(dtDetails.Rows[i]["msp"].ToString());
+            s1.CreateRow(rowDt).GetCell(0).CellStyle = cellTextCenter;
             s1.GetRow(rowDt).HeightInPoints = 50;
             s1.GetRow(rowDt).CreateCell(1).SetCellValue("");
             s1.GetRow(rowDt).CreateCell(2).SetCellValue(dtDetails.Rows[i]["ma_sanpham_khach"].ToString());
