@@ -21,6 +21,9 @@ public class DonHangQRController : IHttpHandler
             case "chuyenThanhPO":
                 this.chuyenThanhPO(context);
                 break;
+            case "getpoinformation":
+                this.getPoInformation(context);
+                break;
             default:
                 switch (oper)
                 {
@@ -33,6 +36,42 @@ public class DonHangQRController : IHttpHandler
                 }
                 break;
         }
+    }
+
+    public void getPoInformation(HttpContext context)
+    {
+        context.Response.ContentType = "text/plain";
+        context.Response.Charset = "UTF-8";
+        string c_donhang_id = context.Request.QueryString["poId"];
+        string msg = "";
+        try
+        {
+            decimal totalQuantity = 0, totalSalary = 0, totalCbm = 0;
+            c_donhangqr dh = db.c_donhangqrs.FirstOrDefault(d => d.c_donhangqr_id.Equals(c_donhang_id));
+            if (dh != null)
+            {
+                var ddh = from c in db.c_dongdonhangqrs where c.c_donhangqr_id.Equals(dh.c_donhangqr_id) select c;
+
+                totalQuantity = ddh.Sum(p => p.soluong).GetValueOrDefault(0);
+                totalCbm =  ddh.Sum(p => p.v2).GetValueOrDefault(0);
+                totalSalary = ddh.ToList().Sum(p => p.soluong.GetValueOrDefault(0) * p.giafob.GetValueOrDefault(0)).DecRound(2);
+                decimal discountVal = (totalSalary * dh.discount.GetValueOrDefault(0) / 100).DecRound(2);
+                totalSalary = (totalSalary - discountVal);
+
+
+                msg = string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dh.sochungtu, totalCbm, totalSalary, totalQuantity);
+            }
+            else
+            {
+                msg = "Đơn hàng này đã bị xóa, hãy thử làm mới dữ liệu.";
+            }
+        }
+        catch (Exception e)
+        {
+            msg = e.Message;
+        }
+
+        context.Response.Write(msg);
     }
 
     public void chuyenThanhPO(HttpContext context)

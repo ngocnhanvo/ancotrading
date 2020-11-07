@@ -514,9 +514,11 @@ public class ProductSOANTHAOController : IHttpHandler
         }
         
         
-        String sqlCount = @"SELECT COUNT(*) AS count 
+        string sqlCount = string.Format(@"
+            SELECT COUNT(1) AS count 
             FROM 
-	            md_sanpham sp left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id
+	            md_sanpham sp 
+                left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id
 	            left join md_doitackinhdoanh ncc on sp.nhacungung = ncc.md_doitackinhdoanh_id
 	            left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
 	            left join md_nhomnangluc nnl on sp.md_nhomnangluc_id = nnl.md_nhomnangluc_id
@@ -525,11 +527,10 @@ public class ProductSOANTHAOController : IHttpHandler
 	            left join md_kieudang kd on sp.md_kieudang_id = kd.md_kieudang_id
                 left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id
             WHERE 
-	            1=1 "+
-                " {0} " +
-                " AND sp.hoatdong = 1 AND sp.trangthai = 'SOANTHAO'";
-
-        sqlCount = String.Format(sqlCount, filter);
+	            1=1
+                {0}
+                AND sp.hoatdong = 1 AND sp.trangthai = 'SOANTHAO'"
+        , filter);
         
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
@@ -557,36 +558,41 @@ public class ProductSOANTHAOController : IHttpHandler
             sidx = "sp.ma_sanpham";
         }
         
-        string strsql = @"select * from( 
-            SELECT
-	           sp.md_sanpham_id, sp.trangthai, sp.ma_sanpham
-	            , kd.ten_tv as ten_kd
-	            , kd.ma_kieudang as ma_kd
-	            , cn.ten_tv as ten_cn
-	            , cn.ma_chucnang as ma_cn
-	            , dvt.ten_dvt as tendvt
-	            , sp.mota_tiengviet,  sp.mota_tienganh
-	            , sp.L_inch, sp.W_inch, sp.H_inch, sp.L_cm, sp.W_cm, sp.H_cm, sp.Trongluong, sp.dientich
-	            , (nnl.hehang + '('+ nnl.nhom +')') as nangluc
-	            , cl.code_cl, sp.ghichu, ncc.ma_dtkd
-	            , cb.ten_cangbien as cangbien, hscode.ma_hscode, hscode.hscode, sp.chucnangsp, sp.ngayxacnhan, sp.hinhthucban
-	            , sp.ngaytao, sp.nguoitao, sp.ngaycapnhat, sp.nguoicapnhat, sp.mota, sp.hoatdong
-	            , ROW_NUMBER() OVER (ORDER BY {0} {1} ) as RowNum 
-            FROM 
-	            md_sanpham sp left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id
-	            left join md_doitackinhdoanh ncc on sp.nhacungung = ncc.md_doitackinhdoanh_id
-	            left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
-	            left join md_nhomnangluc nnl on sp.md_nhomnangluc_id = nnl.md_nhomnangluc_id
-	            left join md_cangbien cb on sp.md_cangbien_id = cb.md_cangbien_id
-	            left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
-	            left join md_kieudang kd on sp.md_kieudang_id = kd.md_kieudang_id                     
-                left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id	      
-            WHERE 1=1 " +
-            " {2} " +
-            " AND sp.hoatdong = 1 AND sp.trangthai = 'SOANTHAO' " +
-            " )P WHERE RowNum > @start AND RowNum < @end";
-        
-        strsql = String.Format(strsql, sidx, sord, filter);
+        string strsql = string.Format(@"
+            select * from( 
+                SELECT
+	                sp.md_sanpham_id, sp.trangthai, sp.ma_sanpham
+	                , kd.ten_tv as ten_kd
+	                , kd.ma_kieudang as ma_kd
+	                , cn.ten_tv as ten_cn
+	                , cn.ma_chucnang as ma_cn
+	                , dvt.ten_dvt as tendvt
+	                , sp.mota_tiengviet,  sp.mota_tienganh
+	                , sp.L_inch, sp.W_inch, sp.H_inch, sp.L_cm, sp.W_cm, sp.H_cm, sp.Trongluong, sp.dientich, sp.thetich
+	                , (nnl.hehang + '('+ nnl.nhom +')') as nangluc
+	                , cl.code_cl, sp.ghichu, ncc.ma_dtkd
+	                , cb.ten_cangbien as cangbien, hscode.ma_hscode, hscode.hscode, sp.chucnangsp, sp.ngayxacnhan, sp.hinhthucban
+	                , sp.ngaytao, sp.nguoitao, sp.ngaycapnhat, sp.nguoicapnhat, sp.mota, sp.hoatdong
+	                , ROW_NUMBER() OVER (ORDER BY {0} {1} ) as RowNum 
+                FROM 
+	                md_sanpham sp 
+                    left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id
+	                left join md_doitackinhdoanh ncc on sp.nhacungung = ncc.md_doitackinhdoanh_id
+	                left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
+	                left join md_nhomnangluc nnl on sp.md_nhomnangluc_id = nnl.md_nhomnangluc_id
+	                left join md_cangbien cb on sp.md_cangbien_id = cb.md_cangbien_id
+	                left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
+	                left join md_kieudang kd on sp.md_kieudang_id = kd.md_kieudang_id                     
+                    left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id	            
+                WHERE 
+	                1=1 {2}
+                    AND sp.hoatdong = 1 
+                    AND sp.trangthai = 'SOANTHAO'
+            )P WHERE RowNum > @start AND RowNum < @end"
+            , sidx
+            , sord
+            , filter
+        );
 
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
@@ -616,23 +622,31 @@ public class ProductSOANTHAOController : IHttpHandler
             xml += "<cell><![CDATA[" + row["H_cm"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["trongluong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["dientich"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["thetich"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nangluc"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["code_cl"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["cangbien"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_hscode"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hscode"] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row["chucnangsp"] + "]]></cell>";
-			if(!string.IsNullOrEmpty(row["ngayxacnhan"] + ""))
-				xml += "<cell><![CDATA[" + DateTime.Parse(row["ngayxacnhan"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-			else
-				xml += "<cell><![CDATA[]]></cell>";
+            xml += "<cell><![CDATA[" + row["chucnangsp"] + "]]></cell>";
+            
+            var nxn = row["ngayxacnhan"] + "";
+            xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", string.IsNullOrEmpty(nxn) ? "" : DateTime.Parse(nxn).ToString("dd/MM/yyyy"));
+            
             xml += "<cell><![CDATA[" + row["hinhthucban"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+
+            var ngaytao = row["ngaytao"] + "";
+            xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", string.IsNullOrEmpty(ngaytao) ? "" : DateTime.Parse(ngaytao).ToString("dd/MM/yyyy"));
+
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+
+            var ngaycapnhat = row["ngaycapnhat"] + "";
+            xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", string.IsNullOrEmpty(ngaycapnhat) ? "" : DateTime.Parse(ngaycapnhat).ToString("dd/MM/yyyy"));
+
             xml += "<cell><![CDATA[" + row["nguoicapnhat"] + "]]></cell>";
+
             xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
             xml += "</row>";

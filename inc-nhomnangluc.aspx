@@ -227,9 +227,11 @@
             ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
             runat="server" />
 			
-<script>
+<script type="text/javascript">
 	if(chietxuatNNL.toLowerCase() == 'false') {
 		var parent = $('#grid_nhomnangluc-pager_left');
 		parent.find('.ui-icon.ui-icon-print').parent().parent().remove();
 	}
+
+	createRightPanel('grid_nhomnangluc');
 </script>

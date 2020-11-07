@@ -60,90 +60,104 @@ public class PackingInvoiceController : IHttpHandler
     public void GetInformation(HttpContext context)
     {
         string id = context.Request.QueryString["pakId"];
-        decimal sum_thanhtien = 0;
-        foreach(c_dongpklinv dong_pkl in db.c_dongpklinvs.ToList().Where(p=>p.c_packinginvoice_id.Equals(id)))
+        string msg = "";
+
+        try
         {
-            sum_thanhtien += dong_pkl.thanhtien.Value;
+            decimal sum_thanhtien = 0;
+            foreach (c_dongpklinv dong_pkl in db.c_dongpklinvs.ToList().Where(p => p.c_packinginvoice_id.Equals(id)))
+            {
+                sum_thanhtien += dong_pkl.thanhtien.Value;
+            }
+
+            md_tygia tg = db.md_tygias.ToList().OrderByDescending(p => p.hieuluc_tungay).FirstOrDefault();
+
+
+            var nhan = from p in db.c_dongpklinvs
+                       join c in db.c_dongnhapxuats on p.c_dongnhapxuat_id equals c.c_dongnhapxuat_id
+                       where p.c_packinginvoice_id == id
+                       select new
+                       {
+                           c_nhapxuat_id = c.c_nhapxuat_id,
+                           c_dongnhapxuat_id = p.c_dongnhapxuat_id,
+                           dongnhapxuat_ref = c.dongnhapxuat_ref
+                       };
+
+            var nhan2 = from p in nhan
+                        join c in db.c_dongnhapxuats on p.dongnhapxuat_ref equals c.c_dongnhapxuat_id
+                        select new
+                        {
+                            c_nhapxuat_id = c.c_nhapxuat_id
+                        };
+
+
+            var nhan3 = from p in nhan2
+                        join c in db.c_nhapxuats on p.c_nhapxuat_id equals c.c_nhapxuat_id
+                        select new
+                        {
+                            c_nhapxuat_id = c.c_nhapxuat_id,
+                            c_donhang_id = c.c_donhang_id,
+                            sophieu = c.sophieu,
+                            ngay_giaonhan = c.ngay_giaonhan,
+                            md_doitackinhdoanh_id = c.md_doitackinhdoanh_id,
+                            nguoigao = c.nguoigiao,
+                            nguoinhan = c.nguoinhan,
+                            sophieukhach = c.sophieukhach,
+                            ngay_phieu = c.ngay_phieu,
+                            md_kho_id = c.md_kho_id,
+                            soseal = c.soseal,
+                            socontainer = c.socontainer,
+                            loaicont = c.loaicont,
+                            md_trangthai_id = c.md_trangthai_id,
+                            md_loaichungtu_id = c.md_loaichungtu_id,
+                            ngaytao = c.ngaytao,
+                            nguoitao = c.nguoitao,
+                            ngaycapnhat = c.ngaycapnhat,
+                            nguoicapnhat = c.nguoicapnhat,
+                            mota = c.mota,
+                            hoatdong = c.hoatdong,
+                            cr_invoice = c.cr_invoice,
+                            cr_phieuxuat = c.cr_phieuxuat,
+                            sophieunx = c.sophieunx,
+                            container = c.container,
+                            phicong = c.phicong,
+                            phitru = c.phitru,
+                            discount = c.discount,
+                            totaldiscount = c.totaldiscount,
+                            grandtotal = c.grandtotal,
+                            sophieunhap = c.sophieunhap
+                        };
+
+            decimal sum_thanhtien2 = 0;
+            decimal phicong = 0, phitru = 0;
+
+            foreach (var t in nhan3.Distinct())
+            {
+                sum_thanhtien2 += t.grandtotal.Value;
+                phicong += t.phicong.Value;
+                phitru += t.phitru.Value;
+            }
+
+            c_packinginvoice c_pkl = db.c_packinginvoices.SingleOrDefault(p => p.c_packinginvoice_id.Equals(id));
+            sum_thanhtien = sum_thanhtien - (sum_thanhtien * c_pkl.discount.Value / 100);
+            //+ c_pkl.giatri_cong.Value - c_pkl.giatri_tru.Value
+            sum_thanhtien = ((sum_thanhtien) * tg.chia_cho.Value);
+            sum_thanhtien = sum_thanhtien * 82 / 100;
+
+            //+  c_pkl.giatricong_po.Value * tg.chia_cho.Value -  c_pkl.giatritru_po.Value * tg.chia_cho.Value
+            sum_thanhtien = sum_thanhtien + phicong - phitru;
+            //context.Response.Write(string.Format("Invoice:{0}, Tổng giá trị các dòng Invoice:{1:#,##0.00}, Tổng giá trị các phiếu NK:{2:#,##0.00}"
+            //    , db.c_packinginvoices.SingleOrDefault(p=>p.c_packinginvoice_id.Equals(id)).so_pkl , sum_thanhtien, sum_thanhtien2));
+
+            msg = string.Format("Invoice:{0}, Tổng giá trị các phiếu NK:{2:#,##0.00}"
+                , db.c_packinginvoices.SingleOrDefault(p => p.c_packinginvoice_id.Equals(id)).so_pkl, sum_thanhtien, sum_thanhtien2);
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
         }
 
-        md_tygia tg = db.md_tygias.ToList().OrderByDescending(p=>p.hieuluc_tungay).FirstOrDefault();
-
-
-        var nhan = from p in db.c_dongpklinvs
-                   join c in db.c_dongnhapxuats on p.c_dongnhapxuat_id equals c.c_dongnhapxuat_id
-                   where p.c_packinginvoice_id == id
-                   select new
-                   {
-                       c_nhapxuat_id = c.c_nhapxuat_id,
-                       c_dongnhapxuat_id = p.c_dongnhapxuat_id,
-                       dongnhapxuat_ref = c.dongnhapxuat_ref
-                   };
-
-        var nhan2 = from p in nhan
-                    join c in db.c_dongnhapxuats on p.dongnhapxuat_ref equals c.c_dongnhapxuat_id
-                    select new
-                    {
-                        c_nhapxuat_id = c.c_nhapxuat_id
-                    };
-
-
-        var nhan3 = from p in nhan2
-                    join c in db.c_nhapxuats on p.c_nhapxuat_id equals c.c_nhapxuat_id
-                    select new
-                    {
-                        c_nhapxuat_id = c.c_nhapxuat_id,
-                        c_donhang_id = c.c_donhang_id,
-                        sophieu = c.sophieu,
-                        ngay_giaonhan = c.ngay_giaonhan,
-                        md_doitackinhdoanh_id = c.md_doitackinhdoanh_id,
-                        nguoigao = c.nguoigiao,
-                        nguoinhan = c.nguoinhan,
-                        sophieukhach = c.sophieukhach,
-                        ngay_phieu = c.ngay_phieu,
-                        md_kho_id = c.md_kho_id,
-                        soseal = c.soseal,
-                        socontainer = c.socontainer,
-                        loaicont = c.loaicont,
-                        md_trangthai_id = c.md_trangthai_id,
-                        md_loaichungtu_id = c.md_loaichungtu_id,
-                        ngaytao = c.ngaytao,
-                        nguoitao = c.nguoitao,
-                        ngaycapnhat = c.ngaycapnhat,
-                        nguoicapnhat = c.nguoicapnhat,
-                        mota = c.mota,
-                        hoatdong = c.hoatdong,
-                        cr_invoice = c.cr_invoice,
-                        cr_phieuxuat = c.cr_phieuxuat,
-                        sophieunx = c.sophieunx,
-                        container = c.container,
-                        phicong = c.phicong,
-                        phitru = c.phitru,
-                        discount = c.discount,
-                        totaldiscount = c.totaldiscount,
-                        grandtotal = c.grandtotal,
-                        sophieunhap = c.sophieunhap
-                    };
-
-        decimal sum_thanhtien2 = 0;
-        decimal phicong = 0, phitru = 0;
-
-        foreach (var t in nhan3.Distinct())
-        {
-            sum_thanhtien2 += t.grandtotal.Value;
-            phicong += t.phicong.Value;
-            phitru += t.phitru.Value;
-        }
-
-        c_packinginvoice c_pkl = db.c_packinginvoices.SingleOrDefault(p => p.c_packinginvoice_id.Equals(id));
-        sum_thanhtien = sum_thanhtien - (sum_thanhtien * c_pkl.discount.Value / 100);
-        //+ c_pkl.giatri_cong.Value - c_pkl.giatri_tru.Value
-        sum_thanhtien = ((sum_thanhtien ) * tg.chia_cho.Value) ;
-        sum_thanhtien = sum_thanhtien * 82 / 100;
-
-        //+  c_pkl.giatricong_po.Value * tg.chia_cho.Value -  c_pkl.giatritru_po.Value * tg.chia_cho.Value
-        sum_thanhtien = sum_thanhtien + phicong - phitru;
-        context.Response.Write(string.Format("Invoice:{0}, Tổng giá trị các dòng Invoice:{1:#,##0.00}, Tổng giá trị các phiếu NK:{2:#,##0.00}"
-            , db.c_packinginvoices.SingleOrDefault(p=>p.c_packinginvoice_id.Equals(id)).so_pkl , sum_thanhtien, sum_thanhtien2));
+        context.Response.Write(msg);
     }
 
     public void Updatephicongphitru(HttpContext context)
@@ -365,7 +379,7 @@ public class PackingInvoiceController : IHttpHandler
             str = str.Replace("[DATCOC]", info.pkl.tiendatcoc == null ? "0" : info.pkl.tiendatcoc.Value.ToString());
             str = str.Replace("[GIATRICONLAI]", info.pkl.tienconlai == null ? "0" : info.pkl.tienconlai.Value.ToString());
             str = str.Replace("[NGANHANG]",nganhang.thongtin);
-            
+
             str = str.Replace("[br]", "<br/>");
             str = str.Replace("[h3]", "<h3>");
             str = str.Replace("[/h3]", "</h3>");

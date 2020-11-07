@@ -21,7 +21,7 @@ using System.Reflection;
 
 
 
-[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="ancotrading2019")]
+[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="ancotradingTest2018ver2")]
 public partial class LinqDBDataContext : System.Data.Linq.DataContext
 {
 	
@@ -11968,6 +11968,8 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
 	
 	private System.Nullable<decimal> _sl_huy;
 	
+	private System.Nullable<decimal> _giachuan;
+	
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -12048,6 +12050,8 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
     partial void Onghichu_vachnganChanged();
     partial void Onsl_huyChanging(System.Nullable<decimal> value);
     partial void Onsl_huyChanged();
+    partial void OngiachuanChanging(System.Nullable<decimal> value);
+    partial void OngiachuanChanged();
     #endregion
 	
 	public c_dongdsdh()
@@ -12811,6 +12815,26 @@ public partial class c_dongdsdh : INotifyPropertyChanging, INotifyPropertyChange
 				this._sl_huy = value;
 				this.SendPropertyChanged("sl_huy");
 				this.Onsl_huyChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_giachuan", DbType="Decimal(18,2)")]
+	public System.Nullable<decimal> giachuan
+	{
+		get
+		{
+			return this._giachuan;
+		}
+		set
+		{
+			if ((this._giachuan != value))
+			{
+				this.OngiachuanChanging(value);
+				this.SendPropertyChanging();
+				this._giachuan = value;
+				this.SendPropertyChanged("giachuan");
+				this.OngiachuanChanged();
 			}
 		}
 	}
@@ -15276,6 +15300,8 @@ public partial class c_donhang : INotifyPropertyChanging, INotifyPropertyChanged
 	
 	private System.Nullable<bool> _discount_hehang2;
 	
+	private System.Nullable<bool> _phanbodiscount;
+	
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -15388,6 +15414,8 @@ public partial class c_donhang : INotifyPropertyChanging, INotifyPropertyChanged
     partial void Ondiscount_hehang_valueChanged();
     partial void Ondiscount_hehang2Changing(System.Nullable<bool> value);
     partial void Ondiscount_hehang2Changed();
+    partial void OnphanbodiscountChanging(System.Nullable<bool> value);
+    partial void OnphanbodiscountChanged();
     #endregion
 	
 	public c_donhang()
@@ -16471,6 +16499,26 @@ public partial class c_donhang : INotifyPropertyChanging, INotifyPropertyChanged
 				this._discount_hehang2 = value;
 				this.SendPropertyChanged("discount_hehang2");
 				this.Ondiscount_hehang2Changed();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_phanbodiscount", DbType="Bit")]
+	public System.Nullable<bool> phanbodiscount
+	{
+		get
+		{
+			return this._phanbodiscount;
+		}
+		set
+		{
+			if ((this._phanbodiscount != value))
+			{
+				this.OnphanbodiscountChanging(value);
+				this.SendPropertyChanging();
+				this._phanbodiscount = value;
+				this.SendPropertyChanged("phanbodiscount");
+				this.OnphanbodiscountChanged();
 			}
 		}
 	}
@@ -31952,6 +32000,8 @@ public partial class md_giasanpham : INotifyPropertyChanging, INotifyPropertyCha
 	
 	private string _barcode;
 	
+	private System.Nullable<decimal> _phi;
+	
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -31978,6 +32028,8 @@ public partial class md_giasanpham : INotifyPropertyChanging, INotifyPropertyCha
     partial void OnhoatdongChanged();
     partial void OnbarcodeChanging(string value);
     partial void OnbarcodeChanged();
+    partial void OnphiChanging(System.Nullable<decimal> value);
+    partial void OnphiChanged();
     #endregion
 	
 	public md_giasanpham()
@@ -32201,6 +32253,26 @@ public partial class md_giasanpham : INotifyPropertyChanging, INotifyPropertyCha
 				this._barcode = value;
 				this.SendPropertyChanged("barcode");
 				this.OnbarcodeChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_phi", DbType="Decimal(18,2)")]
+	public System.Nullable<decimal> phi
+	{
+		get
+		{
+			return this._phi;
+		}
+		set
+		{
+			if ((this._phi != value))
+			{
+				this.OnphiChanging(value);
+				this.SendPropertyChanging();
+				this._phi = value;
+				this.SendPropertyChanged("phi");
+				this.OnphiChanged();
 			}
 		}
 	}
@@ -40064,6 +40136,8 @@ public partial class md_sanpham : INotifyPropertyChanging, INotifyPropertyChange
 	
 	private string _hinhthucban;
 	
+	private System.Nullable<decimal> _thetich;
+	
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -40144,6 +40218,8 @@ public partial class md_sanpham : INotifyPropertyChanging, INotifyPropertyChange
     partial void OnngayxacnhanChanged();
     partial void OnhinhthucbanChanging(string value);
     partial void OnhinhthucbanChanged();
+    partial void OnthetichChanging(System.Nullable<decimal> value);
+    partial void OnthetichChanged();
     #endregion
 	
 	public md_sanpham()
@@ -40907,6 +40983,26 @@ public partial class md_sanpham : INotifyPropertyChanging, INotifyPropertyChange
 				this._hinhthucban = value;
 				this.SendPropertyChanged("hinhthucban");
 				this.OnhinhthucbanChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_thetich", DbType="Decimal(18,3)")]
+	public System.Nullable<decimal> thetich
+	{
+		get
+		{
+			return this._thetich;
+		}
+		set
+		{
+			if ((this._thetich != value))
+			{
+				this.OnthetichChanging(value);
+				this.SendPropertyChanging();
+				this._thetich = value;
+				this.SendPropertyChanged("thetich");
+				this.OnthetichChanged();
 			}
 		}
 	}

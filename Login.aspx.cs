@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Web.Security;
 using System.Data;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
 using System.Net;
 using System.Collections.Generic;
 public partial class Login : System.Web.UI.Page
@@ -52,13 +50,13 @@ public partial class Login : System.Web.UI.Page
                     string ErrorMessage = "";
                     try
                     {
-                        TwilioClient.Init(Public.accountSid, Public.authToken);
-                        CreateMessageOptions options = new CreateMessageOptions(new Twilio.Types.PhoneNumber("+84935385878"));
-                        options.Body = body;
-                        options.From = new Twilio.Types.PhoneNumber(Public.fromTwillo);
-                        ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
-                        var message = MessageResource.Create(options);
-                        ErrorMessage = message.ErrorMessage;
+                        //TwilioClient.Init(Public.accountSid, Public.authToken);
+                        //CreateMessageOptions options = new CreateMessageOptions(new Twilio.Types.PhoneNumber("+84935385878"));
+                        //options.Body = body;
+                        //options.From = new Twilio.Types.PhoneNumber(Public.fromTwillo);
+                        //ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+                        //var message = MessageResource.Create(options);
+                        //ErrorMessage = message.ErrorMessage;
                     }
                     catch
                     {

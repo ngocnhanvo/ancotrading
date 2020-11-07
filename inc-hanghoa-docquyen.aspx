@@ -355,12 +355,25 @@
                     return showMsgDialog(rs); 
                 }
             "
+            EditFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                afterSubmit: function(rs, postdata) { 
+                    return showMsgDialog(rs); 
+                }
+            "
             DelFormOptions="
                 beforeShowForm: function (formid) {
-                        formid.closest('div.ui-jqdialog').dialogCenter(); 
-                    },
-                    afterSubmit: function(rs, postdata) { 
-                        return showMsgDialog(rs); 
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                afterSubmit: function(rs, postdata) { 
+                    return showMsgDialog(rs); 
+                }
+            "
+            ViewFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
                 }
             "
             OnSelectRow = "function(ids) {
@@ -571,4 +584,7 @@
 		var parent = $('#grid_ds_khachhangdocquyen-pager_left');
 		parent.find('.ui-icon.ui-icon-print').parent().parent().remove();
 	}
+
+	createRightPanel('grid_ds_khachhangdocquyen');
+	createRightPanel('grid_ds_hanghoadocquyen');
 </script>

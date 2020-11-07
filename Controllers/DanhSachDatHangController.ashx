@@ -189,18 +189,18 @@ public class DanhSachDatHangController : IHttpHandler
             }
         }
     }
-	
-	public string EncodeHTML_DSDH(string a) {
-		if(a == null) {
-			a = "";
-		}
-		a = a.Replace("&", "%26");
-		a = a.Replace("+", "%2B");
-		a = a.Replace("&", "%26");
-		a = a.Replace("+", "%2B");
-		return a;
-	}
-	
+
+    public string EncodeHTML_DSDH(string a) {
+        if(a == null) {
+            a = "";
+        }
+        a = a.Replace("&", "%26");
+        a = a.Replace("+", "%2B");
+        a = a.Replace("&", "%26");
+        a = a.Replace("+", "%2B");
+        return a;
+    }
+
     public void guidonhang(HttpContext context)
     {
         var db = new LinqDBDataContext();
@@ -235,7 +235,7 @@ public class DanhSachDatHangController : IHttpHandler
                     dsdh.CopyPropertiesTo(dsdh2);
                     dsdh2.sochungtu = EncodeHTML_DSDH(dsdh2.sochungtu);
                     dsdh2.so_po = EncodeHTML_DSDH(dsdh2.so_po);
-					dsdh2.mota = string.IsNullOrEmpty(dsdh2.mota) ? "" : EncodeHTML_DSDH(dsdh2.mota);
+                    dsdh2.mota = string.IsNullOrEmpty(dsdh2.mota) ? "" : EncodeHTML_DSDH(dsdh2.mota);
                     if (string.IsNullOrEmpty(dsdh2.huongdanlamhang))
                         dsdh2.huongdanlamhang = "";
                     dsdh2.huongdanlamhang = EncodeHTML_DSDH(dsdh2.huongdanlamhang);
@@ -510,6 +510,7 @@ public class DanhSachDatHangController : IHttpHandler
         context.Response.ContentType = "text/plain";
         context.Response.Charset = "UTF-8";
         string c_danhsachdathang_id = context.Request.QueryString["poId"];
+        string msg = "";
         try
         {
             decimal totalQuantity = 0, totalSalary = 0, totalCbm = 0;
@@ -529,13 +530,16 @@ public class DanhSachDatHangController : IHttpHandler
                 totalCbm = cbm == null ? 0 : cbm.Value;
                 totalQuantity = quantity == null ? 0 : quantity.Value;
 
-                context.Response.Write(string.Format("Đơn đặt hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dsdh.sochungtu, totalCbm, totalSalary, totalQuantity));
+                msg = string.Format("Đơn đặt hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dsdh.sochungtu, totalCbm, totalSalary, totalQuantity);
             }
+            else
+                msg = "Đơn đặt hàng này đã bị xóa, hãy làm mới dữ liệu";
         }
         catch (Exception e)
         {
-            context.Response.Write(e.Message);
+            msg = e.Message;
         }
+        context.Response.Write(msg);
     }
 
     public void startSendMail(HttpContext context)
@@ -558,21 +562,21 @@ public class DanhSachDatHangController : IHttpHandler
 					    <label for='new'>Danh Sách Đặt Hàng mới:</label>
 					    <!-- -->
 					    <table class='t_new' style='width:100%; padding-left: 50px; border: 1px solid;'>
-						    <tr> 
+						    <tr class='hidden'> 
 							    <td colspan='2'>
 								    <input id='newKcs' value='newKcs' name='newKcs' type='checkbox' class='new_toAll' >
 								    <label for='newKcs'>Gửi cho KCS</label>
 							    </td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi từ:</td>
 							    <td>{0}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi cho:</td>
 							    <td>{3}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Cc:</td>
 							    <td>{2}</td>
 						    </tr>
@@ -620,21 +624,21 @@ public class DanhSachDatHangController : IHttpHandler
 					    <input id='plus' value='toAllPlus' name='rdType' type='radio'/>
 					    <label for='plus'>Bổ Sung Danh Sách Đặt Hàng:</label>
 					    <table class='t_plus' style='width:100%; padding-left: 50px; border: 1px solid;'>
-						    <tr> 
+						    <tr class='hidden'> 
 							    <td colspan='2'>
 								    <input id='Kcs' value='Kcs' name='Kcs' type='checkbox' class='new_toAllPlus'>
 								    <label for='Kcs'>Gửi cho KCS</label>
 							    </td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi từ:</td>
 							    <td>{0}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi cho:</td>
 							    <td>{3}{4}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Cc:</td>
 							    <td>{2}</td>
 						    </tr>

@@ -776,37 +776,29 @@
                     return showMsgDialog(rs); 
                 }
             "
-        OnSelectRow="function(ids) {
-		                if(ids == null) {
-			                ids=0;
-			                if($('#grid_ds_chitietplivn').jqGrid('getGridParam','records') &gt; 0 )
-			                {
-				                $('#grid_ds_chitietplivn').jqGrid('setGridParam',{url:'Controllers/DongPackingListInvoiceController.ashx?&pklId='+ids,page:1});
-				                $('#grid_ds_chitietplivn').jqGrid().trigger('reloadGrid');
-				            }
+        OnSelectRow="
+            function(ids) {
+		        if(ids == null) {
+			        ids=0;
+				} 
+                else {
+					$.ajax({
+                        url: 'Controllers/PackingInvoiceController.ashx?action=getinvoiceinformation&pakId='+ids,
+                        beforeSend:function(){
+                            $('#grid_ds_plivn').jqGrid('setCaption','đang tải...');
+                        },
+                        success: function(data){
+                            $('#grid_ds_plivn').jqGrid('setCaption', data);	
+                        }
+                    }); 			
+		        }
 
-                            if($('#grid_ds_chitietphanboplivn').jqGrid('getGridParam','records') &gt; 0 )
-			                {
-				                $('#grid_ds_chitietphanboplivn').jqGrid('setGridParam',{url:'Controllers/ChiTietThuChiPhanBoController.ashx?&tcId='+ids,page:1});
-				                $('#grid_ds_chitietphanboplivn').jqGrid().trigger('reloadGrid');
-				            } 
-				        } else {
-							$.ajax({
-                                    url: 'Controllers/PackingInvoiceController.ashx?action=getinvoiceinformation&pakId='+ids,
-                                    beforeSend:function(){
-                                        $('#grid_ds_plivn').jqGrid('setCaption','đang tải...');
-                                    },
-                                    success: function(data){
-                                        $('#grid_ds_plivn').jqGrid('setCaption', data);
-                                        $('#grid_ds_chitietplivn').jqGrid('setGridParam',{url:'Controllers/DongPackingListInvoiceController.ashx?&pklId='+ids,page:1});
-			                            $('#grid_ds_chitietplivn').jqGrid().trigger('reloadGrid');
-
-                                        $('#grid_ds_chitietphanboplivn').jqGrid('setGridParam',{url:'Controllers/ChiTietThuChiPhanBoController.ashx?&tcId='+ids,page:1});
-			                            $('#grid_ds_chitietphanboplivn').jqGrid().trigger('reloadGrid');	
-                                    }
-                                });   
-			         			
-		                } }"
+                $('#grid_ds_chitietplivn').jqGrid('getGridParam', 'postData').pklId = ids;
+				$('#grid_ds_chitietplivn')[0].triggerToolbar();
+                $('#grid_ds_chitietphanboplivn').jqGrid('getGridParam', 'postData').pklId = ids;
+				$('#grid_ds_chitietphanboplivn')[0].triggerToolbar();
+            }
+        "
         runat="server" />
 </div>
 
@@ -1282,6 +1274,10 @@
             '<div class="ui-pg-div"><span class="ui-icon ui-icon-gear"></span></div><td>')
             , 5000
     });
+
+    createRightPanel('grid_ds_plivn');
+    createRightPanel('grid_ds_chitietplivn');
+    createRightPanel('grid_ds_chitietphanboplivn');
 </script>
 
 <style type="text/css">

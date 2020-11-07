@@ -71,12 +71,13 @@
 		<tr>
             <td>Loại</td>
             <td>
-				<%if (action.Equals("edit"))%>
+				<%if (action.Equals("edit")) {%>
 					<select disabled id="loai" name="loai">
-				<% else %>
+				<%} else {%>
 					<select id="loai" name="loai">
-				
-				<%if(obj.loai == "CK") {%>
+				<%}
+
+                if (obj.loai == "CK") { %>
 					<option value="TM">Tiền mặt</option>				
 					<option value="CK" selected>Chuyển khoản</option>
 				<%} else { %>

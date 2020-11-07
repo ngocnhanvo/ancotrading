@@ -509,24 +509,22 @@
                 , formatter: 'checkbox'
             }
             ]"
-            OnSelectRow = "function(ids) {
-		                if(ids == null) {
-			                ids=0;
-			                if($('#grid_ds_tuannangluc_qlcs').jqGrid('getGridParam','records') &gt; 0 )
-			                {
-			                    var caption = $(this).jqGrid('getCell', ids, 'ma_dtkd');
-			                    $('#grid_ds_tuannangluc_qlcs').jqGrid('setCaption', 'Tuần năng lực của nhà cung ứng: ' + caption);
-			                        
-				                $('#grid_ds_tuannangluc_qlcs').jqGrid('setGridParam',{url:'Controllers/TuanNangLucController.ashx?&partnerId='+ids,page:1});
-				                $('#grid_ds_tuannangluc_qlcs').jqGrid().trigger('reloadGrid');
-				            } 
-				        } else {
-				            var caption = $(this).jqGrid('getCell', ids, 'ma_dtkd');
-			                $('#grid_ds_tuannangluc_qlcs').jqGrid('setCaption', 'Tuần năng lực của nhà cung ứng: ' + caption);
-			                
-			                $('#grid_ds_tuannangluc_qlcs').jqGrid('setGridParam',{url:'Controllers/TuanNangLucController.ashx?&partnerId='+ids,page:1});
-			                $('#grid_ds_tuannangluc_qlcs').jqGrid().trigger('reloadGrid');			
-		                } }"
+            OnSelectRow = "
+                function(ids) {
+		            if(ids == null) {
+			            ids=0;
+				    }
+                    
+                    if($('#grid_ds_tuannangluc_qlcs').jqGrid('getGridParam','records') &gt; 0 )
+			        {
+			            let caption = $(this).jqGrid('getCell', ids, 'ma_dtkd');
+			            $('#grid_ds_tuannangluc_qlcs').jqGrid('setCaption', 'Tuần năng lực của nhà cung ứng: ' + caption); 
+				    }
+
+                    $('#grid_ds_tuannangluc_qlcs').jqGrid('getGridParam', 'postData').partnerId = ids;
+				    $('#grid_ds_tuannangluc_qlcs')[0].triggerToolbar();
+                }
+            "
             Height = "420"
             ViewFormOptions="
                 beforeShowForm: function (formid) {
@@ -658,18 +656,16 @@
                 , formatter: 'checkbox'
             }
             ]"
-            OnSelectRow = "function(ids) {
-		                if(ids == null) {
-			                ids=0;
-			                if($('#grid_ds_chitietnangluc_qlcs').jqGrid('getGridParam','records') &gt; 0 )
-			                {
-				                $('#grid_ds_chitietnangluc_qlcs').jqGrid('setGridParam',{url:'Controllers/ChiTietNangLucController.ashx?&weekId='+ids,page:1});
-				                $('#grid_ds_chitietnangluc_qlcs').jqGrid().trigger('reloadGrid');
-				            } 
-				        } else {
-			                $('#grid_ds_chitietnangluc_qlcs').jqGrid('setGridParam',{url:'Controllers/ChiTietNangLucController.ashx?&weekId='+ids,page:1});
-			                $('#grid_ds_chitietnangluc_qlcs').jqGrid().trigger('reloadGrid');			
-		                } }"
+            OnSelectRow = "
+                function(ids) {
+		            if(ids == null) {
+			            ids=0;
+				    }
+                    
+                    $('#grid_ds_chitietnangluc_qlcs').jqGrid('getGridParam', 'postData').weekId = ids;
+				    $('#grid_ds_chitietnangluc_qlcs')[0].triggerToolbar();
+                }
+            "
             Height = "420"
             AddFormOptions=" 
                 beforeShowForm: function (formid) {
@@ -943,3 +939,9 @@
             }"
             runat="server" />
 </DIV>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_nhacungung_qlcs');
+    createRightPanel('grid_ds_tuannangluc_qlcs');
+    createRightPanel('grid_ds_chitietnangluc_qlcs');
+</script>

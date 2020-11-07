@@ -52,11 +52,12 @@ public class ProductPriceController : IHttpHandler
         {
             context.Response.Write("Hiện trạng thái của phiên bản giá đã là hiệu lực!");
         }
-        else if(count_gsp <= 0)
+        else if (count_gsp <= 0)
         {
             context.Response.Write("Phiên bản giá chưa có dữ liệu!");
         }
-        else {
+        else
+        {
             pbg.md_trangthai_id = "HIEULUC";
             db.SubmitChanges();
             context.Response.Write(String.Format("Đã hiệu lực phiên bản giá {0} thành công!", pbg.ten_phienbangia));
@@ -79,9 +80,9 @@ public class ProductPriceController : IHttpHandler
             bool hd = false;
             if (h.Equals("on") || h.Equals("true"))
             { hd = true; }
-            String id =  context.Request.Form["id"];
+            String id = context.Request.Form["id"];
             md_giasanpham gsp = db.md_giasanphams.FirstOrDefault(p => p.md_giasanpham_id.Equals(id));
-            md_phienbangia pbg = db.md_phienbangias.FirstOrDefault(p=>p.md_phienbangia_id.Equals(gsp.md_phienbangia_id));
+            md_phienbangia pbg = db.md_phienbangias.FirstOrDefault(p => p.md_phienbangia_id.Equals(gsp.md_phienbangia_id));
 
             if (pbg.md_trangthai_id.Equals("HIEULUC"))
             {
@@ -92,6 +93,7 @@ public class ProductPriceController : IHttpHandler
                 //gsp.md_phienbangia_id = context.Request.Form["md_phienbangia_id"];
                 gsp.md_sanpham_id = context.Request.Form["sanpham_id"];
                 gsp.gia = decimal.Parse(context.Request.Form["gia"]);
+                gsp.phi = decimal.Parse(context.Request.Form["phi"]);
                 gsp.mota = context.Request.Form["mota"];
                 gsp.barcode = context.Request.Form["barcode"];
 
@@ -102,7 +104,9 @@ public class ProductPriceController : IHttpHandler
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Cập nhập thành công!");
             }
-        }catch(Exception ex){
+        }
+        catch (Exception ex)
+        {
             jqGridHelper.Utils.writeResult(0, ex.Message);
         }
     }
@@ -143,6 +147,7 @@ public class ProductPriceController : IHttpHandler
                         md_phienbangia_id = md_phienbangia_id,
                         md_sanpham_id = md_sanpham_id,
                         gia = decimal.Parse(context.Request.Form["gia"]),
+                        phi = decimal.Parse(context.Request.Form["phi"]),
                         mota = context.Request.Form["mota"],
                         barcode = context.Request.Form["barcode"],
                         hoatdong = hd,
@@ -158,7 +163,9 @@ public class ProductPriceController : IHttpHandler
                 }
             }
 
-        }catch(Exception ex){
+        }
+        catch (Exception ex)
+        {
             jqGridHelper.Utils.ShowMsg(ex.Message);
         }
     }
@@ -172,7 +179,8 @@ public class ProductPriceController : IHttpHandler
         if (pbg.md_trangthai_id.Equals("HIEULUC"))
         {
             jqGridHelper.Utils.writeResult(0, "Không thể xóa giá, vì sản phẩm thuộc phiên bản giá đã hiện lực!");
-        }else if(pbg.md_trangthai_id.Equals("SOANTHAO"))
+        }
+        else if (pbg.md_trangthai_id.Equals("SOANTHAO"))
         {
             db.md_giasanphams.DeleteOnSubmit(gsp);
             db.SubmitChanges();
@@ -250,12 +258,14 @@ public class ProductPriceController : IHttpHandler
                     , sp.md_sanpham_id
                     , sp.ma_sanpham as tensp
                     , gsp.gia
+                    , isnull(gsp.phi, 0) as phi
+                    , (gsp.gia + isnull(gsp.phi, 0)) as tongGia
+                    , gsp.mota
+                    , gsp.barcode
                     , gsp.ngaytao
                     , gsp.nguoitao
                     , gsp.ngaycapnhat
                     , gsp.nguoicapnhat
-                    , gsp.mota
-                    , gsp.barcode
                     , gsp.hoatdong
                     , ROW_NUMBER() OVER (ORDER BY {1} {2}) as RowNum
                 FROM md_giasanpham gsp, md_sanpham sp
@@ -282,18 +292,20 @@ public class ProductPriceController : IHttpHandler
         foreach (System.Data.DataRow row in dt.Rows)
         {
             xml += "<row>";
-            xml += "<cell><![CDATA[" + row[0] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[1] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[2] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[3] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[4] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[5].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[6] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[7].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[9] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[10] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[11] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["md_giasanpham_id"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["md_phienbangia_id"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["md_sanpham_id"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tensp"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["gia"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tongGia"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["barcode"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["nguoicapnhat"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

@@ -36,6 +36,10 @@
             top:125px;
             left: 140px;	
         }
+
+        .inputFormLogin {
+            color: #00862d;
+        }
     </style>
 </head>
 <body class="bg">
@@ -44,19 +48,22 @@
                 <div class="form-content">
                     <table>
                         <tr>
-                            <td>Tên Đăng Nhập</td>
+                            <td><label for="txtUserName" class="inputFormLogin">Tên Đăng Nhập</label></td>
                         </tr>
                         <tr>
                             <td><asp:TextBox Width="280" ID="txtUserName" runat="server"></asp:TextBox></td>
                         </tr>
                         <tr>
-                            <td>Mật Khẩu</td>
+                            <td><div style="height: 3px;"></div></td>
+                        </tr>
+                        <tr>
+                            <td><label for="txtPassword" class="inputFormLogin">Mật Khẩu</label></td>
                         </tr>
                         <tr>
                             <td><asp:TextBox Width="280" ID="txtPassword" runat="server" TextMode="Password"></asp:TextBox></td>
                         </tr>
                         <tr>
-                            <td></td>
+                            <td><div style="height: 6px;"></div></td>
                         </tr>
                         <tr>
                             <td><asp:Button ID="btnLogin" OnClick='btnLogin_Click' runat="server" Text="Đăng Nhập" /></td>

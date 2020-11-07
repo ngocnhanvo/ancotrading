@@ -324,3 +324,8 @@
                 "
             runat="server" />
 </DIV>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_md_bo');
+    createRightPanel('grid_ds_md_bo_chitiet');
+</script>

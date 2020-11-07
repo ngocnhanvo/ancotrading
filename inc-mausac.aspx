@@ -209,13 +209,17 @@
             return 'Lỗi: ' + data.responseText 
         }
         } );*/ }"
-        OnSelectRow = "function(ids) {
-		                    if(ids != null) {
-                                var rowSel = $('#grid_ds_mausacmain').jqGrid('getRowData', ids);
-                                var img = rowSel['md_detai_id'] + '-' + rowSel['code_mau'] + '.jpg';
-                                $('#IMG-grid_ds_mausacmain').attr('src', 'images/products/mausac/' + img + '?v' + guidgrid_ds_mausacmain());
-                            }
-                       }"
+        OnSelectRow = "
+            function(ids) {
+		        if(ids != null) {
+                    let rowSel = $('#grid_ds_mausacmain').jqGrid('getRowData', ids);
+                    let img = rowSel['md_detai_id'] + '-' + rowSel['code_mau'];
+
+                    $('#img-grid_ds_mausacmain').attr('src', '');
+                    $('#img-grid_ds_mausacmain').attr('src', 'Controllers/API_System.ashx?oper=loadImageMauSac&msp=' + img + '&ver=' + uuidv4());
+                }
+            }
+        "
         ColModel = "[
         {
             fixed: true, name: 'md_mausac_id'
@@ -414,7 +418,7 @@
     <table style="width:100%; height:100%">
         <tr>
             <td style="text-align: center;">
-                <img alt="  Không có hình ảnh" id="IMG-grid_ds_mausacmain" src="images/products/fullsize/default.jpg" />
+                <img alt="Không có hình ảnh" id="img-grid_ds_mausacmain" class="loadingIMG" style="max-width:100%; margin: 0px auto; min-width: 40px;" src="Controllers/API_System.ashx?oper=loadImageMauSac&msp=default" />
             </td>
         </tr>
     </table>
@@ -535,12 +539,5 @@
 				}
     });
 
-    function guidgrid_ds_mausacmain() {
-      function s4() {
-        return Math.floor((1 + Math.random()) * 0x10000)
-          .toString(16)
-          .substring(1);
-      }
-      return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-    }
+    createRightPanel('grid_ds_mausacmain');
 </script>

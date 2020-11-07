@@ -264,3 +264,7 @@
         <% } %>
     </div>
 </div>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_tygiamua');
+</script>

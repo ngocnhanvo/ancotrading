@@ -7,13 +7,15 @@ using ExcelLibrary;
 
 public class GiaSanPhamImportController : IHttpHandler
 {
-    public void ProcessRequest (HttpContext context) {
+    public void ProcessRequest(HttpContext context)
+    {
         String filename = context.Request.QueryString["filename"];
         String file = context.Server.MapPath("../FileUpload/" + filename);
-		int j = file.LastIndexOf(".");
-		if(file.Substring(j) != ".xls") {
-			file = ConvertXLSXToXLS.ConvertWorkbookXSSFToHSSF(file);
-		}
+        int j = file.LastIndexOf(".");
+        if (file.Substring(j) != ".xls")
+        {
+            file = ConvertXLSXToXLS.ConvertWorkbookXSSFToHSSF(file);
+        }
         Workbook wb = Workbook.Load(file);
         Worksheet ws = wb.Worksheets[0];
         this.NewFromCellCollection(context, ws.Cells);
@@ -27,59 +29,66 @@ public class GiaSanPhamImportController : IHttpHandler
             try
             {
                 Row row = cellCollection.Rows[i];
-				
-				String msg = "";
+
+                String msg = "";
                 msg += String.Format("<div>--- Import Dòng {0} ---</div>", i + 1);
-				bool next = true;
+                bool next = true;
                 String cellMaHH = row.GetCell(0).Value == null ? String.Empty : row.GetCell(0).Value.ToString();
-				if(cellMaHH != null & cellMaHH != "")
-				{
-					cellMaHH = cellMaHH.Replace(" ","");
-					if(cellMaHH.Length != 14) {
-						next = false;
-						msg += "<div style=\"color:red\">Mã hàng chỉ nên có đúng 14 ký tự.</div>";
-					}
-				}
-				else {
-					next = false;
-					msg += "<div style=\"color:red\">Mã hàng không thể rỗng.</div>";
-				}
-                
-				if(next == true) {
-					String cellTenPB = row.GetCell(1).Value == null ? String.Empty : row.GetCell(1).Value.ToString();
-					decimal cellGia = row.GetCell(2).Value == null ? 0 : decimal.Parse(row.GetCell(2).Value.ToString());
-					String cellMoTa = row.GetCell(3).Value == null ? String.Empty : row.GetCell(3).Value.ToString();
-					String cellBarCode = row.GetCell(4).Value == null ? String.Empty : row.GetCell(4).Value.ToString();
-					md_phienbangia pbg = ImportUtils.getPhienBanGia(cellTenPB);
-					md_sanpham sp = ImportUtils.getSanPham(cellMaHH);
-					
-					if (pbg == null)
-					{
-						next = false;
-						msg += String.Format("<div style=\"color:red\">Không tìm thấy phiên bản giá {0} </div>", cellTenPB);
-					}
+                if (cellMaHH != null & cellMaHH != "")
+                {
+                    cellMaHH = cellMaHH.Replace(" ", "");
+                    if (cellMaHH.Length != 14)
+                    {
+                        next = false;
+                        msg += "<div style=\"color:red\">Mã hàng chỉ nên có đúng 14 ký tự.</div>";
+                    }
+                }
+                else
+                {
+                    next = false;
+                    msg += "<div style=\"color:red\">Mã hàng không thể rỗng.</div>";
+                }
 
-					if (sp == null)
-					{
-						next = false;
-						msg += String.Format("<div style=\"color:red\">Không tìm thấy sản phẩm {0} </div>", cellMaHH);
-					}
+                if (next == true)
+                {
+                    String cellTenPB = row.GetCell(1).Value == null ? String.Empty : row.GetCell(1).Value.ToString();
+                    decimal cellGia = row.GetCell(2).Value == null ? 0 : decimal.Parse(row.GetCell(2).Value.ToString());
 
-					if (next)
-					{
-						md_giasanpham gsp = ImportUtils.getGiaSanPham(cellTenPB, cellMaHH);
-						GiaSanPhamImport import = new GiaSanPhamImport(sp.md_sanpham_id, pbg.md_phienbangia_id, cellGia, cellMoTa, cellBarCode);
-						if (gsp == null)
-						{
-							import.Import();
-							msg += String.Format("<div style=\"color:green\">Đã tạo một giá sản phẩm mới!</div>");
-						}
-						else {
-							import.Update();
-							msg += String.Format("<div style=\"color:green\">Cập nhật giá sản phẩm thành công!</div>");
-						}
-					}
-				}
+                    String cellMoTa = row.GetCell(3).Value == null ? String.Empty : row.GetCell(3).Value.ToString();
+                    String cellBarCode = row.GetCell(4).Value == null ? String.Empty : row.GetCell(4).Value.ToString();
+                    decimal cellPhi = row.GetCell(5).Value == null ? 0 : decimal.Parse(row.GetCell(5).Value.ToString());
+
+                    md_phienbangia pbg = ImportUtils.getPhienBanGia(cellTenPB);
+                    md_sanpham sp = ImportUtils.getSanPham(cellMaHH);
+
+                    if (pbg == null)
+                    {
+                        next = false;
+                        msg += String.Format("<div style=\"color:red\">Không tìm thấy phiên bản giá {0} </div>", cellTenPB);
+                    }
+
+                    if (sp == null)
+                    {
+                        next = false;
+                        msg += String.Format("<div style=\"color:red\">Không tìm thấy sản phẩm {0} </div>", cellMaHH);
+                    }
+
+                    if (next)
+                    {
+                        var gsp = ImportUtils.getGiaSanPham(cellTenPB, cellMaHH);
+                        var import = new GiaSanPhamImport(sp.md_sanpham_id, pbg.md_phienbangia_id, cellGia, cellMoTa, cellBarCode, cellPhi);
+                        if (gsp == null)
+                        {
+                            import.Import();
+                            msg += String.Format("<div style=\"color:green\">Đã tạo một giá sản phẩm mới!</div>");
+                        }
+                        else
+                        {
+                            import.Update();
+                            msg += String.Format("<div style=\"color:green\">Cập nhật giá sản phẩm thành công!</div>");
+                        }
+                    }
+                }
                 msg += String.Format("<div>--- Kết thúc dòng {0} ---</div>", i + 1);
                 context.Response.Write(msg);
             }
@@ -89,9 +98,11 @@ public class GiaSanPhamImportController : IHttpHandler
             }
         }
     }
- 
-    public bool IsReusable {
-        get {
+
+    public bool IsReusable
+    {
+        get
+        {
             return false;
         }
     }

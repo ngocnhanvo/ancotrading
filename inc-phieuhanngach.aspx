@@ -307,6 +307,24 @@
                     return showMsgDialog(rs); 
                 }
             "
+            EditFormOptions ="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                }
+                , afterSubmit: function(rs, postdata) {
+                  return showMsgDialog(rs);
+                }
+                , errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+                }
+                "
+            ViewFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+            }"
             DelFormOptions="
                 beforeShowForm: function (formid) {
                         formid.closest('div.ui-jqdialog').dialogCenter(); 
@@ -315,18 +333,15 @@
                         return showMsgDialog(rs); 
                 }
             "
-            OnSelectRow = "function(ids) {
-		                if(ids == null) {
-			                ids=0;
-			                if($('#grid_ds_chitietphieuhanngach').jqGrid('getGridParam','records') &gt; 0 )
-			                {
-				                $('#grid_ds_chitietphieuhanngach').jqGrid('setGridParam',{url:'Controllers/ChiTietPhieuHanNgachController.ashx?&c_phieuhanngach_id='+ids,page:1});
-				                $('#grid_ds_chitietphieuhanngach').jqGrid().trigger('reloadGrid');
-				            } 
-				        } else {
-			                $('#grid_ds_chitietphieuhanngach').jqGrid('setGridParam',{url:'Controllers/ChiTietPhieuHanNgachController.ashx?&c_phieuhanngach_id='+ids,page:1});
-			                $('#grid_ds_chitietphieuhanngach').jqGrid().trigger('reloadGrid');			
-		                } }"
+            OnSelectRow = "
+                function(ids) {
+		            if(ids == null) {
+			            ids=0; 
+				    }
+                    $('#grid_ds_chitietphieuhanngach').jqGrid('getGridParam', 'postData').c_phieuhanngach_id = ids;
+				    $('#grid_ds_chitietphieuhanngach')[0].triggerToolbar();
+                }
+            "
 		                
             Height = "420"
             ShowEdit = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
@@ -555,4 +570,7 @@
             "
             runat="server" />
 </DIV>
-
+<script>
+    createRightPanel('grid_ds_phieuhanngach');
+    createRightPanel('grid_ds_chitietphieuhanngach');
+</script>

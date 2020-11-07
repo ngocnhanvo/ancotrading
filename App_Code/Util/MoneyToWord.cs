@@ -102,48 +102,49 @@ public static class MoneyToWord
         }
         if ((parts.Length == 2) && (int.Parse(parts[1]) != 0))
         {
-			if(returnValue != "") {
-				returnValue = returnValue + HundredsText(parts[1].PadLeft(3, '0')) + "Cent";
-				if (int.Parse(parts[1]) != 1)
-				{
-					returnValue = returnValue + "s";
-				}
-			}
+            if (returnValue != "")
+            {
+                returnValue = returnValue + HundredsText(parts[1].PadLeft(3, '0')) + "Cent";
+                if (int.Parse(parts[1]) != 1)
+                {
+                    returnValue = returnValue + "s";
+                }
+            }
         }
         return returnValue;
     }
 
 
-    static string[] Tens = new string[] { 
-			"Ten",
-			"Twenty", 
-			"Thirty", 
-			"Forty", 
-			"Fifty", 
-			"Sixty", 
-			"Seventy", 
-			"Eighty", 
-			"Ninety" };
-    static string[] Ones = new string[] { 
-			"One",
-			"Two",
-			"Three",
-			"Four",
-			"Five",
-			"Six",
-			"Seven",
-			"Eight",
-			"Nine",
-			"Ten",
-			"Eleven",
-			"Twelve", 
-			"Thirteen", 
-			"Fourteen", 
-			"Fifteen", 
-			"Sixteen", 
-			"Seventeen", 
-			"Eighteen", 
-			"Nineteen" };
+    static string[] Tens = new string[] {
+            "Ten",
+            "Twenty",
+            "Thirty",
+            "Forty",
+            "Fifty",
+            "Sixty",
+            "Seventy",
+            "Eighty",
+            "Ninety" };
+    static string[] Ones = new string[] {
+            "One",
+            "Two",
+            "Three",
+            "Four",
+            "Five",
+            "Six",
+            "Seven",
+            "Eight",
+            "Nine",
+            "Ten",
+            "Eleven",
+            "Twelve",
+            "Thirteen",
+            "Fourteen",
+            "Fifteen",
+            "Sixteen",
+            "Seventeen",
+            "Eighteen",
+            "Nineteen" };
 
 
 
@@ -268,5 +269,31 @@ public static class MoneyToWord
         }
         if (booAm) str = "Âm " + str;
         return str + "chẵn";
+    }
+
+    public static string ConvertMoneyToTextVND(decimal number, string dtkd)
+    {
+        string textMoney = "";
+        if (new string[] { "VINHGIA" }.Contains(dtkd))
+        {
+            string m = MoneyToWord.ConvertMoneyToText(number.ToString()).Replace("Dollars", "");
+            int j = m.LastIndexOf("and");
+
+            if (m.Contains("Cents") | m.Contains("Cent"))
+            {
+                m = m.Replace("Cents", "").Replace("Cent", "");
+                m = m.Insert(m.Length, "cents");
+            }
+            else
+            {
+                m = m.Replace("Cents", "").Replace("Cent", "");
+            }
+            textMoney = m;
+        }
+        else
+        {
+            textMoney = MoneyToWord.ConvertMoneyToTextVND(number);
+        }
+        return textMoney;
     }
 }

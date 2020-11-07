@@ -122,7 +122,7 @@ public static class ExcuteSignalRStatic
             { "cl", "" },
             { "dt", "" },
             { "ms", "" },
-            { "msLink", "images/products/fullsize/default.jpg" }
+            { "msLink", Public.imgNotFound }
         };
 
         try
@@ -139,7 +139,7 @@ public static class ExcuteSignalRStatic
             else if (File.Exists(image + clDTMS))
                 msLink += clDTMS;
             else
-                msLink = "images/products/fullsize/default.jpg";
+                msLink = Public.imgNotFound;
 
             response["cl"] = cl;
             response["dt"] = dt;
@@ -153,27 +153,63 @@ public static class ExcuteSignalRStatic
 
     public static string getImageProduct(string msp)
     {
-        string msLink = "images/products/mausac/";
-        string cl = msp.Substring(0, 2);
-        string dt = msp.Substring(6, 2);
-        string ms = msp.Substring(12, 2);
-        string kd = msp.Substring(0, 9);
-        string image = mapPathSignalR("~/" + msLink);
-
-        if (File.Exists(image + kd + ms + ".jpg"))
-            image = msLink + kd + ms + ".jpg";
-        else
+        string image = "";
+        try
         {
-            if (!msp.Contains("-F"))
-            {
-                image = msp.Substring(0, 8) + ".jpg";
-            }
+            string msLink = "images/products/mausac/";
+            string cl = msp.Substring(0, 2);
+            string dt = msp.Substring(6, 2);
+            string ms = msp.Substring(12, 2);
+            string kd = msp.Substring(0, 9);
+            image = mapPathSignalR("~/" + msLink);
+
+            if (File.Exists(image + kd + ms + ".jpg"))
+                image = msLink + kd + ms + ".jpg";
             else
             {
-                image = msp.Substring(0, 11) + ".jpg";
+                if (!msp.Contains("-F"))
+                {
+                    image = msp.Substring(0, 8) + ".jpg";
+                }
+                else
+                {
+                    image = msp.Substring(0, 11) + ".jpg";
+                }
+
+                image = Public.imgProduct + image;
+            }
+        }
+        catch
+        {
+            image = Public.imgNotFound;
+        }
+
+        return image;
+    }
+
+    public static string getImageColor(string color)
+    {
+        string image = "";
+        try
+        {
+            var mimeImg = color.Substring(color.LastIndexOf("."));
+            var colorFull = string.IsNullOrEmpty(mimeImg) ? color + ".jpg" : color;
+            string msLink = Public.imgProduct;
+            if (color.Length >= 11)
+            {
+                msLink = Public.imgColor;
             }
 
-            image = Public.imgProduct + image;
+            image = mapPathSignalR("~/" + msLink) + colorFull;
+
+            if (File.Exists(image))
+                image = msLink + colorFull;
+            else
+                image = Public.imgNotFound;
+        }
+        catch(Exception ex)
+        {
+            image = "Error:" + ex.Message;
         }
 
         return image;

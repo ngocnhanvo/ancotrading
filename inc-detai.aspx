@@ -210,9 +210,11 @@
             } );*/ }"
             OnSelectRow = "function(ids) {
 		            if(ids != null) {
-                        var rowSel = $('#grid_ds_detaimain').jqGrid('getRowData', ids);
-                        var img = rowSel['md_chungloai_id'] + '-' + rowSel['code_dt'] + '.jpg';
-                        $('#IMG-grid_ds_detaimain').attr('src', 'images/products/detai/' + img + '?v' + guidgrid_ds_detaimain());
+                        let rowSel = $('#grid_ds_detaimain').jqGrid('getRowData', ids);
+                        let img = rowSel['md_chungloai_id'] + '-' + rowSel['code_dt'];
+
+                        $('#img-grid_ds_detaimain').attr('src', '');
+                        $('#img-grid_ds_detaimain').attr('src', 'Controllers/API_System.ashx?oper=loadImageDetai&msp=' + img + '&ver=' + uuidv4());
                     }
                 }"
             ColModel = "[
@@ -393,13 +395,13 @@
     <table style="width:100%; height:100%">
         <tr>
             <td style="text-align: center;">
-                <img alt="  Không có hình ảnh" id="IMG-grid_ds_detaimain" src="images/products/fullsize/default.jpg" />
+                <img alt="Không có hình ảnh" id="img-grid_ds_detaimain" class="loadingIMG" style="max-width:100%; margin: 0px auto; min-width: 40px;" src="Controllers/API_System.ashx?oper=loadImageDetai&msp=default" />
             </td>
         </tr>
     </table>
 </div>
 
-<script>
+<script type="text/javascript">
     function UploadHinhAnhgrid_ds_detaimain() {
         var data_js = new FormData();
         var div = $(
@@ -514,11 +516,5 @@
 				}
     });
 
-    function guidgrid_ds_detaimain() {
-      function s4() {
-        return Math.floor((1 + Math.random()) * 0x10000)
-          .toString(16)
-          .substring(1);
-      }
-      return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-    }
+    createRightPanel('grid_ds_detaimain');
+</script>

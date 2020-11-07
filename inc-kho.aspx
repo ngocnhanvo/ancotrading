@@ -351,3 +351,7 @@
 </DIV>
 
 
+<script type="text/javascript">
+    createRightPanel('grid_ds_kho');
+    createRightPanel('grid_ds_hangtrongkho');
+</script>

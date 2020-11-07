@@ -445,6 +445,51 @@
             },
             {
                 fixed: true
+                , name: 'phi'
+                , index: 'gsp.phi'
+                , label: 'Phí'
+                , width: 100
+                , edittype: 'text'
+                , editable:true
+                , editrules: { required:true, number:true, minValue:0 }
+                , align:'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+            },
+            {
+                fixed: true
+                , name: 'tongGia'
+                , index: 'gsp.gia + gsp.phi'
+                , label: 'Tổng Giá'
+                , width: 100
+                , edittype: 'text'
+                , editable: false
+                , editrules: { required:true, number:true, minValue:0 }
+                , align:'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+            },
+            {
+                fixed: true
+                , name: 'mota'
+                , index: 'gsp.mota'
+                , label: 'Mã Số Khách'
+                , width: 100
+                , editable:true
+                , edittype: 'textarea'
+            },
+            {
+                fixed: true
+                , name: 'barcode'
+                , index: 'gsp.barcode'
+                , label: 'Mã Barcode'
+                , hidden: true
+                , editrules:{ edithidden: true }
+                , width: 100
+                , editable:true
+            },
+            {
+                fixed: true
                 , name: 'ngaytao'
                 , label: 'Ngày Tạo'
                 , index: 'gsp.ngaytao'
@@ -478,25 +523,6 @@
                 , width: 100
                 , editable:false
                 , edittype: 'text'
-            },
-            {
-                fixed: true
-                , name: 'mota'
-                , index: 'gsp.mota'
-                , label: 'Mã Số Khách'
-                , width: 100
-                , editable:true
-                , edittype: 'textarea'
-            },
-            {
-                fixed: true
-                , name: 'barcode'
-                , index: 'gsp.barcode'
-                , label: 'Mã Barcode'
-                , hidden: true
-                , editrules:{ edithidden: true }
-                , width: 100
-                , editable:true
             },
             {
                 fixed: true
@@ -779,3 +805,9 @@
                 "
         runat="server" />
 </DIV>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_banggia');
+    createRightPanel('grid_ds_phienbanggia');
+    createRightPanel('grid_ds_giasanpham');
+</script>

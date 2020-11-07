@@ -14,7 +14,7 @@ public partial class _Default : System.Web.UI.Page
         {
             Response.Redirect("Login.aspx");
         }
-        else if (!user.Equals("admin"))
+        else
         {
             Response.Redirect("Default-Security.aspx");
         }

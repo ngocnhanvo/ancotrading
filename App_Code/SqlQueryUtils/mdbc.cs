@@ -140,6 +140,17 @@ public static class mdbc
         }
         return Command;
     }
+	
+	public static SqlCommand CreateCommand2(String sql, params object[] nameValue)
+    {
+        SqlCommand Command = new SqlCommand(sql, mdbc.GetConnection);
+        Command.CommandType = CommandType.Text;
+        for (int i = 0; i < nameValue.Length; i+=3)
+        {
+			Command = createParramsSQL(Command, nameValue[i].ToString(), nameValue[i + 1].ToString(), nameValue[i + 2]);
+        }
+        return Command;
+    }
 
     public static SqlCommand CreateCommand(String sql, bool procdure, params object[] nameValue)
     {
@@ -220,6 +231,16 @@ public static class mdbc
         cmd.Connection.Close();
         return value;
     }
+	
+	public static object ExecuteScalar2(String sql, params object[] parameters)
+    {
+        SqlCommand cmd = CreateCommand2(sql, parameters);
+        cmd.CommandTimeout = 50000;
+        cmd.Connection.Open();
+        object value = cmd.ExecuteScalar();
+        cmd.Connection.Close();
+        return value;
+    }
 
     // Lấy một giá trị đơn dựa vào câu lệnh sql và danh sách tham số
     public static object ExecuteScalarProcedure(String sql, params object[] parameters)
@@ -231,4 +252,30 @@ public static class mdbc
         cmd.Connection.Close();
         return value;
     }
+	
+	private static SqlCommand createParramsSQL(SqlCommand cmd, string parram, string type, object valueP)
+	{
+		int i1 = type.LastIndexOf("("), i2 = type.LastIndexOf(")");
+        var type1 = i1 > -1 ? type.Substring(0, i1) : type;
+        var type2 = i1 > -1 & i2 > -1 ? type.Substring(i1 + 1, i2 - i1 - 1) : "";
+        if (type1 == "nvarchar") 
+		{
+			var number = type2 == "max" ? -1 : int.Parse(type2);
+			cmd.Parameters.Add(parram, SqlDbType.NVarChar, number);
+		}
+		else if(type1 == "decimal") 
+		{
+			var decs = type2.Split(',');
+			var number1 = byte.Parse(decs[0]);
+			var number2 = byte.Parse(decs[1]);
+			cmd.Parameters.Add(new SqlParameter(parram, SqlDbType.Decimal) { Precision = number1, Scale = number2 });
+		}
+		else if(type1 == "bit") 
+		{
+			cmd.Parameters.Add(new SqlParameter(parram, SqlDbType.Bit));
+		}
+		
+		cmd.Parameters[parram].Value = valueP;
+		return cmd;
+	}
 }

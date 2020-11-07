@@ -226,13 +226,13 @@ function Chitudong(action) {
 
     }
     
-    $(document).ready(function() {
-		setTimeout(function () {
-            $('#grid_ds_phaichi-pager_left table tr').prepend(
-                '<td class="ui-pg-button ui-corner-all" title="Chi tự động" id="chitudong_grid_ds_phaichi">' +
-                '<div class="ui-pg-div"><span onclick="Chitudong(\'add\')" class="ui-icon ui-icon-circle-plus"></span></div><td>')
-            , 5000
-        });
+    $(document).ready(function () {
+		//setTimeout(function () {
+        //    $('#grid_ds_phaichi-pager_left table tr').prepend(
+        //        '<td class="ui-pg-button ui-corner-all" title="Chi tự động" id="chitudong_grid_ds_phaichi">' +
+        //        '<div class="ui-pg-div" onclick="Chitudong(\'add\')"><span class="ui-icon ui-icon-circle-plus"></span></div><td>')
+        //    , 5000
+        //});
 		
         $('#layout-center-phaichi').parent().layout({
             south: {
@@ -1103,4 +1103,17 @@ function Chitudong(action) {
         color: #a46313;
     }
 </style>
+
+<script type="text/javascript">
+    $('#grid_ds_phaichi').jqGrid('navButtonAdd', '#grid_ds_phaichi-pager', {
+        caption: ""
+            , title: "Chi tự động"
+            , buttonicon: "ui-icon-circle-plus"
+            , position: "first"
+            , onClickButton: Chitudong
+    });
+
+    createRightPanel('grid_ds_phaichi');
+    createRightPanel('grid_ds_chitietphaichi');
+</script>
 

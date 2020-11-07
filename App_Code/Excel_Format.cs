@@ -72,15 +72,19 @@ public class Excel_Format
 		}
 		
 		if(VerAlign == "B") {
-			cell.VerticalAlignment = VerticalAlignment.Bottom;
-		}
+            cell.VerticalAlignment = 0;
+        }
 		else if(VerAlign == "T") {
 			cell.VerticalAlignment = VerticalAlignment.Top;
 		}
 		else if(VerAlign == "C") {
 			cell.VerticalAlignment = VerticalAlignment.Center;
 		}
-		return cell;
+        else if (VerAlign == "J")
+        {
+            cell.VerticalAlignment = VerticalAlignment.Justify;
+        }
+        return cell;
 	}
 	
 	public ICellStyle getcell2(short size, bool bold, bool wraptext, string border, string HorAlign, string VerAlign, string dataFormat) 
