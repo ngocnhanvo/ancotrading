@@ -48,6 +48,10 @@ namespace OfficeToPDF
         // Main conversion routine
         public static string Convert(String inputFile, String outputFile, Hashtable options, List<AvariablePrj.lstImage> lstImage, List<AvariablePrj.lstText> lstText)
         {
+            var msg = "";
+            var source = new CancellationTokenSource();
+            var token = source.Token;
+
             var task = new System.Threading.Tasks.Task(() =>
             {
                 options = PDFBookmark.createOptions();
@@ -90,7 +94,8 @@ namespace OfficeToPDF
                     if (tries == 0)
                     {
                         ReleaseCOMObject(app);
-                        return Enum.GetName(typeof(ExitCode), ExitCode.ApplicationError);
+                        msg = Enum.GetName(typeof(ExitCode), ExitCode.ApplicationError);
+                        source.Cancel();
                     }
 
                     //app.Visible = false;
@@ -149,7 +154,8 @@ namespace OfficeToPDF
                     if (Converter.IsPasswordProtected(inputFile) && String.IsNullOrEmpty(readPassword))
                     {
                         Console.WriteLine("Unable to open password protected file");
-                        return Enum.GetName(typeof(ExitCode), ExitCode.PasswordFailure);
+                        msg = Enum.GetName(typeof(ExitCode), ExitCode.PasswordFailure);
+                        source.Cancel();
                     }
 
                     app.EnableEvents = false;
@@ -179,7 +185,8 @@ namespace OfficeToPDF
                     // Unable to open workbook
                     if (workbook == null)
                     {
-                        return Enum.GetName(typeof(ExitCode), ExitCode.FileOpenFailure);
+                        msg = Enum.GetName(typeof(ExitCode), ExitCode.FileOpenFailure);
+                        source.Cancel();
                     }
 
                     if (app.EnableEvents)
@@ -284,7 +291,8 @@ namespace OfficeToPDF
                             if (worksheetNum > allSheets.Count)
                             {
                                 // Sheet count is too big
-                                return Enum.GetName(typeof(ExitCode), ExitCode.WorksheetNotFound);
+                                msg = Enum.GetName(typeof(ExitCode), ExitCode.WorksheetNotFound);
+                                source.Cancel();
                             }
                             if (allSheets[worksheetNum] is _Worksheet)
                             {
@@ -300,7 +308,8 @@ namespace OfficeToPDF
                         }
                         catch (Exception)
                         {
-                            return Enum.GetName(typeof(ExitCode), ExitCode.WorksheetNotFound);
+                            msg = Enum.GetName(typeof(ExitCode), ExitCode.WorksheetNotFound);
+                            source.Cancel();
                         }
                     }
 
@@ -567,7 +576,8 @@ namespace OfficeToPDF
                         }
                         else
                         {
-                            return Enum.GetName(typeof(ExitCode), ExitCode.UnknownError);
+                            msg = Enum.GetName(typeof(ExitCode), ExitCode.UnknownError);
+                            source.Cancel();
                         }
                         AddCOMDelay(options);
                     }
@@ -625,11 +635,13 @@ namespace OfficeToPDF
                 }
                 catch (COMException ce)
                 {
-                    return "COMException: " + ce;
+                    msg = "COMException: " + ce;
+                    source.Cancel();
                 }
                 catch (Exception e)
                 {
-                    return "Exception: " + e;
+                    msg = "Exception: " + e;
+                    source.Cancel();
                 }
                 finally
                 {
@@ -673,10 +685,16 @@ namespace OfficeToPDF
                         Directory.Delete(Path.GetDirectoryName(tmpFile));
                     }
                 }
-            });
+            }, token);
 
+            var timeFist = DateTime.Now;
+            task.Start();
             task.Wait(10000);
-            return "";
+
+            if ((DateTime.Now - timeFist).Seconds >= 10)
+                msg = @"Time out, please change default printer of server to ""Microsoft XPS Document Writer"" or ""Print as PDF""";
+
+            return msg;
         }
 
         // Return true if there is a valid template option
