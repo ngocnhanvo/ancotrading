@@ -187,6 +187,34 @@ public static class ExcuteSignalRStatic
         return image;
     }
 
+    public static string getImageColor(string color)
+    {
+        string image = "";
+        try
+        {
+            var mimeImg = color.Substring(color.LastIndexOf("."));
+            var colorFull = string.IsNullOrEmpty(mimeImg) ? color + ".jpg" : color;
+            string msLink = Public.imgProduct;
+            if (color.Length >= 11)
+            {
+                msLink = Public.imgColor;
+            }
+
+            image = mapPathSignalR("~/" + msLink) + colorFull;
+
+            if (File.Exists(image))
+                image = msLink + colorFull;
+            else
+                image = Public.imgNotFound;
+        }
+        catch(Exception ex)
+        {
+            image = "Error:" + ex.Message;
+        }
+
+        return image;
+    }
+
     public static dynamic getTextFromInner(string inner, string outer, string slinner, string slouter)
     {
         string packingText = "", sizeText = "", quantity = "";

@@ -31,6 +31,7 @@ public class ExportExcel
     Excel_Format ex_fm = null;
     private int start = 0, end = 0;
     public int? endHeader = null;
+    public string title = "";
     private String fmt0 = "#,##0", fmt0i0 = "#,##0.0", fmt0i00 = "#,##0.00", fmt0i000 = "#,##0.000";
     public Logoreport LogoRpt { get; set; } 
     public partial class Logoreport
@@ -317,7 +318,7 @@ public class ExportExcel
                 "ANCO COMPANY LIMITED",
                 "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam",
                 "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com",
-                "PROFORMA INVOICE"
+                string.IsNullOrEmpty(title) ? "PROFORMA INVOICE" : title
             };
 
             s1.CreateRow(row);
