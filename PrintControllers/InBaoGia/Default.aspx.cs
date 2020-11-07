@@ -31,32 +31,16 @@ public partial class PrintControllers_InBaoGia_Default : System.Web.UI.Page
             String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "anco_logo_print.png");
             String imgPath = Public.imgProducts;
 
-            c_baogia bg = db.c_baogias.FirstOrDefault(p => p.c_baogia_id.Equals(c_baogia_id));
+            var bg = db.c_baogias.FirstOrDefault(p => p.c_baogia_id.Equals(c_baogia_id));
             HSSFWorkbook wb = null;
-			if(bg != null) 
-			{
-				//if (bg.isform.Value)
-				//{
-				//	BaoGiaMauReport rptBaoGia = new BaoGiaMauReport(c_baogia_id, logoPath, imgPath);
-				//	wb = rptBaoGia.CreateWBQuotation();
-				//	this.SaveFile(wb, "AncoQuotation_R.xls");				
-				//}
-				//else
-				//{
-				var rptBaoGia = new BaoGiaReport(c_baogia_id, logoPath, imgPath);
-                rptBaoGia.TypeReport = type;
-				wb = rptBaoGia.CreateWBQuotation();
-                lstImage = rptBaoGia.Lstimage;
 
-                this.SaveFile(wb, bg.isform.GetValueOrDefault(false) ? "AncoQuotation_R.xls" : "AncoQuotation.xls");
-				//}
-			}
-			else 
-			{
-				var rptBaoGia = new BaoGiaReport(c_baogia_id, logoPath, imgPath);
-				wb = rptBaoGia.CreateWBQuotation();
-				this.SaveFile(wb, "AncoQuotationQR_R.xls");
-			}
+			var rptBaoGia = new BaoGiaReport(c_baogia_id, logoPath, imgPath);
+            rptBaoGia.TypeReport = type;
+            rptBaoGia.LaBaoGiaMau = bg == null ? false : bg.isform.GetValueOrDefault(false);
+            rptBaoGia.LaBaoGiaMauQR = bg == null ? true : false;
+            wb = rptBaoGia.CreateWBQuotation();
+            lstImage = rptBaoGia.Lstimage;
+            this.SaveFile(wb, bg == null ? "AncoQuotationQR_R.xls" : (bg.isform.GetValueOrDefault(false) ? "AncoQuotation_R.xls" : "AncoQuotation.xls"));
         }
         //catch (Exception ex)
         {
@@ -95,6 +79,7 @@ public partial class PrintControllers_InBaoGia_Default : System.Web.UI.Page
                 MemoryStream ms = new MemoryStream();
                 //pull the memory stream from the image (I need this for the byte array later)
                 image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                image.Dispose();
                 //the drawing patriarch will hold the anchor and the master information
                 IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
                 //store the coordinates of which cell and where in the cell the image goes

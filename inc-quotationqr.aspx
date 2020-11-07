@@ -65,11 +65,11 @@
                         click: function () {
                             var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-qo').val();
                             var printURL = "PrintControllers/";
-                            var windowSize = "width=" + window.innerWidth + ",height=" + window.innerHeight + ",scrollbars=yes";
+                            let windowSize = "top=0, left=0, width=" + window.outerWidth + ", height=" + window.outerHeight;
                             if (typeof printType != 'undefined') {
                                 if (qoId != null) {
-                                    printURL += "InBaoGia/rptBaoGia.aspx";
-                                    window.open(printURL + "?c_baogia_id=" + qoId, "Xem Báo Giá", windowSize);
+                                    printURL += "InBaoGia/";
+                                    window.open(printURL + "?c_baogia_id=" + qoId + "&type=pdf", "Xem Báo Giá", windowSize);
                                 } else {
                                     alert('Bạn chưa chọn báo giá cần xem báo giá');
                                 }

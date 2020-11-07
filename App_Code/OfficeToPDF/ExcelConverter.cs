@@ -95,7 +95,7 @@ namespace OfficeToPDF
                     {
                         ReleaseCOMObject(app);
                         msg = Enum.GetName(typeof(ExitCode), ExitCode.ApplicationError);
-                        source.Cancel();
+                        throw new ArgumentException(msg);
                     }
 
                     //app.Visible = false;
@@ -155,7 +155,7 @@ namespace OfficeToPDF
                     {
                         Console.WriteLine("Unable to open password protected file");
                         msg = Enum.GetName(typeof(ExitCode), ExitCode.PasswordFailure);
-                        source.Cancel();
+                        throw new ArgumentException(msg);
                     }
 
                     app.EnableEvents = false;
@@ -186,7 +186,7 @@ namespace OfficeToPDF
                     if (workbook == null)
                     {
                         msg = Enum.GetName(typeof(ExitCode), ExitCode.FileOpenFailure);
-                        source.Cancel();
+                        throw new ArgumentException(msg);
                     }
 
                     if (app.EnableEvents)
@@ -225,6 +225,8 @@ namespace OfficeToPDF
                         var Top = (float)((double)oRange.Top + rateRowAndPicture);
 
                         var pic = worksheet.Shapes.AddPicture(image.link, Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoCTrue, Left, Top, widthImg, heightImg);
+                        
+                        pictureR.Dispose();
                     }
 
                     foreach (var textInLine in lstText)
@@ -292,7 +294,7 @@ namespace OfficeToPDF
                             {
                                 // Sheet count is too big
                                 msg = Enum.GetName(typeof(ExitCode), ExitCode.WorksheetNotFound);
-                                source.Cancel();
+                                throw new ArgumentException(msg);
                             }
                             if (allSheets[worksheetNum] is _Worksheet)
                             {
@@ -309,7 +311,7 @@ namespace OfficeToPDF
                         catch (Exception)
                         {
                             msg = Enum.GetName(typeof(ExitCode), ExitCode.WorksheetNotFound);
-                            source.Cancel();
+                            throw new ArgumentException(msg);
                         }
                     }
 
@@ -577,7 +579,7 @@ namespace OfficeToPDF
                         else
                         {
                             msg = Enum.GetName(typeof(ExitCode), ExitCode.UnknownError);
-                            source.Cancel();
+                            throw new ArgumentException(msg);
                         }
                         AddCOMDelay(options);
                     }
@@ -636,12 +638,10 @@ namespace OfficeToPDF
                 catch (COMException ce)
                 {
                     msg = "COMException: " + ce;
-                    source.Cancel();
                 }
                 catch (Exception e)
                 {
                     msg = "Exception: " + e;
-                    source.Cancel();
                 }
                 finally
                 {
@@ -690,7 +690,7 @@ namespace OfficeToPDF
             var timeFist = DateTime.Now;
             task.Start();
             task.Wait(10000);
-
+            task.Dispose();
             if ((DateTime.Now - timeFist).Seconds >= 10)
                 msg = @"Time out, please change default printer of server to ""Microsoft XPS Document Writer"" or ""Print as PDF""";
 

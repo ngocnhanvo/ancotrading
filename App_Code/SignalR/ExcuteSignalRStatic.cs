@@ -177,6 +177,9 @@ public static class ExcuteSignalRStatic
                 }
 
                 image = Public.imgProduct + image;
+
+                if (!File.Exists(mapPathSignalR("~/" + image)))
+                    image = Public.imgNotFound;
             }
         }
         catch
