@@ -529,7 +529,6 @@ public class DanhSachDatHangReport
             try
             {
                 var imgPath = System.IO.Path.Combine(productImagePath, dt.Rows[i]["pic"].ToString() + ".jpg");
-                var image = System.Drawing.Image.FromFile(imgPath);
                 lstimage.Add(new AvariablePrj.lstImage() {
                     row = row,
                     column = 3,

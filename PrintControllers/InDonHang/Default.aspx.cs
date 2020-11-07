@@ -1198,10 +1198,10 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             foreach (var item in lstimage)
             {
                 var image = System.Drawing.Image.FromFile(item.link);
-
                 MemoryStream ms = new MemoryStream();
                 //pull the memory stream from the image (I need this for the byte array later)
                 image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                image.Dispose();
                 //the drawing patriarch will hold the anchor and the master information
                 IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
                 //store the coordinates of which cell and where in the cell the image goes
