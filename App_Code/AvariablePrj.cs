@@ -1,7 +1,7 @@
 ﻿
 public class AvariablePrj
 {
-    public partial class lstIamge
+    public partial class lstImage
     {
         public int row { get; set; }
         public int column { get; set; }

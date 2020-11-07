@@ -14,7 +14,14 @@ using System.Data;
 public class BaoGiaReport
 {
     private String c_baogia_id, logoPath, productImagePath, typeReport;
-    private bool? laBaoGiaMau; 
+    private bool? laBaoGiaMau;
+    private List<AvariablePrj.lstImage> lstimage = new List<AvariablePrj.lstImage>();
+
+    public List<AvariablePrj.lstImage> Lstimage
+    {
+        get { return lstimage; }
+        set { lstimage = value; }
+    }
     public String LogoPath
     {
         get { return logoPath; }
@@ -400,23 +407,31 @@ public class BaoGiaReport
         for (int i = 0; i < detailsCount; i++)
         {
             rowDt++;
-
-            try
+            var imgPath = Path.Combine(productImagePath, dtDetails.Rows[i]["pic"].ToString() + ".jpg");
+            var image = System.Drawing.Image.FromFile(imgPath);
+            lstimage.Add(new AvariablePrj.lstImage()
             {
-                String imgPath = System.IO.Path.Combine(productImagePath, dtDetails.Rows[i]["pic"].ToString() + ".jpg");
-                System.Drawing.Image image = System.Drawing.Image.FromFile(imgPath);
-                MemoryStream ms = new MemoryStream();
-                image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                row = rowDt,
+                column = 2,
+                link = imgPath
+            });
 
-                IDrawing patriarch = s1.CreateDrawingPatriarch();
-                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, 1, rowDt, 2, rowDt + 1);
-                anchor.AnchorType = 2;
+            //try
+            //{
+            //    String imgPath = System.IO.Path.Combine(productImagePath, dtDetails.Rows[i]["pic"].ToString() + ".jpg");
+            //    System.Drawing.Image image = System.Drawing.Image.FromFile(imgPath);
+            //    MemoryStream ms = new MemoryStream();
+            //    image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
-                IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
-            }
-            catch
-            { }
+            //    IDrawing patriarch = s1.CreateDrawingPatriarch();
+            //    HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, 1, rowDt, 2, rowDt + 1);
+            //    anchor.AnchorType = 2;
+
+            //    int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
+            //    IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+            //}
+            //catch
+            //{ }
             
             s1.CreateRow(rowDt).CreateCell(0).SetCellValue(dtDetails.Rows[i]["msp"].ToString());
             s1.GetRow(rowDt).HeightInPoints = 50;
