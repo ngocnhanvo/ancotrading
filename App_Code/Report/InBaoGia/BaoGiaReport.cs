@@ -214,20 +214,22 @@ public class BaoGiaReport
         s1.GetRow(row).GetCell(0).CellStyle = cel;
 
         row++;
-        s1.CreateRow(row).CreateCell(3).SetCellValue("CUSTOMER NAME:");
-        s1.GetRow(row).GetCell(3).CellStyle = cellBold;
+        s1.CreateRow(row).CreateCell(1).SetCellValue("CUSTOMER NAME:");
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 
-        s1.GetRow(row).CreateCell(4).SetCellValue(dtDetails.Rows[0]["ten_dtkd"].ToString());
-        s1.GetRow(row).GetCell(4).CellStyle = cellBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 11));
+        s1.GetRow(row).CreateCell(3).SetCellValue(dtDetails.Rows[0]["ten_dtkd"].ToString());
+        s1.GetRow(row).GetCell(3).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 3, 11));
 
         row++;
-        s1.CreateRow(row).CreateCell(3).SetCellValue("ADDRESS:");
-        s1.GetRow(row).GetCell(3).CellStyle = cellBold;
+        s1.CreateRow(row).CreateCell(1).SetCellValue("ADDRESS:");
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 
-        s1.GetRow(row).CreateCell(4).SetCellValue(dtDetails.Rows[0]["diachi"].ToString() + " Tel:" + dtDetails.Rows[0]["tel"].ToString() + " Fax:" + dtDetails.Rows[0]["fax"].ToString());
-        s1.GetRow(row).GetCell(4).CellStyle = cellBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 11));
+        s1.GetRow(row).CreateCell(3).SetCellValue(dtDetails.Rows[0]["diachi"].ToString() + " Tel:" + dtDetails.Rows[0]["tel"].ToString() + " Fax:" + dtDetails.Rows[0]["fax"].ToString());
+        s1.GetRow(row).GetCell(3).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 3, 11));
 
         s1.GetRow(row).CreateCell(12).SetCellValue("Date:");
         s1.GetRow(row).GetCell(12).CellStyle = cellBold;
