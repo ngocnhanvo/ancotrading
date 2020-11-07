@@ -14,6 +14,7 @@ using ExcelLibrary.SpreadSheet;
 
 public class GiaSanPhamImport : ImportOriginal
 {
+	LinqDBDataContext db = new LinqDBDataContext();
     private String maSanPham, tenPhienBanGia, moTa, barCode;
     private decimal gia;
     public String Barcode
@@ -47,13 +48,13 @@ public class GiaSanPhamImport : ImportOriginal
 
     public GiaSanPhamImport()
     {
-    
+		db.CommandTimeout = 100 * 60;
     }
 
     public GiaSanPhamImport(String md_sanpham_id, String md_phienbangia_id, decimal gia, string moTa, string barCode)
         : this(md_sanpham_id, md_phienbangia_id, gia, moTa, barCode, DateTime.Now, "admin", DateTime.Now, "admin", true)
     {
-
+		db.CommandTimeout = 100 * 60;
     }
 
     public GiaSanPhamImport(String md_sanpham_id, String md_phienbangia_id, decimal gia, string moTa, string barCode
@@ -90,7 +91,6 @@ public class GiaSanPhamImport : ImportOriginal
         db.SubmitChanges();
     }
 
-    LinqDBDataContext db = new LinqDBDataContext();
     public void Update()
     {
         md_giasanpham o = db.md_giasanphams.FirstOrDefault(p => p.md_sanpham_id.Equals(maSanPham) && p.md_phienbangia_id.Equals(tenPhienBanGia));

@@ -441,4 +441,321 @@ public class Objects
                 this.type = "";
         }
     }
+
+    public class Inquiry_QRCode
+    {
+        private String logoPath, productImagePath, type, customer, address, tel, fax;
+        private List<Json_product> products;
+        public String LogoPath
+        {
+            get { return logoPath; }
+            set { logoPath = value; }
+        }
+
+        public String ProductImagePath
+        {
+            get { return productImagePath; }
+            set { productImagePath = value; }
+        }
+
+        private LinqDBDataContext db = null;
+        public HSSFWorkbook CreateWBQuotation()
+        {
+            var arr = products.Select(s => s.ma_sanpham).ToList();
+            string strSps = string.Join("','", arr);
+
+            string sql = string.Format(@"
+                select 
+                    A.*,
+                    cast(A.sl_inner as nvarchar(32)) + ' ' + A.dvtinner as [inner],
+                    cast(A.sl_outer as nvarchar(32)) + ' ' + A.dvtouter as [master]
+                from (
+                    select 
+                        sp.ma_sanpham,
+                        sp.mota_tienganh,
+                        dg.sl_inner, 
+                        (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner) as dvtinner,
+                        dg.sl_outer, 
+                        (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer) as dvtouter,
+                        dg.soluonggoi_ctn as nopack,
+                        cb.ten_cangbien,
+                        substring(sp.ma_sanpham, 0, 9) as kd,
+                        substring(sp.ma_sanpham, 9, 3) as dt,
+                        substring(sp.ma_sanpham, 12, 3) as ms,
+                        (case when SUBSTRING(sp.ma_sanpham, 10, 1) != 'F' then SUBSTRING(sp.ma_sanpham, 0, 9) else SUBSTRING(sp.ma_sanpham, 0, 12) end) as pic
+                    from md_sanpham (nolock) sp
+                        left join md_donggoisanpham (nolock) dgsp on dgsp.md_sanpham_id = sp.md_sanpham_id
+                        left join md_donggoi (nolock) dg on dg.md_donggoi_id = dgsp.md_donggoi_id
+                        left join md_cangxuathang (nolock) cxh on cxh.md_sanpham_id = sp.md_sanpham_id
+                        left join md_cangbien (nolock) cb on cb.md_cangbien_id = cxh.md_cangbien_id
+                    where 
+                        1=1
+                        and ma_sanpham in ('{0}')
+                        and dgsp.macdinh = 1
+                        and cxh.macdinh = 1
+                )A
+                order by A.kd, A.ms, A.dt
+            ", strSps);
+            DataTable dtDetails = mdbc.GetData(sql);
+            if (dtDetails.Rows.Count != 0)
+            {
+                HSSFWorkbook hssfworkbook = this.CreateHSSFWorkbook(dtDetails);
+                return hssfworkbook;
+            }
+            else
+            {
+                throw new Exception("Báo giá không có dữ liệu!");
+            }
+        }
+
+        private HSSFWorkbook CreateHSSFWorkbook(DataTable dtDetails)
+        {
+            HSSFWorkbook hssfworkbook = new HSSFWorkbook();
+            ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
+            System.Drawing.Image logo = System.Drawing.Image.FromFile(logoPath);
+            MemoryStream mslogo = new MemoryStream();
+            logo.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+            IDrawing patriarchlogo = s1.CreateDrawingPatriarch();
+            HSSFClientAnchor anchorlogo = new HSSFClientAnchor(0, 0, 0, 0, 0, 0, 1, 3);
+            anchorlogo.AnchorType = 3;
+
+            int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
+            IPicture signaturePicturelogo = patriarchlogo.CreatePicture(anchorlogo, indexlogo);
+
+            s1.CreateRow(0).CreateCell(0).SetCellValue("ANCO COMPANY LIMITED");
+
+            s1.CreateRow(1).CreateCell(0).SetCellValue("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
+
+            s1.CreateRow(2).CreateCell(0).SetCellValue("Tel.: (84-274) 3740 973   Fax:  (84–274) 3740 621  Email: anco@ancopottery.com");
+            
+            s1.CreateRow(3).CreateCell(0).SetCellValue("QUOTATION REQUEST");
+
+            s1.CreateRow(4).CreateCell(0).SetCellValue("Please send us a quotation for the below-mentioned items through our following contact:");
+
+            IFont fontBold = hssfworkbook.CreateFont();
+            fontBold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
+
+            ICellStyle cellBold = hssfworkbook.CreateCellStyle();
+            cellBold.SetFont(fontBold);
+
+            ICellStyle cellBoldCenter = hssfworkbook.CreateCellStyle();
+            cellBoldCenter.Alignment = HorizontalAlignment.Center;
+            cellBoldCenter.VerticalAlignment = VerticalAlignment.Top;
+            cellBoldCenter.SetFont(fontBold);
+
+            // Style of Company Name
+            ICellStyle cellStyleCompany = hssfworkbook.CreateCellStyle();
+            cellStyleCompany.Alignment = HorizontalAlignment.Center;
+            cellStyleCompany.SetFont(NPOIUtils.CreateFontSize(hssfworkbook, 15));
+
+            // Style of Company Information 
+            ICellStyle cellStyleInfomation = hssfworkbook.CreateCellStyle();
+            cellStyleInfomation.Alignment = HorizontalAlignment.Center;
+            cellStyleInfomation.SetFont(NPOIUtils.CreateFontSize(hssfworkbook, 12));
+
+            // Style of Title
+            ICellStyle cellStyleTitle = hssfworkbook.CreateCellStyle();
+            cellStyleTitle.Alignment = HorizontalAlignment.Center;
+            cellStyleTitle.SetFont(NPOIUtils.CreateFontSize(hssfworkbook, 18));
+
+            // Style of Company Information Underline
+            ICellStyle cellStyleInfomationUnderline = hssfworkbook.CreateCellStyle();
+            cellStyleInfomationUnderline.Alignment = HorizontalAlignment.Center;
+            cellStyleInfomationUnderline.SetFont(NPOIUtils.CreateFontSize(hssfworkbook, 12, true));
+
+
+
+            s1.GetRow(0).GetCell(0).CellStyle = cellStyleCompany;
+            s1.GetRow(1).GetCell(0).CellStyle = cellStyleInfomation;
+            s1.GetRow(2).GetCell(0).CellStyle = cellStyleInfomationUnderline;
+            s1.GetRow(3).GetCell(0).CellStyle = cellStyleTitle;
+            s1.GetRow(4).GetCell(0).CellStyle = cellStyleInfomation;
+
+            s1.AddMergedRegion(new CellRangeAddress(0, 0, 0, 6));
+            s1.AddMergedRegion(new CellRangeAddress(1, 1, 0, 6));
+            s1.AddMergedRegion(new CellRangeAddress(2, 2, 0, 6));
+            s1.AddMergedRegion(new CellRangeAddress(3, 3, 0, 6));
+            s1.AddMergedRegion(new CellRangeAddress(4, 4, 0, 6));
+
+            var rowTT = 5;
+            s1.CreateRow(rowTT).CreateCell(0).SetCellValue("CUSTOMER NAME:");
+            s1.GetRow(rowTT).GetCell(0).CellStyle = cellBold;
+
+            s1.GetRow(rowTT).CreateCell(1).SetCellValue(customer);
+            s1.GetRow(rowTT).GetCell(1).CellStyle = cellBold;
+
+
+            s1.CreateRow(rowTT + 1).CreateCell(0).SetCellValue("ADDRESS:");
+            s1.GetRow(rowTT + 1).GetCell(0).CellStyle = cellBold;
+
+            string val51 = "";
+            if (!string.IsNullOrEmpty(address))
+                val51 += address;
+
+            if (!string.IsNullOrEmpty(tel))
+            {
+                if (val51.Length > 0)
+                    val51 += ",";
+                val51 += " Tel: " + tel;
+            }
+
+            if (!string.IsNullOrEmpty(fax))
+            {
+                if (val51.Length > 0)
+                    val51 += ",";
+                val51 += " Fax: " + tel;
+            }
+
+            s1.GetRow(rowTT + 1).CreateCell(1).SetCellValue(val51);
+            s1.AddMergedRegion(new CellRangeAddress(5, 5, 1, 3));
+            s1.GetRow(rowTT + 1).GetCell(1).CellStyle = cellBold;
+
+            s1.GetRow(rowTT).CreateCell(5).SetCellValue("Date:");
+            s1.GetRow(rowTT).CreateCell(6).SetCellValue(DateTime.Now.ToString("dd/MMM/yyyy"));
+            s1.GetRow(rowTT).GetCell(6).CellStyle = cellBold;
+
+            var rowTTH1 = rowTT + 3;
+            var rowTTH2 = rowTT + 4;
+            IRow headerColumn = s1.CreateRow(rowTTH1);
+            IRow headerColumn2 = s1.CreateRow(rowTTH2);
+
+            headerColumn.HeightInPoints = 40;
+            headerColumn2.HeightInPoints = 40;
+            ICellStyle hStyle = hssfworkbook.CreateCellStyle();
+            hStyle.WrapText = true;
+            hStyle.SetFont(fontBold);
+            hStyle.Alignment = HorizontalAlignment.Center;
+            hStyle.VerticalAlignment = VerticalAlignment.Top;
+            hStyle.BorderBottom = hStyle.BorderLeft
+                = hStyle.BorderRight
+                = hStyle.BorderTop
+                = NPOI.SS.UserModel.BorderStyle.Thin;
+
+            for (int i = 0; i <= 6; i++)
+            {
+                headerColumn.CreateCell(i).CellStyle = hStyle;
+                headerColumn2.CreateCell(i).CellStyle = hStyle;
+            }
+
+            headerColumn.GetCell(0).SetCellValue("Item No");
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH2, 0, 0));
+
+            headerColumn.GetCell(1).SetCellValue("Picture - Only for shape ref.");
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH2, 1, 1));
+
+            headerColumn.GetCell(2).SetCellValue("Description");
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH2, 2, 2));
+
+            headerColumn.GetCell(3).SetCellValue("Packing");
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH1, 3, 4));
+
+            headerColumn2.GetCell(3).SetCellValue("Inner");
+            headerColumn2.GetCell(4).SetCellValue("Master");  
+
+            headerColumn.GetCell(5).SetCellValue("No. of master packages per 40'' container");
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH2, 5, 5));
+
+            headerColumn.GetCell(6).SetCellValue("Port of loading");
+            s1.AddMergedRegion(new CellRangeAddress(rowTTH1, rowTTH2, 6, 6));
+
+            HSSFSheet hssfsheet = (HSSFSheet)s1;
+
+            Excel_Format ex_fm = new Excel_Format(hssfworkbook);
+
+            ICellStyle cellStyleCenter = ex_fm.getcell(10, false, true, "LRTB", "C", "T");
+            ICellStyle cellStyleLeft = ex_fm.getcell(10, false, true, "LRTB", "L", "T");
+            ICellStyle cellStyleNumber2 = ex_fm.cell_decimal_2(10, false, true, "LRTB", "C", "T");
+            ICellStyle cellStyleNumber3 = ex_fm.cell_decimal_3(10, false, true, "LRTB", "C", "T");
+
+            ICellStyle border = hssfworkbook.CreateCellStyle();
+            border.BorderBottom = border.BorderLeft
+                = border.BorderRight
+                = border.BorderTop
+                = NPOI.SS.UserModel.BorderStyle.Thin;
+            border.WrapText = true;
+            border.VerticalAlignment = VerticalAlignment.Top;
+
+            s1.SetColumnWidth(0, 5000);
+            s1.SetColumnWidth(1, 4000);
+            s1.SetColumnWidth(2, 9000);
+            s1.SetColumnWidth(3, 3000);
+            s1.SetColumnWidth(4, 3000);
+            s1.SetColumnWidth(5, 3000);
+            s1.SetColumnWidth(6, 3000);
+
+            ICellStyle cellNumBorder = hssfworkbook.CreateCellStyle();
+            cellNumBorder.Alignment = HorizontalAlignment.Right;
+            cellNumBorder.VerticalAlignment = VerticalAlignment.Top;
+            cellNumBorder.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+            cellNumBorder.BorderBottom = cellNumBorder.BorderRight = cellNumBorder.BorderLeft = cellNumBorder.BorderTop = BorderStyle.Thin;
+
+            int detailsCount = dtDetails.Rows.Count;
+            for (int i = 0; i < detailsCount; i++)
+            {
+                var rowTTDT = rowTT + 5 + i;
+                try
+                {
+                    String imgPath = Path.Combine(productImagePath, dtDetails.Rows[i]["pic"].ToString() + ".jpg");
+                    System.Drawing.Image image = System.Drawing.Image.FromFile(imgPath);
+                    MemoryStream ms = new MemoryStream();
+                    image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                    IDrawing patriarch = s1.CreateDrawingPatriarch();
+                    HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, 1, rowTTDT, 2, rowTTDT + 1);
+                    anchor.AnchorType = 2;
+
+                    int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
+                    IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+                }
+                catch
+                { }
+
+                
+                s1.CreateRow(rowTTDT).CreateCell(0).SetCellValue(dtDetails.Rows[i]["ma_sanpham"].ToString());
+                s1.GetRow(rowTTDT).HeightInPoints = 50;
+                s1.GetRow(rowTTDT).CreateCell(1).SetCellValue("");
+                s1.GetRow(rowTTDT).CreateCell(2).SetCellValue(dtDetails.Rows[i]["mota_tienganh"].ToString());
+
+                s1.GetRow(rowTTDT).CreateCell(3).SetCellValue(dtDetails.Rows[i]["inner"].ToString());
+                s1.GetRow(rowTTDT).CreateCell(4).SetCellValue(dtDetails.Rows[i]["master"].ToString());
+
+                s1.GetRow(rowTTDT).CreateCell(5).SetCellValue(double.Parse(dtDetails.Rows[i]["nopack"].ToString()));
+                s1.GetRow(rowTTDT).GetCell(5).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowTTDT).CreateCell(6).SetCellValue(dtDetails.Rows[i]["ten_cangbien"].ToString());
+            }
+
+            for (int i = 0; i < dtDetails.Rows.Count; i++)
+            {
+                var rowTTDT = rowTT + 5 + i;
+                for (int j = 0; j <= 6; j++)
+                {
+                    if (j == 2)
+                    {
+                        s1.GetRow(rowTTDT).GetCell(j).CellStyle = cellStyleLeft;
+                    }
+                    else
+                    {
+                        s1.GetRow(rowTTDT).GetCell(j).CellStyle = cellStyleCenter;
+                    }
+                }
+            }
+            
+            return hssfworkbook;
+        }
+
+        public Inquiry_QRCode(LinqDBDataContext dbP, List<Json_product> products, string logoPath, string productImagePath,
+            string customer, string address, string tel, string fax)
+        {
+            db = dbP;
+            this.logoPath = logoPath;
+            this.productImagePath = productImagePath;
+            this.products = products;
+            this.customer = customer;
+            this.address = address;
+            this.tel = tel;
+            this.fax = fax;
+        }
+    }
 }

@@ -9789,7 +9789,7 @@ public partial class c_danhsachdathang : INotifyPropertyChanging, INotifyPropert
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_discount", DbType="Decimal(18,0)")]
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_discount", DbType="Decimal(18,6)")]
 	public System.Nullable<decimal> discount
 	{
 		get
@@ -9976,6 +9976,8 @@ public partial class c_dongdonhang : INotifyPropertyChanging, INotifyPropertyCha
 	
 	private string _barcode;
 	
+	private System.Nullable<decimal> _phi;
+	
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -10060,6 +10062,8 @@ public partial class c_dongdonhang : INotifyPropertyChanging, INotifyPropertyCha
     partial void OndiscountChanged();
     partial void OnbarcodeChanging(string value);
     partial void OnbarcodeChanged();
+    partial void OnphiChanging(System.Nullable<decimal> value);
+    partial void OnphiChanged();
     #endregion
 	
 	public c_dongdonhang()
@@ -10863,6 +10867,26 @@ public partial class c_dongdonhang : INotifyPropertyChanging, INotifyPropertyCha
 				this._barcode = value;
 				this.SendPropertyChanged("barcode");
 				this.OnbarcodeChanged();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_phi", DbType="Decimal(18,2)")]
+	public System.Nullable<decimal> phi
+	{
+		get
+		{
+			return this._phi;
+		}
+		set
+		{
+			if ((this._phi != value))
+			{
+				this.OnphiChanging(value);
+				this.SendPropertyChanging();
+				this._phi = value;
+				this.SendPropertyChanged("phi");
+				this.OnphiChanged();
 			}
 		}
 	}
