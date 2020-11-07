@@ -419,7 +419,7 @@ public class BaoGiaReport
             { }
             
             s1.CreateRow(rowDt).CreateCell(0).SetCellValue(dtDetails.Rows[i]["msp"].ToString());
-            s1.CreateRow(rowDt).GetCell(0).CellStyle = cellTextCenter;
+            s1.GetRow(rowDt).GetCell(0).CellStyle = cellTextCenter;
             s1.GetRow(rowDt).HeightInPoints = 50;
             s1.GetRow(rowDt).CreateCell(1).SetCellValue("");
             s1.GetRow(rowDt).CreateCell(2).SetCellValue(dtDetails.Rows[i]["ma_sanpham_khach"].ToString());
