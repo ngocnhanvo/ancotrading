@@ -169,7 +169,7 @@ public class BaoGiaReport
         var config = new ExportExcel(hssfworkbook, 0, 23);
         var ex_fm = new Excel_Format(hssfworkbook);
         var celltext = ex_fm.getcell(10, false, true, "", "L", "T");
-        var cellTextCenter = ex_fm.getcell(10, false, true, "", "C", "T");
+        var cellTextCenterBoderAll = ex_fm.getcell(10, false, true, "LRTB", "C", "T");
 
         config.title = "QUOTATION";
 
@@ -419,7 +419,6 @@ public class BaoGiaReport
             { }
             
             s1.CreateRow(rowDt).CreateCell(0).SetCellValue(dtDetails.Rows[i]["msp"].ToString());
-            s1.GetRow(rowDt).GetCell(0).CellStyle = cellTextCenter;
             s1.GetRow(rowDt).HeightInPoints = 50;
             s1.GetRow(rowDt).CreateCell(1).SetCellValue("");
             s1.GetRow(rowDt).CreateCell(2).SetCellValue(dtDetails.Rows[i]["ma_sanpham_khach"].ToString());
@@ -497,7 +496,9 @@ public class BaoGiaReport
             rowDt++;
             for (int j = 0; j <= 30; j++)
             {
-                if (j.Equals(4) || j.Equals(5) || j.Equals(7) || j.Equals(8) || j.Equals(9) || j.Equals(10) || j.Equals(11) || j.Equals(12) || j.Equals(13) || j.Equals(14) || j.Equals(15) || j.Equals(27))
+                if(j == 0)
+                    s1.GetRow(rowDt).GetCell(j).CellStyle = cellTextCenterBoderAll;
+                else if (new int[] { 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 27}.Contains(j))
                 {
                     s1.GetRow(rowDt).GetCell(j).CellStyle = cellStyleRight;
                 }
