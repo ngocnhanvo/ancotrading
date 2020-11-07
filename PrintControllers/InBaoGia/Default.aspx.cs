@@ -21,6 +21,7 @@ public partial class PrintControllers_InBaoGia_Default : System.Web.UI.Page
 {
     LinqDBDataContext db = new LinqDBDataContext();
     public string type = "", c_baogia_id = "";
+    public List<AvariablePrj.lstImage> lstImage = new List<AvariablePrj.lstImage>();
     protected void Page_Load(object sender, EventArgs e)
     {
         type = Request.QueryString["type"];
@@ -30,30 +31,16 @@ public partial class PrintControllers_InBaoGia_Default : System.Web.UI.Page
             String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "anco_logo_print.png");
             String imgPath = Public.imgProducts;
 
-            c_baogia bg = db.c_baogias.FirstOrDefault(p => p.c_baogia_id.Equals(c_baogia_id));
+            var bg = db.c_baogias.FirstOrDefault(p => p.c_baogia_id.Equals(c_baogia_id));
             HSSFWorkbook wb = null;
-			if(bg != null) 
-			{
-				//if (bg.isform.Value)
-				//{
-				//	BaoGiaMauReport rptBaoGia = new BaoGiaMauReport(c_baogia_id, logoPath, imgPath);
-				//	wb = rptBaoGia.CreateWBQuotation();
-				//	this.SaveFile(wb, "AncoQuotation_R.xls");				
-				//}
-				//else
-				//{
-					var rptBaoGia = new BaoGiaReport(c_baogia_id, logoPath, imgPath);
-                    rptBaoGia.TypeReport = type;
-					wb = rptBaoGia.CreateWBQuotation();
-					this.SaveFile(wb, bg.isform.GetValueOrDefault(false) ? "AncoQuotation_R.xls" : "AncoQuotation.xls");
-				//}
-			}
-			else 
-			{
-				var rptBaoGia = new BaoGiaReport(c_baogia_id, logoPath, imgPath);
-				wb = rptBaoGia.CreateWBQuotation();
-				this.SaveFile(wb, "AncoQuotationQR_R.xls");
-			}
+
+			var rptBaoGia = new BaoGiaReport(c_baogia_id, logoPath, imgPath);
+            rptBaoGia.TypeReport = type;
+            rptBaoGia.LaBaoGiaMau = bg == null ? false : bg.isform.GetValueOrDefault(false);
+            rptBaoGia.LaBaoGiaMauQR = bg == null ? true : false;
+            wb = rptBaoGia.CreateWBQuotation();
+            lstImage = rptBaoGia.Lstimage;
+            this.SaveFile(wb, bg == null ? "AncoQuotationQR_R.xls" : (bg.isform.GetValueOrDefault(false) ? "AncoQuotation_R.xls" : "AncoQuotation.xls"));
         }
         //catch (Exception ex)
         {
@@ -76,7 +63,7 @@ public partial class PrintControllers_InBaoGia_Default : System.Web.UI.Page
 
             var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
 
-            var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, new List<AvariablePrj.lstIamge>(), new List<AvariablePrj.lstText>());
+            var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstImage, new List<AvariablePrj.lstText>());
             File.Delete(url);
 
             Response.Write(result);
@@ -85,6 +72,30 @@ public partial class PrintControllers_InBaoGia_Default : System.Web.UI.Page
         }
         else
         {
+            foreach (var item in lstImage)
+            {
+                var image = System.Drawing.Image.FromFile(item.link);
+
+                MemoryStream ms = new MemoryStream();
+                //pull the memory stream from the image (I need this for the byte array later)
+                image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                image.Dispose();
+                //the drawing patriarch will hold the anchor and the master information
+                IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
+                //store the coordinates of which cell and where in the cell the image goes
+                int intx1 = item.column - 1;
+                int inty1 = item.row;
+                int intx2 = item.column;
+                int inty2 = 1 + item.row;
+
+                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
+                //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
+                anchor.AnchorType = 0;
+                //add the byte array and encode it for the excel file
+                int index = hsswb.AddPicture(ms.ToArray(), PictureType.JPEG);
+                IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+            }
+
             MemoryStream exportData = new MemoryStream();
             hsswb.Write(exportData);
 

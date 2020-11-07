@@ -14,7 +14,15 @@ using System.Data;
 public class BaoGiaReport
 {
     private String c_baogia_id, logoPath, productImagePath, typeReport;
-    private bool? laBaoGiaMau; 
+    private bool? laBaoGiaMau;
+    private bool? laBaoGiaMauQR;
+    private List<AvariablePrj.lstImage> lstimage = new List<AvariablePrj.lstImage>();
+
+    public List<AvariablePrj.lstImage> Lstimage
+    {
+        get { return lstimage; }
+        set { lstimage = value; }
+    }
     public String LogoPath
     {
         get { return logoPath; }
@@ -39,105 +47,135 @@ public class BaoGiaReport
         set { laBaoGiaMau = value; }
     }
 
+    public bool? LaBaoGiaMauQR
+    {
+        get { return laBaoGiaMauQR; }
+        set { laBaoGiaMauQR = value; }
+    }
+
 
     private LinqDBDataContext db = new LinqDBDataContext();
     public HSSFWorkbook CreateWBQuotation()
     {
         //try
         //{
+        string tbl = LaBaoGiaMauQR.GetValueOrDefault(false) ? "c_baogiaqr" : "c_baogia";
+        string tblChild1 = LaBaoGiaMauQR.GetValueOrDefault(false) ? "c_chitietbaogiaqr" : "c_chitietbaogia"; 
         string orderby = UserUtils.get_sapxep_qodetail(null, c_baogia_id, "B.ma_sanpham", "order by B.ma_sanpham asc", db);
 
         String selectDetails = String.Format(@"
-				SELECT *, CASE WHEN  B.sl_inner = '0 0' and B.master like N'%ctn%'
-						THEN round(B.n_w_outer + ((B.l2 + B.w2) * (B.w2 + B.h2))/5400,2)
+			SELECT *, 
+                CASE WHEN  B.sl_inner = '0 0' and B.master like N'%ctn%'
+				THEN round(B.n_w_outer + ((B.l2 + B.w2) * (B.w2 + B.h2))/5400,2)
 
-						WHEN B.sl_inner like N'%ctn%' and B.master like N'%ctn%'
-						THEN round((B.g_w_inner * (B.sl_outer/ B.inner_)) +  (((B.l2 + B.w2) * (B.w2 + B.h2))/5400),2)
+				WHEN B.sl_inner like N'%ctn%' and B.master like N'%ctn%'
+				THEN round((B.g_w_inner * (B.sl_outer/ B.inner_)) +  (((B.l2 + B.w2) * (B.w2 + B.h2))/5400),2)
 
-						WHEN B.sl_inner like N'%ctn%' and B.master like N'%pal%'
-						THEN round(B.g_w_inner * (B.sl_outer/ B.inner_) + 20,2)
+				WHEN B.sl_inner like N'%ctn%' and B.master like N'%pal%'
+				THEN round(B.g_w_inner * (B.sl_outer/ B.inner_) + 20,2)
 
-						WHEN B.sl_inner like N'%ctn%' and B.master like N'%crt%'
-						THEN round(B.g_w_inner * (B.sl_outer/ B.inner_) + 5,2)
+				WHEN B.sl_inner like N'%ctn%' and B.master like N'%crt%'
+				THEN round(B.g_w_inner * (B.sl_outer/ B.inner_) + 5,2)
 
-						WHEN B.sl_inner like N'%bun%' and B.master like N'%crt%'
-						THEN round(B.g_w_inner * (B.sl_outer/ B.inner_) + 5,2)
+				WHEN B.sl_inner like N'%bun%' and B.master like N'%crt%'
+				THEN round(B.g_w_inner * (B.sl_outer/ B.inner_) + 5,2)
 
-						WHEN B.sl_inner like N'%bun%' and B.master like N'%pal%'
-						THEN round(B.g_w_inner * (B.sl_outer/ B.inner_) + 20,2)
+				WHEN B.sl_inner like N'%bun%' and B.master like N'%pal%'
+				THEN round(B.g_w_inner * (B.sl_outer/ B.inner_) + 20,2)
 
-						WHEN B.sl_inner = '0 0' and B.master like N'%pal%'
-						THEN round(B.n_w_outer + 25,2)
+				WHEN B.sl_inner = '0 0' and B.master like N'%pal%'
+				THEN round(B.n_w_outer + 25,2)
 
-						WHEN B.sl_inner = '0 0' and B.master like N'%bun%'
-						THEN round(B.n_w_outer + 0.5,2)
+				WHEN B.sl_inner = '0 0' and B.master like N'%bun%'
+				THEN round(B.n_w_outer + 0.5,2)
 						
-						WHEN B.sl_inner = '0 0' and B.master like N'%crt%'
-						THEN round(B.n_w_outer + 5,2)
+				WHEN B.sl_inner = '0 0' and B.master like N'%crt%'
+				THEN round(B.n_w_outer + 5,2)
 
-						ELSE 0 END as g_w_outer
-				FROM(
-				SELECT *,CASE WHEN  A.sl_inner like N'%ctn%'  
-						THEN round(A.n_w_inner + ((A.l1+A.w1)*(A.w1+A.h1)/5400),2)
-						WHEN A.sl_inner like N'%bun%'  
-						THEN round(A.n_w_inner + 0.5,2)
-						WHEN A.sl_inner like N'%crt%'  
-						THEN round(A.n_w_inner + 3,2)
-						ELSE 0 END as g_w_inner
-				FROM(
-				select 
-	            dtkd.ten_dtkd, dtkd.diachi, dtkd.tel, dtkd.fax, bg.ngaybaogia
-	            , sp.ma_sanpham as msp, (case when  SUBSTRING(sp.ma_sanpham,10,1) != 'F' then SUBSTRING(sp.ma_sanpham,0,9) else SUBSTRING(sp.ma_sanpham,0,12) end) as pic, sp.ma_sanpham, ctbg.ma_sanpham_khach
-	            , (CASE 
-						WHEN kt.ten_kichthuoc = 'inch' then dbo.f_taomotainchQoPo(sp.md_sanpham_id) 
-						ELSE ctbg.mota_tienganh
-					END) as mota_tienganh
-				,  (select dbo.f_convertKgToPounds(sp.trongluong, bg.md_trongluong_id)) as trongluong
-                , sp.dientich
-                ,  tl.ten_trongluong, dg.sl_inner as inner_, dg.sl_outer
-                , (CAST(dg.sl_inner as nvarchar) + ' ' + (select ten_dvt from md_donvitinh dvt where dvt.md_donvitinh_id = dg.dvt_inner)) as sl_inner
-	            , (CAST(dg.sl_outer as nvarchar) + ' ' + (select ten_dvt from md_donvitinh dvt where dvt.md_donvitinh_id = dg.dvt_outer)) as master
-                , dg.ten_donggoi, ctbg.l1, ctbg.w1, ctbg.h1, ctbg.l2, ctbg.w2, ctbg.h2, ctbg.v2, round(ctbg.v2 * 35.31466672, 2)  as cbf
-	            , isnull(dg.soluonggoi_ctn,0) as nopack, isnull(dg.soluonggoi_ctn_20,0) as nopack_20, isnull(dg.soluonggoi_ctn_40hc,0) as nopack_40hc, ctbg.giafob
-	            , sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch
-	            , bg.shipmenttime, bg.shipmenttime + 15 as shipmenttime2, cb.ten_cangbien
-	            , bg.ngayhethan, kt.ten_kichthuoc, bg.moq_item_color, hscode.hscode
-				, dg.sl_inner * (SELECT dbo.f_convertKgToPounds(sp.trongluong, bg.md_trongluong_id))  as n_w_inner
-				, dg.sl_outer * (SELECT dbo.f_convertKgToPounds(sp.trongluong, bg.md_trongluong_id)) as n_w_outer
-                , hscode.thanhphan
-            from 
+				ELSE 0 END as g_w_outer
+			FROM (
+				SELECT *,
+                    CASE WHEN  A.sl_inner like N'%ctn%'  
+					THEN round(A.n_w_inner + ((A.l1+A.w1)*(A.w1+A.h1)/5400),2)
+					WHEN A.sl_inner like N'%bun%'  
+					THEN round(A.n_w_inner + 0.5,2)
+					WHEN A.sl_inner like N'%crt%'  
+					THEN round(A.n_w_inner + 3,2)
+					ELSE 0 END as g_w_inner
+				FROM (
+				    select 
+	                    dtkd.ten_dtkd, dtkd.diachi, dtkd.tel, dtkd.fax, bg.ngaybaogia
+	                    , sp.ma_sanpham as msp
+                        , (case when  SUBSTRING(sp.ma_sanpham,10,1) != 'F' then SUBSTRING(sp.ma_sanpham,0,9) else SUBSTRING(sp.ma_sanpham,0,12) end) as pic
+                        , sp.ma_sanpham
+                        , ctbg.ma_sanpham_khach
+	                    , (CASE 
+						        WHEN kt.ten_kichthuoc = 'inch' then dbo.f_taomotainchQoPo(sp.md_sanpham_id) 
+						        ELSE ctbg.mota_tienganh
+					        END) as mota_tienganh
+				        , (select dbo.f_convertKgToPounds(sp.trongluong, bg.md_trongluong_id)) as trongluong
+                        , sp.dientich
+                        , tl.ten_trongluong, dg.sl_inner as inner_, dg.sl_outer
+                        , (CAST(dg.sl_inner as nvarchar) + ' ' + (select ten_dvt from md_donvitinh dvt where dvt.md_donvitinh_id = dg.dvt_inner)) as sl_inner
+	                    , (CAST(dg.sl_outer as nvarchar) + ' ' + (select ten_dvt from md_donvitinh dvt where dvt.md_donvitinh_id = dg.dvt_outer)) as master
+                        , dg.ten_donggoi, ctbg.l1, ctbg.w1, ctbg.h1, ctbg.l2, ctbg.w2, ctbg.h2, ctbg.v2, round(ctbg.v2 * 35.31466672, 2)  as cbf
+	                    , isnull(dg.soluonggoi_ctn,0) as nopack, isnull(dg.soluonggoi_ctn_20,0) as nopack_20, isnull(dg.soluonggoi_ctn_40hc,0) as nopack_40hc, ctbg.giafob
+	                    , sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch
+	                    , bg.shipmenttime, bg.shipmenttime + 15 as shipmenttime2, cb.ten_cangbien
+	                    , bg.ngayhethan, kt.ten_kichthuoc, bg.moq_item_color, hscode.hscode
+				        , dg.sl_inner * (SELECT dbo.f_convertKgToPounds(sp.trongluong, bg.md_trongluong_id))  as n_w_inner
+				        , dg.sl_outer * (SELECT dbo.f_convertKgToPounds(sp.trongluong, bg.md_trongluong_id)) as n_w_outer
+                        , hscode.thanhphan
+                    from 
+	                    {2} bg
+				        left join {3} ctbg ON bg.{2}_id = ctbg.{2}_id
+	                    left join md_doitackinhdoanh dtkd ON bg.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
+				        left join md_sanpham sp ON ctbg.md_sanpham_id = sp.md_sanpham_id
+				        left join md_hscode hscode ON sp.md_hscode_id = hscode.md_hscode_id
+	                    left join md_donggoi dg ON ctbg.md_donggoi_id = dg.md_donggoi_id
+	                    left join md_cangbien cb ON sp.md_cangbien_id = cb.md_cangbien_id
+                        left join md_kichthuoc kt ON bg.md_kichthuoc_id = kt.md_kichthuoc_id
+                        left join md_trongluong tl ON bg.md_trongluong_id = tl.md_trongluong_id
+                    where bg.{2}_id = N'{0}'
+                )A
+            )B {1}
+            "
+            , c_baogia_id == null ? "" : c_baogia_id
+            , orderby
+            , tbl
+            , tblChild1
+        );
+
+
+        String selectRefereces = String.Format(@"
+            SELECT 
+	            (select SUBSTRING(filter, 1, 2) + '-' + ta_ngan as ta_ngan from md_chungloai cl where cl.code_cl = SUBSTRING(filter, 1, 2)) as ta_ngan, 
+                SUBSTRING(filter, 1, 2) as chungloai, 
+                SUBSTRING(filter, 4, len(filter)) as codemau, 
+                mau, 
+                url
+            FROM 
 	            c_baogia bg
-				left join c_chitietbaogia ctbg ON bg.c_baogia_id = ctbg.c_baogia_id
-	            left join md_doitackinhdoanh dtkd ON bg.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
-				left join md_sanpham sp ON ctbg.md_sanpham_id = sp.md_sanpham_id
-				left join md_hscode hscode ON sp.md_hscode_id = hscode.md_hscode_id
-	            left join md_donggoi dg ON ctbg.md_donggoi_id = dg.md_donggoi_id
-	            left join md_cangbien cb ON sp.md_cangbien_id = cb.md_cangbien_id
-                left join md_kichthuoc kt ON bg.md_kichthuoc_id = kt.md_kichthuoc_id
-                left join md_trongluong tl ON bg.md_trongluong_id = tl.md_trongluong_id
-            where bg.c_baogia_id = N'{0}')A)B {1}", c_baogia_id == null ? "" : c_baogia_id, orderby);
+				inner join md_color_reference color on bg.c_baogia_id = color.c_baogia_id
+            WHERE
+                color.hoatdong = 1
+                AND bg.c_baogia_id = N'{0}'
+            order by url
+        ", c_baogia_id == null ? "" : c_baogia_id);
 
-
-        String selectRefereces = String.Format(@"SELECT 
-	                                                  (select SUBSTRING(filter, 1, 2) + '-' + ta_ngan as ta_ngan from md_chungloai cl where cl.code_cl = SUBSTRING(filter, 1, 2)) as ta_ngan, SUBSTRING(filter, 1, 2) as chungloai, SUBSTRING(filter, 4, 2) as codemau, mau , url
-                                                   FROM 
-	                                                   c_baogia bg
-														inner join md_color_reference color on bg.c_baogia_id = color.c_baogia_id
-                                                   WHERE
-                                                       color.hoatdong = 1
-                                                       AND bg.c_baogia_id = N'{0}'", c_baogia_id == null ? "" : c_baogia_id);
-
-        String selectDistinct = String.Format(@"SELECT distinct chungloai, ta_ngan
-                                                    FROM(
-                                                        SELECT 
-	                                                        (select ta_ngan from md_chungloai cl where cl.code_cl = SUBSTRING(filter, 1, 2)) as ta_ngan, SUBSTRING(filter, 1, 2) as chungloai, SUBSTRING(filter, 4, 2) as codemau, mau , url
-                                                        FROM 
-	                                                        c_baogia bg
-															inner join md_color_reference color on bg.c_baogia_id = color.c_baogia_id
-                                                        WHERE
-															color.hoatdong = 1
-                                                            AND bg.c_baogia_id = N'{0}'
-                                                    ) as tmp", c_baogia_id == null ? "" : c_baogia_id);
+        String selectDistinct = String.Format(@"
+            SELECT distinct 
+                chungloai, ta_ngan
+            FROM (
+                SELECT 
+	                (select ta_ngan from md_chungloai cl where cl.code_cl = SUBSTRING(filter, 1, 2)) as ta_ngan, SUBSTRING(filter, 1, 2) as chungloai, SUBSTRING(filter, 4, 2) as codemau, mau , url
+                FROM 
+	                c_baogia bg
+					inner join md_color_reference color on bg.c_baogia_id = color.c_baogia_id
+                WHERE
+					color.hoatdong = 1
+                    AND bg.c_baogia_id = N'{0}'
+            ) as tmp", c_baogia_id == null ? "" : c_baogia_id);
 
         DataTable dtDetails = mdbc.GetData(selectDetails);
         DataTable dtDistinct = mdbc.GetData(selectDistinct);
@@ -150,6 +188,7 @@ public class BaoGiaReport
         else
         {
             throw new Exception("Báo giá không có dữ liệu!");
+            //throw new Exception(selectDetails);
         }
         //}
         //catch (Exception ex)
@@ -394,29 +433,37 @@ public class BaoGiaReport
         cellNumBorderKT.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
         cellNumBorderKT.BorderBottom = cellNumBorderKT.BorderRight = cellNumBorderKT.BorderLeft = cellNumBorderKT.BorderTop = BorderStyle.Thin;
         //SO
-
+        
         int detailsCount = dtDetails.Rows.Count;
         var rowDt = row;
         for (int i = 0; i < detailsCount; i++)
         {
             rowDt++;
-
-            try
+            var imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImageProduct(dtDetails.Rows[i]["msp"].ToString()));
+            //var image = System.Drawing.Image.FromFile(imgPath);
+            lstimage.Add(new AvariablePrj.lstImage()
             {
-                String imgPath = System.IO.Path.Combine(productImagePath, dtDetails.Rows[i]["pic"].ToString() + ".jpg");
-                System.Drawing.Image image = System.Drawing.Image.FromFile(imgPath);
-                MemoryStream ms = new MemoryStream();
-                image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                row = rowDt,
+                column = 2,
+                link = imgPath
+            });
 
-                IDrawing patriarch = s1.CreateDrawingPatriarch();
-                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, 1, rowDt, 2, rowDt + 1);
-                anchor.AnchorType = 2;
+            //try
+            //{
+            //    String imgPath = System.IO.Path.Combine(productImagePath, dtDetails.Rows[i]["pic"].ToString() + ".jpg");
+            //    System.Drawing.Image image = System.Drawing.Image.FromFile(imgPath);
+            //    MemoryStream ms = new MemoryStream();
+            //    image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
-                IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
-            }
-            catch
-            { }
+            //    IDrawing patriarch = s1.CreateDrawingPatriarch();
+            //    HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, 1, rowDt, 2, rowDt + 1);
+            //    anchor.AnchorType = 2;
+
+            //    int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
+            //    IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+            //}
+            //catch
+            //{ }
             
             s1.CreateRow(rowDt).CreateCell(0).SetCellValue(dtDetails.Rows[i]["msp"].ToString());
             s1.GetRow(rowDt).HeightInPoints = 50;

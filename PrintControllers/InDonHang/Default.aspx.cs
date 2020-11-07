@@ -18,7 +18,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
     decimal discountPO = 0;
     string type = "excel";
     string c_donhang_id = "";
-    List<AvariablePrj.lstIamge> lstimage = new List<AvariablePrj.lstIamge>();
+    List<AvariablePrj.lstImage> lstimage = new List<AvariablePrj.lstImage>();
     List<AvariablePrj.lstText> lstText = new List<AvariablePrj.lstText>();
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -825,7 +825,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 string anhhienthi = ExcuteSignalRStatic.getImageProduct(msp);
                 imagesPath = Path.Combine(imagesPath, anhhienthi);
 
-                lstimage.Add(new AvariablePrj.lstIamge {
+                lstimage.Add(new AvariablePrj.lstImage
+                {
                     row = row,
                     column = 3,
                     link = imagesPath

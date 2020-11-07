@@ -15,10 +15,10 @@ public class DanhSachDatHangReport
 {
     LinqDBDataContext db = new LinqDBDataContext();
     private String c_danhsachdathang_id, logoPath, productImagePath, type;
-    private List<AvariablePrj.lstIamge> lstimage = new List<AvariablePrj.lstIamge>();
+    private List<AvariablePrj.lstImage> lstimage = new List<AvariablePrj.lstImage>();
     private List<AvariablePrj.lstText> lstText = new List<AvariablePrj.lstText>();
 
-    public List<AvariablePrj.lstIamge> Lstimage
+    public List<AvariablePrj.lstImage> Lstimage
     {
         get { return lstimage; }
         set { lstimage = value; }
@@ -530,7 +530,7 @@ public class DanhSachDatHangReport
             {
                 var imgPath = System.IO.Path.Combine(productImagePath, dt.Rows[i]["pic"].ToString() + ".jpg");
                 var image = System.Drawing.Image.FromFile(imgPath);
-                lstimage.Add(new AvariablePrj.lstIamge() {
+                lstimage.Add(new AvariablePrj.lstImage() {
                     row = row,
                     column = 3,
                     link = imgPath,
