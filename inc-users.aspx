@@ -10,7 +10,6 @@
             SortName="manv" 
             UrlFileAction="Controllers/UserController.ashx" 
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 65);"
-            ColNames="['Mã Nhân Viên', 'Mật Khẩu', 'Vai Trò', 'Họ Tên', 'Email', 'Email Password', 'Email CC', 'Điện Thoại', 'Địa Chỉ', 'Admin', 'Remote', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
             RowNumbers="true"
             FilterToolbar="true"
             OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid,{ 
@@ -23,6 +22,7 @@
             ColModel = "[
             {
                 fixed: true, name: 'manv'
+                , label: 'Mã Nhân Viên'
                 , index: 'manv'
                 , width: 100 
                 , editable:true
@@ -32,6 +32,7 @@
             },
             {
                 fixed: true, name: 'matkhau'
+                , label: 'Mật Khẩu'
                 , index: 'matkhau'
                 , width: 100 
                 , editable:true
@@ -41,6 +42,7 @@
             },
             {
                 fixed: true, name: 'tenvt'
+                , label: 'Vai Trò'
                 , index: 'tenvt'
                 , width: 100 
                 , editable:true
@@ -49,6 +51,7 @@
             },
             {
                 fixed: true, name: 'hoten'
+                , label: 'Họ Tên'
                 , index: 'hoten'
                 , width: 100 
                 , editable:true
@@ -56,6 +59,7 @@
             },
             {
                 fixed: true, name: 'email'
+                , label: 'Email'
                 , index: 'email'
                 , width: 100 
                 , editable:true
@@ -64,6 +68,7 @@
             },
             {
                 fixed: true, name: 'email_pass'
+                , label: 'Email Password'
                 , index: 'email_pass'
                 , width: 100 
                 , editable: true
@@ -73,6 +78,7 @@
             },
             {
                 fixed: true, name: 'email_cc'
+                , label: 'Email CC'
                 , index: 'email_cc'
                 , width: 100 
                 , editable:true
@@ -81,6 +87,7 @@
             },
             {
                 fixed: true, name: 'dienthoai'
+                , label: 'Điện Thoại'
                 , index: 'dienthoai'
                 , width: 100 
                 , editable:true
@@ -88,6 +95,7 @@
             },
             {
                 fixed: true, name: 'diachi'
+                , label: 'Địa Chỉ'
                 , index: 'diachi'
                 , width: 100 
                 , editable:true
@@ -95,6 +103,7 @@
             },
             {
                 fixed: true, name: 'isadmin'
+                , label: 'Admin'
                 , index: 'isadmin'
                 , width: 100
                 , editable:true
@@ -105,6 +114,7 @@
             },
 			{
                 fixed: true, name: 'remote'
+                , label: 'Remote'
                 , index: 'remote'
                 , width: 100
                 , editable:true
@@ -114,7 +124,17 @@
                 , formatter: 'checkbox'
             },
             {
+                fixed: true, name: 'otp'
+                , label: 'OTP'
+                , index: 'otp'
+                , width: 100
+                , editable:false
+                , edittype: 'text'
+                , hidden: false
+            },
+            {
                 fixed: true, name: 'ngaytao'
+                , label: 'Ngày Tạo'
                 , index: 'ngaytao'
                 , width: 100
                 , editable:false
@@ -123,6 +143,7 @@
             },
             {
                 fixed: true, name: 'nguoitao'
+                , label: 'Người Tạo'
                 , index: 'nguoitao'
                 , width: 100
                 , editable:false
@@ -131,6 +152,7 @@
             },
             {
                 fixed: true, name: 'ngaycapnhat'
+                , label: 'Ngày Cập Nhật'
                 , index: 'ngaycapnhat'
                 , width: 100
                 , editable:false
@@ -139,6 +161,7 @@
             },
             {
                 fixed: true, name: 'nguoicapnhat'
+                , label: 'Người Cập Nhật'
                 , index: 'nguoicapnhat'
                 , width: 100
                 , editable:false
@@ -147,6 +170,7 @@
             },
             {
                 fixed: true, name: 'mota'
+                , label: 'Mô tả'
                 , index: 'mota'
                 , width: 100
                 , editable:true
@@ -154,6 +178,7 @@
             },
             {
                 fixed: true, name: 'hoatdong'
+                , label: 'Hoạt động'
                 , index: 'hoatdong'
                 , width: 100
                 , editable:true
