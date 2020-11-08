@@ -528,7 +528,7 @@ public class DanhSachDatHangReport
             row_t.CreateCell(2);
             try
             {
-                var imgPath = System.IO.Path.Combine(productImagePath, dt.Rows[i]["pic"].ToString() + ".jpg");
+                var imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImageProduct(dt.Rows[i]["maSo"].ToString()));
                 lstimage.Add(new AvariablePrj.lstImage() {
                     row = row,
                     column = 3,

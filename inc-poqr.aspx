@@ -52,41 +52,61 @@
 
         $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
         $('#' + name).dialog({
-			width: 500,
             modal: true
             , open: function(event, ui) {
                 //hide close button.
                 $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
             }
             , buttons: [
-            {
-                id: "btn-print-ok",
-                text: "In",
-                click: function() {
-                    var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-po').val();
-                    var printURL = "PrintControllers/";
-                    var windowSize = "width=700,height=700,scrollbars=yes";
-					if (typeof printType != 'undefined') {
-                        if (printType == 'printPoDetails') {
-                            if (poId != null) {
-                                printURL += "InDonHang/DonHangQR.aspx";
-                                window.open(printURL + "?c_donhangqr_id=" + poId, "In Chiết Xuất Đơn Hàng", windowSize);
-                            } else {
-                                alert('Bạn chưa chọn đơn hàng cần in.!');
+                 {
+                     id: "btn-print-ok",
+                     text: "Xem",
+                     click: function () {
+                         var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-po').val();
+                         var printURL = "PrintControllers/";
+                         let windowSize = "top=0, left=0, width=" + window.outerWidth + ", height=" + window.outerHeight;
+                         if (typeof printType != 'undefined') {
+                             if (printType == 'printPoDetails') {
+                                 if (poId != null) {
+                                     printURL += "InDonHang/";
+                                     window.open(printURL + "?c_donhang_id=" + poId + "&type=pdf", "Xem Đơn Hàng", windowSize);
+                                 } else {
+                                     alert('Bạn chưa chọn đơn hàng cần in.!');
+                                 }
+                             }
+                         } else {
+                             alert('Hãy chọn cách in.!');
+                         }
+                     }
+                 },
+                {
+                    id: "btn-print-ok",
+                    text: "In",
+                    click: function() {
+                        var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-po').val();
+                        var printURL = "PrintControllers/";
+                        var windowSize = "width=700,height=700,scrollbars=yes";
+					    if (typeof printType != 'undefined') {
+                            if (printType == 'printPoDetails') {
+                                if (poId != null) {
+                                    printURL += "InDonHang/";
+                                    window.open(printURL + "?c_donhang_id=" + poId, "In Chiết Xuất Đơn Hàng", windowSize);
+                                } else {
+                                    alert('Bạn chưa chọn đơn hàng cần in.!');
+                                }
                             }
+                        } else {
+                            alert('Hãy chọn cách in.!');
                         }
-                    } else {
-                        alert('Hãy chọn cách in.!');
+                    }
+                },
+                {
+                    id: "btn-print-close",
+                    text: "Thoát",
+                    click: function() {
+                        $(this).dialog("destroy").remove();
                     }
                 }
-            }
-            , {
-                id: "btn-print-close",
-                text: "Thoát",
-                click: function() {
-                    $(this).dialog("destroy").remove();
-                }
-            }
             ]
         });
     }

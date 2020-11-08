@@ -947,6 +947,7 @@
                 , editable: xemgiaDSDH == 'True'
 				, hidden: xemgiaDSDH == 'False'
                 , editrules: { required:true, number: true, minValue:1 }
+                , editoptions: {disabled: true}
                 , align:'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
@@ -960,6 +961,7 @@
                 , editable: xemgiaDSDH == 'True'
 				, hidden: xemgiaDSDH == 'False'
                 , editrules: { required:true, number: true, minValue:1 }
+                , editoptions: {disabled: true}
                 , align:'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
@@ -973,6 +975,7 @@
                 , editable: xemgiaDSDH == 'True'
 				, hidden: xemgiaDSDH == 'False'
                 , editrules: { required:true, number: true, minValue:1 }
+                , editoptions: {disabled: true}
                 , align:'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}

@@ -8,14 +8,15 @@ using System.Data.Linq;
 
 
 
-public partial class TestLinq : System.Web.UI.Page
+public partial class UpdateLinq : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        //String tien = Currency.VndToString("9999999999");
-        //Context.Response.Write(tien);
         
-        md_dongtien dt = ImportUtils.getDongTien("VaD");
-        Response.Write(dt == null);
+    }
+
+    protected void updateLinq_Click(object sender, EventArgs e)
+    {
+        ADmin_UpdateLinq.Exec_UpdateLinq(Context);
     }
 }

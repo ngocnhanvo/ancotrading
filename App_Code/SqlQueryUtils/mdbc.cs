@@ -19,7 +19,8 @@ public static class mdbc
     {
         get
         {
-            String str = WebConfigurationManager.ConnectionStrings["anco_test_importConnectionString"].ConnectionString;
+            var info = new InfomationDB();
+            String str = info.ConnectionString;
             SqlConnection cnn  = new SqlConnection(str);
             return cnn;
         }

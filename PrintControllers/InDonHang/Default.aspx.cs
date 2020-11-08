@@ -20,6 +20,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
     string c_donhang_id = "";
     List<AvariablePrj.lstImage> lstimage = new List<AvariablePrj.lstImage>();
     List<AvariablePrj.lstText> lstText = new List<AvariablePrj.lstText>();
+    bool poQR = false;
+    string tbl = "c_donhang", tblChild = "c_dongdonhang";
     protected void Page_Load(object sender, EventArgs e)
     {
         //try
@@ -27,6 +29,23 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         c_donhang_id = Request.QueryString["c_donhang_id"];
         type = Request.QueryString["type"];
         var dh = db.c_donhangs.Where(s => s.c_donhang_id == c_donhang_id).FirstOrDefault();
+        if(dh == null)
+        {
+            tbl += "qr";
+            tblChild += "qr";
+            var dhqr = db.c_donhangqrs.Where(s => s.c_donhangqr_id == c_donhang_id).FirstOrDefault();
+            dh = new c_donhang();
+            dh.c_donhang_id = dhqr.c_donhangqr_id;
+            dh.discount_hehang = dhqr.discount_hehang;
+            dh.discount = dhqr.discount;
+            dh.phanbodiscount = false;
+            dh.discount_hehang_value = dhqr.discount_hehang_value;
+            dh.cont20 = dhqr.cont20;
+            dh.cont40 = dhqr.cont40;
+            dh.cont40hc = dhqr.cont40hc;
+            dh.cont45 = dhqr.cont45;
+            dh.contle = dhqr.contle;
+        }
         discountPO = dh.discount_hehang.GetValueOrDefault(false) ? 0 : dh.discount.GetValueOrDefault(0);
         dh.discount = dh.phanbodiscount.GetValueOrDefault(false) == true ? 0 : dh.discount;
         dh.discount_hehang = dh.phanbodiscount.GetValueOrDefault(false) == true ? false : dh.discount_hehang;
@@ -64,18 +83,21 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         giam = pGiam == null ? 0 : pGiam.Value;
 
         decimal total = decimal.Parse(
-            mdbc.ExecuteScalar(@"
-                select 
-                    cast(A.amount - (A.amount * @discount / 100) as decimal(18, 2))
-                from (
+            mdbc.ExecuteScalar(
+                string.Format(@"
                     select 
-                        sum(soluong * ((giafob + isnull(phi, 0)) - (giafob + isnull(phi, 0)) * isnull(discount, 0) / 100)) as amount 
-                    from 
-                        c_dongdonhang 
-                    where 
-                        c_donhang_id = @c_donhang_id
-                )A
-                "
+                        cast(A.amount - (A.amount * @discount / 100) as decimal(18, 2))
+                    from (
+                        select 
+                            sum(soluong * ((giafob + isnull(phi, 0)) - (giafob + isnull(phi, 0)) * isnull(discount, 0) / 100)) as amount 
+                        from 
+                            {1} 
+                        where 
+                            {0}_id = @c_donhang_id
+                    )A"
+                    , tbl
+                    , tblChild
+                )
                 , "@c_donhang_id"
                 , c_donhang_id
                 , "@discount"
@@ -218,7 +240,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 					ELSE 0 END as g_w_inner
 				FROM (
                     select 
-						dh.c_donhang_id
+						dh.{9}_id
 						, dh.sochungtu, dh.customer_order_no
 						, dtkd.ten_dtkd
                         , dtkd.diachi
@@ -277,8 +299,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         , tl.ten_trongluong
                         , ddh.barcode
 					from
-						c_donhang dh
-						left join c_dongdonhang ddh on dh.c_donhang_id = ddh.c_donhang_id
+						{9} dh
+						left join {10} ddh on dh.{9}_id = ddh.{9}_id
 						left join md_doitackinhdoanh dtkd on dh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
 						left join md_sanpham sp on ddh.md_sanpham_id = sp.md_sanpham_id
 						left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id
@@ -294,7 +316,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     where 1=1
 				) A
             ) B
-			where B.c_donhang_id = N'{0}' 
+			where B.{9}_id = N'{0}' 
             order by B.ma_sanpham asc"
             , c_donhang_id == null ? "" : c_donhang_id
             , totalWord
@@ -305,6 +327,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , tang
             , giam
             , no_cont
+            , tbl
+            , tblChild
         );
 
         try
@@ -820,16 +844,13 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             //
             try
             {
-                string imagesPath = Path.Combine(Server.MapPath("~"), "");
-                //grab the image file
-                string anhhienthi = ExcuteSignalRStatic.getImageProduct(msp);
-                imagesPath = Path.Combine(imagesPath, anhhienthi);
+                var imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImageProduct(msp));
 
                 lstimage.Add(new AvariablePrj.lstImage
                 {
                     row = row,
                     column = 3,
-                    link = imagesPath
+                    link = imgPath
                 });
             }
             catch { }
