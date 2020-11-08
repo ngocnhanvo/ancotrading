@@ -214,6 +214,7 @@ public class UserController : IHttpHandler {
             xml += "<cell><![CDATA[" + row["diachi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["isadmin"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["remote"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["otp"] + "]]></cell>";
             
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
