@@ -159,14 +159,19 @@ public class DanhSachDatHangController : IHttpHandler
     {
         foreach (var mailObj in lstMail.Where(s => s["ma_dtkd"].ToString() == madtkd))
         {
-            string emailCC = nv.email_cc;
-            if (!string.IsNullOrEmpty(emailCC))
+            string emailCC = nv.email_cc + "," + UserUtils.mailKCS;
+
+            if (string.IsNullOrEmpty(nv.email_cc) & string.IsNullOrEmpty(UserUtils.mailKCS))
             {
-                emailCC = emailCC + "," + UserUtils.mailKCS;
+                emailCC = "";
             }
-            else
+            else if (string.IsNullOrEmpty(nv.email_cc))
             {
                 emailCC = UserUtils.mailKCS;
+            }
+            else if (string.IsNullOrEmpty(UserUtils.mailKCS))
+            {
+                emailCC = nv.email_cc;
             }
 
             var dsdh = mailObj["dsdh"] as c_danhsachdathang;
@@ -348,7 +353,7 @@ public class DanhSachDatHangController : IHttpHandler
                         tieude = tieude.Replace("[SOPO]", dsdh.so_po);
                         var mailObj = new Dictionary<string, object>();
                         mailObj["tieude"] = tieude;
-                        mailObj["noidung"] = "VNN TEST";
+                        mailObj["noidung"] = noidung;
                         mailObj["ma_dtkd"] = dtkd.ma_dtkd;
                         mailObj["email"] = dtkd.email;
                         mailObj["emailkt"] = dtkd.emailkt;
