@@ -25,7 +25,7 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
             lstText = rptDSDH.LstText;
             HSSFWorkbook wb = rptDSDH.CreateWBPI();
 
-            this.SaveFile(wb, "Danh-Sach-Dat-Hang-" + DateTime.Now.ToString() + ".xls");
+            this.SaveFile(wb, "Danh-Sach-Dat-Hang-" + DateTime.Now.ToString() + ".xls", rptDSDH.ConfigExcel);
         }
         catch (Exception ex)
         {
@@ -33,35 +33,12 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
         }
     }
 
-    public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName)
+    public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName, ExportExcel config)
     {
-        var workbook = new Spire.Xls.Workbook();
         if (type != "pdf")
         {
-            foreach (var item in lstimage)
-            {
-                var image = System.Drawing.Image.FromFile(item.link);
 
-                MemoryStream ms = new MemoryStream();
-                //pull the memory stream from the image (I need this for the byte array later)
-                image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                image.Dispose();
-                //the drawing patriarch will hold the anchor and the master information
-                IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
-                //store the coordinates of which cell and where in the cell the image goes
-                int intx1 = item.column - 1;
-                int inty1 = item.row;
-                int intx2 = item.column;
-                int inty2 = 1 + item.row;
-
-                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
-                //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
-                anchor.AnchorType = 0;
-                //add the byte array and encode it for the excel file
-                int index = hsswb.AddPicture(ms.ToArray(), PictureType.JPEG);
-                IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
-            }
-
+            hsswb = config.setImageForExcel(hsswb, lstimage);
             MemoryStream exportData = new MemoryStream();
             hsswb.Write(exportData);
             hsswb.Clear();

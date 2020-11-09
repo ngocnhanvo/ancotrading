@@ -48,6 +48,8 @@ public class DanhSachDatHangReport
         set { type = value; }
     }
 
+    public ExportExcel ConfigExcel { get; set; }
+
     public HSSFWorkbook CreateWBPI()
     {
         String select = String.Format(@"
@@ -156,8 +158,8 @@ public class DanhSachDatHangReport
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
         ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
 		HSSFSheet hssfsheet = (HSSFSheet)s1;
-        var config = new ExportExcel(hssfworkbook, 0, 15);
-        config.endHeader = type == "pdf" ? 16 : 9;
+        ConfigExcel = new ExportExcel(hssfworkbook, 0, 15);
+        ConfigExcel.endHeader = type == "pdf" ? 16 : 9;
         Excel_Format ex_fm = new Excel_Format(hssfworkbook); 
         ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
         ICellStyle cellBold10 = ex_fm.getcell(10, true, true, "", "L", "T");
@@ -216,13 +218,13 @@ public class DanhSachDatHangReport
 		int heigh = 22;
 		int row = 0;
         //set A1 - A4
-        config.LogoRpt = new ExportExcel.Logoreport();
-        config.LogoRpt.cell1 = type == "pdf" ? 4: 3;
-        config.LogoRpt.cell2 = type == "pdf" ? 5 : 3;
-        config.LogoRpt.dx1 = type == "pdf" ? 930 : 270;
-        config.LogoRpt.dx2 = type == "pdf" ? 300 : 500;
-        config.title = "ĐƠN ĐẶT HÀNG";
-        row = config.createHeader(NameHeaderReport.ANCO, s1, row, heigh);
+        ConfigExcel.LogoRpt = new ExportExcel.Logoreport();
+        ConfigExcel.LogoRpt.cell1 = type == "pdf" ? 4: 3;
+        ConfigExcel.LogoRpt.cell2 = type == "pdf" ? 5 : 3;
+        ConfigExcel.LogoRpt.dx1 = type == "pdf" ? 930 : 270;
+        ConfigExcel.LogoRpt.dx2 = type == "pdf" ? 300 : 500;
+        ConfigExcel.title = "ĐƠN ĐẶT HÀNG";
+        row = ConfigExcel.createHeader(NameHeaderReport.ANCO, s1, row, heigh);
 
         s1.CreateRow(row).CreateCell(1).SetCellValue("Số chứng từ:");
         s1.GetRow(row).GetCell(1).CellStyle = celltext10;
@@ -523,7 +525,7 @@ public class DanhSachDatHangReport
             //
 			IRow row_t = s1.CreateRow(row);
             string moTa = dt.Rows[i]["moTa"].ToString();
-            var heighMoTatMAX = config.MeasureTextHeight(moTa, 7000, "Arial", (float)12.25) + 4;
+            var heighMoTatMAX = ConfigExcel.MeasureTextHeight(moTa, 7000, "Arial", (float)12.25) + 4;
             row_t.HeightInPoints = heighMoTatMAX < 70 ? 70 : heighMoTatMAX;
 
             row_t.CreateCell(2);
@@ -795,7 +797,7 @@ public class DanhSachDatHangReport
                 rowLineHDK.CreateCell(2).SetCellValue(arrDDHHs[iHDK]);
                 rowLineHDK.GetCell(2).CellStyle = celltext10Top;
 
-                var heightMAX = config.MeasureTextHeight(arrDDHHs[iHDK], sumWidth2to9, "Arial", (float)10.25);
+                var heightMAX = ConfigExcel.MeasureTextHeight(arrDDHHs[iHDK], sumWidth2to9, "Arial", (float)10.25);
                 rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
                 row++;
             }
@@ -812,7 +814,7 @@ public class DanhSachDatHangReport
             rowLineHDK.CreateCell(2).SetCellValue(huongdanlamhang);
             rowLineHDK.GetCell(2).CellStyle = celltext10Top;
 
-            var heightMAX = config.MeasureTextHeight(huongdanlamhang, sumWidth2to9, "Arial", (float)10.25);
+            var heightMAX = ConfigExcel.MeasureTextHeight(huongdanlamhang, sumWidth2to9, "Arial", (float)10.25);
             rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
             row++;
@@ -838,7 +840,7 @@ public class DanhSachDatHangReport
                 rowLineHDK.CreateCell(2).SetCellValue(arrHDKs[iHDK]);
                 rowLineHDK.GetCell(2).CellStyle = celltext10Top;
 
-                var heightMAX = config.MeasureTextHeight(arrHDKs[iHDK], sumWidth2to9, "Arial", (float)10.25);
+                var heightMAX = ConfigExcel.MeasureTextHeight(arrHDKs[iHDK], sumWidth2to9, "Arial", (float)10.25);
                 rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
                 row++;
             }
@@ -852,7 +854,7 @@ public class DanhSachDatHangReport
             rowLineHDK.CreateCell(2).SetCellValue(huongdanlamhangchung);
             rowLineHDK.GetCell(2).CellStyle = celltext10Top;
 
-            var heightMAX = config.MeasureTextHeight(huongdanlamhangchung, sumWidth2to9, "Arial", (float)10.25);
+            var heightMAX = ConfigExcel.MeasureTextHeight(huongdanlamhangchung, sumWidth2to9, "Arial", (float)10.25);
             rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
             row++;
@@ -910,7 +912,7 @@ public class DanhSachDatHangReport
         cellUn.VerticalAlignment = VerticalAlignment.Top;
         s1.GetRow(2).GetCell(0).CellStyle = cellUn;
 
-        s1 = config.PrintExcel((HSSFSheet)s1, row);
+        s1 = ConfigExcel.PrintExcel((HSSFSheet)s1, row);
         s1.PrintSetup.Landscape = true;
 
         if (type == "pdf")
