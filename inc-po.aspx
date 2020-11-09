@@ -105,7 +105,7 @@
             }
             else {
                 giafob.prop('disabled', true);
-                phifob.prop('disabled', true);
+                phifob.prop('disabled', false);
             }
         }
         docquyen.hide();
