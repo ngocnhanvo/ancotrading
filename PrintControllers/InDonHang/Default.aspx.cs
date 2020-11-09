@@ -937,10 +937,17 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     var range4_10 = new CellRangeAddress(row, row, 4, 10);
                     s1.AddMergedRegion(range1_3);
                     s1.AddMergedRegion(range4_10);
-                    //RegionUtil.SetBorderBottom((int)BorderStyle.Thin, range1_3, s1, hssfworkbook);
-                    //RegionUtil.SetBorderBottom((int)BorderStyle.Thin, range4_10, s1, hssfworkbook);
                     rowToTalHeHang.GetCell(4).CellStyle = leftBold;
-                    string fmlSum = string.Format(@"SUM(M{0}:M{1})", startRowHH + 1, row);
+
+                    string fmlSum = string.Format(@"SUM(I{0}:I{1})", startRowHH + 1, row);
+                    rowToTalHeHang.CreateCell(8).CellFormula = string.Format("{0}", fmlSum, row + 1);
+                    rowToTalHeHang.GetCell(8).CellStyle = rightBold;
+                    
+                    fmlSum = string.Format(@"SUM(L{0}:L{1})", startRowHH + 1, row);
+                    rowToTalHeHang.CreateCell(11).CellFormula = string.Format("{0}", fmlSum, row + 1);
+                    rowToTalHeHang.GetCell(11).CellStyle = rightBold;
+                    
+                    fmlSum = string.Format(@"SUM(M{0}:M{1})", startRowHH + 1, row);
                     rowToTalHeHang.CreateCell(12).CellFormula = string.Format("{0}", fmlSum, row + 1);
                     rowToTalHeHang.GetCell(12).CellStyle = rightBold;
                     row++;
