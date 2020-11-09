@@ -347,8 +347,8 @@ public class DanhSachDatHangController : IHttpHandler
                         tieude = tieude.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
                         tieude = tieude.Replace("[SOPO]", dsdh.so_po);
                         var mailObj = new Dictionary<string, object>();
-                        mailObj["tieude"] = "VNN TEST";
-                        mailObj["noidung"] = noidung;
+                        mailObj["tieude"] = tieude;
+                        mailObj["noidung"] = "VNN TEST";
                         mailObj["ma_dtkd"] = dtkd.ma_dtkd;
                         mailObj["email"] = dtkd.email;
                         mailObj["emailkt"] = dtkd.emailkt;
