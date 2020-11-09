@@ -983,22 +983,29 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         int m = row - count_row;
         int sub = row + 1;
 
-        string sumAmount = "", sumTotalAmount = "";
+        string sumQuantify = "",
+            sumCBM = "",
+            sumAmount = "", 
+            sumTotalAmount = "";
         if (nnl != null)
         {   
             s1.CreateRow(row).CreateCell(4).SetCellValue("Sub Total:");
             s1.GetRow(row).HeightInPoints = height;
             foreach (var i in lstAmountHH)
             {
+                sumQuantify += string.Format("I{0}+", i - 1);
+                sumCBM += string.Format("L{0}+", i - 1);
                 sumAmount += string.Format("M{0}+", i - 1);
                 sumTotalAmount += string.Format("M{0}+", i + 1);
             }
+            sumQuantify += "0";
+            sumCBM += "0";
             sumAmount += "0";
             sumTotalAmount += "0";
 
             s1.GetRow(row).CreateCell(7).CellFormula = string.Format("SUM(H{0}:H{1})", m, row - 3);
-            s1.GetRow(row).CreateCell(8).CellFormula = string.Format("SUM(I{0}:I{1})", m, row - 3);
-            s1.GetRow(row).CreateCell(11).CellFormula = string.Format("SUM(L{0}:L{1})", m, row - 3);
+            s1.GetRow(row).CreateCell(8).CellFormula = string.Format("{0}", sumQuantify);
+            s1.GetRow(row).CreateCell(11).CellFormula = string.Format("{0}", sumCBM);
             s1.GetRow(row).CreateCell(12).CellFormula = string.Format("{0}", sumAmount);
         }
         else
