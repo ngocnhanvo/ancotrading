@@ -2448,7 +2448,6 @@
                  , editoptions: { dataUrl: 'Controllers/PartnerController.ashx?action=getoption&isncc=1&c_donhang_id=' }
                  , search: true
                  , stype: 'select'
-                 , searchoptions:{ sopt:['eq'], dataUrl: 'Controllers/PartnerController.ashx?action=getsearchoption&isncc=1' }
 				 , hidden: true
 			},
 			{
