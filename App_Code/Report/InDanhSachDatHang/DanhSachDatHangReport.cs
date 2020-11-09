@@ -221,7 +221,7 @@ public class DanhSachDatHangReport
         config.LogoRpt.cell2 = type == "pdf" ? 5 : 3;
         config.LogoRpt.dx1 = type == "pdf" ? 930 : 270;
         config.LogoRpt.dx2 = type == "pdf" ? 300 : 500;
-        config.title = "Đơn Đặt Hàng";
+        config.title = "ĐƠN ĐẶT HÀNG";
         row = config.createHeader(NameHeaderReport.ANCO, s1, row, heigh);
 
         s1.CreateRow(row).CreateCell(1).SetCellValue("Số chứng từ:");
