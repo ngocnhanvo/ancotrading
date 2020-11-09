@@ -934,9 +934,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     rowToTalHeHang.HeightInPoints = height;
                     rowToTalHeHang.CreateCell(4).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
                     var range1_3 = new CellRangeAddress(row, row, 1, 3);
-                    var range4_10 = new CellRangeAddress(row, row, 4, 10);
+                    var range4_6 = new CellRangeAddress(row, row, 4, 6);
                     s1.AddMergedRegion(range1_3);
-                    s1.AddMergedRegion(range4_10);
+                    s1.AddMergedRegion(range4_6);
                     rowToTalHeHang.GetCell(4).CellStyle = leftBold;
 
                     string fmlSum = string.Format(@"SUM(I{0}:I{1})", startRowHH + 1, row);
