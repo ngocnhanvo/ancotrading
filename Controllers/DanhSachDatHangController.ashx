@@ -1314,13 +1314,18 @@ public class DanhSachDatHangController : IHttpHandler
         String fileNamePdf = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy")+ guiNCC.ToString() + ".pdf";
         MemoryStream ms = new MemoryStream();
         //-- Tao excel
+        NPOI.HSSF.UserModel.HSSFWorkbook wb = null;
+        DanhSachDatHangReport rptPI = null;
 
         try
         {
-            DanhSachDatHangReport rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
+            rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
             rptPI.guiNCC = guiNCC;
-            NPOI.HSSF.UserModel.HSSFWorkbook wb = rptPI.CreateWBPI();
+            wb = rptPI.CreateWBPI();
+            wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
             wb.Write(ms);
+
+
             fileName = path + fileName;
             File.WriteAllBytes(fileName, ms.ToArray());
             ms.Close();
@@ -1334,106 +1339,108 @@ public class DanhSachDatHangController : IHttpHandler
         //-- Tao PDF
         try
         {
-            rptDanhSachDatHang report = new rptDanhSachDatHang();
-            SqlDataAdapter da = new SqlDataAdapter(getSqlDsdhPdf(dsdh.c_danhsachdathang_id, guiNCC), mdbc.GetConnection);
-            DataSet ds = new DataSet();
-            da.Fill(ds);
-            var tbl = ds.Tables[0];
-            if (tbl.Rows.Count > 0)
-            {
-                string c_danhsachdathang_id = dsdh.c_danhsachdathang_id;
-                tbl.Columns.Add("money", Type.GetType("System.String"));
-                tbl.Columns.Add("mota_cong", Type.GetType("System.String"));
-                tbl.Columns.Add("mota_tru", Type.GetType("System.String"));
-                tbl.Columns.Add("discount", Type.GetType("System.Double"));
-                tbl.Columns.Add("giatritang", Type.GetType("System.Double"));
-                tbl.Columns.Add("giatrigiam", Type.GetType("System.Double"));
-                tbl.Columns.Add("tongtiendatru", Type.GetType("System.Double"));
-                //Header
+            fileNamePdf =  path + fileNamePdf;
+            var result = OfficeToPDF.ExcelConverter.Convert(fileName, fileNamePdf, null, rptPI.Lstimage, rptPI.LstText);
+            //rptDanhSachDatHang report = new rptDanhSachDatHang();
+            //SqlDataAdapter da = new SqlDataAdapter(getSqlDsdhPdf(dsdh.c_danhsachdathang_id, guiNCC), mdbc.GetConnection);
+            //DataSet ds = new DataSet();
+            //da.Fill(ds);
+            //var tbl = ds.Tables[0];
+            //if (tbl.Rows.Count > 0)
+            //{
+            //    string c_danhsachdathang_id = dsdh.c_danhsachdathang_id;
+            //    tbl.Columns.Add("money", Type.GetType("System.String"));
+            //    tbl.Columns.Add("mota_cong", Type.GetType("System.String"));
+            //    tbl.Columns.Add("mota_tru", Type.GetType("System.String"));
+            //    tbl.Columns.Add("discount", Type.GetType("System.Double"));
+            //    tbl.Columns.Add("giatritang", Type.GetType("System.Double"));
+            //    tbl.Columns.Add("giatrigiam", Type.GetType("System.Double"));
+            //    tbl.Columns.Add("tongtiendatru", Type.GetType("System.Double"));
+            //    //Header
 
-                //Footer
-                int lastRow = tbl.Rows.Count - 1;
+            //    //Footer
+            //    int lastRow = tbl.Rows.Count - 1;
 
-                var strSumThanhTien = tbl.Compute("Sum(thanhtien)", string.Empty).ToString();
-                double? total = null;
-                if (!string.IsNullOrEmpty(strSumThanhTien))
-                    total = double.Parse(strSumThanhTien);
+            //    var strSumThanhTien = tbl.Compute("Sum(thanhtien)", string.Empty).ToString();
+            //    double? total = null;
+            //    if (!string.IsNullOrEmpty(strSumThanhTien))
+            //        total = double.Parse(strSumThanhTien);
 
-                var strDiscount = tbl.Rows[0]["discountdecimal"].ToString();
-                double? discount_ = null;
-                if (!string.IsNullOrEmpty(strDiscount))
-                    discount_ = double.Parse(strDiscount);
+            //    var strDiscount = tbl.Rows[0]["discountdecimal"].ToString();
+            //    double? discount_ = null;
+            //    if (!string.IsNullOrEmpty(strDiscount))
+            //        discount_ = double.Parse(strDiscount);
 
-                var totalDiscount = total.GetValueOrDefault(0) * discount_.GetValueOrDefault(0) / 100;
-                tbl.Rows[lastRow]["discount"] = totalDiscount;
+            //    var totalDiscount = total.GetValueOrDefault(0) * discount_.GetValueOrDefault(0) / 100;
+            //    tbl.Rows[lastRow]["discount"] = totalDiscount;
 
-                var phitang = (from t in db.c_phidathangs where t.isphicong.Equals(true) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
-                tbl.Rows[lastRow]["giatritang"] = phitang.GetValueOrDefault(0);
+            //    var phitang = (from t in db.c_phidathangs where t.isphicong.Equals(true) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
+            //    tbl.Rows[lastRow]["giatritang"] = phitang.GetValueOrDefault(0);
 
-                var phigiam = (from t in db.c_phidathangs where t.isphicong.Equals(false) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
-                tbl.Rows[lastRow]["giatrigiam"] = phigiam.GetValueOrDefault(0);
+            //    var phigiam = (from t in db.c_phidathangs where t.isphicong.Equals(false) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
+            //    tbl.Rows[lastRow]["giatrigiam"] = phigiam.GetValueOrDefault(0);
 
-                var varTang = db.c_phidathangs.FirstOrDefault(tg => tg.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && tg.isphicong.Equals(true));
-                var varGiam = db.c_phidathangs.FirstOrDefault(gi => gi.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && gi.isphicong.Equals(false));
+            //    var varTang = db.c_phidathangs.FirstOrDefault(tg => tg.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && tg.isphicong.Equals(true));
+            //    var varGiam = db.c_phidathangs.FirstOrDefault(gi => gi.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && gi.isphicong.Equals(false));
 
-                string dgTang, dgGiam;
-                dgTang = varTang == null ? "" : varTang.mota;
-                dgGiam = varGiam == null ? "" : varGiam.mota;
+            //    string dgTang, dgGiam;
+            //    dgTang = varTang == null ? "" : varTang.mota;
+            //    dgGiam = varGiam == null ? "" : varGiam.mota;
 
-                double? totalUSD = null;
-                string textMoney = "";
-                if (guiNCC == false)
-                {
-                    totalUSD = total - (double)totalDiscount + (double)phitang.GetValueOrDefault(0) - (double)phigiam.GetValueOrDefault(0);
-                    if (totalUSD != null)
-                    {
-                        if (new string[] { "VINHGIA" }.Contains(ma_dtkd))
-                        {
-                            string m = MoneyToWord.ConvertMoneyToText(totalUSD.ToString()).Replace("Dollars", "");
-                            int j = m.LastIndexOf("and");
+            //    double? totalUSD = null;
+            //    string textMoney = "";
+            //    if (guiNCC == false)
+            //    {
+            //        totalUSD = total - (double)totalDiscount + (double)phitang.GetValueOrDefault(0) - (double)phigiam.GetValueOrDefault(0);
+            //        if (totalUSD != null)
+            //        {
+            //            if (new string[] { "VINHGIA" }.Contains(ma_dtkd))
+            //            {
+            //                string m = MoneyToWord.ConvertMoneyToText(totalUSD.ToString()).Replace("Dollars", "");
+            //                int j = m.LastIndexOf("and");
 
-                            if (m.Contains("Cents") | m.Contains("Cent"))
-                            {
-                                m = m.Replace("Cents", "").Replace("Cent", "");
-                                m = m.Insert(m.Length, "cents");
-                            }
-                            else
-                            {
-                                m = m.Replace("Cents", "").Replace("Cent", "");
-                            }
-                            textMoney = m;
-                        }
-                        else
-                        {
-                            textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)totalUSD.GetValueOrDefault(0));
-                        }
-                        tbl.Rows[lastRow]["money"] = textMoney;
-                        tbl.Rows[lastRow]["tongtiendatru"] = totalUSD;
-                    }
-                }
+            //                if (m.Contains("Cents") | m.Contains("Cent"))
+            //                {
+            //                    m = m.Replace("Cents", "").Replace("Cent", "");
+            //                    m = m.Insert(m.Length, "cents");
+            //                }
+            //                else
+            //                {
+            //                    m = m.Replace("Cents", "").Replace("Cent", "");
+            //                }
+            //                textMoney = m;
+            //            }
+            //            else
+            //            {
+            //                textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)totalUSD.GetValueOrDefault(0));
+            //            }
+            //            tbl.Rows[lastRow]["money"] = textMoney;
+            //            tbl.Rows[lastRow]["tongtiendatru"] = totalUSD;
+            //        }
+            //    }
 
-                string diengiai_cong = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 1 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
-                DataTable cong_ = mdbc.GetData(diengiai_cong);
-                var mota_cong = new List<string>();
-                for (int i_ = 0; i_ < cong_.Rows.Count; i_++)
-                {
-                    mota_cong.Add(cong_.Rows[i_]["mota"].ToString());
-                }
+            //    string diengiai_cong = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 1 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
+            //    DataTable cong_ = mdbc.GetData(diengiai_cong);
+            //    var mota_cong = new List<string>();
+            //    for (int i_ = 0; i_ < cong_.Rows.Count; i_++)
+            //    {
+            //        mota_cong.Add(cong_.Rows[i_]["mota"].ToString());
+            //    }
 
-                string diengiai_tru = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 0 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
-                DataTable tru_ = mdbc.GetData(diengiai_tru);
-                var mota_tru = new List<string>();
-                for (int i_ = 0; i_ < tru_.Rows.Count; i_++)
-                {
-                    mota_tru.Add(tru_.Rows[i_]["mota"].ToString());
-                }
-                tbl.Rows[lastRow]["mota_cong"] = string.Join(",", mota_cong);
-                tbl.Rows[lastRow]["mota_tru"] = string.Join(",", mota_tru);
-            }
-            report.DataSource = ds;
-            report.DataAdapter = da;
-            fileNamePdf = path + fileNamePdf;
-            report.ExportToPdf(fileNamePdf);
+            //    string diengiai_tru = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 0 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
+            //    DataTable tru_ = mdbc.GetData(diengiai_tru);
+            //    var mota_tru = new List<string>();
+            //    for (int i_ = 0; i_ < tru_.Rows.Count; i_++)
+            //    {
+            //        mota_tru.Add(tru_.Rows[i_]["mota"].ToString());
+            //    }
+            //    tbl.Rows[lastRow]["mota_cong"] = string.Join(",", mota_cong);
+            //    tbl.Rows[lastRow]["mota_tru"] = string.Join(",", mota_tru);
+            //}
+            //report.DataSource = ds;
+            //report.DataAdapter = da;
+            //fileNamePdf = path + fileNamePdf;
+            //report.ExportToPdf(fileNamePdf);
         }
         catch (Exception ex)
         {
