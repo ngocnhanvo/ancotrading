@@ -21,6 +21,7 @@ using NPOI.HSSF.Record.Aggregates;
 using NPOI.HSSF.Record.AutoFilter;
 using System.Drawing;
 using GemBox.Spreadsheet;
+using Newtonsoft.Json;
 
 /// <summary>
 /// Xuat Excel voi Npoi
@@ -33,7 +34,8 @@ public class ExportExcel
     public int? endHeader = null;
     public string title = "";
     private String fmt0 = "#,##0", fmt0i0 = "#,##0.0", fmt0i00 = "#,##0.00", fmt0i000 = "#,##0.000";
-    public Logoreport LogoRpt { get; set; } 
+    public Logoreport LogoRpt { get; set; }
+    public string NameTypePrint { get; set; }
     public partial class Logoreport
     {
         public string link { get; set; }
@@ -372,6 +374,50 @@ public class ExportExcel
             IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
         }
         return hsswb;
+    }
+
+    public string laySoThapPhanChoRpt(string ma_dtkd, string typeSTP)
+    {
+        var jsonStr = File.ReadAllText(ExcuteSignalRStatic.mapPathSignalR("~/App_Data/JSON/cauHinhSoThapPhan.json"));
+        HttpContext.Current.Response.Write(jsonStr + "\n");
+        var jsons = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonStr);
+        var kq = "";
+        var json = jsons.Where(s => s["name"].ToString() == NameTypePrint).FirstOrDefault();
+        if (json != null)
+        {
+            if (NameTypePrint == "InPO")
+            {
+               
+                var jsonSTPs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json["soThapPhan"].ToString());
+                if (jsonSTPs.Count > 0)
+                {
+                    var jsonSTP = jsonSTPs[0];
+                    kq = jsonSTP[typeSTP].ToString();
+                }
+            }
+            else if (NameTypePrint == "InPI")
+            {
+                var jsonSTPs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json["soThapPhan"].ToString());
+                if (jsonSTPs.Count > 0)
+                {
+                    var jsonSTP = jsonSTPs[0];
+                    var jsonStpDTKDs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonSTP["dtkd"].ToString());
+                    var stpDTKD = jsonStpDTKDs.Where(s => s["name"].ToString() == ma_dtkd).FirstOrDefault();
+                    if (stpDTKD == null)
+                    {
+                        kq = jsonSTP[typeSTP].ToString();
+                    }
+                    else
+                    {
+                        if(stpDTKD.Keys.Contains(typeSTP))
+                            kq = stpDTKD[typeSTP].ToString();
+                        else
+                            kq = jsonSTP[typeSTP].ToString();
+                    }
+                }
+            }
+        }
+        return kq;
     }
 }
 
