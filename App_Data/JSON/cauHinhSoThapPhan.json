@@ -1,0 +1,55 @@
+﻿[
+	{
+    "name": "InPO",
+    "text": "Cấu hình số thập phân khi in Đơn hàng",
+    "soThapPhan": [
+      {
+        "soluong": "#,#",
+        "cbm": "#,#0.000",
+        "fob": "#,#0.00",
+        "amount": "#,#0.00",
+        "discount": "#,#0.0000"
+      }
+    ]
+	},
+	{
+    "name": "InPI",
+    "text": "Cấu hình số thập phân khi in Đơn đặt hàng",
+    "soThapPhan": [
+      {
+        "soluong": "#,#",
+        "cbm": "#,#0.00",
+        "fob": "#,#0.00",
+        "amount": "#,#0.00",
+        "discount": "#,#0.0000",
+        "dtkd": [
+          {
+            "name": "VINHGIA",
+            "discount": "#,#0.0000",
+            "amount": "#,#0.00"
+          },
+          {
+            "name": "ANCO1",
+            "discount": "#,#0.00",
+            "amount": "#,#"
+          },
+          {
+            "name": "ANCO2",
+            "discount": "#,#0.00",
+            "amount": "#,#"
+          },
+          {
+            "name": "ANBINH",
+            "discount": "#,#0.00",
+            "amount": "#,#"
+          },
+          {
+            "name": "TITAN",
+            "discount": "#,#0.00",
+            "amount": "#,#"
+          }
+        ]
+      }
+    ]		
+	}
+]
