@@ -292,7 +292,7 @@ public class DonHangController : IHttpHandler
                 decimal discountVal = (totalSalary * dh.discount.Value / 100).DecRound(2);
                 discountVal = 0;
                 totalSalary = (totalSalary - discountVal) + (phicong == null ? 0 : phicong.Value) - (phitru == null ? 0 : phitru.Value);
-                totalCbm = dh.totalcbm.Value;
+                totalCbm = ddh.ToList().Sum(s=>s.v2.GetValueOrDefault(0));
 
                 msg = string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dh.sochungtu, totalCbm, totalSalary, totalQuantity);
             }
