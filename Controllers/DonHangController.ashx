@@ -290,7 +290,7 @@ public class DonHangController : IHttpHandler
                 phitru = phiDH.Where(p => p.phitang.Equals(false)).Select(p => p.phi).Sum();
                 totalSalary = ddhs.Sum(p => (p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, null, false)).DecRound(2));
                 decimal discountVal = (totalSalary * dh.discount.Value / 100);
-                totalSalary = ddhs.Sum(p => (p.soluong.GetValueOrDefault(0));
+                totalSalary = ddhs.Sum(p => p.soluong.GetValueOrDefault(0));
                 var totalSalary2 = totalSalary;
                 totalSalary = (totalSalary - discountVal) + (phicong == null ? 0 : phicong.Value) - (phitru == null ? 0 : phitru.Value);
                 totalCbm = dh.totalcbm.Value;
