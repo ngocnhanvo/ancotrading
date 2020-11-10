@@ -282,15 +282,15 @@ public class DonHangController : IHttpHandler
             c_donhang dh = db.c_donhangs.FirstOrDefault(d => d.c_donhang_id.Equals(c_donhang_id));
             if (dh != null)
             {
-                var ddh = from c in db.c_dongdonhangs where c.c_donhang_id.Equals(dh.c_donhang_id) select c;
+                var ddhs = db.c_dongdonhangs.Where(s=>s.c_donhang_id == c_donhang_id).ToList();
                 var phiDH = from phi in db.c_phidonhangs where phi.c_donhang_id.Equals(dh.c_donhang_id) select phi;
 
-                totalQuantity = ddh.Sum(p => p.soluong).Value;
+                totalQuantity = ddhs.Sum(p => p.soluong).Value;
                 phicong = phiDH.Where(p => p.phitang.Equals(true)).Select(p => p.phi).Sum();
                 phitru = phiDH.Where(p => p.phitang.Equals(false)).Select(p => p.phi).Sum();
-                totalSalary = ddh.ToList().Sum(p => (p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, null, false)).DecRound(2));
+                totalSalary = ddhs.Sum(p => (p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, null, false)).DecRound(2));
                 decimal discountVal = (totalSalary * dh.discount.Value / 100);
-                totalSalary = ddh.ToList().Sum(p => (p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, null, true)).DecRound(2));
+                totalSalary = ddhs.Sum(p => (p.soluong.GetValueOrDefault(0));
                 var totalSalary2 = totalSalary;
                 totalSalary = (totalSalary - discountVal) + (phicong == null ? 0 : phicong.Value) - (phitru == null ? 0 : phitru.Value);
                 totalCbm = dh.totalcbm.Value;
