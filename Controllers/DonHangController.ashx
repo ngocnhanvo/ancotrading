@@ -282,23 +282,19 @@ public class DonHangController : IHttpHandler
             c_donhang dh = db.c_donhangs.FirstOrDefault(d => d.c_donhang_id.Equals(c_donhang_id));
             if (dh != null)
             {
-                var ddhs = db.c_dongdonhangs.Where(s=>s.c_donhang_id == c_donhang_id).ToList();
+                var ddh = from c in db.c_dongdonhangs where c.c_donhang_id.Equals(dh.c_donhang_id) select c;
                 var phiDH = from phi in db.c_phidonhangs where phi.c_donhang_id.Equals(dh.c_donhang_id) select phi;
 
-                totalQuantity = ddhs.Sum(p => p.soluong).Value;
+                totalQuantity = ddh.Sum(p => p.soluong).Value;
                 phicong = phiDH.Where(p => p.phitang.Equals(true)).Select(p => p.phi).Sum();
                 phitru = phiDH.Where(p => p.phitang.Equals(false)).Select(p => p.phi).Sum();
-                totalSalary = ddhs.Sum(p => (p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, null, false)).DecRound(2));
-                decimal discountVal = (totalSalary * dh.discount.Value / 100);
-                foreach(var ddh in ddhs)
-                {
-                    context.Response.Write("ghd: " + UserUtils.getGiaHopDongPO(dh, ddh, null, false) + ", sl: " + ddh.soluong.GetValueOrDefault(0) + ", amount: " + (UserUtils.getGiaHopDongPO(dh, ddh, null, false) * ddh.soluong.GetValueOrDefault(0)).DecRound(2));
-                }
-                var totalSalary2 = totalSalary;
+                totalSalary = ddh.ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, null, true)).DecRound(2);
+                decimal discountVal = (totalSalary * dh.discount.Value / 100).DecRound(2);
+                discountVal = 0;
                 totalSalary = (totalSalary - discountVal) + (phicong == null ? 0 : phicong.Value) - (phitru == null ? 0 : phitru.Value);
                 totalCbm = dh.totalcbm.Value;
 
-                msg = string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0.######}", dh.sochungtu, totalCbm, totalSalary, totalSalary2);
+                msg = string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dh.sochungtu, totalCbm, totalSalary, totalQuantity);
             }
             else
             {
