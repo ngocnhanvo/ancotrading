@@ -210,8 +210,18 @@ public class DanhSachDatHangReport
 		ICellStyle borderWrap = ex_fm.getcell(12, true, true, "LRBT", "C", "T");
 		//--
 		ICellStyle signBold = ex_fm.getcell(12, true, true, "", "C", "C");
-		//--
-		HSSFUtils.CellStyleModel cellModel = new HSSFUtils.CellStyleModel(hssfworkbook);
+        //--
+        var maDTKD = dt.Rows[0]["ma_dtkd"].ToString();
+        ConfigExcel.NameTypePrint = "InPI";
+        var cellCBM = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "cbm"));
+        var cellSoLuong = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "soluong"));
+        var fmtDiscount = ConfigExcel.laySoThapPhanChoRpt(maDTKD, "discount");
+        var cellAmount = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "amount"));
+        var cellBoldCBM = ex_fm.getcell2(12, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "cbm"));
+        var cellBoldSoLuong = ex_fm.getcell2(12, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "soluong"));
+        var cellBoldAmount = ex_fm.getcell2(12, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "amount"));
+        //--
+        HSSFUtils.CellStyleModel cellModel = new HSSFUtils.CellStyleModel(hssfworkbook);
         cellModel.BorderAll = true;
 		//--
 		//IDataFormat dataFormatCustom = hssfworkbook.CreateDataFormat();
@@ -565,10 +575,8 @@ public class DanhSachDatHangReport
                 {
                     if (guiNCC == false)
                         cel_row_t.CellFormula = String.Format("J{0}*F{0}",row + 1);
-                    if (thanhtien.ToString().LastIndexOf(".") <= -1)
-                        cel_row_t.CellStyle = type == "pdf" ? border_number0 : border_number;
-                    else
-                        cel_row_t.CellStyle = border_number;
+
+                    cel_row_t.CellStyle = cellAmount;
                 }
 				else if(colHeader.value == "trongluong")
                 {
@@ -578,7 +586,7 @@ public class DanhSachDatHangReport
 				else if(colHeader.value == "soLuong")
                 {
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][colHeader.value].ToString()));
-					cel_row_t.CellStyle = border_number0;
+					cel_row_t.CellStyle = cellSoLuong;
 				}
 				else if (new string[] { "giaMua", "tongDonGiaMua", "phi" }.Contains(colHeader.value))
                 {
@@ -586,15 +594,12 @@ public class DanhSachDatHangReport
                     if (guiNCC == false)
                         cel_row_t.SetCellValue(val);
 
-                    if(val.ToString().LastIndexOf(".") <= -1)
-                        cel_row_t.CellStyle = type == "pdf" ? border_number0 : border_number;
-                    else
-                        cel_row_t.CellStyle = border_number;
+                    cel_row_t.CellStyle = cellAmount;
                 }
 				else if( new string[] { "cbm", "soKienInner", "soKienOuter" }.Contains(colHeader.value))
                 {
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][colHeader.value].ToString()));
-					cel_row_t.CellStyle = border_number2;
+					cel_row_t.CellStyle = cellCBM;
 				}
 				else if(colHeader.value == "")
                 {
@@ -621,20 +626,16 @@ public class DanhSachDatHangReport
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.GetRow(row).CreateCell(5).SetCellFormula(String.Format("SUM(F{0}:F{1})", m, row));
-        s1.GetRow(row).GetCell(5).CellStyle = numberBold0;
+        s1.GetRow(row).GetCell(5).CellStyle = cellBoldSoLuong;
 
         if (guiNCC == true)
             s1.GetRow(row).CreateCell(10).SetCellValue("");
         else
             s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("SUM(K{0}:K{1})", m, row));
 
-        if (sumThanhTien.ToString().LastIndexOf(".") <= -1)
-            s1.GetRow(row).GetCell(10).CellStyle = type == "pdf" ? numberBold0 : numberBold;
-        else
-            s1.GetRow(row).GetCell(10).CellStyle = numberBold;
-
+        s1.GetRow(row).GetCell(10).CellStyle = cellBoldAmount;
         s1.GetRow(row).CreateCell(15).SetCellFormula(String.Format("SUM(P{0}:P{1})", m, row));
-        s1.GetRow(row).GetCell(15).CellStyle = numberBold2;
+        s1.GetRow(row).GetCell(15).CellStyle = cellBoldCBM;
 
 		row++;
 		//start +
@@ -651,11 +652,7 @@ public class DanhSachDatHangReport
         if (guiNCC == false)
         {
             cellR10.SetCellValue(phiTangVal);
-
-            if (phiTangVal.ToString().LastIndexOf(".") <= -1)
-                cellR10.CellStyle = type == "pdf" ? numberBold0 : numberBold;
-            else
-                cellR10.CellStyle = numberBold;
+            cellR10.CellStyle = cellBoldAmount;
         }
 
         if (phitang == null)
@@ -686,11 +683,7 @@ public class DanhSachDatHangReport
         if (guiNCC == false)
         {
             cellR10.SetCellValue(phiGiamVal);
-
-            if (phiGiamVal.ToString().LastIndexOf(".") <= -1)
-                cellR10.CellStyle = type == "pdf" ? numberBold0 : numberBold;
-            else
-                cellR10.CellStyle = numberBold;
+            cellR10.CellStyle = cellBoldAmount;
         }
 
         if (phigiam == null)
@@ -709,7 +702,7 @@ public class DanhSachDatHangReport
         row++;
 		// start discount
 		int dis = row + 1;
-        var ds2so = discountP.ToString("#,#0.##");
+        var ds2so = discountP.ToString(fmtDiscount);
         s1.CreateRow(row).CreateCell(1).SetCellValue(String.Format("Discount ({0}%)", ds2so));
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
@@ -717,10 +710,7 @@ public class DanhSachDatHangReport
         if (guiNCC == false)
         {
             cellR10.SetCellValue(discount);
-            if (discount.ToString().LastIndexOf(".") <= -1)
-                cellR10.CellStyle = type == "pdf" ? numberBold0 : numberBold;
-            else
-                cellR10.CellStyle = numberBold;
+            cellR10.CellStyle = cellBoldAmount;
         }
 		row++;
 		// start tổng cộng đã trừ
@@ -732,10 +722,7 @@ public class DanhSachDatHangReport
         if (guiNCC == false)
         {
             cellR10.SetCellFormula(String.Format("K{0} + K{1} - K{2} - K{3}", sub, cong, tru, dis));
-            if(tongCongDaTru.ToString().LastIndexOf(".") <= -1)
-                cellR10.CellStyle = type == "pdf" ? numberBold0 : numberBold;
-            else
-                cellR10.CellStyle = numberBold;
+            cellR10.CellStyle = cellBoldAmount;
         }
 		row++;
 		// start viet bang chu

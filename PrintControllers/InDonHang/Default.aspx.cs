@@ -416,6 +416,15 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         ICellStyle borderWrap = ex_fm.getcell(12, true, true, "LRBT", "C", "T");
         //--
         ICellStyle signBold = ex_fm.getcell(12, true, true, "", "C", "C");
+
+        config.NameTypePrint = "InPO";
+        var cellCBM = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "cbm"));
+        var cellSoLuong = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "soluong"));
+        var fmtDiscount = config.laySoThapPhanChoRpt("", "discount");
+        var cellAmount = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "amount"));
+        var cellBoldCBM = ex_fm.getcell2(12, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "cbm"));
+        var cellBoldSoLuong = ex_fm.getcell2(12, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "soluong"));
+        var cellBoldAmount = ex_fm.getcell2(12, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "amount"));
         #endregion Style Cell
 
         int row = 0;
@@ -872,22 +881,22 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 else if (new string[] { "cbm" }.Contains(columnHeader.value))
                 {
                     cel_row_t.CellFormula = String.Format("((N{0}*O{0}*P{0})*H{0})/1000000", row + 1);
-                    cel_row_t.CellStyle = border_number3;
+                    cel_row_t.CellStyle = cellCBM;
                 }
                 else if (new string[] { "amount" }.Contains(columnHeader.value))
                 {
                     cel_row_t.CellFormula = String.Format("IF(K{0}*I{0}<>0,K{0}*I{0},0)", row + 1);
-                    cel_row_t.CellStyle = border_number2;
+                    cel_row_t.CellStyle = cellAmount;
                 }
                 else if (new string[] { "soluong" }.Contains(columnHeader.value))
                 {
                     cel_row_t.SetCellValue(double.Parse(dt.Rows[i][columnHeader.value].ToString()));
-                    cel_row_t.CellStyle = border_number0;
+                    cel_row_t.CellStyle = cellSoLuong;
                 }
                 else if (new string[] { "giafob", "giachuan", "phi" }.Contains(columnHeader.value))
                 {
                     cel_row_t.SetCellValue(Math.Round(double.Parse(dt.Rows[i][columnHeader.value].ToString()), 2));
-                    cel_row_t.CellStyle = border_number2;
+                    cel_row_t.CellStyle = cellAmount;
                 }
                 else if (new string[] { "l2", "w2", "h2" }.Contains(columnHeader.value))
                 {
@@ -941,24 +950,24 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
                     string fmlSum = string.Format(@"SUM(I{0}:I{1})", startRowHH + 1, row);
                     rowToTalHeHang.CreateCell(8).CellFormula = string.Format("{0}", fmlSum, row + 1);
-                    rowToTalHeHang.GetCell(8).CellStyle = rightBold;
+                    rowToTalHeHang.GetCell(8).CellStyle = cellBoldSoLuong;
                     
                     fmlSum = string.Format(@"SUM(L{0}:L{1})", startRowHH + 1, row);
                     rowToTalHeHang.CreateCell(11).CellFormula = string.Format("{0}", fmlSum, row + 1);
-                    rowToTalHeHang.GetCell(11).CellStyle = rightBold;
+                    rowToTalHeHang.GetCell(11).CellStyle = cellBoldCBM;
                     
                     fmlSum = string.Format(@"SUM(M{0}:M{1})", startRowHH + 1, row);
                     rowToTalHeHang.CreateCell(12).CellFormula = string.Format("{0}", fmlSum, row + 1);
-                    rowToTalHeHang.GetCell(12).CellStyle = rightBold;
+                    rowToTalHeHang.GetCell(12).CellStyle = cellBoldAmount;
                     row++;
                     
                     var rowDisHeHang = s1.CreateRow(row);
                     rowDisHeHang.HeightInPoints = height;
-                    rowDisHeHang.CreateCell(4).SetCellValue(string.Format(@"Discount ({0}%):", gthh));
+                    rowDisHeHang.CreateCell(4).SetCellValue(string.Format(@"Discount ({0}%):", double.Parse(gthh).ToString(fmtDiscount)));
                     rowDisHeHang.GetCell(4).CellStyle = leftBold;
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
                     rowDisHeHang.CreateCell(12).CellFormula = string.Format("M{0}*{1}/100", row, gthh);
-                    rowDisHeHang.GetCell(12).CellStyle = rightBold;
+                    rowDisHeHang.GetCell(12).CellStyle = cellBoldAmount;
                     row++;
 
                     var rowTotalHeHang = s1.CreateRow(row);
@@ -967,7 +976,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     rowTotalHeHang.GetCell(4).CellStyle = leftBold;
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
                     rowTotalHeHang.CreateCell(12).CellFormula = string.Format("M{0} - M{1}", row - 1, row);
-                    rowTotalHeHang.GetCell(12).CellStyle = rightBold;
+                    rowTotalHeHang.GetCell(12).CellStyle = cellBoldAmount;
 
                     lstAmountHH.Add(row);
 
@@ -1029,9 +1038,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         // style
         s1.GetRow(row).GetCell(4).CellStyle = leftBold;
         s1.GetRow(row).GetCell(7).CellStyle = rightBold;
-        s1.GetRow(row).GetCell(8).CellStyle = rightBold0;
-        s1.GetRow(row).GetCell(11).CellStyle = rightBold3;
-        s1.GetRow(row).GetCell(12).CellStyle = rightBold;
+        s1.GetRow(row).GetCell(8).CellStyle = cellBoldSoLuong;
+        s1.GetRow(row).GetCell(11).CellStyle = cellBoldCBM;
+        s1.GetRow(row).GetCell(12).CellStyle = cellBoldAmount;
 
 
         // for(int nht = 7; nht <= 7; nht++)
@@ -1046,7 +1055,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         int dis = row + 1;
         if (nnl == null)
         {
-            s1.CreateRow(row).CreateCell(4).SetCellValue("Discount (" + discount1 + "%):");
+            s1.CreateRow(row).CreateCell(4).SetCellValue("Discount (" + discount1.ToString(fmtDiscount) + "%):");
 
             string str_dsc1 = discount.ToString();
             string funcDiscount = "";
@@ -1092,7 +1101,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         s1.GetRow(row).CreateCell(12).CellFormula = String.Format("Value(\"{0}\")", dt.Rows[0]["phicong"].ToString());
         // style
         s1.GetRow(row).GetCell(4).CellStyle = leftBold;
-        s1.GetRow(row).GetCell(12).CellStyle = rightBold;
+        s1.GetRow(row).GetCell(12).CellStyle = cellBoldAmount;
         row++;
         //
         int tru = row + 1;
@@ -1101,7 +1110,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         s1.GetRow(row).CreateCell(12).CellFormula = String.Format("Value(\"{0}\")", dt.Rows[0]["phitru"].ToString());
         // style
         s1.GetRow(row).GetCell(4).CellStyle = leftBold;
-        s1.GetRow(row).GetCell(12).CellStyle = rightBold;
+        s1.GetRow(row).GetCell(12).CellStyle = cellBoldAmount;
         row++;
         //
         string totalTxt = "";
