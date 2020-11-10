@@ -295,7 +295,7 @@ public class DonHangController : IHttpHandler
                 totalSalary = (totalSalary - discountVal) + (phicong == null ? 0 : phicong.Value) - (phitru == null ? 0 : phitru.Value);
                 totalCbm = dh.totalcbm.Value;
 
-                msg = string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dh.sochungtu, totalCbm, totalSalary, totalSalary2);
+                msg = string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0.######}", dh.sochungtu, totalCbm, totalSalary, totalSalary2);
             }
             else
             {
