@@ -98,6 +98,13 @@
                 thaotac2.attr('onclick', 'submitRptTool(3)');
                 hideEl();
                 break;
+            case 7:
+                frmEl.hide();
+                $('#reportviewer').html('<div id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>');
+                $('#reportviewer').load('Tool/TuyChinhMauIn.aspx', function () {
+
+                });
+                break;
         }
     }
 
@@ -412,6 +419,7 @@
         <button style="text-align:left;" onclick="createTool(this, 4)">Xóa / Hủy màu sắc</button>
         <button style="text-align:left;" onclick="createTool(this, 5)">Xóa / Hủy đề tài</button>
         <button style="text-align:left;" onclick="createTool(this, 6)">Xóa / Hủy chủng loại</button>
+        <button style="text-align:left;" onclick="createTool(this, 7)">Tùy chỉnh mẫu In</button>
     </div>
 </div>
 
