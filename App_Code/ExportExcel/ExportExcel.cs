@@ -85,7 +85,7 @@ public class ExportExcel
     public ICellStyle borderright2dec = null;
     public ICellStyle borderright3dec = null;
     #endregion
-
+    public ExportExcel() { }
     public ExportExcel(HSSFWorkbook hssf, int start, int end)
     {
         hssfworkbook = hssf;
@@ -387,10 +387,22 @@ public class ExportExcel
         return getInfoCHSTP("fontSize", "", isPDF.GetValueOrDefault(false) ? "pdf" : "excel");
     }
 
+    private string linkJsonCHSTP = "~/App_Data/JSON/cauHinhSoThapPhan.json";
+    public List<Dictionary<string, object>> getJsonInfoCHSTP()
+    {
+        var jsonStr = File.ReadAllText(ExcuteSignalRStatic.mapPathSignalR(linkJsonCHSTP));
+        var jsons = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonStr);
+        return jsons;
+    }
+
+    public void writeJsonInfoCHSTP(string jsonStr)
+    {
+        File.WriteAllText(ExcuteSignalRStatic.mapPathSignalR(linkJsonCHSTP), jsonStr);
+    }
+
     public string getInfoCHSTP(string name, string ma_dtkd, string typeSTP)
     {
-        var jsonStr = File.ReadAllText(ExcuteSignalRStatic.mapPathSignalR("~/App_Data/JSON/cauHinhSoThapPhan.json"));
-        var jsons = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonStr);
+        var jsons = getJsonInfoCHSTP();
         var kq = "";
         var json = jsons.Where(s => s["name"].ToString() == NameTypePrint).FirstOrDefault();
         if (json != null)
