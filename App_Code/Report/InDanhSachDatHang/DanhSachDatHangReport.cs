@@ -159,67 +159,74 @@ public class DanhSachDatHangReport
         ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
 		HSSFSheet hssfsheet = (HSSFSheet)s1;
         ConfigExcel = new ExportExcel(hssfworkbook, 0, 15);
+        ConfigExcel.NameTypePrint = "InPI";
         ConfigExcel.endHeader = type == "pdf" ? 16 : 9;
+        ConfigExcel.isPDF = type == "pdf";
+        var fontSizeRpt = double.Parse(ConfigExcel.layKichThuocChuChoRpt());
+        var fontSizeRptShort = (short)fontSizeRpt;
+
         Excel_Format ex_fm = new Excel_Format(hssfworkbook); 
-        ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
-        ICellStyle cellBold10 = ex_fm.getcell(10, true, true, "", "L", "T");
-        ICellStyle cellBold10Top = ex_fm.getcell(10, true, true, "", "L", "B");
+        ICellStyle cellBold = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "T");
+        ICellStyle cellBold10 = ex_fm.getcell((short)(fontSizeRptShort - 2), true, true, "", "L", "T");
+        ICellStyle cellBold10Top = ex_fm.getcell((short)(fontSizeRptShort - 2), true, true, "", "L", "B");
         //-- 
-        ICellStyle cellHeader = ex_fm.getcell(18, true, true, "", "C", "T");
+        ICellStyle cellHeader = ex_fm.getcell((short)(fontSizeRptShort + 6), true, true, "", "C", "T");
 		//-- 
-		ICellStyle cellHeader_n = ex_fm.getcell(12, false, true, "", "C", "T");
+		ICellStyle cellHeader_n = ex_fm.getcell(fontSizeRptShort, false, true, "", "C", "T");
 		//--
-		ICellStyle celltext = ex_fm.getcell(12, false, true, "", "L", "T");
-        ICellStyle celltext10 = ex_fm.getcell(10, false, true, "", "L", "T");
-        ICellStyle celltext10Top = ex_fm.getcell(10, false, true, "", "L", "B");
-        ICellStyle cellTextCenter = ex_fm.getcell(12, false, true, "", "C", "T");
-        ICellStyle cellText10Center = ex_fm.getcell(10, false, true, "", "C", "T");
+		ICellStyle celltext = ex_fm.getcell(fontSizeRptShort, false, true, "", "L", "T");
+        ICellStyle celltext10 = ex_fm.getcell((short)(fontSizeRptShort - 2), false, true, "", "L", "T");
+        ICellStyle celltext10Top = ex_fm.getcell((short)(fontSizeRptShort - 2), false, true, "", "L", "B");
+        ICellStyle cellTextCenter = ex_fm.getcell(fontSizeRptShort, false, true, "", "C", "T");
+        ICellStyle cellText10Center = ex_fm.getcell((short)(fontSizeRptShort - 2), false, true, "", "C", "T");
         //--
-        ICellStyle rightBold = ex_fm.getcell(12, true, false, "", "R", "T");
+        ICellStyle rightBold = ex_fm.getcell(fontSizeRptShort, true, false, "", "R", "T");
 		//--
-		ICellStyle right = ex_fm.getcell(12, false, false, "", "R", "T");
+		ICellStyle right = ex_fm.getcell(fontSizeRptShort, false, false, "", "R", "T");
 		//--
-		ICellStyle leftBold = ex_fm.getcell(12, true, false, "", "L", "T");
+		ICellStyle leftBold = ex_fm.getcell(fontSizeRptShort, true, false, "", "L", "T");
 		//--
-		ICellStyle left = ex_fm.getcell(12, false, false, "", "L", "T");
+		ICellStyle left = ex_fm.getcell(fontSizeRptShort, false, false, "", "L", "T");
         //--
-        ICellStyle border_number = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0####");
-        ICellStyle border_number_ = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.####");
-        ICellStyle border_number0 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0");
-		ICellStyle border_number1 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0");
-		ICellStyle border_number2 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.00");
-		ICellStyle border_number3 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.000");
-		ICellStyle border_number4 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0000");
+        ICellStyle border_number = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0####");
+        ICellStyle border_number_ = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.####");
+        ICellStyle border_number0 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0");
+		ICellStyle border_number1 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0");
+		ICellStyle border_number2 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.00");
+		ICellStyle border_number3 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.000");
+		ICellStyle border_number4 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0000");
 
-        var number = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0####");
-        var number0 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0");
-        var number1 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.0");
-        var number2 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.00");
-        var number3 = ex_fm.getcell2(12, false, true, "", "R", "T", "#,##0.000");
-        var numberBold = ex_fm.getcell2(12, true, true, "", "R", "T", "#,##0.0####");
-        var numberBold0 = ex_fm.getcell2(12, true, true, "", "R", "T", "#,##0");
-        var numberBold2 = ex_fm.getcell2(12, true, true, "", "R", "T", "#,##0.00");
+        var number = ex_fm.getcell2(fontSizeRptShort, false, true, "", "R", "T", "#,##0.0####");
+        var number0 = ex_fm.getcell2(fontSizeRptShort, false, true, "", "R", "T", "#,##0");
+        var number1 = ex_fm.getcell2(fontSizeRptShort, false, true, "", "R", "T", "#,##0.0");
+        var number2 = ex_fm.getcell2(fontSizeRptShort, false, true, "", "R", "T", "#,##0.00");
+        var number3 = ex_fm.getcell2(fontSizeRptShort, false, true, "", "R", "T", "#,##0.000");
+        var numberBold = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", "#,##0.0####");
+        var numberBold0 = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", "#,##0");
+        var numberBold2 = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", "#,##0.00");
 
-        ICellStyle border = ex_fm.getcell(12, false, true, "LRBT", "L", "T");
-		ICellStyle border_center = ex_fm.getcell(12, false, true, "LRBT", "C", "T");
+        ICellStyle border = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "L", "T");
+		ICellStyle border_center = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "C", "T");
 		//--
-		ICellStyle borderright = ex_fm.getcell(12, false, true, "LRBT", "L", "T");
+		ICellStyle borderright = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "L", "T");
 		//--
-		ICellStyle borderonlyleft = ex_fm.getcell(12, false, true, "L", "T", "T");
+		ICellStyle borderonlyleft = ex_fm.getcell(fontSizeRptShort, false, true, "L", "T", "T");
 		//--
-		ICellStyle borderWrap = ex_fm.getcell(12, true, true, "LRBT", "C", "T");
+		ICellStyle borderWrap = ex_fm.getcell(fontSizeRptShort, true, true, "LRBT", "C", "T");
 		//--
-		ICellStyle signBold = ex_fm.getcell(12, true, true, "", "C", "C");
+		ICellStyle signBold = ex_fm.getcell(fontSizeRptShort, true, true, "", "C", "C");
         //--
         var maDTKD = dt.Rows[0]["ma_dtkd"].ToString();
-        ConfigExcel.NameTypePrint = "InPI";
-        var cellCBM = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "cbm"));
-        var cellSoLuong = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "soluong"));
+
+        ConfigExcel.cellHeader = cellHeader;
+        ConfigExcel.cellHeader_n = cellHeader_n;
+        var cellCBM = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "cbm"));
+        var cellSoLuong = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "soluong"));
         var fmtDiscount = ConfigExcel.laySoThapPhanChoRpt(maDTKD, "discount");
-        var cellAmount = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "amount"));
-        var cellBoldCBM = ex_fm.getcell2(12, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "cbm"));
-        var cellBoldSoLuong = ex_fm.getcell2(12, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "soluong"));
-        var cellBoldAmount = ex_fm.getcell2(12, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "amount"));
+        var cellAmount = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "amount"));
+        var cellBoldCBM = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "cbm"));
+        var cellBoldSoLuong = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "soluong"));
+        var cellBoldAmount = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "amount"));
         //--
         HSSFUtils.CellStyleModel cellModel = new HSSFUtils.CellStyleModel(hssfworkbook);
         cellModel.BorderAll = true;
@@ -247,6 +254,8 @@ public class DanhSachDatHangReport
             row = row,
             columnF = 2,
             columnT = 3,
+            columnFPrev = 1,
+            columnTPrev = 1,
             left = 88,
             top = (float)-0.5
         });
@@ -262,6 +271,8 @@ public class DanhSachDatHangReport
             row = row,
             columnF = 5,
             columnT = 9,
+            columnFPrev = 4,
+            columnTPrev = 4,
             left = 108,
             top = (float)-0.5
         });
@@ -280,6 +291,8 @@ public class DanhSachDatHangReport
             row = row,
             columnF = 2,
             columnT = 3,
+            columnFPrev = 1,
+            columnTPrev = 1,
             left = 105,
             top = (float)-0.5
         });
@@ -295,6 +308,8 @@ public class DanhSachDatHangReport
             row = row,
             columnF = 5,
             columnT = 9,
+            columnFPrev = 4,
+            columnTPrev = 4,
             left = 78,
             top = (float)-0.5
         });
@@ -318,6 +333,8 @@ public class DanhSachDatHangReport
             row = row,
             columnF = 2,
             columnT = 3,
+            columnFPrev = 1,
+            columnTPrev = 1,
             left = 98,
             top = (float)-0.5
         });
@@ -333,6 +350,8 @@ public class DanhSachDatHangReport
             row = row,
             columnF = 5,
             columnT = 9,
+            columnFPrev = 4,
+            columnTPrev = 4,
             left = 147,
             top = (float)-0.2
         });
@@ -535,7 +554,7 @@ public class DanhSachDatHangReport
             //
 			IRow row_t = s1.CreateRow(row);
             string moTa = dt.Rows[i]["moTa"].ToString();
-            var heighMoTatMAX = ConfigExcel.MeasureTextHeight(moTa, 7000, "Arial", (float)12.25) + 4;
+            var heighMoTatMAX = ConfigExcel.MeasureTextHeight(moTa, 7000, "Arial", fontSizeRptShort) + 4;
             row_t.HeightInPoints = heighMoTatMAX < 70 ? 70 : heighMoTatMAX;
 
             row_t.CreateCell(2);
@@ -765,6 +784,7 @@ public class DanhSachDatHangReport
         s1.CreateRow(row).CreateCell(1).SetCellValue("Hướng dẫn làm hàng:");
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 5));
         row++;
 		// start dac diem hang hoa
         string huongdanlamhang = dt.Rows[0]["huongdanlamhang"].ToString();
@@ -784,7 +804,7 @@ public class DanhSachDatHangReport
                 rowLineHDK.CreateCell(2).SetCellValue(arrDDHHs[iHDK]);
                 rowLineHDK.GetCell(2).CellStyle = celltext10Top;
 
-                var heightMAX = ConfigExcel.MeasureTextHeight(arrDDHHs[iHDK], sumWidth2to9, "Arial", (float)10.25);
+                var heightMAX = ConfigExcel.MeasureTextHeight(arrDDHHs[iHDK], sumWidth2to9, "Arial", fontSizeRptShort - 2);
                 rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
                 row++;
             }
@@ -801,7 +821,7 @@ public class DanhSachDatHangReport
             rowLineHDK.CreateCell(2).SetCellValue(huongdanlamhang);
             rowLineHDK.GetCell(2).CellStyle = celltext10Top;
 
-            var heightMAX = ConfigExcel.MeasureTextHeight(huongdanlamhang, sumWidth2to9, "Arial", (float)10.25);
+            var heightMAX = ConfigExcel.MeasureTextHeight(huongdanlamhang, sumWidth2to9, "Arial", fontSizeRptShort - 2);
             rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
             row++;
@@ -827,7 +847,7 @@ public class DanhSachDatHangReport
                 rowLineHDK.CreateCell(2).SetCellValue(arrHDKs[iHDK]);
                 rowLineHDK.GetCell(2).CellStyle = celltext10Top;
 
-                var heightMAX = ConfigExcel.MeasureTextHeight(arrHDKs[iHDK], sumWidth2to9, "Arial", (float)10.25);
+                var heightMAX = ConfigExcel.MeasureTextHeight(arrHDKs[iHDK], sumWidth2to9, "Arial", fontSizeRptShort - 2);
                 rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
                 row++;
             }
@@ -841,7 +861,7 @@ public class DanhSachDatHangReport
             rowLineHDK.CreateCell(2).SetCellValue(huongdanlamhangchung);
             rowLineHDK.GetCell(2).CellStyle = celltext10Top;
 
-            var heightMAX = ConfigExcel.MeasureTextHeight(huongdanlamhangchung, sumWidth2to9, "Arial", (float)10.25);
+            var heightMAX = ConfigExcel.MeasureTextHeight(huongdanlamhangchung, sumWidth2to9, "Arial", fontSizeRptShort - 2);
             rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
             row++;

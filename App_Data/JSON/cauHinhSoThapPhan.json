@@ -2,6 +2,12 @@
 	{
     "name": "InPO",
     "text": "Cấu hình số thập phân khi in Đơn hàng",
+    "fontSize": [
+      {
+        "excel": "12",
+        "pdf": "15"
+      }
+    ],
     "soThapPhan": [
       {
         "soluong": "#,#",
@@ -15,6 +21,12 @@
 	{
     "name": "InPI",
     "text": "Cấu hình số thập phân khi in Đơn đặt hàng",
+    "fontSize": [
+      {
+        "excel": "12",
+        "pdf": "15"
+      }
+    ],
     "soThapPhan": [
       {
         "soluong": "#,#",
