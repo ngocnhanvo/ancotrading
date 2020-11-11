@@ -243,20 +243,14 @@
                         id: "btn-active",
                         text: "Có",
                         click: function () {
-                            $("#dialog-caution").ajaxStart(function () {
-                                $("#wait").css("display", "block");
-                                $("#btn-active").button("disable");
-                                $("#btn-close").button("disable");
-                            });
+                            $("#wait").css("display", "block");
+                            $("#btn-active").button("disable");
+                            $("#btn-close").button("disable");
 
-                            $("#dialog-caution").ajaxComplete(function () {
+                            $.get("Controllers/DonHangController.ashx?action=activepo&poId=" + id, function (result) {
                                 $("#wait").css("display", "none");
                                 $("#btn-close span").text("Thoát");
                                 $("#btn-close").button("enable");
-                            });
-
-                            $.get("Controllers/DonHangController.ashx?action=activepo&poId=" + id, function (result) {
-                                //$('#dialog-caution').css({ 'color': 'green' });
                                 $('#dialog-active-po').find('#dialog-caution').html(result);
                                 $('#grid_ds_po').jqGrid().trigger('reloadGrid');
                             });

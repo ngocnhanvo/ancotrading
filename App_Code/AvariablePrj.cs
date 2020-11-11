@@ -13,8 +13,11 @@ public class AvariablePrj
     public partial class lstText
     {
         public int row { get; set; }
+        public int? columnFPrev { get; set; }
+        public int? columnTPrev { get; set; }
         public int columnF { get; set; }
         public int columnT { get; set; }
+        public double? minWidth { get; set; }
         public string value { get; set; }
         public float left { get; set; }
         public float top { get; set; }

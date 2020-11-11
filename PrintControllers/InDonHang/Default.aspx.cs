@@ -257,6 +257,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         , ddh.sl_inner
 						, (case ddh.sl_outer when 0 then ' ' else (cast(ddh.sl_outer as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) end) as ten_donggoi
 						, ddh.soluong
+                        , ddh.discount as discountHH
                         , dvt.ten_dvt as dvt_sp
                         , cast((
                             case 
@@ -369,62 +370,67 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         HSSFSheet hssfsheet = (HSSFSheet)s1;
 
         var config = new ExportExcel(hssfworkbook, 0, type == "pdf" ? 12 : 16);
+        config.NameTypePrint = "InPO";
+        config.isPDF = type == "pdf";
         config.endHeader = 12;
 
         Excel_Format ex_fm = new Excel_Format(hssfworkbook);
-        
+
         #region Style Cell
-        ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
-        ICellStyle cellBoldTop = ex_fm.getcell(12, true, true, "", "L", "B");
-        ICellStyle cellBoldJustify = ex_fm.getcell(12, true, true, "", "L", "J");
-        var cellBoldBG = ex_fm.getcell(12, true, true, "", "L", "T");
+        var fontSizeRpt = double.Parse(config.layKichThuocChuChoRpt());
+        var fontSizeRptShort = (short)fontSizeRpt;
+        ICellStyle cellBold = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "T");
+        ICellStyle cellBoldTop = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "B");
+        ICellStyle cellBoldJustify = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "J");
+        var cellBoldBG = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "T");
         cellBoldBG.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
         cellBoldBG.FillPattern = FillPattern.SolidForeground;
         //-- 
-        ICellStyle cellHeader = ex_fm.getcell(18, true, true, "", "C", "T");
+        ICellStyle cellHeader = ex_fm.getcell((short)(fontSizeRptShort + 6), true, true, "", "C", "T");
         //-- 
-        ICellStyle cellHeader_n = ex_fm.getcell(12, false, true, "", "C", "T");
+        ICellStyle cellHeader_n = ex_fm.getcell(fontSizeRptShort, false, true, "", "C", "T");
         //--
-        ICellStyle celltext = ex_fm.getcell(12, false, true, "", "L", "T");
+        ICellStyle celltext = ex_fm.getcell(fontSizeRptShort, false, true, "", "L", "T");
         //--
-        ICellStyle rightBold = ex_fm.getcell(12, true, false, "", "R", "T");
-        var bottomLeftBold = ex_fm.getcell(12, true, false, "B", "L", "T");
+        ICellStyle rightBold = ex_fm.getcell(fontSizeRptShort, true, false, "", "R", "T");
+        var bottomLeftBold = ex_fm.getcell(fontSizeRptShort, true, false, "B", "L", "T");
 
-        ICellStyle rightBold0 = ex_fm.getcell2(12, true, false, "", "R", "T", fmt0);
-        ICellStyle rightBold3 = ex_fm.getcell2(12, true, false, "", "R", "T", fmt0i000);
+        ICellStyle rightBold0 = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", fmt0);
+        ICellStyle rightBold3 = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", fmt0i000);
         //--
-        ICellStyle rightBold4 = ex_fm.getcell2(12, true, false, "", "R", "T", "#,##0.0000");
+        ICellStyle rightBold4 = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", "#,##0.0000");
         //--
-        ICellStyle right = ex_fm.getcell(12, false, false, "", "R", "T");
+        ICellStyle right = ex_fm.getcell(fontSizeRptShort, false, false, "", "R", "T");
         //--
-        ICellStyle leftBold = ex_fm.getcell(12, true, false, "", "L", "T");
+        ICellStyle leftBold = ex_fm.getcell(fontSizeRptShort, true, false, "", "L", "T");
         //--
-        ICellStyle left = ex_fm.getcell(12, false, false, "", "L", "T");
+        ICellStyle left = ex_fm.getcell(fontSizeRptShort, false, false, "", "L", "T");
         //--
-        ICellStyle border_number0 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##");
-        ICellStyle border_number1 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0");
-        ICellStyle border_number2 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.00");
-        ICellStyle border_number3 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.000");
-        ICellStyle border_number4 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0000");
-        ICellStyle border = ex_fm.getcell(12, false, true, "LRBT", "L", "T");
-        ICellStyle border_center = ex_fm.getcell(12, false, true, "LRBT", "C", "T");
+        ICellStyle border_number0 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##");
+        ICellStyle border_number1 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0");
+        ICellStyle border_number2 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.00");
+        ICellStyle border_number3 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.000");
+        ICellStyle border_number4 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0000");
+        ICellStyle border = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "L", "T");
+        ICellStyle border_center = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "C", "T");
         //--
-        ICellStyle borderright = ex_fm.getcell(12, false, true, "LRBT", "L", "T");
+        ICellStyle borderright = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "L", "T");
         //--
-        ICellStyle borderonlyleft = ex_fm.getcell(12, false, true, "L", "T", "T");
+        ICellStyle borderonlyleft = ex_fm.getcell(fontSizeRptShort, false, true, "L", "T", "T");
         //--
-        ICellStyle borderWrap = ex_fm.getcell(12, true, true, "LRBT", "C", "T");
+        ICellStyle borderWrap = ex_fm.getcell(fontSizeRptShort, true, true, "LRBT", "C", "T");
         //--
-        ICellStyle signBold = ex_fm.getcell(12, true, true, "", "C", "C");
+        ICellStyle signBold = ex_fm.getcell(fontSizeRptShort, true, true, "", "C", "C");
 
-        config.NameTypePrint = "InPO";
-        var cellCBM = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "cbm"));
-        var cellSoLuong = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "soluong"));
+        config.cellHeader = cellHeader;
+        config.cellHeader_n = cellHeader_n;
+        var cellCBM = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "cbm"));
+        var cellSoLuong = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "soluong"));
         var fmtDiscount = config.laySoThapPhanChoRpt("", "discount");
-        var cellAmount = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "amount"));
-        var cellBoldCBM = ex_fm.getcell2(12, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "cbm"));
-        var cellBoldSoLuong = ex_fm.getcell2(12, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "soluong"));
-        var cellBoldAmount = ex_fm.getcell2(12, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "amount"));
+        var cellAmount = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "amount"));
+        var cellBoldCBM = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "cbm"));
+        var cellBoldSoLuong = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "soluong"));
+        var cellBoldAmount = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "amount"));
         #endregion Style Cell
 
         int row = 0;
@@ -621,8 +627,16 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         columnHeaders.Add(new columnHeader()
         {
             text = "",
-            value = "h1",
+            value = "w1",
             columnAt = 23,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "h1",
+            columnAt = 24,
             width = 0
         });
 
@@ -630,14 +644,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         {
             text = "Product size (LxWxH) cm",
             value = "l_cm",
-            columnAt = 24,
-            width = 0
-        });
-
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "w_cm",
             columnAt = 25,
             width = 0
         });
@@ -645,8 +651,16 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         columnHeaders.Add(new columnHeader()
         {
             text = "",
-            value = "h_cm",
+            value = "w_cm",
             columnAt = 26,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "h_cm",
+            columnAt = 27,
             width = 0
         });
 
@@ -654,14 +668,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         {
             text = "Product size (LxWxH) inch",
             value = "l_inch",
-            columnAt = 27,
-            width = 0
-        });
-
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "w_inch",
             columnAt = 28,
             width = 0
         });
@@ -669,8 +675,16 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         columnHeaders.Add(new columnHeader()
         {
             text = "",
-            value = "h_inch",
+            value = "w_inch",
             columnAt = 29,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "",
+            value = "h_inch",
+            columnAt = 30,
             width = 0
         });
 
@@ -678,7 +692,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         {
             text = "Barcode",
             value = "barcode",
-            columnAt = 30,
+            columnAt = 31,
             width = 0
         });
 
@@ -686,7 +700,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         {
             text = "Giá gốc",
             value = "giachuan",
-            columnAt = 31,
+            columnAt = 32,
             width = 0
         });
 
@@ -694,7 +708,15 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         {
             text = "Phí",
             value = "phi",
-            columnAt = 32,
+            columnAt = 33,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            text = "Discount (%)",
+            value = "discountHH",
+            columnAt = 34,
             width = 0
         });
 
@@ -766,6 +788,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 var int6 = new int[] { 6 }.Contains(i);
 
                 lstText.Add(new AvariablePrj.lstText() {
+                    columnFPrev = 1,
+                    columnTPrev = 1,
                     columnF = 2,
                     columnT = 12,
                     left = int012 ? 60 : (int3 ? 60 : (int5 ? 15 : (int6 ? 60 : 0))),
@@ -789,7 +813,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         // set A13 - All
         // -- Header
         IRow rowColumnHeader = s1.CreateRow(row);
-        rowColumnHeader.HeightInPoints = 47;
+        rowColumnHeader.Height = -1;
         foreach(var columnHeader in columnHeaders.OrderBy(s=>s.columnAt))
         {
             rowColumnHeader.CreateCell(columnHeader.columnAt).SetCellValue(columnHeader.text);
@@ -847,7 +871,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             discount1 = double.Parse(dt.Rows[i]["dis1"].ToString());
 
             IRow row_t = s1.CreateRow(row);
-            float heightMAX = config.MeasureTextHeight(mota, 10000);
+            float heightMAX = config.MeasureTextHeight(mota, 10000, "Arial", fontSizeRptShort);
             row_t.HeightInPoints = heightMAX < 60 ? 60 : heightMAX;
 
             //
@@ -907,6 +931,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 {
                     cel_row_t.SetCellValue(dt.Rows[i][columnHeader.value].ToString());
                     cel_row_t.CellStyle = border_center;
+                }
+                else if (new string[] { "discountHH" }.Contains(columnHeader.value))
+                {
+                    cel_row_t.SetCellValue(dt.Rows[i][columnHeader.value].ToString());
+                    cel_row_t.CellStyle = border_number4;
                 }
                 // else if( e_value[j] == "ten_donggoi_inner") {
                 // cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString().Replace(" ","\n"));
@@ -1077,8 +1106,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             }
             s1.GetRow(row).CreateCell(12).CellFormula = String.Format(funcDiscount, row, row);
             s1.GetRow(row).GetCell(4).CellStyle = leftBold;
-            s1.GetRow(row).GetCell(12).CellStyle = rightBold;
-            s1.GetRow(row).GetCell(12).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+            s1.GetRow(row).GetCell(12).CellStyle = cellBoldAmount;
             if (discount1 <= 0)
             {
                 s1.GetRow(row).HeightInPoints = 0;
@@ -1164,7 +1192,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             height = 22;
             if (f_value[i] == "mota")
             {
-                float maxHeight = config.MeasureTextHeight(text, width02to12);
+                float maxHeight = config.MeasureTextHeight(text, width02to12, "Arial", fontSizeRptShort);
                 height = maxHeight < height ? height : (int)maxHeight;
             }
 
@@ -1183,6 +1211,16 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 1));
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
             s1.GetRow(row).HeightInPoints = height;
+            lstText.Add(new AvariablePrj.lstText()
+            {
+                columnF = 2,
+                columnT = 12,
+                columnFPrev = 1,
+                columnTPrev = 1,
+                row = row,
+                minWidth = 140
+            });
+
             row++;
         }
         height = 22;
@@ -1214,7 +1252,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         ICellStyle cellUn = hssfworkbook.CreateCellStyle();
         IFont funderline = hssfworkbook.CreateFont();
         funderline.Underline = FontUnderlineType.Single;
-        funderline.FontHeightInPoints = 12;
+        funderline.FontHeightInPoints = fontSizeRptShort;
         cellUn.SetFont(funderline);
         cellUn.Alignment = HorizontalAlignment.Center;
         cellUn.VerticalAlignment = VerticalAlignment.Top;

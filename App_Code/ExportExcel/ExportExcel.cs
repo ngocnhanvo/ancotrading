@@ -36,6 +36,7 @@ public class ExportExcel
     private String fmt0 = "#,##0", fmt0i0 = "#,##0.0", fmt0i00 = "#,##0.00", fmt0i000 = "#,##0.000";
     public Logoreport LogoRpt { get; set; }
     public string NameTypePrint { get; set; }
+    public bool? isPDF { get; set; }
     public partial class Logoreport
     {
         public string link { get; set; }
@@ -336,7 +337,7 @@ public class ExportExcel
                 if (new int[] { 0, 3 }.Contains(i))
                 {
                     s1.GetRow(row).HeightInPoints = 30;
-                    s1.GetRow(row).GetCell(0).CellStyle = cellHeader;
+                    s1.GetRow(row).GetCell(0).CellStyle = i == 0 ? ex_fm.getcell(18, true, true, "", "C", "T") : cellHeader;
                 }
                 else
                 {
@@ -378,6 +379,16 @@ public class ExportExcel
 
     public string laySoThapPhanChoRpt(string ma_dtkd, string typeSTP)
     {
+        return getInfoCHSTP("soThapPhan", ma_dtkd, typeSTP);
+    }
+
+    public string layKichThuocChuChoRpt()
+    {
+        return getInfoCHSTP("fontSize", "", isPDF.GetValueOrDefault(false) ? "pdf" : "excel");
+    }
+
+    public string getInfoCHSTP(string name, string ma_dtkd, string typeSTP)
+    {
         var jsonStr = File.ReadAllText(ExcuteSignalRStatic.mapPathSignalR("~/App_Data/JSON/cauHinhSoThapPhan.json"));
         var jsons = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonStr);
         var kq = "";
@@ -386,8 +397,8 @@ public class ExportExcel
         {
             if (NameTypePrint == "InPO")
             {
-               
-                var jsonSTPs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json["soThapPhan"].ToString());
+
+                var jsonSTPs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json[name].ToString());
                 if (jsonSTPs.Count > 0)
                 {
                     var jsonSTP = jsonSTPs[0];
@@ -396,26 +407,32 @@ public class ExportExcel
             }
             else if (NameTypePrint == "InPI")
             {
-                var jsonSTPs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json["soThapPhan"].ToString());
+                var jsonSTPs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json[name].ToString());
                 if (jsonSTPs.Count > 0)
                 {
                     var jsonSTP = jsonSTPs[0];
-                    var jsonStpDTKDs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonSTP["dtkd"].ToString());
-                    var stpDTKD = jsonStpDTKDs.Where(s => s["name"].ToString() == ma_dtkd).FirstOrDefault();
-                    if (stpDTKD == null)
+                    if (name == "SoThapPhan")
                     {
-                        kq = jsonSTP[typeSTP].ToString();
+                        var jsonStpDTKDs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonSTP["dtkd"].ToString());
+                        var stpDTKD = jsonStpDTKDs.Where(s => s["name"].ToString() == ma_dtkd).FirstOrDefault();
+                        if (stpDTKD == null)
+                        {
+                            kq = jsonSTP[typeSTP].ToString();
+                        }
+                        else
+                        {
+                            if (stpDTKD.Keys.Contains(typeSTP))
+                                kq = stpDTKD[typeSTP].ToString();
+                            else
+                                kq = jsonSTP[typeSTP].ToString();
+                        }
                     }
                     else
-                    {
-                        if(stpDTKD.Keys.Contains(typeSTP))
-                            kq = stpDTKD[typeSTP].ToString();
-                        else
-                            kq = jsonSTP[typeSTP].ToString();
-                    }
+                        kq = jsonSTP[typeSTP].ToString();
                 }
             }
         }
+
         return kq;
     }
 }

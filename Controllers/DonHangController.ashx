@@ -683,6 +683,7 @@ public class DonHangController : IHttpHandler
                                 else
                                 {
                                     result += "Năng lực của nhà cung ứng không đáp ứng đủ cho đơn hàng này.! <br/>";
+                                    result += "<table><tr><td><input type='checkbox'/></td><td>Yêu cầu Administrator Hiệu Lực</td></tr></table>";
                                 }
                             }
                         }
