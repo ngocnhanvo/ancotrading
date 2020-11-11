@@ -379,7 +379,6 @@ public class ExportExcel
     public string laySoThapPhanChoRpt(string ma_dtkd, string typeSTP)
     {
         var jsonStr = File.ReadAllText(ExcuteSignalRStatic.mapPathSignalR("~/App_Data/JSON/cauHinhSoThapPhan.json"));
-        HttpContext.Current.Response.Write(jsonStr + "\n");
         var jsons = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonStr);
         var kq = "";
         var json = jsons.Where(s => s["name"].ToString() == NameTypePrint).FirstOrDefault();
