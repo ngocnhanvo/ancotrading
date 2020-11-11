@@ -261,7 +261,7 @@ namespace OfficeToPDF
 
                             var textBoxPrev = worksheet.Shapes.AddTextbox(Microsoft.Office.Core.MsoTextOrientation.msoTextOrientationHorizontal, leftTextPrev, topTextPrev, widthTextPrev, heightTextPrev);
                             textBoxPrev.TextFrame.VerticalAlignment = XlVAlign.xlVAlignCenter;
-                            textBoxPrev.TextFrame.MarginLeft = 2;
+                            textBoxPrev.TextFrame.MarginLeft = 3;
                             textBoxPrev.TextFrame.MarginRight = 2;
                             if (string.IsNullOrEmpty(textRangePrev))
                                 textBoxPrev.Width = widthBackUp;
