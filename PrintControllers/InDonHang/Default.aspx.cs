@@ -257,7 +257,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         , ddh.sl_inner
 						, (case ddh.sl_outer when 0 then ' ' else (cast(ddh.sl_outer as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) end) as ten_donggoi
 						, ddh.soluong
-                        , ddh.discount as discountHH
+                        , (case when isnull(dh.phanbodiscount, 0) = 1 then ddh.discount else null end) as discountHH
                         , dvt.ten_dvt as dvt_sp
                         , cast((
                             case 
