@@ -918,9 +918,9 @@ public class DanhSachDatHangReport
         s1.GetRow(row).GetCell(1).CellStyle = cellTextCenter;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 		//
-		s1.GetRow(row).CreateCell(8).SetCellValue("Nhà cung ứng");
-        s1.GetRow(row).GetCell(8).CellStyle = cellTextCenter;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
+		s1.GetRow(row).CreateCell(7).SetCellValue("Nhà cung ứng");
+        s1.GetRow(row).GetCell(7).CellStyle = cellTextCenter;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 7, 10));
 		row++;
 		//--
         s1.CreateRow(row).CreateCell(1).SetCellValue("(Ký và ghi rõ họ tên)");
@@ -928,8 +928,8 @@ public class DanhSachDatHangReport
         s1.GetRow(row).GetCell(1).CellStyle = cellText10Center;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 		//--
-		s1.GetRow(row).CreateCell(8).SetCellValue("(Ký và ghi rõ họ tên)");
-        s1.GetRow(row).GetCell(8).CellStyle = cellText10Center;
+		s1.GetRow(row).CreateCell(7).SetCellValue("(Ký và ghi rõ họ tên)");
+        s1.GetRow(row).GetCell(7).CellStyle = cellText10Center;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 7, 10));
 		row = row + 3;
 		//
