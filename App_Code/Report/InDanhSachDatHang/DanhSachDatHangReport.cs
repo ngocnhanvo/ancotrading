@@ -798,7 +798,7 @@ public class DanhSachDatHangReport
             rowLineHDK.GetCell(2).CellStyle = celltext;
 
             var heightMAX = ConfigExcel.MeasureTextHeight(ghiChuHDDH, sumWidth2to9, "Arial", fontSizeRptShort - 2);
-            rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+            rowLineHDK.HeightInPoints = heightMAX < 30 ? 30 : heightMAX;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
             row++;
         }
