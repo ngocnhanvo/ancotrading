@@ -855,7 +855,7 @@ public class DanhSachDatHangReport
         else
         {
             var rowLineHDK = s1.CreateRow(row);
-            rowLineHDK.CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
+            rowLineHDK.CreateCell(1).SetCellValue("1.Đặc điểm hàng hóa:");
             rowLineHDK.GetCell(1).CellStyle = cellBold10Top;
 
             rowLineHDK.CreateCell(2).SetCellValue(huongdanlamhang);
@@ -879,7 +879,7 @@ public class DanhSachDatHangReport
                 var rowLineHDK = s1.CreateRow(row);
                 if (iHDK == 0)
                 {
-                    rowLineHDK.CreateCell(1).SetCellValue("2. Các hướng dẫn khác:");
+                    rowLineHDK.CreateCell(1).SetCellValue("2.Các hướng dẫn khác:");
                     rowLineHDK.GetCell(1).CellStyle = cellBold10Top;
                 }
 
