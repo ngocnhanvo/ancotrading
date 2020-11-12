@@ -1,6 +1,11 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="TuyChinhMauIn.aspx.cs" Inherits="Tool_TuyChinhMauIn" %>
 <% if(!send) { %>
 <style type="text/css">
+    .frmMauIn table {
+        max-width: 500px;
+        border-collapse: collapse;
+    }
+
     .frmMauIn {
         margin-top: 15px;
         margin-left: 15px;
@@ -16,50 +21,151 @@
     }
 
     .frmMauIn input, .frmMauIn select {
+        width: 99%;
+    }
+    .frmMauIn fieldset {
+        padding: 15px;
         width: 100%;
     }
 
+    .frmMauIn .spaceTr {
+        width: 20px;
+        height: 15px;
+    }
+
+    #ktcExcel, #ktcPDF {
+        width: 50px;
+    }
+
+    #LuuChinhSua, #selectRpt {
+        max-width: 120px;
+    }
+
+    #selectRpt2 {
+        display:none;
+    }
 </style>
 <div class="frmMauIn">
     <h1>Tùy chỉnh mẫu in đơn hàng, DSDH</h1>
 
-    <div style="display:table">
-         <div style="display:table-row">
-            <div style="display:table-cell">
-                <label>Chọn mẫu in</label><br>
+    <table>
+         <tr>
+            <td>
+                <label>Chọn mẫu in: </label>
                 <%=optionsMauIn %>
-            </div>
-        </div>
-        <div style="height:15px;"></div>
-        <div style="display:table-row">
-            <div style="display:table-cell">
-                <label>Kích thước chữ Excel</label><br>
+                <select id="selectRpt2"></select>
+            </td>
+        </tr>
+        
+        <tr><td><div class="spaceTr"></div></td></tr>
+
+        <tr>
+            <td>
+                <label>Kích thước chữ Excel: </label>
                 <input id="ktcExcel" type="number" />
-            </div>
-            <div style="display:table-cell;width:20px">
-            </div>
-            <div style="display:table-cell">
-                <label>Kích thước chữ PDF</label><br>
+            </td>
+            <td><div class="spaceTr"></div></td>
+            <td>
+                <label>Kích thước chữ PDF: </label>
                 <input id="ktcPDF" type="number" />
-            </div>
-        </div>
-        <div style="height:15px;"></div>
-        <div style="display:table-row">
-            <div style="display:table-cell">
+            </td>
+        </tr>
+
+        <tr><td><div class="spaceTr"></div></td></tr>
+
+        <tr>
+            <td colspan="3">
+                <fieldset>
+                    <legend><b>Định dạng số thập phân</b></legend>
+                    <div class="selectNCC">
+                        <label>Chọn NCC</label><br>
+                        <select id="selNCCStp"></select>
+                    </div>
+                    <div class="selectNCC" style="height:15px;"></div>
+                    <div style="display:table">
+                        <div style="display:table-row">
+                            <div style="display:table-cell">
+                                <label>Số lượng</label><br>
+                                <input id="fmtSoLuong" type="text" />
+                            </div>
+                            <div style="display:table-cell;width:20px"></div>
+                            <div style="display:table-cell">
+                                <label>CBM</label><br>
+                                <input id="fmtCBM" type="text" />
+                            </div>
+                            <div style="display:table-cell;width:20px"></div>
+                            <div style="display:table-cell">
+                                <label>Discount</label><br>
+                                <input id="fmtDiscount" type="text" />
+                            </div>
+                            <div style="display:table-cell;width:20px"></div>
+                            <div style="display:table-cell">
+                                <label>Đơn giá, Thành Tiền</label><br>
+                                <input id="fmtAmount" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </td>
+        </tr>
+
+        <tr><td><div class="spaceTr"></div></td></tr>
+
+       <tr>
+            <td style="text-align:center" colspan="3">
                 <input type="button" value="Lưu chỉnh sửa" id="LuuChinhSua" />
-            </div>
-        </div>
-    </div>
+            </td>
+        </tr>
+
+    </table>
 
     <script type="text/javascript">
         let selectRpt = document.getElementById('selectRpt');
         selectRpt.onchange = function (e) {
             let optionSel = selectRpt.options[selectRpt.selectedIndex];
-
             let jsonKTC = JSON.parse(optionSel.getAttribute('ktc'))[0];
-
+            let selectNCC = document.getElementsByClassName('selectNCC');
             document.getElementById('ktcExcel').value = jsonKTC.excel;
             document.getElementById('ktcPDF').value = jsonKTC.pdf;
+
+            let jsonSTP = JSON.parse(optionSel.getAttribute('stps'))[0];
+            let jsonDTKDs = jsonSTP.dtkd;
+            let selNCCStp = document.getElementById('selNCCStp');
+            selNCCStp.innerHTML = '';
+            if (jsonDTKDs) {
+                Array.prototype.forEach.call(selectNCC, function (item) { item.style.display = 'block'; });
+                let node = document.createElement("option");
+                selNCCStp.appendChild(node);
+                for (let i = 0; i < jsonDTKDs.length; i++)
+                {
+                    let row = jsonDTKDs[i];
+                    let node = document.createElement("option");
+                    node.value = row.name;
+                    node.text = row.name;
+                    node.setAttribute("cbm", row.cbm ? row.cbm : jsonSTP.cbm);
+                    node.setAttribute("soluong", row.soluong ? row.soluong : jsonSTP.soluong);
+                    node.setAttribute("discount", row.discount ? row.discount : jsonSTP.discount);
+                    node.setAttribute("amount", row.amount ? row.amount : jsonSTP.amount);
+                    selNCCStp.appendChild(node);
+                }
+
+                selNCCStp.onchange = function () {
+                    let optionSel = selNCCStp.options[selNCCStp.selectedIndex];
+                    document.getElementById('fmtSoLuong').value = optionSel.getAttribute("soluong");
+                    document.getElementById('fmtCBM').value = optionSel.getAttribute("cbm");
+                    document.getElementById('fmtDiscount').value = optionSel.getAttribute("discount");
+                    document.getElementById('fmtAmount').value = optionSel.getAttribute("amount");
+                };
+
+                selNCCStp.onchange();
+            }
+            else {
+                Array.prototype.forEach.call(selectNCC, function (item) { item.style.display = 'none'; });
+                document.getElementById('fmtSoLuong').value = jsonSTP.soluong;
+                document.getElementById('fmtCBM').value = jsonSTP.cbm;
+                document.getElementById('fmtDiscount').value = jsonSTP.discount;
+                document.getElementById('fmtAmount').value = jsonSTP.amount;
+            }
         };
 
         document.getElementById('LuuChinhSua').onclick = function() {
@@ -71,6 +177,14 @@
                     name;
 
                 // Turn the data object into an array of URL-encoded key/value pairs.
+                let dtkd = document.getElementById('selNCCStp').value;
+                let stps = {
+                    "soluong": document.getElementById('fmtSoLuong').value,
+                    "cbm": document.getElementById('fmtCBM').value,
+                    "discount": document.getElementById('fmtDiscount').value,
+                    "amount": document.getElementById('fmtAmount').value
+                };
+
                 let data =
                 {
                     "fontSize": JSON.stringify([
@@ -80,6 +194,8 @@
                         }
                     ]),
                     "name": document.getElementById("selectRpt").value,
+                    "dtkd": dtkd,
+                    "soThapPhan": JSON.stringify(stps),
                     "send": "true"
                 };
 
@@ -93,7 +209,20 @@
 
                 // Define what happens on successful data submission
                 XHR.addEventListener('load', function (event) {
-                    console.log(event);
+                    //console.log(event.currentTarget.response);
+                    let selectRpt = document.getElementById('selectRpt');
+                    let selectRpt2 = document.getElementById('selectRpt2');
+                    selectRpt2.innerHTML = event.currentTarget.response;
+
+                    let options = selectRpt.options;
+                    for (let i = 0; i < options.length; i++)
+                    {
+                        let option = options[i];
+                        let option2 = selectRpt2.options[i];
+
+                        option.setAttribute("ktc", option2.getAttribute("ktc"));
+                        option.setAttribute("stps", option2.getAttribute("stps"));
+                    }
                     alert('Lưu thành công');
                 });
 
