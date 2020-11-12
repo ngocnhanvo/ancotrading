@@ -930,7 +930,7 @@ public class DanhSachDatHangReport
 		//--
 		s1.GetRow(row).CreateCell(8).SetCellValue("(Ký và ghi rõ họ tên)");
         s1.GetRow(row).GetCell(8).CellStyle = cellText10Center;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 7, 10));
 		row = row + 3;
 		//
         s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["nguoitao"].ToString());
