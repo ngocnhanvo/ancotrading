@@ -47,6 +47,7 @@
     function createTool(a, stt) {
         var frmID = '#frmvnn_tool';
         var frmEl = $("#frmvnn_tool");
+        var divRptEl = $("#reportviewer");
         var chuThich = frmEl.find('.chuthich');
         var thaotac2 = frmEl.find('.thaotac2');
         var startDate = $('#tungayvnn_tool');
@@ -54,6 +55,7 @@
         frmEl.attr('stt', stt);
         $('#lblReportNamevnn_tool').html($(a).text());
         frmEl.show();
+        divRptEl.html('');
         var showEl = function() {
             startDate.parent().parent().show();
             endDate.parent().parent().show();
