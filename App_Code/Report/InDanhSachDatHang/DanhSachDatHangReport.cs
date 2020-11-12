@@ -236,9 +236,9 @@ public class DanhSachDatHangReport
 		int row = 0;
         //set A1 - A4
         ConfigExcel.LogoRpt = new ExportExcel.Logoreport();
-        ConfigExcel.LogoRpt.cell1 = type == "pdf" ? 4: 3;
-        ConfigExcel.LogoRpt.cell2 = type == "pdf" ? 5 : 3;
-        ConfigExcel.LogoRpt.dx1 = type == "pdf" ? 930 : 270;
+        ConfigExcel.LogoRpt.cell1 = type == "pdf" ? 0: 3;
+        ConfigExcel.LogoRpt.cell2 = type == "pdf" ? 1 : 3;
+        ConfigExcel.LogoRpt.dx1 = type == "pdf" ? 2930 : 270;
         ConfigExcel.LogoRpt.dx2 = type == "pdf" ? 300 : 500;
         ConfigExcel.title = "ĐƠN ĐẶT HÀNG";
         row = ConfigExcel.createHeader(NameHeaderReport.ANCO, s1, row, heigh);
@@ -455,7 +455,7 @@ public class DanhSachDatHangReport
             columnAt = 10,
             text = "Thành tiền",
             value = "thanhTien",
-            width = guiNCC ? 0 : (int)(fontSizeRpt * 360)
+            width = guiNCC ? 0 : (int)(fontSizeRpt * 380)
             
         });
 
@@ -757,20 +757,39 @@ public class DanhSachDatHangReport
         s1.GetRow(row).HeightInPoints = 30;
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(2).SetCellValue(MoneyToWord.ConvertMoneyToTextVND((decimal)tongCongDaTru, dt.Rows[0]["ma_dtkd"].ToString()));
+            var textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)tongCongDaTru, dt.Rows[0]["ma_dtkd"].ToString()).Trim();
+            textMoney = textMoney.Substring(0, 1).ToUpper() + textMoney.Substring(1);
+            s1.GetRow(row).CreateCell(2).SetCellValue(textMoney);
             s1.GetRow(row).GetCell(2).CellStyle = celltext;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 10));
         }
 		row++;
-		// start ghi chu
-        s1.CreateRow(row).CreateCell(1).SetCellValue("Ghi chú:");
-        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
-        s1.GetRow(row).HeightInPoints = 30;
-        s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["ghiChuDSDH"].ToString());
-        s1.GetRow(row).GetCell(2).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
-		s1.GetRow(row).HeightInPoints = 45;;
-		row++;
+        // start ghi chu
+        var ghiChuHDDH = dt.Rows[0]["ghiChuDSDH"].ToString();
+
+        if (type == "pdf")
+        {
+            string[] arrDDHHs = ghiChuHDDH.Split(new string[] { "\n", "\r" }, StringSplitOptions.None);
+            for (var iHDK = 0; iHDK < arrDDHHs.Length; iHDK++)
+            {
+                var rowLineHDK = s1.CreateRow(row);
+                if (iHDK == 0)
+                {
+                    rowLineHDK.CreateCell(1).SetCellValue("Ghi chú:");
+                    rowLineHDK.GetCell(1).CellStyle = cellBold;
+                }
+
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+                rowLineHDK.CreateCell(2).SetCellValue(arrDDHHs[iHDK]);
+                rowLineHDK.GetCell(2).CellStyle = celltext;
+
+                var heightMAX = ConfigExcel.MeasureTextHeight(arrDDHHs[iHDK], sumWidth2to9, "Arial", fontSizeRptShort);
+                rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+                row++;
+            }
+        }
+
+        row++;
 		// Ngay xong hang
         s1.CreateRow(row).CreateCell(1).SetCellValue("Ngày xong hàng:");
         s1.GetRow(row).HeightInPoints = 30;
