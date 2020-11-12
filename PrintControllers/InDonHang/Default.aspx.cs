@@ -229,7 +229,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     , isnull('{6}',0) as phicong
                     , isnull('{7}',0) as phitru
                     , N'{8}' as no_cont
-
+                    , (case when isnull(A.phanbodiscount, 0) = 1 then A.discountHHVal else null end) as discountHH
                     , CASE
 					    WHEN A.dvt_inner like N'%bun%'
 					    THEN A.n_w_inner + 0.5
@@ -238,10 +238,13 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 					    WHEN A.dvt_inner like N'%ctn%'  
 					    THEN A.n_w_inner + t_thung_inner
 					ELSE 0 END as g_w_inner
+                    
 				FROM (
                     select 
 						dh.{9}_id
-						, dh.sochungtu, dh.customer_order_no
+						, dh.sochungtu
+                        , dh.phanbodiscount
+                        , dh.customer_order_no
 						, dtkd.ten_dtkd
                         , dtkd.diachi
                         , dtkd.tel
@@ -257,7 +260,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         , ddh.sl_inner
 						, (case ddh.sl_outer when 0 then ' ' else (cast(ddh.sl_outer as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) end) as ten_donggoi
 						, ddh.soluong
-                        , (case when isnull(dh.phanbodiscount, 0) = 1 then ddh.discount else null end) as discountHH
+                        , (case when isnull(dh.discount, 0) > 0 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discountHHVal
                         , dvt.ten_dvt as dvt_sp
                         , cast((
                             case 
