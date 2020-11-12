@@ -87,7 +87,7 @@ public class DanhSachDatHangReport
                             , (select hoten from nhanvien where manv = dsdh.nguoitao) as nguoitao
 							, sp.trongluong
 							, sp.mota as ghichu
-							, dsdh.mota
+							, dsdh.mota as ghiChuDSDH
 							, ddsdh.gianhap as gianhap
 							, ddsdh.sl_dathang * ddsdh.gianhap as thanhtien
                         from 
@@ -428,7 +428,8 @@ public class DanhSachDatHangReport
             columnAt = 7,
             text = "Giá mua",
             value = "giaMua",
-            width = guiNCC ? 0 : 4000
+            width = guiNCC ? 0 : (int)(fontSizeRpt * 260),
+            autoSize = guiNCC ? false : true
         });
 
         columnHeaders.Add(new columnHeader()
@@ -436,15 +437,17 @@ public class DanhSachDatHangReport
             columnAt = 8,
             text = "Phí",
             value = "phi",
-            width = guiNCC ? 0 : 4000
+            width = guiNCC ? 0 : (int)(fontSizeRpt * 260),
+            autoSize = guiNCC ? false : true
         });
 
         columnHeaders.Add(new columnHeader()
         {
             columnAt = 9,
-            text = "Tổng đơn giá mua",
+            text = "Tổng đơn\ngiá mua",
             value = "tongDonGiaMua",
-            width = guiNCC ? 0 : 4000
+            width = guiNCC ? 0 : (int)(fontSizeRpt * 260),
+            autoSize = guiNCC ? false : true
         });
 
         columnHeaders.Add(new columnHeader()
@@ -452,7 +455,8 @@ public class DanhSachDatHangReport
             columnAt = 10,
             text = "Thành tiền",
             value = "thanhTien",
-            width = guiNCC ? 0 : 5000
+            width = guiNCC ? 0 : (int)(fontSizeRpt * 360)
+            
         });
 
         columnHeaders.Add(new columnHeader()
@@ -630,7 +634,10 @@ public class DanhSachDatHangReport
 					cel_row_t.SetCellValue(dt.Rows[i][colHeader.value].ToString());
 					cel_row_t.CellStyle = border;
 				}
-			}
+
+                if (colHeader.autoSize.GetValueOrDefault(false))
+                    s1.AutoSizeColumn(colHeader.columnAt);
+            }
 			row++;
 			count_row++;
 		}
@@ -752,14 +759,14 @@ public class DanhSachDatHangReport
         {
             s1.GetRow(row).CreateCell(2).SetCellValue(MoneyToWord.ConvertMoneyToTextVND((decimal)tongCongDaTru, dt.Rows[0]["ma_dtkd"].ToString()));
             s1.GetRow(row).GetCell(2).CellStyle = celltext;
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 10));
         }
 		row++;
 		// start ghi chu
         s1.CreateRow(row).CreateCell(1).SetCellValue("Ghi chú:");
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.GetRow(row).HeightInPoints = 30;
-        s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["mota"].ToString());
+        s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["ghiChuDSDH"].ToString());
         s1.GetRow(row).GetCell(2).CellStyle = celltext;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
 		s1.GetRow(row).HeightInPoints = 45;;
