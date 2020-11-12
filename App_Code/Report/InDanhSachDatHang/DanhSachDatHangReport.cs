@@ -236,10 +236,10 @@ public class DanhSachDatHangReport
 		int row = 0;
         //set A1 - A4
         ConfigExcel.LogoRpt = new ExportExcel.Logoreport();
-        ConfigExcel.LogoRpt.cell1 = type == "pdf" ? 0: 3;
-        ConfigExcel.LogoRpt.cell2 = type == "pdf" ? 1 : 3;
-        ConfigExcel.LogoRpt.dx1 = type == "pdf" ? 2930 : 270;
-        ConfigExcel.LogoRpt.dx2 = type == "pdf" ? 300 : 500;
+        ConfigExcel.LogoRpt.cell1 = type == "pdf" ? 0: 0;
+        ConfigExcel.LogoRpt.cell2 = type == "pdf" ? 1 : 1;
+        ConfigExcel.LogoRpt.dx1 = type == "pdf" ? 2930 : 2930;
+        ConfigExcel.LogoRpt.dx2 = type == "pdf" ? 300 : 300;
         ConfigExcel.title = "ĐƠN ĐẶT HÀNG";
         row = ConfigExcel.createHeader(NameHeaderReport.ANCO, s1, row, heigh);
 
