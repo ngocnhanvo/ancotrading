@@ -476,4 +476,5 @@ public class columnHeader
     public string value { get; set; }
     public int width { get; set; }
     public int columnAt { get; set; }
+    public bool? autoSize { get; set; }
 }
