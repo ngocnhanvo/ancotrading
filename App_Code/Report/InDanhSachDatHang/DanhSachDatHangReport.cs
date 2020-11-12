@@ -788,6 +788,20 @@ public class DanhSachDatHangReport
                 row++;
             }
         }
+        else
+        {
+            var rowLineHDK = s1.CreateRow(row);
+            rowLineHDK.CreateCell(1).SetCellValue("Ghi chú:");
+            rowLineHDK.GetCell(1).CellStyle = cellBold;
+
+            rowLineHDK.CreateCell(2).SetCellValue(ghiChuHDDH);
+            rowLineHDK.GetCell(2).CellStyle = celltext;
+
+            var heightMAX = ConfigExcel.MeasureTextHeight(ghiChuHDDH, sumWidth2to9, "Arial", fontSizeRptShort - 2);
+            rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+            row++;
+        }
 
         row++;
 		// Ngay xong hang
