@@ -236,10 +236,10 @@ public class DanhSachDatHangReport
 		int row = 0;
         //set A1 - A4
         ConfigExcel.LogoRpt = new ExportExcel.Logoreport();
-        ConfigExcel.LogoRpt.cell1 = type == "pdf" ? 0: 3;
-        ConfigExcel.LogoRpt.cell2 = type == "pdf" ? 1 : 3;
-        ConfigExcel.LogoRpt.dx1 = type == "pdf" ? 2930 : 270;
-        ConfigExcel.LogoRpt.dx2 = type == "pdf" ? 300 : 500;
+        ConfigExcel.LogoRpt.cell1 = type == "pdf" ? 0: 0;
+        ConfigExcel.LogoRpt.cell2 = type == "pdf" ? 1 : 1;
+        ConfigExcel.LogoRpt.dx1 = type == "pdf" ? 2930 : 2930;
+        ConfigExcel.LogoRpt.dx2 = type == "pdf" ? 300 : 300;
         ConfigExcel.title = "ĐƠN ĐẶT HÀNG";
         row = ConfigExcel.createHeader(NameHeaderReport.ANCO, s1, row, heigh);
 
@@ -787,6 +787,20 @@ public class DanhSachDatHangReport
                 rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
                 row++;
             }
+        }
+        else
+        {
+            var rowLineHDK = s1.CreateRow(row);
+            rowLineHDK.CreateCell(1).SetCellValue("Ghi chú:");
+            rowLineHDK.GetCell(1).CellStyle = cellBold;
+
+            rowLineHDK.CreateCell(2).SetCellValue(ghiChuHDDH);
+            rowLineHDK.GetCell(2).CellStyle = celltext;
+
+            var heightMAX = ConfigExcel.MeasureTextHeight(ghiChuHDDH, sumWidth2to9, "Arial", fontSizeRptShort - 2);
+            rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+            row++;
         }
 
         row++;
