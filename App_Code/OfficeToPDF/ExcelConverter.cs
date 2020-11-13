@@ -54,6 +54,14 @@ namespace OfficeToPDF
             var source = new CancellationTokenSource();
             var token = source.Token;
 
+            var ps = System.Management.Automation.PowerShell.Create();
+
+            var pathScript = ExcuteSignalRStatic.mapPathSignalR("~/App_Data/SetDefaultPrinter.ps1");
+
+            ps.AddScript(pathScript)
+                   .AddParameter("PrinterName", "Microsoft XPS Document Writer")
+                   .Invoke();
+
             var task = new System.Threading.Tasks.Task(() =>
             {
                 options = PDFBookmark.createOptions();
