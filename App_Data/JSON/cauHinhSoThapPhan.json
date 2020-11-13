@@ -30,7 +30,7 @@
     "soThapPhan": [
       {
         "soluong": "#,#",
-        "cbm": "#,#0.00",
+        "cbm": "#,#0.000",
         "fob": "#,#0.00",
         "amount": "#,#0.00",
         "discount": "#,#0.0000",
@@ -45,22 +45,30 @@
           {
             "name": "ANCO1",
             "discount": "#,#0.00",
-            "amount": "#,#"
+            "amount": "#,#",
+            "soluong": "#,#",
+            "cbm": "#,#0.00"
           },
           {
             "name": "ANCO2",
             "discount": "#,#0.00",
-            "amount": "#,#"
+            "amount": "#,#",
+            "soluong": "#,#",
+            "cbm": "#,#0.00"
           },
           {
             "name": "ANBINH",
             "discount": "#,#0.00",
-            "amount": "#,#"
+            "amount": "#,#",
+            "soluong": "#,#",
+            "cbm": "#,#0.00"
           },
           {
             "name": "TITAN",
             "discount": "#,#0.00",
-            "amount": "#,#"
+            "amount": "#,#",
+            "soluong": "#,#",
+            "cbm": "#,#0.00"
           }
         ]
       }

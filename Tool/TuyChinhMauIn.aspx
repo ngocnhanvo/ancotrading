@@ -168,8 +168,14 @@
             }
         };
 
-        document.getElementById('LuuChinhSua').onclick = function() {
-            if (confirm('Thực hiện lưu chỉnh sửa của bạn???')) {
+        document.getElementById('LuuChinhSua').onclick = function () {
+            if (!document.getElementById('selectRpt').value) {
+                alert('Phải chọn mẫu in');
+                return;
+            }
+
+            if (confirm('Thực hiện lưu chỉnh sửa của bạn???'))
+            {
                 const XHR = new XMLHttpRequest();
 
                 let urlEncodedData = "",
@@ -223,6 +229,12 @@
                         option.setAttribute("ktc", option2.getAttribute("ktc"));
                         option.setAttribute("stps", option2.getAttribute("stps"));
                     }
+
+                    let valSel = document.getElementById('selNCCStp').value;
+                    selectRpt.onchange();
+                    document.getElementById('selNCCStp').value = valSel;
+                    document.getElementById('selNCCStp').onchange();
+
                     alert('Lưu thành công');
                 });
 

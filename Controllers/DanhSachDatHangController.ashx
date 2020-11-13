@@ -351,6 +351,8 @@ public class DanhSachDatHangController : IHttpHandler
                         string tieude = tmp.subject_mail;
                         tieude = tieude.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
                         tieude = tieude.Replace("[SOPO]", dsdh.so_po);
+                        tieude = tieude.Replace("[NGAYLAP]", dsdh.ngaylap == null ? "" : dsdh.ngaylap.Value.ToString("dd/MM/yyyy"));
+
                         var mailObj = new Dictionary<string, object>();
                         mailObj["tieude"] = tieude;
                         mailObj["noidung"] = noidung;
@@ -771,7 +773,7 @@ public class DanhSachDatHangController : IHttpHandler
         catch (Exception ex)
         {
             next = false;
-            context.Response.Write("Không tạo được file Excel, " + ex.Message);
+            context.Response.Write("Không tạo được file \""+ fileNameExcel +"\", " + ex.Message);
         }
 
         if (next)
@@ -800,6 +802,8 @@ public class DanhSachDatHangController : IHttpHandler
 
                 tmp.subject_mail = tmp.subject_mail.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
                 tmp.subject_mail = tmp.subject_mail.Replace("[SOPO]", dsdh.so_po);
+                tmp.subject_mail = tmp.subject_mail.Replace("[NGAYLAP]", dsdh.ngaylap == null ? "" : dsdh.ngaylap.Value.ToString("dd/MM/yyyy"));
+
                 tmp.content_mail = tmp.content_mail.Replace("[NHACUNGUNG]", doitac.ten_dtkd);
                 tmp.content_mail = tmp.content_mail.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
                 tmp.content_mail = tmp.content_mail.Replace("[NGAYGIAOHANG]", dsdh.hangiaohang_po.Value.ToString("dd/MM/yyyy"));
@@ -1315,8 +1319,9 @@ public class DanhSachDatHangController : IHttpHandler
     public List<string> taoFileDonDatHang(HttpContext context, string manv, string ma_dtkd, c_danhsachdathang dsdh, bool guiNCC)
     {
         //-Tao file dinh kem
-        String fileName = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + guiNCC.ToString() + ".xls";
-        String fileNamePdf = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy")+ guiNCC.ToString() + ".pdf";
+        String fileName = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + guiNCC.ToString();
+        String fileNameXls = fileName + ".xls";
+        String fileNamePdf = fileName + ".pdf";
         MemoryStream ms = new MemoryStream();
         //-- Tao excel
         NPOI.HSSF.UserModel.HSSFWorkbook wb = null;
@@ -1330,22 +1335,34 @@ public class DanhSachDatHangController : IHttpHandler
             wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
             wb.Write(ms);
 
-
-            fileName = path + fileName;
-            File.WriteAllBytes(fileName, ms.ToArray());
+            fileNameXls = path + fileNameXls;
+            File.WriteAllBytes(fileNameXls, ms.ToArray());
             ms.Close();
         }
         catch (Exception ex)
         {
-            fileName = "";
+            fileNameXls = "";
             context.Response.Write("Không tạo được file excel, " + ex.Message);
         }
 
         //-- Tao PDF
         try
         {
+            ms = new MemoryStream();
+            rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
+            rptPI.guiNCC = guiNCC;
+            rptPI.TypePrint = "pdf";
+            wb = rptPI.CreateWBPI();
+            wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
+            wb.Write(ms);
+
+            var url = path + Guid.NewGuid().ToString() + ".xls";
+            File.WriteAllBytes(url, ms.ToArray());
+            ms.Close();
+
             fileNamePdf =  path + fileNamePdf;
-            var result = OfficeToPDF.ExcelConverter.Convert(fileName, fileNamePdf, null, rptPI.Lstimage, rptPI.LstText);
+            var result = OfficeToPDF.ExcelConverter.Convert(url, fileNamePdf, null, rptPI.Lstimage, rptPI.LstText);
+            File.Delete(url);
             //rptDanhSachDatHang report = new rptDanhSachDatHang();
             //SqlDataAdapter da = new SqlDataAdapter(getSqlDsdhPdf(dsdh.c_danhsachdathang_id, guiNCC), mdbc.GetConnection);
             //DataSet ds = new DataSet();
@@ -1454,7 +1471,7 @@ public class DanhSachDatHangController : IHttpHandler
         }
 
         var arrLst = new List<string>();
-        arrLst.Add(fileName);
+        arrLst.Add(fileNameXls);
         arrLst.Add(fileNamePdf);
         return arrLst;
     }
