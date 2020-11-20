@@ -24,6 +24,7 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.Office.Interop.Excel;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace OfficeToPDF
 {
@@ -54,13 +55,19 @@ namespace OfficeToPDF
             var source = new CancellationTokenSource();
             var token = source.Token;
 
-            var ps = System.Management.Automation.PowerShell.Create();
+            var settings = new System.Drawing.Printing.PrinterSettings();
 
-            var pathScript = ExcuteSignalRStatic.mapPathSignalR("~/App_Data/SetDefaultPrinter.ps1");
-
-            ps.AddScript(pathScript)
-                   .AddParameter("PrinterName", "Microsoft XPS Document Writer")
-                   .Invoke();
+            if (settings.PrinterName.ToLower() != "Microsoft XPS Document Writer".ToLower())
+            {
+                var pathScript = ExcuteSignalRStatic.mapPathSignalR("~/App_Data/SetDefaultPrinter.ps1");
+                var process = new Process();
+                var startInfo = new ProcessStartInfo("powershell.exe", "-File " + pathScript + " -PrinterName \"Microsoft XPS Document Writer\"");
+                startInfo.WindowStyle = ProcessWindowStyle.Normal;
+                startInfo.UseShellExecute = false;
+                process.StartInfo = startInfo;
+                process.Start();
+                process.WaitForExit();
+            }
 
             var task = new System.Threading.Tasks.Task(() =>
             {
