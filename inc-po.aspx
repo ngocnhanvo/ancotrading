@@ -36,8 +36,9 @@
                 phifob.val(data.phi[0]);
                 updateMoTaGiaPO_CallBack(c_donhang_id, md_sanpham_id);
 
-                if (phifob.val() == 0)
-                    editPhiFOB.prop('checked', true);
+                if (phifob.val() == 0) {
+                    editPhiFOB.prop('checked', true).change();
+                }
             }
         });
     }
@@ -103,7 +104,11 @@
         
         if (celgia_db == 'True') {
             giafob.prop('disabled', true);
-            phifob.prop('disabled', editphi.prop('checked'));
+
+            editphi.off('change');
+            editphi.change(function () {
+                phifob.prop('disabled', editphi.prop('checked'));
+            });
         }
         else {
             if (vnnIsAdmin == 'True') {
