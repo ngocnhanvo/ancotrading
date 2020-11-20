@@ -109,6 +109,7 @@
             editphi.change(function () {
                 phifob.prop('disabled', !editphi.prop('checked'));
             });
+            editphi.change();
         }
         else {
             if (vnnIsAdmin == 'True') {
