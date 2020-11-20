@@ -107,7 +107,7 @@
 
             editphi.off('change');
             editphi.change(function () {
-                phifob.prop('disabled', editphi.prop('checked'));
+                phifob.prop('disabled', !editphi.prop('checked'));
             });
         }
         else {
