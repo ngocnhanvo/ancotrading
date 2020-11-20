@@ -389,6 +389,7 @@ public class DongDonHangController : IHttpHandler
             mnu.giafob = gia_sp;
             mnu.giachuan = null;
             mnu.discount = 0;
+            mnu.editphi = (context.Request.Form["editphi"] + "").ToLower() == "true";
 
             if(donhang.discount_hehang.GetValueOrDefault(false) == true)
             {
