@@ -2172,7 +2172,7 @@
 				, label: 'Cho phép sửa phí'
                 , index: 'ddh.editphi'
                 , edittype: 'checkbox'
-                , editoptions:{ value:'True:False', defaultValue: 'True' }
+                , editoptions:{ value:'True:False', defaultValue: 'False' }
                 , fixed:true 
 				, width: 100
                 , editable:true
