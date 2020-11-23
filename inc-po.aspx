@@ -25,6 +25,7 @@
         let giafob = $('#giafob', frm);
         let phifob = $('#phi', frm);
         let docquyen = $('#docquyen', frm);
+        let editPhiFOB = $('#editphi', frm);
         giafob.val('Đang tải...');
         $.ajax({
             url: "Controllers/DongDonHangController.ashx?action=getgiasanpham&c_donhang_id=" + c_donhang_id + "&md_sanpham_id=" + md_sanpham_id,
@@ -34,6 +35,10 @@
                 giafob.val(data.gia[0]);
                 phifob.val(data.phi[0]);
                 updateMoTaGiaPO_CallBack(c_donhang_id, md_sanpham_id);
+
+                if (phifob.val() == 0) {
+                    editPhiFOB.prop('checked', true).change();
+                }
             }
         });
     }
@@ -94,9 +99,17 @@
         let giafob = $('#giafob', frm);
         let phifob = $('#phi', frm);
         let docquyen = $('#tr_docquyen', frm);
+        let editphiTr = $('#tr_editphi', frm);
+        let editphi = $('#editphi', frm);
+        
         if (celgia_db == 'True') {
             giafob.prop('disabled', true);
-            phifob.prop('disabled', true);
+
+            editphi.off('change');
+            editphi.change(function () {
+                phifob.prop('disabled', !editphi.prop('checked'));
+            });
+            editphi.change();
         }
         else {
             if (vnnIsAdmin == 'True') {
@@ -109,6 +122,7 @@
             }
         }
         docquyen.hide();
+        editphiTr.hide();
         //$("#md_donggoi_id").bind("change", function(e) { updatePackingPO_CallBack($("#sanpham_id").val()); });
         //$("#nhacungungid").bind("change", function(e) { updateNhaCungUngPO_CallBack($("#sanpham_id").val()); });  
     }
@@ -2152,6 +2166,18 @@
                 , fixed:true 
 				, width: 100
 				, hidden: true
+            },
+            {
+                name: 'editphi'
+				, label: 'Cho phép sửa phí'
+                , index: 'ddh.editphi'
+                , edittype: 'checkbox'
+                , editoptions:{ value:'True:False', defaultValue: 'False' }
+                , fixed:true 
+				, width: 100
+                , editable:true
+				, hidden: true
+                , editrules: { edithidden:true }
             }
             ]"
             GridComplete = "let o = $('#tabs-donhang-details'); $(this).setGridHeight($(o).height() - 97);$(this).setGridWidth($(o).width())"

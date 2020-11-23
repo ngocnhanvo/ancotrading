@@ -136,10 +136,24 @@ public static class ExcuteSignalRStatic
             string clDTMS = string.Format(@"{0}-{1}-{2}.jpg", cl, dt, ms);
             if (File.Exists(image + kd + ms + ".jpg"))
                 msLink += kd + ms + ".jpg";
-            else if (File.Exists(image + clDTMS))
-                msLink += clDTMS;
-            else
-                msLink = Public.imgNotFound;
+            else {
+                bool haveImg = false;
+                for (var i = 0; i < 99; i++)
+                {
+                    var msCP = i < 10 ? "0" + i : i.ToString();
+                    if (File.Exists(image + kd + msCP + ".jpg"))
+                    {
+                        msLink += kd + msCP + ".jpg";
+                        haveImg = true;
+                        break;
+                    }
+                }
+
+                if(haveImg == false)
+                    msLink = Public.imgNotFound;
+            }
+            //else if (File.Exists(image + clDTMS))
+            //msLink += clDTMS;
 
             response["cl"] = cl;
             response["dt"] = dt;

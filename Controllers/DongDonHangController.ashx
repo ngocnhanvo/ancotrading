@@ -389,6 +389,7 @@ public class DongDonHangController : IHttpHandler
             mnu.giafob = gia_sp;
             mnu.giachuan = null;
             mnu.discount = 0;
+            mnu.editphi = (context.Request.Form["editphi"] + "").ToLower() == "true";
 
             if(donhang.discount_hehang.GetValueOrDefault(false) == true)
             {
@@ -565,7 +566,7 @@ public class DongDonHangController : IHttpHandler
                         , ddh.l1, ddh.w1, ddh.h1,  ddh.sl_outer, ddh.l2, ddh.w2, ddh.h2
                         , ddh.sl_cont, ddh.v2, dtkd.ma_dtkd, ddh.ngaytao, ddh.nguoitao
                         , ddh.ngaycapnhat,  ddh.nguoicapnhat, ddh.mota
-                        , ddh.hoatdong ,ddh.trangthai as trangthai_ddh, ddh.docquyen, ddh.barcode
+                        , ddh.hoatdong ,ddh.trangthai as trangthai_ddh, ddh.docquyen, ddh.barcode, ddh.editphi
                         , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
             @" FROM
                 c_dongdonhang ddh
@@ -632,6 +633,7 @@ public class DongDonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["docquyen"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["barcode"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["editphi"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";
