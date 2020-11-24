@@ -1310,7 +1310,7 @@ public class DanhSachDatHangController : IHttpHandler
         catch (Exception ex)
         {
             fileNameExcel = "";
-            context.Response.Write("Không tạo được file Excel, " + ex.Message);
+            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Thông tin sản phẩm</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
         }
 
         return fileNameExcel;
@@ -1322,43 +1322,41 @@ public class DanhSachDatHangController : IHttpHandler
         String fileName = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + guiNCC.ToString();
         String fileNameXls = fileName + ".xls";
         String fileNamePdf = fileName + ".pdf";
-        MemoryStream ms = new MemoryStream();
         //-- Tao excel
         NPOI.HSSF.UserModel.HSSFWorkbook wb = null;
-        DanhSachDatHangReport rptPI = null;
 
         try
         {
-            rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
+            var rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
             rptPI.guiNCC = guiNCC;
             wb = rptPI.CreateWBPI();
             wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
-            wb.Write(ms);
-
             fileNameXls = path + fileNameXls;
-            File.WriteAllBytes(fileNameXls, ms.ToArray());
-            ms.Close();
+            var xfile = new FileStream(fileNameXls, FileMode.Create, FileAccess.ReadWrite);
+            wb.Write(xfile);
+            xfile.Close();
+            xfile.Dispose();
         }
         catch (Exception ex)
         {
             fileNameXls = "";
-            context.Response.Write("Không tạo được file excel, " + ex.Message);
+            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Đơn Đặt Hàng</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
         }
 
         //-- Tao PDF
         try
         {
-            ms = new MemoryStream();
-            rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
+            var rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
             rptPI.guiNCC = guiNCC;
             rptPI.TypePrint = "pdf";
             wb = rptPI.CreateWBPI();
-            wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
-            wb.Write(ms);
+            //wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
 
             var url = path + Guid.NewGuid().ToString() + ".xls";
-            File.WriteAllBytes(url, ms.ToArray());
-            ms.Close();
+            var xfile = new FileStream(url, FileMode.Create, FileAccess.ReadWrite);
+            wb.Write(xfile);
+            xfile.Close();
+            xfile.Dispose();
 
             fileNamePdf =  path + fileNamePdf;
             var result = OfficeToPDF.ExcelConverter.Convert(url, fileNamePdf, null, rptPI.Lstimage, rptPI.LstText);
@@ -1467,7 +1465,7 @@ public class DanhSachDatHangController : IHttpHandler
         catch (Exception ex)
         {
             fileNamePdf = "";
-            context.Response.Write("Không tạo được file PDF, " + ex.Message);
+            context.Response.Write(string.Format(@"<div>Không tạo được file PDF Thông tin sản phẩm</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
         }
 
         var arrLst = new List<string>();
@@ -1478,7 +1476,7 @@ public class DanhSachDatHangController : IHttpHandler
 
     public string taoFileXacNhanBaoBi(HttpContext context, string manv, c_danhsachdathang dsdh)
     {
-        string pathInBaoBi = path + "/AnCoInBaoBi" + DateTime.Now.ToString("ddMMyyyyhhmmss") + ".xls";
+        string pathInBaoBi = path + "AnCoInBaoBi" + DateTime.Now.ToString("ddMMyyyyhhmmss") + ".xls";
         try
         {
             string sql = String.Format(@"select 
@@ -1501,7 +1499,7 @@ public class DanhSachDatHangController : IHttpHandler
         catch (Exception ex)
         {
             pathInBaoBi = "";
-            context.Response.Write("Không tạo được file xác nhận bao bì PDF, " + ex.Message);
+            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Xác Nhận Bao Bì</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
         }
 
         return pathInBaoBi;
