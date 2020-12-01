@@ -115,7 +115,7 @@ public class MainHub : Hub
 
         try
         {
-            var img = ExcuteSignalRStatic.getImage(ma_sanpham);
+            var img = ExcuteSignalRStatic.getImage(ma_sanpham, 1);
             response["Success"] = true;
             response["Message"] = img["msLink"];
             response["CL"] = img["cl"];
@@ -185,7 +185,7 @@ public class MainHub : Hub
                         }
                     }
 
-                    var img = ExcuteSignalRStatic.getImage(sp.ma_sanpham);
+                    var img = ExcuteSignalRStatic.getImage(sp.ma_sanpham, 0);
                     rowSP.image = img["msLink"];
                 }
             }
