@@ -115,7 +115,7 @@ public static class ExcuteSignalRStatic
         return mdbc.GetData(strsql);
     }
 
-    public static dynamic getImage(string ma_sanpham)
+    public static dynamic getImage(string ma_sanpham, int type)
     {
         var response = new Dictionary<string, object>()
         {
@@ -138,22 +138,26 @@ public static class ExcuteSignalRStatic
                 msLink += kd + ms + ".jpg";
             else {
                 bool haveImg = false;
-                for (var i = 0; i < 99; i++)
-                {
-                    var msCP = i < 10 ? "0" + i : i.ToString();
-                    if (File.Exists(image + kd + msCP + ".jpg"))
-                    {
-                        msLink += kd + msCP + ".jpg";
-                        haveImg = true;
-                        break;
-                    }
-                }
 
-                if(haveImg == false)
-                    msLink = Public.imgNotFound;
+                if (type == 0)
+                {
+                    for (var i = 0; i < 99; i++)
+                    {
+                        var msCP = i < 10 ? "0" + i : i.ToString();
+                        if (File.Exists(image + kd + msCP + ".jpg"))
+                        {
+                            msLink += kd + msCP + ".jpg";
+                            haveImg = true;
+                            break;
+                        }
+                    }
+
+                    if (haveImg == false)
+                        msLink = Public.imgNotFound;
+                }
+                else if (File.Exists(image + clDTMS))
+                    msLink += clDTMS;
             }
-            //else if (File.Exists(image + clDTMS))
-            //msLink += clDTMS;
 
             response["cl"] = cl;
             response["dt"] = dt;
