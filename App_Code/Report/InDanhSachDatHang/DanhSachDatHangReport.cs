@@ -495,7 +495,7 @@ public class DanhSachDatHangReport
             columnAt = 15,
             text = "Cbm",
             value = "cbm",
-            width = 2500
+            width = 3000
         });
 
         columnHeaders.Add(new columnHeader()
