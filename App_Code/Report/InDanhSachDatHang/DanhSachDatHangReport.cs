@@ -650,6 +650,8 @@ public class DanhSachDatHangReport
         s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng:");
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 4));
+
         s1.GetRow(row).CreateCell(5).SetCellFormula(String.Format("SUM(F{0}:F{1})", m, row));
         s1.GetRow(row).GetCell(5).CellStyle = cellBoldSoLuong;
 
@@ -731,6 +733,8 @@ public class DanhSachDatHangReport
         s1.CreateRow(row).CreateCell(1).SetCellValue(String.Format("Discount ({0}%)", ds2so));
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 4));
+
         cellR10 = s1.GetRow(row).CreateCell(10);
         if (guiNCC == false)
         {
@@ -742,6 +746,7 @@ public class DanhSachDatHangReport
 		s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng đã trừ:");
         s1.GetRow(row).HeightInPoints = 30;
         s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 4));
         cellR10 = s1.GetRow(row).CreateCell(10);
         var tongCongDaTru = sumThanhTien + phiTangVal - phiGiamVal - discount;
         if (guiNCC == false)
