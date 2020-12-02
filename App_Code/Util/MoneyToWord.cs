@@ -295,9 +295,6 @@ public static class MoneyToWord
         else
         {
             textMoney = MoneyToWord.ConvertMoneyToTextVND(number);
-
-            if (number == 0)
-                textMoney = "Không " + textMoney;
         }
         return textMoney;
     }
