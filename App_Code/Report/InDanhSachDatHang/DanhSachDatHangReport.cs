@@ -64,7 +64,6 @@ public class DanhSachDatHangReport
 							, dtkd.tel
 							, dtkd.fax
 	                        , sp.ma_sanpham as maSo
-							, (case when  SUBSTRING(sp.ma_sanpham,10,1) != 'F' then SUBSTRING(sp.ma_sanpham,0,9) else SUBSTRING(sp.ma_sanpham,0,12) end) as pic
 							, ddsdh.ma_sanpham_khach as maKhachHang
                             , ddsdh.mota_tiengviet as moTa
                             , dvt.ma_edi as dvt

@@ -277,6 +277,8 @@ public static class MoneyToWord
         if (new string[] { "VINHGIA" }.Contains(dtkd))
         {
             string m = MoneyToWord.ConvertMoneyToText(number.ToString()).Replace("Dollars", "");
+            if (number == 0)
+                m = "Zero " + m;
             int j = m.LastIndexOf("and");
 
             if (m.Contains("Cents") | m.Contains("Cent"))
@@ -293,6 +295,9 @@ public static class MoneyToWord
         else
         {
             textMoney = MoneyToWord.ConvertMoneyToTextVND(number);
+
+            if (number == 0)
+                textMoney = "Không " + textMoney;
         }
         return textMoney;
     }
