@@ -702,7 +702,7 @@ public static class UserUtils
         }
         else
         {
-            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : (decimal)ddh.discount.GetValueOrDefault(0);
+            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : (dh.discount.GetValueOrDefault(0) <= 0 ? (decimal)ddh.discount.GetValueOrDefault(0): dh.discount.GetValueOrDefault(0));
         }
         return discount;
     }
