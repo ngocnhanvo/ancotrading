@@ -92,7 +92,7 @@ public class TaoPackingListController : IHttpHandler {
 
                 line.thanhtien = dongnx.slthuc_nhapxuat * dongnx.dongia;
 
-                var discountHH_DH = (double)UserUtils.getDiscountgPO(donhang, dongdonhang);
+                var discountHH_DH = (double)UserUtils.getDiscountgPO(donhang, dongdonhang, 1);
                 discountHH += (double)line.thanhtien.GetValueOrDefault(0) * discountHH_DH / 100;
 
                 line.nhacungungid = dongdonhang.nhacungungid;
