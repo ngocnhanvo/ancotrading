@@ -707,6 +707,21 @@ public static class UserUtils
         return discount;
     }
 
+    public static decimal getDiscountgPO(c_donhang dh, c_dongdonhang ddh, int type)
+    {
+
+        decimal discount = 0;
+        if (type == 0)
+        {
+            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : dh.discount.GetValueOrDefault(0);
+        }
+        else if(type == 1)
+        {
+            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : (decimal)ddh.discount.GetValueOrDefault(0);
+        }
+        return discount;
+    }
+
     private class dsncc_ptr
     {
         public string id;
