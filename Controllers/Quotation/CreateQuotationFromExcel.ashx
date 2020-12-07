@@ -129,7 +129,6 @@ public class CreateQuotationFromExcel : IHttpHandler
                         {
                             db.SubmitChanges();
                             msg += string.Format(@"<div style='color:blue'>Đã tạo thành công báo giá ""{0}""</div>", sochungtu);
-                            msg = msg.Substring(4);
                         }
                         else
                         {
