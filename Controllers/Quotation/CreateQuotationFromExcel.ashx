@@ -170,6 +170,10 @@ public class CreateQuotationFromExcel : IHttpHandler
                 ok = false;
                 msg = msg.Substring(6);
             }
+            else
+            {
+                ok = true;
+            }
         }
         catch {
             msg = "Không tìm thấy tập tin.";
