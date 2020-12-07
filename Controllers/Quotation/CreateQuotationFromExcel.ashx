@@ -165,7 +165,11 @@ public class CreateQuotationFromExcel : IHttpHandler
             Workbook wb = Workbook.Load(filePath);
             Worksheet ws = wb.Worksheets[0];
             msg = this.NewFromCellCollection(context, ws.Cells);
-            ok = !msg.StartsWith("false#");
+            if (msg.StartsWith("false#"))
+            {
+                ok = false;
+                msg = msg.Substring(6);
+            }
         }
         catch {
             msg = "Không tìm thấy tập tin.";
@@ -329,7 +333,7 @@ public class CreateQuotationFromExcel : IHttpHandler
         }
 
         if (rowAdd == 0)
-            msg = "false#";
+            msg = "false#" + msg;
 
         return msg;
     }
