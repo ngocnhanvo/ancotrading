@@ -372,14 +372,15 @@ public static class UserUtils
             gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
             if (giaNhap2BD > -1)
             {
-                gianhap = gianhap2;
                 if (maNCC != "VINHGIA")
                 {
+					gianhap = gianhap2;
                     giachuan = jqGridHelper.Utils.Round3(gianhap, -2);
                     gianhap = jqGridHelper.Utils.Round3(gianhap + (phiDiscount * tygia), -2);
                 }
                 else
                 {
+					gianhap = giaNhap2BD;
                     giachuan = gianhap;
                     gianhap = gianhap + phiDiscount;
                 }
