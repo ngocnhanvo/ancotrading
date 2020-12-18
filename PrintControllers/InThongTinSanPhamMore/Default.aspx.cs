@@ -154,7 +154,7 @@ public partial class PrintControllers_InThongTinSanPhamMore_Default : System.Web
 				rowDetails.GetCell(12).CellStyle = cellBold3;
 
                 var rowDT13 = rowDetails.CreateCell(13);
-                if (row["thetich"] != null)
+                if (!string.IsNullOrEmpty(row["thetich"].ToString()))
                     rowDT13.SetCellValue(double.Parse(row["thetich"].ToString()));
                 rowDetails.GetCell(13).CellStyle = cellBold3;
 
