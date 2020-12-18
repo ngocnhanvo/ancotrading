@@ -153,7 +153,9 @@ public partial class PrintControllers_InThongTinSanPhamMore_Default : System.Web
                 rowDetails.CreateCell(12).SetCellValue(double.Parse(row["dientich"].ToString()));
 				rowDetails.GetCell(12).CellStyle = cellBold3;
 
-                rowDetails.CreateCell(13).SetCellValue(double.Parse(row["thetich"].ToString()));
+                var rowDT13 = rowDetails.CreateCell(13);
+                if (row["thetich"] != null)
+                    rowDT13.SetCellValue(double.Parse(row["thetich"].ToString()));
                 rowDetails.GetCell(13).CellStyle = cellBold3;
 
                 rowDetails.CreateCell(14).SetCellValue(row["nhom nang luc"].ToString());
