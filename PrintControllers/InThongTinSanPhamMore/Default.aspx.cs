@@ -38,7 +38,7 @@ public partial class PrintControllers_InThongTinSanPhamMore_Default : System.Web
                     , kd.ma_kieudang as [ma kieu dang], cn.ma_chucnang as [ma chuc nang] 
                     , (select dvtsp.ten_dvt from md_donvitinhsanpham dvtsp where dvtsp.md_donvitinhsanpham_id = sp.md_donvitinhsanpham_id) as [don vi tinh sp]
                     , l_cm as l, w_cm as w, h_cm as h
-                    , sp.trongluong, sp.dientich
+                    , sp.trongluong, sp.dientich, sp.thetich
                     , (select nhom from md_nhomnangluc nnl where nnl.md_nhomnangluc_id = sp.md_nhomnangluc_id) as [nhom nang luc]    
 					, cb.ma_cangbien as [Cang Bien], dtkd.ma_dtkd as [NCC]
 					, hscode.ma_hscode as [HS Code]
@@ -123,66 +123,82 @@ public partial class PrintControllers_InThongTinSanPhamMore_Default : System.Web
                 IRow rowDetails = s1.CreateRow(iRow);
                 
                 rowDetails.CreateCell(0).SetCellValue(row["ma san pham"].ToString());
+
                 rowDetails.CreateCell(1).SetCellValue(row["ten tieng viet"].ToString());
+
                 rowDetails.CreateCell(2).SetCellValue(row["ten tieng anh"].ToString());
-				rowDetails.CreateCell(3).SetCellValue(row["ten kieu dang"].ToString());
+
+                rowDetails.CreateCell(3).SetCellValue(row["ten kieu dang"].ToString());
+
                 rowDetails.CreateCell(4).SetCellValue(row["ten chuc nang"].ToString());
+
                 rowDetails.CreateCell(5).SetCellValue(row["ma kieu dang"].ToString());
+
                 rowDetails.CreateCell(6).SetCellValue(row["ma chuc nang"].ToString());
+
                 rowDetails.CreateCell(7).SetCellValue(row["don vi tinh sp"].ToString());
+
                 rowDetails.CreateCell(8).SetCellValue(double.Parse(row["l"].ToString()));
 				rowDetails.GetCell(8).CellStyle = cellBold;
+
                 rowDetails.CreateCell(9).SetCellValue(double.Parse(row["w"].ToString()));
 				rowDetails.GetCell(9).CellStyle = cellBold;
+
                 rowDetails.CreateCell(10).SetCellValue(double.Parse(row["h"].ToString()));
 				rowDetails.GetCell(10).CellStyle = cellBold;
+
                 rowDetails.CreateCell(11).SetCellValue(double.Parse(row["trongluong"].ToString()));
 				rowDetails.GetCell(11).CellStyle = cellBold2;
+
                 rowDetails.CreateCell(12).SetCellValue(double.Parse(row["dientich"].ToString()));
 				rowDetails.GetCell(12).CellStyle = cellBold3;
-                rowDetails.CreateCell(13).SetCellValue(row["nhom nang luc"].ToString());
-				rowDetails.CreateCell(14).SetCellValue(row["Cang Bien"].ToString());
-				rowDetails.CreateCell(15).SetCellValue(row["NCC"].ToString());
-                rowDetails.CreateCell(16).SetCellValue(row["HS Code"].ToString());
-				rowDetails.CreateCell(17).SetCellValue(row["chucnangsp"].ToString());
-				rowDetails.CreateCell(18).SetCellValue(row["ngayxacnhan"].ToString());
-				rowDetails.CreateCell(19).SetCellValue(row["hinhthucban"].ToString());
-                rowDetails.CreateCell(20).SetCellValue(row["mota"].ToString());
-				rowDetails.CreateCell(21).SetCellValue(row["ghichu"].ToString());
-                rowDetails.CreateCell(22).SetCellValue(double.Parse(row["gia ban"].ToString()));
-				rowDetails.GetCell(22).CellStyle = cellBold2;
-                rowDetails.CreateCell(23).SetCellValue(double.Parse(row["gia mua"].ToString()));
+
+                rowDetails.CreateCell(13).SetCellValue(double.Parse(row["thetich"].ToString()));
+                rowDetails.GetCell(13).CellStyle = cellBold3;
+
+                rowDetails.CreateCell(14).SetCellValue(row["nhom nang luc"].ToString());
+				rowDetails.CreateCell(15).SetCellValue(row["Cang Bien"].ToString());
+				rowDetails.CreateCell(16).SetCellValue(row["NCC"].ToString());
+                rowDetails.CreateCell(17).SetCellValue(row["HS Code"].ToString());
+				rowDetails.CreateCell(18).SetCellValue(row["chucnangsp"].ToString());
+				rowDetails.CreateCell(19).SetCellValue(row["ngayxacnhan"].ToString());
+				rowDetails.CreateCell(20).SetCellValue(row["hinhthucban"].ToString());
+                rowDetails.CreateCell(21).SetCellValue(row["mota"].ToString());
+				rowDetails.CreateCell(22).SetCellValue(row["ghichu"].ToString());
+                rowDetails.CreateCell(23).SetCellValue(double.Parse(row["gia ban"].ToString()));
 				rowDetails.GetCell(23).CellStyle = cellBold2;
-                rowDetails.CreateCell(24).SetCellValue(double.Parse(row["SL Inner"].ToString()));
-                rowDetails.CreateCell(25).SetCellValue(row["DVT Inner"].ToString());
-                rowDetails.CreateCell(26).SetCellValue(double.Parse(row["l1"].ToString()));
-				rowDetails.GetCell(26).CellStyle = cellBold;
-                rowDetails.CreateCell(27).SetCellValue(double.Parse(row["w1"].ToString()));
+                rowDetails.CreateCell(24).SetCellValue(double.Parse(row["gia mua"].ToString()));
+				rowDetails.GetCell(24).CellStyle = cellBold2;
+                rowDetails.CreateCell(25).SetCellValue(double.Parse(row["SL Inner"].ToString()));
+                rowDetails.CreateCell(26).SetCellValue(row["DVT Inner"].ToString());
+                rowDetails.CreateCell(27).SetCellValue(double.Parse(row["l1"].ToString()));
 				rowDetails.GetCell(27).CellStyle = cellBold;
-                rowDetails.CreateCell(28).SetCellValue(double.Parse(row["h1"].ToString()));
+                rowDetails.CreateCell(28).SetCellValue(double.Parse(row["w1"].ToString()));
 				rowDetails.GetCell(28).CellStyle = cellBold;
-                rowDetails.CreateCell(29).SetCellValue(double.Parse(row["SL Outer"].ToString()));
-                rowDetails.CreateCell(30).SetCellValue(row["DVT Outer"].ToString());
-                rowDetails.CreateCell(31).SetCellValue(double.Parse(row["l2"].ToString()));
-				rowDetails.GetCell(31).CellStyle = cellBold;
-                rowDetails.CreateCell(32).SetCellValue(double.Parse(row["w2"].ToString()));
+                rowDetails.CreateCell(29).SetCellValue(double.Parse(row["h1"].ToString()));
+				rowDetails.GetCell(29).CellStyle = cellBold;
+                rowDetails.CreateCell(30).SetCellValue(double.Parse(row["SL Outer"].ToString()));
+                rowDetails.CreateCell(31).SetCellValue(row["DVT Outer"].ToString());
+                rowDetails.CreateCell(32).SetCellValue(double.Parse(row["l2"].ToString()));
 				rowDetails.GetCell(32).CellStyle = cellBold;
-                rowDetails.CreateCell(33).SetCellValue(double.Parse(row["h2"].ToString()));
+                rowDetails.CreateCell(33).SetCellValue(double.Parse(row["w2"].ToString()));
 				rowDetails.GetCell(33).CellStyle = cellBold;
-                rowDetails.CreateCell(34).SetCellValue(double.Parse(row["SL Cont 20"].ToString()));
-                rowDetails.CreateCell(35).SetCellValue(double.Parse(row["SL Cont 40"].ToString()));
-                rowDetails.CreateCell(36).SetCellValue(double.Parse(row["SL Cont 40 hc"].ToString()));
-                rowDetails.CreateCell(37).SetCellValue(double.Parse(row["vd"].ToString()));
-				s1.SetColumnWidth(37, 0);
-                rowDetails.CreateCell(38).SetCellValue(double.Parse(row["vn"].ToString()));
+                rowDetails.CreateCell(34).SetCellValue(double.Parse(row["h2"].ToString()));
+				rowDetails.GetCell(34).CellStyle = cellBold;
+                rowDetails.CreateCell(35).SetCellValue(double.Parse(row["SL Cont 20"].ToString()));
+                rowDetails.CreateCell(36).SetCellValue(double.Parse(row["SL Cont 40"].ToString()));
+                rowDetails.CreateCell(37).SetCellValue(double.Parse(row["SL Cont 40 hc"].ToString()));
+                rowDetails.CreateCell(38).SetCellValue(double.Parse(row["vd"].ToString()));
 				s1.SetColumnWidth(38, 0);
-                rowDetails.CreateCell(39).SetCellValue(double.Parse(row["vl"].ToString()));
+                rowDetails.CreateCell(39).SetCellValue(double.Parse(row["vn"].ToString()));
 				s1.SetColumnWidth(39, 0);
-				rowDetails.CreateCell(40).SetCellValue(row["ghichu_vachngan"].ToString());
+                rowDetails.CreateCell(40).SetCellValue(double.Parse(row["vl"].ToString()));
 				s1.SetColumnWidth(40, 0);
-				rowDetails.CreateCell(41).SetCellValue(row["ngayxacnhan_donggoi"].ToString());
-                rowDetails.CreateCell(42).SetCellValue(row["trangthai"].ToString());
-                rowDetails.CreateCell(43).SetCellValue(row["ghi chu dong goi"].ToString());        
+				rowDetails.CreateCell(41).SetCellValue(row["ghichu_vachngan"].ToString());
+				s1.SetColumnWidth(41, 0);
+				rowDetails.CreateCell(42).SetCellValue(row["ngayxacnhan_donggoi"].ToString());
+                rowDetails.CreateCell(43).SetCellValue(row["trangthai"].ToString());
+                rowDetails.CreateCell(44).SetCellValue(row["ghi chu dong goi"].ToString());        
                 iRow++;
             }
             String saveAsFileName = "ThongTinSanPham.xls";
