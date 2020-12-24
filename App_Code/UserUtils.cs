@@ -380,7 +380,7 @@ public static class UserUtils
                 }
                 else
                 {
-					gianhap = giaNhap2BD;
+					gianhap = ddonhang.discount.GetValueOrDefault(0) > 0 ? gianhap2 : giaNhap2BD;
                     giachuan = gianhap;
                     gianhap = gianhap + phiDiscount;
                 }
