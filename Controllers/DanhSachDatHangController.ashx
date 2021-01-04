@@ -387,6 +387,7 @@ public class DanhSachDatHangController : IHttpHandler
             }
             catch (Exception ex)
             {
+				msg += string.Format("<div style='display:none'>{0}</div>", ex + "");
                 msg += "errVinhGia:" + ex.Message;
             }
 
@@ -418,6 +419,7 @@ public class DanhSachDatHangController : IHttpHandler
             }
             catch (Exception ex)
             {
+				msg += string.Format("<div style='display:none'>{0}</div>", ex + "");
                 msg += "errAnco2: " + ex.Message;
             }
 
