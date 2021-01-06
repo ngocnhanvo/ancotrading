@@ -917,17 +917,20 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 }
                 else if (new string[] { "soluong" }.Contains(columnHeader.value))
                 {
-                    cel_row_t.SetCellValue(double.Parse(dt.Rows[i][columnHeader.value].ToString()));
+                    var val = dt.Rows[i][columnHeader.value].ToString();
+                    cel_row_t.SetCellValue(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val));
                     cel_row_t.CellStyle = cellSoLuong;
                 }
                 else if (new string[] { "giafob", "giachuan", "phi" }.Contains(columnHeader.value))
                 {
-                    cel_row_t.SetCellValue(Math.Round(double.Parse(dt.Rows[i][columnHeader.value].ToString()), 2));
+                    var val = dt.Rows[i][columnHeader.value].ToString();
+                    cel_row_t.SetCellValue(Math.Round(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val), 2));
                     cel_row_t.CellStyle = cellAmount;
                 }
                 else if (new string[] { "l2", "w2", "h2" }.Contains(columnHeader.value))
                 {
-                    cel_row_t.SetCellValue(double.Parse(dt.Rows[i][columnHeader.value].ToString()));
+                    var val = dt.Rows[i][columnHeader.value].ToString();
+                    cel_row_t.SetCellValue(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val));
                     cel_row_t.CellStyle = border_number2;
                 }
                 else if (new string[] { "ma_hscode", "ma_sanpham" }.Contains(columnHeader.value))
