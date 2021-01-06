@@ -870,8 +870,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             if (startRowHH == -1)
                 startRowHH = row;
 
-            discount = double.Parse(dt.Rows[i]["dis"].ToString());
-            discount1 = double.Parse(dt.Rows[i]["dis1"].ToString());
+            var valDis = dt.Rows[i]["dis"].ToString();
+            discount = double.Parse(string.IsNullOrWhiteSpace(valDis) ? "0" : valDis);
+
+            var valDis1 = dt.Rows[i]["dis1"].ToString();
+            discount1 = double.Parse(string.IsNullOrWhiteSpace(valDis1) ? "0" : valDis1);
 
             IRow row_t = s1.CreateRow(row);
             float heightMAX = config.MeasureTextHeight(mota, 10000, "Arial", fontSizeRptShort);
