@@ -644,7 +644,7 @@ public class BaoGiaReport
         row++;
         s1.CreateRow(row).CreateCell(0).SetCellValue("");
         s1.GetRow(row).CreateCell(1).SetCellValue(
-           @"The fee of Fumigation and Ventilation under AFAS standard for all containers imported to Australia (if required) will be charged to customers: 220 USD/20"" container; 310 USD/40"", 40”HC, 45” container."
+           @"The fee of Fumigation and Ventilation under AFAS standard for all containers imported to Australia (if required) will be charged to customers: 250 USD/20"" container; 350 USD/40"", 40”HC, 45” container."
         );
         s1.GetRow(row).GetCell(1).CellStyle = celltext;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
