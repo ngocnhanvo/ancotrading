@@ -59,11 +59,20 @@ namespace OfficeToPDF
 
             if (settings.PrinterName.ToLower() != "Microsoft XPS Document Writer".ToLower())
             {
-                var pathScript = ExcuteSignalRStatic.mapPathSignalR("~/App_Data/SetDefaultPrinter.ps1");
-                var process = new Process();
-                var startInfo = new ProcessStartInfo("powershell.exe", "-File " + pathScript + " -PrinterName \"Microsoft XPS Document Writer\"");
-                startInfo.WindowStyle = ProcessWindowStyle.Normal;
-                startInfo.UseShellExecute = false;
+                //var pathScript = ExcuteSignalRStatic.mapPathSignalR("~/App_Data/SetDefaultPrinter.ps1");
+                //var process = new Process();
+                //var startInfo = new ProcessStartInfo("powershell.exe", "-File " + pathScript + " -PrinterName \"Microsoft XPS Document Writer\"");
+                //startInfo.WindowStyle = ProcessWindowStyle.Normal;
+                //startInfo.UseShellExecute = false;
+                //process.StartInfo = startInfo;
+                //process.Start();
+                //process.WaitForExit();
+
+                var process = new System.Diagnostics.Process();
+                var startInfo = new System.Diagnostics.ProcessStartInfo();
+                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                startInfo.FileName = "cmd.exe";
+                startInfo.Arguments = "RUNDLL32 PRINTUI.DLL,PrintUIEntry /y /n \"Microsoft XPS Document Writer\"";
                 process.StartInfo = startInfo;
                 process.Start();
                 process.WaitForExit();
