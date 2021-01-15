@@ -75,6 +75,7 @@ namespace OfficeToPDF
                 startInfo.Arguments = "RUNDLL32 PRINTUI.DLL,PrintUIEntry /y /n \"Microsoft XPS Document Writer\"";
                 process.StartInfo = startInfo;
                 process.Start();
+                process.WaitForExit();
             }
 
             var task = new System.Threading.Tasks.Task(() =>
