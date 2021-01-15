@@ -72,8 +72,7 @@ namespace OfficeToPDF
                 var startInfo = new ProcessStartInfo();
                 startInfo.WindowStyle = ProcessWindowStyle.Normal;
                 startInfo.UseShellExecute = false;
-                startInfo.FileName = "cmd.exe";
-                startInfo.Arguments = "RUNDLL32 PRINTUI.DLL,PrintUIEntry /y /n \"Microsoft XPS Document Writer\"";
+                startInfo.FileName = ExcuteSignalRStatic.mapPathSignalR("~/App_Data/AutoSetDefaultPrinter.bat");
                 process.StartInfo = startInfo;
                 process.Start();
                 process.WaitForExit();
