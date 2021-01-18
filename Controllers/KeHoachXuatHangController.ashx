@@ -331,10 +331,10 @@ public class KeHoachXuatHangController : IHttpHandler {
 
         if(dateType == "0")
         {
-            sqlCount += " AND kh.ngaygiaohang >= N'{1}' AND kh.ngaygiaohang <= N'{2}' ";
+            sqlCount += " AND kh.ngaygiaohang >= {1} AND kh.ngaygiaohang <= {2} ";
         }
         else{
-            sqlCount += " AND kh.ngayxonghang >= N'{1}' AND kh.ngayxonghang <= N'{2}' ";
+            sqlCount += " AND kh.ngayxonghang >= {1} AND kh.ngayxonghang <= {2} ";
         }
 
         sqlCount = String.Format(sqlCount, isadmin == true ? "" : "AND kh.nguoitao IN(" + strAccount + ")", from, to);
@@ -413,10 +413,10 @@ public class KeHoachXuatHangController : IHttpHandler {
 
         if(dateType == "0")
         {
-            strsql += " AND kh.ngaygiaohang >= N'{1}' AND kh.ngaygiaohang <= N'{2}' ";
+            strsql += " AND kh.ngaygiaohang >= {1} AND kh.ngaygiaohang <= {2} ";
         }
         else{
-            strsql += " AND kh.ngayxonghang >= N'{1}' AND kh.ngayxonghang <= N'{2}' ";
+            strsql += " AND kh.ngayxonghang >= {1} AND kh.ngayxonghang <= {2} ";
         }
 
         strsql += " )P where RowNum > @start AND RowNum < @end ";
