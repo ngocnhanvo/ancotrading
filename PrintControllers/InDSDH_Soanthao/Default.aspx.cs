@@ -131,7 +131,7 @@ public partial class PrintControllers_Default : System.Web.UI.Page
 			int cell_t = 0;
 			for (int j = 0; j < e_value.Count(); j++)
 			{
-                if (j == 3 | j == 4)
+                if (new int[] { 3, 4, 5 }.Contains(j))
                 {
                     var strDate = dt.Rows[i][e_value[j]].ToString();
                     strDate = string.IsNullOrEmpty(strDate) ? "" : Convert.ToDateTime(strDate).ToString("dd/MM/yyyy");
