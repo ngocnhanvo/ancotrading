@@ -133,8 +133,9 @@ public partial class PrintControllers_Default : System.Web.UI.Page
 			{
                 if (j == 3 | j == 4)
                 {
-                    var dateTime = (DateTime?)dt.Rows[i][e_value[j]];
-                    row_t.CreateCell(cell_t).SetCellValue(dateTime.Value.ToString("dd/MM/yyyy"));
+                    var strDate = dt.Rows[i][e_value[j]].ToString();
+                    strDate = string.IsNullOrEmpty(strDate) ? "" : Convert.ToDateTime(strDate).ToString("dd/MM/yyyy");
+                    row_t.CreateCell(cell_t).SetCellValue(strDate);
                 }
                 else
                     row_t.CreateCell(cell_t).SetCellValue(dt.Rows[i][e_value[j]].ToString());
