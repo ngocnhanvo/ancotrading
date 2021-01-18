@@ -171,9 +171,10 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
                     where 
                         1=1
 						AND dh.md_trangthai_id <> 'KETTHUC'
-                        AND khxh.{3} >= '{0}' 
-                        AND khxh.{3} <='{1}' {2} {4}
-				) A Where 1=1 ", dateFrom, dateTo, dsNhanVien, dateType =="0"? "ngaygiaohang" : "ngayxonghang", sql_them);
+                        AND khxh.{3} >= convert(datetime, '{0} 00:00:00', 103) 
+                        AND khxh.{3} <= convert(datetime, '{1} 23:59:59', 103) 
+                        {2} {4}
+				) A Where 1=1 ", dateFrom.ToString("dd/MM/yyyy"), dateTo.ToString("dd/MM/yyyy"), dsNhanVien, dateType =="0"? "ngaygiaohang" : "ngayxonghang", sql_them);
 			// select top 1 pkl.etd 
 			// from c_dongpklinv dpkl, c_packinginvoice pkl 
 			// where dpkl.c_packinginvoice_id = pkl.c_packinginvoice_id
