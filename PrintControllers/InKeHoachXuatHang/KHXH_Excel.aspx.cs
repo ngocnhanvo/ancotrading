@@ -123,8 +123,8 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
         }
 		
         String str = String.Format(@"
-                declare @tungay = convert(datetime, '{0} 00:00:00', 103);
-               declare @denngay = convert(datetime, '{1} 23:59:59', 103);
+               declare @tungay datetime = convert(datetime, '{0} 00:00:00', 103);
+               declare @denngay datetime = convert(datetime, '{1} 23:59:59', 103);
 
 				select A.*, (DATEDIFF(day, A.shipmenttime, A.etd)) as tre_nv
 				
