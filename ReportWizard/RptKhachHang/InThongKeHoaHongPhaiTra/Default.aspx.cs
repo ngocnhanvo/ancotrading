@@ -48,11 +48,14 @@ public partial class PrintControllers_InPhieuNhapHang_Default : System.Web.UI.Pa
 		}
 		
 		string str = String.Format(@"
+            declare @tungay datetime = convert(datetime, '{0} 00:00:00', 103);
+            declare @denngay datetime = convert(datetime, '{1} 23:59:59', 103);
+
 			select
 				convert(varchar(10),getdate(),103) as ngaylap, tmp.so_pkl as inv, tmp.sochungtu as po, tmp.dtkd as ma_kh,
 				round(tmp.hoahongphaitra,2) as hoahong,
 				tmp.hoahong as ghichu,
-				N'Từ ngày: ' + '{2}' as tungay, N'Đến ngày' + '{1}' as denngay,
+				N'Từ ngày: ' + '{0}' as tungay, N'Đến ngày' + '{1}' as denngay,
 				tmp.total as tongtien,
 				isnull(tmp.hoahongdatra,0) as datra,
 				isnull(tmp.conlaiphaitra,0) as conlai,
@@ -71,7 +74,7 @@ public partial class PrintControllers_InPhieuNhapHang_Default : System.Web.UI.Pa
 					and cdi.c_donhang_id = cdh.c_donhang_id
 					{2}
 					and coalesce(cdh.hoahong, 0) > 0
-					and civ.ngay_motokhai >= '{0}' and civ.ngay_motokhai <= '{1}'
+					and civ.ngay_motokhai >= @tungay and civ.ngay_motokhai <= @denngay
 					and civ.md_trangthai_id = 'HIEULUC' ) as tmp ", 
 			tu, den, dtkd );
 		return str;

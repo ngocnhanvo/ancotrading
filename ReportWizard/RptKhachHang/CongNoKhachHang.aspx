@@ -14,23 +14,28 @@
     string dn = (DateTime.ParseExact(denngay, "dd/MM/yyyy", null)).ToString("MM/dd/yyyy");
 
 
-    string sql = @"select * from
-                    (
-	                    select civ.ngaylap as ngay, civ.so_inv as sophieu, 'Invoice' as noidung, 
-		                    civ.totalgross as giatriinvoice, 0 as trigiathanhtoan, civ.md_doitackinhdoanh_id
-	                    from c_packinginvoice civ
-	                    where civ.md_trangthai_id = 'HIEULUC'
-		                    and civ.ngaylap >='"+tungay+@"'
-		                    and civ.ngaylap <= '"+denngay+@"' {dk2}
-	                    union
-	                    select ct.ngaylapphieu as ngay, ct.sophieu as sophieu, 'Phieu thu' as noidung, 
-		                    0 as giatriinvoice, ct.sotien as trigiathanhtoan, ct.md_doitackinhdoanh_id
-	                    from c_thuchi ct
-	                    where ct.ngaylapphieu > = '"+tungay+@"'
-		                    and ct.ngaylapphieu <= '"+denngay+@"' {dk1}
-                    ) as tmp
-                    where tmp.md_doitackinhdoanh_id is not null
-                    ";
+    string sql = string.Format(@"
+        declare @tungay datetime = convert(datetime, '{0} 00:00:00', 103);
+        declare @denngay datetime = convert(datetime, '{1} 23:59:59', 103);
+        select * 
+        from
+        (
+	        select civ.ngaylap as ngay, civ.so_inv as sophieu, 'Invoice' as noidung, 
+		        civ.totalgross as giatriinvoice, 0 as trigiathanhtoan, civ.md_doitackinhdoanh_id
+	        from c_packinginvoice civ
+	        where civ.md_trangthai_id = 'HIEULUC'
+		        and civ.ngaylap >= @tungay
+		        and civ.ngaylap <= @denngay {dk2}
+	        union
+	        select ct.ngaylapphieu as ngay, ct.sophieu as sophieu, 'Phieu thu' as noidung, 
+		        0 as giatriinvoice, ct.sotien as trigiathanhtoan, ct.md_doitackinhdoanh_id
+	        from c_thuchi ct
+	        where ct.ngaylapphieu > = @tungay
+		        and ct.ngaylapphieu <= @denngay {dk1}
+        ) as tmp
+        where tmp.md_doitackinhdoanh_id is not null
+    ", tungay, denngay);
+
     if(!md_doitackinhdoanh_id.Equals("NULL")){
         sql = sql.Replace("{dk2}", " and civ.md_doitackinhdoanh_id ='" + md_doitackinhdoanh_id + "'");
         sql = sql.Replace("{dk1}", " and ct.md_doitackinhdoanh_id ='" + md_doitackinhdoanh_id + "'");
