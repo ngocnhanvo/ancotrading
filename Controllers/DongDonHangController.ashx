@@ -60,10 +60,10 @@ public class DongDonHangController : IHttpHandler
             {
                 string gia_sp = "1";
                 string dtkd_id = db.c_donhangs.FirstOrDefault(p => p.c_donhang_id.Equals(c_donhang_id)).md_doitackinhdoanh_id;
-                if(donhang.gia_db == true)
+                if (donhang.gia_db == true)
                     gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@ngaytinhgia", donhang.ngaylap);
-                else if(donhang.isdonhangtmp == true)
-                    gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia_Mau", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@loai_bg", true, "@ngaytinhgia", donhang.ngaylap,"@mau",1);
+                else if (donhang.isdonhangtmp == true)
+                    gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia_Mau", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@loai_bg", true, "@ngaytinhgia", donhang.ngaylap, "@mau", 1);
                 else
                     gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@loai_bg", true, "@ngaytinhgia", donhang.ngaylap);
 
@@ -87,7 +87,10 @@ public class DongDonHangController : IHttpHandler
         string c_donhang_id = context.Request.QueryString["c_donhang_id"];
         string md_sanpham_id = context.Request.QueryString["md_sanpham_id"];
         var itemJS = UserUtils.get_giasanpham(context, c_donhang_id, md_sanpham_id, db);
-        context.Response.Write(itemJS["gia"].ToString());
+
+        var entries = itemJS.Select(d =>
+           string.Format("\"{0}\": [\"{1}\"]", d.Key, string.Join(",", d.Value).Replace("\"","\\\"")));
+        context.Response.Write("{" + string.Join(",", entries) + "}");
     }
 
     public void getSelectOption(HttpContext context)
@@ -136,6 +139,7 @@ public class DongDonHangController : IHttpHandler
                     {
                         m.giafob = decimal.Parse(context.Request.Form["giafob"]);
                     }
+                    m.phi = decimal.Parse(context.Request.Form["phi"]);
                     m.soluong = decimal.Parse(context.Request.Form["soluong"]);
                     m.soluong_conlai = decimal.Parse(context.Request.Form["soluong"]);
 
@@ -181,7 +185,7 @@ public class DongDonHangController : IHttpHandler
                     {
                         m.trangthai = "DQ";
                     }
-                    else if(donggoi.doigia_donggoi == true)
+                    else if (donggoi.doigia_donggoi == true)
                     {
                         m.trangthai = "DGDG";
                     }
@@ -226,7 +230,9 @@ public class DongDonHangController : IHttpHandler
                     jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi đơn hàng đã kết thúc!");
                 }
             }
-        }catch(Exception ex){
+        }
+        catch (Exception ex)
+        {
             jqGridHelper.Utils.writeResult(0, ex.Message);
         }
     }
@@ -251,14 +257,16 @@ public class DongDonHangController : IHttpHandler
 
         var itemJS = UserUtils.get_giasanpham(context, c_donhang_id, md_sanpham_id, db);
         string barcode = "";
-        decimal gia_sp = decimal.Parse(context.Request.Form["giafob"]);;
-        try {
+        decimal gia_sp = decimal.Parse(context.Request.Form["giafob"]); ;
+        try
+        {
             barcode = itemJS["barcode"].ToString();
-        } catch { }
+        }
+        catch { }
 
         // Lấy đóng gói của sản phẩm
         //md_donggoi donggoi = LinqUtils.getDongGoi(md_sanpham_id);
-        md_donggoi donggoi = db.md_donggois.FirstOrDefault(s=>s.md_donggoi_id == context.Request.Form["md_donggoi_id"]);
+        md_donggoi donggoi = db.md_donggois.FirstOrDefault(s => s.md_donggoi_id == context.Request.Form["md_donggoi_id"]);
         // Lấy số thứ tự cao nhất trong đơn hàng
         int maxLine = LinqUtils.getMaxSttDonHang(c_donhang_id);
 
@@ -275,17 +283,12 @@ public class DongDonHangController : IHttpHandler
                           select new { hdq.md_hanghoadocquyen_id }).Count();
 
         // kiem tra tinh hop le doi voi ma hang co 2 nha cung ung
-        bool checkncu_cb = false;
         string ncu_line = sanpham.nhacungung;
-        var nhacungung = db.md_doitackinhdoanhs.FirstOrDefault(nc=>nc.md_doitackinhdoanh_id.Equals(sanpham.nhacungung));
+        var nhacungung = db.md_doitackinhdoanhs.FirstOrDefault(nc => nc.md_doitackinhdoanh_id.Equals(sanpham.nhacungung));
         string ncc_cangbien = "", dh_cangbien = "";
         try { ncc_cangbien = nhacungung.md_cangbien_id; } catch { }
         try { dh_cangbien = donhang.md_cangbien_id; } catch { }
-        if (ncc_cangbien == dh_cangbien)
-        {
-            checkncu_cb = true;
-        }
-        else
+        if (ncc_cangbien != dh_cangbien)
         {
             int count_donghang = (from ddh in db.c_dongdonhangs
                                   where ddh.c_donhang_id.Equals(c_donhang_id)
@@ -300,13 +303,8 @@ public class DongDonHangController : IHttpHandler
             }
 
             DataTable dbcb = mdbc.GetData(sql_cb);
-            if (dbcb.Rows.Count == 0)
+            if (dbcb.Rows.Count != 0)
             {
-                checkncu_cb = false;
-            }
-            else
-            {
-                checkncu_cb = true;
                 ncu_line = dbcb.Rows[0][0].ToString();
             }
         }
@@ -361,7 +359,7 @@ public class DongDonHangController : IHttpHandler
 
         //var check_cbien = db.md_sanphams.Where(s=>s.md_cangbien_id.Equals(donhang.md_cangbien_id) & s.md_sanpham_id == md_sanpham_id).Count();
 
-        if(check_cbien <= 0 && donhang.donhang_mau.Value.Equals(false))
+        if (check_cbien <= 0 && donhang.donhang_mau.Value.Equals(false))
         {
             next = false;
             jqGridHelper.Utils.writeResult(0, "Mã hàng này không thuộc cảng biển được chọn trên PO!");
@@ -389,6 +387,17 @@ public class DongDonHangController : IHttpHandler
             mnu.ma_sanpham_khach = context.Request.Form["ma_sanpham_khach"];
             mnu.sothutu = maxLine + 10;
             mnu.giafob = gia_sp;
+            mnu.giachuan = null;
+            mnu.discount = 0;
+            mnu.editphi = (context.Request.Form["editphi"] + "").ToLower() == "true";
+
+            if(donhang.discount_hehang.GetValueOrDefault(false) == true)
+            {
+                mnu = Public.DiscountHehangValue(donhang.discount_hehang_value, mnu, db);
+            }
+
+            string phi = context.Request.Form["phi"];
+            mnu.phi = decimal.Parse(string.IsNullOrEmpty(phi) ? "0" : phi);
             mnu.soluong = decimal.Parse(context.Request.Form["soluong"]);
             mnu.soluong_conlai = decimal.Parse(context.Request.Form["soluong"]);
             mnu.soluong_daxuat = 0;
@@ -425,7 +434,7 @@ public class DongDonHangController : IHttpHandler
             {
                 mnu.trangthai = "DQ";
             }
-            else if(donggoi.doigia_donggoi == true)
+            else if (donggoi.doigia_donggoi == true)
             {
                 mnu.trangthai = "DGDG";
             }
@@ -457,13 +466,14 @@ public class DongDonHangController : IHttpHandler
     {
         String id = context.Request.Form["id"];
         c_dongdonhang ddh = db.c_dongdonhangs.FirstOrDefault(p => p.c_dongdonhang_id.Equals(id));
-        c_donhang dh = db.c_donhangs.FirstOrDefault(c=>c.c_donhang_id.Equals(ddh.c_donhang_id));
+        c_donhang dh = db.c_donhangs.FirstOrDefault(c => c.c_donhang_id.Equals(ddh.c_donhang_id));
 
         if (dh.md_trangthai_id.Equals("HIEULUC"))
         {
             jqGridHelper.Utils.writeResult(0, "Không thể xóa dòng trong PO đã hiệu lực!");
         }
-        else {
+        else
+        {
             db.c_dongdonhangs.DeleteOnSubmit(ddh);
             db.SubmitChanges();
             jqGridHelper.Utils.writeResult(1, "Xóa dòng thành công!");
@@ -487,22 +497,17 @@ public class DongDonHangController : IHttpHandler
 
         string poId = context.Request.QueryString["poId"];
 
-        string sqlCount = "SELECT COUNT(*) AS count " +
-            " FROM c_dongdonhang ddh, c_donhang dh, md_sanpham sp, md_donggoi dg, md_doitackinhdoanh dtkd " +
-            " WHERE ddh.c_donhang_id = dh.c_donhang_id " +
-            " AND ddh.md_sanpham_id = sp.md_sanpham_id " +
-            " AND ddh.md_donggoi_id = dg.md_donggoi_id " +
-            "    AND ddh.nhacungungid = dtkd.md_doitackinhdoanh_id " +
-            " AND dh.c_donhang_id = N'{0}' " + filter;
-
-        if (poId != null)
-        {
-            sqlCount = string.Format(sqlCount, poId);
-        }
-        else
-        {
-            sqlCount = string.Format(sqlCount, 0);
-        }
+        string sqlCount = string.Format(@"
+            SELECT COUNT(1) AS count
+            FROM c_dongdonhang ddh, c_donhang dh, md_sanpham sp, md_donggoi dg, md_doitackinhdoanh dtkd
+            WHERE ddh.c_donhang_id = dh.c_donhang_id
+            AND ddh.md_sanpham_id = sp.md_sanpham_id
+            AND ddh.md_donggoi_id = dg.md_donggoi_id
+            AND ddh.nhacungungid = dtkd.md_doitackinhdoanh_id
+            AND dh.c_donhang_id = N'{0}' {1}",
+            poId != null ? poId : "0",
+            filter
+        );
 
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
@@ -531,7 +536,18 @@ public class DongDonHangController : IHttpHandler
         }
 
         string strsql = @"
-                select * from(
+                select 
+                    P.* 
+                    , (P.giafob + P.phi) - 
+                    (
+                        case 
+                            when isnull(P.phanbodiscount, 0) = 1
+                            then (P.giafob + P.phi) * P.discount / 100
+                            else 0 
+                        end
+                    )
+                    as giahopdong
+                from(
                     select
                         ddh.c_dongdonhang_id
                         , dh.c_donhang_id
@@ -541,13 +557,16 @@ public class DongDonHangController : IHttpHandler
                         , sp.ma_sanpham
                         , ddh.ma_sanpham_khach
                         , ddh.giafob
+                        , isnull(ddh.phi, 0) as phi
+                        , (case when isnull(dh.discount, 0) > 0 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discount
+                        , dh.phanbodiscount
                         , ddh.soluong
                         , dg.ten_donggoi
                         , ddh.sl_inner
                         , ddh.l1, ddh.w1, ddh.h1,  ddh.sl_outer, ddh.l2, ddh.w2, ddh.h2
                         , ddh.sl_cont, ddh.v2, dtkd.ma_dtkd, ddh.ngaytao, ddh.nguoitao
                         , ddh.ngaycapnhat,  ddh.nguoicapnhat, ddh.mota
-                        , ddh.hoatdong ,ddh.trangthai as trangthai_ddh, ddh.docquyen, ddh.barcode
+                        , ddh.hoatdong ,ddh.trangthai as trangthai_ddh, ddh.docquyen, ddh.barcode, ddh.editphi
                         , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
             @" FROM
                 c_dongdonhang ddh
@@ -589,6 +608,10 @@ public class DongDonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["ma_sanpham"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_sanpham_khach"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["giafob"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["discount"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["giahopdong"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["phanbodiscount"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["soluong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_donggoi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sl_inner"] + "]]></cell>";
@@ -610,6 +633,7 @@ public class DongDonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["docquyen"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["barcode"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["editphi"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

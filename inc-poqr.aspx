@@ -52,41 +52,61 @@
 
         $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
         $('#' + name).dialog({
-			width: 500,
             modal: true
             , open: function(event, ui) {
                 //hide close button.
                 $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
             }
             , buttons: [
-            {
-                id: "btn-print-ok",
-                text: "In",
-                click: function() {
-                    var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-po').val();
-                    var printURL = "PrintControllers/";
-                    var windowSize = "width=700,height=700,scrollbars=yes";
-					if (typeof printType != 'undefined') {
-                        if (printType == 'printPoDetails') {
-                            if (poId != null) {
-                                printURL += "InDonHang/DonHangQR.aspx";
-                                window.open(printURL + "?c_donhangqr_id=" + poId, "In Chiết Xuất Đơn Hàng", windowSize);
-                            } else {
-                                alert('Bạn chưa chọn đơn hàng cần in.!');
+                 {
+                     id: "btn-print-ok",
+                     text: "Xem",
+                     click: function () {
+                         var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-po').val();
+                         var printURL = "PrintControllers/";
+                         let windowSize = "top=0, left=0, width=" + window.outerWidth + ", height=" + window.outerHeight;
+                         if (typeof printType != 'undefined') {
+                             if (printType == 'printPoDetails') {
+                                 if (poId != null) {
+                                     printURL += "InDonHang/";
+                                     window.open(printURL + "?c_donhang_id=" + poId + "&type=pdf", "Xem Đơn Hàng", windowSize);
+                                 } else {
+                                     alert('Bạn chưa chọn đơn hàng cần in.!');
+                                 }
+                             }
+                         } else {
+                             alert('Hãy chọn cách in.!');
+                         }
+                     }
+                 },
+                {
+                    id: "btn-print-ok",
+                    text: "In",
+                    click: function() {
+                        var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-po').val();
+                        var printURL = "PrintControllers/";
+                        var windowSize = "width=700,height=700,scrollbars=yes";
+					    if (typeof printType != 'undefined') {
+                            if (printType == 'printPoDetails') {
+                                if (poId != null) {
+                                    printURL += "InDonHang/";
+                                    window.open(printURL + "?c_donhang_id=" + poId, "In Chiết Xuất Đơn Hàng", windowSize);
+                                } else {
+                                    alert('Bạn chưa chọn đơn hàng cần in.!');
+                                }
                             }
+                        } else {
+                            alert('Hãy chọn cách in.!');
                         }
-                    } else {
-                        alert('Hãy chọn cách in.!');
+                    }
+                },
+                {
+                    id: "btn-print-close",
+                    text: "Thoát",
+                    click: function() {
+                        $(this).dialog("destroy").remove();
                     }
                 }
-            }
-            , {
-                id: "btn-print-close",
-                text: "Thoát",
-                click: function() {
-                    $(this).dialog("destroy").remove();
-                }
-            }
             ]
         });
     }
@@ -670,36 +690,19 @@
 					if(!chk_box.prop('checked')) { ids = null; }
 					if(ids == null) {
 						ids=0;
-						if($('#grid_ds_chitietpoqr').jqGrid('getGridParam','records') &gt; 0 )
-						{
-							$('#grid_ds_poqr').jqGrid('setCaption', 'Đơn Hàng');
-							// $.ajax({
-								// url: 'Controllers/DonHangQRController.ashx?action=getpoinformation&poId='+ids,
-								// beforeSend:function(){
-									// $('#grid_ds_poqr').jqGrid('setCaption','đang tải...');
-								// },
-								// success: function(data){
-									 // $('#grid_ds_poqr').jqGrid('setCaption', data);
-								// }
-							// });
-							
-							$('#grid_ds_chitietpoqr').jqGrid('setGridParam',{url:'Controllers/DongDonHangQRController.ashx?&poId='+ids,page:1});
-							$('#grid_ds_chitietpoqr').jqGrid().trigger('reloadGrid');	
-						} 
 					} else {
 						$.ajax({
-								url: 'Controllers/DonHangQRController.ashx?action=getpoinformation&poId='+ids,
-								beforeSend:function(){
-									$('#grid_ds_poqr').jqGrid('setCaption','đang tải...');
-								},
-								success: function(data){
-									 $('#grid_ds_poqr').jqGrid('setCaption', data);
-								}
-							});
-				
-						$('#grid_ds_chitietpoqr').jqGrid('setGridParam',{url:'Controllers/DongDonHangQRController.ashx?&poId='+ids,page:1});
-						$('#grid_ds_chitietpoqr').jqGrid().trigger('reloadGrid');		
-					} 
+							url: 'Controllers/DonHangQRController.ashx?action=getpoinformation&poId='+ids,
+							beforeSend:function(){
+								$('#grid_ds_poqr').jqGrid('setCaption','đang tải...');
+							},
+							success: function(data){
+								$('#grid_ds_poqr').jqGrid('setCaption', data);
+							}
+						});
+					}
+                    $('#grid_ds_chitietpoqr').jqGrid('getGridParam', 'postData').poId = ids;
+					$('#grid_ds_chitietpoqr')[0].triggerToolbar();
 				},10);
 			}"
 		    AddFormOptions=" 
@@ -1084,9 +1087,9 @@
             ShowDel = "false"
 			OnSelectRow = "
 				function(ids) {
-					let cellMSP = $('#grid_ds_chitietpoqr').jqGrid('getCell', ids, 'ma_sanpham') + '';
-					let hinhanh = cellMSP.lastIndexOf('F') > -1 ? cellMSP.substr(0, 11) : cellMSP.substr(0, 8) + '.jpg';
-					$('#product-view-poqr').attr('src','images/products/fullsize/' + hinhanh);
+					let ma_sanpham = $('#grid_ds_chitietpoqr').jqGrid('getCell', ids, 'ma_sanpham') + '';
+                    $('#product-view-poqr').attr('src', '');
+                    $('#product-view-poqr').attr('src', 'Controllers/API_System.ashx?oper=loadImageProduct&msp=' + ma_sanpham + '&ver=' + uuidv4());
 				}
 			"
             AddFormOptions=" 
@@ -1240,7 +1243,7 @@
 		<table style="width:100%; height:100%">
 			<tr>
 				<td>
-					<img id="product-view-poqr" style="width:200px; height:150px" src="images/products/fullsize/default.jpg" />
+					<img id="product-view-poqr" class="loadingIMG" style="max-width:100%; margin: 0px auto; min-width: 40px;" src="Controllers/API_System.ashx?oper=loadImageProduct&msp=default" />
 				</td>
 			</tr>
 		</table>
@@ -1592,6 +1595,9 @@
                 title: "Chuyển thành PO",
                 cursor: "pointer"
             });
+
+        createRightPanel('grid_ds_poqr');
+        createRightPanel('grid_ds_chitietpoqr'); 
     </script>
 </DIV>
     

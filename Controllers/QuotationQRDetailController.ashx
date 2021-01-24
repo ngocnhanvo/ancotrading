@@ -32,31 +32,39 @@ public class QuotationQRDetailController : IHttpHandler
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
         String quotationId = context.Request.QueryString["quotationId"];
-		bool ghepbo = false;
+
+        String filter = "";
+        bool _search = bool.Parse(context.Request.QueryString["_search"]);
+        if (_search)
+        {
+            String _filters = context.Request.QueryString["filters"];
+            jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
+            filter = f.ToScript();
+        }
+
+        bool ghepbo = false;
         c_baogiaqr bg = db.c_baogiaqrs.FirstOrDefault(s=>s.c_baogiaqr_id == quotationId);
         if(bg != null) {
-			if(bg.ghepbo == true) {
-				ghepbo = true;
-			}
-		}
-		String sqlCount = @"SELECT COUNT(1) AS count 
+            ghepbo = bg.ghepbo.GetValueOrDefault(false);
+        }
+        String sqlCount = @"SELECT COUNT(1) AS count 
         FROM c_chitietbaogiaqr ctbg with (nolock) 
 		left join c_baogiaqr bg with (nolock) on ctbg.c_baogiaqr_id = bg.c_baogiaqr_id 
 		left join md_sanpham sp with (nolock) on ctbg.md_sanpham_id = sp.md_sanpham_id
 		left join md_donggoi dg with (nolock) on ctbg.md_donggoi_id = dg.md_donggoi_id 
 		left join md_hscode hs with (nolock) on hs.md_hscode_id = sp.md_hscode_id 
-		WHERE 1=1 AND ctbg.c_baogiaqr_id = N'{0}'";
+		WHERE 1=1 AND ctbg.c_baogiaqr_id = N'{0}' {1}";
 
         if (quotationId != null)
         {
-            sqlCount = string.Format(sqlCount, quotationId);
+            sqlCount = string.Format(sqlCount, quotationId, filter);
         }
         else
         {
-            sqlCount = string.Format(sqlCount, 0);
+            sqlCount = string.Format(sqlCount, 0, filter);
         }
-        
-        
+
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -77,19 +85,19 @@ public class QuotationQRDetailController : IHttpHandler
         if (page > total_page) page = total_page;
         start = limit * page - limit;
         end = (page * limit) + 1;
-		
-		string orderby = "";
+
+        string orderby = "";
         if (sidx.Equals("") || sidx == null)
         {
             sidx = "ctbg.c_chitietbaogiaqr_id";
         }
-	
-		if(ghepbo == true) {
-			orderby = "ORDER BY substring(sp.ma_sanpham,0, 8) asc, substring(sp.ma_sanpham,13, 2) asc, substring(sp.ma_sanpham,10, 2) asc";
-		}
-		else {
-			orderby = "ORDER BY " + sidx + " " + sord;
-		}
+
+        if(ghepbo == true) {
+            orderby = "ORDER BY substring(sp.ma_sanpham,0, 8) asc, substring(sp.ma_sanpham,13, 2) asc, substring(sp.ma_sanpham,10, 2) asc";
+        }
+        else {
+            orderby = "ORDER BY " + sidx + " " + sord;
+        }
         string strsql = @"select * from(
             select ctbg.c_chitietbaogiaqr_id, bg.c_baogiaqr_id, sp.trangthai, ctbg.trangthai as trangthai_ctbg, ctbg.sothutu, sp.md_sanpham_id, sp.ma_sanpham, hs.hscode, ctbg.ma_sanpham_khach,
             ctbg.giafob, ctbg.soluong, dg.ten_donggoi, ctbg.sl_inner,
@@ -102,18 +110,18 @@ public class QuotationQRDetailController : IHttpHandler
 			left join md_sanpham sp with (nolock) on ctbg.md_sanpham_id = sp.md_sanpham_id
 			left join md_donggoi dg with (nolock) on ctbg.md_donggoi_id = dg.md_donggoi_id 
 			left join md_hscode hs with (nolock) on hs.md_hscode_id = sp.md_hscode_id 
-            WHERE 1=1 AND ctbg.c_baogiaqr_id = N'{0}'
+            WHERE 1=1 AND ctbg.c_baogiaqr_id = N'{0}' {2}
             )P where RowNum > @start AND RowNum < @end";
 
         if (quotationId != null)
         {
-            strsql = string.Format(strsql, quotationId, orderby);
+            strsql = string.Format(strsql, quotationId, orderby, filter);
         }
         else
         {
-            strsql = string.Format(strsql, 0, orderby);
+            strsql = string.Format(strsql, 0, orderby, filter);
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
@@ -131,7 +139,7 @@ public class QuotationQRDetailController : IHttpHandler
             xml += "<cell><![CDATA[" + row[5] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[6] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[7] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[9] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[10] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[11] + "]]></cell>";
@@ -146,7 +154,7 @@ public class QuotationQRDetailController : IHttpHandler
             xml += "<cell><![CDATA[" + row[20] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[21] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[22] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row[23] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[23] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row[24].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row[25] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row[26].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";

@@ -310,3 +310,9 @@
             }"
             runat="server" />
 </div>  
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_import');
+    createRightPanel('grid_ds_phanquyen_import');
+</script>
+

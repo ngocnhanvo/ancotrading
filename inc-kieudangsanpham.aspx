@@ -325,4 +325,6 @@ function ChangeStatus() {
 		var parent = $('#grid_ds_kieudangsanpham-pager_left');
 		parent.find('.ui-icon.ui-icon-print').parent().parent().remove();
 	}
+
+	createRightPanel('grid_ds_kieudangsanpham');
 </script>

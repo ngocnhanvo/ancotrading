@@ -358,4 +358,7 @@
             runat="server" />
 </div>
 
-
+<script type="text/javascript">
+    createRightPanel('grid_ds_nhom');
+    createRightPanel('grid_ds_chitietnhom');
+</script>

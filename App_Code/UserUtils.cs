@@ -14,7 +14,7 @@ public static class UserUtils
     }
 
     //Mail KCS
-    public static string mailKCS = "quality@ancopottery.com";
+    public static string mailKCS = "";
     //Mail Ke Toan NCU
     public static string mailKeToanNCU = "ketoanTEST@ancometal.com";
 
@@ -31,66 +31,68 @@ public static class UserUtils
             getptr = 2;
 
         decimal gianhap = -1;
-        string[] arr1 = new string[] { "ANBINH", "ANCO1", "ANCO2" };
-        //Neu doi tac la VINHGIA
-        if (("VINHGIA").Contains(ma_dtkd_select))
-        {
-            decimal tygia = /*23300*/1;
-            decimal discountVNN = decimal.Parse("0.82");
-            decimal gianhaptam = gia_fob - (gia_fob * discount_vinhgia) / 100;
-            gianhap = gianhaptam * discountVNN;
-            gianhap = gianhap * tygia;
-
-            if (getptr == 1)
-            {
-                gianhap = 1;
-                gianhap = gianhap * discountVNN;
-            }
-            else if (getptr == 2)
-            {
-                gianhap = tygia;
-            }
-            else
-            {
-                if (tygia > 1)
-                {
-                    gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
-                }
-            }
-        }
-        //Neu doi tac la ANBINH, ANCO1, ANCO2 tỷ giá mua theo ngay tạo
-        else if (arr1.Contains(ma_dtkd_select))
+        //Neu doi tac la ANBINH, ANCO2, NAMAN
+        if (new string[] { "ANBINH", "ANCO2", "NAMAN" }.Contains(ma_dtkd_select))
         {
             decimal tygia = 23000;
             decimal discountVNN = decimal.Parse("0.80");
-            decimal gianhaptam = gia_fob - (gia_fob * discount) / 100;
-            gianhap = gianhaptam * discountVNN;
-            gianhap = gianhap * tygia;
+            //Lay discount dac biet
             if (getptr == 1)
             {
-                gianhap = 1;
-                gianhap = gianhap * discountVNN;
+                gianhap = discountVNN;
             }
+            //Lay ty gia
             else if (getptr == 2)
             {
-                //var db = new LinqDBDataContext();
-                //var tgm = db.md_tygiamuas.Where(s => s.ngayapdung <= DateTime.Now & s.ngayketthuc >= DateTime.Now).FirstOrDefault();
-                //tygia = (decimal)tgm.nhan_voi.Value;
                 gianhap = tygia;
             }
+            //Lay gia mua từ NCC
             else
             {
-                if (ma_dtkd_select == "ANCO1")
-                {
-                    if (tygia > 1)
-                    {
-                        gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
-                    }
-                }
-                else
-                {
-                    gianhap = -1;
-                }
+                gianhap = -1;
+            }
+        }
+        //Neu doi tac là ANCO1
+        else if (new string[] { "ANCO1" }.Contains(ma_dtkd_select))
+        {
+            decimal tygia = 23000;
+            decimal discountVNN = decimal.Parse("0.80");
+            //Lay discount dac biet
+            if (getptr == 1)
+            {
+                gianhap = discountVNN;
+            }
+            //Lay ty gia
+            else if (getptr == 2)
+            {
+                gianhap = tygia;
+            }
+            //Lay gia mua từ NCC
+            else
+            {
+                //Công thức: giá mua = (FOB –Discount)*0.8*23.000 
+                gianhap = (gia_fob - (gia_fob * discount) / 100) * discountVNN * tygia;
+            }
+        }
+        //Neu doi tac la VINHGIA
+        else if (("VINHGIA").Contains(ma_dtkd_select))
+        {
+            decimal tygia = 1;
+            //Lay discount dac biet
+            if (getptr == 1)
+            {
+                gianhap = decimal.Parse("0.82");
+            }
+            //Lay ty gia
+            else if (getptr == 2)
+            {
+                gianhap = tygia;
+            }
+            //Lay gia mua từ NCC
+            else
+            {
+                //Công thức: giá mua = FOB
+                gianhap = gia_fob;
             }
         }
         //Neu doi tac la TITAN
@@ -98,24 +100,21 @@ public static class UserUtils
         {
             decimal tygia = 22200;
             decimal discountVNN = decimal.Parse("0.95");
-            decimal gianhaptam = gia_fob - (gia_fob * discount) / 100;
-            gianhap = gianhaptam * discountVNN;
-            gianhap = gianhap * tygia;
+            //Lay discount dac biet
             if (getptr == 1)
             {
-                gianhap = 1;
-                gianhap = gianhap * discountVNN;
+                gianhap = discountVNN;
             }
+            //Lay ty gia
             else if (getptr == 2)
             {
                 gianhap = tygia;
             }
+            //Lay gia mua từ NCC
             else
             {
-                if (tygia > 1)
-                {
-                    gianhap = jqGridHelper.Utils.Round3(gianhap, -2);
-                }
+                //Công thức: giá mua = FOB
+                gianhap = gia_fob - (gia_fob * discount) / 100 * discountVNN * tygia;
             }
         }
         return gianhap;
@@ -126,6 +125,7 @@ public static class UserUtils
         var itemJS = new Dictionary<string, object>();
         itemJS["gia"] = "-1";
         itemJS["barcode"] = "";
+        itemJS["phi"] = "";
 
         var baogia = db.c_baogias.Where(d => d.c_baogia_id.Equals(c_baogia_id)).
             Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, ngaybaogia = s.ngaybaogia }).FirstOrDefault();
@@ -159,6 +159,7 @@ public static class UserUtils
                     var items = mdbc.GetDataFromProcedure("getGiaMuaSp_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", md_doitackinhdoanh_id, "@ngaytinhgia", baogia.ngaybaogia);
                     itemJS["gia"] = items.Rows[0]["gia"].ToString();
                     itemJS["barcode"] = items.Rows[0]["barcode"].ToString();
+                    itemJS["phi"] = items.Rows[0]["phi"].ToString();
                 }
                 //Lấy theo giá chuẩn
                 else
@@ -166,6 +167,7 @@ public static class UserUtils
                     decimal gia_sp = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", baogia.md_doitackinhdoanh_id, "@loai_bg", true, "@ngaytinhgia", baogia.ngaybaogia);
                     itemJS["gia"] = gia_sp + "";
                     itemJS["barcode"] = "";
+                    itemJS["phi"] = 0 + "";
                 }
             }
         }
@@ -356,16 +358,38 @@ public static class UserUtils
             var ddonhang = db.c_dongdonhangs.FirstOrDefault(p => p.c_dongdonhang_id.Equals(item.c_dongdonhang_id));
             string nhacungung = ddonhang.nhacungungid;
             decimal gianhap = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp", "@md_sanpham_id", sp.md_sanpham_id, "@md_doitackinhdoanh_id", nhacungung, "@loai_bg", 0, "@ngaytinhgia", DateTime.Now);
-
+            decimal giachuan = gianhap;
             //Neu doi tac la VINHGIA
-            if (maNCC == "VINHGIA")
-                gianhap = ddonhang.giafob.GetValueOrDefault(0);
-			else {
-				decimal gianhap2 = UserUtils.get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.Value, 0);
-				if(gianhap2 > -1) {
+            
+			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, 0, 0);
+            var giaNhap2BD = gianhap2;
+            decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2);
+
+            var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
+            if(donhang.discount.GetValueOrDefault(0) > 0)
+                phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + donhang.discount.GetValueOrDefault(0));
+
+            gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
+            if (giaNhap2BD > -1)
+            {
+                if (maNCC != "VINHGIA")
+                {
 					gianhap = gianhap2;
-				}
-			}
+                    giachuan = jqGridHelper.Utils.Round3(gianhap, -2);
+                    gianhap = jqGridHelper.Utils.Round3(gianhap + (phiDiscount * tygia), -2);
+                }
+                else
+                {
+					gianhap = ddonhang.discount.GetValueOrDefault(0) > 0 ? gianhap2 : giaNhap2BD;
+                    giachuan = gianhap;
+                    gianhap = gianhap + phiDiscount;
+                }
+            }
+            else
+            {
+                gianhap = jqGridHelper.Utils.Round3(gianhap + phiDiscount * tygia, -2);
+            }
+
             var ddsdh = new c_dongdsdh();
 
             ddsdh.c_dongdsdh_id = ImportUtils.getNEWID();
@@ -376,7 +400,7 @@ public static class UserUtils
             ddsdh.mota_tiengviet = sp.mota_tiengviet;
             ddsdh.mota_tienganh = sp.mota_tienganh;
             ddsdh.md_doitackinhdoanh_id = ddonhang.nhacungungid;
-            ddsdh.huongdan_dathang = "";
+            ddsdh.huongdan_dathang = ma_dtkd_select;
             ddsdh.han_giaohang = DateTime.Now;
             ddsdh.tem_dan = "Tem dáng";
             ddsdh.sl_dathang = item.soluong_dadat;
@@ -404,6 +428,7 @@ public static class UserUtils
             ddsdh.nguoitao = getUser(context);
             ddsdh.nguoicapnhat = getUser(context);
             ddsdh.hoatdong = true;
+            ddsdh.giachuan = giachuan;
 
             lstDongDonDatHang.Add(ddsdh);
         }
@@ -648,6 +673,54 @@ public static class UserUtils
         db.c_dongdsdhs.InsertAllOnSubmit(lstDongDonDatHang);
         db.SubmitChanges();
         return string.Format("Đã tạo đơn đặt hàng thành công với số chứng từ {0}.!", sochungtu);
+    }
+
+    public static decimal getGiaHopDongPO(c_donhang dh, c_dongdonhang ddh)
+    {
+        var giaFOBvaPhi = ddh.giafob.GetValueOrDefault(0) + ddh.phi.GetValueOrDefault(0);
+        var discount = dh.discount.GetValueOrDefault(0) > 0 ? dh.discount.GetValueOrDefault(0) : (decimal)ddh.discount.GetValueOrDefault(0);
+        var phanBoDiscountVaoGia = dh.phanbodiscount.GetValueOrDefault(false) ? giaFOBvaPhi * discount / 100 : 0;
+        var giaHopDong = giaFOBvaPhi - phanBoDiscountVaoGia;
+        return Math.Round(giaHopDong, 2);
+    }
+
+    public static decimal getGiaHopDongPO(c_donhang dh, c_dongdonhang ddh, int? round, bool? pbds)
+    {
+        pbds = pbds == null ? dh.phanbodiscount.GetValueOrDefault(false) : pbds.GetValueOrDefault(false);
+        var giaFOBvaPhi = ddh.giafob.GetValueOrDefault(0) + ddh.phi.GetValueOrDefault(0);
+        var discount = dh.discount.GetValueOrDefault(0) > 0 ? dh.discount.GetValueOrDefault(0) : (decimal)ddh.discount.GetValueOrDefault(0);
+        var phanBoDiscountVaoGia = pbds.GetValueOrDefault(false) ? giaFOBvaPhi * discount / 100 : 0;
+        var giaHopDong = giaFOBvaPhi - phanBoDiscountVaoGia;
+        return round == null ? giaHopDong : Math.Round(giaHopDong, round.GetValueOrDefault(0));
+    }
+
+    public static decimal getDiscountgPO(c_donhang dh, c_dongdonhang ddh)
+    {
+        decimal discount = 0;
+        if (ddh == null)
+        {
+            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : dh.discount.GetValueOrDefault(0);
+        }
+        else
+        {
+            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : (dh.discount.GetValueOrDefault(0) <= 0 ? (decimal)ddh.discount.GetValueOrDefault(0): dh.discount.GetValueOrDefault(0));
+        }
+        return discount;
+    }
+
+    public static decimal getDiscountgPO(c_donhang dh, c_dongdonhang ddh, int type)
+    {
+
+        decimal discount = 0;
+        if (type == 0)
+        {
+            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : dh.discount.GetValueOrDefault(0);
+        }
+        else if(type == 1)
+        {
+            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : (decimal)ddh.discount.GetValueOrDefault(0);
+        }
+        return discount;
     }
 
     private class dsncc_ptr

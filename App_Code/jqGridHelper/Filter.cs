@@ -128,7 +128,7 @@ namespace jqGridHelper
                             str += String.Format("{0} {1} NOT LIKE N'%{2}%' ", groupOp, item.Field, item.Data);
                             break;
                         default:
-                            str += " LIKE N'{0}%' ";
+                            str += "";
                             break;
                     }
                 }

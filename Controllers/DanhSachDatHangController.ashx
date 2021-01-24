@@ -159,14 +159,19 @@ public class DanhSachDatHangController : IHttpHandler
     {
         foreach (var mailObj in lstMail.Where(s => s["ma_dtkd"].ToString() == madtkd))
         {
-            string emailCC = nv.email_cc;
-            if (!string.IsNullOrEmpty(emailCC))
+            string emailCC = nv.email_cc + "," + UserUtils.mailKCS;
+
+            if (string.IsNullOrEmpty(nv.email_cc) & string.IsNullOrEmpty(UserUtils.mailKCS))
             {
-                emailCC = emailCC + "," + UserUtils.mailKCS;
+                emailCC = "";
             }
-            else
+            else if (string.IsNullOrEmpty(nv.email_cc))
             {
                 emailCC = UserUtils.mailKCS;
+            }
+            else if (string.IsNullOrEmpty(UserUtils.mailKCS))
+            {
+                emailCC = nv.email_cc;
             }
 
             var dsdh = mailObj["dsdh"] as c_danhsachdathang;
@@ -188,6 +193,17 @@ public class DanhSachDatHangController : IHttpHandler
                 );
             }
         }
+    }
+
+    public string EncodeHTML_DSDH(string a) {
+        if(a == null) {
+            a = "";
+        }
+        a = a.Replace("&", "%26");
+        a = a.Replace("+", "%2B");
+        a = a.Replace("&", "%26");
+        a = a.Replace("+", "%2B");
+        return a;
     }
 
     public void guidonhang(HttpContext context)
@@ -222,18 +238,15 @@ public class DanhSachDatHangController : IHttpHandler
                     dsdh.trangthai = "DAGUI";
                     var dsdh2 = new c_danhsachdathang();
                     dsdh.CopyPropertiesTo(dsdh2);
-                    dsdh2.sochungtu = dsdh2.sochungtu.Replace("&", "%26");
-                    dsdh2.sochungtu = dsdh2.sochungtu.Replace("+", "%2B");
-                    dsdh2.so_po = dsdh2.so_po.Replace("&", "%26");
-                    dsdh2.so_po = dsdh2.so_po.Replace("+", "%2B");
+                    dsdh2.sochungtu = EncodeHTML_DSDH(dsdh2.sochungtu);
+                    dsdh2.so_po = EncodeHTML_DSDH(dsdh2.so_po);
+                    dsdh2.mota = string.IsNullOrEmpty(dsdh2.mota) ? "" : EncodeHTML_DSDH(dsdh2.mota);
                     if (string.IsNullOrEmpty(dsdh2.huongdanlamhang))
                         dsdh2.huongdanlamhang = "";
-                    dsdh2.huongdanlamhang = dsdh2.huongdanlamhang.Replace("&", "%26");
-                    dsdh2.huongdanlamhang = dsdh2.huongdanlamhang.Replace("+", "%2B");
+                    dsdh2.huongdanlamhang = EncodeHTML_DSDH(dsdh2.huongdanlamhang);
                     if (string.IsNullOrEmpty(dsdh2.huongdanlamhangchung))
                         dsdh2.huongdanlamhangchung = "";
-                    dsdh2.huongdanlamhangchung = dsdh2.huongdanlamhangchung.Replace("&", "%26");
-                    dsdh2.huongdanlamhangchung = dsdh2.huongdanlamhangchung.Replace("+", "%2B");
+                    dsdh2.huongdanlamhangchung = EncodeHTML_DSDH(dsdh2.huongdanlamhangchung);
 
                     if (string.IsNullOrEmpty(dsdh2.diachigiaohang))
                         dsdh2.diachigiaohang = "";
@@ -252,7 +265,7 @@ public class DanhSachDatHangController : IHttpHandler
                                 x.vl,
                                 x.vd,
                                 x.v2,
-                                x.tem_dan,
+                                tem_dan = EncodeHTML_DSDH(x.tem_dan),
                                 x.sothutu,
                                 x.sl_inner,
                                 dvt_inner = db.md_donvitinhs.FirstOrDefault(t => t.md_donvitinh_id == db.md_donggois.FirstOrDefault(tt => tt.md_donggoi_id == x.md_donggoi_id).dvt_inner).ten_dvt,
@@ -263,18 +276,18 @@ public class DanhSachDatHangController : IHttpHandler
                                 x.sl_dagiao,
                                 x.sl_cont,
                                 x.sl_conlai,
-                                x.mota,
+                                mota = EncodeHTML_DSDH(x.mota),
                                 md_sanpham_id = db.md_sanphams.Where(t => t.md_sanpham_id == x.md_sanpham_id).Select(t => t.ma_sanpham).FirstOrDefault(),
                                 x.md_donggoi_id,
                                 x.md_doitackinhdoanh_id,
-                                x.ma_sanpham_khach,
+                                ma_sanpham_khach = EncodeHTML_DSDH(x.ma_sanpham_khach),
                                 x.l2,
                                 x.l1,
-                                x.huongdan_dathang,
+                                huongdan_dathang = EncodeHTML_DSDH(x.huongdan_dathang),
                                 x.h2,
                                 x.h1,
                                 x.gianhap,
-                                x.ghichu_vachngan,
+                                ghichu_vachngan = EncodeHTML_DSDH(x.ghichu_vachngan),
                                 x.c_dongdsdh_id,
                                 x.c_dongdonhang_id,
                                 x.c_danhsachdathang_id
@@ -287,7 +300,7 @@ public class DanhSachDatHangController : IHttpHandler
                         {
                             x.sotien,
                             x.isphicong,
-                            x.mota,
+                            mota = EncodeHTML_DSDH(x.mota),
                             x.c_phidathang_id,
                             x.c_danhsachdathang_id
                         })
@@ -338,6 +351,8 @@ public class DanhSachDatHangController : IHttpHandler
                         string tieude = tmp.subject_mail;
                         tieude = tieude.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
                         tieude = tieude.Replace("[SOPO]", dsdh.so_po);
+                        tieude = tieude.Replace("[NGAYLAP]", dsdh.ngaylap == null ? "" : dsdh.ngaylap.Value.ToString("dd/MM/yyyy"));
+
                         var mailObj = new Dictionary<string, object>();
                         mailObj["tieude"] = tieude;
                         mailObj["noidung"] = noidung;
@@ -372,6 +387,7 @@ public class DanhSachDatHangController : IHttpHandler
             }
             catch (Exception ex)
             {
+				msg += string.Format("<div style='display:none'>{0}</div>", ex + "");
                 msg += "errVinhGia:" + ex.Message;
             }
 
@@ -403,6 +419,7 @@ public class DanhSachDatHangController : IHttpHandler
             }
             catch (Exception ex)
             {
+				msg += string.Format("<div style='display:none'>{0}</div>", ex + "");
                 msg += "errAnco2: " + ex.Message;
             }
 
@@ -502,6 +519,7 @@ public class DanhSachDatHangController : IHttpHandler
         context.Response.ContentType = "text/plain";
         context.Response.Charset = "UTF-8";
         string c_danhsachdathang_id = context.Request.QueryString["poId"];
+        string msg = "";
         try
         {
             decimal totalQuantity = 0, totalSalary = 0, totalCbm = 0;
@@ -521,13 +539,16 @@ public class DanhSachDatHangController : IHttpHandler
                 totalCbm = cbm == null ? 0 : cbm.Value;
                 totalQuantity = quantity == null ? 0 : quantity.Value;
 
-                context.Response.Write(string.Format("Đơn đặt hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dsdh.sochungtu, totalCbm, totalSalary, totalQuantity));
+                msg = string.Format("Đơn đặt hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dsdh.sochungtu, totalCbm, totalSalary, totalQuantity);
             }
+            else
+                msg = "Đơn đặt hàng này đã bị xóa, hãy làm mới dữ liệu";
         }
         catch (Exception e)
         {
-            context.Response.Write(e.Message);
+            msg = e.Message;
         }
+        context.Response.Write(msg);
     }
 
     public void startSendMail(HttpContext context)
@@ -550,21 +571,21 @@ public class DanhSachDatHangController : IHttpHandler
 					    <label for='new'>Danh Sách Đặt Hàng mới:</label>
 					    <!-- -->
 					    <table class='t_new' style='width:100%; padding-left: 50px; border: 1px solid;'>
-						    <tr> 
+						    <tr class='hidden'> 
 							    <td colspan='2'>
 								    <input id='newKcs' value='newKcs' name='newKcs' type='checkbox' class='new_toAll' >
 								    <label for='newKcs'>Gửi cho KCS</label>
 							    </td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi từ:</td>
 							    <td>{0}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi cho:</td>
 							    <td>{3}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Cc:</td>
 							    <td>{2}</td>
 						    </tr>
@@ -612,21 +633,21 @@ public class DanhSachDatHangController : IHttpHandler
 					    <input id='plus' value='toAllPlus' name='rdType' type='radio'/>
 					    <label for='plus'>Bổ Sung Danh Sách Đặt Hàng:</label>
 					    <table class='t_plus' style='width:100%; padding-left: 50px; border: 1px solid;'>
-						    <tr> 
+						    <tr class='hidden'> 
 							    <td colspan='2'>
 								    <input id='Kcs' value='Kcs' name='Kcs' type='checkbox' class='new_toAllPlus'>
 								    <label for='Kcs'>Gửi cho KCS</label>
 							    </td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi từ:</td>
 							    <td>{0}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Gửi cho:</td>
 							    <td>{3}{4}</td>
 						    </tr>
-						    <tr>
+						    <tr class='hidden'>
 							    <td>Cc:</td>
 							    <td>{2}</td>
 						    </tr>
@@ -754,7 +775,7 @@ public class DanhSachDatHangController : IHttpHandler
         catch (Exception ex)
         {
             next = false;
-            context.Response.Write("Không tạo được file Excel, " + ex.Message);
+            context.Response.Write("Không tạo được file \""+ fileNameExcel +"\", " + ex.Message);
         }
 
         if (next)
@@ -783,6 +804,8 @@ public class DanhSachDatHangController : IHttpHandler
 
                 tmp.subject_mail = tmp.subject_mail.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
                 tmp.subject_mail = tmp.subject_mail.Replace("[SOPO]", dsdh.so_po);
+                tmp.subject_mail = tmp.subject_mail.Replace("[NGAYLAP]", dsdh.ngaylap == null ? "" : dsdh.ngaylap.Value.ToString("dd/MM/yyyy"));
+
                 tmp.content_mail = tmp.content_mail.Replace("[NHACUNGUNG]", doitac.ten_dtkd);
                 tmp.content_mail = tmp.content_mail.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
                 tmp.content_mail = tmp.content_mail.Replace("[NGAYGIAOHANG]", dsdh.hangiaohang_po.Value.ToString("dd/MM/yyyy"));
@@ -1289,7 +1312,7 @@ public class DanhSachDatHangController : IHttpHandler
         catch (Exception ex)
         {
             fileNameExcel = "";
-            context.Response.Write("Không tạo được file Excel, " + ex.Message);
+            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Thông tin sản phẩm</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
         }
 
         return fileNameExcel;
@@ -1298,146 +1321,164 @@ public class DanhSachDatHangController : IHttpHandler
     public List<string> taoFileDonDatHang(HttpContext context, string manv, string ma_dtkd, c_danhsachdathang dsdh, bool guiNCC)
     {
         //-Tao file dinh kem
-        String fileName = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + guiNCC.ToString() + ".xls";
-        String fileNamePdf = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy")+ guiNCC.ToString() + ".pdf";
-        MemoryStream ms = new MemoryStream();
+        String fileName = manv + "Don-Dat-Hang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + guiNCC.ToString();
+        String fileNameXls = fileName + ".xls";
+        String fileNamePdf = fileName + ".pdf";
         //-- Tao excel
+        NPOI.HSSF.UserModel.HSSFWorkbook wb = null;
 
         try
         {
-            DanhSachDatHangReport rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
+            var rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
             rptPI.guiNCC = guiNCC;
-            NPOI.HSSF.UserModel.HSSFWorkbook wb = rptPI.CreateWBPI();
-            wb.Write(ms);
-            fileName = path + fileName;
-            File.WriteAllBytes(fileName, ms.ToArray());
-            ms.Close();
+            wb = rptPI.CreateWBPI();
+            wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
+            fileNameXls = path + fileNameXls;
+            var xfile = new FileStream(fileNameXls, FileMode.Create, FileAccess.ReadWrite);
+            wb.Write(xfile);
+            xfile.Close();
+            xfile.Dispose();
         }
         catch (Exception ex)
         {
-            fileName = "";
-            context.Response.Write("Không tạo được file excel, " + ex.Message);
+            fileNameXls = "";
+            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Đơn Đặt Hàng</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
         }
 
         //-- Tao PDF
         try
         {
-            rptDanhSachDatHang report = new rptDanhSachDatHang();
-            SqlDataAdapter da = new SqlDataAdapter(getSqlDsdhPdf(dsdh.c_danhsachdathang_id, guiNCC), mdbc.GetConnection);
-            DataSet ds = new DataSet();
-            da.Fill(ds);
-            var tbl = ds.Tables[0];
-            if (tbl.Rows.Count > 0)
-            {
-                string c_danhsachdathang_id = dsdh.c_danhsachdathang_id;
-                tbl.Columns.Add("money", Type.GetType("System.String"));
-                tbl.Columns.Add("mota_cong", Type.GetType("System.String"));
-                tbl.Columns.Add("mota_tru", Type.GetType("System.String"));
-                tbl.Columns.Add("discount", Type.GetType("System.Double"));
-                tbl.Columns.Add("giatritang", Type.GetType("System.Double"));
-                tbl.Columns.Add("giatrigiam", Type.GetType("System.Double"));
-                tbl.Columns.Add("tongtiendatru", Type.GetType("System.Double"));
-                //Header
+            var rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
+            rptPI.guiNCC = guiNCC;
+            rptPI.TypePrint = "pdf";
+            wb = rptPI.CreateWBPI();
+            //wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
 
-                //Footer
-                int lastRow = tbl.Rows.Count - 1;
+            var url = path + Guid.NewGuid().ToString() + ".xls";
+            var xfile = new FileStream(url, FileMode.Create, FileAccess.ReadWrite);
+            wb.Write(xfile);
+            xfile.Close();
+            xfile.Dispose();
 
-                var strSumThanhTien = tbl.Compute("Sum(thanhtien)", string.Empty).ToString();
-                double? total = null;
-                if (!string.IsNullOrEmpty(strSumThanhTien))
-                    total = double.Parse(strSumThanhTien);
+            fileNamePdf =  path + fileNamePdf;
+            var result = OfficeToPDF.ExcelConverter.Convert(url, fileNamePdf, null, rptPI.Lstimage, rptPI.LstText);
+            File.Delete(url);
+            //rptDanhSachDatHang report = new rptDanhSachDatHang();
+            //SqlDataAdapter da = new SqlDataAdapter(getSqlDsdhPdf(dsdh.c_danhsachdathang_id, guiNCC), mdbc.GetConnection);
+            //DataSet ds = new DataSet();
+            //da.Fill(ds);
+            //var tbl = ds.Tables[0];
+            //if (tbl.Rows.Count > 0)
+            //{
+            //    string c_danhsachdathang_id = dsdh.c_danhsachdathang_id;
+            //    tbl.Columns.Add("money", Type.GetType("System.String"));
+            //    tbl.Columns.Add("mota_cong", Type.GetType("System.String"));
+            //    tbl.Columns.Add("mota_tru", Type.GetType("System.String"));
+            //    tbl.Columns.Add("discount", Type.GetType("System.Double"));
+            //    tbl.Columns.Add("giatritang", Type.GetType("System.Double"));
+            //    tbl.Columns.Add("giatrigiam", Type.GetType("System.Double"));
+            //    tbl.Columns.Add("tongtiendatru", Type.GetType("System.Double"));
+            //    //Header
 
-                var strDiscount = tbl.Rows[0]["discountdecimal"].ToString();
-                double? discount_ = null;
-                if (!string.IsNullOrEmpty(strDiscount))
-                    discount_ = double.Parse(strDiscount);
+            //    //Footer
+            //    int lastRow = tbl.Rows.Count - 1;
 
-                var totalDiscount = total.GetValueOrDefault(0) * discount_.GetValueOrDefault(0) / 100;
-                tbl.Rows[lastRow]["discount"] = totalDiscount;
+            //    var strSumThanhTien = tbl.Compute("Sum(thanhtien)", string.Empty).ToString();
+            //    double? total = null;
+            //    if (!string.IsNullOrEmpty(strSumThanhTien))
+            //        total = double.Parse(strSumThanhTien);
 
-                var phitang = (from t in db.c_phidathangs where t.isphicong.Equals(true) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
-                tbl.Rows[lastRow]["giatritang"] = phitang.GetValueOrDefault(0);
+            //    var strDiscount = tbl.Rows[0]["discountdecimal"].ToString();
+            //    double? discount_ = null;
+            //    if (!string.IsNullOrEmpty(strDiscount))
+            //        discount_ = double.Parse(strDiscount);
 
-                var phigiam = (from t in db.c_phidathangs where t.isphicong.Equals(false) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
-                tbl.Rows[lastRow]["giatrigiam"] = phigiam.GetValueOrDefault(0);
+            //    var totalDiscount = total.GetValueOrDefault(0) * discount_.GetValueOrDefault(0) / 100;
+            //    tbl.Rows[lastRow]["discount"] = totalDiscount;
 
-                var varTang = db.c_phidathangs.FirstOrDefault(tg => tg.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && tg.isphicong.Equals(true));
-                var varGiam = db.c_phidathangs.FirstOrDefault(gi => gi.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && gi.isphicong.Equals(false));
+            //    var phitang = (from t in db.c_phidathangs where t.isphicong.Equals(true) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
+            //    tbl.Rows[lastRow]["giatritang"] = phitang.GetValueOrDefault(0);
 
-                string dgTang, dgGiam;
-                dgTang = varTang == null ? "" : varTang.mota;
-                dgGiam = varGiam == null ? "" : varGiam.mota;
+            //    var phigiam = (from t in db.c_phidathangs where t.isphicong.Equals(false) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
+            //    tbl.Rows[lastRow]["giatrigiam"] = phigiam.GetValueOrDefault(0);
 
-                double? totalUSD = null;
-                string textMoney = "";
-                if (guiNCC == false)
-                {
-                    totalUSD = total - (double)totalDiscount + (double)phitang.GetValueOrDefault(0) - (double)phigiam.GetValueOrDefault(0);
-                    if (totalUSD != null)
-                    {
-                        if (new string[] { "VINHGIA" }.Contains(ma_dtkd))
-                        {
-                            string m = MoneyToWord.ConvertMoneyToText(totalUSD.ToString()).Replace("Dollars", "");
-                            int j = m.LastIndexOf("and");
+            //    var varTang = db.c_phidathangs.FirstOrDefault(tg => tg.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && tg.isphicong.Equals(true));
+            //    var varGiam = db.c_phidathangs.FirstOrDefault(gi => gi.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && gi.isphicong.Equals(false));
 
-                            if (m.Contains("Cents") | m.Contains("Cent"))
-                            {
-                                m = m.Replace("Cents", "").Replace("Cent", "");
-                                m = m.Insert(m.Length, "cents");
-                            }
-                            else
-                            {
-                                m = m.Replace("Cents", "").Replace("Cent", "");
-                            }
-                            textMoney = m;
-                        }
-                        else
-                        {
-                            textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)totalUSD.GetValueOrDefault(0));
-                        }
-                        tbl.Rows[lastRow]["money"] = textMoney;
-                        tbl.Rows[lastRow]["tongtiendatru"] = totalUSD;
-                    }
-                }
+            //    string dgTang, dgGiam;
+            //    dgTang = varTang == null ? "" : varTang.mota;
+            //    dgGiam = varGiam == null ? "" : varGiam.mota;
 
-                string diengiai_cong = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 1 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
-                DataTable cong_ = mdbc.GetData(diengiai_cong);
-                var mota_cong = new List<string>();
-                for (int i_ = 0; i_ < cong_.Rows.Count; i_++)
-                {
-                    mota_cong.Add(cong_.Rows[i_]["mota"].ToString());
-                }
+            //    double? totalUSD = null;
+            //    string textMoney = "";
+            //    if (guiNCC == false)
+            //    {
+            //        totalUSD = total - (double)totalDiscount + (double)phitang.GetValueOrDefault(0) - (double)phigiam.GetValueOrDefault(0);
+            //        if (totalUSD != null)
+            //        {
+            //            if (new string[] { "VINHGIA" }.Contains(ma_dtkd))
+            //            {
+            //                string m = MoneyToWord.ConvertMoneyToText(totalUSD.ToString()).Replace("Dollars", "");
+            //                int j = m.LastIndexOf("and");
 
-                string diengiai_tru = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 0 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
-                DataTable tru_ = mdbc.GetData(diengiai_tru);
-                var mota_tru = new List<string>();
-                for (int i_ = 0; i_ < tru_.Rows.Count; i_++)
-                {
-                    mota_tru.Add(tru_.Rows[i_]["mota"].ToString());
-                }
-                tbl.Rows[lastRow]["mota_cong"] = string.Join(",", mota_cong);
-                tbl.Rows[lastRow]["mota_tru"] = string.Join(",", mota_tru);
-            }
-            report.DataSource = ds;
-            report.DataAdapter = da;
-            fileNamePdf = path + fileNamePdf;
-            report.ExportToPdf(fileNamePdf);
+            //                if (m.Contains("Cents") | m.Contains("Cent"))
+            //                {
+            //                    m = m.Replace("Cents", "").Replace("Cent", "");
+            //                    m = m.Insert(m.Length, "cents");
+            //                }
+            //                else
+            //                {
+            //                    m = m.Replace("Cents", "").Replace("Cent", "");
+            //                }
+            //                textMoney = m;
+            //            }
+            //            else
+            //            {
+            //                textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)totalUSD.GetValueOrDefault(0));
+            //            }
+            //            tbl.Rows[lastRow]["money"] = textMoney;
+            //            tbl.Rows[lastRow]["tongtiendatru"] = totalUSD;
+            //        }
+            //    }
+
+            //    string diengiai_cong = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 1 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
+            //    DataTable cong_ = mdbc.GetData(diengiai_cong);
+            //    var mota_cong = new List<string>();
+            //    for (int i_ = 0; i_ < cong_.Rows.Count; i_++)
+            //    {
+            //        mota_cong.Add(cong_.Rows[i_]["mota"].ToString());
+            //    }
+
+            //    string diengiai_tru = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 0 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
+            //    DataTable tru_ = mdbc.GetData(diengiai_tru);
+            //    var mota_tru = new List<string>();
+            //    for (int i_ = 0; i_ < tru_.Rows.Count; i_++)
+            //    {
+            //        mota_tru.Add(tru_.Rows[i_]["mota"].ToString());
+            //    }
+            //    tbl.Rows[lastRow]["mota_cong"] = string.Join(",", mota_cong);
+            //    tbl.Rows[lastRow]["mota_tru"] = string.Join(",", mota_tru);
+            //}
+            //report.DataSource = ds;
+            //report.DataAdapter = da;
+            //fileNamePdf = path + fileNamePdf;
+            //report.ExportToPdf(fileNamePdf);
         }
         catch (Exception ex)
         {
             fileNamePdf = "";
-            context.Response.Write("Không tạo được file PDF, " + ex.Message);
+            context.Response.Write(string.Format(@"<div>Không tạo được file PDF Thông tin sản phẩm</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
         }
 
         var arrLst = new List<string>();
-        arrLst.Add(fileName);
+        arrLst.Add(fileNameXls);
         arrLst.Add(fileNamePdf);
         return arrLst;
     }
 
     public string taoFileXacNhanBaoBi(HttpContext context, string manv, c_danhsachdathang dsdh)
     {
-        string pathInBaoBi = path + "/AnCoInBaoBi" + DateTime.Now.ToString("ddMMyyyyhhmmss") + ".xls";
+        string pathInBaoBi = path + "AnCoInBaoBi" + DateTime.Now.ToString("ddMMyyyyhhmmss") + ".xls";
         try
         {
             string sql = String.Format(@"select 
@@ -1460,7 +1501,7 @@ public class DanhSachDatHangController : IHttpHandler
         catch (Exception ex)
         {
             pathInBaoBi = "";
-            context.Response.Write("Không tạo được file xác nhận bao bì PDF, " + ex.Message);
+            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Xác Nhận Bao Bì</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
         }
 
         return pathInBaoBi;

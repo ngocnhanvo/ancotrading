@@ -14,7 +14,21 @@ using NPOI.SS.Util;
 public class DanhSachDatHangReport
 {
     LinqDBDataContext db = new LinqDBDataContext();
-    private String c_danhsachdathang_id, logoPath, productImagePath;
+    private String c_danhsachdathang_id, logoPath, productImagePath, type;
+    private List<AvariablePrj.lstImage> lstimage = new List<AvariablePrj.lstImage>();
+    private List<AvariablePrj.lstText> lstText = new List<AvariablePrj.lstText>();
+
+    public List<AvariablePrj.lstImage> Lstimage
+    {
+        get { return lstimage; }
+        set { lstimage = value; }
+    }
+
+    public List<AvariablePrj.lstText> LstText
+    {
+        get { return lstText; }
+        set { lstText = value; }
+    }
 
     public String LogoPath
     {
@@ -27,6 +41,14 @@ public class DanhSachDatHangReport
         get { return productImagePath; }
         set { productImagePath = value; }
     }
+
+    public String TypePrint
+    {
+        get { return type; }
+        set { type = value; }
+    }
+
+    public ExportExcel ConfigExcel { get; set; }
 
     public HSSFWorkbook CreateWBPI()
     {
@@ -41,11 +63,14 @@ public class DanhSachDatHangReport
 							, dtkd.ten_dtkd
 							, dtkd.tel
 							, dtkd.fax
-	                        , sp.ma_sanpham
-							, (case when  SUBSTRING(sp.ma_sanpham,10,1) != 'F' then SUBSTRING(sp.ma_sanpham,0,9) else SUBSTRING(sp.ma_sanpham,0,12) end) as pic
-							, ddsdh.ma_sanpham_khach, ddsdh.mota_tiengviet, dvt.ma_edi
-                            , ddsdh.sl_dathang
-							, ddsdh.gianhap
+	                        , sp.ma_sanpham as maSo
+							, ddsdh.ma_sanpham_khach as maKhachHang
+                            , ddsdh.mota_tiengviet as moTa
+                            , dvt.ma_edi as dvt
+                            , ddsdh.sl_dathang as soLuong
+							, ddsdh.gianhap as tongDonGiaMua
+                            , isnull(ddsdh.giachuan, ddsdh.gianhap) as giaMua
+                            , (ddsdh.gianhap - isnull(ddsdh.giachuan, ddsdh.gianhap)) as phi
 							, dsdh.huongdanlamhang
 							, dsdh.huongdanlamhangchung
 							, ddsdh.huongdan_dathang
@@ -53,13 +78,15 @@ public class DanhSachDatHangReport
 							, dh.sl_cont
 							, dh.loai_cont
 							, dsdh.discount as discountdecimal
-							, ddsdh.v2
+							, ddsdh.v2 as cbm
                             , (case ddsdh.sl_inner when 0 then ' ' else (cast(ddsdh.sl_inner as nvarchar) + ' ' + (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as dginner
                             , (cast(ddsdh.sl_outer as nvarchar) + ' ' + (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) as dgouter
+                            , (case ddsdh.sl_inner when 0 then 0 else ddsdh.sl_dathang / ddsdh.sl_inner end) as soKienInner
+                            , (case ddsdh.sl_outer when 0 then 0 else ddsdh.sl_dathang / ddsdh.sl_outer end) as soKienOuter
                             , (select hoten from nhanvien where manv = dsdh.nguoitao) as nguoitao
 							, sp.trongluong
 							, sp.mota as ghichu
-							, dsdh.mota
+							, dsdh.mota as ghiChuDSDH
 							, ddsdh.gianhap as gianhap
 							, ddsdh.sl_dathang * ddsdh.gianhap as thanhtien
                         from 
@@ -73,7 +100,7 @@ public class DanhSachDatHangReport
 							left join md_donggoi dg on ddsdh.md_donggoi_id = dg.md_donggoi_id
                         where
 	                        dsdh.c_danhsachdathang_id = N'{0}' order by sp.ma_sanpham asc"
-							, c_danhsachdathang_id == null ? "" : c_danhsachdathang_id
+                            , c_danhsachdathang_id == null ? "" : c_danhsachdathang_id
 						);
 
         DataTable dt = mdbc.GetData(select);
@@ -92,55 +119,12 @@ public class DanhSachDatHangReport
             //Footer
             int lastRow = tbl.Rows.Count - 1;
 
-            var strSumThanhTien = tbl.Compute("Sum(thanhtien)", string.Empty).ToString();
-			double? total = 0;
-			if (!string.IsNullOrEmpty(strSumThanhTien))
-                total = double.Parse(strSumThanhTien);
-			
-			var strDiscount = tbl.Rows[0]["discountdecimal"].ToString();
-			double? discount = 0;
-			if (!string.IsNullOrEmpty(strDiscount))
-                discount = double.Parse(strDiscount);
-            
-			var totalDiscount = total.GetValueOrDefault(0) * discount.GetValueOrDefault(0) / 100;
-			tbl.Rows[0]["discount"] = tbl.Rows[lastRow]["discount"] = totalDiscount;
-			
 			var phitang = (from t in db.c_phidathangs where t.isphicong.Equals(true) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
 			tbl.Rows[0]["giatritang"] = tbl.Rows[lastRow]["giatritang"] = phitang.GetValueOrDefault(0);
 			
 			var phigiam = (from t in db.c_phidathangs where t.isphicong.Equals(false) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
 			tbl.Rows[0]["giatrigiam"] = tbl.Rows[lastRow]["giatrigiam"] = phigiam.GetValueOrDefault(0);
-			
-			var varTang = db.c_phidathangs.FirstOrDefault(tg => tg.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && tg.isphicong.Equals(true));
-			var varGiam = db.c_phidathangs.FirstOrDefault(gi => gi.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && gi.isphicong.Equals(false));
-
-			string dgTang, dgGiam;
-			dgTang = varTang == null ? "" : varTang.mota;
-			dgGiam = varGiam == null ? "" : varGiam.mota;
-			
-			string textMoney = "";
-			double? totalUSD = total - (double)totalDiscount + (double)phitang.GetValueOrDefault(0) - (double)phigiam.GetValueOrDefault(0);
-			var ma_dtkd = tbl.Rows[0]["ma_dtkd"].ToString();
-			if(new string[]{ "VINHGIA" }.Contains(ma_dtkd)) {
-				string m = MoneyToWord.ConvertMoneyToText(totalUSD.ToString()).Replace("Dollars", "");			
-				int j =  m.LastIndexOf("and");
-			
-				if (m.Contains("Cents") | m.Contains("Cent"))
-				{
-					m = m.Replace("Cents", "").Replace("Cent", "");
-					m = m.Insert(m.Length, "cents");
-				}
-				else {
-					m = m.Replace("Cents", "").Replace("Cent", "");
-				}
-				textMoney = m;
-			}
-			else {
-				textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)totalUSD.GetValueOrDefault(0));
-			}
-			tbl.Rows[0]["money"] = tbl.Rows[lastRow]["money"] = textMoney;
-			tbl.Rows[0]["tongtiendatru"] = tbl.Rows[lastRow]["tongtiendatru"] = totalUSD;
-			
+            
 			string diengiai_cong = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 1 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
 			DataTable cong = mdbc.GetData(diengiai_cong);
 			var mota_cong = new List<string>();
@@ -173,355 +157,789 @@ public class DanhSachDatHangReport
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
         ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
 		HSSFSheet hssfsheet = (HSSFSheet)s1;
-		
-		Excel_Format ex_fm = new Excel_Format(hssfworkbook); 
-        ICellStyle cellBold = ex_fm.getcell(12, true, true, "", "L", "T");
+        ConfigExcel = new ExportExcel(hssfworkbook, 0, 15);
+        ConfigExcel.NameTypePrint = "InPI";
+        ConfigExcel.endHeader = type == "pdf" ? 16 : 9;
+        ConfigExcel.isPDF = type == "pdf";
+        var fontSizeRpt = double.Parse(ConfigExcel.layKichThuocChuChoRpt());
+        var fontSizeRptShort = (short)fontSizeRpt;
+
+        Excel_Format ex_fm = new Excel_Format(hssfworkbook); 
+        ICellStyle cellBold = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "T");
+        ICellStyle cellBold10 = ex_fm.getcell((short)(fontSizeRptShort - 2), true, true, "", "L", "T");
+        ICellStyle cellBold10Top = ex_fm.getcell((short)(fontSizeRptShort - 2), true, true, "", "L", "B");
+        //-- 
+        ICellStyle cellHeader = ex_fm.getcell((short)(fontSizeRptShort + 6), true, true, "", "C", "T");
 		//-- 
-		ICellStyle cellHeader = ex_fm.getcell(18, true, true, "", "C", "T");
-		//-- 
-		ICellStyle cellHeader_n = ex_fm.getcell(12, false, true, "", "C", "T");
+		ICellStyle cellHeader_n = ex_fm.getcell(fontSizeRptShort, false, true, "", "C", "T");
 		//--
-		ICellStyle celltext = ex_fm.getcell(12, false, true, "", "L", "T");
+		ICellStyle celltext = ex_fm.getcell(fontSizeRptShort, false, true, "", "L", "T");
+        ICellStyle celltext10 = ex_fm.getcell((short)(fontSizeRptShort - 2), false, true, "", "L", "T");
+        ICellStyle celltext10Top = ex_fm.getcell((short)(fontSizeRptShort - 2), false, true, "", "L", "B");
+        ICellStyle cellTextCenter = ex_fm.getcell(fontSizeRptShort, false, true, "", "C", "T");
+        ICellStyle cellText10Center = ex_fm.getcell((short)(fontSizeRptShort - 2), false, true, "", "C", "T");
+        //--
+        ICellStyle rightBold = ex_fm.getcell(fontSizeRptShort, true, false, "", "R", "T");
 		//--
-		ICellStyle rightBold = ex_fm.getcell(12, true, false, "", "R", "T");
+		ICellStyle right = ex_fm.getcell(fontSizeRptShort, false, false, "", "R", "T");
 		//--
-		ICellStyle right = ex_fm.getcell(12, false, false, "", "R", "T");
+		ICellStyle leftBold = ex_fm.getcell(fontSizeRptShort, true, false, "", "L", "T");
 		//--
-		ICellStyle leftBold = ex_fm.getcell(12, true, false, "", "L", "T");
+		ICellStyle left = ex_fm.getcell(fontSizeRptShort, false, false, "", "L", "T");
+        //--
+        ICellStyle border_number = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0####");
+        ICellStyle border_number_ = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.####");
+        ICellStyle border_number0 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0");
+		ICellStyle border_number1 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0");
+		ICellStyle border_number2 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.00");
+		ICellStyle border_number3 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.000");
+		ICellStyle border_number4 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0000");
+
+        var number = ex_fm.getcell2(fontSizeRptShort, false, true, "", "R", "T", "#,##0.0####");
+        var number0 = ex_fm.getcell2(fontSizeRptShort, false, true, "", "R", "T", "#,##0");
+        var number1 = ex_fm.getcell2(fontSizeRptShort, false, true, "", "R", "T", "#,##0.0");
+        var number2 = ex_fm.getcell2(fontSizeRptShort, false, true, "", "R", "T", "#,##0.00");
+        var number3 = ex_fm.getcell2(fontSizeRptShort, false, true, "", "R", "T", "#,##0.000");
+        var numberBold = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", "#,##0.0####");
+        var numberBold0 = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", "#,##0");
+        var numberBold2 = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", "#,##0.00");
+
+        ICellStyle border = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "L", "T");
+		ICellStyle border_center = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "C", "T");
 		//--
-		ICellStyle left = ex_fm.getcell(12, false, false, "", "L", "T");
+		ICellStyle borderright = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "L", "T");
 		//--
-		ICellStyle border_number0 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##");
-		ICellStyle border_number1 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0");
-		ICellStyle border_number2 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.00");
-		ICellStyle border_number3 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.000");
-		ICellStyle border_number4 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.0000");
-		ICellStyle border = ex_fm.getcell(12, false, true, "LRBT", "L", "T");
-		ICellStyle border_center = ex_fm.getcell(12, false, true, "LRBT", "C", "T");
+		ICellStyle borderonlyleft = ex_fm.getcell(fontSizeRptShort, false, true, "L", "T", "T");
 		//--
-		ICellStyle borderright = ex_fm.getcell(12, false, true, "LRBT", "L", "T");
+		ICellStyle borderWrap = ex_fm.getcell(fontSizeRptShort, true, true, "LRBT", "C", "T");
 		//--
-		ICellStyle borderonlyleft = ex_fm.getcell(12, false, true, "L", "T", "T");
-		//--
-		ICellStyle borderWrap = ex_fm.getcell(12, true, true, "LRBT", "C", "T");
-		//--
-		ICellStyle signBold = ex_fm.getcell(12, true, true, "", "C", "C");
-		//--
-		HSSFUtils.CellStyleModel cellModel = new HSSFUtils.CellStyleModel(hssfworkbook);
+		ICellStyle signBold = ex_fm.getcell(fontSizeRptShort, true, true, "", "C", "C");
+        //--
+        var maDTKD = dt.Rows[0]["ma_dtkd"].ToString();
+
+        ConfigExcel.cellHeader = cellHeader;
+        ConfigExcel.cellHeader_n = cellHeader_n;
+        var cellCBM = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "cbm"));
+        var cellSoLuong = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "soluong"));
+        var fmtDiscount = ConfigExcel.laySoThapPhanChoRpt(maDTKD, "discount");
+        var cellAmount = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "amount"));
+        var cellBoldCBM = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "cbm"));
+        var cellBoldSoLuong = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "soluong"));
+        var cellBoldAmount = ex_fm.getcell2(fontSizeRptShort, true, true, "", "R", "T", ConfigExcel.laySoThapPhanChoRpt(maDTKD, "amount"));
+        //--
+        HSSFUtils.CellStyleModel cellModel = new HSSFUtils.CellStyleModel(hssfworkbook);
         cellModel.BorderAll = true;
 		//--
 		//IDataFormat dataFormatCustom = hssfworkbook.CreateDataFormat();
 		int heigh = 22;
 		int row = 0;
-		//set A1 - A4
-		string[] a = { "ANCO COMPANY LIMITED","3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam","Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com","ĐƠN ĐẶT HÀNG"};
-		for(int i = 0; i < a.Count(); i++)
-		{		
-			s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
-			s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 9));
-			s1.GetRow(row).HeightInPoints = heigh;
-			if(i == 0 | i == 3)
-			{
-				s1.GetRow(row).HeightInPoints = 30;
-				s1.GetRow(row).GetCell(0).CellStyle = cellHeader;
-			}
-			else
-			{
-				s1.GetRow(row).GetCell(0).CellStyle = cellHeader_n;
-			}
-			row++;
-		}
-        s1.AddMergedRegion(new CellRangeAddress(5, 5, 5, 7));
-        s1.AddMergedRegion(new CellRangeAddress(6, 6, 1, 9));
-        s1.AddMergedRegion(new CellRangeAddress(10, 10, 1, 9));
+        //set A1 - A4
+        ConfigExcel.LogoRpt = new ExportExcel.Logoreport();
+        ConfigExcel.LogoRpt.cell1 = type == "pdf" ? 0: 0;
+        ConfigExcel.LogoRpt.cell2 = type == "pdf" ? 1 : 1;
+        ConfigExcel.LogoRpt.dx1 = type == "pdf" ? 2930 : 2930;
+        ConfigExcel.LogoRpt.dx2 = type == "pdf" ? 300 : 300;
+        ConfigExcel.title = "ĐƠN ĐẶT HÀNG";
+        row = ConfigExcel.createHeader(NameHeaderReport.ANCO, s1, row, heigh);
 
+        s1.CreateRow(row).CreateCell(1).SetCellValue("Số chứng từ:");
+        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["sochungtu"].ToString());
+        s1.GetRow(row).GetCell(2).CellStyle = celltext10;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 3));
+        lstText.Add(new AvariablePrj.lstText() {
+            value = "",
+            row = row,
+            columnF = 2,
+            columnT = 3,
+            columnFPrev = 1,
+            columnTPrev = 1,
+            left = 88,
+            top = (float)-0.5
+        });
+        
+        s1.GetRow(row).CreateCell(4).SetCellValue("Theo P/O số:");
+        s1.GetRow(row).GetCell(4).CellStyle = celltext10;
+        s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["so_po"].ToString());
+        s1.GetRow(row).GetCell(5).CellStyle = celltext10;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 9));
+        lstText.Add(new AvariablePrj.lstText()
+        {
+            value = "",
+            row = row,
+            columnF = 5,
+            columnT = 9,
+            columnFPrev = 4,
+            columnTPrev = 4,
+            left = 108,
+            top = (float)-0.5
+        });
+        row++;
 
-        s1.CreateRow(4).CreateCell(1).SetCellValue("Số chứng từ:");
-        s1.GetRow(4).CreateCell(2).SetCellValue(dt.Rows[0]["sochungtu"].ToString());
+        var ngayLapText = DateTime.Parse(dt.Rows[0]["ngaylap"].ToString()).ToString("dd/MM/yyyy");
+        s1.CreateRow(row).CreateCell(1).SetCellValue("Ngày lập:");
+        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.GetRow(row).CreateCell(2).SetCellValue(ngayLapText);
+        s1.GetRow(row).GetCell(2).CellStyle = celltext10;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 3));
+        lstText.Add(new AvariablePrj.lstText()
+        {
+            value = "",
+            row = row,
+            columnF = 2,
+            columnT = 3,
+            columnFPrev = 1,
+            columnTPrev = 1,
+            left = 105,
+            top = (float)-0.5
+        });
 
-        s1.GetRow(4).CreateCell(4).SetCellValue("Theo P/O số:");
-        s1.GetRow(4).CreateCell(5).SetCellValue(dt.Rows[0]["so_po"].ToString());
-        s1.AddMergedRegion(new CellRangeAddress(4, 4, 5, 7));
+        s1.GetRow(row).CreateCell(4).SetCellValue("Customer Order No:");
+        s1.GetRow(row).GetCell(4).CellStyle = celltext10;
+        s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["customer_order_no"].ToString());
+        s1.GetRow(row).GetCell(5).CellStyle = celltext10;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 9));
+        lstText.Add(new AvariablePrj.lstText()
+        {
+            value = "",
+            row = row,
+            columnF = 5,
+            columnT = 9,
+            columnFPrev = 4,
+            columnTPrev = 4,
+            left = 78,
+            top = (float)-0.5
+        });
+        row++;
 
-        s1.CreateRow(5).CreateCell(1).SetCellValue("Ngày lập:");
-        s1.GetRow(5).CreateCell(2).SetCellValue(DateTime.Parse(dt.Rows[0]["ngaylap"].ToString()).ToString("dd/MM/yyyy"));
+        s1.CreateRow(row).CreateCell(1).SetCellValue("Công ty AnCơ kính đề nghị Quý Công ty/Đơn vị: " + dt.Rows[0]["ten_dtkd"].ToString());
+        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 9));
+        row++;
 
-        s1.GetRow(5).CreateCell(4).SetCellValue("Customer Order No:");
-        s1.GetRow(5).CreateCell(5).SetCellValue(dt.Rows[0]["customer_order_no"].ToString());
+        s1.CreateRow(row).CreateCell(1).SetCellValue("Điện thoại:");
+        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["tel"].ToString());
+        s1.GetRow(row).GetCell(2).CellStyle = celltext10;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 3));
+        lstText.Add(new AvariablePrj.lstText()
+        {
+            value = "",
+            row = row,
+            columnF = 2,
+            columnT = 3,
+            columnFPrev = 1,
+            columnTPrev = 1,
+            left = 98,
+            top = (float)-0.5
+        });
 
-        s1.CreateRow(6).CreateCell(1).SetCellValue("Công ty AnCơ kính đề nghị Quý Công ty/Đơn vị: " + dt.Rows[0]["ten_dtkd"].ToString());
+        s1.GetRow(row).CreateCell(4).SetCellValue("Fax:");
+        s1.GetRow(row).GetCell(4).CellStyle = celltext10;
+        s1.GetRow(row).CreateCell(5).SetCellValue(dt.Rows[0]["fax"].ToString());
+        s1.GetRow(row).GetCell(5).CellStyle = celltext10;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 9));
+        lstText.Add(new AvariablePrj.lstText()
+        {
+            value = "",
+            row = row,
+            columnF = 5,
+            columnT = 9,
+            columnFPrev = 4,
+            columnTPrev = 4,
+            left = 147,
+            top = (float)-0.2
+        });
+        row++;
+        row++;
+        s1.CreateRow(row).CreateCell(1).SetCellValue("Cung cấp cho công ty chúng tôi các mặt hàng với chi tiết:");
+        s1.GetRow(row).GetCell(1).CellStyle = celltext10;
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 9));
+        row++;
+        // set A13 - All
+        // -- Header
+        var columnHeaders = new List<columnHeader>();
+        int width = 5000;
+        #region columnHeaders
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 0,
+            text = "STT",
+            value = "stt",
+            width = 1500
+        });
 
-        s1.CreateRow(7).CreateCell(1).SetCellValue("Điện thoại");
-        s1.GetRow(7).CreateCell(2).SetCellValue(dt.Rows[0]["tel"].ToString());
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 1,
+            text = "Mã số",
+            value = "maSo",
+            width = 7000
+        });
 
-        s1.GetRow(7).CreateCell(4).SetCellValue("Fax");
-        s1.GetRow(7).CreateCell(5).SetCellValue(dt.Rows[0]["fax"].ToString());
-        s1.AddMergedRegion(new CellRangeAddress(7, 7, 5, 7));
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 2,
+            text = "Hình ảnh",
+            value = "",
+            width = width
+        });
 
-        s1.CreateRow(10).CreateCell(1).SetCellValue("Cung cấp cho công ty chúng tôi các mặt hàng với chi tiết:");
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 3,
+            text = "Mã khách hàng",
+            value = "maKhachHang",
+            width = width
+        });
 
-		row = 11;
-		// set A13 - All
-		// -- Header
-		int cell = 0;
-		string[] d = { "STT","Mã số","Hình ảnh","Mã khách hàng"
-		,"Mô tả","ĐVT"
-		,"Cbm","SL"
-		,"Giá","Thành tiền","Hướng dẫn làm hàng"
-		,"Đóng gói Inner","Đóng gói Outer","Trọng lượng","Xác nhận kích thước" };
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 4,
+            text = "Mô tả",
+            value = "moTa",
+            width = 8000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 5,
+            text = "SL",
+            value = "soLuong",
+            width = 2500
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 6,
+            text = "ĐVT",
+            value = "dvt",
+            width = 2000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 7,
+            text = "Giá mua",
+            value = "giaMua",
+            width = guiNCC ? 0 : (int)(fontSizeRpt * 260),
+            autoSize = guiNCC ? false : true
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 8,
+            text = "Phí",
+            value = "phi",
+            width = guiNCC ? 0 : (int)(fontSizeRpt * 260),
+            autoSize = guiNCC ? false : true
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 9,
+            text = "Tổng đơn\ngiá mua",
+            value = "tongDonGiaMua",
+            width = guiNCC ? 0 : (int)(fontSizeRpt * 260),
+            autoSize = guiNCC ? false : true
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 10,
+            text = "Thành tiền",
+            value = "thanhTien",
+            width = guiNCC ? 0 : (int)(fontSizeRpt * 380)
+            
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 11,
+            text = "Đóng gói Inner",
+            value = "dginner",
+            width = 4000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 12,
+            text = "Đóng gói Outer",
+            value = "dgouter",
+            width = 4000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 13,
+            text = "Số kiện Inner",
+            value = "soKienInner",
+            width = 3400
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 14,
+            text = "Số kiện Outer",
+            value = "soKienOuter",
+            width = 3400
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 15,
+            text = "Cbm",
+            value = "cbm",
+            width = 3000
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 16,
+            text = "Hướng dẫn làm hàng",
+            value = "huongdan_dathang",
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 17,
+            text = "Trọng lượng",
+            value = "trongluong",
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 18,
+            text = "Xác nhận kích thước",
+            value = "ghichu",
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 19,
+            text = "Giá gốc",
+            value = "giaMua",
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 20,
+            text = "Phí",
+            value = "phi",
+            width = 0
+        });
+        #endregion columnHeaders
+
 		IRow rowColumnHeader = s1.CreateRow(row);
 		rowColumnHeader.HeightInPoints = 47;
-		for(int i = 0; i < d.Count(); i++)
-		{		
-			int with = 5000;
-			rowColumnHeader.CreateCell(cell).SetCellValue(d[i]);
-			rowColumnHeader.GetCell(i).CellStyle = borderWrap;
-			if( i == 4) {
-				with = 7000;
-			}
-			else if( i == 9) {
-				with = 3000;
-			}
-			else if( i == 10 | i == 14 | i == 10) {
-				with = 0;
-			}
-
-            if ((i == 8 | i == 9) & guiNCC == true)
-                with = 0;
-			s1.SetColumnWidth(cell,with);
-			cell++;
+        var sumWidth2to9 = columnHeaders.Where(s=>s.columnAt >=2 & s.columnAt <= 9).Sum(s=>s.width);
+		foreach(var colHeader in columnHeaders)
+		{
+			rowColumnHeader.CreateCell(colHeader.columnAt).SetCellValue(colHeader.text);
+			rowColumnHeader.GetCell(colHeader.columnAt).CellStyle = borderWrap;
+            s1.SetColumnWidth(colHeader.columnAt, colHeader.width);
 		}
 		row ++;
 		//thu tu tong cong // dem so dong hang cua tung sochungtu
 		int count_row = 1;
+        double sumThanhTien = 0;
         for (int i = 0; i < dt.Rows.Count; i++)
         {
-			string[] e_value = {"no","ma_sanpham","","ma_sanpham_khach","mota_tiengviet","ma_edi","v2","sl_dathang"
-			,"gianhap","thanhtien","huongdan_dathang","dginner","dgouter","trongluong","ghichu" };
             //
-			IRow row_t = s1.CreateRow(row); row_t.HeightInPoints = 80;
+			IRow row_t = s1.CreateRow(row);
+            string moTa = dt.Rows[i]["moTa"].ToString();
+            var heighMoTatMAX = ConfigExcel.MeasureTextHeight(moTa, 7000, "Arial", fontSizeRptShort) + 4;
+            row_t.HeightInPoints = heighMoTatMAX < 70 ? 70 : heighMoTatMAX;
+
             row_t.CreateCell(2);
             try
             {
-                String imgPath = System.IO.Path.Combine(productImagePath, dt.Rows[i]["pic"].ToString() + ".jpg");
-                System.Drawing.Image image = System.Drawing.Image.FromFile(imgPath);
-                MemoryStream ms = new MemoryStream();
-                image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                IDrawing patriarch = s1.CreateDrawingPatriarch();
-                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, 2, 12 + i, 3, 13 + i);
-                anchor.AnchorType = 2;
-
-                int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
-                IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+                var imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImageProduct(dt.Rows[i]["maSo"].ToString()));
+                lstimage.Add(new AvariablePrj.lstImage() {
+                    row = row,
+                    column = 3,
+                    link = imgPath,
+                    heightCell = row_t.HeightInPoints,
+                    widthCell = 5000
+                });
             }
             catch
             { }
 
-			for (int j = 0; j < e_value.Length; j++)
+            var soLuong = double.Parse(dt.Rows[i]["soluong"].ToString());
+            var tongDonGiaMua = double.Parse(dt.Rows[i]["tongDonGiaMua"].ToString());
+            var thanhtien = soLuong * tongDonGiaMua;
+            sumThanhTien += thanhtien;
+
+            foreach (var colHeader in columnHeaders)
 			{
-				var cel_row_t = row_t.CreateCell(j);
-				if(e_value[j] == "no") {
+				var cel_row_t = row_t.CreateCell(colHeader.columnAt);
+				if(colHeader.value == "stt")
+                {
 					cel_row_t.SetCellValue(count_row);
 					cel_row_t.CellStyle = border_center; 
 				}
-				else if(e_value[j] == "thanhtien") {
-                    if (guiNCC == false)
-                        cel_row_t.CellFormula = String.Format("H{0}*I{0}",row + 1);
-					cel_row_t.CellStyle = border_number1;
-				}
-				else if(e_value[j] == "trongluong"){
-					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
-					cel_row_t.CellStyle = border_number1;
-				}
-				else if(e_value[j] == "sl_dathang") {
-					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
-					cel_row_t.CellStyle = border_number0;
-				}
-				else if( e_value[j] == "gianhap") {
-                    if (guiNCC == false)
-                        cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
-                    cel_row_t.CellStyle = border_number2;
+                else if (new string[] { "dvt", "maSo" }.Contains(colHeader.value))
+                {
+                    cel_row_t.SetCellValue(dt.Rows[i][colHeader.value].ToString());
+                    cel_row_t.CellStyle = border_center;
                 }
-				else if( e_value[j] == "v2") {
-					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
-					cel_row_t.CellStyle = border_number2;
+                else if(colHeader.value == "thanhTien")
+                {
+                    if (guiNCC == false)
+                        cel_row_t.CellFormula = String.Format("J{0}*F{0}",row + 1);
+
+                    cel_row_t.CellStyle = cellAmount;
+                }
+				else if(colHeader.value == "trongluong")
+                {
+					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][colHeader.value].ToString()));
+					cel_row_t.CellStyle = border_number1;
 				}
-				else if( e_value[j] == "") {
+				else if(colHeader.value == "soLuong")
+                {
+					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][colHeader.value].ToString()));
+					cel_row_t.CellStyle = cellSoLuong;
+				}
+				else if (new string[] { "giaMua", "tongDonGiaMua", "phi" }.Contains(colHeader.value))
+                {
+                    var val = double.Parse(dt.Rows[i][colHeader.value].ToString());
+                    if (guiNCC == false)
+                        cel_row_t.SetCellValue(val);
+
+                    cel_row_t.CellStyle = cellAmount;
+                }
+				else if( new string[] { "cbm", "soKienInner", "soKienOuter" }.Contains(colHeader.value))
+                {
+					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][colHeader.value].ToString()));
+					cel_row_t.CellStyle = cellCBM;
+				}
+				else if(colHeader.value == "")
+                {
 					cel_row_t.SetCellValue("");
 					cel_row_t.CellStyle = border;
 				}
-				else {
-					cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString());
+				else
+                {
+					cel_row_t.SetCellValue(dt.Rows[i][colHeader.value].ToString());
 					cel_row_t.CellStyle = border;
 				}
-			}	
+
+                if (colHeader.autoSize.GetValueOrDefault(false))
+                    s1.AutoSizeColumn(colHeader.columnAt);
+            }
 			row++;
 			count_row++;
 		}
-		//vi tri row dau tien
-		int m = row - count_row + 2;
+        var discountP = double.Parse(dt.Rows[0]["discountdecimal"].ToString());
+        var discount = sumThanhTien * discountP / 100;
+
+        //vi tri row dau tien
+        int m = row - count_row + 2;
 		int sub = row + 1;
 		//start tong cong 1
         s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng:");
-        s1.GetRow(row).CreateCell(7).SetCellFormula(String.Format("SUM(H{0}:H{1})", m, row));
-        cellModel.BorderAll = false;
-        cellModel.FormatData = "#,##0";
-        cellModel.HorizontalAlignment = HorizontalAlignment.Right;
-        s1.GetRow(row).GetCell(7).CellStyle = cellModel.CreateCellStyle();
+        s1.GetRow(row).HeightInPoints = 30;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 4));
 
-        s1.GetRow(row).CreateCell(6).SetCellFormula(String.Format("SUM(G{0}:G{1})", m, row));
-        cellModel.FormatData = "#,##0.000";
-        s1.GetRow(row).GetCell(6).CellStyle = cellModel.CreateCellStyle();
+        s1.GetRow(row).CreateCell(5).SetCellFormula(String.Format("SUM(F{0}:F{1})", m, row));
+        s1.GetRow(row).GetCell(5).CellStyle = cellBoldSoLuong;
 
         if (guiNCC == true)
-            s1.GetRow(row).CreateCell(9).SetCellValue("");
+            s1.GetRow(row).CreateCell(10).SetCellValue("");
         else
-            s1.GetRow(row).CreateCell(9).SetCellFormula(String.Format("SUM(J{0}:J{1})", m, row));
-        cellModel.FormatData = "#,##0";
-        s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
+            s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("SUM(K{0}:K{1})", m, row));
+
+        s1.GetRow(row).GetCell(10).CellStyle = cellBoldAmount;
+        s1.GetRow(row).CreateCell(15).SetCellFormula(String.Format("SUM(P{0}:P{1})", m, row));
+        s1.GetRow(row).GetCell(15).CellStyle = cellBoldCBM;
+
 		row++;
 		//start +
 		int cong = row + 1;
         //s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["diengiaitang"].ToString() + "(+):");
-        s1.CreateRow(row).CreateCell(1).SetCellValue("(+):" + dt.Rows[0]["mota_cong"].ToString());
+        var cellR01 = s1.CreateRow(row).CreateCell(1);
+        cellR01.SetCellValue("(+):" + dt.Rows[0]["mota_cong"].ToString());
+        cellR01.CellStyle = cellBold;
+        var cellRange1to5v1 = new CellRangeAddress(row, row, 1, 9);
+        s1.AddMergedRegion(cellRange1to5v1);
+
+        var cellR10 = s1.GetRow(row).CreateCell(10);
+        var phiTangVal = double.Parse(phitang == null ? "0" : phitang.Value.ToString());
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(9).SetCellValue(double.Parse(phitang == null ? "0" : phitang.Value.ToString()));
-            cellModel.BorderAll = false;
-            cellModel.FormatData = "#,##0";
-            cellModel.HorizontalAlignment = HorizontalAlignment.Right;
-            s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
+            cellR10.SetCellValue(phiTangVal);
+            cellR10.CellStyle = cellBoldAmount;
         }
 
         if (phitang == null)
         {
-            s1.GetRow(row).HeightInPoints = 0;
+            s1.GetRow(row).ZeroHeight = true;
+
+            if (type == "pdf")
+            {
+                s1.GetRow(row).RemoveCell(cellR01);
+                s1.GetRow(row).RemoveCell(cellR10);
+            }
         }
-		row++;
+        else
+            s1.GetRow(row).HeightInPoints = 30;
+
+        row++;
 		//start -
 		int tru = row + 1;
         //s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["diengiaigiam"].ToString() + " (-):");
-        s1.CreateRow(row).CreateCell(1).SetCellValue("(-):" + dt.Rows[0]["mota_tru"].ToString());
+        cellR01 = s1.CreateRow(row).CreateCell(1);
+        cellR01.SetCellValue("(-):" + dt.Rows[0]["mota_tru"].ToString());
+        cellR01.CellStyle = cellBold;
+        var cellRange1to5v2 = new CellRangeAddress(row, row, 1, 9);
+        s1.AddMergedRegion(cellRange1to5v2);
+
+        cellR10 = s1.GetRow(row).CreateCell(10);
+        var phiGiamVal = double.Parse(phigiam == null ? "0" : phigiam.Value.ToString());
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(9).SetCellValue(double.Parse(phigiam == null ? "0" : phigiam.Value.ToString()));
-            cellModel.BorderAll = false;
-            cellModel.FormatData = "#,##0";
-            cellModel.HorizontalAlignment = HorizontalAlignment.Right;
-            s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
+            cellR10.SetCellValue(phiGiamVal);
+            cellR10.CellStyle = cellBoldAmount;
         }
 
         if (phigiam == null)
         {
-            s1.GetRow(row).HeightInPoints = 0;
+            //s1.GetRow(row).HeightInPoints = 0;
+            s1.GetRow(row).ZeroHeight = true;
+            if (type == "pdf")
+            {
+                s1.GetRow(row).RemoveCell(cellR01);
+                s1.GetRow(row).RemoveCell(cellR10);
+            }
         }
-		row++;
+        else
+            s1.GetRow(row).HeightInPoints = 30;
+
+        row++;
 		// start discount
 		int dis = row + 1;
-        s1.CreateRow(row).CreateCell(1).SetCellValue(String.Format("Discount ({0}%)", dt.Rows[0]["discountdecimal"].ToString()));
+        var ds2so = discountP.ToString(fmtDiscount);
+        s1.CreateRow(row).CreateCell(1).SetCellValue(String.Format("Discount ({0}%)", ds2so));
+        s1.GetRow(row).HeightInPoints = 30;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 4));
+
+        cellR10 = s1.GetRow(row).CreateCell(10);
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(9).SetCellValue(double.Parse(dt.Rows[0]["discount"].ToString()));
-            cellModel.BorderAll = false;
-            cellModel.FormatData = "#,##0";
-            cellModel.HorizontalAlignment = HorizontalAlignment.Right;
-            s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
+            cellR10.SetCellValue(discount);
+            cellR10.CellStyle = cellBoldAmount;
         }
 		row++;
 		// start tổng cộng đã trừ
 		s1.CreateRow(row).CreateCell(1).SetCellValue("Tổng cộng đã trừ:");
+        s1.GetRow(row).HeightInPoints = 30;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 4));
+        cellR10 = s1.GetRow(row).CreateCell(10);
+        var tongCongDaTru = sumThanhTien + phiTangVal - phiGiamVal - discount;
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(9).SetCellFormula(String.Format("J{0} + J{1} - J{2} - J{3}", sub, cong, tru, dis));
-            cellModel.FormatData = "#,##0";
-            s1.GetRow(row).GetCell(9).CellStyle = cellModel.CreateCellStyle();
+            cellR10.SetCellFormula(String.Format("K{0} + K{1} - K{2} - K{3}", sub, cong, tru, dis));
+            cellR10.CellStyle = cellBoldAmount;
         }
 		row++;
 		// start viet bang chu
         s1.CreateRow(row).CreateCell(1).SetCellValue("Viết bằng chữ:");
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.GetRow(row).HeightInPoints = 30;
         if (guiNCC == false)
         {
-            s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["money"].ToString());
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
+            var textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)tongCongDaTru, dt.Rows[0]["ma_dtkd"].ToString()).Trim();
+            textMoney = textMoney.Substring(0, 1).ToUpper() + textMoney.Substring(1);
+            s1.GetRow(row).CreateCell(2).SetCellValue(textMoney);
+            s1.GetRow(row).GetCell(2).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 10));
         }
 		row++;
-		// start ghi chu
-        s1.CreateRow(row).CreateCell(1).SetCellValue("Ghi chú:");
-        s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["mota"].ToString());
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
-		s1.GetRow(row).HeightInPoints = 45;
-		
-        cellModel.VerticalAlignment = VerticalAlignment.Top;
-		cellModel.HorizontalAlignment = HorizontalAlignment.Left;
-		s1.GetRow(row).GetCell(1).CellStyle = cellModel.CreateCellStyle();
-        s1.GetRow(row).GetCell(2).CellStyle = cellModel.CreateCellStyle();
-		row++;
+        // start ghi chu
+        var ghiChuHDDH = dt.Rows[0]["ghiChuDSDH"].ToString();
+
+        if (type == "pdf")
+        {
+            string[] arrDDHHs = ghiChuHDDH.Split(new string[] { "\n", "\r" }, StringSplitOptions.None);
+            for (var iHDK = 0; iHDK < arrDDHHs.Length; iHDK++)
+            {
+                var rowLineHDK = s1.CreateRow(row);
+                if (iHDK == 0)
+                {
+                    rowLineHDK.CreateCell(1).SetCellValue("Ghi chú:");
+                    rowLineHDK.GetCell(1).CellStyle = cellBold;
+                }
+
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+                rowLineHDK.CreateCell(2).SetCellValue(arrDDHHs[iHDK]);
+                rowLineHDK.GetCell(2).CellStyle = celltext;
+
+                var heightMAX = ConfigExcel.MeasureTextHeight(arrDDHHs[iHDK], sumWidth2to9, "Arial", fontSizeRptShort);
+                rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+                row++;
+            }
+        }
+        else
+        {
+            var rowLineHDK = s1.CreateRow(row);
+            rowLineHDK.CreateCell(1).SetCellValue("Ghi chú:");
+            rowLineHDK.GetCell(1).CellStyle = cellBold;
+
+            rowLineHDK.CreateCell(2).SetCellValue(ghiChuHDDH);
+            rowLineHDK.GetCell(2).CellStyle = celltext;
+
+            var heightMAX = ConfigExcel.MeasureTextHeight(ghiChuHDDH, sumWidth2to9, "Arial", fontSizeRptShort - 2);
+            rowLineHDK.HeightInPoints = heightMAX < 30 ? 30 : heightMAX;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+            row++;
+        }
+
+        row++;
 		// Ngay xong hang
         s1.CreateRow(row).CreateCell(1).SetCellValue("Ngày xong hàng:");
+        s1.GetRow(row).HeightInPoints = 30;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.GetRow(row).CreateCell(2).SetCellValue(DateTime.Parse(dt.Rows[0]["hangiaohang_po"].ToString()).ToString("dd/MM/yyyy"));
+        s1.GetRow(row).GetCell(2).CellStyle = celltext;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
 		row++;
 		// Dia diem xuat hang
         s1.CreateRow(row).CreateCell(1).SetCellValue("Địa điểm xuất hàng:");
+        s1.GetRow(row).HeightInPoints = 30;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[0]["diachigiaohang"].ToString());
+        s1.GetRow(row).GetCell(2).CellStyle = celltext;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 5));
 		row++;
 		//Huong dan lam hang
         s1.CreateRow(row).CreateCell(1).SetCellValue("Hướng dẫn làm hàng:");
-		row++;
+        s1.GetRow(row).HeightInPoints = 30;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 5));
+        row++;
 		// start dac diem hang hoa
-		s1.CreateRow(row).CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
-        HSSFRichTextString rich = new HSSFRichTextString(dt.Rows[0]["huongdanlamhang"].ToString());
-        s1.GetRow(row).CreateCell(2).SetCellValue(rich);
-        s1.GetRow(row).HeightInPoints = 45;
-		
-		cellModel.VerticalAlignment = VerticalAlignment.Top;
-		cellModel.HorizontalAlignment = HorizontalAlignment.Left;
-		s1.GetRow(row).GetCell(1).CellStyle = cellModel.CreateCellStyle();
-        s1.GetRow(row).GetCell(2).CellStyle = cellModel.CreateCellStyle();
-		row++;
-		// start cac huong dan khac
-		s1.CreateRow(row).CreateCell(1).SetCellValue("2. Các hướng dẫn khác:");
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
-        HSSFRichTextString rich_khac = new HSSFRichTextString(dt.Rows[0]["huongdanlamhangchung"].ToString());
-        s1.GetRow(row).CreateCell(2).SetCellValue(rich_khac);
-        s1.GetRow(row).HeightInPoints = 45;
-		
-		cellModel.VerticalAlignment = VerticalAlignment.Top;
-		cellModel.HorizontalAlignment = HorizontalAlignment.Left;
-        s1.GetRow(row).GetCell(1).CellStyle = cellModel.CreateCellStyle();
-        s1.GetRow(row).GetCell(2).CellStyle = cellModel.CreateCellStyle();
-		row++;
-		//--
+        string huongdanlamhang = dt.Rows[0]["huongdanlamhang"].ToString();
+        if (type == "pdf")
+        {
+            string[] arrDDHHs = huongdanlamhang.Split(new string[] { "\n", "\r" }, StringSplitOptions.None);
+            for (var iHDK = 0; iHDK < arrDDHHs.Length; iHDK++)
+            {
+                var rowLineHDK = s1.CreateRow(row);
+                if (iHDK == 0)
+                {
+                    rowLineHDK.CreateCell(1).SetCellValue("1. Đặc điểm hàng hóa:");
+                    rowLineHDK.GetCell(1).CellStyle = cellBold10Top;
+                }
+
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+                rowLineHDK.CreateCell(2).SetCellValue(arrDDHHs[iHDK]);
+                rowLineHDK.GetCell(2).CellStyle = celltext10Top;
+
+                var heightMAX = ConfigExcel.MeasureTextHeight(arrDDHHs[iHDK], sumWidth2to9, "Arial", fontSizeRptShort - 2);
+                rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+                row++;
+            }
+            s1.CreateRow(row).HeightInPoints = 25;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 9));
+            row++;
+        }
+        else
+        {
+            var rowLineHDK = s1.CreateRow(row);
+            rowLineHDK.CreateCell(1).SetCellValue("1.Đặc điểm hàng hóa:");
+            rowLineHDK.GetCell(1).CellStyle = cellBold10Top;
+
+            rowLineHDK.CreateCell(2).SetCellValue(huongdanlamhang);
+            rowLineHDK.GetCell(2).CellStyle = celltext10Top;
+
+            var heightMAX = ConfigExcel.MeasureTextHeight(huongdanlamhang, sumWidth2to9, "Arial", fontSizeRptShort - 2);
+            rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+            row++;
+            s1.CreateRow(row).HeightInPoints = 25;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 9));
+            row++;
+        }
+        // start cac huong dan khac
+        var huongdanlamhangchung = dt.Rows[0]["huongdanlamhangchung"].ToString();
+        if (type == "pdf")
+        {
+            string[] arrHDKs = huongdanlamhangchung.Split(new string[] { "\n", "\r" }, StringSplitOptions.None);
+            for (var iHDK = 0; iHDK < arrHDKs.Length; iHDK++)
+            {
+                var rowLineHDK = s1.CreateRow(row);
+                if (iHDK == 0)
+                {
+                    rowLineHDK.CreateCell(1).SetCellValue("2.Các hướng dẫn khác:");
+                    rowLineHDK.GetCell(1).CellStyle = cellBold10Top;
+                }
+
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+                rowLineHDK.CreateCell(2).SetCellValue(arrHDKs[iHDK]);
+                rowLineHDK.GetCell(2).CellStyle = celltext10Top;
+
+                var heightMAX = ConfigExcel.MeasureTextHeight(arrHDKs[iHDK], sumWidth2to9, "Arial", fontSizeRptShort - 2);
+                rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+                row++;
+            }
+        }
+        else
+        {
+            var rowLineHDK = s1.CreateRow(row);
+            rowLineHDK.CreateCell(1).SetCellValue("2. Các hướng dẫn khác:");
+            rowLineHDK.GetCell(1).CellStyle = cellBold10Top;
+
+            rowLineHDK.CreateCell(2).SetCellValue(huongdanlamhangchung);
+            rowLineHDK.GetCell(2).CellStyle = celltext10Top;
+
+            var heightMAX = ConfigExcel.MeasureTextHeight(huongdanlamhangchung, sumWidth2to9, "Arial", fontSizeRptShort - 2);
+            rowLineHDK.HeightInPoints = heightMAX < 14 ? 14 : heightMAX;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 9));
+            row++;
+        }
+        //--
         s1.CreateRow(row).CreateCell(1).SetCellValue("* Khi cơ sở nhận được đơn đặt hàng này vui lòng ký xác nhận và gửi lại.");
+        s1.GetRow(row).HeightInPoints = 30;
+        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 9));
 		row++;
-        ICellStyle cCenter = hssfworkbook.CreateCellStyle();
-        cCenter.Alignment = HorizontalAlignment.Center;
-        cCenter.VerticalAlignment = VerticalAlignment.Top;
 		//--
         s1.CreateRow(row).CreateCell(1).SetCellValue("Người lập phiếu");
-        s1.GetRow(row).GetCell(1).CellStyle = cCenter;
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.GetRow(row).GetCell(1).CellStyle = cellTextCenter;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 		//
-		s1.GetRow(row).CreateCell(8).SetCellValue("Nhà cung ứng");
-        s1.GetRow(row).GetCell(8).CellStyle = cCenter;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
+		s1.GetRow(row).CreateCell(7).SetCellValue("Nhà cung ứng");
+        s1.GetRow(row).GetCell(7).CellStyle = cellTextCenter;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 7, 10));
 		row++;
 		//--
-        s1.CreateRow(row).CreateCell(1).SetCellValue("Ký và ghi rõ họ tên");
-        s1.GetRow(row).GetCell(1).CellStyle = cCenter;
+        s1.CreateRow(row).CreateCell(1).SetCellValue("(Ký và ghi rõ họ tên)");
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.GetRow(row).GetCell(1).CellStyle = cellText10Center;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 		//--
-		s1.GetRow(row).CreateCell(8).SetCellValue("Ký và ghi rõ họ tên");
-        s1.GetRow(row).GetCell(8).CellStyle = cCenter;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
+		s1.GetRow(row).CreateCell(7).SetCellValue("(Ký và ghi rõ họ tên)");
+        s1.GetRow(row).GetCell(7).CellStyle = cellText10Center;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 7, 10));
 		row = row + 3;
 		//
         s1.CreateRow(row).CreateCell(1).SetCellValue(dt.Rows[0]["nguoitao"].ToString());
-        s1.GetRow(row).GetCell(1).CellStyle = cCenter;
+        s1.GetRow(row).HeightInPoints = 20;
+        s1.GetRow(row).GetCell(1).CellStyle = cellTextCenter;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 		row++;
         //s1.GetRow(row).CreateCell(4).SetCellValue("Trưởng phòng");
@@ -544,7 +962,13 @@ public class DanhSachDatHangReport
         cellUn.Alignment = HorizontalAlignment.Center;
         cellUn.VerticalAlignment = VerticalAlignment.Top;
         s1.GetRow(2).GetCell(0).CellStyle = cellUn;
-		return hssfworkbook;
+
+        s1 = ConfigExcel.PrintExcel((HSSFSheet)s1, row);
+        s1.PrintSetup.Landscape = true;
+
+        if (type == "pdf")
+            s1.PrintSetup.PaperSize = (short)PaperSize.A4;
+        return hssfworkbook;
     }
 
     public String C_baogia_id
@@ -569,4 +993,5 @@ public class DanhSachDatHangReport
         font.FontHeightInPoints = size;
         return font;
     }
+
 }

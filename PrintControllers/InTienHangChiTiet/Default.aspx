@@ -7,11 +7,11 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head id="Head1" runat="server">
-    <title></title>
+    <title>GIÁ TRỊ TIỀN HÀNG ĐÃ NHẬP CHI TIẾT</title>
 </head>
 <body>
     <form id="form1" runat="server">
-    <div>
+    <div align="center">
     
         <dx:ReportToolbar ID="ReportToolbar1" runat="server" 
             ReportViewerID="ReportViewer1" ShowDefaultButtons="False">
@@ -35,9 +35,9 @@
                 <dx:ReportToolbarButton ItemKind="SaveToWindow" />
                 <dx:ReportToolbarComboBox ItemKind="SaveFormat" Width="70px">
                     <Elements>
-                        <dx:ListElement Value="pdf" />
                         <dx:ListElement Value="xls" />
                         <dx:ListElement Value="xlsx" />
+                        <dx:ListElement Value="pdf" />
                         <dx:ListElement Value="rtf" />
                         <dx:ListElement Value="mht" />
                         <dx:ListElement Value="html" />

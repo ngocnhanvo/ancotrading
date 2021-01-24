@@ -21,6 +21,7 @@ using NPOI.HSSF.Record.Aggregates;
 using NPOI.HSSF.Record.AutoFilter;
 using System.Drawing;
 using GemBox.Spreadsheet;
+using Newtonsoft.Json;
 
 /// <summary>
 /// Xuat Excel voi Npoi
@@ -30,7 +31,25 @@ public class ExportExcel
     HSSFWorkbook hssfworkbook = null;
     Excel_Format ex_fm = null;
     private int start = 0, end = 0;
+    public int? endHeader = null;
+    public string title = "";
     private String fmt0 = "#,##0", fmt0i0 = "#,##0.0", fmt0i00 = "#,##0.00", fmt0i000 = "#,##0.000";
+    public Logoreport LogoRpt { get; set; }
+    public string NameTypePrint { get; set; }
+    public bool? isPDF { get; set; }
+    public partial class Logoreport
+    {
+        public string link { get; set; }
+        public int? dx1 { get; set; }
+        public int? dx2 { get; set; }
+        public int? dy1 { get; set; }
+        public int? dy2 { get; set; }
+        public int? cell1 { get; set; }
+        public int? row1 { get; set; }
+        public int? cell2 { get; set; }
+        public int? row2 { get; set; }
+        public bool? hasLogo { get; set; }
+    }
     #region cellStyle
     public ICellStyle cellHeader = null;
     public ICellStyle cellHeader_n = null;
@@ -66,7 +85,7 @@ public class ExportExcel
     public ICellStyle borderright2dec = null;
     public ICellStyle borderright3dec = null;
     #endregion
-
+    public ExportExcel() { }
     public ExportExcel(HSSFWorkbook hssf, int start, int end)
     {
         hssfworkbook = hssf;
@@ -142,16 +161,16 @@ public class ExportExcel
 
     public HSSFSheet PrintExcel(HSSFSheet s1, int row)
     {
-        s1.PrintSetup.PaperSize = (short)PaperSize.A4;
+        s1.PrintSetup.PaperSize = (short)PaperSize.A4_Small;
         s1.FitToPage = true;
         s1.PrintSetup.FitWidth = 1;
         s1.PrintSetup.FitHeight = 0;
-        s1.SetMargin(MarginType.TopMargin, 0.75);
-        s1.SetMargin(MarginType.BottomMargin, 0.75);
+        s1.SetMargin(MarginType.TopMargin, 0.25);
+        s1.SetMargin(MarginType.BottomMargin, 0.25);
         s1.SetMargin(MarginType.LeftMargin, 0.23);
         s1.SetMargin(MarginType.RightMargin, 0.23);
-        s1.SetMargin(MarginType.HeaderMargin, 0.31);
-        s1.SetMargin(MarginType.FooterMargin, 0.31);
+        s1.SetMargin(MarginType.HeaderMargin, 0.1);
+        s1.SetMargin(MarginType.FooterMargin, 0.1);
         hssfworkbook.SetPrintArea(
             hssfworkbook.GetSheetIndex(s1.SheetName), //sheet index
             0, //start column
@@ -227,6 +246,22 @@ public class ExportExcel
         return (float)Math.Min(Convert.ToDouble(size.Height) * 72 / 96, 409) + 5;
     }
 
+    public float MeasureTextHeight(string text, int width, string font, float fontSize)
+    {
+        double width2 = width * 0.003756;
+        width2 = width2 * 7.5;
+        if (string.IsNullOrEmpty(text)) return (float)0.0;
+        var bitmap = new Bitmap(1, 1);
+        var graphics = Graphics.FromImage(bitmap);
+
+        var pixelWidth = Convert.ToInt32(width * 7.5);  //7.5 pixels per excel column width
+        var drawingFont = new Font(font, fontSize);
+        var size = graphics.MeasureString(text, drawingFont, (int)width2);
+
+        //72 DPI and 96 points per inch.  Excel height in points with max of 409 per Excel requirements.
+        return (float)Math.Min(Convert.ToDouble(size.Height) * 72 / 96, 409) + 5;
+    }
+
     public void set_borderThin(CellRangeAddress cellRange, string border, HSSFSheet hssfsheet)
     {
         ex_fm.set_border(cellRange, border, hssfsheet);
@@ -248,16 +283,198 @@ public class ExportExcel
         context.Response.BinaryWrite(exportData.GetBuffer());
         context.Response.End();
     }
+
+    public int createHeader(NameHeaderReport name, ISheet s1, int row, int? height)
+    {
+        LogoRpt = LogoRpt == null ? new Logoreport() : LogoRpt;
+
+        if (name == NameHeaderReport.ANCO)
+        {
+            //Logo
+            if (LogoRpt.hasLogo.GetValueOrDefault(true))
+            {
+                string logoPath = Path.Combine(HttpContext.Current.Server.MapPath("~/images/"), "anco_logo_print.png");
+                //String productImagePath = Server.MapPath("~/images/products/fullsize/");
+                var logo = System.Drawing.Image.FromFile(logoPath);
+                var mslogo = new MemoryStream();
+                logo.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                var patriarchlogo = s1.CreateDrawingPatriarch();
+                var anchorLogo = new HSSFClientAnchor();
+                anchorLogo.Dx1 = LogoRpt.dx1.GetValueOrDefault(470);
+                anchorLogo.Dy1 = LogoRpt.dy1.GetValueOrDefault(10);
+                anchorLogo.Dx2 = LogoRpt.dx2.GetValueOrDefault(600);
+                anchorLogo.Dy2 = LogoRpt.dy2.GetValueOrDefault(253);
+                anchorLogo.Col1 = LogoRpt.cell1.GetValueOrDefault(4);
+                anchorLogo.Row1 = LogoRpt.row1.GetValueOrDefault(1);
+                anchorLogo.Col2 = LogoRpt.cell2.GetValueOrDefault(4);
+                anchorLogo.Row2 = LogoRpt.row2.GetValueOrDefault(1);
+
+                anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
+
+                int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
+                var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
+                //signaturePicturelogo.Resize();
+            }
+
+            string[] a = {
+                "ANCO COMPANY LIMITED",
+                "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam",
+                "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com",
+                string.IsNullOrEmpty(title) ? "PROFORMA INVOICE" : title
+            };
+
+            s1.CreateRow(row);
+            row++;
+            for (int i = 0; i < a.Length; i++)
+            {
+                s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 0, endHeader.GetValueOrDefault(this.end)));
+
+                if (height != null)
+                    s1.GetRow(row).HeightInPoints = height.GetValueOrDefault(0);
+
+                if (new int[] { 0, 3 }.Contains(i))
+                {
+                    s1.GetRow(row).HeightInPoints = 30;
+                    s1.GetRow(row).GetCell(0).CellStyle = i == 0 ? ex_fm.getcell(18, true, true, "", "C", "T") : cellHeader;
+                }
+                else
+                {
+                    s1.GetRow(row).GetCell(0).CellStyle = cellHeader_n;
+                }
+                row++;
+            }
+        }
+        return row;
+    }
+
+    public HSSFWorkbook setImageForExcel(HSSFWorkbook hsswb, List<AvariablePrj.lstImage> lstimage)
+    {
+        foreach (var item in lstimage)
+        {
+            var image = System.Drawing.Image.FromFile(item.link);
+
+            MemoryStream ms = new MemoryStream();
+            //pull the memory stream from the image (I need this for the byte array later)
+            image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            image.Dispose();
+            //the drawing patriarch will hold the anchor and the master information
+            IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
+            //store the coordinates of which cell and where in the cell the image goes
+            int intx1 = item.column - 1;
+            int inty1 = item.row;
+            int intx2 = item.column;
+            int inty2 = 1 + item.row;
+
+            HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
+            //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
+            anchor.AnchorType = 0;
+            //add the byte array and encode it for the excel file
+            int index = hsswb.AddPicture(ms.ToArray(), PictureType.JPEG);
+            IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+        }
+        return hsswb;
+    }
+
+    public string laySoThapPhanChoRpt(string ma_dtkd, string typeSTP)
+    {
+        return getInfoCHSTP("soThapPhan", ma_dtkd, typeSTP);
+    }
+
+    public string layKichThuocChuChoRpt()
+    {
+        return getInfoCHSTP("fontSize", "", isPDF.GetValueOrDefault(false) ? "pdf" : "excel");
+    }
+
+    private string linkJsonCHSTP = "~/App_Data/JSON/cauHinhSoThapPhan.json";
+    public List<Dictionary<string, object>> getJsonInfoCHSTP()
+    {
+        var jsonStr = File.ReadAllText(ExcuteSignalRStatic.mapPathSignalR(linkJsonCHSTP));
+        var jsons = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonStr);
+        return jsons;
+    }
+
+    public void writeJsonInfoCHSTP(string jsonStr)
+    {
+        File.WriteAllText(ExcuteSignalRStatic.mapPathSignalR(linkJsonCHSTP), jsonStr);
+    }
+
+    public string getInfoCHSTP(string name, string ma_dtkd, string typeSTP)
+    {
+        var jsons = getJsonInfoCHSTP();
+        var kq = "";
+        var json = jsons.Where(s => s["name"].ToString() == NameTypePrint).FirstOrDefault();
+        if (json != null)
+        {
+            if (NameTypePrint == "InPO")
+            {
+
+                var jsonSTPs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json[name].ToString());
+                if (jsonSTPs.Count > 0)
+                {
+                    var jsonSTP = jsonSTPs[0];
+                    kq = jsonSTP[typeSTP].ToString();
+                }
+            }
+            else if (NameTypePrint == "InPI")
+            {
+                var jsonSTPs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json[name].ToString());
+                if (jsonSTPs.Count > 0)
+                {
+                    var jsonSTP = jsonSTPs[0];
+                    if (name == "SoThapPhan")
+                    {
+                        var jsonStpDTKDs = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonSTP["dtkd"].ToString());
+                        var stpDTKD = jsonStpDTKDs.Where(s => s["name"].ToString() == ma_dtkd).FirstOrDefault();
+                        if (stpDTKD == null)
+                        {
+                            kq = jsonSTP[typeSTP].ToString();
+                        }
+                        else
+                        {
+                            if (stpDTKD.Keys.Contains(typeSTP))
+                                kq = stpDTKD[typeSTP].ToString();
+                            else
+                                kq = jsonSTP[typeSTP].ToString();
+                        }
+                    }
+                    else
+                        kq = jsonSTP[typeSTP].ToString();
+                }
+            }
+        }
+
+        return kq;
+    }
+}
+
+public enum NameHeaderReport
+{
+    ANCO,
+    ANCO1,
+    ANCO2,
+    ANBINH,
+    VINHGIA
 }
 
 public class ItemValue
 {
-    private int _width;
+    private int? _width;
     public string item { get; set; }
     public string value { get; set; }
     public int witdh
     {
-        get { return (_width == null ? 5000 : _width); }
+        get { return (_width == null ? 5000 : _width.GetValueOrDefault(0)); }
         set { _width = value; }
     }
+}
+
+public class columnHeader
+{
+    public string text { get; set; }
+    public string value { get; set; }
+    public int width { get; set; }
+    public int columnAt { get; set; }
+    public bool? autoSize { get; set; }
 }

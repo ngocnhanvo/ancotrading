@@ -11,19 +11,23 @@
     string md_doitackinhdoanh_id = Context.Request.Form["ncu"].ToString();
 
     String sel = String.Format(@"
-                select dt.ma_dtkd, coalesce(SUM(civ.totalgross), 0) as tonginvoice, 
-                    coalesce(sum(civ.tiendatcoc + civ.tiendatra), 0) as dathanhtoan, 
-                    coalesce(SUM(tienconlai), 0) as tienconlai
-                from c_packinginvoice civ, md_doitackinhdoanh dt
-                where civ.md_doitackinhdoanh_id = dt.md_doitackinhdoanh_id
-                    and civ.ngaylap >= '{0}'
-                    and civ.ngaylap <= '{1}'
-                    {2}                   
-                    and (civ.thanhtoanxong <> 1 or civ.thanhtoanxong is null)
-                group by dt.ma_dtkd
-                ", DateTime.ParseExact(tungay, "dd/MM/yyyy", null)
-                 , DateTime.ParseExact(denngay, "dd/MM/yyyy", null)
-                 , md_doitackinhdoanh_id.Equals("NULL") ? "" : "and civ.md_doitackinhdoanh_id ='"+md_doitackinhdoanh_id+"'");
+        declare @tungay datetime = convert(datetime, '{0} 00:00:00', 103);
+        declare @denngay datetime = convert(datetime, '{1} 23:59:59', 103);
+
+        select dt.ma_dtkd, coalesce(SUM(civ.totalgross), 0) as tonginvoice, 
+            coalesce(sum(civ.tiendatcoc + civ.tiendatra), 0) as dathanhtoan, 
+            coalesce(SUM(tienconlai), 0) as tienconlai
+        from c_packinginvoice civ, md_doitackinhdoanh dt
+        where civ.md_doitackinhdoanh_id = dt.md_doitackinhdoanh_id
+            and civ.ngaylap >= @tungay
+            and civ.ngaylap <= @denngay
+            {2}                   
+            and (civ.thanhtoanxong <> 1 or civ.thanhtoanxong is null)
+        group by dt.ma_dtkd
+    ", 
+    tungay, 
+    denngay, 
+    md_doitackinhdoanh_id.Equals("NULL") ? "" : "and civ.md_doitackinhdoanh_id ='"+md_doitackinhdoanh_id+"'");
     DataTable dt = mdbc.GetData(sel);
 %>
 <style>

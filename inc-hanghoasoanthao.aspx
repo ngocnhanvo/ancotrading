@@ -250,20 +250,13 @@
             SortOrder ="asc"
             UrlFileAction="Controllers/ProductSOANTHAOController.ashx" 
             BtnPrint="funcPrintSP"
-			ColNames="[
-						'md_sanpham_id', 'TT', 'H/A', 'Mã SP', 'Tên KD', 'Mã KD'
-					  , 'Tên CN', 'Mã CN', 'Mô Tả TV', 'Mô Tả TA', 'ĐVT', 'L(inch)', 'W(inch)'
-					  , 'H(inch)', 'L(cm)', 'W(cm)', 'H(cm)', 'Tr.Lượng', 'D.Tich', 'Nhóm NL'
-					  , 'Loại SP', 'NCU', 'Cảng Biển', 'HSCode', 'HSCode(số)', 'Nhóm chức năng'
-					  , 'Ngày xác nhận', 'Hình thức bán', 'Ghi Chú'
-					  , 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động'
-					  ]"
             RowNumbers="true"
             FuncChangeStatus="ChangeStatus"
             FuncImportPicture = "function(){ add_tab('Upload Hình Ảnh', 'inc-upload-image.aspx') }"
             ColModel = "[
             {
                 fixed: true, name: 'md_sanpham_id'
+                , label: 'md_sanpham_id'
                 , index: 'sp.md_sanpham_id'
                 , width: 100
                 , hidden: true 
@@ -273,6 +266,7 @@
             },
             {
                 fixed: true, name: 'trangthai'
+                , label: 'TT'
                 , index: 'sp.trangthai'
                 , width: 100
                 , editable:false
@@ -285,6 +279,7 @@
             },
             {
                 fixed: true, name: 'picture'
+                , label: 'H/A'
                 , index: 'sp.picture'
                 , width: 50
                 , editable:false
@@ -297,6 +292,7 @@
             },
             {
                  fixed: true, name: 'ma_sanpham'
+                 , label: 'Mã SP'
                  , index: 'sp.ma_sanpham'
                  , width: 100
                  , edittype: 'text'
@@ -305,6 +301,7 @@
             },
             {
                 fixed: true, name: 'md_kieudang_id'
+                , label: 'Tên KD'
                 , index: 'kd.ten_tv'
                 , width: 50
                 , edittype: 'select'
@@ -314,6 +311,7 @@
             },
 			{
                 fixed: true, name: 'ma_kieudang'
+                , label: 'Mã KD'
                 , index: 'kd.ma_kieudang'
                 , width: 50
                 , edittype: 'text'
@@ -322,6 +320,7 @@
             },
             {
                 fixed: true, name: 'md_chucnang_id'
+                , label: 'Tên CN'
                 , index: 'cn.ten_tv'
                 , width: 50
                 , edittype: 'select'
@@ -331,6 +330,7 @@
             },
 			{
                 fixed: true, name: 'ma_chucnang'
+                , label: 'Mã CN'
                 , index: 'cn.ma_chucnang'
                 , width: 50
                 , edittype: 'text'
@@ -339,6 +339,7 @@
             },
             {
                 fixed: true, name: 'mota_tiengviet'
+                , label: 'Mô tả TV'
                 , index: 'sp.mota_tiengviet'
                 , width: 100
                 , edittype: 'textarea'
@@ -346,6 +347,7 @@
             },
             {
                 fixed: true, name: 'mota_tienganh'
+                , label: 'Mô tả TA'
                 , index: 'sp.mota_tienganh'
                 , width: 100
                 , edittype: 'textarea'
@@ -353,6 +355,7 @@
             },
             {
                 fixed: true, name: 'tendvt'
+                , label: 'ĐVT'
                 , index: 'dvt.ten_dvt'
                 , width: 50
                 , align: 'center'
@@ -365,6 +368,7 @@
             },
             {
                 fixed: true, name: 'l_inch'
+                , label: 'L (inch)'
                 , index: 'sp.l_inch'
                 , width: 50
                 , edittype: 'text'
@@ -374,6 +378,7 @@
             },
             {
                 fixed: true, name: 'w_inch'
+                , label: 'W (inch)'
                 , index: 'sp.w_inch'
                 , width: 50
                 , edittype: 'text'
@@ -383,6 +388,7 @@
             },
             {
                 fixed: true, name: 'h_inch'
+                , label: 'H (inch)'
                 , index: 'sp.h_inch'
                 , width: 50
                 , edittype: 'text'
@@ -392,6 +398,7 @@
             },
             {
                 fixed: true, name: 'l_cm'
+                , label: 'L (cm)'
                 , index: 'sp.l_cm'
                 , width: 50
                 , align: 'right'
@@ -402,6 +409,7 @@
             },
             {
                 fixed: true, name: 'w_cm'
+                , label: 'W (cm)'
                 , index: 'sp.w_cm'
                 , width: 50
                 , align: 'right'
@@ -412,6 +420,7 @@
             },
             {
                 fixed: true, name: 'h_cm'
+                , label: 'H (cm)'
                 , index: 'sp.h_cm'
                 , width: 50
                 , align: 'right'
@@ -422,6 +431,7 @@
             },
             {
                 fixed: true, name: 'trongluong'
+                , label: 'Trọng lượng'
                 , index: 'sp.trongluong'
                 , width: 50
                 , align: 'right'
@@ -432,6 +442,7 @@
             },
             {
                 fixed: true, name: 'dientich'
+                , label: 'Diện tích'
                 , index: 'sp.dientich'
                 , width: 50
                 , align: 'right'
@@ -441,7 +452,19 @@
                 , editoptions:{ defaultValue: '0' }
             },
             {
+                fixed: true, name: 'thetich'
+                , label: 'Thể tích'
+                , index: 'sp.thetich'
+                , width: 50
+                , align: 'right'
+                , edittype: 'text'
+                , editable:true
+                , editrules : { required:true, number:true }
+                , editoptions:{ defaultValue: '0' }
+            },
+            {
                 fixed: true, name: 'md_nhomnangluc_id'
+                , label: 'Nhóm NL'
                 , index: 'nnl.hehang'
                 , width: 50
                 , edittype: 'select'
@@ -452,6 +475,7 @@
             },
             {
                 fixed: true, name: 'md_chungloai_id'
+                , label: 'Loại SP'
                 , index: 'cl.code_cl'
                 , width: 50
                 , edittype: 'select'
@@ -462,6 +486,7 @@
             },
             {
                 fixed: true, name: 'tenncc'
+                , label: 'NCU'
                 , index: 'ncc.ma_dtkd'
                 , width: 50
                 , edittype: 'select'
@@ -472,6 +497,7 @@
             },
             {
                 fixed: true, name: 'md_cangbien_id'
+                , label: 'Cảng biển'
                 , index: 'cb.ten_cangbien'
                 , width: 50
                 , edittype: 'select'
@@ -481,6 +507,7 @@
             },
             {
                 fixed: true, name: 'md_hscode_id'
+                , label: 'HSCode'
                 , index: 'cb.ma_hscode'
                 , width: 50
                 , edittype: 'select'
@@ -490,13 +517,15 @@
             },
 			{
                 fixed: true, name: 'hscode_val'
+                , label: 'HSCode (số)'
                 , index: 'cb.ma_hscode'
                 , width: 100
                 , editable: false
                 , hidden: false 
             },
-			{
+            {
                 fixed: true, name: 'chucnangsp'
+                , label: 'Nhóm CN'
                 , index: 'sp.chucnangsp'
                 , width: 100
                 , editable: false
@@ -504,16 +533,18 @@
             },
 			{
                 fixed: true, name: 'ngayxacnhan'
+                , label: 'Ngày xác nhận'
                 , index: 'sp.ngayxacnhan'
                 , width: 100
                 , editable: true
 				, edittype: 'text'
-                , editoptions: {disabled: true, dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+                , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
                 , hidden: false 
             },
 			{
 				fixed: true, name: 'hinhthucban'
-				, index: 'ms.hinhthucban'
+                , label: 'Hình thức bán'
+				, index: 'sp.hinhthucban'
 				, width: 100
 				, edittype: 'select'
 				, editoptions: { value: selectHinhThucBan }
@@ -522,6 +553,7 @@
 			},
             {
                 fixed: true, name: 'ghichu'
+                , label: 'Ghi chú'
                 , index: 'sp.ghichu'
                 , width: 100
                 , edittype: 'textarea'
@@ -531,6 +563,7 @@
             },
             {
                 fixed: true, name: 'ngaytao'
+                , label: 'Ngày tạo'
                 , index: 'sp.ngaytao'
                 , width: 50
                 , editable:false
@@ -539,6 +572,7 @@
             },
             {
                 fixed: true, name: 'nguoitao'
+                , label: 'Người tạo'
                 , index: 'sp.nguoitao'
                 , width: 50
                 , editable:false
@@ -547,6 +581,7 @@
             },
             {
                 fixed: true, name: 'ngaycapnhat'
+                , label: 'Ngày cập nhật'
                 , index: 'sp.ngaycapnhat'
                 , width: 50
                 , editable:false
@@ -555,6 +590,7 @@
             },
             {
                 fixed: true, name: 'nguoicapnhat'
+                , label: 'Người cập nhật'
                 , index: 'sp.nguoicapnhat'
                 , width: 50
                 , editable:false
@@ -563,6 +599,7 @@
             },
             {
                 fixed: true, name: 'mota'
+                , label: 'Mô tả'
                 , index: 'sp.mota'
                 , width: 50
                 , editable:true
@@ -572,6 +609,7 @@
             },
             {
                 fixed: true, name: 'hoatdong', hidden: true
+                , label: 'Hoạt động'
                 , index: 'sp.hoatdong'
                 , width: 50
                 , editable:true
@@ -678,10 +716,9 @@
 			                    $('#grid_ds_nhacungungmacdinh_soanthao').jqGrid('setGridParam',{url:'Controllers/NhaCungUngMacDinhController.ashx?&productId='+ids,page:1});
 			                    $('#grid_ds_nhacungungmacdinh_soanthao').jqGrid().trigger('reloadGrid');
 			                    
-			                    var ma_sanpham = $(this).jqGrid('getCell', ids, 'ma_sanpham');
-			                    $.get('Controllers/ProductController.ashx?action=getSinglePicture&ma_sanpham=' + ma_sanpham, function(data) {
-                                      $('#img-product').attr('src', data);
-                                });
+			                    let ma_sanpham = $(this).jqGrid('getCell', ids, 'ma_sanpham');
+			                    $('#img-productSoanThao').attr('src', '');
+                                $('#img-productSoanThao').attr('src', 'Controllers/API_System.ashx?oper=loadImageProduct&msp=' + ma_sanpham + '&ver=' + uuidv4());
 		                    } 
 		                }"
             Height = "420"
@@ -1450,7 +1487,7 @@
                            return showMsgDialog(rs);
                         }
                         , beforeShowForm: function (formid) {
-                            var masterId = $('#grid_ds_sanpham').jqGrid('getGridParam', 'selrow');
+                            var masterId = $('#grid_ds_sanphamsoanthao').jqGrid('getGridParam', 'selrow');
                             var forId = 'md_sanpham_id';
                             if(masterId == null)
                             {
@@ -1462,7 +1499,7 @@
                             }
                         }
                         , beforeSubmit:function(postdata, formid){
-                            var masterId = $('#grid_ds_sanpham').jqGrid('getGridParam', 'selrow');
+                            var masterId = $('#grid_ds_sanphamsoanthao').jqGrid('getGridParam', 'selrow');
                             var forId = 'md_sanpham_id';
                             if(masterId == null)
                             {
@@ -1474,11 +1511,17 @@
                             }
                         }"
                     EditFormOptions="
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
                         afterSubmit: function(rs, postdata){
                            return showMsgDialog(rs);
                         }
                     "
                     DelFormOptions="
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
                         afterSubmit: function(rs, postdata){
                            return showMsgDialog(rs);
                         }
@@ -1689,7 +1732,7 @@
                            return showMsgDialog(rs);
                         }
                         , beforeShowForm: function (formid) {
-                            var masterId = $('#grid_ds_sanpham').jqGrid('getGridParam', 'selrow');
+                            var masterId = $('#grid_ds_sanphamsoanthao').jqGrid('getGridParam', 'selrow');
                             var forId = 'md_sanpham_id';
                             if(masterId == null)
                             {
@@ -1701,7 +1744,7 @@
                             }
                         }
                         , beforeSubmit:function(postdata, formid){
-                            var masterId = $('#grid_ds_sanpham').jqGrid('getGridParam', 'selrow');
+                            var masterId = $('#grid_ds_sanphamsoanthao').jqGrid('getGridParam', 'selrow');
                             var forId = 'md_sanpham_id';
                             if(masterId == null)
                             {
@@ -1713,19 +1756,27 @@
                             }
                         }"
                     EditFormOptions="
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
                         afterSubmit: function(rs, postdata){
                            return showMsgDialog(rs);
                         }
                     "
                     DelFormOptions="
+                        beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        },
                         afterSubmit: function(rs, postdata){
                            return showMsgDialog(rs);
                         }
                     "
-                    ViewFormOptions="width:900
-                                    , beforeShowForm: function (formid) {
-                                        formid.closest('div.ui-jqdialog').dialogCenter(); 
-                                    } "
+                    ViewFormOptions="
+                        width:900
+                        , beforeShowForm: function (formid) {
+                            formid.closest('div.ui-jqdialog').dialogCenter(); 
+                        } 
+                    "
                     runat="server" />
 		    </div>
     </div>
@@ -1733,7 +1784,7 @@
         <table style="width:100%; height:100%">
             <tr>
                 <td>
-                    <img id="img-product" style="width:200px; height:150px" src="images/products/fullsize/default.jpg" />
+                    <img id="img-productSoanThao" class="loadingIMG" style="max-width:100%; margin: 0px auto; min-width: 40px;" src="Controllers/API_System.ashx?oper=loadImageProduct&msp=default" />
                 </td>
             </tr>
         </table>
@@ -1754,5 +1805,13 @@
 		parent.find('.ui-icon.ui-icon-print').parent().parent().remove();
 	}
 	
+	createRightPanel('grid_ds_sanphamsoanthao');
+	createRightPanel('grid_ds_quycachdonggoi_soanthao');
+	createRightPanel('grid_ds_giafob_soanthao');
+	createRightPanel('grid_ds_gianoi_soanthao');
+	createRightPanel('grid_ds_khachhangdocquyen_soanthao');
+	createRightPanel('grid_ds_cangxuathang_soanthao');
+	createRightPanel('grid_ds_bientau_soanthao');
+	createRightPanel('grid_ds_nhacungungmacdinh_soanthao');
 	$('#tab-product-detailssoanthao').tabs();
 </script>

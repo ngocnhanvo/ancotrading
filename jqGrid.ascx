@@ -60,6 +60,7 @@
             //ondblClickRow: function(rowid) { $("#<%=ID%>").jqGrid('editGridRow', rowid, prmEdit) },
             sortname: "<%= _sortName %>",
             sortorder: "<%= _sortOrder %>",
+            <%= _gridBeforeRequest == "" ? "" : "beforeRequest: function () { " + _gridBeforeRequest + " }," %> 
             <%= _gridComplete == "" ? "" : "gridComplete: function () { " + _gridComplete + " }," %> 
             <%= _loadError == "" ? "" : "loadError: function(xhr,st,err) { " + _loadError + " }," %>
             <%= _onSelectRow == "" ? "" : "onSelectRow: " + _onSelectRow + "," %>
@@ -237,7 +238,7 @@
         /* Hieu luc Nhap Kho */
         $("#<%=ID%>").jqGrid('navButtonAdd','#<%=ID%>-pager',{
             caption:""
-            , title:"Hiệu lực nhập kho"
+            , title: "<%= _funcActiveNhapKho.Contains("XuatKho") ? "Hiệu lực xuất kho" : "Hiệu lực nhập kho" %>"
             , buttonicon: "icon-active-qo"
             , onClickButton : <%= _funcActiveNhapKho %>
         });
@@ -249,7 +250,7 @@
         /* Soan thao Nhap Kho */
         $("#<%=ID%>").jqGrid('navButtonAdd','#<%=ID%>-pager',{
             caption:""
-            , title:"Chuyển trạng thái \"Soạn thảo\" phiếu nhập kho"
+            , title: '<%= _funcDeactiveNhapKho.Contains("XuatKho") ? "Chuyển trạng thái \"Soạn thảo\" phiếu xuất kho" : "Chuyển trạng thái \"Soạn thảo\" phiếu nhập kho" %>'
             , buttonicon: "icon-deactive-qo"
             , onClickButton : <%= _funcDeactiveNhapKho %>
         });

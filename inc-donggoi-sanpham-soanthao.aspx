@@ -824,4 +824,7 @@
 		var parent = $('#grid_ds_donggoi_soanthao-pager_left');
 		parent.find('.ui-icon.ui-icon-print').parent().parent().remove();
 	}
+
+	createRightPanel('grid_ds_donggoi_soanthao');
+	createRightPanel('grid_ds_donggoi_soanthaosanpham_soanthao');
 </script>

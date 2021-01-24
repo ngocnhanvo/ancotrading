@@ -85,7 +85,7 @@
 			{
 				var count = sctDH.toString().indexOf('_SR-');
 				var rowCell = $('#'+options.rowId).find('td:eq(' + (Number(options.pos)) + ')');
-				console.error(sctDH + ':' + khongkhachkiem);
+
 				if(khongkhachkiem == 'true') {
 					rowCell.removeClass('xnbb_dnow');
 					rowCell.addClass("xnbbHT_dnow");
@@ -468,14 +468,14 @@
                 ]
         });
     });
-</script>
 
-
-<script>
     function dupEditKeHoachXH(rowid) {
         $('#edit_grid_ds_kehoachxuathang').click();
     };
 </script>
+
+
+
     <table class="ui-widget-header" style="width:100%; height:40px">
         <tr>
             <td>
@@ -502,7 +502,7 @@
             </td>
         </tr>
     </table>
-     <uc1:jqGrid  ID="grid_ds_kehoachxuathang" 
+    <uc1:jqGrid  ID="grid_ds_kehoachxuathang" 
             SortName="c_kehoachxuathang_id" 
             UrlFileAction="Controllers/KeHoachXuatHangController.ashx" 
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 105);
@@ -511,6 +511,7 @@
                 for (var i = 0, il = ids.length; i &lt; il; i++) {
                     var ret = gridData.jqGrid('getRowData', ids[i], true);
                 }
+                createRightPanel('grid_ds_kehoachxuathang'); 
             "
             FuncActive="activeKHXH"
             FuncKetThuc="KetThucKeHoach"
@@ -882,11 +883,11 @@
             ]"
             FilterToolbar="true"
             ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
-            ViewFormOptions = "width:900
+            ViewFormOptions = "width:500
                         , beforeShowForm: function (formid) {
                             formid.closest('div.ui-jqdialog').dialogCenter(); 
                         }"
-            EditFormOptions = "width:900
+            EditFormOptions = "width:500
                         , beforeShowForm: function (formid) {
 							$('#ngayxacnhanbaobi', formid).change(function(){
 								$('#khongkhachkiem', formid).prop('checked', true);
@@ -898,3 +899,4 @@
                         }"
             Height = "420"
             runat="server" />
+

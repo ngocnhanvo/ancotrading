@@ -14,8 +14,9 @@ using ExcelLibrary.SpreadSheet;
 
 public class GiaSanPhamImport : ImportOriginal
 {
+    LinqDBDataContext db = new LinqDBDataContext();
     private String maSanPham, tenPhienBanGia, moTa, barCode;
-    private decimal gia;
+    private decimal gia, phi;
     public String Barcode
     {
         get { return barCode; }
@@ -45,23 +46,30 @@ public class GiaSanPhamImport : ImportOriginal
         set { gia = value; }
     }
 
-    public GiaSanPhamImport()
+    public decimal Phi
     {
-    
+        get { return phi; }
+        set { phi = value; }
     }
 
-    public GiaSanPhamImport(String md_sanpham_id, String md_phienbangia_id, decimal gia, string moTa, string barCode)
-        : this(md_sanpham_id, md_phienbangia_id, gia, moTa, barCode, DateTime.Now, "admin", DateTime.Now, "admin", true)
+    public GiaSanPhamImport()
     {
+        db.CommandTimeout = 100 * 60;
+    }
 
+    public GiaSanPhamImport(String md_sanpham_id, String md_phienbangia_id, decimal gia, string moTa, string barCode, decimal phi)
+        : this(md_sanpham_id, md_phienbangia_id, gia, moTa, barCode, phi, DateTime.Now, "admin", DateTime.Now, "admin", true)
+    {
+        db.CommandTimeout = 100 * 60;
     }
 
     public GiaSanPhamImport(String md_sanpham_id, String md_phienbangia_id, decimal gia, string moTa, string barCode
-        , DateTime ngayTao, String nguoiTao, DateTime ngayCapNhat, String nguoiCapNhat, bool hoatDong)
+        , decimal phi, DateTime ngayTao, String nguoiTao, DateTime ngayCapNhat, String nguoiCapNhat, bool hoatDong)
     {
         this.maSanPham = md_sanpham_id;
         this.tenPhienBanGia = md_phienbangia_id;
         this.gia = gia;
+        this.phi = phi;
         this.moTa = moTa;
         this.barCode = barCode;
         this.ngayTao = ngayTao;
@@ -78,6 +86,7 @@ public class GiaSanPhamImport : ImportOriginal
         gsp.md_sanpham_id = maSanPham;
         gsp.md_phienbangia_id = tenPhienBanGia;
         gsp.gia = gia;
+        gsp.phi = phi;
         gsp.mota = moTa;
         gsp.barcode = barCode;
         gsp.ngaytao = ngayTao;
@@ -90,11 +99,12 @@ public class GiaSanPhamImport : ImportOriginal
         db.SubmitChanges();
     }
 
-    LinqDBDataContext db = new LinqDBDataContext();
+   
     public void Update()
     {
         md_giasanpham o = db.md_giasanphams.FirstOrDefault(p => p.md_sanpham_id.Equals(maSanPham) && p.md_phienbangia_id.Equals(tenPhienBanGia));
         o.gia = gia;
+        o.phi = phi;
         o.mota = moTa;
         o.barcode = barCode;
         o.ngaycapnhat = ngayCapNhat;

@@ -8,7 +8,7 @@ using System.Data;
 public class KeHoachXuatHangController : IHttpHandler {
 
     LinqDBDataContext db = new LinqDBDataContext();
-    
+
     public void ProcessRequest (HttpContext context) {
         String action, oper;
         action = context.Request.QueryString["action"];
@@ -18,7 +18,7 @@ public class KeHoachXuatHangController : IHttpHandler {
             case "autostopkh":
                 this.autostopKH(context);
                 break;
-			case "stopkh":
+            case "stopkh":
                 this.stopKH(context);
                 break;
             case "activekh":
@@ -44,7 +44,7 @@ public class KeHoachXuatHangController : IHttpHandler {
         {
             string kh_id = context.Request.QueryString["khxh"];
             string msg = "";
-			//--
+            //--
             int check = db.c_kehoachxuathangs.Where(p => !p.md_trangthai_id.Equals("KETTHUC") && p.cbm_conlai <= 0).Count();
             if (check <= 0)
             {
@@ -52,18 +52,18 @@ public class KeHoachXuatHangController : IHttpHandler {
             }
             else
             {
-				foreach(c_kehoachxuathang khxh in db.c_kehoachxuathangs.Where(p => !p.md_trangthai_id.Equals("KETTHUC") && p.cbm_conlai <= 0))
-				{
-					khxh.md_trangthai_id = "KETTHUC";
-				}
-				check = 1;
+                foreach(c_kehoachxuathang khxh in db.c_kehoachxuathangs.Where(p => !p.md_trangthai_id.Equals("KETTHUC") && p.cbm_conlai <= 0))
+                {
+                    khxh.md_trangthai_id = "KETTHUC";
+                }
+                check = 1;
             }
-			
-			if(check == 1)
-			{
-				msg = "Cập nhật thành công.";
+
+            if(check == 1)
+            {
+                msg = "Cập nhật thành công.";
                 db.SubmitChanges();
-			}
+            }
             context.Response.Write(msg);
         }
         catch (Exception e)
@@ -71,8 +71,8 @@ public class KeHoachXuatHangController : IHttpHandler {
             context.Response.Write("Lỗi xảy ra khi kết thúc KHXH!, " + e.Message);
         }
     }
-	
-	public void stopKH(HttpContext context)
+
+    public void stopKH(HttpContext context)
     {
         try
         {
@@ -128,7 +128,7 @@ public class KeHoachXuatHangController : IHttpHandler {
             string msg = "";
             bool next = true;
             var khxh = db.c_kehoachxuathangs.FirstOrDefault(k=>k.c_kehoachxuathang_id.Equals(kh_id));
-            
+
             if (!khxh.khongtem.Equals(true) && khxh.ngayxacnhantem == null)
             {
                 next = false;
@@ -143,16 +143,16 @@ public class KeHoachXuatHangController : IHttpHandler {
 
             // if (!khxh.khongkhachkiem.Equals(true) && khxh.ngaykhachkiem == null)
             // {
-                // next = false;
-                // msg += "<div>Vui lòng chọn ngày khách kiểm!</div>";
+            // next = false;
+            // msg += "<div>Vui lòng chọn ngày khách kiểm!</div>";
             // }
 
             // if (khxh.ngayxuathang == null)
             // {
-                // next = false;
-                // msg += "<div>Vui lòng chọn ngày xuất hàng!</div>";
+            // next = false;
+            // msg += "<div>Vui lòng chọn ngày xuất hàng!</div>";
             // }
-            
+
             if (khxh.ngayxonghang == null)
             {
                 next = false;
@@ -161,8 +161,8 @@ public class KeHoachXuatHangController : IHttpHandler {
 
             // if (khxh.ngaykiemhang == null)
             // {
-                // next = false;
-                // msg += "<div>Vui lòng chọn ngày kiểm hàng!</div>";
+            // next = false;
+            // msg += "<div>Vui lòng chọn ngày kiểm hàng!</div>";
             // }
 
             if (next)
@@ -188,14 +188,14 @@ public class KeHoachXuatHangController : IHttpHandler {
             string kt = context.Request.Form["khongtem"].ToLower();
             string kbb = context.Request.Form["khongbaobi"].ToLower();
             string kkk = context.Request.Form["khongkhachkiem"].ToLower();
-            
-            
+
+
             bool  khongtem, khongbaobi, khongkhachkiem;
             khongtem = khongbaobi = khongkhachkiem = false;
-            
+
             if (kt.Equals("on") || kt.Equals("true"))
             { khongtem = true; }
-            
+
             if (kbb.Equals("on") || kbb.Equals("true"))
             { khongbaobi = true; }
 
@@ -218,7 +218,7 @@ public class KeHoachXuatHangController : IHttpHandler {
             {
                 if (kh.md_trangthai_id.Equals("SOANTHAO"))
                 {
-                    c_kehoachxuathang khxh = db.c_kehoachxuathangs.FirstOrDefault(p => p.c_kehoachxuathang_id.Equals(c_kehoachxuathang_id));        
+                    c_kehoachxuathang khxh = db.c_kehoachxuathangs.FirstOrDefault(p => p.c_kehoachxuathang_id.Equals(c_kehoachxuathang_id));
                     khxh.chungloaihang = context.Request.Form["chungloaihang"];
 
                     /*if (ngaygiaohang != "")
@@ -227,23 +227,23 @@ public class KeHoachXuatHangController : IHttpHandler {
                     }*/
                     if (ngayxonghang != "")
                     {
-                        khxh.ngayxonghang = DateTime.ParseExact(ngayxonghang, "dd/MM/yyyy", null);    
+                        khxh.ngayxonghang = DateTime.ParseExact(ngayxonghang, "dd/MM/yyyy", null);
                     }
                     /*if (ngaykhachkiem != "")
                     {
                         khxh.ngaykhachkiem = DateTime.ParseExact(ngaykhachkiem, "dd/MM/yyyy", null);
                     }*/
-					khxh.khongtem = khongtem;
+                    khxh.khongtem = khongtem;
                     if (ngayxacnhantem != "")
                     {
                         khxh.ngayxacnhantem = DateTime.ParseExact(ngayxacnhantem, "dd/MM/yyyy", null);
                     }
-					khxh.khongbaobi = khongbaobi;
+                    khxh.khongbaobi = khongbaobi;
                     if (ngayxacnhanbaobi != "")
                     {
                         khxh.ngayxacnhanbaobi = DateTime.ParseExact(ngayxacnhanbaobi, "dd/MM/yyyy", null);
                     }
-					khxh.khongkhachkiem = khongkhachkiem;
+                    khxh.khongkhachkiem = khongkhachkiem;
                     /*if (ngaykiemhang != "")
                     {
                         khxh.ngaykiemhang = DateTime.ParseExact(ngaykiemhang, "dd/MM/yyyy", null);
@@ -253,25 +253,25 @@ public class KeHoachXuatHangController : IHttpHandler {
                     {
                         khxh.ngayxnbaobi = DateTime.ParseExact(ngayxnbaobi, "dd/MM/yyyy", null);
                     }
-					else {
-						khxh.ngayxnbaobi = null;
-					}	
+                    else {
+                        khxh.ngayxnbaobi = null;
+                    }
                     khxh.ketquakiemhang = ketquakiemhang;
                     khxh.nhanvienct = context.Request.Form["nhanvienct"];
-					//--
-					khxh.ghichu = context.Request.Form["ghichu"];
+                    //--
+                    khxh.ghichu = context.Request.Form["ghichu"];
                     khxh.mota = context.Request.Form["mota"];
-					//--
+                    //--
                     khxh.ngaycapnhat = DateTime.Now;
-					khxh.nguoicapnhat = UserUtils.getUser(context);
-					
-					foreach(c_kehoachxuathang kh2 in db.c_kehoachxuathangs.Where(p => p.so_po.Equals(khxh.so_po)))
-					{
-						if(kh2.md_trangthai_id.Equals("SOANTHAO"))
-						{
-							kh2.nhanvienct = khxh.nhanvienct;
-						}
-					}
+                    khxh.nguoicapnhat = UserUtils.getUser(context);
+
+                    foreach(c_kehoachxuathang kh2 in db.c_kehoachxuathangs.Where(p => p.so_po.Equals(khxh.so_po)))
+                    {
+                        if(kh2.md_trangthai_id.Equals("SOANTHAO"))
+                        {
+                            kh2.nhanvienct = khxh.nhanvienct;
+                        }
+                    }
                     db.SubmitChanges();
                 }
                 else
@@ -281,7 +281,7 @@ public class KeHoachXuatHangController : IHttpHandler {
             }
         }
         // catch (Exception e) {
-            // jqGridHelper.Utils.writeResult(0, "Lỗi: " + e.Message);
+        // jqGridHelper.Utils.writeResult(0, "Lỗi: " + e.Message);
         // }
     }
     public void load(HttpContext context)
@@ -289,17 +289,19 @@ public class KeHoachXuatHangController : IHttpHandler {
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
         bool isadmin = db.nhanviens.FirstOrDefault(p => p.manv.Equals(UserUtils.getUser(context))).isadmin.Value;
-        
+
         String dateFrom, dateTo, dateType;
         dateFrom = context.Request.QueryString["dateFrom"];
         dateTo = context.Request.QueryString["dateTo"];
-		dateType = context.Request.QueryString["dateType"];
-		
-        
-        DateTime from, to;
-        from = dateFrom == "" || dateFrom == null ? DateTime.Now : DateTime.ParseExact(dateFrom, "dd/MM/yyyy", null);
-        to = dateTo == "" || dateTo  == null ? DateTime.Now : DateTime.ParseExact(dateTo, "dd/MM/yyyy", null);
+        dateType = context.Request.QueryString["dateType"];
 
+
+        DateTime fromDate, toDate;
+        fromDate = dateFrom == "" || dateFrom == null ? DateTime.Now : DateTime.ParseExact(dateFrom, "dd/MM/yyyy", null);
+        toDate = dateTo == "" || dateTo  == null ? DateTime.Now : DateTime.ParseExact(dateTo, "dd/MM/yyyy", null);
+
+        string from = string.Format(@"convert(datetime, N'{0} 00:00:00', 103)", fromDate.ToString("dd/MM/yyy"));
+        string to = string.Format(@"convert(datetime, N'{0} 23:59:59', 103)", toDate.ToString("dd/MM/yyy"));
         //// filter
         String filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
@@ -319,24 +321,24 @@ public class KeHoachXuatHangController : IHttpHandler {
             strAccount += String.Format(", '{0}'", item);
         }
         strAccount = String.Format("'{0}'{1}", manv, strAccount);
-            
+
         String sqlCount = "SELECT COUNT(*) AS count " +
             " FROM c_kehoachxuathang kh, c_donhang dh, md_doitackinhdoanh dtkd " +
             " WHERE kh.c_donhang_id = dh.c_donhang_id " +
             " AND kh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " + filter +
             " {0} " +
             " AND dh.md_trangthai_id <> 'KETTHUC' ";
-		
-		if(dateType == "0")
-		{
-			sqlCount += " AND kh.ngaygiaohang >= N'{1}' AND kh.ngaygiaohang <= N'{2}' ";
-		}
-		else{
-			sqlCount += " AND kh.ngayxonghang >= N'{1}' AND kh.ngayxonghang <= N'{2}' ";
-		}
-		
+
+        if(dateType == "0")
+        {
+            sqlCount += " AND kh.ngaygiaohang >= {1} AND kh.ngaygiaohang <= {2} ";
+        }
+        else{
+            sqlCount += " AND kh.ngayxonghang >= {1} AND kh.ngayxonghang <= {2} ";
+        }
+
         sqlCount = String.Format(sqlCount, isadmin == true ? "" : "AND kh.nguoitao IN(" + strAccount + ")", from, to);
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -408,22 +410,22 @@ public class KeHoachXuatHangController : IHttpHandler {
 			left join c_donhang dh on kh.c_donhang_id = dh.c_donhang_id
 			left join md_doitackinhdoanh dtkd  on kh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
             WHERE 1=1  " + filter + @" {0} AND dh.md_trangthai_id <> 'KETTHUC'";
-		
-		if(dateType == "0")
-		{
-			strsql += " AND kh.ngaygiaohang >= N'{1}' AND kh.ngaygiaohang <= N'{2}' ";
-		}
-		else{
-			strsql += " AND kh.ngayxonghang >= N'{1}' AND kh.ngayxonghang <= N'{2}' ";
-		}
-		
-		strsql += " )P where RowNum > @start AND RowNum < @end ";
-		
+
+        if(dateType == "0")
+        {
+            strsql += " AND kh.ngaygiaohang >= {1} AND kh.ngaygiaohang <= {2} ";
+        }
+        else{
+            strsql += " AND kh.ngayxonghang >= {1} AND kh.ngayxonghang <= {2} ";
+        }
+
+        strsql += " )P where RowNum > @start AND RowNum < @end ";
+
         strsql = string.Format(strsql, isadmin == true ? "" : "AND kh.nguoitao IN(" + strAccount + ")", from, to);
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         int colCount = dt.Columns.Count;
-        
+
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
         xml += "<page>" + page + "</page>";
@@ -435,40 +437,40 @@ public class KeHoachXuatHangController : IHttpHandler {
             xml += "<row>";
             xml += "<cell><![CDATA[" + row["c_kehoachxuathang_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["md_trangthai_id"] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row["khachhang"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["khachhang"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ct_dh"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["c_danhsachdathang_id"] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["chungloaihang"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["cbm"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["cbm_conlai"] + "]]></cell>";
-            
-			xml += "<cell><![CDATA[" + (!row["shipmenttime"].ToString().Equals("") ? DateTime.Parse(row["shipmenttime"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
+
+            xml += "<cell><![CDATA[" + (!row["shipmenttime"].ToString().Equals("") ? DateTime.Parse(row["shipmenttime"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
             xml += "<cell><![CDATA[" + (!row["ngaygiaohang"].ToString().Equals("") ? DateTime.Parse(row["ngaygiaohang"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
             xml += "<cell><![CDATA[" + (!row["ngayxonghang_xxn"].ToString().Equals("") ? DateTime.Parse(row["ngayxonghang_xxn"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
             xml += "<cell><![CDATA[" + (!row["ngayxonghang"].ToString().Equals("") ? DateTime.Parse(row["ngayxonghang"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-			xml += "<cell><![CDATA[" + (!row["ngayxacnhanbaobi"].ToString().Equals("") ? DateTime.Parse(row["ngayxacnhanbaobi"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
+            xml += "<cell><![CDATA[" + (!row["ngayxacnhanbaobi"].ToString().Equals("") ? DateTime.Parse(row["ngayxacnhanbaobi"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
 
             xml += "<cell><![CDATA[" + row["khongtem"] + "]]></cell>";
             xml += "<cell><![CDATA[" + (!row["ngayxacnhantem"].ToString().Equals("") ? DateTime.Parse(row["ngayxacnhantem"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-            
-            xml += "<cell><![CDATA[" + row["khongbaobi"] + "]]></cell>";            
-            
-			xml += "<cell><![CDATA[" + (!row["ngaytrenhat"].ToString().Equals("") ? DateTime.Parse(row["ngaytrenhat"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-			xml += "<cell><![CDATA[" + (!row["ngaykiemhang"].ToString().Equals("") ? DateTime.Parse(row["ngaykiemhang"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>"; 
-			xml += "<cell><![CDATA[" + row["khongkhachkiem"] + "]]></cell>";
+
+            xml += "<cell><![CDATA[" + row["khongbaobi"] + "]]></cell>";
+
+            xml += "<cell><![CDATA[" + (!row["ngaytrenhat"].ToString().Equals("") ? DateTime.Parse(row["ngaytrenhat"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
+            xml += "<cell><![CDATA[" + (!row["ngaykiemhang"].ToString().Equals("") ? DateTime.Parse(row["ngaykiemhang"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["khongkhachkiem"] + "]]></cell>";
             xml += "<cell><![CDATA[" + (!row["ngaykhachkiem"].ToString().Equals("") ? DateTime.Parse(row["ngaykhachkiem"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-			
+
             xml += "<cell><![CDATA[" + row["ketquakiemhang"] + "]]></cell>";
-			
-			xml += "<cell><![CDATA[" + (!row["etd"].ToString().Equals("") ? DateTime.Parse(row["etd"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-			xml += "<cell><![CDATA[" + row["nhanvienct"] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row["nguoilap"] + "]]></cell>";
-			
-			xml += "<cell><![CDATA[" + row["tre_nv"] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row["tre"] + "]]></cell>";
-			
-			xml += "<cell><![CDATA[" + (!row["ngayxuathang"].ToString().Equals("") ? DateTime.Parse(row["ngayxuathang"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
+
+            xml += "<cell><![CDATA[" + (!row["etd"].ToString().Equals("") ? DateTime.Parse(row["etd"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["nhanvienct"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["nguoilap"] + "]]></cell>";
+
+            xml += "<cell><![CDATA[" + row["tre_nv"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tre"] + "]]></cell>";
+
+            xml += "<cell><![CDATA[" + (!row["ngayxuathang"].ToString().Equals("") ? DateTime.Parse(row["ngayxuathang"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["thang"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nam"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
@@ -483,7 +485,7 @@ public class KeHoachXuatHangController : IHttpHandler {
         xml += "</rows>";
         context.Response.Write(xml);
     }
- 
+
     public bool IsReusable {
         get {
             return false;

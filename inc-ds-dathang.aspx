@@ -173,8 +173,10 @@
                             if (printType == "printRequired") {
                                 if (piId != null) {
                                     printURL += "InDonDatHang/";
-									let params_ = "&DSDHG=" + xemgiaDSDH;
-                                    window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "In Đơn Đặt Hàng", windowSize);
+                                    let params_ = '';
+                                    params_ += "&DSDHG=" + xemgiaDSDH;
+                                    params_ += "&type=excel";
+                                    window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "Chiết xuất Đơn Đặt Hàng", windowSize);
                                 } else {
                                 alert('Bạn chưa chọn đơn đặt hàng cần in!');
                                 }
@@ -194,9 +196,13 @@
                                 }
                             } else if (printType == 'printDSDH') {
                                 if (piId != null) {
-                                    printURL += "InDonDatHangTool/";
-									let params_ = "&DSDHG=" + xemgiaDSDH;
-                                    window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "In Danh sách đặt hàng", windowSize);
+                                    printURL += "InDonDatHang/";
+                                    let params_ = '';
+                                    params_ += "&DSDHG=" + xemgiaDSDH;
+                                    params_ += "&type=pdf";
+
+                                    windowSize = "top=0, left=0, width=" + window.outerWidth + ", height=" + window.outerHeight;
+                                    window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "In Đơn Đặt Hàng", windowSize);
                                 } else {
                                     alert('Bạn chưa chọn danh sách đặt hàng cần in.!');
                                 }
@@ -443,6 +449,11 @@
             });
         }
     }
+
+    /*ColNames="['c_danhsachdathang_id','TT', 'Trạng thái', 'Số chứng từ', 'Số Đơn Hàng', 'Customer Order No' 
+                , 'Ngày xong hàng', 'NCU', 'Nơi Giao Hàng'
+                , 'Discount(%)', 'Ngày Lập', 'Người Phụ Trách', 'Người Đặt Hàng',   'Đặt điểm hàng hóa', 'Các hướng dẩn khác'
+                , 'Đã Gửi Hướng Dẫn Làm Hàng', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Ghi chú', 'Hoạt động']"*/
 </script>
 
 <DIV class="ui-layout-center ui-widget-content" id="lay-center-dathang">
@@ -453,10 +464,7 @@
             FuncSendMail="sendMailPI"
             BtnPrint="printPI"
             UrlFileAction="Controllers/DanhSachDatHangController.ashx" 
-            ColNames="['c_danhsachdathang_id','TT', 'Trạng thái', 'Số chứng từ', 'Số Đơn Hàng', 'Customer Order No' 
-                , 'Ngày xong hàng', 'NCU', 'Nơi Giao Hàng'
-                , 'Discount(%)', 'Ngày Lập', 'Người Phụ Trách', 'Người Đặt Hàng',   'Đặt điểm hàng hóa', 'Các hướng dẩn khác'
-                , 'Đã Gửi Hướng Dẫn Làm Hàng', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Ghi chú', 'Hoạt động']"
+
             RowNumbers="true"
             OndblClickRow = "dupEditDanhSachDatHang"
             FuncChiaTachPOTaoPI="function(){ add_tab('Tạo đơn đặt hàng', 'inc-chiatachpo-taopi.aspx')}"
@@ -465,6 +473,7 @@
 			ColModel = "[
             {
                 fixed: true, name: 'c_danhsachdathang_id'
+                , label: 'c_danhsachdathang_id'
                 , index: 'dsdh.c_danhsachdathang_id'
                 , width: 100
                 , hidden: true 
@@ -475,6 +484,7 @@
             },
             {
                  fixed: true, name: 'md_trangthai_id'
+                 , label: 'TT'
                  , index: 'dsdh.md_trangthai_id'
                  , editable: false
                  , fixed:true , width: 100
@@ -488,6 +498,7 @@
             },
 			{
 			     fixed: true, name: 'trangthai'
+                 , label: 'Trạng thái'
                  , index: 'dsdh.trangthai'
                  , editable: false
                  , width: 100
@@ -501,6 +512,7 @@
             },
             {
                  fixed: true, name: 'sochungtu'
+                 , label: 'Số chứng từ'
                  , index: 'dsdh.sochungtu'
                  , editable: false
                  , width: 100
@@ -508,6 +520,7 @@
             },
             {
                  fixed: true, name: 'c_donhang_id'
+                 , label: 'Số Đơn Hàng'
                  , index: 'dh.sochungtu'
                  , editable: false
                  , width: 100
@@ -517,21 +530,25 @@
             },
             {
                  fixed: true, name: 'customer_order_no'
+                 , label: 'Customer Order No'
                  , index: 'dh.customer_order_no'
                  , editable: false
                  , width: 120
             },
             {
                  fixed: true, name: 'hangiaohang_po'
+                 , label: 'Ngày xong hàng'
+                 , align: 'center'
                  , index: 'dsdh.hangiaohang_po'
                  , editable: true
-                 , width: 100
+                 , width: 90
                  , edittype: 'text'
                  , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
                  , formoptions: { colpos: 1, rowpos: 7 }
             },
             {
                  fixed: true, name: 'md_doitackinhdoanh_id'
+                 , label: 'NCU'
                  , index: 'dtkd.ma_dtkd'
                  , editable: false
                  , width: 100
@@ -542,6 +559,7 @@
 			
 			{
                  fixed: true, name: 'diachigiaohang'
+                 , label: 'Nơi giao hàng'
                  , index: 'dsdh.diachigiaohang'
                  , editable: true
                  , width: 100
@@ -552,6 +570,7 @@
 			
             {
                 fixed: true, name: 'discount'
+                , label: 'Discount(%)'
                 , index: 'dsdh.discount'
                 , width: 100
                 , editable:true
@@ -563,15 +582,18 @@
             },
 			{
                  fixed: true, name: 'ngaylap'
+                 , label: 'Ngày Lập'
+                 , align: 'center'
                  , index: 'dsdh.ngaylap'
                  , editable: true
-                 , width: 100
+                 , width: 90
                  , edittype: 'text'
                  , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
                  , formoptions: { colpos: 1, rowpos: 6 }
             },
 			{
                 fixed: true, name: 'nguoi_phutrach'
+                , label: 'Người phụ trách'
                 , index: 'dsdh.nguoi_phutrach'
                 , width: 100
                 , editable:false
@@ -580,6 +602,7 @@
             },
             {
                  fixed: true, name: 'nguoi_dathang'
+                 , label: 'Người đặt hàng'
                  , index: 'dsdh.nguoi_dathang'
                  , editable: false
                  , width: 100
@@ -588,6 +611,7 @@
             },
             {
                 fixed: true, name: 'huongdanlamhang'
+                , label: 'Đặc điểm hàng hóa'
                 , index: 'dsdh.huongdanlamhang'
                 , width: 100
                 , editable:true
@@ -598,6 +622,7 @@
             },
 			{
                 fixed: true, name: 'huongdanlamhangchung'
+                , label: 'Các hướng dẩn khác'
                 , index: 'dsdh.huongdanlamhangchung'
                 , width: 100
                 , editable:true
@@ -608,6 +633,7 @@
             },
             {
                 fixed: true, name: 'isgui_hdlh'
+                , label: 'Đã gửi HDLH'
                 , index: 'dsdh.isgui_hdlh'
                 , width: 100
                 , editable:true
@@ -621,6 +647,7 @@
             },
             {
                 fixed: true, name: 'ngaytao'
+                , label: 'Ngày tạo'
                 , index: 'dsdh.ngaytao'
                 , width: 100
                 , editable:false
@@ -630,6 +657,7 @@
             },
             {
                 fixed: true, name: 'nguoitao'
+                , label: 'Người tạo'
                 , index: 'dsdh.nguoitao'
                 , width: 100
                 , editable:false
@@ -639,6 +667,7 @@
             },
             {
                 fixed: true, name: 'ngaycapnhat'
+                , label: 'Ngày cập nhật'
                 , index: 'dsdh.ngaycapnhat'
                 , width: 100
                 , editable:false
@@ -648,6 +677,7 @@
             },
             {
                 fixed: true, name: 'nguoicapnhat'
+                , label: 'Người cập nhật'
                 , index: 'dsdh.nguoicapnhat'
                 , width: 100
                 , editable:false
@@ -657,6 +687,7 @@
             },
             {
                 fixed: true, name: 'mota'
+                , label: 'Ghi chú'
                 , index: 'dsdh.mota'
                 , width: 100
                 , editable:true
@@ -667,6 +698,7 @@
             },
             {
                 fixed: true, name: 'hoatdong', hidden: true
+                , label: 'Hoạt động'
                 , index: 'dsdh.hoatdong'
                 , width: 100
                 , editable:true
@@ -721,46 +753,27 @@
 				var chk_box = $('#jqg_grid_ds_dathang_' + ids);
 				setTimeout(function() {
 					if(!chk_box.prop('checked')) { ids = null; }
-					if(ids == null) {
-						ids=0;
+					if(ids == null) 
+                    {
+						ids = 0;
 						$('#grid_ds_dathang').jqGrid('setCaption','Danh Sách Đặt Hàng');
-						if($('#grid_ds_chitietdathang').jqGrid('getGridParam','records') &gt; 0 )
-						{
-
-							// $.ajax({
-								// url: 'Controllers/DanhSachDatHangController.ashx?action=getpiinformation&poId='+ids,
-								// beforeSend:function(){
-									// $('#grid_ds_dathang').jqGrid('setCaption','đang tải...');
-								// },
-								// success: function(data){
-									 // $('#grid_ds_dathang').jqGrid('setCaption', data);
-								// }
-							// });
-						
-							$('#grid_ds_chitietdathang').jqGrid('setGridParam',{url:'Controllers/DongDanhSachDatHangController.ashx?&poId='+ids,page:1});
-							$('#grid_ds_chitietdathang').jqGrid().trigger('reloadGrid');
-							
-							$('#grid_phidathang').jqGrid('setGridParam',{url:'Controllers/PhiDatHangController.ashx?&poId='+ids,page:1});
-							$('#grid_phidathang').jqGrid().trigger('reloadGrid');	
-						} 
-					} else {
-					
+					} 
+                    else 
+                    {					
 						$.ajax({
 							url: 'Controllers/DanhSachDatHangController.ashx?action=getpiinformation&poId='+ids,
-							beforeSend:function(){
+							beforeSend:function() {
 								$('#grid_ds_dathang').jqGrid('setCaption','đang tải...');
 							},
-							success: function(data){
+							success: function(data) {
 								 $('#grid_ds_dathang').jqGrid('setCaption', data);
 							}
-						});
-					
-						$('#grid_ds_chitietdathang').jqGrid('setGridParam',{url:'Controllers/DongDanhSachDatHangController.ashx?&poId='+ids,page:1});
-						$('#grid_ds_chitietdathang').jqGrid().trigger('reloadGrid');
-						
-						$('#grid_phidathang').jqGrid('setGridParam',{url:'Controllers/PhiDatHangController.ashx?&poId='+ids,page:1});
-						$('#grid_phidathang').jqGrid().trigger('reloadGrid');			
-					} 
+						});			
+					}
+                    $('#grid_ds_chitietdathang').jqGrid('getGridParam', 'postData').poId = ids;
+                    $('#grid_phidathang').jqGrid('getGridParam', 'postData').poId = ids;
+                    $('#grid_ds_chitietdathang')[0].triggerToolbar();
+                    $('#grid_phidathang')[0].triggerToolbar();
 				},10);
 			}"
             runat="server" />
@@ -776,11 +789,7 @@
             SortName="sp.ma_sanpham" 
 			SortOrder="ASC"
             UrlFileAction="Controllers/DongDanhSachDatHangController.ashx" 
-            ColNames="['c_dongdsdh_id', 'Danh Sách Đặt Hàng', 'TT', 'STT'
-                    , 'Mã SP', 'Mã SP', 'Mô Tả TV'
-                    , 'NCU', 'Hướng Dẫn Đặt Hàng', 'Hạn Giao Hàng', 'Tem Dán'
-                    , 'SL Đặt Hàng', 'Giá Nhập' , 'SL Đã Giao', 'SL Còn Lại'
-                    , 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
+
             RowNumbers="true"
             OndblClickRow = "function(rowid) { $(this).jqGrid(
                                     'editGridRow', rowid, { 
@@ -798,6 +807,7 @@
             ColModel = "[
             {
                 fixed: true, name: 'c_dongdsdh_id'
+                , label: 'c_dongdsdh_id'
                 , index: 'ddsdh.c_dongdsdh_id'
                 , width: 100
                 , hidden: true 
@@ -807,6 +817,7 @@
             },
             {
                 fixed: true, name: 'c_danhsachdathang_id'
+                , label: 'Danh sách đặt hàng'
                 , index: 'dsdh.c_danhsachdathang_id'
                 , width: 100
                 , edittype: 'text'
@@ -815,6 +826,7 @@
             },
             {
                 fixed: true, name: 'trangthai'
+                , label: 'TT'
                 , index: 'sp.trangthai'
                 , width: 100
                 , editable:false
@@ -826,6 +838,7 @@
             },
             {
                 fixed: true, name: 'sothutu'
+                , label: 'STT'
                 , index: 'ddsdh.sothutu'
                 , width: 50
                 , edittype: 'text'
@@ -833,6 +846,7 @@
             },
             {
                 fixed: true, name: 'sanpham_id'
+                , label: 'Mã SP'
                 , index: 'sp.md_sanpham_id'
                 , width: 100
                 , hidden: true 
@@ -841,6 +855,7 @@
             },
             {
                 fixed: true, name: 'ma_sanpham'
+                , label: 'Mã SP'
                 , index: 'sp.ma_sanpham'
                 , width: 100
                 , edittype: 'text'
@@ -866,6 +881,7 @@
             },
             {
                 fixed: true, name: 'mota_tiengviet'
+                , label: 'Mô Tả TV'
                 , index: 'ddsdh.mota_tiengviet'
                 , width: 200
                 , edittype: 'text'
@@ -873,7 +889,8 @@
 				, hidden: true
             },
             {
-                fixed: true, name: 'md_doitackinhdoanh_id' // nha cung ung
+                fixed: true, name: 'md_doitackinhdoanh_id'
+                , label: 'NCU'
                 , index: 'dtkd.md_doitackinhdoanh_id'
                 , width: 250
                 , edittype: 'select'
@@ -882,6 +899,7 @@
             },
             {
                 fixed: true, name: 'huongdan_dathang'
+                , label: 'Hướng dẫn đặt hàng'
                 , index: 'ddsdh.huongdan_dathang'
                 , width: 100
                 , edittype: 'textarea'
@@ -891,6 +909,7 @@
             },
             {
                 fixed: true, name: 'han_giaohang'
+                , label: 'Hạn giao hàng'
                 , index: 'ddsdh.han_giaohang'
                 , width: 100
                 , edittype: 'text'
@@ -901,6 +920,7 @@
             },
             {
                 fixed: true, name: 'tem_dan'
+                , label: 'Tem dán'
                 , index: 'ddsdh.tem_dan'
                 , width: 100
                 , edittype: 'text'
@@ -910,6 +930,7 @@
             },
             {
                 fixed: true, name: 'sl_dathang'
+                , label: 'SL đặt hàng'
                 , index: 'ddsdh.sl_dathang'
                 , width: 100
                 , edittype: 'text'
@@ -917,20 +938,51 @@
                 , editrules: { required:true, number: true, minValue:0 }
                 , align:'right'
             },
+            {
+                fixed: true, name: 'giachuan'
+                , label: 'Giá mua'
+                , index: 'ddsdh.giachuan'
+                , width: 100
+                , edittype: 'text'
+                , editable: xemgiaDSDH == 'True'
+				, hidden: xemgiaDSDH == 'False'
+                , editrules: { required:true, number: true, minValue:1 }
+                , editoptions: {disabled: true}
+                , align:'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+            },
+            {
+                fixed: true, name: 'phi'
+                , label: 'Phí'
+                , index: 'ddsdh.gianhap - ddsdh.giachuan'
+                , width: 100
+                , edittype: 'text'
+                , editable: xemgiaDSDH == 'True'
+				, hidden: xemgiaDSDH == 'False'
+                , editrules: { required:true, number: true, minValue:1 }
+                , editoptions: {disabled: true}
+                , align:'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+            },
 			{
                 fixed: true, name: 'gianhap'
+                , label: 'Giá nhập'
                 , index: 'ddsdh.gianhap'
                 , width: 100
                 , edittype: 'text'
                 , editable: xemgiaDSDH == 'True'
 				, hidden: xemgiaDSDH == 'False'
                 , editrules: { required:true, number: true, minValue:1 }
+                , editoptions: {disabled: true}
                 , align:'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
             },
             {
                 fixed: true, name: 'sl_dagiao'
+                , label: 'SL đã giao'
                 , index: 'ddsdh.sl_dagiao'
                 , width: 100
                 , edittype: 'text'
@@ -942,6 +994,7 @@
             },
             {
                 fixed: true, name: 'sl_conlai'
+                , label: 'SL còn lại'
                 , index: 'ddsdh.sl_conlai'
                 , width: 100
                 , edittype: 'text'
@@ -953,6 +1006,7 @@
             },
             {
                 fixed: true, name: 'ngaytao'
+                , label: 'Ngày tạo'
                 , index: 'ddsdh.ngaytao'
                 , width: 100
                 , editable:false
@@ -962,6 +1016,7 @@
             },
             {
                 fixed: true, name: 'nguoitao'
+                , label: 'Người tạo'
                 , index: 'ddsdh.nguoitao'
                 , width: 100
                 , editable:false
@@ -971,6 +1026,7 @@
             },
             {
                 fixed: true, name: 'ngaycapnhat'
+                , label: 'Ngày cập nhật'
                 , index: 'ddsdh.ngaycapnhat'
                 , width: 100
                 , editable:false
@@ -980,6 +1036,7 @@
             },
             {
                 fixed: true, name: 'nguoicapnhat'
+                , label: 'Người cập nhật'
                 , index: 'ddsdh.nguoicapnhat'
                 , width: 100
                 , editable:false
@@ -989,6 +1046,7 @@
             },
             {
                 fixed: true, name: 'mota'
+                , label: 'Mô tả'
                 , index: 'ddsdh.mota'
                 , width: 100
                 , editable:true
@@ -998,6 +1056,7 @@
             },
             {
                 fixed: true, name: 'hoatdong', hidden: true
+                , label: 'Hoạt động'
                 , index: 'ddsdh.hoatdong'
                 , width: 100
                 , editable:true
@@ -1007,7 +1066,6 @@
                 , formatter: 'checkbox'
             }
             ]"
-            Caption = "Danh sách sản phẩm"
             GridComplete = "let o = $(this).parent().parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 97);$(this).setGridWidth($(o).width())"
             FilterToolbar = "true"
             Height = "150"
@@ -1035,10 +1093,6 @@
             SortName="ngaytao" 
             SortOrder="ASC"
             UrlFileAction="Controllers/PhiDathangController.ashx" 
-            ColNames="['c_phidathang_id', 'Đơn đặt Hàng', 'Số tiền'
-                    , 'Là Phí Tăng', 'Ngày tạo' 
-                    , 'Người Tạo', 'Ngày Cập Nhật'
-                    , 'Người Cập Nhật', 'Diễn giải', 'Hoạt động']"
             RowNumbers="true"
             OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid,
                                                     {
@@ -1057,6 +1111,7 @@
             ColModel = "[
             {
                 name: 'c_phidathang_id'
+                , label: 'c_phidathang_id'
                 , index: 'c_phidathang_id'
                 , fixed:true , width: 100
                 , hidden: true 
@@ -1066,6 +1121,7 @@
             },
             {
                 name: 'c_danhsachdathang_id'
+                , label: 'Đơn đặt hàng'
                 , index: 'dh.c_danhsachdathang_id'
                 , fixed:true , width: 100
                 , edittype: 'text'
@@ -1074,6 +1130,7 @@
             },
             {
                  name: 'sotien'
+                 , label: 'Số tiền'
                  , index: 'sotien'
                  , editable: true
                  , fixed:true , width: 100
@@ -1084,6 +1141,7 @@
             },
             {
                  name: 'isphicong'
+                 , label: 'Là phí tăng' 
                  , index: 'isphicong'
                  , editable: true
                  , fixed:true , width: 100
@@ -1094,6 +1152,7 @@
             },
             {
                 name: 'ngaytao'
+                , label: 'Ngày tạo'
                 , index: 'ngaytao'
                 , fixed:true , width: 100
                 , editable:false
@@ -1103,6 +1162,7 @@
             },
             {
                 name: 'nguoitao'
+                , label: 'Người tạo'
                 , index: 'nguoitao'
                 , fixed:true , width: 100
                 , editable:false
@@ -1112,6 +1172,7 @@
             },
             {
                 name: 'ngaycapnhat'
+                , label: 'Ngày cập nhật'
                 , index: 'ngaycapnhat'
                 , fixed:true , width: 100
                 , editable:false
@@ -1121,6 +1182,7 @@
             },
             {
                 name: 'nguoicapnhat'
+                , label: 'Người cập nhật'
                 , index: 'nguoicapnhat'
                 , fixed:true , width: 100
                 , editable:false
@@ -1130,6 +1192,7 @@
             },
             {
                 name: 'mota'
+                , label: 'Mô tả'
                 , index: 'mota'
                 , fixed:true , width: 200
                 , editable:true
@@ -1137,6 +1200,7 @@
             },
             {
                 name: 'hoatdong', hidden: true
+                , label: 'Hoạt động'
                 , index: 'hoatdong'
                 , width: 30
                 , editable:true
@@ -1233,5 +1297,10 @@
 		}, 
 		title: "Làm mới trạng thái ĐĐH", 
 		cursor: "pointer"
-	});	
+	});
+
+	$('#grid_phidathang-pager_left').removeAttr('style');
+	createRightPanel('grid_ds_dathang');
+	createRightPanel('grid_ds_chitietdathang');
+	createRightPanel('grid_phidathang');
 </script>

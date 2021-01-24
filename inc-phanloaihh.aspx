@@ -140,3 +140,8 @@
                                 formid.closest('div.ui-jqdialog').dialogCenter(); 
                             }"
             runat="server" />
+
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_phanloai_hanghoa');
+</script>

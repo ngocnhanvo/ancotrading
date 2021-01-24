@@ -56,11 +56,13 @@
 
 
     function getQueryString() {
-        var frmID = '#frmBCNCU';
-        var tungayBCNCU = $("#tungayBCNCU", frmID).val();
-        var denngayBCNCU = $("#denngayBCNCU", frmID).val();
-        var ncu = $("#md_doitackinhdoanh_id", frmID).val();
-        var queryString = "?startdate=" + tungayBCNCU + "&enddate=" + denngayBCNCU;
+        let frmID = '#frmBCNCU';
+        let tungayBCNCU = $("#tungayBCNCU", frmID).val();
+        let denngayBCNCU = $("#denngayBCNCU", frmID).val();
+        let ncu = $("#md_doitackinhdoanh_id", frmID).val();
+        let cdxem = $("#chedoxem", frmID).val();
+        let queryString = "?startdate=" + tungayBCNCU + "&enddate=" + denngayBCNCU;
+        queryString = queryString + "&cdxem=" + cdxem;
         if (ncu != "NULL") {
             queryString = queryString + "&doitackinhdoanh_id=" + ncu;
         }
@@ -129,7 +131,8 @@
         var qstring = getQueryString();
         
         if (reportid == 1) {
-            window.open("ReportWizard/Rpt_NCC/rpt_tienhangdanhap.aspx" + qstring);
+            //window.open("ReportWizard/Rpt_NCC/rpt_tienhangdanhap.aspx" + qstring);
+            window.open("PrintControllers/InTienHangChiTiet/rpt_tienhangdanhap.aspx" + qstring);
         } 
 		else if (reportid == 2) {
             window.open("PrintControllers/InTienHangChiTiet/"+ qstring);
@@ -201,10 +204,28 @@
                 <td>Chọn NCU</td>
                 <td><uc3:Cbm id="doitackinhdoanh" runat="server"/></td>
             </tr>
-            <tr><td></td></tr>
+            <tr>
+                <td>Chọn chế độ xem</td>
+                <td>
+                    <select id="chedoxem">
+                        <option value="">Bình thường</option>
+                        <option value="KT">Kế Toán</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <b>Chế độ xem KT : </b><i>Thời gian dựa trên ngày nhập kho và xem được phiếu Soạn Thảo</i>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div style="height:10px"></div>
+                </td>
+            </tr>
             <tr>
                 <td></td>
-                <td><input type = "button" name="xemketqua" id="xemketqua" value="Xem kết quả" onclick="submitRpt()"/></td>
+                <td><input style="padding:10px; font-weight: bold" type="button" name="xemketqua" id="xemketqua" value="Xem kết quả" onclick="submitRpt()"/></td>
             </tr>
         </table>
     </form>

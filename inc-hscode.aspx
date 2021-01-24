@@ -242,4 +242,6 @@
 		var parent = $('#grid_ds_hscode-pager_left');
 		parent.find('.ui-icon.ui-icon-print').parent().parent().remove();
 	}
+
+	createRightPanel('grid_ds_hscode');
 </script>

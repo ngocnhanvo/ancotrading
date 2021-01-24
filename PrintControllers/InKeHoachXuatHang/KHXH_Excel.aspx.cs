@@ -25,8 +25,8 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
     LinqDBDataContext db = new LinqDBDataContext();
     protected void Page_Load(object sender, EventArgs e)
     {
-        DateTime dateFrom = DateTime.ParseExact(Request.QueryString["from"] + " 00:00:00", "dd/MM/yyyy HH:mm:ss", null);
-        DateTime dateTo = DateTime.ParseExact(Request.QueryString["to"] + " 23:59:59", "dd/MM/yyyy HH:mm:ss", null);
+        DateTime dateFrom = DateTime.ParseExact(Request.QueryString["from"], "dd/MM/yyyy", null);
+        DateTime dateTo = DateTime.ParseExact(Request.QueryString["to"], "dd/MM/yyyy", null);
         String md_doitackinhdoanh_id = Request.QueryString["md_doitackinhdoanh_id"];
         string chkManv = Request.QueryString["manv"];
 		string dateType = Request.QueryString["dateType"];
@@ -123,14 +123,16 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
         }
 		
         String str = String.Format(@"
+               declare @tungay datetime = convert(datetime, '{0} 00:00:00', 103);
+               declare @denngay datetime = convert(datetime, '{1} 23:59:59', 103);
+
 				select A.*, (DATEDIFF(day, A.shipmenttime, A.etd)) as tre_nv
 				
 				from (
 					select khxh.so_po, khxh.chungloaihang, khxh.cbm, khxh.cbm_conlai, khxh.shipmenttime, khxh.c_danhsachdathang_id
 	                    , khxh.ngaygiaohang, khxh.ngayxonghang, khxh.cont20, khxh.cont40, khxh.cont40hc
 	                    , khxh.ngayxuathang as ngaymotokhai, khxh.ghichu, khxh.ketquakiemhang, khxh.ngaykiemhang
-                        , dtkd.ma_dtkd as nhacungung, cast('{0}' as datetime) as tungay 
-                        , cast('{1}' as datetime) as denngay
+                        , dtkd.ma_dtkd as nhacungung, @tungay as tungay, @denngay as denngay
                         , (case when khxh.khongtem = 0 and khxh.ngayxacnhantem is not null then (cast(datepart(d, khxh.ngayxacnhantem) as nvarchar) +'/'+ cast(datepart(m, khxh.ngayxacnhantem) as nvarchar)+'/'+ cast(datepart(yy, khxh.ngayxacnhantem) as nvarchar))
 			                    when khxh.khongtem = 0 and khxh.ngayxacnhantem is null then ' '
 			                    when khxh.khongtem = 1 then 'null'
@@ -171,9 +173,10 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
                     where 
                         1=1
 						AND dh.md_trangthai_id <> 'KETTHUC'
-                        AND khxh.{3} >= '{0}' 
-                        AND khxh.{3} <='{1}' {2} {4}
-				) A Where 1=1 ", dateFrom, dateTo, dsNhanVien, dateType =="0"? "ngaygiaohang" : "ngayxonghang", sql_them);
+                        AND khxh.{3} >= @tungay
+                        AND khxh.{3} <= @denngay
+                        {2} {4}
+				) A Where 1=1 ", dateFrom.ToString("dd/MM/yyyy"), dateTo.ToString("dd/MM/yyyy"), dsNhanVien, dateType =="0"? "ngaygiaohang" : "ngayxonghang", sql_them);
 			// select top 1 pkl.etd 
 			// from c_dongpklinv dpkl, c_packinginvoice pkl 
 			// where dpkl.c_packinginvoice_id = pkl.c_packinginvoice_id

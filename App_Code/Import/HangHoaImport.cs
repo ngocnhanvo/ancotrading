@@ -14,7 +14,7 @@ using ExcelLibrary.SpreadSheet;
 
 public class HangHoaImport : ImportOriginal
 {
-    private decimal l, w, h, trongLuong, dienTich;
+    private decimal l, w, h, trongLuong, dienTich, theTich;
     private String maHangHoa, maChungLoai, maKieuDang, maChucNang, maDonViTinh, maNhomNangLuc, 
         maCangBien, maNhaCungUng, maHSCode, trangThai, ghiChu, chucNangSP, ngayXacNhan, hinhThucBan;
 
@@ -138,16 +138,26 @@ public class HangHoaImport : ImportOriginal
     { }
 
     public HangHoaImport(String maHangHoa, String md_chungloai_id, String md_kieudang_id, String md_chucnang_id, 
-        String md_donvitinhsanpham_id, decimal l, decimal w, decimal h, decimal trongLuong, decimal dienTich, 
-        String md_nhomnangluc_id, String md_cangbien_id, String md_doitackinhdoanh_id, String md_hscode_id, 
+        String md_donvitinhsanpham_id, decimal l, decimal w, decimal h, decimal trongLuong
+        , decimal dienTich
+        , decimal theTich
+        , String md_nhomnangluc_id, String md_cangbien_id, String md_doitackinhdoanh_id, String md_hscode_id, 
         String trangthai, String chucnangsp, String ngayXacNhan, String hinhThucBan, String ghichu)
-        : this(maHangHoa, md_chungloai_id, md_kieudang_id, md_chucnang_id, md_donvitinhsanpham_id, l, w, h, trongLuong, dienTich, md_nhomnangluc_id, md_cangbien_id, md_doitackinhdoanh_id, md_hscode_id, trangthai, 
+        : this(maHangHoa, md_chungloai_id, md_kieudang_id, md_chucnang_id, md_donvitinhsanpham_id, l, w, h, trongLuong
+              , dienTich
+              , theTich
+              , md_nhomnangluc_id, md_cangbien_id, md_doitackinhdoanh_id, md_hscode_id, trangthai, 
              chucnangsp, ngayXacNhan, hinhThucBan, ghichu, DateTime.Now, "admin", DateTime.Now, "admin", true)
     {
 
     }
 
-    public HangHoaImport(String maHangHoa, String md_chungloai_id, String md_kieudang_id, String md_chucnang_id, String md_donvitinhsanpham_id, decimal l, decimal w, decimal h, decimal trongLuong, decimal dienTich, String md_nhomnangluc_id, String md_cangbien_id, 
+    public HangHoaImport(String maHangHoa, String md_chungloai_id, String md_kieudang_id, String md_chucnang_id, String md_donvitinhsanpham_id, 
+        decimal l, decimal w, decimal h, decimal trongLuong
+        , decimal dienTich
+        , decimal theTich
+        , String md_nhomnangluc_id
+        , String md_cangbien_id, 
         String md_doitackinhdoanh_id, String md_hscode_id, String trangthai, String chucnangsp, String ngayXacNhan, String hinhThucBan, String ghichu
         , DateTime ngayTao, String nguoiTao, DateTime ngayCapNhat, String nguoiCapNhat, bool hoatDong)
     {
@@ -161,6 +171,7 @@ public class HangHoaImport : ImportOriginal
         this.h = h;
         this.trongLuong = trongLuong;
         this.dienTich = dienTich;
+        this.theTich = theTich;
         this.maNhomNangLuc = md_nhomnangluc_id;
         this.maCangBien = md_cangbien_id;
         this.maNhaCungUng = md_doitackinhdoanh_id;
@@ -203,7 +214,8 @@ public class HangHoaImport : ImportOriginal
         sp.h_inch = h / (decimal)2.54;
 
         sp.trongluong = trongLuong;
-        sp.dientich =dienTich;
+        sp.dientich = dienTich;
+        sp.thetich = theTich;
         sp.md_nhomnangluc_id = maNhomNangLuc;
         sp.nhacungung = maNhaCungUng;
         sp.md_cangbien_id = maCangBien;
@@ -243,6 +255,7 @@ public class HangHoaImport : ImportOriginal
         o.h_inch = h / (decimal)2.54;
         o.trongluong = trongLuong;
         o.dientich = dienTich;
+        o.thetich = theTich;
         o.md_nhomnangluc_id = maNhomNangLuc;
         o.md_chungloai_id =maChungLoai;
         o.nhacungung = maNhaCungUng;

