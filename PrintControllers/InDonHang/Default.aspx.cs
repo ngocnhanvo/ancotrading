@@ -794,7 +794,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     row = row - 1;
                     rowCreate = s1.GetRow(row);
                     rowCreate.GetCell(2).SetCellValue(rowCreate.GetCell(2).StringCellValue + "\n" + rich_text);
-                    height = 60;
+                    height = 50;
                 }
             }
             else
