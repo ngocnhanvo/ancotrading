@@ -785,7 +785,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     rowCreate = s1.CreateRow(row);
                     rowCreate.CreateCell(1).SetCellValue(c[i]);
                     rowCreate.GetCell(1).SetCellValue(c[i]);
-                    rowCreate.GetCell(1).CellStyle = cellBold;
+                    rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
                     rowCreate.CreateCell(2).SetCellValue(rich_text);
                 }
                 else
@@ -793,7 +793,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     row = row - 1;
                     rowCreate = s1.GetRow(row);
                     rowCreate.GetCell(2).SetCellValue(rowCreate.GetCell(2).StringCellValue + "\n" + rich_text);
-                    height = 66;
+                    height = 60;
                 }
             }
             else
@@ -802,6 +802,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 rowCreate.CreateCell(1).SetCellValue(c[i]);
                 rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
                 rowCreate.CreateCell(2).SetCellValue(rich_text);
+                height = 22;
             }
             
             rowCreate.GetCell(2).CellStyle = i > 2 ? celltext : cellBold;
