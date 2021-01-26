@@ -773,6 +773,10 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
         for (int i = 0; i < c.Length; i++)
         {
+            var rich_text = "";
+            rich_text = i == 0 ? "{0}" : (i == 1 ? "Address: {1}" : (i == 2 ? "Tel: {2}                          Fax: {3}" : "{4}"));
+            rich_text = string.Format(rich_text, dt.Rows[0]["ten_dtkd"], dt.Rows[0]["diachi"], dt.Rows[0]["tel"], dt.Rows[0]["fax"], c_value[i] == "" ? "" : dt.Rows[0][c_value[i]]);
+
             IRow rowCreate = null;
             if (!config.isPDF.GetValueOrDefault(false))
             {
@@ -780,12 +784,14 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 {
                     rowCreate = s1.CreateRow(row);
                     rowCreate.CreateCell(1).SetCellValue(c[i]);
+                    rowCreate.GetCell(1).SetCellValue(c[i]);
+                    rowCreate.CreateCell(2).SetCellValue(rich_text);
                 }
                 else
                 {
                     row = row - 1;
                     rowCreate = s1.GetRow(row);
-                    rowCreate.GetCell(1).SetCellValue(rowCreate.GetCell(1).StringCellValue + "\n" + c[i]);
+                    rowCreate.GetCell(2).SetCellValue(rowCreate.GetCell(2).StringCellValue + "\n" + rich_text);
                 }
             }
             else
@@ -793,12 +799,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 rowCreate = s1.CreateRow(row);
                 rowCreate.CreateCell(1).SetCellValue(c[i]);
                 rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
+                rowCreate.CreateCell(2).SetCellValue(rich_text);
             }
-
-            var rich_text = "";
-            rich_text = i == 0 ? "{0}" : (i == 1 ? "Address: {1}" : (i == 2 ? "Tel: {2}                          Fax: {3}" : "{4}"));
-            rich_text = string.Format(rich_text, dt.Rows[0]["ten_dtkd"], dt.Rows[0]["diachi"], dt.Rows[0]["tel"], dt.Rows[0]["fax"], c_value[i] == "" ? "" : dt.Rows[0][c_value[i]]);
-            rowCreate.CreateCell(2).SetCellValue(rich_text);
+            
             rowCreate.GetCell(2).CellStyle = i > 2 ? celltext : cellBold;
 
             if (new int[] { 0, 1, 2, 3, 5, 6 }.Contains(i))
