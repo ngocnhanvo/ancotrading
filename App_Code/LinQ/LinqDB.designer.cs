@@ -1,4 +1,4 @@
-//Update at 08/11/2020 23:05:10
+//Update at 23/11/2020 14:48:48
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 
 
-[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="ancotradingTest2018ver2")]
+[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="ancotrading2019")]
 public partial class LinqDBDataContext : System.Data.Linq.DataContext
 {
 private static System.Data.Linq.Mapping.MappingSource mappingSource = new AttributeMappingSource();
@@ -8867,6 +8867,7 @@ private System.Nullable<decimal> _giachuan;
 private System.Nullable<double> _discount;
 private string _barcode;
 private System.Nullable<decimal> _phi;
+private System.Nullable<bool> _editphi;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -8953,6 +8954,8 @@ partial void OnbarcodeChanging(string value);
 partial void OnbarcodeChanged();
 partial void OnphiChanging(System.Nullable<decimal> value);
 partial void OnphiChanged();
+partial void OneditphiChanging(System.Nullable<bool> value);
+partial void OneditphiChanged();
 #endregion
 public c_dongdonhang()
 {
@@ -9734,6 +9737,25 @@ this.SendPropertyChanging();
 this._phi = value;
 this.SendPropertyChanged("phi");
 this.OnphiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_editphi", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @editphi
+{
+get
+{
+return this._editphi;
+}
+set
+{
+if ((this._editphi != value))
+{
+this.OneditphiChanging(value);
+this.SendPropertyChanging();
+this._editphi = value;
+this.SendPropertyChanged("editphi");
+this.OneditphiChanged();
 }
 }
 }
