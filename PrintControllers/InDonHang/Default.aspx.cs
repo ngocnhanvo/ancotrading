@@ -774,7 +774,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         for (int i = 0; i < c.Length; i++)
         {
             IRow rowCreate = null;
-            if (config.isPDF.GetValueOrDefault(false))
+            if (!config.isPDF.GetValueOrDefault(false))
             {
                 if (!new int[] { 1, 2 }.Contains(i))
                 {
