@@ -787,6 +787,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     rowCreate.GetCell(1).SetCellValue(c[i]);
                     rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
                     rowCreate.CreateCell(2).SetCellValue(rich_text);
+                    height = 22;
                 }
                 else
                 {
