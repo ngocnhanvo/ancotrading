@@ -773,9 +773,27 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
         for (int i = 0; i < c.Length; i++)
         {
-            var rowCreate = s1.CreateRow(row);
-            rowCreate.CreateCell(1).SetCellValue(c[i]);
-            rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
+            IRow rowCreate = null;
+            if (config.isPDF.GetValueOrDefault(false))
+            {
+                if (!new int[] { 1, 2 }.Contains(i))
+                {
+                    rowCreate = s1.CreateRow(row);
+                    rowCreate.CreateCell(1).SetCellValue(c[i]);
+                }
+                else
+                {
+                    row = row - 1;
+                    rowCreate = s1.GetRow(row);
+                    rowCreate.GetCell(1).SetCellValue(rowCreate.GetCell(1).StringCellValue + "\n" + c[i]);
+                }
+            }
+            else
+            {
+                rowCreate = s1.CreateRow(row);
+                rowCreate.CreateCell(1).SetCellValue(c[i]);
+                rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
+            }
 
             var rich_text = "";
             rich_text = i == 0 ? "{0}" : (i == 1 ? "Address: {1}" : (i == 2 ? "Tel: {2}                          Fax: {3}" : "{4}"));
@@ -1265,7 +1283,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         cellUn.SetFont(funderline);
         cellUn.Alignment = HorizontalAlignment.Center;
         cellUn.VerticalAlignment = VerticalAlignment.Top;
-        s1.GetRow(2).GetCell(0).CellStyle = cellUn;
+        s1.GetRow(3).GetCell(0).CellStyle = cellUn;
 
         s1 = config.PrintExcel((HSSFSheet)s1, row);
 
