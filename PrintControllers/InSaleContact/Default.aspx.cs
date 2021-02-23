@@ -528,7 +528,6 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
             s1.CreateRow(r).CreateCell(0).SetCellValue("P/I No.:" + g_it["sodh"].ToString());
             if (g_line == 0)
             {
-
                 s1.GetRow(r).CreateCell(4).SetCellValue("FOB " + g_it["ten_cangbien"].ToString());
             }
             else
