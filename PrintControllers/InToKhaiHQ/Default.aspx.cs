@@ -455,6 +455,7 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                 dh.sochungtu as sodh, 
                 convert(decimal(18,2), po.discountPO) as discount, 
 		        po.discountPO as discount1,
+                po.hehang_value as discount_hehang_value,
 		        cnx.container, 
                 cnx.soseal, 
                 cb.ten_cangbien, 
@@ -474,7 +475,7 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         , c_pkivn_id);
         DataTable dt_g = mdbc.GetData(sql_group);
 
-        string dh_ = @"select distinct c_donhang_id, sodh, container, soseal , discount, discount1, c_nhapxuat_id, ten_cangbien from (" + sql_group + ") as tmp order by container asc, sodh asc";
+        string dh_ = @"select distinct c_donhang_id, sodh, container, soseal , discount, discount1, discount_hehang_value, c_nhapxuat_id, ten_cangbien from (" + sql_group + ") as tmp order by container asc, sodh asc";
         DataTable data_dh = mdbc.GetData(dh_);
 
         int g_line = 0;
@@ -493,6 +494,9 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
 		
         foreach (DataRow g_it in data_dh.Rows)
         {
+            string discount_hehang_value = g_it["discount_hehang_value"].ToString();
+            var nnl = string.IsNullOrEmpty(discount_hehang_value) ? null : Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(discount_hehang_value);
+
             s1.CreateRow(r).CreateCell(0).SetCellValue("");
             s1.GetRow(r).CreateCell(0).SetCellValue("P/I No. " + g_it["sodh"].ToString());
             if (g_line == 0)
@@ -546,10 +550,20 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
 								) as tmp order by ma_sanpham asc ", g_it["c_donhang_id"], c_pkivn_id, g_it["c_nhapxuat_id"]);
 
             DataTable dt_d = mdbc.GetData(sql_de);
-			
-            foreach (DataRow g_dt in dt_d.Rows)
+
+            var startRowHH = -1;
+            var lstHH = new List<int>();
+
+            for (var i = 0; i < dt_d.Rows.Count; i++)
             {
                 r++;
+                DataRow g_dt = dt_d.Rows[i];
+                var msp = g_dt["ma_sanpham"].ToString();
+                var chungloai = msp.Substring(0, 2);
+                var chungloaiTT = i == dt_d.Rows.Count - 1 ? chungloai : dt_d.Rows[i + 1]["ma_sanpham"].ToString().Substring(0, 2);
+                if (startRowHH == -1)
+                    startRowHH = r;
+
                 IRow ir = s1.CreateRow(r);
                 ir.CreateCell(0).SetCellValue(g_dt["ma_sanpham"].ToString());
                 ir.GetCell(0).CellStyle = styleBorder12;
@@ -587,10 +601,99 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
 
                 ir.CreateCell(11).SetCellValue(double.Parse(g_dt["cbm"].ToString()));
                 ir.GetCell(11).CellStyle = styleNumber0i00Border12;
+
+                if ((chungloai != chungloaiTT & i < dt_d.Rows.Count - 1) | i == dt_d.Rows.Count - 1)
+                {
+                    if (nnl != null)
+                    {
+                        string gthh = nnl == null ? "0" : nnl.Where(s => s["hehang"].ToString() == chungloai).Select(s => s["giatri"].ToString()).FirstOrDefault();
+                        var rowHeight = gthh == "0" ? 0 : 20;
+                        r++;
+                        var rowToTalHeHang = s1.CreateRow(r);
+                        rowToTalHeHang.HeightInPoints = rowHeight;
+                        rowToTalHeHang.CreateCell(2).SetCellValue(string.Format("Tổng cộng ({0}):", lstHH.Count + 1));
+                        rowToTalHeHang.GetCell(2).CellStyle = style12Bold;
+                        s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 1));
+                        string fmlSum = string.Format(@"SUM(VNN{0}:VNN{1})", startRowHH + 1, r);
+                        rowToTalHeHang.CreateCell(5).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "F"));
+                        rowToTalHeHang.GetCell(5).CellStyle = styleNumber012Bold;
+                        rowToTalHeHang.CreateCell(6).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "G"));
+                        rowToTalHeHang.GetCell(6).CellStyle = styleNumber012Bold;
+                        rowToTalHeHang.CreateCell(8).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "I"));
+                        rowToTalHeHang.GetCell(8).CellStyle = styleNumber0i0012Bold;
+                        rowToTalHeHang.CreateCell(9).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "J"));
+                        rowToTalHeHang.GetCell(9).CellStyle = styleNumber0i0012Bold;
+                        rowToTalHeHang.CreateCell(10).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "K"));
+                        rowToTalHeHang.GetCell(10).CellStyle = styleNumber0i0012Bold;
+                        rowToTalHeHang.CreateCell(11).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "L"));
+                        rowToTalHeHang.GetCell(11).CellStyle = styleNumber0i0012Bold;
+                        r++;
+
+                        var rowDisHeHang = s1.CreateRow(r);
+                        rowDisHeHang.HeightInPoints = rowHeight;
+                        rowDisHeHang.CreateCell(2).SetCellValue(string.Format(@"Giảm giá ({0}%):", gthh));
+                        rowDisHeHang.GetCell(2).CellStyle = style12Bold;
+                        s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 1));
+                        rowDisHeHang.CreateCell(8).CellFormula = string.Format("I{0}*{1}/100", r, gthh);
+                        rowDisHeHang.GetCell(8).CellStyle = styleNumber0i0012Bold;
+                        r++;
+
+                        var rowTotalHeHang = s1.CreateRow(r);
+                        rowTotalHeHang.HeightInPoints = rowHeight;
+                        rowTotalHeHang.CreateCell(2).SetCellValue(string.Format("Tổng cộng ({0}):", lstHH.Count + 1));
+                        rowTotalHeHang.GetCell(2).CellStyle = style12Bold;
+                        s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 1));
+                        rowTotalHeHang.CreateCell(5).CellFormula = string.Format("F{0}", r - 1);
+                        rowTotalHeHang.GetCell(5).CellStyle = styleNumber012Bold;
+                        rowTotalHeHang.CreateCell(6).CellFormula = string.Format("G{0}", r - 1);
+                        rowTotalHeHang.GetCell(6).CellStyle = styleNumber012Bold;
+                        rowTotalHeHang.CreateCell(8).CellFormula = string.Format("I{0} - I{1}", r - 1, r);
+                        rowTotalHeHang.GetCell(8).CellStyle = styleNumber0i0012Bold;
+                        rowTotalHeHang.CreateCell(9).CellFormula = string.Format("J{0}", r - 1);
+                        rowTotalHeHang.GetCell(9).CellStyle = styleNumber0i0012Bold;
+                        rowTotalHeHang.CreateCell(10).CellFormula = string.Format("K{0}", r - 1);
+                        rowTotalHeHang.GetCell(10).CellStyle = styleNumber0i0012Bold;
+                        rowTotalHeHang.CreateCell(11).CellFormula = string.Format("L{0}", r - 1);
+                        rowTotalHeHang.GetCell(11).CellStyle = styleNumber0i0012Bold;
+
+                        lstHH.Add(r);
+                        startRowHH = r + 1;
+                    }
+                }
+            }
+
+            string sumQuantityPO = "", sumSubToTalPO = "", sumNoOfPackPO = "", sumNWPO = "", sumGWPO = "", sumCBMPO = "";
+            if (nnl != null)
+            {
+                for (var iHH = 0; iHH < lstHH.Count; iHH++)
+                {
+                    var rowHH = lstHH[iHH];
+                    sumNoOfPackPO += string.Format(@"F{0}+", rowHH + 1);
+                    sumQuantityPO += string.Format(@"G{0}+", rowHH + 1);
+                    sumSubToTalPO += string.Format(@"I{0}+", rowHH + 1);
+                    sumNWPO += string.Format(@"J{0}+", rowHH + 1);
+                    sumGWPO += string.Format(@"K{0}+", rowHH + 1);
+                    sumCBMPO += string.Format(@"L{0}+", rowHH + 1);
+                }
+                sumNoOfPackPO += "0";
+                sumQuantityPO += "0";
+                sumSubToTalPO += "0";
+                sumNWPO += "0";
+                sumGWPO += "0";
+                sumCBMPO += "0";
+            }
+            else
+            {
+                sumNoOfPackPO += string.Format(@"SUM(F{0}:F{1})", startRowHH + 1, r + 1);
+                sumQuantityPO += string.Format(@"SUM(G{0}:G{1})", startRowHH + 1, r + 1);
+                sumSubToTalPO += string.Format(@"SUM(I{0}:I{1})", startRowHH + 1, r + 1);
+                sumNWPO += string.Format(@"SUM(J{0}:J{1})", startRowHH + 1, r + 1);
+                sumGWPO += string.Format(@"SUM(K{0}:K{1})", startRowHH + 1, r + 1);
+                sumCBMPO += string.Format(@"SUM(L{0}:L{1})", startRowHH + 1, r + 1);
             }
 
             r++;
-            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Tổng cộng{0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
+            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Tổng cộng PO {0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
             s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
 			
 			double dsc1 = double.Parse(g_it["discount1"].ToString());
@@ -598,33 +701,33 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
 				s1.GetRow(r).HeightInPoints = 0;
 
             // total NoOfPack
-            s1.GetRow(r).CreateCell(5).CellFormula = String.Format("SUM(F{0}:F{1})", r - dt_d.Rows.Count + 1, r);
+            s1.GetRow(r).CreateCell(5).CellFormula = sumNoOfPackPO;
             s1.GetRow(r).GetCell(5).CellStyle = styleNumber012Bold;
             lstNoOfPack.Add(r + 1);
 
             // total quantity
-            s1.GetRow(r).CreateCell(6).CellFormula = String.Format("SUM(G{0}:G{1})", r - dt_d.Rows.Count + 1, r);
+            s1.GetRow(r).CreateCell(6).CellFormula = sumQuantityPO;
             s1.GetRow(r).GetCell(6).CellStyle = styleNumber012Bold;
             lstQuantity.Add(r + 1);
 
 
             //total salary
-            s1.GetRow(r).CreateCell(8).CellFormula = String.Format("SUM(I{0}:I{1})", r - dt_d.Rows.Count + 1, r);
+            s1.GetRow(r).CreateCell(8).CellFormula = sumSubToTalPO;
             s1.GetRow(r).GetCell(8).CellStyle = styleNumber0i0012Bold;
             lstTotalSalary.Add(r + 1);
 			
 			//total nw
-            s1.GetRow(r).CreateCell(9).CellFormula = String.Format("SUM(J{0}:J{1})", r - dt_d.Rows.Count + 1, r);
+            s1.GetRow(r).CreateCell(9).CellFormula = sumNWPO;
             s1.GetRow(r).GetCell(9).CellStyle = styleNumber0i0012Bold;
             lstNW.Add(r + 1);
 			
             //total gw
-            s1.GetRow(r).CreateCell(10).CellFormula = String.Format("SUM(K{0}:K{1})", r - dt_d.Rows.Count + 1, r);
+            s1.GetRow(r).CreateCell(10).CellFormula = sumGWPO;
             s1.GetRow(r).GetCell(10).CellStyle = styleNumber0i0012Bold;
             lstGW.Add(r + 1);
 
             //total cbm
-            s1.GetRow(r).CreateCell(11).CellFormula = String.Format("SUM(L{0}:L{1})", r - dt_d.Rows.Count + 1, r);
+            s1.GetRow(r).CreateCell(11).CellFormula = sumCBMPO;
             s1.GetRow(r).GetCell(11).CellStyle = styleNumber0i0012Bold;
             lstCBM.Add(r + 1);
 
@@ -637,7 +740,7 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
 			
 			string str_dsc1 = dsc1.ToString();
 			
-            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Giảm giá({0}%):", g_it["discount"].ToString()));
+            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Giảm giá ({0}%):", g_it["discount"].ToString()));
             s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
 			
 			if(str_dsc1.Contains(".")) {
@@ -664,7 +767,7 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
             lstDiscount.Add(r + 1);
 
             r++;
-            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Tổng cộng{0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
+            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Tổng cộng PO {0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
             s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
 
             // total NoOfPack
@@ -677,6 +780,15 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
 
             s1.GetRow(r).CreateCell(8).CellFormula = String.Format("I{0}-I{1}", r - 1, r);
             s1.GetRow(r).GetCell(8).CellStyle = styleNumber0i0012Bold;
+
+            s1.GetRow(r).CreateCell(9).CellFormula = String.Format("J{0}", r - 1);
+            s1.GetRow(r).GetCell(9).CellStyle = styleNumber0i0012Bold;
+
+            s1.GetRow(r).CreateCell(10).CellFormula = String.Format("K{0}", r - 1);
+            s1.GetRow(r).GetCell(10).CellStyle = styleNumber0i0012Bold;
+
+            s1.GetRow(r).CreateCell(11).CellFormula = String.Format("L{0}", r - 1);
+            s1.GetRow(r).GetCell(11).CellStyle = styleNumber0i0012Bold;
 
             count++;
             r++;

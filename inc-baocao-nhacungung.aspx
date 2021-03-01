@@ -70,9 +70,30 @@
     }
 
     function createFilter(stt) {
-        var frmID = '#frmBCNCU';
-        var ncuDisplay = $("#md_doitackinhdoanh_id", frmID).parent().parent();
+        let frmID = '#frmBCNCU';
+        let ncuDisplay = $("#md_doitackinhdoanh_id", frmID).parent().parent();
+        let namDisplay = $('#namBCNCU', frmID).parent().parent();
+        let tungayDisplay = $('#tungayBCNCU', frmID).parent().parent();
+        let denngayDisplay = $('#denngayBCNCU', frmID).parent().parent();
+
+        let ncuDisplayFilter = function (filter) {
+            $('#md_doitackinhdoanh_id option', frmID).each(function () {
+                if (filter != null) {
+                    if (filter.lastIndexOf($(this).text()) <= -1)
+                        $(this).hide();
+                    else
+                        $(this).show();
+                }
+                else
+                    $(this).show();
+            });
+        }
+
+        namDisplay.hide();
+        tungayDisplay.show();
+        denngayDisplay.show();
         ncuDisplay.show();
+        ncuDisplayFilter(null);
         $("#filter").css({ "display": "" });
         $("#report_id").val(stt);
         switch (stt) {
@@ -83,6 +104,13 @@
             case 1001:
                 ncuDisplay.hide();
                 $('#lblReportNameNCU').html("Báo cáo phí cộng trừ theo nhà cung ứng");
+                break;
+            case 1002:
+                namDisplay.show();
+                tungayDisplay.hide();
+                denngayDisplay.hide();
+                ncuDisplayFilter(['ANCO1', 'ANCO2']);
+                $('#lblReportNameNCU').html("Báo cáo tổng hợp doanh thu - chi phí của xưởng");
                 break;
 			case 100:
                 $('#lblReportNameNCU').html("Tổng hợp tiền hàng đã xuất chi tiết");
@@ -173,6 +201,12 @@
         else if (reportid == 1001) {
             window.open("PrintControllers/0BaoCaoNCU/rpt_PhiCongPhiTruNCU.aspx" + qstring);
         }
+        else if (reportid == 1002) {
+            qstring = "";
+            qstring += "?nam=" + $('#namBCNCU', frmBCNCU).val();
+            qstring += "?xuong=" + $('#md_doitackinhdoanh_id', frmBCNCU).val();
+            window.open("PrintControllers/InBaoCaoTongHopDoanhThu/rptDoanhThuChiPhiXuong.aspx" + qstring);
+        }
     }
  
 </script>
@@ -199,6 +233,17 @@
             <tr>
                 <td>Đến ngày</td>
                 <td><input type="text" name="denngay" id="denngayBCNCU"/></td>
+            </tr>
+            <tr>
+                <td>Chọn năm</td>
+                <td>
+                    <select name="nam" id="namBCNCU">
+                        <% for (int i = DateTime.Now.Year + 10; i >= DateTime.Now.Year - 10; i--)
+                           {%>
+                              <option value="<%=i %>" <%= DateTime.Now.Year == i ? " selected=\"selected\"" :""%> ><%=i %> </option> 
+                           <%} %>
+                   </select>
+                </td>
             </tr>
             <tr>
                 <td>Chọn NCU</td>
