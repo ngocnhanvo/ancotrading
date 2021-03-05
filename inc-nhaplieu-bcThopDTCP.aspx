@@ -88,7 +88,6 @@
                 , editoptions: { defaultValue: nowMonth.toString(), value: jsonMonthEdit }
                 , stype: 'select'
                 , searchoptions: { opt:['eq'], value: jsonMonthSearch }
-                , editrules: { required:true }
             },
             {
                 fixed: true
@@ -98,7 +97,6 @@
                 , editable: true
                 , width: 100
                 , edittype: 'text'
-                , editrules: { required:true } 
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -110,8 +108,7 @@
                 , label: 'Tiền BHXH, BHLĐ, nghỉ việc'
                 , editable: true
                 , width: 100
-                , edittype: 'text'
-                , editrules: { required:true } 
+                , edittype: 'text' 
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -124,7 +121,6 @@
                 , editable: true
                 , width: 100
                 , edittype: 'text'
-                , editrules: { required:true } 
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -137,7 +133,6 @@
                 , editable: true
                 , width: 100
                 , edittype: 'text'
-                , editrules: { required:true } 
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -150,7 +145,6 @@
                 , width: 100
                 , edittype: 'text'
                 , editable: true
-                , editrules: { required:true }
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
