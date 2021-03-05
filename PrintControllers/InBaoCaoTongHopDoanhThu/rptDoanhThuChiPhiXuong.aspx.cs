@@ -104,7 +104,12 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 chiTienMatKhac decimal(18,2), 
                 khieuNai decimal(18,2), 
                 cuocGuiMauKiemDinh decimal(18,2),
-                noDauNam decimal(18,2)
+                noDauNam decimal(18,2),
+                tienBHXHBHLDNghiViec decimal(18,2),
+                dienNuocRacCtyHaca decimal(18,2),
+                nopTamUng decimal(18,2),
+                tamUngLuongCN decimal(18,2),
+                trich20PheLieu decimal(18,2)
             )
             insert into @tblNhapLieu
             select 
@@ -122,7 +127,12 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 tc.chiTienMatKhac, 
                 tc.khieuNai, 
                 tc.cuocGuiMauKiemDinh,
-                tc.noDauNam
+                tc.noDauNam,
+                tc.tienBHXHBHLDNghiViec,
+                tc.dienNuocRacCtyHaca,
+                tc.nopTamUng,
+                tc.tamUngLuongCN,
+                tc.trich20PheLieu
             from rpt_tonghopdoanhthuchiphi tc
             where 
                 tc.nam = @nam
@@ -181,6 +191,7 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 (select sum(vtbb) from @tblPhieuChi where thang = 10) as b_1_10,
 	            (select sum(vtbb) from @tblPhieuChi where thang = 11) as b_1_11,
                 (select sum(vtbb) from @tblPhieuChi where thang = 12) as b_1_12,
+
                 (select sum(chiPhiXuatKhau) from @tblNhapLieu where thang = 1) as b_2_1,
 	            (select sum(chiPhiXuatKhau) from @tblNhapLieu where thang = 2) as b_2_2,
                 (select sum(chiPhiXuatKhau) from @tblNhapLieu where thang = 3) as b_2_3,
@@ -193,6 +204,46 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 (select sum(chiPhiXuatKhau) from @tblNhapLieu where thang = 10) as b_2_10,
 	            (select sum(chiPhiXuatKhau) from @tblNhapLieu where thang = 11) as b_2_11,
                 (select sum(chiPhiXuatKhau) from @tblNhapLieu where thang = 12) as b_2_12,
+                
+                (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 1) as b_2BS1_1,
+	            (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 2) as b_2BS1_2,
+                (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 3) as b_2BS1_3,
+                (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 4) as b_2BS1_4,
+	            (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 5) as b_2BS1_5,
+                (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 6) as b_2BS1_6,
+                (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 7) as b_2BS1_7,
+	            (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 8) as b_2BS1_8,
+                (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 9) as b_2BS1_9,
+                (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 10) as b_2BS1_10,
+	            (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 11) as b_2BS1_11,
+                (select sum(tienBHXHBHLDNghiViec) from @tblNhapLieu where thang = 12) as b_2BS1_12,
+
+                (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 1) as b_2BS2_1,
+	            (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 2) as b_2BS2_2,
+                (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 3) as b_2BS2_3,
+                (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 4) as b_2BS2_4,
+	            (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 5) as b_2BS2_5,
+                (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 6) as b_2BS2_6,
+                (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 7) as b_2BS2_7,
+	            (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 8) as b_2BS2_8,
+                (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 9) as b_2BS2_9,
+                (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 10) as b_2BS2_10,
+	            (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 11) as b_2BS2_11,
+                (select sum(dienNuocRacCtyHaca) from @tblNhapLieu where thang = 12) as b_2BS2_12,
+
+                (select sum(nopTamUng) from @tblNhapLieu where thang = 1) as b_2BS3_1,
+	            (select sum(nopTamUng) from @tblNhapLieu where thang = 2) as b_2BS3_2,
+                (select sum(nopTamUng) from @tblNhapLieu where thang = 3) as b_2BS3_3,
+                (select sum(nopTamUng) from @tblNhapLieu where thang = 4) as b_2BS3_4,
+	            (select sum(nopTamUng) from @tblNhapLieu where thang = 5) as b_2BS3_5,
+                (select sum(nopTamUng) from @tblNhapLieu where thang = 6) as b_2BS3_6,
+                (select sum(nopTamUng) from @tblNhapLieu where thang = 7) as b_2BS3_7,
+	            (select sum(nopTamUng) from @tblNhapLieu where thang = 8) as b_2BS3_8,
+                (select sum(nopTamUng) from @tblNhapLieu where thang = 9) as b_2BS3_9,
+                (select sum(nopTamUng) from @tblNhapLieu where thang = 10) as b_2BS3_10,
+	            (select sum(nopTamUng) from @tblNhapLieu where thang = 11) as b_2BS3_11,
+                (select sum(nopTamUng) from @tblNhapLieu where thang = 12) as b_2BS3_12,
+
                 (select sum(chiPhiHCNS) from @tblNhapLieu where thang = 1) as b_3_1,
 	            (select sum(chiPhiHCNS) from @tblNhapLieu where thang = 2) as b_3_2,
                 (select sum(chiPhiHCNS) from @tblNhapLieu where thang = 3) as b_3_3,
@@ -277,6 +328,20 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 (select sum(thuongLeTetCN) from @tblNhapLieu where thang = 10) as b_9_10,
 	            (select sum(thuongLeTetCN) from @tblNhapLieu where thang = 11) as b_9_11,
                 (select sum(thuongLeTetCN) from @tblNhapLieu where thang = 12) as b_9_12,
+
+                (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 1) as b_9BS1_1,
+	            (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 2) as b_9BS1_2,
+                (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 3) as b_9BS1_3,
+                (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 4) as b_9BS1_4,
+	            (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 5) as b_9BS1_5,
+                (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 6) as b_9BS1_6,
+                (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 7) as b_9BS1_7,
+	            (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 8) as b_9BS1_8,
+                (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 9) as b_9BS1_9,
+                (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 10) as b_9BS1_10,
+	            (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 11) as b_9BS1_11,
+                (select sum(tamUngLuongCN) from @tblNhapLieu where thang = 12) as b_9BS1_12,                
+
                 (select sum(chiTienMatKhac) from @tblNhapLieu where thang = 1) as b_10_1,
 	            (select sum(chiTienMatKhac) from @tblNhapLieu where thang = 2) as b_10_2,
                 (select sum(chiTienMatKhac) from @tblNhapLieu where thang = 3) as b_10_3,
@@ -289,6 +354,20 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 (select sum(chiTienMatKhac) from @tblNhapLieu where thang = 10) as b_10_10,
 	            (select sum(chiTienMatKhac) from @tblNhapLieu where thang = 11) as b_10_11,
                 (select sum(chiTienMatKhac) from @tblNhapLieu where thang = 12) as b_10_12,
+
+                (select sum(trich20PheLieu) from @tblNhapLieu where thang = 1) as b_10BS1_1,
+	            (select sum(trich20PheLieu) from @tblNhapLieu where thang = 2) as b_10BS1_2,
+                (select sum(trich20PheLieu) from @tblNhapLieu where thang = 3) as b_10BS1_3,
+                (select sum(trich20PheLieu) from @tblNhapLieu where thang = 4) as b_10BS1_4,
+	            (select sum(trich20PheLieu) from @tblNhapLieu where thang = 5) as b_10BS1_5,
+                (select sum(trich20PheLieu) from @tblNhapLieu where thang = 6) as b_10BS1_6,
+                (select sum(trich20PheLieu) from @tblNhapLieu where thang = 7) as b_10BS1_7,
+	            (select sum(trich20PheLieu) from @tblNhapLieu where thang = 8) as b_10BS1_8,
+                (select sum(trich20PheLieu) from @tblNhapLieu where thang = 9) as b_10BS1_9,
+                (select sum(trich20PheLieu) from @tblNhapLieu where thang = 10) as b_10BS1_10,
+	            (select sum(trich20PheLieu) from @tblNhapLieu where thang = 11) as b_10BS1_11,
+                (select sum(trich20PheLieu) from @tblNhapLieu where thang = 12) as b_10BS1_12,                 
+
                 (select sum(tien) from @tblHoaHong where thang = 1) as b_11_1,
 	            (select sum(tien) from @tblHoaHong where thang = 2) as b_11_2,
                 (select sum(tien) from @tblHoaHong where thang = 3) as b_11_3,
