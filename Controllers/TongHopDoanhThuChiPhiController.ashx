@@ -214,7 +214,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             select * from (
                 select 
                     cl.rpt_tonghopdoanhthuchiphi_id, ncc.ma_dtkd, cl.noDauNam, cl.nam, cl.thang, cl.dsoVTXuatChoBPCtyKhac, 
-                    cl.tienPheLieu, cl.chiPhiXuatKhau, cl.tienBHXHBHLDNghiViec, cl.dienNuocRacCtyHaca, cl.nopTamUng, 
+                    cl.tienBHXHBHLDNghiViec, cl.dienNuocRacCtyHaca, cl.nopTamUng, cl.tienPheLieu, cl.chiPhiXuatKhau,  
                     cl.chiPhiHCNS, cl.luongNV, cl.luongCN, cl.phiCDBHXHNV, cl.phiCDBHXHCN, cl.thuongLeTetNV, 
                     cl.thuongLeTetCN, cl.chiTienMatKhac, cl.khieuNai, cl.cuocGuiMauKiemDinh, 
                     cl.ngaytao, cl.nguoitao, cl.ngaycapnhat, cl.nguoicapnhat, cl.mota, cl.hoatdong,
