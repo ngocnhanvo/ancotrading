@@ -39,8 +39,8 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
 
     public string removeSpace(string a)
     {
-        if (a == null)
-            a = "";
+        if (string.IsNullOrWhiteSpace(a))
+            a = "0";
         return a.Replace(" ", "");
     }
 
@@ -198,9 +198,10 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         start = limit * page - limit;
         end = (page * limit) + 1;
 
+        var orderBy = sidx + " " + sord;
         if (sidx.Equals("") || sidx == null)
         {
-            sidx = "cl.rpt_tonghopdoanhthuchiphi_id";
+            orderBy = "ncc.ma_dtkd, cl.nam desc, cl.thang desc";
         }
 
         string strsql = string.Format(@"
@@ -211,13 +212,15 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
                     cl.phiCDBHXHNV, cl.phiCDBHXHCN, cl.thuongLeTetNV, cl.thuongLeTetCN, 
                     cl.chiTienMatKhac, cl.khieuNai, cl.cuocGuiMauKiemDinh, 
                     cl.ngaytao, cl.nguoitao, cl.ngaycapnhat, cl.nguoicapnhat, cl.mota, cl.hoatdong,
-                    ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum
+                    ROW_NUMBER() OVER (ORDER BY {0}) as RowNum
                 FROM rpt_tonghopdoanhthuchiphi cl 
                 left join md_doitackinhdoanh ncc on ncc.md_doitackinhdoanh_id = cl.xuongId
-                where 1=1 {2}
-            )P where RowNum > @start AND RowNum < @end",
-            sidx,
-            sord,
+                where 1=1 {1}
+            )P 
+            where RowNum > @start AND RowNum < @end
+            order by P.RowNum
+            ",
+            orderBy,
             filter
         );
         strsql = string.Format(strsql, filter);
