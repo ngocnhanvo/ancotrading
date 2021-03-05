@@ -37,6 +37,13 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         }
     }
 
+    public string removeSpace(string a)
+    {
+        if (a == null)
+            a = "";
+        return a.Replace(" ", "");
+    }
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -48,7 +55,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         var xuongId = context.Request.Form["xuongId"];
         var nam = int.Parse(context.Request.Form["nam"]);
         var thang = int.Parse(context.Request.Form["thang"]);
-        var noDauNamStr = context.Request.Form["noDauNam"];
+        var noDauNamStr = removeSpace(context.Request.Form["noDauNam"]);
         var noDauNam = string.IsNullOrEmpty(noDauNamStr) ? 0 : decimal.Parse(noDauNamStr);
         var lst = (from o in db.rpt_tonghopdoanhthuchiphis
                    where
@@ -69,19 +76,19 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             m.nam = nam;
             m.thang = thang;
             m.noDauNam = thang == 1 ? noDauNam : 0;
-            m.chiPhiHCNS = decimal.Parse(context.Request.Form["chiPhiHCNS"]);
-            m.chiPhiXuatKhau = decimal.Parse(context.Request.Form["chiPhiXuatKhau"]);
-            m.chiTienMatKhac = decimal.Parse(context.Request.Form["chiTienMatKhac"]);
-            m.cuocGuiMauKiemDinh = decimal.Parse(context.Request.Form["cuocGuiMauKiemDinh"]);
-            m.dsoVTXuatChoBPCtyKhac = decimal.Parse(context.Request.Form["dsoVTXuatChoBPCtyKhac"]);
+            m.chiPhiHCNS = decimal.Parse(removeSpace(context.Request.Form["chiPhiHCNS"]));
+            m.chiPhiXuatKhau = decimal.Parse(removeSpace(context.Request.Form["chiPhiXuatKhau"]));
+            m.chiTienMatKhac = decimal.Parse(removeSpace(context.Request.Form["chiTienMatKhac"]));
+            m.cuocGuiMauKiemDinh = decimal.Parse(removeSpace(context.Request.Form["cuocGuiMauKiemDinh"]));
+            m.dsoVTXuatChoBPCtyKhac = decimal.Parse(removeSpace(context.Request.Form["dsoVTXuatChoBPCtyKhac"]));
             m.khieuNai = 0;
-            m.luongCN = decimal.Parse(context.Request.Form["luongCN"]);
-            m.luongNV = decimal.Parse(context.Request.Form["luongNV"]);
-            m.phiCDBHXHCN = decimal.Parse(context.Request.Form["phiCDBHXHCN"]);
-            m.phiCDBHXHNV = decimal.Parse(context.Request.Form["phiCDBHXHNV"]);
-            m.thuongLeTetNV = decimal.Parse(context.Request.Form["thuongLeTetNV"]);
-            m.thuongLeTetCN = decimal.Parse(context.Request.Form["thuongLeTetCN"]);
-            m.tienPheLieu = decimal.Parse(context.Request.Form["tienPheLieu"]);
+            m.luongCN = decimal.Parse(removeSpace(context.Request.Form["luongCN"]));
+            m.luongNV = decimal.Parse(removeSpace(context.Request.Form["luongNV"]));
+            m.phiCDBHXHCN = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHCN"]));
+            m.phiCDBHXHNV = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHNV"]));
+            m.thuongLeTetNV = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetNV"]));
+            m.thuongLeTetCN = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetCN"]));
+            m.tienPheLieu = decimal.Parse(removeSpace(context.Request.Form["tienPheLieu"]));
 
             m.mota = context.Request.Form["mota"];
             m.hoatdong = hd;
@@ -101,7 +108,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         var xuongId = context.Request.Form["xuongId"];
         var nam = int.Parse(context.Request.Form["nam"]);
         var thang = int.Parse(context.Request.Form["thang"]);
-        var noDauNamStr = context.Request.Form["noDauNam"];
+        var noDauNamStr = removeSpace(context.Request.Form["noDauNam"]);
         var noDauNam = string.IsNullOrEmpty(noDauNamStr) ? 0 : decimal.Parse(noDauNamStr);
 
         var lst = from o in db.rpt_tonghopdoanhthuchiphis where o.nam.Equals(nam) & o.thang.Equals(thang) select o;
@@ -117,19 +124,19 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             mnu.thang = thang;
             mnu.xuongId = xuongId;
             mnu.noDauNam = thang == 1 ? noDauNam : 0;
-            mnu.chiPhiHCNS = decimal.Parse(context.Request.Form["chiPhiHCNS"]);
-            mnu.chiPhiXuatKhau = decimal.Parse(context.Request.Form["chiPhiXuatKhau"]);
-            mnu.chiTienMatKhac = decimal.Parse(context.Request.Form["chiTienMatKhac"]);
-            mnu.cuocGuiMauKiemDinh = decimal.Parse(context.Request.Form["cuocGuiMauKiemDinh"]);
-            mnu.dsoVTXuatChoBPCtyKhac = decimal.Parse(context.Request.Form["dsoVTXuatChoBPCtyKhac"]);
+            mnu.chiPhiHCNS = decimal.Parse(removeSpace(context.Request.Form["chiPhiHCNS"]));
+            mnu.chiPhiXuatKhau = decimal.Parse(removeSpace(context.Request.Form["chiPhiXuatKhau"]));
+            mnu.chiTienMatKhac = decimal.Parse(removeSpace(context.Request.Form["chiTienMatKhac"]));
+            mnu.cuocGuiMauKiemDinh = decimal.Parse(removeSpace(context.Request.Form["cuocGuiMauKiemDinh"]));
+            mnu.dsoVTXuatChoBPCtyKhac = decimal.Parse(removeSpace(context.Request.Form["dsoVTXuatChoBPCtyKhac"]));
             mnu.khieuNai = 0;
-            mnu.luongCN = decimal.Parse(context.Request.Form["luongCN"]);
-            mnu.luongNV = decimal.Parse(context.Request.Form["luongNV"]);
-            mnu.phiCDBHXHCN = decimal.Parse(context.Request.Form["phiCDBHXHCN"]);
-            mnu.phiCDBHXHNV = decimal.Parse(context.Request.Form["phiCDBHXHNV"]);
-            mnu.thuongLeTetNV = decimal.Parse(context.Request.Form["thuongLeTetNV"]);
-            mnu.thuongLeTetCN = decimal.Parse(context.Request.Form["thuongLeTetCN"]);
-            mnu.tienPheLieu = decimal.Parse(context.Request.Form["tienPheLieu"]);
+            mnu.luongCN = decimal.Parse(removeSpace(context.Request.Form["luongCN"]));
+            mnu.luongNV = decimal.Parse(removeSpace(context.Request.Form["luongNV"]));
+            mnu.phiCDBHXHCN = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHCN"]));
+            mnu.phiCDBHXHNV = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHNV"]));
+            mnu.thuongLeTetNV = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetNV"]));
+            mnu.thuongLeTetCN = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetCN"]));
+            mnu.tienPheLieu = decimal.Parse(removeSpace(context.Request.Form["tienPheLieu"]));
             mnu.mota = context.Request.Form["mota"];
             mnu.hoatdong = hd;
             mnu.nguoitao = UserUtils.getUser(context);
