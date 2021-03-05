@@ -15,7 +15,7 @@ public partial class inc_nhaplieu_bcThopDTCP : System.Web.UI.Page
         var nowYear = DateTime.Now.Year;
         var list = new List<string>();
         list.Add(":");
-        for (var i = nowYear + 10; i >= nowYear - 10; i--)
+        for (var i = nowYear + 2; i >= 2020; i--)
         {
             list.Add(string.Format(@"{0}:{1}", i, i));
         }
