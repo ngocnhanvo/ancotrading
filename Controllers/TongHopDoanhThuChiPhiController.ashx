@@ -73,7 +73,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             m.chiTienMatKhac = decimal.Parse(context.Request.Form["chiTienMatKhac"]);
             m.cuocGuiMauKiemDinh = decimal.Parse(context.Request.Form["cuocGuiMauKiemDinh"]);
             m.dsoVTXuatChoBPCtyKhac = decimal.Parse(context.Request.Form["dsoVTXuatChoBPCtyKhac"]);
-            m.khieuNai = decimal.Parse(context.Request.Form["khieuNai"]);
+            m.khieuNai = 0;
             m.luongCN = decimal.Parse(context.Request.Form["luongCN"]);
             m.luongNV = decimal.Parse(context.Request.Form["luongNV"]);
             m.phiCDBHXHCN = decimal.Parse(context.Request.Form["phiCDBHXHCN"]);
@@ -118,7 +118,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             mnu.chiTienMatKhac = decimal.Parse(context.Request.Form["chiTienMatKhac"]);
             mnu.cuocGuiMauKiemDinh = decimal.Parse(context.Request.Form["cuocGuiMauKiemDinh"]);
             mnu.dsoVTXuatChoBPCtyKhac = decimal.Parse(context.Request.Form["dsoVTXuatChoBPCtyKhac"]);
-            mnu.khieuNai = decimal.Parse(context.Request.Form["khieuNai"]);
+            mnu.khieuNai = 0;
             mnu.luongCN = decimal.Parse(context.Request.Form["luongCN"]);
             mnu.luongNV = decimal.Parse(context.Request.Form["luongNV"]);
             mnu.phiCDBHXHCN = decimal.Parse(context.Request.Form["phiCDBHXHCN"]);
