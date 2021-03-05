@@ -115,7 +115,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         var noDauNamStr = removeSpace(context.Request.Form["noDauNam"]);
         var noDauNam = string.IsNullOrEmpty(noDauNamStr) ? 0 : decimal.Parse(noDauNamStr);
 
-        var lst = from o in db.rpt_tonghopdoanhthuchiphis where o.nam.Equals(nam) & o.thang.Equals(thang) select o;
+        var lst = from o in db.rpt_tonghopdoanhthuchiphis where o.xuongId.Equals(xuongId) & o.nam.Equals(nam) & o.thang.Equals(thang) select o;
         if (lst.Count() != 0)
         {
             jqGridHelper.Utils.writeResult(0, "Đã có code chủng loại này!");
