@@ -14,8 +14,10 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
     {
         var context = HttpContext.Current;
         sothapphan = PrintAnco2.GetDecimal(context.Request.QueryString["stp"], 1);
-        string nameTemp = "(KT) Báo cáo tổng hợp doanh thu - chi phí của xưởng.xls";
-        string nameRpt = "Báo cáo tổng hợp doanh thu - chi phí của xưởng";
+
+        var maXuong = context.Request.QueryString["maXuong"];
+        string nameTemp = "(KT) Báo cáo tổng hợp doanh thu - chi phí của xưởng " + maXuong + ".xls";
+        string nameRpt = "Báo cáo tổng hợp doanh thu - chi phí của xưởng " + maXuong;
         string sql = CreateSql(context);
 
         inPDF = "2";

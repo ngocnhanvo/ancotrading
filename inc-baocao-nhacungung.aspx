@@ -218,6 +218,7 @@
             qstring = "";
             qstring += "?nam=" + $('#namBCNCU', frmBCNCU).val();
             qstring += "&xuong=" + $('#md_doitackinhdoanh_id', frmBCNCU).val();
+            qstring += "&maXuong=" + $('#md_doitackinhdoanh_id', frmBCNCU).text();
             window.open("PrintControllers/InBaoCaoTongHopDoanhThu/rptDoanhThuChiPhiXuong.aspx" + qstring);
         }
     }
