@@ -2,6 +2,9 @@
 <%@ Register src="jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
 
 <script type="text/javascript">
+    var nowYear = <%=DateTime.Now.Year %>;
+    var nowMonth = <%=DateTime.Now.Month %>;
+
     var jsonYearEdit = "<%=jsonYear.Substring(2)%>";
     var jsonYearSearch = "<%=jsonYear%>";
 
