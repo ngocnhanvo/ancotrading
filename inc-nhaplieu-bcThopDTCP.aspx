@@ -400,7 +400,21 @@
                     //$('#nam', sel).prop('disabled', false);
                     //$('#thang', sel).prop('disabled', false);
                 },
-                afterSubmit: function(rs, postdata){
+                beforeSubmit: function(rs, postdata) {
+                    return [true,''];
+                },
+                afterSubmit: function(rs, postdata) {
+                    setTimeout(function() {
+                        let formId = '#FrmGrid_grid_ds_rpt_tonghopdoanhthuchiphi';
+                        $('#nam', formId).val(postdata.nam);
+                        $('#thang', formId).val(postdata.thang);
+                        $('#xuongId', formId).children().each(function(){
+                            if($(this).text() == postdata.xuongId)
+                            {
+                                $(this).prop('selected', true);
+                            }
+                        });
+                    }, 100);
                     return showMsgDialog(rs);
                 }
             "
