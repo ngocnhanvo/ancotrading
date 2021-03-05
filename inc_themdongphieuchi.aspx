@@ -12,7 +12,7 @@
     string c_thuchi_id = Context.Request.Form["c_thuchi_id"];
     var thuchi = db.c_thuchis.Single(c=>c.c_thuchi_id.Equals(c_thuchi_id));
     string md_doitackinhdoanh = thuchi.md_doitackinhdoanh_id;
-
+    string loaiphieu2 = "", xuongId = md_doitackinhdoanh;
     this.po.md_doitackinhdoanh_id = md_doitackinhdoanh;
     this.po.Name = "c_donhang_id";
     this.po.NullFirstItem = true;
@@ -30,7 +30,7 @@
     this.phieunhap.NullFirstItem = true;
 
     string action = Context.Request.Form["action"].ToString();
-	string value_date = "";
+    string value_date = "";
     c_chitietthuchi obj = new c_chitietthuchi();
     if (action.Equals("edit"))
     {
@@ -40,19 +40,21 @@
         this.invoice.Value = obj.c_packinginvoice_id;
         this.phieunhap.Value = obj.obj_code;
         this.loaithanhtoan.Value = obj.loaiphieu;
-		if(obj.ngaychi != null)
-			value_date = obj.ngaychi.Value.ToString("dd/MM/yyyy");
+        loaiphieu2 = obj.loaiphieu2;
+        xuongId = obj.md_doitackinhdoanh_id;
+        if (obj.ngaychi != null)
+            value_date = obj.ngaychi.Value.ToString("dd/MM/yyyy");
     }
     else {
         obj.sotien = thuchi.tienconlai;
         obj.isdatcoc = false;
     }
-	
-	string kh_id = db.md_loaidtkds.Where(s => s.ma_loaidtkd == "KH").Select(s => s.md_loaidtkd_id).FirstOrDefault();
-	string ncc_id = db.md_loaidtkds.Where(s => s.ma_loaidtkd == "NCC").Select(s => s.md_loaidtkd_id).FirstOrDefault();
-	string ncuvt_id = db.md_loaidtkds.Where(s => s.ma_loaidtkd == "NCCVT").Select(s => s.md_loaidtkd_id).FirstOrDefault();
-	string obj_loaidtkd_id = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == obj.md_doitackinhdoanh_id).Select(s => s.md_loaidtkd_id).FirstOrDefault();
-    
+
+    string kh_id = db.md_loaidtkds.Where(s => s.ma_loaidtkd == "KH").Select(s => s.md_loaidtkd_id).FirstOrDefault();
+    string ncc_id = db.md_loaidtkds.Where(s => s.ma_loaidtkd == "NCC").Select(s => s.md_loaidtkd_id).FirstOrDefault();
+    string ncuvt_id = db.md_loaidtkds.Where(s => s.ma_loaidtkd == "NCCVT").Select(s => s.md_loaidtkd_id).FirstOrDefault();
+    string obj_loaidtkd_id = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == obj.md_doitackinhdoanh_id).Select(s => s.md_loaidtkd_id).FirstOrDefault();
+
  %>
  <script>
 	$(function(){
@@ -71,13 +73,8 @@
 		<tr>
             <td>Loại</td>
             <td>
-				<%if (action.Equals("edit")) {%>
-					<select disabled id="loai" name="loai">
-				<%} else {%>
-					<select id="loai" name="loai">
-				<%}
-
-                if (obj.loai == "CK") { %>
+				<select <%= action.Equals("edit") ? "disabled" : "" %> id="loai" name="loai">
+                <% if (obj.loai == "CK") { %>
 					<option value="TM">Tiền mặt</option>				
 					<option value="CK" selected>Chuyển khoản</option>
 				<%} else { %>
@@ -87,6 +84,7 @@
                 </select>
             </td>
         </tr>
+
         <tr>
             <td>TK Nợ</td>
             <td><input type="text" name="tkno" id="tkno" value="<%=obj.tk_no %>"/></td>
@@ -293,6 +291,17 @@
                 </select>
             </td>
         </tr>
+
+        <tr>
+            <td>Loại chi trả</td>
+            <td>
+                <select id="loaiphieu2" name="loaiphieu2">
+                    <option value=""></option>
+                    <option value="VTBBPLTNK">Vật tư, bao bì, Pallet, Tem nhập kho</option>
+                    <option value="KhieuNai">Khiếu nại</option>
+                </select>
+            </td>
+        </tr>
         
         <tr id="tr_pn" style="display:none">
             <td>Chọn Phiếu nhập</td>
@@ -333,9 +342,10 @@
     <div id="ds_phieunhap-pager"></div>
 </div>
 
-    <script language="javascript">
+    <script type="text/javascript">
         $(document).ready(function () {
-            var lastSel = -1;
+            
+            let lastSel = -1;
             jQuery("#ds_phieunhap").jqGrid({
                 url:"Controllers/ChiTietPhaiChiController.ashx?action=loadPN&dtkd="+$("#dtkd").val(),
                 datatype: "xml",
@@ -432,29 +442,8 @@
 
 </form>
 
-<script language="javascript">
+<script type="text/javascript">
     $(function() {
-		/*if($("#loai").val() == "TM")
-		{
-			$("#md_doitackinhdoanh_id2").hide();
-		}
-		else if($("#loai").val() == "CK")
-		{
-			$("#md_doitackinhdoanh_id3").hide();
-		}
-		
-		$("#loai").change(function(){
-			if($("#loai").val() == "TM")
-			{
-				$("#md_doitackinhdoanh_id2").hide();
-				$("#md_doitackinhdoanh_id3").show();
-			}
-			else if($("#loai").val() == "CK")
-			{
-				$("#md_doitackinhdoanh_id3").hide();
-				$("#md_doitackinhdoanh_id2").show();
-			}
-		});*/
 	
         if ($("#loaithanhtoan").val() == "PO") {
             $("#tr_invoice").css({ "display": "none" });
@@ -496,11 +485,15 @@
             $("#grid_pb").css({ "display": "" });
         }
 
-        $("#loaithanhtoan").change(function() {
-            var sel_op = $("#loaithanhtoan").val();
+        let loaithanhtoan = $('#loaithanhtoan', '#f_thanhtoan');
+        loaithanhtoan.change(function () {
+            let sel_op = $("#loaithanhtoan").val();
+            let lp2Pr = $('#loaiphieu2', '#f_thanhtoan').parent().parent();
             $("#istiencoc").attr("disabled", false);
             $("#tr_inv").css({ "display": "none" });
             $("#tr_invoice").css({ "display": "none" });
+            lp2Pr.hide();
+
             if (sel_op == "PO") {
                 $("#tr_invoice").css({ "display": "none" });
                 $("#c_donhang_id").css({ "display": "" });
@@ -540,6 +533,8 @@
                 $("#grid_pb").css({ "display": "none" });
                 $("#istiencoc").attr("disabled", true);
 
+                lp2Pr.show();
+
             } else {
                 $("#tr_po").css({ "display": "none" });
                 $("#tr_invoice").css({ "display": "none" });
@@ -547,6 +542,10 @@
                 $("#grid_pb").css({ "display": "" });
             }
         });
+
+        $('#md_doitackinhdoanh_id2', '#f_thanhtoan').val('<%=xuongId%>');
+        $('#loaiphieu2', '#f_thanhtoan').val('<%=loaiphieu2%>');
+        loaithanhtoan.change();
     });
 
     function luuThanhToan_pc(dialog, grid) {

@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="InDoiTacKinhDoanh.aspx.cs" Inherits="PrintControllers_InDoiTacKinhDoanh_Default" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" %>
 
 <!DOCTYPE html>
 

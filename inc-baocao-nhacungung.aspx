@@ -20,6 +20,19 @@
         dt = mdbc.GetData(sql, "@manv", manv);
     }
 %>
+<style type="text/css">
+    a.nhapDuLieuChoBaoCao {
+        top: 15px;
+        position: relative;
+        font-weight: bold;
+        text-align: center;
+        width: 100%;
+        color: blue;
+        text-decoration: underline;
+        cursor: pointer;
+        user-select: none;
+    }
+</style>
 <script>
     $(document).ready(function() {
         $('#lay-center-baocaonhacungung').parent().layout({
@@ -204,8 +217,19 @@
         else if (reportid == 1002) {
             qstring = "";
             qstring += "?nam=" + $('#namBCNCU', frmBCNCU).val();
-            qstring += "?xuong=" + $('#md_doitackinhdoanh_id', frmBCNCU).val();
+            qstring += "&xuong=" + $('#md_doitackinhdoanh_id', frmBCNCU).val();
             window.open("PrintControllers/InBaoCaoTongHopDoanhThu/rptDoanhThuChiPhiXuong.aspx" + qstring);
+        }
+    }
+
+    function nhapLieuBaoCaoNCC()
+    {
+        var reportid = eval($("#report_id").val());
+        if (reportid == 1002) {
+            add_tab('Nhập liệu tổng hợp D.Thu-C.Phí', 'inc-nhaplieu-bcThopDTCP.aspx');
+        }
+        else {
+            alert('Báo cáo này không cần nhập liệu');
         }
     }
  
@@ -260,6 +284,11 @@
             </tr>
             <tr>
                 <td colspan="2">
+                    <div style="height:10px"></div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
                     <b>Chế độ xem KT : </b><i>Thời gian dựa trên ngày nhập kho và xem được phiếu Soạn Thảo</i>
                 </td>
             </tr>
@@ -271,6 +300,12 @@
             <tr>
                 <td></td>
                 <td><input style="padding:10px; font-weight: bold" type="button" name="xemketqua" id="xemketqua" value="Xem kết quả" onclick="submitRpt()"/></td>
+            </tr>
+
+            <tr>
+                <td colspan="2" style="text-align:center">
+                    <a class="nhapDuLieuChoBaoCao" onclick="nhapLieuBaoCaoNCC(this)" id="nhapLieuBaoCao">Nhập dữ liệu cho báo cáo</a>
+                </td>
             </tr>
         </table>
     </form>
