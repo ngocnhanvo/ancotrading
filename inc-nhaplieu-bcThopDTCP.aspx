@@ -261,9 +261,35 @@
             },
             {
                 fixed: true
+                , name: 'tamUngLuongCN'
+                , index: 'cl.tamUngLuongCN'
+                , label: 'Tạm ứng lương C.Nhân'
+                , width: 100
+                , edittype: 'text'
+                , editable: true
+                , hidden: false
+                , align: 'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
+            },
+            {
+                fixed: true
                 , name: 'chiTienMatKhac'
                 , index: 'cl.chiTienMatKhac'
                 , label: 'Chi Tiền Mặt Khác'
+                , width: 100
+                , edittype: 'text'
+                , editable: true
+                , hidden: false
+                , align: 'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
+            },
+            {
+                fixed: true
+                , name: 'trich20PheLieu'
+                , index: 'cl.trich20PheLieu'
+                , label: 'Trích 20% phế liệu'
                 , width: 100
                 , edittype: 'text'
                 , editable: true

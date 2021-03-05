@@ -91,8 +91,9 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             m.phiCDBHXHNV = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHNV"]));
             m.thuongLeTetNV = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetNV"]));
             m.thuongLeTetCN = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetCN"]));
+            m.tamUngLuongCN = decimal.Parse(removeSpace(context.Request.Form["tamUngLuongCN"]));
             m.tienPheLieu = decimal.Parse(removeSpace(context.Request.Form["tienPheLieu"]));
-
+            m.trich20PheLieu = decimal.Parse(removeSpace(context.Request.Form["trich20PheLieu"]));
             m.mota = context.Request.Form["mota"];
             m.hoatdong = hd;
             m.nguoicapnhat = UserUtils.getUser(context);
@@ -142,7 +143,9 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             mnu.phiCDBHXHNV = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHNV"]));
             mnu.thuongLeTetNV = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetNV"]));
             mnu.thuongLeTetCN = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetCN"]));
+            mnu.tamUngLuongCN = decimal.Parse(removeSpace(context.Request.Form["tamUngLuongCN"]));
             mnu.tienPheLieu = decimal.Parse(removeSpace(context.Request.Form["tienPheLieu"]));
+            mnu.trich20PheLieu = decimal.Parse(removeSpace(context.Request.Form["trich20PheLieu"]));
             mnu.mota = context.Request.Form["mota"];
             mnu.hoatdong = hd;
             mnu.nguoitao = UserUtils.getUser(context);
@@ -216,8 +219,8 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
                     cl.rpt_tonghopdoanhthuchiphi_id, ncc.ma_dtkd, cl.noDauNam, cl.nam, cl.thang, cl.dsoVTXuatChoBPCtyKhac, 
                     cl.tienBHXHBHLDNghiViec, cl.dienNuocRacCtyHaca, cl.nopTamUng, cl.tienPheLieu, cl.chiPhiXuatKhau,  
                     cl.chiPhiHCNS, cl.luongNV, cl.luongCN, cl.phiCDBHXHNV, cl.phiCDBHXHCN, cl.thuongLeTetNV, 
-                    cl.thuongLeTetCN, cl.chiTienMatKhac, cl.khieuNai, cl.cuocGuiMauKiemDinh, 
-                    cl.ngaytao, cl.nguoitao, cl.ngaycapnhat, cl.nguoicapnhat, cl.mota, cl.hoatdong,
+                    cl.thuongLeTetCN, cl.tamUngLuongCN, cl.chiTienMatKhac, cl.trich20PheLieu, cl.khieuNai, 
+                    cl.cuocGuiMauKiemDinh, cl.ngaytao, cl.nguoitao, cl.ngaycapnhat, cl.nguoicapnhat, cl.mota, cl.hoatdong,
                     ROW_NUMBER() OVER (ORDER BY {0}) as RowNum
                 FROM rpt_tonghopdoanhthuchiphi cl 
                 left join md_doitackinhdoanh ncc on ncc.md_doitackinhdoanh_id = cl.xuongId
@@ -262,12 +265,14 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             xml += "<cell><![CDATA[" + row[18] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[19] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[20] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[21].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[21] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[22] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row[23].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row[24] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[25] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[25].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row[26] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[27] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[28] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";
