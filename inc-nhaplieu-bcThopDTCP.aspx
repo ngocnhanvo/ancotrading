@@ -105,6 +105,45 @@
             },
             {
                 fixed: true
+                , name: 'tienBHXHBHLDNghiViec'
+                , index: 'cl.tienBHXHBHLDNghiViec'
+                , label: 'Tiền BHXH, BHLĐ, nghỉ việc'
+                , editable: true
+                , width: 100
+                , edittype: 'text'
+                , editrules: { required:true } 
+                , align: 'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
+            },
+            {
+                fixed: true
+                , name: 'dienNuocRacCtyHaca'
+                , index: 'cl.dienNuocRacCtyHaca'
+                , label: 'Điện, nước, rác cty Haca'
+                , editable: true
+                , width: 100
+                , edittype: 'text'
+                , editrules: { required:true } 
+                , align: 'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
+            },
+            {
+                fixed: true
+                , name: 'nopTamUng'
+                , index: 'cl.nopTamUng'
+                , label: 'Nộp tạm ứng'
+                , editable: true
+                , width: 100
+                , edittype: 'text'
+                , editrules: { required:true } 
+                , align: 'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
+            },
+            {
+                fixed: true
                 , name: 'tienPheLieu'
                 , label: 'Tiền Phế Liệu'
                 , index: 'cl.ta_ngan'

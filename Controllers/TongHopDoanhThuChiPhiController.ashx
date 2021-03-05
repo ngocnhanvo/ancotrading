@@ -78,6 +78,9 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             m.noDauNam = thang == 1 ? noDauNam : 0;
             m.chiPhiHCNS = decimal.Parse(removeSpace(context.Request.Form["chiPhiHCNS"]));
             m.chiPhiXuatKhau = decimal.Parse(removeSpace(context.Request.Form["chiPhiXuatKhau"]));
+            m.tienBHXHBHLDNghiViec = decimal.Parse(removeSpace(context.Request.Form["tienBHXHBHLDNghiViec"]));
+            m.dienNuocRacCtyHaca = decimal.Parse(removeSpace(context.Request.Form["dienNuocRacCtyHaca"]));
+            m.nopTamUng = decimal.Parse(removeSpace(context.Request.Form["nopTamUng"]));
             m.chiTienMatKhac = decimal.Parse(removeSpace(context.Request.Form["chiTienMatKhac"]));
             m.cuocGuiMauKiemDinh = decimal.Parse(removeSpace(context.Request.Form["cuocGuiMauKiemDinh"]));
             m.dsoVTXuatChoBPCtyKhac = decimal.Parse(removeSpace(context.Request.Form["dsoVTXuatChoBPCtyKhac"]));
@@ -126,6 +129,9 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             mnu.noDauNam = thang == 1 ? noDauNam : 0;
             mnu.chiPhiHCNS = decimal.Parse(removeSpace(context.Request.Form["chiPhiHCNS"]));
             mnu.chiPhiXuatKhau = decimal.Parse(removeSpace(context.Request.Form["chiPhiXuatKhau"]));
+            mnu.tienBHXHBHLDNghiViec = decimal.Parse(removeSpace(context.Request.Form["tienBHXHBHLDNghiViec"]));
+            mnu.dienNuocRacCtyHaca = decimal.Parse(removeSpace(context.Request.Form["dienNuocRacCtyHaca"]));
+            mnu.nopTamUng = decimal.Parse(removeSpace(context.Request.Form["nopTamUng"]));
             mnu.chiTienMatKhac = decimal.Parse(removeSpace(context.Request.Form["chiTienMatKhac"]));
             mnu.cuocGuiMauKiemDinh = decimal.Parse(removeSpace(context.Request.Form["cuocGuiMauKiemDinh"]));
             mnu.dsoVTXuatChoBPCtyKhac = decimal.Parse(removeSpace(context.Request.Form["dsoVTXuatChoBPCtyKhac"]));
@@ -208,9 +214,9 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             select * from (
                 select 
                     cl.rpt_tonghopdoanhthuchiphi_id, ncc.ma_dtkd, cl.noDauNam, cl.nam, cl.thang, cl.dsoVTXuatChoBPCtyKhac, 
-                    cl.tienPheLieu, cl.chiPhiXuatKhau, cl.chiPhiHCNS, cl.luongNV, cl.luongCN, 
-                    cl.phiCDBHXHNV, cl.phiCDBHXHCN, cl.thuongLeTetNV, cl.thuongLeTetCN, 
-                    cl.chiTienMatKhac, cl.khieuNai, cl.cuocGuiMauKiemDinh, 
+                    cl.tienPheLieu, cl.chiPhiXuatKhau, cl.tienBHXHBHLDNghiViec, cl.dienNuocRacCtyHaca, cl.nopTamUng, 
+                    cl.chiPhiHCNS, cl.luongNV, cl.luongCN, cl.phiCDBHXHNV, cl.phiCDBHXHCN, cl.thuongLeTetNV, 
+                    cl.thuongLeTetCN, cl.chiTienMatKhac, cl.khieuNai, cl.cuocGuiMauKiemDinh, 
                     cl.ngaytao, cl.nguoitao, cl.ngaycapnhat, cl.nguoicapnhat, cl.mota, cl.hoatdong,
                     ROW_NUMBER() OVER (ORDER BY {0}) as RowNum
                 FROM rpt_tonghopdoanhthuchiphi cl 
@@ -253,12 +259,15 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             xml += "<cell><![CDATA[" + row[15] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[16] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[17] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[18].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[18] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[19] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[20].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[21] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[20] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[21].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row[22] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[23] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[23].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[24] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[25] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[26] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";
