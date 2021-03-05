@@ -48,7 +48,8 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         var xuongId = context.Request.Form["xuongId"];
         var nam = int.Parse(context.Request.Form["nam"]);
         var thang = int.Parse(context.Request.Form["thang"]);
-
+        var noDauNamStr = context.Request.Form["noDauNam"];
+        var noDauNam = string.IsNullOrEmpty(noDauNamStr) ? 0 : decimal.Parse(noDauNamStr);
         var lst = (from o in db.rpt_tonghopdoanhthuchiphis
                    where
                         o.nam.Equals(nam)
@@ -67,7 +68,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             m.xuongId = xuongId;
             m.nam = nam;
             m.thang = thang;
-            m.noDauNam = decimal.Parse(context.Request.Form["noDauNam"]);
+            m.noDauNam = thang == 1 ? noDauNam : 0;
             m.chiPhiHCNS = decimal.Parse(context.Request.Form["chiPhiHCNS"]);
             m.chiPhiXuatKhau = decimal.Parse(context.Request.Form["chiPhiXuatKhau"]);
             m.chiTienMatKhac = decimal.Parse(context.Request.Form["chiTienMatKhac"]);
@@ -100,6 +101,9 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         var xuongId = context.Request.Form["xuongId"];
         var nam = int.Parse(context.Request.Form["nam"]);
         var thang = int.Parse(context.Request.Form["thang"]);
+        var noDauNamStr = context.Request.Form["noDauNam"];
+        var noDauNam = string.IsNullOrEmpty(noDauNamStr) ? 0 : decimal.Parse(noDauNamStr);
+
         var lst = from o in db.rpt_tonghopdoanhthuchiphis where o.nam.Equals(nam) & o.thang.Equals(thang) select o;
         if (lst.Count() != 0)
         {
@@ -112,7 +116,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             mnu.nam = nam;
             mnu.thang = thang;
             mnu.xuongId = xuongId;
-            mnu.noDauNam = decimal.Parse(context.Request.Form["noDauNam"]);
+            mnu.noDauNam = thang == 1 ? noDauNam : 0;
             mnu.chiPhiHCNS = decimal.Parse(context.Request.Form["chiPhiHCNS"]);
             mnu.chiPhiXuatKhau = decimal.Parse(context.Request.Form["chiPhiXuatKhau"]);
             mnu.chiTienMatKhac = decimal.Parse(context.Request.Form["chiTienMatKhac"]);
