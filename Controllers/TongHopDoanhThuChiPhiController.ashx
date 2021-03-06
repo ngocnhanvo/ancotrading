@@ -216,7 +216,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         string strsql = string.Format(@"
             select * from (
                 select 
-                    cl.rpt_tonghopdoanhthuchiphi_id, ncc.ma_dtkd, cl.noDauNam, cl.nam, cl.thang, cl.dsoVTXuatChoBPCtyKhac, 
+                    cl.rpt_tonghopdoanhthuchiphi_id, ncc.ma_dtkd, cl.nam, cl.thang, cl.noDauNam, cl.dsoVTXuatChoBPCtyKhac, 
                     cl.tienBHXHBHLDNghiViec, cl.dienNuocRacCtyHaca, cl.nopTamUng, cl.tienPheLieu, cl.chiPhiXuatKhau,  
                     cl.chiPhiHCNS, cl.luongNV, cl.luongCN, cl.phiCDBHXHNV, cl.phiCDBHXHCN, cl.thuongLeTetNV, 
                     cl.thuongLeTetCN, cl.tamUngLuongCN, cl.chiTienMatKhac, cl.trich20PheLieu, cl.khieuNai, 

@@ -69,7 +69,7 @@
     <input type="hidden" name="dtkd" id="dtkd" value="<%=md_doitackinhdoanh %>"/>
     <input type="hidden" name="ids" id="ids"/>
     <input type="hidden" name="values" id="values"/>
-    <table>
+    <table style="width: 100%;">
 		<tr>
             <td>Loại</td>
             <td>
@@ -295,10 +295,27 @@
         <tr>
             <td>Loại chi trả</td>
             <td>
-                <select id="loaiphieu2" name="loaiphieu2">
+                <select id="loaiphieu2" name="loaiphieu2" style="max-width: 200px;">
                     <option value=""></option>
-                    <option value="VTBBPLTNK">Vật tư, bao bì, Pallet, Tem nhập kho</option>
-                    <option value="KhieuNai">Khiếu nại</option>
+                    <option ncc="ANCO1,ANCO2" value="dsoVTXuatChoBPCtyKhac">D/số vật tư xuất cho các BP, các cty khác</option>
+                    <option ncc="ANCO2" value="tienBHXHBHLDNghiViec">Tiền BHXH,BHLĐ, nghỉ việc</option>
+                    <option ncc="ANCO2" value="dienNuocRacCtyHaca">Điện, nước, rác cty Haca</option>
+                    <option ncc="ANCO2" value="nopTamUng">Nộp tạm ứng</option>
+                    <option ncc="ANCO1,ANCO2" value="tienPheLieu">Tiền phế liệu</option>
+                    <option ncc="ANCO1,ANCO2" value="VTBBPLTNK">Vật tư, bao bì, Pallet, Tem nhập kho</option>
+                    <option ncc="ANCO1,ANCO2" value="chiPhiXuatKhau">Chi phí xuất khẩu</option>
+                    <option ncc="ANCO1,ANCO2" value="chiPhiHCNS">Chi phí HCNS (điện, nước, rác, photo, bảo vệ, cước điện thoại, cơm trưa, xăng xe, VPP, tạp phẩm…)</option>
+                    <option ncc="ANCO1,ANCO2" value="luongNV">Lương nhân viên</option>
+                    <option ncc="ANCO1,ANCO2" value="luongCN">Lương công nhân</option>
+                    <option ncc="ANCO1,ANCO2" value="phiCDBHXHNV">Phí CĐ và BHXH (34%) nhân viên</option>
+                    <option ncc="ANCO1,ANCO2" value="phiCDBHXHCN">Phí CĐ và BHXH (34%) công nhân</option>
+                    <option ncc="ANCO1,ANCO2" value="thuongLeTetNV">Thưởng lễ, tết nhân viên</option>
+                    <option ncc="ANCO1,ANCO2" value="thuongLeTetCN">Thưởng tết công nhân</option>
+                    <option ncc="ANCO2" value="tamUngLuongCN">Tạm ứng lương công nhân</option>
+                    <option ncc="ANCO1,ANCO2" value="chiTienMatKhac">Chi tiền mặt khác (phí kiểm hàng tre, thiết bị máy vi tính…)</option>
+                    <option ncc="ANCO2" value="trich20PheLieu">Trích 20% phế liệu</option>
+                    <option ncc="ANCO1,ANCO2" value="KhieuNai">Khiếu nại</option>
+                    <option ncc="ANCO1,ANCO2" value="cuocGuiMauKiemDinh">Cước gửi mẫu, kiểm định</option>
                 </select>
             </td>
         </tr>
@@ -543,7 +560,25 @@
             }
         });
 
-        $('#md_doitackinhdoanh_id2', '#f_thanhtoan').val('<%=xuongId%>');
+        let dtkd = $('#md_doitackinhdoanh_id2', '#f_thanhtoan');
+        dtkd.change(function () {
+            let sel = $(this).find('option:selected').text();
+            
+            $('#loaiphieu2 option', '#f_thanhtoan').each(function () {
+                let attr = $(this).attr('ncc');
+                if (typeof attr !== typeof undefined && attr !== false) {
+                    let arrAttr = attr.split(',');
+                    if (arrAttr.lastIndexOf(sel) > -1)
+                        $(this).show();
+                    else
+                        $(this).hide();
+                }
+                else {
+                    $(this).show();
+                }
+            });
+        });
+        dtkd.val('<%=xuongId%>').change();
         $('#loaiphieu2', '#f_thanhtoan').val('<%=loaiphieu2%>');
         loaithanhtoan.change();
     });

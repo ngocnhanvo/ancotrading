@@ -23,7 +23,7 @@ public partial class inc_nhaplieu_bcThopDTCP : System.Web.UI.Page
 
         list = new List<string>();
         list.Add(":");
-        for (var i = 1; i <= 12; i++)
+        for (var i = 1; i <= 1; i++)
         {
             list.Add(string.Format(@"{0}:{1}", i, i));
         }

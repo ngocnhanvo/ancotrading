@@ -45,18 +45,6 @@
                 , searchoptions:{ opt:['eq'], value: jsonXuongSearch }
                 , editrules: { required:true }
             },
-            {
-                fixed: true
-                , name: 'noDauNam'
-                , index: 'cl.noDauNam'
-                , label: 'Nợ đầu năm'
-                , editable: true
-                , width: 70
-                , edittype: 'text'
-                , align: 'right'
-                , formatter:'currency'
-                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
-            },
 			{
                 fixed: true
                 , name: 'nam'
@@ -91,10 +79,23 @@
             },
             {
                 fixed: true
+                , name: 'noDauNam'
+                , index: 'cl.noDauNam'
+                , label: 'Nợ đầu năm'
+                , editable: true
+                , width: 70
+                , edittype: 'text'
+                , align: 'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
+            },
+            {
+                fixed: true
                 , name: 'dsoVTXuatChoBPCtyKhac'
                 , index: 'cl.dsoVTXuatChoBPCtyKhac'
                 , label: 'D.Số Vật Tư xuất cho B.Phận hoặc C.Ty khác'
-                , editable: true
+                , editable: false
+                , hidden: true
                 , width: 100
                 , edittype: 'text'
                 , align: 'right'
@@ -106,7 +107,8 @@
                 , name: 'tienBHXHBHLDNghiViec'
                 , index: 'cl.tienBHXHBHLDNghiViec'
                 , label: 'Tiền BHXH, BHLĐ, nghỉ việc'
-                , editable: true
+                , editable: false
+                , hidden: true
                 , width: 100
                 , edittype: 'text' 
                 , align: 'right'
@@ -118,7 +120,8 @@
                 , name: 'dienNuocRacCtyHaca'
                 , index: 'cl.dienNuocRacCtyHaca'
                 , label: 'Điện, nước, rác cty Haca'
-                , editable: true
+                , editable: false
+                , hidden: true
                 , width: 100
                 , edittype: 'text'
                 , align: 'right'
@@ -130,7 +133,8 @@
                 , name: 'nopTamUng'
                 , index: 'cl.nopTamUng'
                 , label: 'Nộp tạm ứng'
-                , editable: true
+                , editable: false
+                , hidden: true
                 , width: 100
                 , edittype: 'text'
                 , align: 'right'
@@ -144,7 +148,8 @@
                 , index: 'cl.ta_ngan'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -156,8 +161,8 @@
                 , label: 'Chi Phí Xuất Khẩu'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -169,8 +174,8 @@
                 , label: 'Chi Phí HCNS'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -182,8 +187,8 @@
                 , label: 'Lương N.Viên'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -195,8 +200,8 @@
                 , label: 'Lương C.Nhân'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -208,8 +213,8 @@
                 , label: 'Phí C.Đoàn, BHXH của N.Viên'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -221,8 +226,8 @@
                 , label: 'Phí C.Đoàn, BHXH của C.Nhân'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -234,8 +239,8 @@
                 , label: 'Thưởng Lễ Tết N.Viên'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -247,8 +252,8 @@
                 , label: 'Thưởng Lễ Tết C.Nhân'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -260,8 +265,8 @@
                 , label: 'Tạm ứng lương C.Nhân'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -273,8 +278,8 @@
                 , label: 'Chi Tiền Mặt Khác'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -286,8 +291,8 @@
                 , label: 'Trích 20% phế liệu'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
@@ -312,8 +317,8 @@
                 , label: 'Cước Gửi Mẫu, Kiểm Định'
                 , width: 100
                 , edittype: 'text'
-                , editable: true
-                , hidden: false
+                , editable: false
+                , hidden: true
                 , align: 'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
