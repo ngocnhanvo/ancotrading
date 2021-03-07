@@ -101,30 +101,32 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             )
             insert into @tblPhieuChi
             select 
-                MONTH(tc.ngaychi) as thang,
-                (case when tc.loaiphieu2 = 'dsoVTXuatChoBPCtyKhac' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'tienBHXHBHLDNghiViec' then tc.sotien else 0 end), 
-                (case when tc.loaiphieu2 = 'dienNuocRacCtyHaca' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'nopTamUng' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'tienPheLieu' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'VTBBPLTNK' then tc.sotien else 0 end), 
-                (case when tc.loaiphieu2 = 'chiPhiXuatKhau' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'chiPhiHCNS' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'luongNV' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'luongCN' then tc.sotien else 0 end), 
-                (case when tc.loaiphieu2 = 'phiCDBHXHNV' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'phiCDBHXHCN' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'thuongLeTetNV' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'thuongLeTetCN' then tc.sotien else 0 end), 
-                (case when tc.loaiphieu2 = 'tamUngLuongCN' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'chiTienMatKhac' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'trich20PheLieu' then tc.sotien else 0 end),
-                (case when tc.loaiphieu2 = 'KhieuNai' then tc.sotien else 0 end), 
-                (case when tc.loaiphieu2 = 'cuocGuiMauKiemDinh' then tc.sotien else 0 end)
-            from c_chitietthuchi tc
+                MONTH(dtc.ngaychi) as thang,
+                (case when dtc.loaiphieu2 = 'dsoVTXuatChoBPCtyKhac' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'tienBHXHBHLDNghiViec' then dtc.sotien else 0 end), 
+                (case when dtc.loaiphieu2 = 'dienNuocRacCtyHaca' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'nopTamUng' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'tienPheLieu' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'VTBBPLTNK' then dtc.sotien else 0 end), 
+                (case when dtc.loaiphieu2 = 'chiPhiXuatKhau' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'chiPhiHCNS' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'luongNV' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'luongCN' then dtc.sotien else 0 end), 
+                (case when dtc.loaiphieu2 = 'phiCDBHXHNV' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'phiCDBHXHCN' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'thuongLeTetNV' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'thuongLeTetCN' then dtc.sotien else 0 end), 
+                (case when dtc.loaiphieu2 = 'tamUngLuongCN' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'chiTienMatKhac' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'trich20PheLieu' then dtc.sotien else 0 end),
+                (case when dtc.loaiphieu2 = 'KhieuNai' then dtc.sotien else 0 end), 
+                (case when dtc.loaiphieu2 = 'cuocGuiMauKiemDinh' then dtc.sotien else 0 end)
+            from c_chitietthuchi dtc
+				left join c_thuchi tc on tc.c_thuchi_id = dtc.c_thuchi_id
             where 
-                tc.ngaychi between @tungay and @denngay
-                and tc.md_doitackinhdoanh_id = @xuongId
+                dtc.ngaychi between @tungay and @denngay
+                and dtc.md_doitackinhdoanh_id = @xuongId
+				and tc.md_trangthai_id = 'HIEULUC'
 
             declare @tblNhapLieu table (
                 thang int, 
