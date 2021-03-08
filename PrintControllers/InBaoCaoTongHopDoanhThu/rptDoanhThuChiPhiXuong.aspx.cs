@@ -59,11 +59,13 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             insert into @tblINV
             select 
                 civ.c_packinginvoice_id, 
-                civ.totalgross * civ.phantramhoahong / 100 as tienhoahong,
+                isnull(civ.hoahongdatra, 0),
                 civ.ngay_motokhai
             from c_packinginvoice civ
-            where civ.ngay_motokhai between @tungay and @denngay
-            
+            where 
+                civ.ngay_motokhai between @tungay and @denngay
+                and civ.md_trangthai_id = 'HIEULUC'              
+
             declare @tblHoaHong table (tien decimal(18,2), thang int)
             insert into @tblHoaHong
             select civ.tienhoahong, MONTH(civ.ngay_motokhai) as thang

@@ -141,14 +141,22 @@ public static class ExcuteSignalRStatic
 
                 if (type == 0)
                 {
-                    for (var i = 0; i < 99; i++)
+                    var rgxMauSac3 = new System.Text.RegularExpressions.Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-F[0-9]-[0-9][0-9]$");
+                    if (rgxMauSac3.IsMatch(ma_sanpham)) {
+                        msLink += ma_sanpham + ".jpg";
+                        haveImg = true;
+                    }
+                    else
                     {
-                        var msCP = i < 10 ? "0" + i : i.ToString();
-                        if (File.Exists(image + kd + msCP + ".jpg"))
+                        for (var i = 0; i < 99; i++)
                         {
-                            msLink += kd + msCP + ".jpg";
-                            haveImg = true;
-                            break;
+                            var msCP = i < 10 ? "0" + i : i.ToString();
+                            if (File.Exists(image + kd + msCP + ".jpg"))
+                            {
+                                msLink += kd + msCP + ".jpg";
+                                haveImg = true;
+                                break;
+                            }
                         }
                     }
 
@@ -213,8 +221,9 @@ public static class ExcuteSignalRStatic
         string image = "";
         try
         {
-            var mimeImg = color.Substring(color.LastIndexOf("."));
-            var colorFull = string.IsNullOrEmpty(mimeImg) ? color + ".jpg" : color;
+            var indexMimeImg = color.LastIndexOf(".");
+            var colorFull = indexMimeImg <= -1 ? color + ".jpg" : color;
+            var mimeImg = colorFull.Substring(colorFull.LastIndexOf("."));
             string msLink = Public.imgProduct;
             if (color.Length >= 11)
             {

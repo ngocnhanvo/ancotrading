@@ -69,7 +69,9 @@ public partial class ReportWizard_RptKhachHang_rpt_ThongKeHoaHongPhaiTra : Syste
                     isnull(civ.hoahongdatra, 0) as DaTra,
                     civ.phantramhoahong
                 from c_packinginvoice civ
-                where civ.ngay_motokhai between @start and @end
+                where 
+                    civ.ngay_motokhai between @start and @end
+                    and civ.md_trangthai_id = 'HIEULUC'
             )civ
             inner join c_dongpklinv cdiv on civ.c_packinginvoice_id = cdiv.c_packinginvoice_id
             inner join c_donhang dh on cdiv.c_donhang_id = dh.c_donhang_id and len(dh.md_nguoilienhe_id) > 0 and isnull(dh.hoahong, 0) > 0 {2}
