@@ -197,13 +197,13 @@ public static class ExcuteSignalRStatic
                 if (rgxMauSac3.IsMatch(msp))
                 {
                     image = msp + ".jpg";
+                    image = Public.imgColor + image;
                 }
                 else
                 {
                     image = msp.Substring(0, 8) + ".jpg";
+                    image = Public.imgProduct + image;
                 }
-
-                image = Public.imgProduct + image;
 
                 if (!File.Exists(mapPathSignalR("~/" + image)))
                     image = Public.imgNotFound;
