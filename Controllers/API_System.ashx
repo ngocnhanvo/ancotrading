@@ -101,7 +101,7 @@ public class API_System : IHttpHandler {
     public void loadImageProduct(HttpContext context)
     {
         var msp = context.Request.QueryString["msp"];
-        var path = ExcuteSignalRStatic.getImageColor(msp);
+        var path = ExcuteSignalRStatic.getImageProduct(msp);
         //throw new ArgumentNullException(msp);
         var url = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
         var lastIndex = url.LastIndexOf(".");

@@ -193,13 +193,14 @@ public static class ExcuteSignalRStatic
                 image = msLink + kd + ms + ".jpg";
             else
             {
-                if (!msp.Contains("-F"))
+                var rgxMauSac3 = new System.Text.RegularExpressions.Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-F[0-9]-[0-9][0-9]$");
+                if (rgxMauSac3.IsMatch(msp))
                 {
-                    image = msp.Substring(0, 8) + ".jpg";
+                    image = msp + ".jpg";
                 }
                 else
                 {
-                    image = msp.Substring(0, 11) + ".jpg";
+                    image = msp.Substring(0, 8) + ".jpg";
                 }
 
                 image = Public.imgProduct + image;
