@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiXuong : System.Web.UI.Page
+public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuXuongTheoNam : System.Web.UI.Page
 {
     public string logo = "", sothapphan = "", inPDF = "";
     public InfoPrint infoPrint = PrintAnco2.GetInfoPrint();
@@ -16,8 +16,8 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
         sothapphan = PrintAnco2.GetDecimal(context.Request.QueryString["stp"], 1);
 
         var maXuong = context.Request.QueryString["maXuong"];
-        string nameTemp = "(KT) Báo cáo tổng hợp doanh thu - chi phí của xưởng " + maXuong + ".xls";
-        string nameRpt = "Báo cáo tổng hợp doanh thu - chi phí của xưởng " + maXuong;
+        string nameTemp = "(KT) Báo cáo tổng hợp doanh thu - chi phí theo năm của xưởng " + maXuong + ".xls";
+        string nameRpt = "Báo cáo tổng hợp doanh thu - chi phí theo năm của xưởng " + maXuong;
         string sql = CreateSql(context);
 
         inPDF = "2";
@@ -127,8 +127,8 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
 				left join c_thuchi tc on tc.c_thuchi_id = dtc.c_thuchi_id
             where 
                 dtc.ngaychi between @tungay and @denngay
-                and dtc.md_doitackinhdoanh_id = @xuongId
-				and tc.md_trangthai_id = 'HIEULUC'
+                and dtc.dtkd_id_ThuChi = @xuongId
+				--and tc.md_trangthai_id = 'HIEULUC'
 
             declare @tblNhapLieu table (
                 thang int, 

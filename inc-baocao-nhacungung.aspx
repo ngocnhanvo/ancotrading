@@ -21,8 +21,7 @@
     }
 %>
 <style type="text/css">
-    a.nhapDuLieuChoBaoCao {
-        top: 15px;
+    a#nhapDuLieuChoBaoCao {
         position: relative;
         font-weight: bold;
         text-align: center;
@@ -31,6 +30,10 @@
         text-decoration: underline;
         cursor: pointer;
         user-select: none;
+    }
+
+    td.td100 {
+        width: 100px;
     }
 </style>
 <script>
@@ -88,6 +91,9 @@
         let namDisplay = $('#namBCNCU', frmID).parent().parent();
         let tungayDisplay = $('#tungayBCNCU', frmID).parent().parent();
         let denngayDisplay = $('#denngayBCNCU', frmID).parent().parent();
+        let loaiBaoCaoDisplay = $('#loaiBaoCao', frmID).parent().parent();
+
+        let cheDoXemBThoacKT = $('.cheDoXemBThoacKT');
 
         let ncuDisplayFilter = function (filter) {
             $('#md_doitackinhdoanh_id option', frmID).each(function () {
@@ -103,6 +109,9 @@
         }
 
         namDisplay.hide();
+        loaiBaoCaoDisplay.hide();
+
+        cheDoXemBThoacKT.hide();
         tungayDisplay.show();
         denngayDisplay.show();
         ncuDisplay.show();
@@ -119,6 +128,7 @@
                 $('#lblReportNameNCU').html("Báo cáo phí cộng trừ theo nhà cung ứng");
                 break;
             case 1002:
+                loaiBaoCaoDisplay.show();
                 namDisplay.show();
                 tungayDisplay.hide();
                 denngayDisplay.hide();
@@ -132,6 +142,7 @@
                 $('#lblReportNameNCU').html("Tổng tiền hàng đã nhập");
                 break;
             case 2:
+                cheDoXemBThoacKT.show();
                 $('#lblReportNameNCU').html("Tổng hợp tiền hàng đã nhập chi tiết");
                 break;
             case 3:
@@ -219,7 +230,18 @@
             qstring += "?nam=" + $('#namBCNCU', frmBCNCU).val();
             qstring += "&xuong=" + $('#md_doitackinhdoanh_id', frmBCNCU).val();
             qstring += "&maXuong=" + $('#md_doitackinhdoanh_id option:selected', frmBCNCU).text();
-            window.open("PrintControllers/InBaoCaoTongHopDoanhThu/rptDoanhThuChiPhiXuong.aspx" + qstring);
+
+            let lbc = $('#loaiBaoCao', frmBCNCU).val();
+            let url = '';
+            if (lbc == 'DTCPtheoNam')
+                url = "PrintControllers/InBaoCaoTongHopDoanhThu/rptDoanhThuChiPhiXuongTheoNam.aspx" + qstring;
+            else if (lbc == 'DTCPtheoThang')
+                url = "PrintControllers/InBaoCaoTongHopDoanhThu/rptDoanhThuChiPhiXuongTheoThang.aspx" + qstring;
+            else if (lbc == 'DTtheoNam')
+                url = "PrintControllers/InBaoCaoTongHopDoanhThu/rptDoanhThuXuongTheoNam.aspx" + qstring;
+            else if (lbc == 'DTtheoThang')
+                url = "PrintControllers/InBaoCaoTongHopDoanhThu/rptDoanhThuXuongTheoThang.aspx" + qstring;
+            window.open(url);
         }
     }
 
@@ -247,20 +269,30 @@
     <div id="filter" style="display:none;">
     <input type="hidden" name="report_id" id="report_id"/>
     <form id="frmBCNCU">
-        <table>
+        <table style="padding: 5px 10px 5px 10px;">
             <tr>
                 <td colspan="2"><h3 style="font-size:18px; padding:5px" id="lblReportNameNCU"></h3></td>
             </tr>
             <tr>
-                <td>Từ ngày</td>
+                <td class="td100">Loại báo cáo</td>
+                <td>
+                    <select id="loaiBaoCao">
+                        <option rpId="1002" value="DTCPtheoNam">Doanh thu và chi phí theo năm</option>
+                        <option rpId="1002" value="DTCPtheoThang">Doanh thu và chi phí theo tháng</option>
+                        <option rpId="1002" value="DTtheoNam">Doanh Thu theo năm</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="td100">Từ ngày</td>
                 <td><input type="text" name="tungay" id="tungayBCNCU"/></td>
             </tr>
             <tr>
-                <td>Đến ngày</td>
+                <td class="td100">Đến ngày</td>
                 <td><input type="text" name="denngay" id="denngayBCNCU"/></td>
             </tr>
             <tr>
-                <td>Chọn năm</td>
+                <td class="td100">Chọn năm</td>
                 <td>
                     <select name="nam" id="namBCNCU">
                         <% for (int i = DateTime.Now.Year + 10; i >= DateTime.Now.Year - 10; i--)
@@ -271,11 +303,11 @@
                 </td>
             </tr>
             <tr>
-                <td>Chọn NCU</td>
+                <td class="td100">Chọn NCU</td>
                 <td><uc3:Cbm id="doitackinhdoanh" runat="server"/></td>
             </tr>
-            <tr>
-                <td>Chọn chế độ xem</td>
+            <tr class="cheDoXemBThoacKT">
+                <td class="td100">Chọn chế độ xem</td>
                 <td>
                     <select id="chedoxem">
                         <option value="">Bình thường</option>
@@ -289,8 +321,9 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="2">
-                    <b>Chế độ xem KT : </b><i>Thời gian dựa trên ngày nhập kho và xem được phiếu Soạn Thảo</i>
+                <td></td>
+                <td>
+                    <input style="padding:10px; font-weight: bold" type="button" name="xemketqua" id="xemketqua" value="Xem kết quả" onclick="submitRpt()"/>
                 </td>
             </tr>
             <tr>
@@ -299,13 +332,19 @@
                 </td>
             </tr>
             <tr>
-                <td></td>
-                <td><input style="padding:10px; font-weight: bold" type="button" name="xemketqua" id="xemketqua" value="Xem kết quả" onclick="submitRpt()"/></td>
+                <td class="td100"></td>
+                <td>
+                    <a onclick="nhapLieuBaoCaoNCC(this)" id="nhapDuLieuChoBaoCao">Nhập dữ liệu cho báo cáo</a>
+                </td>
             </tr>
-
-            <tr>
-                <td colspan="2" style="text-align:center">
-                    <a class="nhapDuLieuChoBaoCao" onclick="nhapLieuBaoCaoNCC(this)" id="nhapLieuBaoCao">Nhập dữ liệu cho báo cáo</a>
+            <tr class="cheDoXemBThoacKT">
+                <td colspan="2">
+                    <div style="height:10px"></div>
+                </td>
+            </tr>
+            <tr class="cheDoXemBThoacKT">
+                <td colspan="2">
+                    <b>Chế độ xem KT : </b><i>Thời gian dựa trên ngày nhập kho và xem được phiếu Soạn Thảo</i>
                 </td>
             </tr>
         </table>

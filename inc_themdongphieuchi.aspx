@@ -8,11 +8,11 @@
 <%@ Register Src="PhieuNhap.ascx" TagName="Cbm" TagPrefix="uc4" %>
 
 <%
-    LinqDBDataContext db = new LinqDBDataContext();
+    var db = new LinqDBDataContext();
     string c_thuchi_id = Context.Request.Form["c_thuchi_id"];
     var thuchi = db.c_thuchis.Single(c=>c.c_thuchi_id.Equals(c_thuchi_id));
     string md_doitackinhdoanh = thuchi.md_doitackinhdoanh_id;
-    string loaiphieu2 = "", xuongId = md_doitackinhdoanh;
+    string loaiphieu2 = "", xuongId = md_doitackinhdoanh, xuongVal = thuchi.doitacValue;
     this.po.md_doitackinhdoanh_id = md_doitackinhdoanh;
     this.po.Name = "c_donhang_id";
     this.po.NullFirstItem = true;
@@ -31,7 +31,7 @@
 
     string action = Context.Request.Form["action"].ToString();
     string value_date = "";
-    c_chitietthuchi obj = new c_chitietthuchi();
+    var obj = new c_chitietthuchi();
     if (action.Equals("edit"))
     {
         string line_id = Context.Request.Form["line_id"].ToString();
@@ -42,6 +42,7 @@
         this.loaithanhtoan.Value = obj.loaiphieu;
         loaiphieu2 = obj.loaiphieu2;
         xuongId = obj.md_doitackinhdoanh_id;
+        //xuongVal = obj.dtkd_val_ThuChi;
         if (obj.ngaychi != null)
             value_date = obj.ngaychi.Value.ToString("dd/MM/yyyy");
     }
@@ -560,25 +561,22 @@
             }
         });
 
-        let dtkd = $('#md_doitackinhdoanh_id2', '#f_thanhtoan');
-        dtkd.change(function () {
-            let sel = $(this).find('option:selected').text();
-            
-            $('#loaiphieu2 option', '#f_thanhtoan').each(function () {
-                let attr = $(this).attr('ncc');
-                if (typeof attr !== typeof undefined && attr !== false) {
-                    let arrAttr = attr.split(',');
-                    if (arrAttr.lastIndexOf(sel) > -1)
-                        $(this).show();
-                    else
-                        $(this).hide();
-                }
-                else {
+        let sel = '<%=xuongVal%>';    
+        $('#loaiphieu2 option', '#f_thanhtoan').each(function () {
+            let attr = $(this).attr('ncc');
+            if (typeof attr !== typeof undefined && attr !== false) {
+                let arrAttr = attr.split(',');
+                if (arrAttr.lastIndexOf(sel) > -1)
                     $(this).show();
-                }
-            });
+                else
+                    $(this).hide();
+            }
+            else {
+                $(this).show();
+            }
         });
-        dtkd.val('<%=xuongId%>').change();
+
+        $('#md_doitackinhdoanh_id2', '#f_thanhtoan').val('<%=xuongId%>').change();
         $('#loaiphieu2', '#f_thanhtoan').val('<%=loaiphieu2%>');
         loaithanhtoan.change();
     });
@@ -612,6 +610,4 @@
                 }
             }); 
     }
-
-
 </script> 

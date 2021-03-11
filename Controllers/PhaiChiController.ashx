@@ -23,7 +23,7 @@ public class PhaiChiController : IHttpHandler
             case "getoption":
                 this.getSelectOption(context);
                 break;
-			case "chitudong":
+            case "chitudong":
                 this.ChiTuDong(context);
                 break;
             case "getdoitac":
@@ -54,9 +54,9 @@ public class PhaiChiController : IHttpHandler
                 break;
         }
     }
-	
-	//nhan-chitudong
-	public void Getdoitac(HttpContext context)
+
+    //nhan-chitudong
+    public void Getdoitac(HttpContext context)
     {
         string select = "<select>";
         foreach (md_doitackinhdoanh dtkd in db.md_doitackinhdoanhs.ToList().OrderBy(p => p.ma_dtkd))
@@ -103,9 +103,9 @@ public class PhaiChiController : IHttpHandler
             return 0;
         else
             return t;
-            
+
     }
-    
+
     public void ChiTuDong(HttpContext context)
     {
         try
@@ -116,17 +116,17 @@ public class PhaiChiController : IHttpHandler
             { hd = true; }*/
 
             md_sochungtu sochungtu = db.md_sochungtus.Single(s => s.tiento.Equals("PC"));
-			string dtkd = context.Request.Form["md_doitackinhdoanh_id"];
-			string ma_dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dtkd).Select(s => s.ma_dtkd).FirstOrDefault();
+            string dtkd = context.Request.Form["md_doitackinhdoanh_id"];
+            string ma_dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dtkd).Select(s => s.ma_dtkd).FirstOrDefault();
             string sphieu = sochungtu.tiento + "/" + sochungtu.so_duocgan + "/" + sochungtu.hauto;
             bool check = (bool)mdbc.ExecuteScalarProcedure("p_kiemtragiaodich", "@date", (DateTime.ParseExact(context.Request.Form["ngaylapphieu"], "dd/MM/yyyy", null)).ToString("MM/dd/yyyy"), "@md_doitackinhdoanh_id", dtkd);
             DateTime nbd = DateTime.ParseExact(context.Request.Form["tungay"], "dd/MM/yyyy", null);
             DateTime nkt = DateTime.ParseExact(context.Request.Form["denngay"], "dd/MM/yyyy", null);
             if(ma_dtkd == "")
-			{
-				jqGridHelper.Utils.writeResult(0, "Lỗi:Chưa chọn Đối tác");
-			}
-			else if (check.Equals(true))
+            {
+                jqGridHelper.Utils.writeResult(0, "Lỗi:Chưa chọn Đối tác");
+            }
+            else if (check.Equals(true))
             {
                 //dtkd = context.Request.Form["md_doitackinhdoanh_id"];
                 var chitietcackhoan = from c in db.c_nhapxuats
@@ -144,7 +144,7 @@ public class PhaiChiController : IHttpHandler
                                           sochungtu = c.sophieu,
                                           sodonhang = p.sochungtu,
                                           thanhtien = c.grandtotal,
-                                          datra = 
+                                          datra =
                                           (from k in db.c_chitietthuchis.ToList()
                                            where k.obj_code == c.c_nhapxuat_id
                                            select new { sotien = k.sotien }).Sum(t => t.sotien.Value)
@@ -160,13 +160,13 @@ public class PhaiChiController : IHttpHandler
                                            sodonhang = c.sodonhang,
                                            thanhtien = c.thanhtien,
                                            datra = c.datra.ToString(),
-                             //              conlaiphaitra = c.thanhtien - isnull(c.datra)
+                                           //              conlaiphaitra = c.thanhtien - isnull(c.datra)
                                        };
 
 
                 var sotien = mdbc.ExecuteScalar("select [dbo].[getTIENCHITUDONG]('" + dtkd + "','"+ nbd.ToString("MM/dd/yyyy") +"','"+ nkt.ToString("MM/dd/yyyy") +"')");
-               
-                
+
+
                 c_thuchi mnu = new c_thuchi();
                 string c_thuchi_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss"));
                 mnu.c_thuchi_id = c_thuchi_id;
@@ -181,8 +181,8 @@ public class PhaiChiController : IHttpHandler
                 // mnu.lydo = context.Request.Form["lydo"];
                 mnu.loaiphieu = context.Request.Form["loaiphieu"];
                 mnu.sochungtu = context.Request.Form["sochungtu"];
-				
-				string ma_iso = db.md_dongtiens.Where(s => s.md_dongtien_id == context.Request.Form["md_dongtien_id"]).Select(s => s.ma_iso).FirstOrDefault();
+
+                string ma_iso = db.md_dongtiens.Where(s => s.md_dongtien_id == context.Request.Form["md_dongtien_id"]).Select(s => s.ma_iso).FirstOrDefault();
                 if (ma_iso == "VND")
                 {
                     mnu.quydoi_vnd = mnu.sotien;
@@ -197,7 +197,7 @@ public class PhaiChiController : IHttpHandler
                 mnu.tongkhoanphi = 0;
                 mnu.tienconlai = 0;
                 // mnu.md_trangthai_id = context.Request.Form["SOANTHAO"];'
-				string md_loaichungtu_id = db.md_loaichungtus.Where(s => s.kieu_doituong == "PT").Select(s => s.md_loaichungtu_id).FirstOrDefault();
+                string md_loaichungtu_id = db.md_loaichungtus.Where(s => s.kieu_doituong == "PT").Select(s => s.md_loaichungtu_id).FirstOrDefault();
                 mnu.md_loaichungtu_id = md_loaichungtu_id;
                 mnu.ispaymentin = false;
                 mnu.md_trangthai_id = "SOANTHAO";
@@ -266,11 +266,11 @@ public class PhaiChiController : IHttpHandler
             }
             else
             {
-                 jqGridHelper.Utils.writeResult(0, e.Message);
+                jqGridHelper.Utils.writeResult(0, e.Message);
             }
         }
     }
-	//end nhan-chitudong
+    //end nhan-chitudong
     public void ActivePhieuChi(HttpContext context)
     {
         String id = context.Request.QueryString["id"];
@@ -279,24 +279,24 @@ public class PhaiChiController : IHttpHandler
         if (thuchi != null)
         {
             if (thuchi.md_trangthai_id.Equals("SOANTHAO"))
-	        {
+            {
                 if (thuchi.sotien.Value >= sum_detail)
                 {
-					thuchi.md_trangthai_id = "HIEULUC";
+                    thuchi.md_trangthai_id = "HIEULUC";
                     db.SubmitChanges();
                     string sql = "select distinct c_packinginvoice_id from c_chitietthuchi where c_thuchi_id = '" + id + "'";
                     DataTable data = mdbc.GetData(sql);
                     foreach (DataRow item in data.Rows)
                     {
                         mdbc.ExcuteNonQuery("update c_packinginvoice set ngaycapnhat = getdate() where c_packinginvoice_id = N'"+item[0].ToString() +"'");
-					}
+                    }
                     context.Response.Write("Hiệu lực phiếu chi thành công.");
                 }
                 else
                 {
                     context.Response.Write("Số tiền phân bổ ở các dòng không được lớn hơn số tiền trên phiếu chi.");
                 }
-                
+
             }else
             {
                 context.Response.Write("Phiếu chi đang ở trạng thái hiệu lực.");
@@ -318,11 +318,11 @@ public class PhaiChiController : IHttpHandler
     {
         //String h = context.Request.Form["hoatdong"].ToLower();
         bool hd = false;
-		string md_doitackinhdoanh_id= context.Request.Form["md_doitackinhdoanh_id"];
+        string md_doitackinhdoanh_id= context.Request.Form["md_doitackinhdoanh_id"];
         /*if (h.Equals("on") || h.Equals("true"))
         { hd = true; }*/
         bool check = (bool)mdbc.ExecuteScalarProcedure("p_kiemtragiaodich", "@date", (DateTime.ParseExact(context.Request.Form["ngaylapphieu"], "dd/MM/yyyy", null)).ToString("MM/dd/yyyy")
-		,"@md_doitackinhdoanh_id", md_doitackinhdoanh_id);
+        ,"@md_doitackinhdoanh_id", md_doitackinhdoanh_id);
         if (check.Equals(true))
         {
             c_thuchi mnu = db.c_thuchis.Single(p => p.c_thuchi_id == context.Request.Form["id"]);
@@ -365,23 +365,29 @@ public class PhaiChiController : IHttpHandler
     {
         //try
         {
-            //String h = context.Request.Form["hoatdong"].ToLower();
             bool hd = false;
-            /*f (h.Equals("on") || h.Equals("true"))
-            { hd = true; }*/
-			string md_doitackinhdoanh_id= context.Request.Form["md_doitackinhdoanh_id"];
+            string md_doitackinhdoanh_id= context.Request.Form["md_doitackinhdoanh_id"];
             md_sochungtu sochungtu = db.md_sochungtus.Single(s => s.tiento.Equals("PC"));
             string sphieu = sochungtu.tiento + "/" + sochungtu.so_duocgan + "/" + sochungtu.hauto;
-            //bool check = (bool)mdbc.ExecuteScalarProcedure("p_kiemtragiaodich", "@date", (DateTime.ParseExact(context.Request.Form["ngaylapphieu"], "dd/MM/yyyy", null)).ToString("MM/dd/yyyy"));
             bool check = (bool)mdbc.ExecuteScalarProcedure("p_kiemtragiaodich", "@date", (DateTime.ParseExact(context.Request.Form["ngaylapphieu"], "dd/MM/yyyy", null)).ToString("MM/dd/yyyy")
-			,"@md_doitackinhdoanh_id", md_doitackinhdoanh_id);
-			
-			if (check.Equals(true))
+            ,"@md_doitackinhdoanh_id", md_doitackinhdoanh_id);
+
+            if (check.Equals(true))
             {
-                c_thuchi mnu = new c_thuchi();
+                string dtkdId = context.Request.Form["md_doitackinhdoanh_id"];
+                var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dtkdId).FirstOrDefault();
+                var idVal = new string[] { "", "" };
+                if(dtkd == null)
+                {
+                    idVal[0] = dtkd.md_doitackinhdoanh_id;
+                    idVal[1] = dtkd.ma_dtkd;
+                }
+
+                var mnu = new c_thuchi();
                 mnu.c_thuchi_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss"));
                 mnu.sophieu = sphieu;
-                mnu.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
+                mnu.md_doitackinhdoanh_id = idVal[0];
+                mnu.doitacValue = idVal[1];
                 mnu.ngaylapphieu = DateTime.ParseExact(context.Request.Form["ngaylapphieu"], "dd/MM/yyyy", null);
                 mnu.nguoi_giaonop = context.Request.Form["nguoi_giaonop"];
                 mnu.ngay_giaonop = DateTime.ParseExact(context.Request.Form["ngay_giaonop"], "dd/MM/yyyy", null);
@@ -397,7 +403,7 @@ public class PhaiChiController : IHttpHandler
                 mnu.tongkhoanphi = 0;
                 mnu.tienconlai = 0;
                 mnu.md_trangthai_id = context.Request.Form["SOANTHAO"];
-				string md_loaichungtu_id = db.md_loaichungtus.Where(s => s.kieu_doituong == "PT").Select(s => s.md_loaichungtu_id).FirstOrDefault();
+                string md_loaichungtu_id = db.md_loaichungtus.Where(s => s.kieu_doituong == "PT").Select(s => s.md_loaichungtu_id).FirstOrDefault();
                 mnu.md_loaichungtu_id = md_loaichungtu_id;
                 mnu.ispaymentin = false;
                 mnu.md_trangthai_id = "SOANTHAO";
@@ -418,8 +424,8 @@ public class PhaiChiController : IHttpHandler
                 jqGridHelper.Utils.writeResult(0, "Không thể thêm giao dịch vào kỳ kế toán đã đóng!");
             }
         }
-		//catch(Exception e)
-		{
+        //catch(Exception e)
+        {
             //jqGridHelper.Utils.writeResult(0, e.Message);
         }
     }
@@ -436,7 +442,7 @@ public class PhaiChiController : IHttpHandler
                 String delThuChi = "delete c_thuchi where c_thuchi_id = @c_thuchi_id";
                 String delCT = "delete c_chitietthuchi where c_thuchi_id = @c_thuchi_id";
                 mdbc.ExcuteNonQuery(delCT, "@c_thuchi_id", id);
-                mdbc.ExcuteNonQuery(delThuChi, "@c_thuchi_id", id);      
+                mdbc.ExcuteNonQuery(delThuChi, "@c_thuchi_id", id);
             }
             else {
                 jqGridHelper.Utils.writeResult(0, "Không thể xóa phiếu chi đang hiệu lực.!");
@@ -451,8 +457,8 @@ public class PhaiChiController : IHttpHandler
     {
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
-		
-		//// filter
+
+        //// filter
         String filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
         if (_search)
@@ -461,7 +467,7 @@ public class PhaiChiController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-		
+
         String sqlCount = "SELECT COUNT(*) AS count FROM c_thuchi tc, md_doitackinhdoanh dtkd, md_dongtien dt, md_loaichungtu lct " +
             " WHERE tc.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " +
             " AND tc.md_dongtien_id = dt.md_dongtien_id " +
@@ -491,23 +497,23 @@ public class PhaiChiController : IHttpHandler
         {
             sidx = "tc.c_thuchi_id";
         }
-        
+
         string strsql = "select * from( " +
             " select tc.c_thuchi_id, tc.md_trangthai_id, tc.sophieu,  " +
             " dtkd.ma_dtkd, tc.ngaylapphieu, tc.nguoi_giaonop, " +
-	        " tc.ngay_giaonop, tc.sotien, " +
-	        " dt.ma_iso, tc.tygia, " +
-	        " tc.lydo, tc.loaiphieu, " +
-	        " tc.sochungtu, tc.quydoi_vnd, " +
-	        " tc.tk_no, tc.tk_co, " +
-	        " tc.tk_quy, tc.so_dadinhkhoan, " +
-	        " tc.so_chuadinhkhoan, tc.so_dachiphi, tc.ispaymentin," +
+            " tc.ngay_giaonop, tc.sotien, " +
+            " dt.ma_iso, tc.tygia, " +
+            " tc.lydo, tc.loaiphieu, " +
+            " tc.sochungtu, tc.quydoi_vnd, " +
+            " tc.tk_no, tc.tk_co, " +
+            " tc.tk_quy, tc.so_dadinhkhoan, " +
+            " tc.so_chuadinhkhoan, tc.so_dachiphi, tc.ispaymentin," +
             " lct.tenchungtu, tc.tongcackhoan, tc.tongkhoanphi, tc.tienconlai," +
             " tc.ngaytao, tc.nguoitao, tc.ngaycapnhat, tc.nguoicapnhat, tc.mota, tc.hoatdong, " +
             " ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
             " FROM c_thuchi tc, md_doitackinhdoanh dtkd, md_dongtien dt, md_loaichungtu lct " +
             " WHERE tc.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " +
-	        " AND tc.md_dongtien_id = dt.md_dongtien_id " +
+            " AND tc.md_dongtien_id = dt.md_dongtien_id " +
             " AND tc.md_loaichungtu_id = lct.md_loaichungtu_id " +
             " AND tc.ispaymentin = 0 " + filter +
             ")P WHERE RowNum > @start AND RowNum < @end";
