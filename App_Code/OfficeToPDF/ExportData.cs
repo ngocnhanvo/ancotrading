@@ -162,66 +162,71 @@ namespace OfficeToPDF
                     }
                     catch { }
 
-
-                    for (var col = 0; col <= maxColumn; col++)
+                    var rowI = s1.GetRow(i);
+                    if (rowI != null)
                     {
-                        var cell = s1.GetRow(i).GetCell(col);
-                        if (i == 0)
+                        for (var col = 0; col <= maxColumn; col++)
                         {
-                            string commentCol = "";
-                            try
+                            var cell = rowI.GetCell(col);
+                            if (i == 0)
                             {
-                                commentCol = cell.CellComment.String.String;
-                            }
-                            catch { }
-
-                            if (commentCol.StartsWith("autoFit"))
-                            {
-                                lstAutoSizeColumn.Add(col);
-                                cell.RemoveCellComment();
-                            }
-                        }
-
-                        if (cell.CellType == CellType.String)
-                        {
-                            if (!findlogo)
-                            {
-
-                                var cellTxt = cell.StringCellValue;
-                                if (cellTxt.StartsWith("{logo}"))
+                                string commentCol = "";
+                                try
                                 {
-                                    lstImage.Add(new AvariablePrj.lstImage()
-                                    {
-                                        column = col,
-                                        columnLast = col,
-                                        row = i,
-                                        rowLast = i,
-                                        link = context.Server.MapPath(config.logo.Substring(0, config.logo.LastIndexOf("?")))
-                                    });
-                                    findlogo = true;
+                                    commentCol = cell.CellComment.String.String;
+                                }
+                                catch { }
+
+                                if (commentCol.StartsWith("autoFit"))
+                                {
+                                    lstAutoSizeColumn.Add(col);
+                                    cell.RemoveCellComment();
                                 }
                             }
 
-                            if (cell.StringCellValue.LastIndexOf("{!") > -1)
+                            if (cell != null)
                             {
-                                string commentCol = "level0";
-                                try { commentCol = cell.CellComment.String.String; cell.RemoveCellComment(); } catch { }
-
-                                string cellFormula = cell.StringCellValue.Replace("{!", "").Replace("}", "");
-                                cell.SetCellFormula(cellFormula);
-                                cell.SetCellType(CellType.Formula);
-
-                                lstFormula.Add(new AvariablePrj.lstFormula()
+                                if (cell.CellType == CellType.String)
                                 {
-                                    row = i + 1,
-                                    col = col + 1,
-                                    levelFML = int.Parse(commentCol.Replace("level","")),
-                                    formula = cellFormula
-                                });
+                                    if (!findlogo)
+                                    {
+
+                                        var cellTxt = cell.StringCellValue;
+                                        if (cellTxt.StartsWith("{logo}"))
+                                        {
+                                            lstImage.Add(new AvariablePrj.lstImage()
+                                            {
+                                                column = col,
+                                                columnLast = col,
+                                                row = i,
+                                                rowLast = i,
+                                                link = context.Server.MapPath(config.logo.Substring(0, config.logo.LastIndexOf("?")))
+                                            });
+                                            findlogo = true;
+                                        }
+                                    }
+
+                                    if (cell.StringCellValue.LastIndexOf("{!") > -1)
+                                    {
+                                        string commentCol = "level0";
+                                        try { commentCol = cell.CellComment.String.String; cell.RemoveCellComment(); } catch { }
+
+                                        string cellFormula = cell.StringCellValue.Replace("{!", "").Replace("}", "");
+                                        cell.SetCellFormula(cellFormula);
+                                        cell.SetCellType(CellType.Formula);
+
+                                        lstFormula.Add(new AvariablePrj.lstFormula()
+                                        {
+                                            row = i + 1,
+                                            col = col + 1,
+                                            levelFML = int.Parse(commentCol.Replace("level", "")),
+                                            formula = cellFormula
+                                        });
+                                    }
+                                }
                             }
                         }
                     }
-                    
                     
                     if (comment.StartsWith("sizePDF:"))
                     {
@@ -287,7 +292,9 @@ namespace OfficeToPDF
                 var rowsAboveFooter = new List<float>();
                 for (var iGH = rowFTCP.row.RowNum + 1; iGH <= s1.LastRowNum; iGH++)
                 {
-                    rowsAboveFooter.Add(s1.GetRow(iGH).HeightInPoints);
+                    var rowIGH = s1.GetRow(iGH);
+                    if(rowIGH != null)
+                        rowsAboveFooter.Add(s1.GetRow(iGH).HeightInPoints);
                 }
 
                 int rowAddGHeader = 0, totalRow = 0;
@@ -443,8 +450,12 @@ namespace OfficeToPDF
                 var roWsAboveAt = rowsAboveFooter.Count + atFooter;
                 for(var i = atFooter + 1; i <= roWsAboveAt; i++)
                 {
-                    var atPre = i - (atFooter + 1);
-                    s1.GetRow(i).HeightInPoints = rowsAboveFooter[atPre];
+                    var rowI = s1.GetRow(i);
+                    if (rowI != null)
+                    {
+                        var atPre = i - (atFooter + 1);
+                        rowI.HeightInPoints = rowsAboveFooter[atPre];
+                    }
                 }
 
                 printCf.hssfworkbook = hssfwb;
@@ -647,7 +658,9 @@ namespace OfficeToPDF
             rowCP.cells = new List<ICell>();
             for (var iCol = 0; iCol <= maxColumn; iCol++)
             {
-                rowCP.cells.Add(rowCP.row.GetCell(iCol));
+                var cell = rowCP.row.GetCell(iCol);
+                if (cell != null)
+                    rowCP.cells.Add(cell);
             }
             var defaultHeightFT = rowCP.row.HeightInPoints;
 

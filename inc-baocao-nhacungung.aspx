@@ -89,6 +89,7 @@
         let frmID = '#frmBCNCU';
         let ncuDisplay = $("#md_doitackinhdoanh_id", frmID).parent().parent();
         let namDisplay = $('#namBCNCU', frmID).parent().parent();
+        let thangDisplay = $('#thangBCNCU', frmID).parent().parent();
         let tungayDisplay = $('#tungayBCNCU', frmID).parent().parent();
         let denngayDisplay = $('#denngayBCNCU', frmID).parent().parent();
         let loaiBaoCaoDisplay = $('#loaiBaoCao', frmID).parent().parent();
@@ -109,6 +110,7 @@
         }
 
         namDisplay.hide();
+        thangDisplay.hide();
         loaiBaoCaoDisplay.hide();
 
         cheDoXemBThoacKT.hide();
@@ -176,6 +178,16 @@
                 $('#lblReportNameNCU').html("Không xác định report");
                 break;
         }
+
+        let loaiBC = $('#loaiBaoCao', frmID);
+        loaiBC.off('change');
+        loaiBC.change(function () {
+            if ($(this).val() == 'DTCPtheoThang')
+                thangDisplay.show();
+            else
+                thangDisplay.hide();
+        });
+        loaiBC.prop('selectedIndex', 0).change();
     }
 
     function submitRpt() {
@@ -228,6 +240,7 @@
         else if (reportid == 1002) {
             qstring = "";
             qstring += "?nam=" + $('#namBCNCU', frmBCNCU).val();
+            qstring += "&thang=" + $('#thangBCNCU', frmBCNCU).val();
             qstring += "&xuong=" + $('#md_doitackinhdoanh_id', frmBCNCU).val();
             qstring += "&maXuong=" + $('#md_doitackinhdoanh_id option:selected', frmBCNCU).text();
 
@@ -298,6 +311,17 @@
                         <% for (int i = DateTime.Now.Year + 10; i >= DateTime.Now.Year - 10; i--)
                            {%>
                               <option value="<%=i %>" <%= DateTime.Now.Year == i ? " selected=\"selected\"" :""%> ><%=i %> </option> 
+                           <%} %>
+                   </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="td100">Chọn tháng</td>
+                <td>
+                    <select name="thang" id="thangBCNCU">
+                        <% for (int i = 12; i >= 1; i--)
+                           {%>
+                              <option value="<%=i %>" <%= DateTime.Now.Month == i ? " selected=\"selected\"" :""%> ><%=i %> </option> 
                            <%} %>
                    </select>
                 </td>
