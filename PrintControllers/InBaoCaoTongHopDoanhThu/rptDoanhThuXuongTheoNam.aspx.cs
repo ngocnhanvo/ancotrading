@@ -65,11 +65,10 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuXuongTh
                 isnull(civ.totalgross, 0),
                 MONTH(civ.ngay_motokhai)
             from c_packinginvoice (nolock) civ
-            left join c_dongpklinv (nolock) cdiv on cdiv.c_packinginvoice_id = civ.c_packinginvoice_id
             where 
                 civ.ngay_motokhai between @tungay and @denngay
                 and civ.md_trangthai_id = 'HIEULUC'
-                and cdiv.nhacungungid = @xuongId
+                and (select count(1) from c_dongpklinv (nolock) cdiv where cdiv.c_packinginvoice_id = civ.c_packinginvoice_id and cdiv.nhacungungid = @xuongId) > 0
 
             select 
                 @nam as nam,
