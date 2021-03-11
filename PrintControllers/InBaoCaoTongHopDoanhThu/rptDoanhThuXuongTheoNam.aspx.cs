@@ -59,29 +59,17 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuXuongTh
 	            and nx.md_doitackinhdoanh_id = @xuongId
                 and nx.md_trangthai_id = 'HIEULUC'
             
-            declare @tblINV table (id varchar(32), tien decimal(18,2), ngay_motokhai datetime)
-            insert into @tblINV
-            select 
-                civ.c_packinginvoice_id, 
-                isnull(civ.totalgross, 0),
-                civ.ngay_motokhai
-            from c_packinginvoice civ
-            where 
-                civ.ngay_motokhai between @tungay and @denngay
-                and civ.md_trangthai_id = 'HIEULUC'              
-
             declare @tblTriGiaUSD table (tien decimal(18,2), thang int)
             insert into @tblTriGiaUSD
-            select civ.tien, MONTH(civ.ngay_motokhai) as thang
-            from @tblINV civ
-            where
-            (
-                select count(1)
-                from c_dongpklinv (nolock) cdiv
-                where 
-                    cdiv.nhacungungid = @xuongId
-                    and cdiv.c_packinginvoice_id = civ.id
-            ) > 0
+            select
+                isnull(civ.totalgross, 0),
+                MONTH(civ.ngay_motokhai)
+            from c_packinginvoice (nolock) civ
+            left join c_dongpklinv (nolock) cdiv on cdiv.c_packinginvoice_id = civ.c_packinginvoice_id
+            where 
+                civ.ngay_motokhai between @tungay and @denngay
+                and civ.md_trangthai_id = 'HIEULUC'
+                and cdiv.nhacungungid = @xuongId
 
             select 
                 @nam as nam,
