@@ -102,7 +102,6 @@ public class API_System : IHttpHandler {
     {
         var msp = context.Request.QueryString["msp"];
         var path = ExcuteSignalRStatic.getImageProduct(msp);
-        //throw new ArgumentNullException(msp);
         var url = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
         var lastIndex = url.LastIndexOf(".");
         var mimeType = url.Substring(lastIndex + 1).ToLower();
