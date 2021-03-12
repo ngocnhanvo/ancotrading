@@ -99,18 +99,18 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuXuongTh
 	            (select sum(tien) from @tblTriGiaUSD where thang = 11) as triGiaUSD11,
 	            (select sum(tien) from @tblTriGiaUSD where thang = 12) as triGiaUSD12,
 
-                (select @tygia) as tyGia1,
-	            (select @tygia) as tyGia2,
-                (select @tygia) as tyGia3,
-                (select @tygia) as tyGia4,
-	            (select @tygia) as tyGia5,
-                (select @tygia) as tyGia6,
-                (select @tygia) as tyGia7,
-	            (select @tygia) as tyGia8,
-                (select @tygia) as tyGia9,
-                (select @tygia) as tyGia10,
-	            (select @tygia) as tyGia11,
-                (select @tygia) as tyGia12
+                (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 1 and YEAR(ngayapdung) = @nam) as tyGia1,
+	            (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 2 and YEAR(ngayapdung) = @nam) as tyGia2,
+                (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 3 and YEAR(ngayapdung) = @nam) as tyGia3,
+                (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 4 and YEAR(ngayapdung) = @nam) as tyGia4,
+	            (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 5 and YEAR(ngayapdung) = @nam) as tyGia5,
+                (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 6 and YEAR(ngayapdung) = @nam) as tyGia6,
+                (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 7 and YEAR(ngayapdung) = @nam) as tyGia7,
+	            (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 8 and YEAR(ngayapdung) = @nam) as tyGia8,
+                (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 9 and YEAR(ngayapdung) = @nam) as tyGia9,
+                (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 10 and YEAR(ngayapdung) = @nam) as tyGia10,
+	            (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 11 and YEAR(ngayapdung) = @nam) as tyGia11,
+                (select nhan_voi from md_tygiamua where MONTH(ngayapdung) = 12 and YEAR(ngayapdung) = @nam) as tyGia12
 		"
         , nam
         , xuong
