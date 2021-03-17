@@ -671,7 +671,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
                 sumSubToTalPO += string.Format(@"SUM(H{0}:H{1})", startRowHH + 1, r + 1);
             }
             r++;
-            s1.CreateRow(r).CreateCell(3).SetCellValue(String.Format("Sub Total PO {0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
+            s1.CreateRow(r).CreateCell(3).SetCellValue(String.Format("Sub Total:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
             s1.GetRow(r).GetCell(3).CellStyle = style12Bold;
 
             // total quantity

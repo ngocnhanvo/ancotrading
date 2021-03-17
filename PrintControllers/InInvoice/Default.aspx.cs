@@ -764,7 +764,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
                 sumSubToTalPO += string.Format(@"SUM(G{0}:G{1})", startRowHH + 1, r + 1);
             }
             r++;
-            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Sub Total PO {0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
+            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Sub Total:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
             s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
 
             // total quantity
