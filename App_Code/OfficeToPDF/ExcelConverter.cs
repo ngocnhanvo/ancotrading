@@ -85,12 +85,19 @@ namespace OfficeToPDF
                         }
                         else
                         {
-                            int phStart = oRange.Value.ToString().LastIndexOf(textReplace.oldT);
-                            int phEnd = textReplace.oldT.Length;
-
-                            if (phStart > -1 & phEnd > -1)
+                            try
                             {
-                                oRange.Characters[phStart + 1, phEnd].Insert(textReplace.newT);
+                                int phStart = oRange.Value.ToString().LastIndexOf(textReplace.oldT);
+                                int phEnd = textReplace.oldT.Length;
+
+                                if (phStart > -1 & phEnd > -1)
+                                {
+                                    oRange.Characters[phStart + 1, phEnd].Insert(textReplace.newT);
+                                }
+                            }
+                            catch
+                            {
+                                oRange.Value2 = textReplace.newT;
                             }
                         }
                     }
