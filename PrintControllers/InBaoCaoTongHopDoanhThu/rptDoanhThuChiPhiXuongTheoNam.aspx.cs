@@ -126,7 +126,7 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             from c_chitietthuchi dtc
 				left join c_thuchi tc on tc.c_thuchi_id = dtc.c_thuchi_id
             where 
-                dtc.ngaychi between @tungay and @denngay
+                tc.ngay_giaonop between @tungay and @denngay
                 and dtc.dtkd_id_ThuChi = @xuongId
 				--and tc.md_trangthai_id = 'HIEULUC'
 

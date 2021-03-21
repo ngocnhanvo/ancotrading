@@ -55,8 +55,13 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         var xuongId = context.Request.Form["xuongId"];
         var nam = int.Parse(context.Request.Form["nam"]);
         var thang = int.Parse(context.Request.Form["thang"]);
+
         var noDauNamStr = removeSpace(context.Request.Form["noDauNam"]);
         var noDauNam = string.IsNullOrEmpty(noDauNamStr) ? 0 : decimal.Parse(noDauNamStr);
+
+        var tygiaNamStr = removeSpace(context.Request.Form["tyGiaMua"]);
+        var tygiaNam = string.IsNullOrEmpty(tygiaNamStr) ? 23000 : decimal.Parse(tygiaNamStr);
+
         var lst = (from o in db.rpt_tonghopdoanhthuchiphis
                    where
                         o.nam.Equals(nam)
@@ -71,34 +76,42 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         }
         else
         {
-            var m = db.rpt_tonghopdoanhthuchiphis.Single(p => p.rpt_tonghopdoanhthuchiphi_id.Equals(id));
-            m.xuongId = xuongId;
-            m.nam = nam;
-            m.thang = thang;
-            m.noDauNam = thang == 1 ? noDauNam : 0;
-            m.chiPhiHCNS = decimal.Parse(removeSpace(context.Request.Form["chiPhiHCNS"]));
-            m.chiPhiXuatKhau = decimal.Parse(removeSpace(context.Request.Form["chiPhiXuatKhau"]));
-            m.tienBHXHBHLDNghiViec = decimal.Parse(removeSpace(context.Request.Form["tienBHXHBHLDNghiViec"]));
-            m.dienNuocRacCtyHaca = decimal.Parse(removeSpace(context.Request.Form["dienNuocRacCtyHaca"]));
-            m.nopTamUng = decimal.Parse(removeSpace(context.Request.Form["nopTamUng"]));
-            m.chiTienMatKhac = decimal.Parse(removeSpace(context.Request.Form["chiTienMatKhac"]));
-            m.cuocGuiMauKiemDinh = decimal.Parse(removeSpace(context.Request.Form["cuocGuiMauKiemDinh"]));
-            m.dsoVTXuatChoBPCtyKhac = decimal.Parse(removeSpace(context.Request.Form["dsoVTXuatChoBPCtyKhac"]));
-            m.khieuNai = 0;
-            m.luongCN = decimal.Parse(removeSpace(context.Request.Form["luongCN"]));
-            m.luongNV = decimal.Parse(removeSpace(context.Request.Form["luongNV"]));
-            m.phiCDBHXHCN = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHCN"]));
-            m.phiCDBHXHNV = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHNV"]));
-            m.thuongLeTetNV = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetNV"]));
-            m.thuongLeTetCN = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetCN"]));
-            m.tamUngLuongCN = decimal.Parse(removeSpace(context.Request.Form["tamUngLuongCN"]));
-            m.tienPheLieu = decimal.Parse(removeSpace(context.Request.Form["tienPheLieu"]));
-            m.trich20PheLieu = decimal.Parse(removeSpace(context.Request.Form["trich20PheLieu"]));
-            m.mota = context.Request.Form["mota"];
-            m.hoatdong = hd;
-            m.nguoicapnhat = UserUtils.getUser(context);
-            m.ngaycapnhat = DateTime.Now;
-            db.SubmitChanges();
+            var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == xuongId).FirstOrDefault();
+            if (dtkd == null)
+                jqGridHelper.Utils.writeResult(0, "Không tìm thấy xưởng đã chọn!");
+            else
+            {
+                var m = db.rpt_tonghopdoanhthuchiphis.Where(p => p.rpt_tonghopdoanhthuchiphi_id.Equals(id)).FirstOrDefault();
+                m.xuongId = xuongId;
+                m.xuongValue = dtkd.ma_dtkd;
+                m.nam = nam;
+                m.thang = thang;
+                m.noDauNam = thang == 1 ? noDauNam : 0;
+                m.tyGiaMua = thang == 1 ? tygiaNam : 0;
+                m.chiPhiHCNS = decimal.Parse(removeSpace(context.Request.Form["chiPhiHCNS"]));
+                m.chiPhiXuatKhau = decimal.Parse(removeSpace(context.Request.Form["chiPhiXuatKhau"]));
+                m.tienBHXHBHLDNghiViec = decimal.Parse(removeSpace(context.Request.Form["tienBHXHBHLDNghiViec"]));
+                m.dienNuocRacCtyHaca = decimal.Parse(removeSpace(context.Request.Form["dienNuocRacCtyHaca"]));
+                m.nopTamUng = decimal.Parse(removeSpace(context.Request.Form["nopTamUng"]));
+                m.chiTienMatKhac = decimal.Parse(removeSpace(context.Request.Form["chiTienMatKhac"]));
+                m.cuocGuiMauKiemDinh = decimal.Parse(removeSpace(context.Request.Form["cuocGuiMauKiemDinh"]));
+                m.dsoVTXuatChoBPCtyKhac = decimal.Parse(removeSpace(context.Request.Form["dsoVTXuatChoBPCtyKhac"]));
+                m.khieuNai = 0;
+                m.luongCN = decimal.Parse(removeSpace(context.Request.Form["luongCN"]));
+                m.luongNV = decimal.Parse(removeSpace(context.Request.Form["luongNV"]));
+                m.phiCDBHXHCN = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHCN"]));
+                m.phiCDBHXHNV = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHNV"]));
+                m.thuongLeTetNV = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetNV"]));
+                m.thuongLeTetCN = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetCN"]));
+                m.tamUngLuongCN = decimal.Parse(removeSpace(context.Request.Form["tamUngLuongCN"]));
+                m.tienPheLieu = decimal.Parse(removeSpace(context.Request.Form["tienPheLieu"]));
+                m.trich20PheLieu = decimal.Parse(removeSpace(context.Request.Form["trich20PheLieu"]));
+                m.mota = context.Request.Form["mota"];
+                m.hoatdong = hd;
+                m.nguoicapnhat = UserUtils.getUser(context);
+                m.ngaycapnhat = DateTime.Now;
+                db.SubmitChanges();
+            }
         }
     }
 
@@ -115,46 +128,57 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         var noDauNamStr = removeSpace(context.Request.Form["noDauNam"]);
         var noDauNam = string.IsNullOrEmpty(noDauNamStr) ? 0 : decimal.Parse(noDauNamStr);
 
+        var tygiaNamStr = removeSpace(context.Request.Form["tyGiaMua"]);
+        var tygiaNam = string.IsNullOrEmpty(tygiaNamStr) ? 23000 : decimal.Parse(tygiaNamStr);
+
         var lst = from o in db.rpt_tonghopdoanhthuchiphis where o.xuongId.Equals(xuongId) & o.nam.Equals(nam) & o.thang.Equals(thang) select o;
         if (lst.Count() != 0)
         {
-            jqGridHelper.Utils.writeResult(0, "Đã có code chủng loại này!");
+            jqGridHelper.Utils.writeResult(0, "Đã tồn tại!");
         }
         else
         {
-            var mnu = new rpt_tonghopdoanhthuchiphi();
-            mnu.rpt_tonghopdoanhthuchiphi_id = Helper.getNewId();
-            mnu.nam = nam;
-            mnu.thang = thang;
-            mnu.xuongId = xuongId;
-            mnu.noDauNam = thang == 1 ? noDauNam : 0;
-            mnu.chiPhiHCNS = decimal.Parse(removeSpace(context.Request.Form["chiPhiHCNS"]));
-            mnu.chiPhiXuatKhau = decimal.Parse(removeSpace(context.Request.Form["chiPhiXuatKhau"]));
-            mnu.tienBHXHBHLDNghiViec = decimal.Parse(removeSpace(context.Request.Form["tienBHXHBHLDNghiViec"]));
-            mnu.dienNuocRacCtyHaca = decimal.Parse(removeSpace(context.Request.Form["dienNuocRacCtyHaca"]));
-            mnu.nopTamUng = decimal.Parse(removeSpace(context.Request.Form["nopTamUng"]));
-            mnu.chiTienMatKhac = decimal.Parse(removeSpace(context.Request.Form["chiTienMatKhac"]));
-            mnu.cuocGuiMauKiemDinh = decimal.Parse(removeSpace(context.Request.Form["cuocGuiMauKiemDinh"]));
-            mnu.dsoVTXuatChoBPCtyKhac = decimal.Parse(removeSpace(context.Request.Form["dsoVTXuatChoBPCtyKhac"]));
-            mnu.khieuNai = 0;
-            mnu.luongCN = decimal.Parse(removeSpace(context.Request.Form["luongCN"]));
-            mnu.luongNV = decimal.Parse(removeSpace(context.Request.Form["luongNV"]));
-            mnu.phiCDBHXHCN = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHCN"]));
-            mnu.phiCDBHXHNV = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHNV"]));
-            mnu.thuongLeTetNV = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetNV"]));
-            mnu.thuongLeTetCN = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetCN"]));
-            mnu.tamUngLuongCN = decimal.Parse(removeSpace(context.Request.Form["tamUngLuongCN"]));
-            mnu.tienPheLieu = decimal.Parse(removeSpace(context.Request.Form["tienPheLieu"]));
-            mnu.trich20PheLieu = decimal.Parse(removeSpace(context.Request.Form["trich20PheLieu"]));
-            mnu.mota = context.Request.Form["mota"];
-            mnu.hoatdong = hd;
-            mnu.nguoitao = UserUtils.getUser(context);
-            mnu.nguoicapnhat = UserUtils.getUser(context);
-            mnu.ngaytao = DateTime.Now;
-            mnu.ngaycapnhat = DateTime.Now;
+            var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == xuongId).FirstOrDefault();
+            if (dtkd == null)
+                jqGridHelper.Utils.writeResult(0, "Không tìm thấy xưởng đã chọn!");
+            else
+            {
+                var mnu = new rpt_tonghopdoanhthuchiphi();
+                mnu.rpt_tonghopdoanhthuchiphi_id = Helper.getNewId();
+                mnu.nam = nam;
+                mnu.thang = thang;
+                mnu.xuongId = xuongId;
+                mnu.xuongValue = dtkd.ma_dtkd;
+                mnu.tyGiaMua = tygiaNam;
+                mnu.noDauNam = thang == 1 ? noDauNam : 0;
+                mnu.chiPhiHCNS = decimal.Parse(removeSpace(context.Request.Form["chiPhiHCNS"]));
+                mnu.chiPhiXuatKhau = decimal.Parse(removeSpace(context.Request.Form["chiPhiXuatKhau"]));
+                mnu.tienBHXHBHLDNghiViec = decimal.Parse(removeSpace(context.Request.Form["tienBHXHBHLDNghiViec"]));
+                mnu.dienNuocRacCtyHaca = decimal.Parse(removeSpace(context.Request.Form["dienNuocRacCtyHaca"]));
+                mnu.nopTamUng = decimal.Parse(removeSpace(context.Request.Form["nopTamUng"]));
+                mnu.chiTienMatKhac = decimal.Parse(removeSpace(context.Request.Form["chiTienMatKhac"]));
+                mnu.cuocGuiMauKiemDinh = decimal.Parse(removeSpace(context.Request.Form["cuocGuiMauKiemDinh"]));
+                mnu.dsoVTXuatChoBPCtyKhac = decimal.Parse(removeSpace(context.Request.Form["dsoVTXuatChoBPCtyKhac"]));
+                mnu.khieuNai = 0;
+                mnu.luongCN = decimal.Parse(removeSpace(context.Request.Form["luongCN"]));
+                mnu.luongNV = decimal.Parse(removeSpace(context.Request.Form["luongNV"]));
+                mnu.phiCDBHXHCN = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHCN"]));
+                mnu.phiCDBHXHNV = decimal.Parse(removeSpace(context.Request.Form["phiCDBHXHNV"]));
+                mnu.thuongLeTetNV = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetNV"]));
+                mnu.thuongLeTetCN = decimal.Parse(removeSpace(context.Request.Form["thuongLeTetCN"]));
+                mnu.tamUngLuongCN = decimal.Parse(removeSpace(context.Request.Form["tamUngLuongCN"]));
+                mnu.tienPheLieu = decimal.Parse(removeSpace(context.Request.Form["tienPheLieu"]));
+                mnu.trich20PheLieu = decimal.Parse(removeSpace(context.Request.Form["trich20PheLieu"]));
+                mnu.mota = context.Request.Form["mota"];
+                mnu.hoatdong = hd;
+                mnu.nguoitao = UserUtils.getUser(context);
+                mnu.nguoicapnhat = UserUtils.getUser(context);
+                mnu.ngaytao = DateTime.Now;
+                mnu.ngaycapnhat = DateTime.Now;
 
-            db.rpt_tonghopdoanhthuchiphis.InsertOnSubmit(mnu);
-            db.SubmitChanges();
+                db.rpt_tonghopdoanhthuchiphis.InsertOnSubmit(mnu);
+                db.SubmitChanges();
+            }
         }
     }
 
@@ -216,7 +240,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         string strsql = string.Format(@"
             select * from (
                 select 
-                    cl.rpt_tonghopdoanhthuchiphi_id, ncc.ma_dtkd, cl.nam, cl.thang, cl.noDauNam, cl.dsoVTXuatChoBPCtyKhac, 
+                    cl.rpt_tonghopdoanhthuchiphi_id, ncc.ma_dtkd, cl.nam, cl.thang, cl.noDauNam, cl.tyGiaMua, cl.dsoVTXuatChoBPCtyKhac, 
                     cl.tienBHXHBHLDNghiViec, cl.dienNuocRacCtyHaca, cl.nopTamUng, cl.tienPheLieu, cl.chiPhiXuatKhau,  
                     cl.chiPhiHCNS, cl.luongNV, cl.luongCN, cl.phiCDBHXHNV, cl.phiCDBHXHCN, cl.thuongLeTetNV, 
                     cl.thuongLeTetCN, cl.tamUngLuongCN, cl.chiTienMatKhac, cl.trich20PheLieu, cl.khieuNai, 
@@ -267,12 +291,13 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             xml += "<cell><![CDATA[" + row[20] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[21] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[22] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[23].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[24] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[25].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[26] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[23] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[24].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[25] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[26].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row[27] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[28] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[29] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

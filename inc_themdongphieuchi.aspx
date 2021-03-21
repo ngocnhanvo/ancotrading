@@ -299,7 +299,7 @@
                 <select id="loaiphieu2" name="loaiphieu2" style="max-width: 200px;">
                     <option value=""></option>
                     <option ncc="ANCO1,ANCO2" value="dsoVTXuatChoBPCtyKhac">D/số vật tư xuất cho các BP, các cty khác</option>
-                    <option ncc="ANCO2" value="tienBHXHBHLDNghiViec">Tiền BHXH,BHLĐ, nghỉ việc</option>
+                    <option ncc="ANCO1,ANCO2" value="tienBHXHBHLDNghiViec">Tiền BHXH,BHLĐ, nghỉ việc</option>
                     <option ncc="ANCO2" value="dienNuocRacCtyHaca">Điện, nước, rác cty Haca</option>
                     <option ncc="ANCO2" value="nopTamUng">Nộp tạm ứng</option>
                     <option ncc="ANCO1,ANCO2" value="tienPheLieu">Tiền phế liệu</option>

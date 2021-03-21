@@ -18,7 +18,7 @@ public static class UserUtils
     //Mail Ke Toan NCU
     public static string mailKeToanNCU = "ketoanTEST@ancometal.com";
 
-    public static decimal get_gianhap(HttpContext context, string ma_dtkd_select, decimal gia_fob, decimal discount, decimal discount_vinhgia)
+    public static decimal get_gianhap(HttpContext context, string ma_dtkd_select, decimal gia_fob, decimal discount, decimal discount_vinhgia, LinqDBDataContext db)
     {
         //Tinh % theo nha cung ung
 
@@ -56,6 +56,12 @@ public static class UserUtils
         else if (new string[] { "ANCO1" }.Contains(ma_dtkd_select))
         {
             decimal tygia = 23000;
+            var tyGiaMua = db.rpt_tonghopdoanhthuchiphis.Where(s => s.xuongId == ma_dtkd_select & s.nam == DateTime.Now.Year).FirstOrDefault();
+            if(tyGiaMua != null)
+            {
+                tygia = tyGiaMua.tyGiaMua.GetValueOrDefault(0) > 0 ? tyGiaMua.tyGiaMua.GetValueOrDefault(0) : tygia;
+            }
+
             decimal discountVNN = decimal.Parse("0.80");
             //Lay discount dac biet
             if (getptr == 1)
@@ -361,9 +367,9 @@ public static class UserUtils
             decimal giachuan = gianhap;
             //Neu doi tac la VINHGIA
             
-			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, 0, 0);
+			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, 0, 0, db);
             var giaNhap2BD = gianhap2;
-            decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2);
+            decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2, db);
 
             var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
             if(donhang.discount.GetValueOrDefault(0) > 0)
@@ -464,7 +470,7 @@ public static class UserUtils
                             decimal vnn = Math.Round((cbm * 100) / donhang.totalcbm.Value, 0);
                             decimal vnn1 = Math.Round(pdonh.phi.Value * vnn / 100, 0);
 
-                            decimal get_giaPB = get_gianhap(context, cbm_ncc[0], -2, -2, -2);
+                            decimal get_giaPB = get_gianhap(context, cbm_ncc[0], -2, -2, -2, db);
                             decimal tienVND = 0;
                             if (get_giaPB > 1)
                             {
@@ -512,7 +518,7 @@ public static class UserUtils
                             if (md_doitackinhdoanh_id == row.id.ToString())
                             {
                                 decimal tien = decimal.Parse((row.tien.ToString()).ToString());
-                                decimal get_giaPB = UserUtils.get_gianhap(context, row.ma_dtkd, -2, -2, -2);
+                                decimal get_giaPB = UserUtils.get_gianhap(context, row.ma_dtkd, -2, -2, -2, db);
                                 decimal tienVND = 0;
                                 if (get_giaPB > 1)
                                 {
@@ -566,7 +572,7 @@ public static class UserUtils
                         if (md_doitackinhdoanh_id == row.id.ToString())
                         {
                             decimal tien = decimal.Parse((row.tien.ToString()).ToString());
-                            decimal get_giaPB = get_gianhap(context, row.ma_dtkd, tien, 0, 0);
+                            decimal get_giaPB = get_gianhap(context, row.ma_dtkd, tien, 0, 0, db);
                             decimal tienVND = 0;
                             if (get_giaPB > 0)
                             {

@@ -91,6 +91,18 @@
             },
             {
                 fixed: true
+                , name: 'tyGiaMua'
+                , index: 'cl.tyGiaMua'
+                , label: 'Tỷ giá mua'
+                , editable: true
+                , width: 70
+                , edittype: 'text'
+                , align: 'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
+            },
+            {
+                fixed: true
                 , name: 'dsoVTXuatChoBPCtyKhac'
                 , index: 'cl.dsoVTXuatChoBPCtyKhac'
                 , label: 'D.Số Vật Tư xuất cho B.Phận hoặc C.Ty khác'
