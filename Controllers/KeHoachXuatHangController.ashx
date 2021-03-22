@@ -322,29 +322,201 @@ public class KeHoachXuatHangController : IHttpHandler {
         }
         strAccount = String.Format("'{0}'{1}", manv, strAccount);
 
-        String sqlCount = "SELECT COUNT(*) AS count " +
-            " FROM c_kehoachxuathang kh, c_donhang dh, md_doitackinhdoanh dtkd " +
-            " WHERE kh.c_donhang_id = dh.c_donhang_id " +
-            " AND kh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " + filter +
-            " {0} " +
-            " AND dh.md_trangthai_id <> 'KETTHUC' ";
-
-        if(dateType == "0")
-        {
-            sqlCount += " AND kh.ngaygiaohang >= {1} AND kh.ngaygiaohang <= {2} ";
-        }
-        else{
-            sqlCount += " AND kh.ngayxonghang >= {1} AND kh.ngayxonghang <= {2} ";
-        }
-
-        sqlCount = String.Format(sqlCount, isadmin == true ? "" : "AND kh.nguoitao IN(" + strAccount + ")", from, to);
-
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
         String sord = context.Request.QueryString["sord"];
+
+        if (sidx.Equals("") || sidx == null)
+        {
+            sidx = "c_kehoachxuathang_id";
+        }
+
+        string strsql = @"
+        declare @tungay datetime = {0};
+        declare @denngay datetime = {1};
+
+        declare @tblKHXH table (
+            c_kehoachxuathang_id nvarchar(32),
+            md_trangthai_id nvarchar(32),
+            sochungtu nvarchar(MAX),
+	        so_po nvarchar(MAX),
+	        chungloaihang nvarchar(MAX),
+	        cbm decimal(18, 4),
+	        cbm_conlai decimal(18, 4),
+	        shipmenttime datetime,
+	        c_danhsachdathang_id nvarchar(50),
+	        ngaygiaohang datetime,
+	        ngayxonghang datetime,
+	        cont20 decimal(18, 4),
+	        cont40 decimal(18, 4),
+	        cont40hc decimal(18, 4),
+	        ngayxuathang datetime,
+	        ghichu nvarchar(MAX),
+	        ketquakiemhang nvarchar(MAX),
+	        ngaykiemhang datetime,
+	        ngaykhachkiem datetime,
+	        tre int,
+	        hangiaohang datetime,
+	        thang int,
+            nam int,
+	        ngayxonghang_xxn datetime,
+	        ngaytrenhat datetime,
+	        md_doitackinhdoanh_id nvarchar(32),
+	        c_donhang_id nvarchar(32),
+            ngaytao datetime, 
+            nguoitao nvarchar(32), 
+            ngaycapnhat datetime, 
+            nguoicapnhat nvarchar(32), 
+            mota nvarchar(MAX), 
+            hoatdong bit,
+            nhanvienct nvarchar(MAX),
+            khongkhachkiem bit,
+            ngayxnbaobi datetime,
+            khongtem bit, 
+            ngayxacnhantem datetime,
+			khongbaobi bit,
+			ngayxacnhanbaobi datetime
+        )
+        insert into @tblKHXH
+        select
+            khxh.c_kehoachxuathang_id, 
+            khxh.md_trangthai_id,
+            dh.sochungtu,
+	        khxh.so_po, 
+            khxh.chungloaihang, 
+            khxh.cbm, 
+            khxh.cbm_conlai, 
+            khxh.shipmenttime, 
+            khxh.c_danhsachdathang_id, 
+	        khxh.ngaygiaohang, 
+            khxh.ngayxonghang, 
+            khxh.cont20, 
+            khxh.cont40, 
+            khxh.cont40hc, 
+            khxh.ngayxuathang,
+	        khxh.ghichu, 
+            khxh.ketquakiemhang, 
+            khxh.ngaykiemhang, 
+            khxh.ngaykhachkiem, 
+            isnull((case when DATEDIFF(DAY, (khxh.shipmenttime - 7), khxh.ngayxonghang) > 0 then DATEDIFF(DAY, (khxh.shipmenttime - 7), khxh.ngayxonghang) else null end),0) as tre,
+	        isnull(khxh.ngaygiaohang, khxh.shipmenttime) as hangiaohang,
+	        khxh.thang,
+            khxh.nam,
+	        khxh.shipmenttime - 7,
+	        khxh.shipmenttime - 35,
+	        khxh.md_doitackinhdoanh_id,
+	        khxh.c_donhang_id,
+            khxh.ngaytao, 
+            khxh.nguoitao, 
+            khxh.ngaycapnhat, 
+            khxh.nguoicapnhat, 
+            khxh.mota, 
+            khxh.hoatdong,
+            khxh.nhanvienct,
+            khxh.khongkhachkiem,
+            khxh.ngayxnbaobi,
+            khxh.khongtem, 
+            khxh.ngayxacnhantem,
+			khxh.khongbaobi,
+			khxh.ngayxacnhanbaobi
+        from c_kehoachxuathang khxh
+        left join c_donhang dh on khxh.c_donhang_id = dh.c_donhang_id
+        where 
+	        khxh.{3} between @tungay and @denngay
+	        AND dh.md_trangthai_id != 'KETTHUC'
+            {2} {4}
+    
+        declare @tblINV table (donhangId nvarchar(32), ngay_motokhai datetime)
+                insert into @tblINV
+                select dpkl.c_donhang_id, inv.ngay_motokhai 
+                from c_packinginvoice inv
+                inner join c_dongpklinv dpkl on dpkl.c_packinginvoice_id = inv.c_packinginvoice_id
+                where 
+	                dpkl.c_dongnhapxuat_id in
+	                (
+		                select c_dongnhapxuat_id 
+		                from c_dongnhapxuat
+		                where c_dongdonhang_id in (
+			                select c_dongdonhang_id from c_dongdonhang where c_donhang_id in (
+				                select khxh.c_donhang_id from @tblKHXH khxh
+			                )
+		                )
+	                )        
+        
+        if(@count = 1)
+        begin
+            select count(1) FROM @tblKHXH kh
+        end
+        else
+        begin 
+            select 
+                P.*, 
+                isnull((DATEDIFF(day, P.shipmenttime, P.etd)),0) as tre_nv 
+            from (
+                select
+                kh.c_kehoachxuathang_id
+			    , kh.md_trangthai_id
+			    , kh.sochungtu as ct_dh 
+                , kh.c_danhsachdathang_id
+			    , dtkd.ma_dtkd
+			    , kh.chungloaihang 
+                , kh.cbm 
+                , kh.cbm_conlai 
+                , kh.shipmenttime
+			    , kh.ngayxonghang_xxn
+			    , kh.ngayxonghang
+			    , kh.ngayxnbaobi as ngaytrenhat
+			    , kh.khongtem 
+			    , kh.ngayxacnhantem
+			    , kh.khongbaobi
+			    , kh.ngayxacnhanbaobi
+			    , kh.ngaykiemhang
+			    , kh.ngaykhachkiem			
+			    , kh.ketquakiemhang
+			    , (select top 1 inv.ngay_motokhai from @tblINV inv where inv.donhangId = kh.c_donhang_id order by inv.ngay_motokhai asc) as etd
+			    , (select top 1 hoten from nhanvien where manv = (select distinct nguoitao from c_danhsachdathang where sochungtu = kh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC')) as nguoilap
+			    , kh.tre
+			    , (select top 1 ma_dtkd from md_doitackinhdoanh dtkd, c_donhang dh where dtkd.md_doitackinhdoanh_id = dh.md_doitackinhdoanh_id AND dh.c_donhang_id = kh.c_donhang_id) as khachhang
+			    , kh.ghichu 
+                , kh.khongkhachkiem
+                , kh.ngayxuathang
+                , kh.ngaygiaohang
+                , kh.thang
+                , kh.nam
+                , kh.nhanvienct  
+                , kh.ngaytao
+                , kh.nguoitao
+                , kh.ngaycapnhat
+                , kh.nguoicapnhat
+                , kh.mota
+                , kh.hoatdong 
+                , ROW_NUMBER() OVER (ORDER BY {5} {6}) as RowNum 
+                FROM @tblKHXH kh
+			    left join md_doitackinhdoanh dtkd  on kh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
+                WHERE 1=1
+            )P where RowNum > @start AND RowNum < @end 
+        end
+        ";
+
+        strsql = string.Format(strsql,
+            from,
+            to,
+            isadmin == true ? "" : "AND kh.nguoitao IN(" + strAccount + ")",
+            dateType =="0" ? "ngaygiaohang" : "ngayxonghang",
+            filter,
+            sidx,
+            sord
+        );
+
+        throw new ArgumentNullException(strsql);
+
+        var dtCount = mdbc.GetData(strsql, "@start", 0, "@end", 99999999999, "@count", true);
+
+        int count = dtCount.Rows.Count;
+
         int total_page;
-        int count = (int)mdbc.ExecuteScalar(sqlCount);
+
         int start, end;
 
         if (count > 0)
@@ -360,72 +532,8 @@ public class KeHoachXuatHangController : IHttpHandler {
         start = limit * page - limit;
         end = (page * limit) + 1;
 
-        if (sidx.Equals("") || sidx == null)
-        {
-            sidx = "c_kehoachxuathang_id";
-        }
+        var dt = mdbc.GetData(strsql, "@start", start, "@end", end, "@count", false);
 
-        string strsql = @"select P.*, isnull((DATEDIFF(day, P.shipmenttime, P.etd)),0) as tre_nv from(
-            select
-            kh.c_kehoachxuathang_id
-			, kh.md_trangthai_id
-			, dh.sochungtu as ct_dh 
-            , kh.c_danhsachdathang_id
-			, dtkd.ma_dtkd
-			, kh.chungloaihang 
-            , kh.cbm 
-            , kh.cbm_conlai 
-            , kh.shipmenttime
-			, (kh.shipmenttime - 7) as ngayxonghang_xxn
-			, kh.ngayxonghang
-			--, (kh.shipmenttime - 35) as ngaytrenhat
-			, kh.ngayxnbaobi as ngaytrenhat
-			, kh.khongtem 
-			, kh.ngayxacnhantem
-			, kh.khongbaobi
-			, kh.ngayxacnhanbaobi
-			, kh.ngaykiemhang
-			, kh.ngaykhachkiem			
-			, kh.ketquakiemhang
-			, (
-                select top 1 ngay_motokhai from c_packinginvoice where c_packinginvoice_id in (
-				    select c_packinginvoice_id from c_dongpklinv where c_dongnhapxuat_id in
-				    (
-					    select c_dongnhapxuat_id 
-					    from c_dongnhapxuat
-					    where c_dongdonhang_id in (
-						    select c_dongdonhang_id from c_dongdonhang where c_donhang_id = kh.c_donhang_id
-					    )
-				    )
-			    )
-                order by ngay_motokhai asc
-            ) as etd
-			, (select top 1 hoten from nhanvien where manv = (select distinct nguoitao from c_danhsachdathang where sochungtu = kh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC')) as nguoilap
-			, isnull((case when DATEDIFF(DAY, (kh.shipmenttime - 7), kh.ngayxonghang) > 0 then DATEDIFF(DAY, (kh.shipmenttime - 7), kh.ngayxonghang) else null end),0) as tre
-			, (select top 1 ma_dtkd from md_doitackinhdoanh dtkd, c_donhang dh where dtkd.md_doitackinhdoanh_id = dh.md_doitackinhdoanh_id AND dh.c_donhang_id = kh.c_donhang_id) as khachhang
-			, kh.ghichu 
-            , kh.khongkhachkiem, kh.ngayxuathang, kh.ngaygiaohang
-            , kh.thang, kh.nam, kh.nhanvienct  
-            , kh.ngaytao, kh.nguoitao, kh.ngaycapnhat, kh.nguoicapnhat, kh.mota, kh.hoatdong 
-            , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + @") as RowNum 
-            FROM c_kehoachxuathang kh
-			left join c_donhang dh on kh.c_donhang_id = dh.c_donhang_id
-			left join md_doitackinhdoanh dtkd  on kh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
-            WHERE 1=1  " + filter + @" {0} AND dh.md_trangthai_id <> 'KETTHUC'";
-
-        if(dateType == "0")
-        {
-            strsql += " AND kh.ngaygiaohang >= {1} AND kh.ngaygiaohang <= {2} ";
-        }
-        else{
-            strsql += " AND kh.ngayxonghang >= {1} AND kh.ngayxonghang <= {2} ";
-        }
-
-        strsql += " )P where RowNum > @start AND RowNum < @end ";
-
-        strsql = string.Format(strsql, isadmin == true ? "" : "AND kh.nguoitao IN(" + strAccount + ")", from, to);
-
-        System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         int colCount = dt.Columns.Count;
 
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
