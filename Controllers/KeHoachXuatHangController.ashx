@@ -387,17 +387,19 @@ public class KeHoachXuatHangController : IHttpHandler {
 			, kh.ngaykiemhang
 			, kh.ngaykhachkiem			
 			, kh.ketquakiemhang
-			,(select top 1 ngay_motokhai from c_packinginvoice where c_packinginvoice_id = (
-				select top 1 c_packinginvoice_id from c_dongpklinv where c_dongnhapxuat_id =
-				(
-					select top 1 c_dongnhapxuat_id 
-					from c_dongnhapxuat
-					inner join c_nhapxuat on c_nhapxuat.c_nhapxuat_id = c_dongnhapxuat.c_nhapxuat_id
-					where c_dongdonhang_id in (
-						select c_dongdonhang_id from c_dongdonhang where c_donhang_id = kh.c_donhang_id
-					) and c_nhapxuat.md_loaichungtu_id = 'XK'
-				)
-			)) as etd
+			, (
+                select top 1 ngay_motokhai from c_packinginvoice where c_packinginvoice_id in (
+				    select c_packinginvoice_id from c_dongpklinv where c_dongnhapxuat_id in
+				    (
+					    select c_dongnhapxuat_id 
+					    from c_dongnhapxuat
+					    where c_dongdonhang_id in (
+						    select c_dongdonhang_id from c_dongdonhang where c_donhang_id = kh.c_donhang_id
+					    )
+				    )
+			    )
+                order by ngay_motokhai asc
+            ) as etd
 			, (select top 1 hoten from nhanvien where manv = (select distinct nguoitao from c_danhsachdathang where sochungtu = kh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC')) as nguoilap
 			, isnull((case when DATEDIFF(DAY, (kh.shipmenttime - 7), kh.ngayxonghang) > 0 then DATEDIFF(DAY, (kh.shipmenttime - 7), kh.ngayxonghang) else null end),0) as tre
 			, (select top 1 ma_dtkd from md_doitackinhdoanh dtkd, c_donhang dh where dtkd.md_doitackinhdoanh_id = dh.md_doitackinhdoanh_id AND dh.c_donhang_id = kh.c_donhang_id) as khachhang

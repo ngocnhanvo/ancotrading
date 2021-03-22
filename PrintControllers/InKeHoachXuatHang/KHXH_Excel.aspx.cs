@@ -166,6 +166,7 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
 					                )
 				                )
 			                )
+                            order by ngay_motokhai asc
                         ) as etd
 						, dtkd.md_doitackinhdoanh_id
                     from 
