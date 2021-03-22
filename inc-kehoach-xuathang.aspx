@@ -766,7 +766,7 @@
             },
 			{
                  fixed: true, name: 'nguoilap'
-                 , index: 'kh.nguoilap'
+                 , index: 'nv.hoten'
                  , editable: false
                  , width: 100
                  , edittype: 'text'

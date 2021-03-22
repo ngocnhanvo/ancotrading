@@ -378,7 +378,8 @@ public class KeHoachXuatHangController : IHttpHandler {
 			khongbaobi bit,
 			ngayxacnhanbaobi datetime,
             ma_dtkd nvarchar(MAX),
-            khachhang nvarchar(MAX)
+            khachhang nvarchar(MAX),
+            nguoilap nvarchar(MAX)
         )
         insert into @tblKHXH
         select distinct
@@ -423,11 +424,13 @@ public class KeHoachXuatHangController : IHttpHandler {
 			kh.khongbaobi,
 			kh.ngayxacnhanbaobi,
             dtkd.ma_dtkd,
-            khachhang.ma_dtkd
+            khachhang.ma_dtkd,
+            nv.hoten
         from c_kehoachxuathang kh
         left join c_donhang dh on kh.c_donhang_id = dh.c_donhang_id
         left join md_doitackinhdoanh dtkd on kh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
         left join md_doitackinhdoanh khachhang on dh.md_doitackinhdoanh_id = khachhang.md_doitackinhdoanh_id
+        left join nhanvien nv on nc.manv = (select top 1 nguoitao from c_danhsachdathang where sochungtu = kh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC'))
         where 
 	        kh.{3} between @tungay and @denngay
 	        AND dh.md_trangthai_id != 'KETTHUC'
@@ -481,7 +484,7 @@ public class KeHoachXuatHangController : IHttpHandler {
 			    , kh.ngaykhachkiem			
 			    , kh.ketquakiemhang
 			    , (select top 1 inv.ngay_motokhai from @tblINV inv where inv.donhangId = kh.c_donhang_id order by inv.ngay_motokhai asc) as etd
-			    , (select top 1 hoten from nhanvien where manv = (select distinct nguoitao from c_danhsachdathang where sochungtu = kh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC')) as nguoilap
+			    , kh.nguoilap
 			    , kh.tre
 			    , kh.khachhang
 			    , kh.ghichu 
