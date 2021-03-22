@@ -555,7 +555,7 @@
             },
 			{
                 fixed: true, name: 'khachhang'
-                , index: 'khachhang'
+                , index: 'khachhang.ma_dtkd'
                 , width: 100
                 , editable: false
                 , edittype: 'text'
