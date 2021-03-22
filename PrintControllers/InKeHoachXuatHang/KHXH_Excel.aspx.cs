@@ -155,32 +155,20 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
                         , (CAST(DATEPART(MONTH,khxh.ngaygiaohang) as nvarchar) + '/' + CAST(DATEPART(YEAR, khxh.ngaygiaohang) as nvarchar)) as thang
 						, (select hoten from nhanvien where manv = (select distinct nguoitao from c_danhsachdathang where sochungtu = khxh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC')) as nguoilappi
 						, (khxh.shipmenttime - 7) as ngayxonghang_xxn, (khxh.shipmenttime - 35) as ngaytrenhat , khxh.khongtem, khxh.khongbaobi
-						, 
-						(
-                            select inv.etd 
-                            from c_packinginvoice inv 
-                            where inv.c_packinginvoice_id in (
-							    select dpkl.c_packinginvoice_id 
-                                from c_dongpklinv dpkl 
-                                where dpkl.c_dongnhapxuat_id =
-							    (
-								    select top 1 dnx.c_dongnhapxuat_id 
-                                    from c_dongnhapxuat dnx
-								    where dnx.c_dongdonhang_id in (
-									    select ddh.c_dongdonhang_id 
-                                        from c_dongdonhang ddh
-                                        where 
-                                            ddh.c_donhang_id = khxh.c_donhang_id 
-								    )
-                                )
-                                and khxh.c_danhsachdathang_id in (
-                                        select dsdh.sochungtu 
-                                        from c_danhsachdathang dsdh 
-                                        where dsdh.c_danhsachdathang_id = dpkl.c_danhsachdathang_id
-                                    )
-						    )
+						, (
+                            select top 1 ngay_motokhai from c_packinginvoice where c_packinginvoice_id = (
+				                select top 1 c_packinginvoice_id from c_dongpklinv where c_dongnhapxuat_id =
+				                (
+					                select top 1 c_dongnhapxuat_id 
+					                from c_dongnhapxuat
+					                inner join c_nhapxuat on c_nhapxuat.c_nhapxuat_id = c_dongnhapxuat.c_nhapxuat_id
+					                where c_dongdonhang_id in (
+						                select c_dongdonhang_id from c_dongdonhang where c_donhang_id = khxh.c_donhang_id
+					                ) and c_nhapxuat.md_loaichungtu_id = 'XK'
+				                )
+			                )
                         ) as etd
-						,dtkd.md_doitackinhdoanh_id
+						, dtkd.md_doitackinhdoanh_id
                     from 
                         c_kehoachxuathang khxh
 						left join md_doitackinhdoanh dtkd on khxh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
