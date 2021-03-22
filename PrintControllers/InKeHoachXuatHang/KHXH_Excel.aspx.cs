@@ -157,10 +157,12 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
 						, (khxh.shipmenttime - 7) as ngayxonghang_xxn, (khxh.shipmenttime - 35) as ngaytrenhat , khxh.khongtem, khxh.khongbaobi
 						, 
 						(
-                            select top 1 inv.etd 
+                            select inv.etd 
                             from c_packinginvoice inv 
-                            where inv.c_packinginvoice_id = (
-							    select top 1 dpkl.c_packinginvoice_id from c_dongpklinv dpkl where dpkl.c_dongnhapxuat_id =
+                            where inv.c_packinginvoice_id in (
+							    select dpkl.c_packinginvoice_id 
+                                from c_dongpklinv dpkl 
+                                where dpkl.c_dongnhapxuat_id =
 							    (
 								    select top 1 dnx.c_dongnhapxuat_id 
                                     from c_dongnhapxuat dnx
@@ -169,13 +171,13 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
                                         from c_dongdonhang ddh
                                         where 
                                             ddh.c_donhang_id = khxh.c_donhang_id 
-                                            and khxh.c_danhsachdathang_id in (
-                                                select dsdh.sochungtu 
-                                                from c_danhsachdathang dsdh 
-                                                where dsdh.c_danhsachdathang_id = dpkl.c_danhsachdathang_id
-                                            )
 								    )
-							    )
+                                )
+                                and khxh.c_danhsachdathang_id in (
+                                        select dsdh.sochungtu 
+                                        from c_danhsachdathang dsdh 
+                                        where dsdh.c_danhsachdathang_id = dpkl.c_danhsachdathang_id
+                                    )
 						    )
                         ) as etd
 						,dtkd.md_doitackinhdoanh_id
@@ -195,7 +197,7 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
         // where dpkl.c_packinginvoice_id = pkl.c_packinginvoice_id
         // and dpkl.c_donhang_id = dh.c_donhang_id
         // ) as etd
-        //throw new ArgumentNullException(str);	
+        throw new ArgumentNullException(str);	
         return str;
     }
 	
