@@ -185,7 +185,7 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
         // where dpkl.c_packinginvoice_id = pkl.c_packinginvoice_id
         // and dpkl.c_donhang_id = dh.c_donhang_id
         // ) as etd
-        throw new ArgumentNullException(str);	
+        //throw new ArgumentNullException(str);	
         return str;
     }
 	
