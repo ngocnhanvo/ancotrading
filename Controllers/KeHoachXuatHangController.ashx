@@ -423,11 +423,11 @@ public class KeHoachXuatHangController : IHttpHandler {
 			kh.khongbaobi,
 			kh.ngayxacnhanbaobi,
             dtkd.ma_dtkd,
-            khachang.ma_dtkd
+            khachhang.ma_dtkd
         from c_kehoachxuathang kh
         left join c_donhang dh on kh.c_donhang_id = dh.c_donhang_id
         left join md_doitackinhdoanh dtkd on kh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
-        left join md_doitackinhdoanh khachang on dh.md_doitackinhdoanh_id = khachang.md_doitackinhdoanh_id
+        left join md_doitackinhdoanh khachhang on dh.md_doitackinhdoanh_id = khachhang.md_doitackinhdoanh_id
         where 
 	        kh.{3} between @tungay and @denngay
 	        AND dh.md_trangthai_id != 'KETTHUC'
