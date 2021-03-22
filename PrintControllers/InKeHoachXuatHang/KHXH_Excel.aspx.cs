@@ -160,7 +160,7 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
                             select top 1 inv.etd 
                             from c_packinginvoice inv 
                             where inv.c_packinginvoice_id = (
-							    select dpkl.c_packinginvoice_id from c_dongpklinv dpkl where dpkl.c_dongnhapxuat_id =
+							    select top 1 dpkl.c_packinginvoice_id from c_dongpklinv dpkl where dpkl.c_dongnhapxuat_id =
 							    (
 								    select top 1 dnx.c_dongnhapxuat_id 
                                     from c_dongnhapxuat dnx
