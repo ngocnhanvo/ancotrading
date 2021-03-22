@@ -420,7 +420,7 @@ public class KeHoachXuatHangController : IHttpHandler {
             kh.ngayxacnhantem,
 			kh.khongbaobi,
 			kh.ngayxacnhanbaobi
-        from c_kehoachxuathang khxh
+        from c_kehoachxuathang kh
         left join c_donhang dh on kh.c_donhang_id = dh.c_donhang_id
         where 
 	        kh.{3} between @tungay and @denngay
