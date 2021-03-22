@@ -378,7 +378,7 @@ public class KeHoachXuatHangController : IHttpHandler {
 			khongbaobi bit,
 			ngayxacnhanbaobi datetime,
             ma_dtkd nvarchar(MAX),
-            khachang nvarchar(MAX)
+            khachhang nvarchar(MAX)
         )
         insert into @tblKHXH
         select distinct
