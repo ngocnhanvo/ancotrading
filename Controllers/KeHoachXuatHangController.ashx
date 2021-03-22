@@ -423,7 +423,7 @@ public class KeHoachXuatHangController : IHttpHandler {
 			kh.khongbaobi,
 			kh.ngayxacnhanbaobi,
             dtkd.ma_dtkd,
-            khachang.khachang
+            khachang.ma_dtkd
         from c_kehoachxuathang kh
         left join c_donhang dh on kh.c_donhang_id = dh.c_donhang_id
         left join md_doitackinhdoanh dtkd on kh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
