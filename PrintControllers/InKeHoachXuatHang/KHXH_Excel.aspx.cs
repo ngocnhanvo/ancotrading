@@ -156,15 +156,14 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
 						, (select hoten from nhanvien where manv = (select distinct nguoitao from c_danhsachdathang where sochungtu = khxh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC')) as nguoilappi
 						, (khxh.shipmenttime - 7) as ngayxonghang_xxn, (khxh.shipmenttime - 35) as ngaytrenhat , khxh.khongtem, khxh.khongbaobi
 						, (
-                            select top 1 ngay_motokhai from c_packinginvoice where c_packinginvoice_id = (
-				                select top 1 c_packinginvoice_id from c_dongpklinv where c_dongnhapxuat_id =
+                            select top 1 ngay_motokhai from c_packinginvoice where c_packinginvoice_id in (
+				                select c_packinginvoice_id from c_dongpklinv where c_dongnhapxuat_id in
 				                (
-					                select top 1 c_dongnhapxuat_id 
+					                select c_dongnhapxuat_id 
 					                from c_dongnhapxuat
-					                inner join c_nhapxuat on c_nhapxuat.c_nhapxuat_id = c_dongnhapxuat.c_nhapxuat_id
 					                where c_dongdonhang_id in (
 						                select c_dongdonhang_id from c_dongdonhang where c_donhang_id = khxh.c_donhang_id
-					                ) and c_nhapxuat.md_loaichungtu_id = 'XK'
+					                )
 				                )
 			                )
                         ) as etd
