@@ -123,63 +123,148 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
         }
 		
         String str = String.Format(@"
-               declare @tungay datetime = convert(datetime, '{0} 00:00:00', 103);
-               declare @denngay datetime = convert(datetime, '{1} 23:59:59', 103);
+                declare @tungay datetime = convert(datetime, '{0} 00:00:00', 103);
+                declare @denngay datetime = convert(datetime, '{1} 23:59:59', 103);
+                
+                declare @tblKHXH table (
+	                so_po nvarchar(MAX),
+	                chungloaihang nvarchar(MAX),
+	                cbm decimal(18, 4),
+	                cbm_conlai decimal(18, 4),
+	                shipmenttime datetime,
+	                c_danhsachdathang_id nvarchar(50),
+	                ngaygiaohang datetime,
+	                ngayxonghang datetime,
+	                cont20 numeric,
+	                cont40 numeric,
+	                cont40hc numeric,
+	                ngayxuathang datetime,
+	                ghichu nvarchar(MAX),
+	                ketquakiemhang nvarchar(MAX),
+	                ngaykiemhang datetime,
+	                ngayxacnhantem nvarchar(MAX),
+	                ngayxacnhanbaobi nvarchar(MAX),
+	                ngaykhachkiem nvarchar(MAX),
+	                tre int,
+	                hangiaohang datetime,
+	                thang nvarchar(MAX),
+	                ngayxonghang_xxn datetime,
+	                ngaytrenhat datetime,
+	                khongtem bit,
+	                khongbaobi bit,
+	                md_doitackinhdoanh_id nvarchar(32),
+	                c_donhang_id nvarchar(32)
+                )
+                insert into @tblKHXH
+                select 
+	                khxh.so_po, khxh.chungloaihang, khxh.cbm, khxh.cbm_conlai, khxh.shipmenttime, khxh.c_danhsachdathang_id, 
+	                khxh.ngaygiaohang, khxh.ngayxonghang, khxh.cont20, khxh.cont40, khxh.cont40hc, khxh.ngayxuathang,
+	                khxh.ghichu, khxh.ketquakiemhang, khxh.ngaykiemhang, 
+	                (
+		                case when khxh.khongtem = 0 and khxh.ngayxacnhantem is not null then (cast(datepart(d, khxh.ngayxacnhantem) as nvarchar) +'/'+ cast(datepart(m, khxh.ngayxacnhantem) as nvarchar)+'/'+ cast(datepart(yy, khxh.ngayxacnhantem) as nvarchar))
+		                when khxh.khongtem = 0 and khxh.ngayxacnhantem is null then ' '
+		                when khxh.khongtem = 1 then 'null'
+		                else ' '
+		                end 
+	                )as ngayxacnhantem,
+	                (
+		                case when khxh.khongbaobi = 0 and khxh.ngayxacnhanbaobi is not null then (cast(datepart(d, khxh.ngayxacnhanbaobi) as nvarchar) +'/'+ cast(datepart(m, khxh.ngayxacnhanbaobi) as nvarchar)+'/'+ cast(datepart(yy, khxh.ngayxacnhanbaobi) as nvarchar))
+                        when khxh.khongbaobi = 0 and khxh.ngayxacnhanbaobi is null then ' '
+                        when khxh.khongbaobi = 1 then 'null'
+                        else ' '
+		                end 
+	                )as ngayxacnhanbaobi,
+	                (
+		                case when khxh.khongkhachkiem = 0 and khxh.ngaykhachkiem is not null then (cast(datepart(d, khxh.ngaykhachkiem) as nvarchar) +'/'+ cast(datepart(m, khxh.ngaykhachkiem) as nvarchar)+'/'+ cast(datepart(yy, khxh.ngaykhachkiem) as nvarchar))
+                        when khxh.khongkhachkiem = 0 and khxh.ngaykhachkiem is null then ' '
+                        when khxh.khongkhachkiem = 1 then 'null'
+                        else ' '
+		                end 
+	                )as ngaykhachkiem,
+	                (
+		                case when DATEDIFF(DAY, khxh.shipmenttime, DATEADD(DAY, 6, khxh.ngayxonghang)) > 0 
+		                then DATEDIFF(DAY, khxh.shipmenttime, DATEADD(DAY, 6, khxh.ngayxonghang)) 
+		                else null 
+		                end
+	                ) as tre,
+	                isnull(khxh.ngaygiaohang, khxh.shipmenttime) as hangiaohang,
+	                CAST(DATEPART(MONTH,khxh.ngaygiaohang) as nvarchar) + '/' + CAST(DATEPART(YEAR, khxh.ngaygiaohang) as nvarchar),
+	                khxh.shipmenttime - 7,
+	                khxh.shipmenttime - 35,
+	                khxh.khongtem, 
+	                khxh.khongbaobi,
+	                khxh.md_doitackinhdoanh_id,
+	                khxh.c_donhang_id
+                from c_kehoachxuathang khxh
+                left join c_donhang dh on khxh.c_donhang_id = dh.c_donhang_id
+                where 
+	                khxh.{3} between @tungay and @denngay
+	                AND dh.md_trangthai_id != 'KETTHUC'
+                    {2} {4}
 
-				select A.*, (DATEDIFF(day, A.shipmenttime, A.etd)) as tre_nv
-				
-				from (
-					select khxh.so_po, khxh.chungloaihang, khxh.cbm, khxh.cbm_conlai, khxh.shipmenttime, khxh.c_danhsachdathang_id
-	                    , khxh.ngaygiaohang, khxh.ngayxonghang, khxh.cont20, khxh.cont40, khxh.cont40hc
-	                    , khxh.ngayxuathang as ngaymotokhai, khxh.ghichu, khxh.ketquakiemhang, khxh.ngaykiemhang
-                        , dtkd.ma_dtkd as nhacungung, @tungay as tungay, @denngay as denngay
-                        , (case when khxh.khongtem = 0 and khxh.ngayxacnhantem is not null then (cast(datepart(d, khxh.ngayxacnhantem) as nvarchar) +'/'+ cast(datepart(m, khxh.ngayxacnhantem) as nvarchar)+'/'+ cast(datepart(yy, khxh.ngayxacnhantem) as nvarchar))
-			                    when khxh.khongtem = 0 and khxh.ngayxacnhantem is null then ' '
-			                    when khxh.khongtem = 1 then 'null'
-			                    else ' '
-			                    end )as ngayxacnhantem
-
-	                    , (case when khxh.khongbaobi = 0 and khxh.ngayxacnhanbaobi is not null then (cast(datepart(d, khxh.ngayxacnhanbaobi) as nvarchar) +'/'+ cast(datepart(m, khxh.ngayxacnhanbaobi) as nvarchar)+'/'+ cast(datepart(yy, khxh.ngayxacnhanbaobi) as nvarchar))
-			                    when khxh.khongbaobi = 0 and khxh.ngayxacnhanbaobi is null then ' '
-			                    when khxh.khongbaobi = 1 then 'null'
-			                    else ' '
-			                    end )as ngayxacnhanbaobi
-                        , (case when khxh.khongkhachkiem = 0 and khxh.ngaykhachkiem is not null then (cast(datepart(d, khxh.ngaykhachkiem) as nvarchar) +'/'+ cast(datepart(m, khxh.ngaykhachkiem) as nvarchar)+'/'+ cast(datepart(yy, khxh.ngaykhachkiem) as nvarchar))
-			                    when khxh.khongkhachkiem = 0 and khxh.ngaykhachkiem is null then ' '
-			                    when khxh.khongkhachkiem = 1 then 'null'
-			                    else ' '
-			                    end )as ngaykhachkiem
-						, 	(case when DATEDIFF(DAY, khxh.shipmenttime, DATEADD(DAY, 6, khxh.ngayxonghang)) > 0 then DATEDIFF(DAY, khxh.shipmenttime, DATEADD(DAY, 6, khxh.ngayxonghang)) else null end) as tre
-                        , (select ma_dtkd from md_doitackinhdoanh dtkd, c_donhang dh where dtkd.md_doitackinhdoanh_id = dh.md_doitackinhdoanh_id AND dh.c_donhang_id = khxh.c_donhang_id) as ma_dtkd
-                        , isnull(khxh.ngaygiaohang, khxh.shipmenttime) as hangiaohang
-                        , (CAST(DATEPART(MONTH,khxh.ngaygiaohang) as nvarchar) + '/' + CAST(DATEPART(YEAR, khxh.ngaygiaohang) as nvarchar)) as thang
-						, (select hoten from nhanvien where manv = (select distinct nguoitao from c_danhsachdathang where sochungtu = khxh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC')) as nguoilappi
-						, (khxh.shipmenttime - 7) as ngayxonghang_xxn, (khxh.shipmenttime - 35) as ngaytrenhat , khxh.khongtem, khxh.khongbaobi
-						, (
-                            select top 1 ngay_motokhai from c_packinginvoice where c_packinginvoice_id in (
-				                select c_packinginvoice_id from c_dongpklinv where c_dongnhapxuat_id in
-				                (
-					                select c_dongnhapxuat_id 
-					                from c_dongnhapxuat
-					                where c_dongdonhang_id in (
-						                select c_dongdonhang_id from c_dongdonhang where c_donhang_id = khxh.c_donhang_id
-					                )
-				                )
+                declare @tblINV table (donhangId nvarchar(32), ngay_motokhai datetime)
+                insert into @tblINV
+                select dpkl.c_donhang_id, inv.ngay_motokhai 
+                from c_packinginvoice inv
+                inner join c_dongpklinv dpkl on dpkl.c_packinginvoice_id = inv.c_packinginvoice_id
+                where 
+	                dpkl.c_dongnhapxuat_id in
+	                (
+		                select c_dongnhapxuat_id 
+		                from c_dongnhapxuat
+		                where c_dongdonhang_id in (
+			                select c_dongdonhang_id from c_dongdonhang where c_donhang_id in (
+				                select khxh.c_donhang_id from @tblKHXH khxh
 			                )
-                            order by ngay_motokhai asc
-                        ) as etd
-						, dtkd.md_doitackinhdoanh_id
-                    from 
-                        c_kehoachxuathang khxh
-						left join md_doitackinhdoanh dtkd on khxh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
-						left join c_donhang dh on khxh.c_donhang_id = dh.c_donhang_id
-                    where 
-                        1=1
-						AND dh.md_trangthai_id <> 'KETTHUC'
-                        AND khxh.{3} >= @tungay
-                        AND khxh.{3} <= @denngay
-                        {2} {4}
-				) A Where 1=1 ", dateFrom.ToString("dd/MM/yyyy"), dateTo.ToString("dd/MM/yyyy"), dsNhanVien, dateType =="0"? "ngaygiaohang" : "ngayxonghang", sql_them);
+		                )
+	                )
+                
+                select 
+                    A.*, 
+                    (DATEDIFF(day, A.shipmenttime, A.etd)) as tre_nv
+                from (
+	                select 
+		                khxh.so_po, 
+		                khxh.chungloaihang, 
+		                khxh.cbm, 
+		                khxh.cbm_conlai, 
+		                khxh.shipmenttime, 
+		                khxh.c_danhsachdathang_id, 
+		                khxh.ngaygiaohang, 
+		                khxh.ngayxonghang, 
+		                khxh.cont20, khxh.cont40, khxh.cont40hc, 
+		                khxh.ngayxuathang as ngaymotokhai, 
+		                khxh.ghichu, 
+		                khxh.ketquakiemhang, 
+		                khxh.ngaykiemhang, 
+		                dtkd.ma_dtkd as nhacungung, 
+		                @tungay as tungay, 
+		                @denngay as denngay,
+		                khxh.ngayxacnhantem,
+		                khxh.ngayxacnhanbaobi,
+		                khxh.ngaykhachkiem,
+		                khxh.tre,
+		                khxh.hangiaohang,
+		                khxh.thang,
+		                khxh.ngayxonghang_xxn,
+		                khxh.ngaytrenhat,
+		                khxh.khongtem, 
+		                khxh.khongbaobi,
+		                (select ma_dtkd from md_doitackinhdoanh dtkd, c_donhang dh where dtkd.md_doitackinhdoanh_id = dh.md_doitackinhdoanh_id AND dh.c_donhang_id = khxh.c_donhang_id) as ma_dtkd,
+		                (select hoten from nhanvien where manv = (select distinct nguoitao from c_danhsachdathang where sochungtu = khxh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC')) as nguoilappi,
+		                (select top 1 inv.ngay_motokhai from @tblINV inv where inv.donhangId = khxh.c_donhang_id order by inv.ngay_motokhai asc) as etd,
+		                dtkd.md_doitackinhdoanh_id
+	                from @tblKHXH khxh
+		                left join md_doitackinhdoanh dtkd on khxh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id		     
+                )A 
+                where 1=1
+			", 
+            dateFrom.ToString("dd/MM/yyyy"), 
+            dateTo.ToString("dd/MM/yyyy"), 
+            dsNhanVien, 
+            dateType =="0"? "ngaygiaohang" : "ngayxonghang", 
+            sql_them
+        );
         // select top 1 pkl.etd 
         // from c_dongpklinv dpkl, c_packinginvoice pkl 
         // where dpkl.c_packinginvoice_id = pkl.c_packinginvoice_id
