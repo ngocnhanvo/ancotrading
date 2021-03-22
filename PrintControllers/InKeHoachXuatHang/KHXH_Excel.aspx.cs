@@ -156,15 +156,28 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
 						, (select hoten from nhanvien where manv = (select distinct nguoitao from c_danhsachdathang where sochungtu = khxh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC')) as nguoilappi
 						, (khxh.shipmenttime - 7) as ngayxonghang_xxn, (khxh.shipmenttime - 35) as ngaytrenhat , khxh.khongtem, khxh.khongbaobi
 						, 
-						(select etd from c_packinginvoice where c_packinginvoice_id = (
-							select c_packinginvoice_id from c_dongpklinv where c_dongnhapxuat_id =
-							(
-								select top 1 c_dongnhapxuat_id from c_dongnhapxuat
-								where c_dongdonhang_id in (
-									select c_dongdonhang_id from c_dongdonhang where c_donhang_id = khxh.c_donhang_id
-								)
-							)
-						)) as etd
+						(
+                            select inv.etd 
+                            from c_packinginvoice inv 
+                            where inv.c_packinginvoice_id = (
+							    select top 1 dpkl.c_packinginvoice_id from c_dongpklinv dpkl where dpkl.c_dongnhapxuat_id =
+							    (
+								    select top 1 dnx.c_dongnhapxuat_id 
+                                    from c_dongnhapxuat dnx
+								    where dnx.c_dongdonhang_id in (
+									    select ddh.c_dongdonhang_id 
+                                        from c_dongdonhang ddh
+                                        where 
+                                            ddh.c_donhang_id = khxh.c_donhang_id 
+                                            and khxh.c_danhsachdathang_id in (
+                                                select dsdh.sochungtu 
+                                                from c_danhsachdathang dsdh 
+                                                where dsdh.c_danhsachdathang_id = dpkl.c_danhsachdathang_id
+                                            )
+								    )
+							    )
+						    )
+                        ) as etd
 						,dtkd.md_doitackinhdoanh_id
                     from 
                         c_kehoachxuathang khxh
@@ -177,12 +190,12 @@ public partial class PrintControllers_InKeHoachXuatHang_KHXH_Excel : System.Web.
                         AND khxh.{3} <= @denngay
                         {2} {4}
 				) A Where 1=1 ", dateFrom.ToString("dd/MM/yyyy"), dateTo.ToString("dd/MM/yyyy"), dsNhanVien, dateType =="0"? "ngaygiaohang" : "ngayxonghang", sql_them);
-			// select top 1 pkl.etd 
-			// from c_dongpklinv dpkl, c_packinginvoice pkl 
-			// where dpkl.c_packinginvoice_id = pkl.c_packinginvoice_id
-			// and dpkl.c_donhang_id = dh.c_donhang_id
-			// ) as etd
-			
+        // select top 1 pkl.etd 
+        // from c_dongpklinv dpkl, c_packinginvoice pkl 
+        // where dpkl.c_packinginvoice_id = pkl.c_packinginvoice_id
+        // and dpkl.c_donhang_id = dh.c_donhang_id
+        // ) as etd
+        //throw new ArgumentNullException(str);	
         return str;
     }
 	
