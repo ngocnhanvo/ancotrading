@@ -376,7 +376,8 @@ public class KeHoachXuatHangController : IHttpHandler {
             khongtem bit, 
             ngayxacnhantem datetime,
 			khongbaobi bit,
-			ngayxacnhanbaobi datetime
+			ngayxacnhanbaobi datetime,
+            ma_dtkd nvarchar(MAX)
         )
         insert into @tblKHXH
         select
@@ -419,9 +420,11 @@ public class KeHoachXuatHangController : IHttpHandler {
             kh.khongtem, 
             kh.ngayxacnhantem,
 			kh.khongbaobi,
-			kh.ngayxacnhanbaobi
+			kh.ngayxacnhanbaobi,
+            dtkd.ma_dtkd
         from c_kehoachxuathang kh
         left join c_donhang dh on kh.c_donhang_id = dh.c_donhang_id
+        left join md_doitackinhdoanh dtkd  on kh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
         where 
 	        kh.{3} between @tungay and @denngay
 	        AND dh.md_trangthai_id != 'KETTHUC'
@@ -459,7 +462,7 @@ public class KeHoachXuatHangController : IHttpHandler {
 			    , kh.md_trangthai_id
 			    , kh.sochungtu as ct_dh 
                 , kh.c_danhsachdathang_id
-			    , dtkd.ma_dtkd
+			    , kh.ma_dtkd
 			    , kh.chungloaihang 
                 , kh.cbm 
                 , kh.cbm_conlai 
@@ -493,7 +496,6 @@ public class KeHoachXuatHangController : IHttpHandler {
                 , kh.hoatdong 
                 , ROW_NUMBER() OVER (ORDER BY {5} {6}) as RowNum 
                 FROM @tblKHXH kh
-			    left join md_doitackinhdoanh dtkd  on kh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
                 WHERE 1=1
             )P where RowNum > @start AND RowNum < @end 
         end
