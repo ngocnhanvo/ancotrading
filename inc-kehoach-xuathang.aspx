@@ -547,7 +547,7 @@
                  , edittype: 'text'
                  , editoptions: { readonly: 'readonly' }
                  , formatter: 'imagestatus'
-                 , align:'right'
+                 , align:'center'
                  , search : true
                  , stype : 'select'
                  , searchoptions:{sopt:['in'], value:'SOANTHAO,HIEULUC:SOẠN THẢO & HIỆU LỰC;:[ALL];SOANTHAO:SOẠN THẢO;HIEULUC:HIỆU LỰC;KETTHUC:KẾT THÚC' }
