@@ -430,7 +430,7 @@ public class KeHoachXuatHangController : IHttpHandler {
         left join c_donhang dh on kh.c_donhang_id = dh.c_donhang_id
         left join md_doitackinhdoanh dtkd on kh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
         left join md_doitackinhdoanh khachhang on dh.md_doitackinhdoanh_id = khachhang.md_doitackinhdoanh_id
-        left join nhanvien nv on nc.manv = (select top 1 nguoitao from c_danhsachdathang where sochungtu = kh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC')
+        left join nhanvien nv on nv.manv = (select top 1 nguoitao from c_danhsachdathang where sochungtu = kh.c_danhsachdathang_id AND md_trangthai_id = 'HIEULUC')
         where 
 	        kh.{3} between @tungay and @denngay
 	        AND dh.md_trangthai_id != 'KETTHUC'
