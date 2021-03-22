@@ -511,7 +511,7 @@ public class KeHoachXuatHangController : IHttpHandler {
 
         throw new ArgumentNullException(strsql);
 
-        var dtCount = mdbc.GetData(strsql, "@start", 0, "@end", 99999999999, "@count", true);
+        var dtCount = mdbc.GetData(strsql, "@start", 0, "@end", int.MaxValue, "@count", true);
 
         int count = dtCount.Rows.Count;
 
