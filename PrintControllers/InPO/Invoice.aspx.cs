@@ -522,7 +522,7 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
                     //vi tri row dau tien
                     int m = row - count_row + 1, sub_row = 0, discount_row = 0;
                     //start tong cong 1
-                    s1.CreateRow(row).CreateCell(2).SetCellValue(string.Format("Sub Total PO ({0}):", lstPO.Count + 1));
+                    s1.CreateRow(row).CreateCell(2).SetCellValue(string.Format("Sub Total:", lstPO.Count + 1));
                     s1.GetRow(row).CreateCell(3).CellFormula = string.Format("{0}", sumQuantity);
                     s1.GetRow(row).CreateCell(6).CellFormula = string.Format("{0}", sumAmount);
                     s1.GetRow(row).CreateCell(14).SetCellValue(discountPO);
@@ -645,7 +645,7 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
                         sumToTalPO += string.Format(@"G{0}+", rowHH + 1);
                     }
                     sumToTalPO += "0";
-                    s1.CreateRow(row).CreateCell(2).SetCellValue(string.Format("Total PO ({0}):", lstPO.Count + 1));
+                    s1.CreateRow(row).CreateCell(2).SetCellValue(string.Format("Total ({0}):", lstPO.Count + 1));
                     s1.GetRow(row).CreateCell(3).CellFormula = string.Format("D{0}", sub_row);
                     s1.GetRow(row).CreateCell(6).CellFormula = string.Format("G{0}-G{1}+G{2}-G{3}", sub_row, sub_row + 1, sub_row + 2, sub_row + 3);
                     // style

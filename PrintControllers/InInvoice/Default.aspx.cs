@@ -821,7 +821,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
             if (double.Parse(discountPO) == 0) s1.GetRow(r).HeightInPoints = 0;
 
             r++;
-            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Total PO{0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
+            s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Total {0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
             s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
 
             s1.GetRow(r).CreateCell(6).CellFormula = String.Format("G{0}-G{1}", r - 1, r);

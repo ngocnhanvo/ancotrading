@@ -522,7 +522,7 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
                     //vi tri row dau tien
                     int m = row - count_row + 1, sub_row = 0, discount_row = 0;
                     //start tong cong 1
-                    s1.CreateRow(row).CreateCell(3).SetCellValue(string.Format("Sub Total PO ({0}):", lstPO.Count + 1));
+                    s1.CreateRow(row).CreateCell(3).SetCellValue(string.Format("Sub Total:", lstPO.Count + 1));
                     s1.GetRow(row).CreateCell(4).CellFormula = string.Format("{0}", sumQuantity);
                     s1.GetRow(row).CreateCell(7).CellFormula = string.Format("{0}", sumAmount);
                     s1.GetRow(row).CreateCell(14).SetCellValue(discountPO);
@@ -638,7 +638,7 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
                         sumToTalPO += string.Format(@"G{0}+", rowHH + 1);
                     }
                     sumToTalPO += "0";
-                    s1.CreateRow(row).CreateCell(3).SetCellValue(string.Format("Total PO ({0}):", lstPO.Count + 1));
+                    s1.CreateRow(row).CreateCell(3).SetCellValue(string.Format("Total ({0}):", lstPO.Count + 1));
                     s1.GetRow(row).CreateCell(4).CellFormula = string.Format("E{0}", sub_row);
                     s1.GetRow(row).CreateCell(7).CellFormula = string.Format("H{0}-H{1}+H{2}-H{3}", sub_row, sub_row + 1, sub_row + 2, sub_row + 3);
                     // style
