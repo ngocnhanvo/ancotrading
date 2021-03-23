@@ -521,7 +521,7 @@ public class KeHoachXuatHangController : IHttpHandler {
 
         var dtCount = mdbc.GetData(strsql, "@start", 0, "@end", int.MaxValue, "@count", 1);
 
-        int count = dtCount.Rows.Count;
+        int count = int.Parse(dtCount.Rows[0].ToString());
 
         int total_page;
 
