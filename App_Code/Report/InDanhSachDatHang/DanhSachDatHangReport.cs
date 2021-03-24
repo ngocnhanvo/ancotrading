@@ -761,9 +761,12 @@ public class DanhSachDatHangReport
         s1.GetRow(row).HeightInPoints = 30;
         if (guiNCC == false)
         {
-            var textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)tongCongDaTru, dt.Rows[0]["ma_dtkd"].ToString()).Trim();
+            var textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)tongCongDaTru, maDTKD).Trim();
 			if(textMoney.Length > 0) {
 				textMoney = textMoney.Substring(0, 1).ToUpper() + textMoney.Substring(1);
+			}
+			else {
+				textMoney = tongCongDaTru + "," + maDTKD;
 			}
             s1.GetRow(row).CreateCell(2).SetCellValue(textMoney);
             s1.GetRow(row).GetCell(2).CellStyle = celltext;
