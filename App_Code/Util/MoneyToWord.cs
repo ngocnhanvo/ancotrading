@@ -291,6 +291,8 @@ public static class MoneyToWord
                 m = m.Replace("Cents", "").Replace("Cent", "");
             }
             textMoney = m;
+			if(textMoney.Length <= 0)
+				m = "Zero " + m;
         }
         else
         {
