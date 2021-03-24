@@ -765,9 +765,7 @@ public class DanhSachDatHangReport
 			if(textMoney.Length > 0) {
 				textMoney = textMoney.Substring(0, 1).ToUpper() + textMoney.Substring(1);
 			}
-			else {
-				textMoney = tongCongDaTru + "," + maDTKD;
-			}
+
             s1.GetRow(row).CreateCell(2).SetCellValue(textMoney);
             s1.GetRow(row).GetCell(2).CellStyle = celltext;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 10));
