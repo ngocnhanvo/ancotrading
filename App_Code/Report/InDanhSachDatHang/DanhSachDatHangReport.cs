@@ -762,7 +762,9 @@ public class DanhSachDatHangReport
         if (guiNCC == false)
         {
             var textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)tongCongDaTru, dt.Rows[0]["ma_dtkd"].ToString()).Trim();
-            textMoney = textMoney.Substring(0, 1).ToUpper() + textMoney.Substring(1);
+			if(textMoney.Length > 0) {
+				textMoney = textMoney.Substring(0, 1).ToUpper() + textMoney.Substring(1);
+			}
             s1.GetRow(row).CreateCell(2).SetCellValue(textMoney);
             s1.GetRow(row).GetCell(2).CellStyle = celltext;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 10));
