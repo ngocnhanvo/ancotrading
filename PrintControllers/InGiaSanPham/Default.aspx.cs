@@ -14,7 +14,7 @@ public partial class PrintControllers_InGiaSanPham_Default : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         String md_phienbangia_id = Request.QueryString["md_phienbangia_id"];
-        String sql = "select pbg.ten_phienbangia, sp.ma_sanpham, gia, gsp.mota from md_sanpham sp, md_giasanpham gsp, md_phienbangia pbg where sp.md_sanpham_id = gsp.md_sanpham_id AND pbg.md_phienbangia_id = gsp.md_phienbangia_id AND pbg.md_phienbangia_id = @md_phienbangia_id order by sp.ma_sanpham asc";
+        String sql = "select pbg.ten_phienbangia, sp.ma_sanpham, gsp.gia, gsp.phi, gsp.mota from md_sanpham sp, md_giasanpham gsp, md_phienbangia pbg where sp.md_sanpham_id = gsp.md_sanpham_id AND pbg.md_phienbangia_id = gsp.md_phienbangia_id AND pbg.md_phienbangia_id = @md_phienbangia_id order by sp.ma_sanpham asc";
         DataTable dt = mdbc.GetData(sql, "@md_phienbangia_id", md_phienbangia_id);
         
         if (dt.Rows.Count != 0)
