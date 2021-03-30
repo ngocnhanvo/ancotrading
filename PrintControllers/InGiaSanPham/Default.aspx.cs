@@ -41,15 +41,28 @@ public partial class PrintControllers_InGiaSanPham_Default : System.Web.UI.Page
 
         row1.CreateCell(0).SetCellValue("Mã sản phẩm");
         row1.CreateCell(1).SetCellValue("Giá");
-        row1.CreateCell(2).SetCellValue("Mã Khách Hàng");
+		row1.CreateCell(2).SetCellValue("Phí");
+		row1.CreateCell(3).SetCellValue("Tổng Giá");
+        row1.CreateCell(4).SetCellValue("Mã Khách Hàng");
 
         for (int i = 0; i < dt.Rows.Count; i++)
         {
 			var row = i + 1;
             s1.CreateRow(row).CreateCell(0).SetCellValue(dt.Rows[i]["ma_sanpham"].ToString());
-            s1.GetRow(row).CreateCell(1).SetCellValue(double.Parse(dt.Rows[i]["gia"].ToString()));
+			
+			var gia = double.Parse(dt.Rows[i]["gia"].ToString());
+            s1.GetRow(row).CreateCell(1).SetCellValue(gia);
 			s1.GetRow(row).GetCell(1).CellStyle = cellBold2;
-            s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[i]["mota"].ToString());
+			
+			var phi = double.Parse(dt.Rows[i]["phi"].ToString());
+			s1.GetRow(row).CreateCell(2).SetCellValue(phi);
+			s1.GetRow(row).GetCell(2).CellStyle = cellBold2;
+			
+			var tonggia = gia + phi;
+			s1.GetRow(row).CreateCell(3).SetCellValue(tonggia);
+			s1.GetRow(row).GetCell(3).CellStyle = cellBold2;
+			
+            s1.GetRow(row).CreateCell(4).SetCellValue(dt.Rows[i]["mota"].ToString());
         }
 
         return hssfworkbook;
