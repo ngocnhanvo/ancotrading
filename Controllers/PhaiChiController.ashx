@@ -468,10 +468,16 @@ public class PhaiChiController : IHttpHandler
             filter = f.ToScript();
         }
 
-        String sqlCount = "SELECT COUNT(*) AS count FROM c_thuchi tc, md_doitackinhdoanh dtkd, md_dongtien dt, md_loaichungtu lct " +
-            " WHERE tc.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " +
-            " AND tc.md_dongtien_id = dt.md_dongtien_id " +
-            " AND tc.md_loaichungtu_id = lct.md_loaichungtu_id AND tc.ispaymentin = 0  " + filter;
+        String sqlCount = string.Format(@"
+			SELECT COUNT(1) AS count 
+			FROM c_thuchi tc
+			left join md_doitackinhdoanh dtkd on tc.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
+			left join md_dongtien dt on tc.md_dongtien_id = dt.md_dongtien_id
+			left join md_loaichungtu lct on tc.md_loaichungtu_id = lct.md_loaichungtu_id
+            WHERE AND tc.ispaymentin = 0 {0}", 
+			filter
+		);
+		
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -498,25 +504,31 @@ public class PhaiChiController : IHttpHandler
             sidx = "tc.c_thuchi_id";
         }
 
-        string strsql = "select * from( " +
-            " select tc.c_thuchi_id, tc.md_trangthai_id, tc.sophieu,  " +
-            " dtkd.ma_dtkd, tc.ngaylapphieu, tc.nguoi_giaonop, " +
-            " tc.ngay_giaonop, tc.sotien, " +
-            " dt.ma_iso, tc.tygia, " +
-            " tc.lydo, tc.loaiphieu, " +
-            " tc.sochungtu, tc.quydoi_vnd, " +
-            " tc.tk_no, tc.tk_co, " +
-            " tc.tk_quy, tc.so_dadinhkhoan, " +
-            " tc.so_chuadinhkhoan, tc.so_dachiphi, tc.ispaymentin," +
-            " lct.tenchungtu, tc.tongcackhoan, tc.tongkhoanphi, tc.tienconlai," +
-            " tc.ngaytao, tc.nguoitao, tc.ngaycapnhat, tc.nguoicapnhat, tc.mota, tc.hoatdong, " +
-            " ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            " FROM c_thuchi tc, md_doitackinhdoanh dtkd, md_dongtien dt, md_loaichungtu lct " +
-            " WHERE tc.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " +
-            " AND tc.md_dongtien_id = dt.md_dongtien_id " +
-            " AND tc.md_loaichungtu_id = lct.md_loaichungtu_id " +
-            " AND tc.ispaymentin = 0 " + filter +
-            ")P WHERE RowNum > @start AND RowNum < @end";
+        string strsql = string.Format(@"
+			select P.* 
+			from(
+				select tc.c_thuchi_id, tc.md_trangthai_id, tc.sophieu,
+				dtkd.ma_dtkd, tc.ngaylapphieu, tc.nguoi_giaonop,
+				tc.ngay_giaonop, tc.sotien,
+				dt.ma_iso, tc.tygia,
+				tc.lydo, tc.loaiphieu,
+				tc.sochungtu, tc.quydoi_vnd,
+				tc.tk_no, tc.tk_co,
+				tc.tk_quy, tc.so_dadinhkhoan,
+				tc.so_chuadinhkhoan, tc.so_dachiphi, tc.ispaymentin,
+				lct.tenchungtu, tc.tongcackhoan, tc.tongkhoanphi, tc.tienconlai,
+				tc.ngaytao, tc.nguoitao, tc.ngaycapnhat, tc.nguoicapnhat, tc.mota, tc.hoatdong,
+				ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum
+				FROM c_thuchi tc
+				left join md_doitackinhdoanh dtkd on tc.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
+				left join md_dongtien dt on tc.md_dongtien_id = dt.md_dongtien_id
+				left join md_loaichungtu lct on tc.md_loaichungtu_id = lct.md_loaichungtu_id
+				WHERE
+				1=1
+				AND tc.ispaymentin = 0 {2}
+            )P 
+			WHERE RowNum > @start AND RowNum < @end", 
+			sidx, sord, filter);
 
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
