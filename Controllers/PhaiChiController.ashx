@@ -474,7 +474,7 @@ public class PhaiChiController : IHttpHandler
 			left join md_doitackinhdoanh dtkd on tc.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
 			left join md_dongtien dt on tc.md_dongtien_id = dt.md_dongtien_id
 			left join md_loaichungtu lct on tc.md_loaichungtu_id = lct.md_loaichungtu_id
-            WHERE AND tc.ispaymentin = 0 {0}", 
+            WHERE 1=1 AND tc.ispaymentin = 0 {0}", 
 			filter
 		);
 		
