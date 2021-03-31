@@ -328,7 +328,17 @@ public class PhaiChiController : IHttpHandler
             c_thuchi mnu = db.c_thuchis.Single(p => p.c_thuchi_id == context.Request.Form["id"]);
             if (mnu.md_trangthai_id.Equals("SOANTHAO"))
             {
-                mnu.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
+				var dtkdId = context.Request.Form["md_doitackinhdoanh_id"];
+				var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dtkdId).FirstOrDefault();
+                var idVal = new string[] { "", "" };
+                if(dtkd != null)
+                {
+                    idVal[0] = dtkd.md_doitackinhdoanh_id;
+                    idVal[1] = dtkd.ma_dtkd;
+                }
+				
+                mnu.md_doitackinhdoanh_id = idVal[0];
+				mnu.doitacValue = idVal[1];
                 mnu.ngaylapphieu = DateTime.ParseExact(context.Request.Form["ngaylapphieu"], "dd/MM/yyyy", null);
                 mnu.nguoi_giaonop = context.Request.Form["nguoi_giaonop"];
                 mnu.ngay_giaonop = DateTime.ParseExact(context.Request.Form["ngay_giaonop"], "dd/MM/yyyy", null);
@@ -377,7 +387,7 @@ public class PhaiChiController : IHttpHandler
                 string dtkdId = context.Request.Form["md_doitackinhdoanh_id"];
                 var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dtkdId).FirstOrDefault();
                 var idVal = new string[] { "", "" };
-                if(dtkd == null)
+                if(dtkd != null)
                 {
                     idVal[0] = dtkd.md_doitackinhdoanh_id;
                     idVal[1] = dtkd.ma_dtkd;
