@@ -726,7 +726,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
                         rowDisHeHang.CreateCell(2).SetCellValue(string.Format(@"Discount ({0}%):", gthh));
                         rowDisHeHang.GetCell(2).CellStyle = style12Bold;
                         s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 1));
-                        rowDisHeHang.CreateCell(6).CellFormula = string.Format("G{0}*{1}/100", r, gthh);
+                        rowDisHeHang.CreateCell(6).CellFormula = string.Format("ROUND(G{0}*{1}/100, 2)", r, gthh);
                         rowDisHeHang.GetCell(6).CellStyle = styleNumber0i0012Bold;
                         r++;
 

@@ -633,7 +633,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
                         rowDisHeHang.CreateCell(3).SetCellValue(string.Format(@"Discount ({0}%):", gthh));
                         rowDisHeHang.GetCell(3).CellStyle = style12Bold;
                         s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 2));
-                        rowDisHeHang.CreateCell(7).CellFormula = string.Format("H{0}*{1}/100", r, gthh);
+                        rowDisHeHang.CreateCell(7).CellFormula = string.Format("ROUND(H{0}*{1}/100, 2)", r, gthh);
                         rowDisHeHang.GetCell(7).CellStyle = styleNumber0i0012Bold;
                         r++;
 

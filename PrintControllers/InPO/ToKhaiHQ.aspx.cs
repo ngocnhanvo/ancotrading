@@ -405,7 +405,7 @@ public partial class PrintControllers_IToKhaiHQ_Default : System.Web.UI.Page
                         rowDisHeHang.CreateCell(2).SetCellValue(string.Format(@"Giảm giá ({0}%):", gthh));
                         rowDisHeHang.GetCell(2).CellStyle = leftBold;
                         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 1));
-                        rowDisHeHang.CreateCell(8).CellFormula = string.Format("I{0}*{1}/100", row, gthh);
+                        rowDisHeHang.CreateCell(8).CellFormula = string.Format("ROUND(I{0}*{1}/100, 2)", row, gthh);
                         rowDisHeHang.GetCell(8).CellStyle = number2Bold;
                         row++;
                         count_row++;

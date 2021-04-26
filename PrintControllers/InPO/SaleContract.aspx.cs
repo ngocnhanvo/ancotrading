@@ -64,7 +64,7 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
 	                        )
                         from (
                             select
-                                sum(soluong * (isnull(giachuan, giafob) + isnull(phi, 0) - isnull(giachuan, giafob) * isnull(discount, 0) / 100)) as amount 
+                                sum(soluong * (isnull(giachuan, giafob) + isnull(phi, 0) - round(isnull(giachuan, giafob) * isnull(discount, 0) / 100), 2)) as amount 
                             from 
                                 c_dongdonhang
                             where 
@@ -472,7 +472,7 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
                         rowDisHeHang.CreateCell(3).SetCellValue(string.Format(@"Discount ({0}%):", gthh));
                         rowDisHeHang.GetCell(3).CellStyle = leftBold;
                         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 1));
-                        rowDisHeHang.CreateCell(7).CellFormula = string.Format("H{0}*{1}/100", row, gthh);
+                        rowDisHeHang.CreateCell(7).CellFormula = string.Format("ROUND(H{0}*{1}/100, 2)", row, gthh);
                         rowDisHeHang.GetCell(7).CellStyle = number2Bold;
                         row++;
                         count_row++;
