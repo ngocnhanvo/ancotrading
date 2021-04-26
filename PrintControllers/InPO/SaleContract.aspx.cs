@@ -56,20 +56,31 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
                     giam = pGiam == null ? 0 : pGiam.Value;
 
                     total = (decimal)mdbc.ExecuteScalar(@"
-                        select 
-	                        cast(
-                                A.amount - 
-                                (A.amount * isnull((select discount from c_donhang where c_donhang_id = @c_donhang_id), 0) / 100) 
-                                as decimal(18, 2)
-	                        )
+                        declare @discount numeric(18, 6) = isnull((select discount from c_donhang where c_donhang_id = @c_donhang_id), 0)
+                        select a.total -
+                        cast(a.total * @discount / 100 as decimal(18, 2)) 
                         from (
-                            select
-                                sum(soluong * (isnull(giachuan, giafob) + isnull(phi, 0) - round(isnull(giachuan, giafob) * isnull(discount, 0) / 100, 2))) as amount 
-                            from 
-                                c_dongdonhang
-                            where 
-                                c_donhang_id = @c_donhang_id
-                        )A
+	                        select sum(amount) as total
+	                        from (
+		                        select a.hehang, a.amount - round(a.amount * a.discount / 100, 2) as amount
+		                        from (
+			                        select a.hehang, a.discount, sum(a.amount) as amount
+			                        from (
+				                        select
+					                        dh.soluong * (isnull(dh.giachuan, dh.giafob)) as amount,
+					                        isnull(dh.discount, 0) as discount,
+					                        isnull(dh.phi, 0) as phi,
+					                        SUBSTRING(sp.ma_sanpham,0,3) as hehang
+				                        from 
+					                        c_dongdonhang dh
+					                        left join md_sanpham sp on sp.md_sanpham_id = dh.md_sanpham_id
+				                        where 
+					                        c_donhang_id = @c_donhang_id
+			                        )a
+			                        group by hehang, discount
+		                        )a
+	                        )a
+                        )a
                     "
                     , "@c_donhang_id"
                     , c_id[i]);
