@@ -55,7 +55,7 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
                     tang = pTang == null ? 0 : pTang.Value;
                     giam = pGiam == null ? 0 : pGiam.Value;
 
-                    string totalStr = (string)mdbc.ExecuteScalar(@"
+                    double totalDB = (double)mdbc.ExecuteScalar(@"
                         declare @discount numeric(18, 6) = isnull((select discount from c_donhang where c_donhang_id = @c_donhang_id), 0)
                         select a.total -
                         cast(a.total * @discount / 100 as decimal(18, 2)) 
@@ -85,7 +85,7 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
                     , "@c_donhang_id"
                     , c_id[i]);
 
-                    total = decimal.Parse(totalStr);
+                    total = (decimal)totalDB;
                     total = total + tang - giam;
                     total_all += total;
                 }
