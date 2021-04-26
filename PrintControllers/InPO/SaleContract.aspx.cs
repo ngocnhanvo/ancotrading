@@ -64,7 +64,7 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
 	                        )
                         from (
                             select
-                                sum(soluong * (isnull(giachuan, giafob) + isnull(phi, 0) - round(isnull(giachuan, giafob) * isnull(discount, 0) / 100), 2)) as amount 
+                                sum(soluong * (isnull(giachuan, giafob) + isnull(phi, 0) - round(isnull(giachuan, giafob) * isnull(discount, 0) / 100, 2))) as amount 
                             from 
                                 c_dongdonhang
                             where 
