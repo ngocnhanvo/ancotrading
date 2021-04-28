@@ -581,7 +581,7 @@ public class DonHangController : IHttpHandler
 
     public void activePO(HttpContext context)
     {
-        //try
+        try
         {
             String result = "";
             String poId = context.Request.QueryString["poId"];
@@ -695,9 +695,9 @@ public class DonHangController : IHttpHandler
 
             context.Response.Write(result);
         }
-        //catch (Exception ex)
+        catch (Exception ex)
         {
-            //context.Response.Write(ex.Message);
+            context.Response.Write(ex.ToString());
         }
     }
 
