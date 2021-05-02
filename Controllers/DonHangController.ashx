@@ -629,16 +629,16 @@ public class DonHangController : IHttpHandler
                             string sql_TongCanDat = string.Format(@"select sum(v2)  from c_dongdonhang ddh where ddh.c_donhang_id ='{0}'", poId);
                             string sql_slCandat = @"select isnull(SUM(cbm_candat), 0) from f_tinhNangLucCungUng('" + poId + "')";
                             string tong = mdbc.ExecuteScalar(sql_TongCanDat).ToString();
-                            decimal slTongCanDat = decimal.Parse(tong.Substring(0, tong.Length - 1));
-                            decimal slCanDat = decimal.Parse(mdbc.ExecuteScalar(sql_slCandat).ToString());
+                            string tongCanDat = mdbc.ExecuteScalar(sql_slCandat).ToString();
+                            decimal slTongCanDat = string.IsNullOrWhiteSpace(tong) ? 0 : decimal.Parse(tong);
+                            decimal slCanDat = string.IsNullOrWhiteSpace(tongCanDat) ? 0 : decimal.Parse(tongCanDat);
                             if (count != 0 && slCanDat >= slTongCanDat)
                             {
-
-                                String selDetails = "select COUNT(*) as count from c_dongdonhang where c_donhang_id = @c_donhang_id";
+                                String selDetails = "select COUNT(1) as count from c_dongdonhang where c_donhang_id = @c_donhang_id";
                                 int countNL = (int)mdbc.ExecuteScalar(selDetails, "@c_donhang_id", poId);
                                 if (countNL > 0)
                                 {
-                                    string sql_check = @"select COUNT(*) from [dbo].[f_tinhNangLucCungUng]('" + poId + "')" + " where result_nhandh = 0 or result = 0";
+                                    string sql_check = @"select COUNT(1) from [dbo].[f_tinhNangLucCungUng]('" + poId + "')" + " where result_nhandh = 0 or result = 0";
                                     int check = (int)mdbc.ExecuteScalar(sql_check);
                                     if (check == 0)
                                     {
@@ -647,6 +647,10 @@ public class DonHangController : IHttpHandler
                                         db.SubmitChanges();
                                         mdbc.ExecuteScalarProcedure("p_bookNangLucCungUng", "@donhang_id", poId);
                                         result += "Hiệu lực đơn hàng thành công.! <br/>";
+                                    }
+                                    else
+                                    {
+                                        result += "Đơn hàng không đủ năng lực NCC.! <br/>";
                                     }
                                 }
                                 else
@@ -660,11 +664,11 @@ public class DonHangController : IHttpHandler
                                 decimal sl_chk_lai_TongCanDat = decimal.Parse(mdbc.ExecuteScalar(sql_chk_lai_tongcandat).ToString());
                                 if (count != 0 && slCanDat >= slTongCanDat)
                                 {
-                                    String selDetails = "select COUNT(*) as count from c_dongdonhang where c_donhang_id = @c_donhang_id";
+                                    String selDetails = "select COUNT(1) as count from c_dongdonhang where c_donhang_id = @c_donhang_id";
                                     int countNL = (int)mdbc.ExecuteScalar(selDetails, "@c_donhang_id", poId);
                                     if (countNL > 0)
                                     {
-                                        string sql_check = @"select COUNT(*) from [dbo].[f_tinhNangLucCungUng]('" + poId + "')" + " where result_nhandh = 0 or result = 0";
+                                        string sql_check = @"select COUNT(1) from [dbo].[f_tinhNangLucCungUng]('" + poId + "')" + " where result_nhandh = 0 or result = 0";
                                         int check = (int)mdbc.ExecuteScalar(sql_check);
                                         if (check == 0)
                                         {
