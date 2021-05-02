@@ -67,6 +67,7 @@ public class TaoPackingListController : IHttpHandler {
             p.noidi = md_cangbien_id;
 
             double discountHH = 0;
+            var lstHH = new List<Dictionary<string, object>>();
             foreach (DataRow item in dt.Rows)
             {
 
@@ -95,14 +96,20 @@ public class TaoPackingListController : IHttpHandler {
                 var discountHH_DH = (double)UserUtils.getDiscountgPO(donhang, dongdonhang, 1);
                 discountHH += (double)line.thanhtien.GetValueOrDefault(0) * discountHH_DH / 100;
 
+                lstHH.Add(new Dictionary<string, object>() {
+                    { "code_cl", dongdonhang.code_cl },
+                    { "thanhtien", line.thanhtien  },
+                    { "discountHH_DH", discountHH_DH  }
+                });
+
                 line.nhacungungid = dongdonhang.nhacungungid;
                 line.v2 = dongdonhang.v2;
                 line.soluong_ddh = dongdonhang.soluong;
                 line.c_nhapxuat_id = dongnx.c_nhapxuat_id;
                 line.c_danhsachdathang_id = c_danhsachdathang_id;
-                
+
                 var discountPO = UserUtils.getDiscountgPO(donhang, null);
-                totaldiscount += (line.thanhtien.Value * discountPO) / 100;
+                totaldiscount += Math.Round((line.thanhtien.Value * discountPO) / 100, 2);
                 totalnet += line.thanhtien.Value;
 
                 line.line = sothutu;
@@ -166,7 +173,14 @@ public class TaoPackingListController : IHttpHandler {
             p.diengiaicong_po = diendai_phitang;
             p.diengiaitru_po = diendai_phigiam;
 
-            totaldiscount = totaldiscount + (decimal)discountHH;
+            foreach(var hh in lstHH.Select(s=>s["code_cl"].ToString()).Distinct())
+            {
+                var tt = lstHH.Where(s => s["code_cl"].ToString() == hh).Sum(s => double.Parse(s["thanhtien"].ToString()));
+                var discount = lstHH.Where(s => s["code_cl"].ToString() == hh).Select(s => double.Parse(s["discount"].ToString())).FirstOrDefault();
+                totaldiscount = totaldiscount + (decimal)(tt - Math.Round(tt * discount / 100, 2));
+            }
+
+            //totaldiscount = totaldiscount + (decimal)discountHH;
             p.totaldis = Math.Round(totaldiscount, 2);
             p.totalnet = Math.Round(totalnet, 2);
             p.totalgross = p.totalnet - p.totaldis + (p.giatri_cong + p.giatricong_po) - (p.giatri_tru + p.giatritru_po);
