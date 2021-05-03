@@ -1374,12 +1374,16 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 excel.lstText = lstText;
                 var result = excel.ConvertInterop(url, urlXls, null);
                 File.Delete(url);
-                var data = "";
-                data += "oper=downloadFile";
-                data += string.Format("&name={0}", saveAsFileName);
-                data += string.Format("&path=ReportPdf/{0}1.xls", fileName);
-                data += string.Format("&remove=false");
-                Response.Redirect(string.Format("../../Controllers/API_System.ashx?{0}", data));
+                Response.Write(result);
+                if (result.Length <= 0)
+                {
+                    var data = "";
+                    data += "oper=downloadFile";
+                    data += string.Format("&name={0}", saveAsFileName);
+                    data += string.Format("&path=ReportPdf/{0}1.xls", fileName);
+                    data += string.Format("&remove=true");
+                    Response.Redirect(string.Format("../../Controllers/API_System.ashx?{0}", data));
+                }
             }
         }
     }
