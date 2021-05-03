@@ -1354,11 +1354,11 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             hsswb.Write(xfile);
             xfile.Close();
             xfile.Dispose();
-
-            var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
-            var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstimage, lstText);
+            
             if (type == "pdf")
             {
+                var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
+                var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstimage, lstText);
                 File.Delete(url);
                 Response.Write(result);
                 if (result.Length <= 0)
@@ -1366,7 +1366,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             }
             else
             {
-                File.Delete(urlPDF);
+                var result = OfficeToPDF.ExcelConverter.Convert(url, url, null, lstimage, lstText);
                 var data = "";
                 data += "oper=downloadFile";
                 data += string.Format("&name={0}", saveAsFileName);
