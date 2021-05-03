@@ -1373,8 +1373,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 data += string.Format("&path=ReportPdf/{0}.xls", fileName);
                 data += string.Format("&remove=true");
                 Response.Redirect(string.Format("../../Controllers/API_System.ashx?{0}", data));
-
-                
             }
         }
     }

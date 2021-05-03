@@ -53,6 +53,10 @@ public class API_System : IHttpHandler {
                 File.Delete(path);
             context.Response.End();
         }
+        else
+        {
+            context.Response.Write(string.Format("Không tìm thấy đường dẫn<br>{0}", path));
+        }
     }
 
     public void loadPDF(HttpContext context)
