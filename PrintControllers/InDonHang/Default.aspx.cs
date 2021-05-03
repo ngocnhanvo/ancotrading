@@ -1366,11 +1366,15 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             }
             else
             {
-                var result = OfficeToPDF.ExcelConverter.Convert(url, url, null, lstimage, lstText);
+                var urlXls = url.Replace(fileName + ".xls", fileName + "1.xls");
+                var excel = new OfficeToPDF.ExcelConverter();
+                excel.lstImage = lstimage;
+                excel.lstText = lstText;
+                var result = excel.ConvertInterop(url, urlXls, null);
                 var data = "";
                 data += "oper=downloadFile";
                 data += string.Format("&name={0}", saveAsFileName);
-                data += string.Format("&path=ReportPdf/{0}.xls", fileName);
+                data += string.Format("&path=ReportPdf/{0}.xls", urlXls);
                 data += string.Format("&remove=false");
                 Response.Redirect(string.Format("../../Controllers/API_System.ashx?{0}", data));
             }
