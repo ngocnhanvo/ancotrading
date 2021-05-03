@@ -35,10 +35,10 @@ public class API_System : IHttpHandler {
 
     public void downloadFile(HttpContext context)
     {
-        string name = context.Request.Form["name"];
-        string type = context.Request.Form["type"];
-        string path = context.Request.Form["path"];
-        var remove = context.Request.Form["remove"] == "true";
+        string name = context.Request.QueryString["name"];
+        string type = context.Request.QueryString["type"];
+        string path = context.Request.QueryString["path"];
+        var remove = context.Request.QueryString["remove"] == "true";
         path = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
         if (File.Exists(path))
         {
