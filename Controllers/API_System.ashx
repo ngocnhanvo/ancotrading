@@ -27,8 +27,34 @@ public class API_System : IHttpHandler {
             case "loadPDF":
                 this.loadPDF(context);
                 break;
+            case "downloadFile":
+                this.downloadFile(context);
+                break;
         }
     }
+
+    public void downloadFile(HttpContext context)
+    {
+        string name = context.Request.Form["name"];
+        string type = context.Request.Form["type"];
+        string path = context.Request.Form["path"];
+        var remove = context.Request.Form["remove"] == "true";
+        path = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
+        if (File.Exists(path))
+        {
+            context.Response.Clear();
+            context.Response.Buffer = true;
+            context.Response.AddHeader("Content-Disposition", "attachment;filename=" + name);
+            context.Response.Charset = "";
+            context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            context.Response.WriteFile(path);
+            context.Response.Flush();
+            if(remove)
+                File.Delete(path);
+            context.Response.End();
+        }
+    }
+
     public void loadPDF(HttpContext context)
     {
         var urlPDF = context.Request.QueryString["urlPDF"];
