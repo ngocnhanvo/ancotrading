@@ -260,7 +260,6 @@ namespace OfficeToPDF
                     // object a few times
                     int tries = 10;
                     app = new Microsoft.Office.Interop.Excel.Application();
-                    app.Calculation = XlCalculation.xlCalculationAutomatic;
                     while (tries > 0)
                     {
                         try
@@ -366,6 +365,7 @@ namespace OfficeToPDF
                     {
                         workbook = workbooks.Open(inputFile, updateLinks, nowrite, oMissing, oReadPass, oWritePass, true, oMissing, oMissing, oMissing, oMissing, oMissing, false, oMissing, oMissing);
                     }
+                    app.Calculation = XlCalculation.xlCalculationAutomatic;
                     // Add in a delay to let Excel sort itself out
                     AddCOMDelay(options);
 
