@@ -260,7 +260,7 @@ namespace OfficeToPDF
                     // object a few times
                     int tries = 10;
                     app = new Microsoft.Office.Interop.Excel.Application();
-
+                    app.Calculation = XlCalculation.xlCalculationAutomatic;
                     while (tries > 0)
                     {
                         try
