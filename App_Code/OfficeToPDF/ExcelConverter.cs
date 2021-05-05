@@ -365,7 +365,7 @@ namespace OfficeToPDF
                     {
                         workbook = workbooks.Open(inputFile, updateLinks, nowrite, oMissing, oReadPass, oWritePass, true, oMissing, oMissing, oMissing, oMissing, oMissing, false, oMissing, oMissing);
                     }
-                    app.Calculation = XlCalculation.xlCalculationAutomatic;
+                    
                     // Add in a delay to let Excel sort itself out
                     AddCOMDelay(options);
 
@@ -955,6 +955,8 @@ namespace OfficeToPDF
                     }
                     else
                     {
+                        app.Calculation = XlCalculation.xlCalculationAutomatic;
+                        workbook.Application.Calculation = XlCalculation.xlCalculationAutomatic;
                         workbook.SaveAs(outputFile, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing,
                         Type.Missing, Type.Missing);
                     }
