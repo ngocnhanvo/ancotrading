@@ -298,7 +298,7 @@ namespace OfficeToPDF
                     var onlyActiveSheet = false;
                     Boolean activeSheetOnMaxRows = false;
                     Boolean includeProps = !false;
-                    Boolean skipRecalculation = true;
+                    Boolean skipRecalculation = false;
                     Boolean showHeadings = false;
                     Boolean showFormulas = false;
                     Boolean isHidden = false;
@@ -955,8 +955,8 @@ namespace OfficeToPDF
                     }
                     else
                     {
-                        app.Calculation = XlCalculation.xlCalculationAutomatic;
-                        workbook.Application.Calculation = XlCalculation.xlCalculationAutomatic;
+                        //app.Calculation = XlCalculation.xlCalculationAutomatic;
+                        //workbook.Application.Calculation = XlCalculation.xlCalculationAutomatic;
                         workbook.SaveAs(outputFile, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing,
                         Type.Missing, Type.Missing);
                     }
@@ -1114,7 +1114,7 @@ namespace OfficeToPDF
                     var onlyActiveSheet = false;
                     Boolean activeSheetOnMaxRows = false;
                     Boolean includeProps = !false;
-                    Boolean skipRecalculation = true;
+                    Boolean skipRecalculation = false;
                     Boolean showHeadings = false;
                     Boolean showFormulas = false;
                     Boolean isHidden = false;
