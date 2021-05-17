@@ -128,6 +128,7 @@ public class DeTaiImport : ImportOriginal
     public void Update()
     {
         md_detai o = db.md_detais.FirstOrDefault(p =>p.code_dt.Equals(code_dt) && p.code_cl.Equals(code_cl));
+		o.md_chungloai_id = code_cl_id;
         o.tv_ngan = tv_ngan;
         //o.tv_dai = tv_dai;
         o.ta_ngan = ta_ngan;
