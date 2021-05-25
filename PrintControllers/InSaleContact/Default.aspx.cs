@@ -703,22 +703,22 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
             s1.CreateRow(r).CreateCell(3).SetCellValue(String.Format("Discount ({0}%):", discountPO));
             s1.GetRow(r).GetCell(3).CellStyle = style12Bold;
 
-            if (str_dsc1.Contains("."))
-            {
-                string dot1 = str_dsc1.Split('.')[1];
-                if (dot1.Length > 2)
-                {
-                    funcDiscount = "H{0}*L{0}/100";
-                }
-                else
-                {
-                    funcDiscount = "ROUND(H{0}*L{0}/100,2)";
-                }
-            }
-            else
-            {
-                funcDiscount = "ROUND(H{0}*L{0}/100,2)";
-            }
+            //if (str_dsc1.Contains("."))
+            //{
+            //    string dot1 = str_dsc1.Split('.')[1];
+            //    if (dot1.Length > 2)
+            //    {
+            //        funcDiscount = "H{0}*L{0}/100";
+            //    }
+            //    else
+            //    {
+            //        funcDiscount = "ROUND(H{0}*L{0}/100,2)";
+            //    }
+            //}
+            //else
+            //{
+            funcDiscount = "ROUND(H{0}*L{0}/100,2)";
+            //}
 
             rDiscount = r;
             s1.GetRow(r).CreateCell(7).CellFormula = String.Format(funcDiscount, r);

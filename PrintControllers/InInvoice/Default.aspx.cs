@@ -796,18 +796,18 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
             s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Discount ({0}%):", discountPO));
             s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
 			
-			if(str_dsc1.Contains(".")) {
-				string dot1 = str_dsc1.Split('.')[1];
-				if(dot1.Length > 2) {
-					funcDiscount = "G{0}*L{0}/100";
-				}
-				else {
-					funcDiscount = "ROUND(G{0}*L{0}/100,2)";
-				}
-			}
-			else {
-				funcDiscount = "ROUND(G{0}*L{0}/100,2)";
-			}
+			//if(str_dsc1.Contains(".")) {
+			//	string dot1 = str_dsc1.Split('.')[1];
+			//	if(dot1.Length > 2) {
+			//		funcDiscount = "G{0}*L{0}/100";
+			//	}
+			//	else {
+			//		funcDiscount = "ROUND(G{0}*L{0}/100,2)";
+			//	}
+			//}
+			//else {
+			funcDiscount = "ROUND(G{0}*L{0}/100,2)";
+			//}
 			
 			rDiscount = r;
 			s1.GetRow(r).CreateCell(6).CellFormula = String.Format(funcDiscount, r);
