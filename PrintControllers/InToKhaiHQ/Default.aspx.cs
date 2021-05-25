@@ -743,18 +743,18 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
             s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Giảm giá ({0}%):", g_it["discount"].ToString()));
             s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
 			
-			if(str_dsc1.Contains(".")) {
-				string dot1 = str_dsc1.Split('.')[1];
-				if(dot1.Length > 2) {
-					funcDiscount = "I{0}*O{0}/100";
-				}
-				else {
-					funcDiscount = "ROUND(I{0}*O{0}/100,2)";
-				}
-			}
-			else {
-				funcDiscount = "ROUND(I{0}*O{0}/100,2)";
-			}
+			//if(str_dsc1.Contains(".")) {
+			//	string dot1 = str_dsc1.Split('.')[1];
+			//	if(dot1.Length > 2) {
+			//		funcDiscount = "I{0}*O{0}/100";
+			//	}
+			//	else {
+			//		funcDiscount = "ROUND(I{0}*O{0}/100,2)";
+			//	}
+			//}
+			//else {
+			funcDiscount = "ROUND(I{0}*O{0}/100,2)";
+			//}
 			
             s1.GetRow(r).CreateCell(8).CellFormula = String.Format(funcDiscount, r);
             s1.GetRow(r).GetCell(8).CellStyle = styleNumber0i0012Bold;
