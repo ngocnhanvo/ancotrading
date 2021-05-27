@@ -255,9 +255,12 @@ public static class UserUtils
                         where c.md_sanpham_id == sp.md_sanpham_id
                         select new { c.md_sanpham_id }).Count();
 
-        var HinhAnh = System.IO.File.Exists(
-            context.Server.MapPath(string.Format(@"~/images/products/fullsize/{0}.jpg", sp.ma_sanpham.Contains("F") ? sp.ma_sanpham.Substring(0, 11) : sp.ma_sanpham.Substring(0, 8)))
-            );
+        
+        var path = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
+        var HinhAnh = path != Public.imgNotFound;
+
+        if(HinhAnh)
+            HinhAnh = System.IO.File.Exists(ExcuteSignalRStatic.mapPathSignalR(string.Format("~/{0}", path)));
 
         if (countDG <= 0)
             msg += "Thiếu đóng gói,";
