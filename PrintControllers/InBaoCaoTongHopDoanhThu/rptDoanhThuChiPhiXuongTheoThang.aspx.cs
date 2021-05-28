@@ -192,8 +192,11 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 @thang_nam as thang_nam,
                 (select sum(noDauNam) from @tblNhapLieu where thang = 1) as noDauNam,
 	            
-                (select sum(tien) from @tbl) + (select sum(chenhLechTyGia) from @tblNhapLieu where thang = @thang) as a1,
+                (select sum(tien) from @tbl) as a1,
                 '' as gc_a1,
+                
+                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = @thang) as a1BS1,
+                '' as gc_a1BS1,
 
                 (select sum(dsoVTXuatChoBPCtyKhac) from @tblPhieuChi where dsoVTXuatChoBPCtyKhac > 0) as a2,
                 substring((select ', ' + GCdsoVTXuatChoBPCtyKhac from @tblPhieuChi where dsoVTXuatChoBPCtyKhac > 0 FOR XML PATH ('')),2,100000) as gc_a2,
