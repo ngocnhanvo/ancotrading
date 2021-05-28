@@ -308,8 +308,8 @@
                     <option ncc="ANCO1,ANCO2" value="chiPhiHCNS">Chi phí HCNS (điện, nước, rác, photo, bảo vệ, cước điện thoại, cơm trưa, xăng xe, VPP, tạp phẩm…)</option>
                     <option ncc="ANCO1,ANCO2" value="luongNV">Lương nhân viên</option>
                     <option ncc="ANCO1,ANCO2" value="luongCN">Lương công nhân</option>
-                    <option ncc="ANCO1,ANCO2" value="phiCDBHXHNV">Phí CĐ và BHXH (34%) nhân viên</option>
-                    <option ncc="ANCO1,ANCO2" value="phiCDBHXHCN">Phí CĐ và BHXH (34%) công nhân</option>
+                    <option ncc="ANCO1,ANCO2" value="phiCDBHXHNV">Phí CĐ và BHXH (23,5%) nhân viên</option>
+                    <option ncc="ANCO1,ANCO2" value="phiCDBHXHCN">Phí CĐ và BHXH (23,5%) công nhân</option>
                     <option ncc="ANCO1,ANCO2" value="thuongLeTetNV">Thưởng lễ, tết nhân viên</option>
                     <option ncc="ANCO1,ANCO2" value="thuongLeTetCN">Thưởng tết công nhân</option>
                     <option ncc="ANCO2" value="tamUngLuongCN">Tạm ứng lương công nhân</option>
