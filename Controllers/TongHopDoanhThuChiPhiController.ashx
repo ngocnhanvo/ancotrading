@@ -62,6 +62,9 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         var tygiaNamStr = removeSpace(context.Request.Form["tyGiaMua"]);
         var tygiaNam = string.IsNullOrEmpty(tygiaNamStr) ? 23000 : decimal.Parse(tygiaNamStr);
 
+        var chenhLechTyGiaStr = removeSpace(context.Request.Form["chenhLechTyGia"]);
+        var chenhLechTyGia = string.IsNullOrEmpty(chenhLechTyGiaStr) ? 0 : decimal.Parse(chenhLechTyGiaStr);
+
         var lst = (from o in db.rpt_tonghopdoanhthuchiphis
                    where
                         o.nam.Equals(nam)
@@ -79,6 +82,10 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == xuongId).FirstOrDefault();
             if (dtkd == null)
                 jqGridHelper.Utils.writeResult(0, "Không tìm thấy xưởng đã chọn!");
+            else if(dtkd.ma_dtkd != "ANCO1" & chenhLechTyGia != 0)
+            {
+                jqGridHelper.Utils.writeResult(0, "Xưởng ANCO1 mới có chênh lệch tỷ giá!");
+            }
             else
             {
                 var m = db.rpt_tonghopdoanhthuchiphis.Where(p => p.rpt_tonghopdoanhthuchiphi_id.Equals(id)).FirstOrDefault();
@@ -88,6 +95,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
                 m.thang = thang;
                 m.noDauNam = thang == 1 ? noDauNam : 0;
                 m.tyGiaMua = thang == 1 ? tygiaNam : 0;
+                m.chenhLechTyGia = chenhLechTyGia;
                 m.chiPhiHCNS = decimal.Parse(removeSpace(context.Request.Form["chiPhiHCNS"]));
                 m.chiPhiXuatKhau = decimal.Parse(removeSpace(context.Request.Form["chiPhiXuatKhau"]));
                 m.tienBHXHBHLDNghiViec = decimal.Parse(removeSpace(context.Request.Form["tienBHXHBHLDNghiViec"]));
@@ -131,6 +139,9 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         var tygiaNamStr = removeSpace(context.Request.Form["tyGiaMua"]);
         var tygiaNam = string.IsNullOrEmpty(tygiaNamStr) ? 23000 : decimal.Parse(tygiaNamStr);
 
+        var chenhLechTyGiaStr = removeSpace(context.Request.Form["chenhLechTyGia"]);
+        var chenhLechTyGia = string.IsNullOrEmpty(chenhLechTyGiaStr) ? 0 : decimal.Parse(chenhLechTyGiaStr);
+
         var lst = from o in db.rpt_tonghopdoanhthuchiphis where o.xuongId.Equals(xuongId) & o.nam.Equals(nam) & o.thang.Equals(thang) select o;
         if (lst.Count() != 0)
         {
@@ -141,6 +152,10 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == xuongId).FirstOrDefault();
             if (dtkd == null)
                 jqGridHelper.Utils.writeResult(0, "Không tìm thấy xưởng đã chọn!");
+            else if(dtkd.ma_dtkd != "ANCO1" & chenhLechTyGia != 0)
+            {
+                jqGridHelper.Utils.writeResult(0, "Xưởng ANCO1 mới có chênh lệch tỷ giá!");
+            }
             else
             {
                 var mnu = new rpt_tonghopdoanhthuchiphi();
@@ -150,6 +165,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
                 mnu.xuongId = xuongId;
                 mnu.xuongValue = dtkd.ma_dtkd;
                 mnu.tyGiaMua = tygiaNam;
+                mnu.chenhLechTyGia = chenhLechTyGia;
                 mnu.noDauNam = thang == 1 ? noDauNam : 0;
                 mnu.chiPhiHCNS = decimal.Parse(removeSpace(context.Request.Form["chiPhiHCNS"]));
                 mnu.chiPhiXuatKhau = decimal.Parse(removeSpace(context.Request.Form["chiPhiXuatKhau"]));
@@ -240,7 +256,7 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         string strsql = string.Format(@"
             select * from (
                 select 
-                    cl.rpt_tonghopdoanhthuchiphi_id, ncc.ma_dtkd, cl.nam, cl.thang, cl.noDauNam, cl.tyGiaMua, cl.dsoVTXuatChoBPCtyKhac, 
+                    cl.rpt_tonghopdoanhthuchiphi_id, ncc.ma_dtkd, cl.nam, cl.thang, cl.noDauNam, cl.tyGiaMua, cl.chenhLechTyGia, cl.dsoVTXuatChoBPCtyKhac, 
                     cl.tienBHXHBHLDNghiViec, cl.dienNuocRacCtyHaca, cl.nopTamUng, cl.tienPheLieu, cl.chiPhiXuatKhau,  
                     cl.chiPhiHCNS, cl.luongNV, cl.luongCN, cl.phiCDBHXHNV, cl.phiCDBHXHCN, cl.thuongLeTetNV, 
                     cl.thuongLeTetCN, cl.tamUngLuongCN, cl.chiTienMatKhac, cl.trich20PheLieu, cl.khieuNai, 
@@ -267,38 +283,16 @@ public class TongHopDoanhThuChiPhiController : IHttpHandler
         xml += "<records>" + count + "</records>";
         foreach (DataRow row in dt.Rows)
         {
-            xml += "<row>";
-            xml += "<cell><![CDATA[" + row[0] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[1] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[2] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[3] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[4] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[5] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[6] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[7] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[9] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[10] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[11] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[12] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[13] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[14] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[15] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[16] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[17] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[18] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[19] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[20] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[21] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[22] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[23] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[24].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[25] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[26].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[27] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[28] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[29] + "]]></cell>";
-            xml += "</row>";
+            var xmlDT = "";
+            foreach (DataColumn col in dt.Columns)
+            {
+                var colsDate = new string[] { "ngaytao", "ngaycapnhat" };
+                var val = row[col.ColumnName] + "";
+                if (colsDate.Contains(col.ColumnName))
+                    val = DateTime.Parse(val).ToString("dd/MM/yyyy");
+                xmlDT += "<cell><![CDATA[" + val + "]]></cell>";
+            }
+            xml += string.Format(@"<row>{0}</row>", xmlDT);
         }
         xml += "</rows>";
         context.Response.Write(xml);

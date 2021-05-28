@@ -103,6 +103,18 @@
             },
             {
                 fixed: true
+                , name: 'chenhLechTyGia'
+                , index: 'cl.chenhLechTyGia'
+                , label: 'Chênh lệch Tỷ Giá'
+                , editable: true
+                , width: 100
+                , edittype: 'text'
+                , align: 'right'
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
+            },
+            {
+                fixed: true
                 , name: 'dsoVTXuatChoBPCtyKhac'
                 , index: 'cl.dsoVTXuatChoBPCtyKhac'
                 , label: 'D.Số Vật Tư xuất cho B.Phận hoặc C.Ty khác'
@@ -413,9 +425,7 @@
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 },
                 afterShowForm: function (formid) {
-                    //let sel = formid.selector;
-                    //$('#nam', sel).prop('disabled', false);
-                    //$('#thang', sel).prop('disabled', false);
+                    openDialogTongHopDoanhThuChiPhi('add');
                 },
                 beforeSubmit: function(rs, postdata) {
                     return [true,''];
@@ -441,9 +451,7 @@
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 },
                 afterShowForm: function (formid) {
-                    //let sel = formid.selector;
-                    //$('#nam', sel).prop('disabled', true);
-                    //$('#thang', sel).prop('disabled', true); 
+                    openDialogTongHopDoanhThuChiPhi('edit'); 
                 },
                 afterSubmit: function(rs, postdata){
                     return showMsgDialog(rs);
@@ -470,4 +478,25 @@
 	}
 
 	createRightPanel('grid_ds_rpt_tonghopdoanhthuchiphi');
+
+	var openDialogTongHopDoanhThuChiPhi = function(action) {
+	    let frmId = '#FrmGrid_grid_ds_rpt_tonghopdoanhthuchiphi';
+	    let thang = $('#thang', frmId);
+	    let noDauNamTR = $('#noDauNam', frmId).parent().parent();
+	    let tyGiaMuaTR = $('#tyGiaMua', frmId).parent().parent();
+	    thang.off('change');
+	    thang.change(function(){
+	        let val = $(this).val();
+	        if(val == 1) {
+	            noDauNamTR.show();
+	            tyGiaMuaTR.show();
+	        }
+	        else {
+	            noDauNamTR.hide();
+	            tyGiaMuaTR.hide();
+	        }
+	    });
+
+	    thang.change();
+	}
 </script>

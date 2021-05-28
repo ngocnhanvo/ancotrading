@@ -172,21 +172,27 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 and dtc.dtkd_id_ThuChi = @xuongId
 				--and tc.md_trangthai_id = 'HIEULUC'
 
-            declare @tblNhapLieu table (noDauNam decimal(18,2))
+            declare @tblNhapLieu table (
+                thang int, 
+                noDauNam decimal(18,2),
+                chenhLechTyGia decimal(18,2)
+            )
             insert into @tblNhapLieu
             select 
-                tc.noDauNam
+                tc.thang,
+                tc.noDauNam,
+                tc.chenhLechTyGia
             from rpt_tonghopdoanhthuchiphi tc
             where 
                 tc.nam = @nam
-                and tc.thang = 1
+                and tc.thang <= @thang
                 and tc.xuongId = @xuongId
 
             select 
                 @thang_nam as thang_nam,
-                (select sum(noDauNam) from @tblNhapLieu) as noDauNam,
+                (select sum(noDauNam) from @tblNhapLieu where thang = 1) as noDauNam,
 	            
-                (select sum(tien) from @tbl) as a1,
+                (select sum(tien) from @tbl) + (select sum(chenhLechTyGia) from @tblNhapLieu where thang = @thang) as a1,
                 '' as gc_a1,
 
                 (select sum(dsoVTXuatChoBPCtyKhac) from @tblPhieuChi where dsoVTXuatChoBPCtyKhac > 0) as a2,
