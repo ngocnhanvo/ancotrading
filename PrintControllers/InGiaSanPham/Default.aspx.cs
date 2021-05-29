@@ -54,11 +54,11 @@ public partial class PrintControllers_InGiaSanPham_Default : System.Web.UI.Page
             s1.GetRow(row).CreateCell(1).SetCellValue(gia);
 			s1.GetRow(row).GetCell(1).CellStyle = cellBold2;
 
-            var colPhi = dt.Rows[i]["phi"];
-            if (colPhi == null)
+            var colPhi = dt.Rows[i]["phi"] + "";
+            if (string.IsNullOrWhiteSpace(colPhi))
                 colPhi = "0";
 
-            var phi = double.Parse(colPhi.ToString());
+            var phi = double.Parse(colPhi);
 			s1.GetRow(row).CreateCell(2).SetCellValue(phi);
 			s1.GetRow(row).GetCell(2).CellStyle = cellBold2;
 			
