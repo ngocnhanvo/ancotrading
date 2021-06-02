@@ -242,71 +242,67 @@ public class ChiTietPhaiChiController : IHttpHandler
                 {
                     for (int i = 0; i < idsArr.Length; i++)
                     {
-                        var mnu = new c_chitietthuchi
-                        {
-                            c_chitietthuchi_id = Helper.getNewId(),
-                            c_thuchi_id = c_thuchi_id,
-                            loaiphieu2 = lp2,
-                            loai = loai,
-                            so_c = sphieu,
-                            tk_no = int.Parse(context.Request.Form["tkno"]),
-                            tk_co = int.Parse(context.Request.Form["tkco"]),
-                            md_doitackinhdoanh_id = md_doitackinhdoanh_id,
-                            dtkd_id_ThuChi = idVal[0],
-                            dtkd_val_ThuChi = idVal[1],
-                            sotien = decimal.Parse(valuesArr[i]),
-                            sotiencong = decimal.Parse(tiencong),
-                            quydoi = (thuchi.tygia.Value * decimal.Parse(valuesArr[i])),
-                            diengiai = context.Request.Form["diengiai"],
-                            c_donhang_id = context.Request.Form["c_donhang_id"],
-                            ngaychi = ngaychi,
-                            c_packinginvoice_id = context.Request.Form["c_packinginvoice_id"],
-                            obj_code = idsArr[i],
-                            isdatcoc = istiencoc,
-                            thue = thue,
-                            mota = context.Request.Form["mota"],
-                            hoatdong = true,
-                            ngaytao = DateTime.Now,
-                            ngaycapnhat = DateTime.Now,
-                            nguoitao = UserUtils.getUser(context),
-                            nguoicapnhat = UserUtils.getUser(context)
-                        };
+                        var mnu = new c_chitietthuchi();
+                        mnu.c_chitietthuchi_id = Helper.getNewId();
+                        mnu.c_thuchi_id = c_thuchi_id;
+                        mnu.loaiphieu2 = lp2;
+                        mnu.loai = loai;
+                        mnu.so_c = sphieu;
+                        mnu.tk_no = int.Parse(context.Request.Form["tkno"]);
+                        mnu.tk_co = int.Parse(context.Request.Form["tkco"]);
+                        mnu.md_doitackinhdoanh_id = md_doitackinhdoanh_id;
+                        mnu.dtkd_id_ThuChi = idVal[0];
+                        mnu.dtkd_val_ThuChi = idVal[1];
+                        mnu.sotien = decimal.Parse(valuesArr[i]);
+                        mnu.sotiencong = decimal.Parse(tiencong);
+                        mnu.quydoi = (thuchi.tygia.Value * decimal.Parse(valuesArr[i]));
+                        mnu.diengiai = context.Request.Form["diengiai"];
+                        mnu.c_donhang_id = context.Request.Form["c_donhang_id"];
+                        mnu.ngaychi = ngaychi;
+                        mnu.c_packinginvoice_id = context.Request.Form["c_packinginvoice_id"];
+                        mnu.obj_code = idsArr[i];
+                        mnu.isdatcoc = istiencoc;
+                        mnu.thue = thue;
+                        mnu.mota = context.Request.Form["mota"];
+                        mnu.hoatdong = true;
+                        mnu.ngaytao = DateTime.Now;
+                        mnu.ngaycapnhat = DateTime.Now;
+                        mnu.nguoitao = UserUtils.getUser(context);
+                        mnu.nguoicapnhat = UserUtils.getUser(context);
 
                         db.c_chitietthuchis.InsertOnSubmit(mnu);
                     }
                 }
                 else
                 {
-                    var mnu = new c_chitietthuchi
-                    {
-                        c_chitietthuchi_id = Helper.getNewId(),
-                        c_thuchi_id = c_thuchi_id,
-                        so_c = sphieu,
-                        loai = loai,
-                        tk_no = int.Parse(context.Request.Form["tkno"]),
-                        tk_co = int.Parse(context.Request.Form["tkco"]),
-                        md_doitackinhdoanh_id = md_doitackinhdoanh_id,
-                        dtkd_id_ThuChi = idVal[0],
-                        dtkd_val_ThuChi = idVal[1],
-                        sotien = decimal.Parse(context.Request.Form["sotien"]),
-                        sotiencong = decimal.Parse(tiencong),
-                        quydoi = (thuchi.tygia.Value * decimal.Parse(context.Request.Form["sotien"])),
-                        diengiai = context.Request.Form["diengiai"],
-                        c_donhang_id = context.Request.Form["c_donhang_id"],
-                        ngaychi = ngaychi,
-                        c_packinginvoice_id = context.Request.Form["c_packinginvoice_id"],
-                        obj_code = context.Request.Form["c_nhapxuat_id"],
-                        loaiphieu = ltt,
-                        loaiphieu2 = lp2,
-                        isdatcoc = istiencoc,
-                        thue = thue,
-                        mota = context.Request.Form["mota"],
-                        hoatdong = true,
-                        ngaytao = DateTime.Now,
-                        ngaycapnhat = DateTime.Now,
-                        nguoitao = UserUtils.getUser(context),
-                        nguoicapnhat = UserUtils.getUser(context)
-                    };
+                    var mnu = new c_chitietthuchi();
+                    mnu.c_chitietthuchi_id = Helper.getNewId();
+                    mnu.c_thuchi_id = c_thuchi_id;
+                    mnu.so_c = sphieu;
+                    mnu.loai = loai;
+                    mnu.tk_no = int.Parse(context.Request.Form["tkno"]);
+                    mnu.tk_co = int.Parse(context.Request.Form["tkco"]);
+                    mnu.md_doitackinhdoanh_id = md_doitackinhdoanh_id;
+                    mnu.dtkd_id_ThuChi = idVal[0];
+                    mnu.dtkd_val_ThuChi = idVal[1];
+                    mnu.sotien = decimal.Parse(context.Request.Form["sotien"]);
+                    mnu.sotiencong = decimal.Parse(tiencong);
+                    mnu.quydoi = (thuchi.tygia.Value * decimal.Parse(context.Request.Form["sotien"]));
+                    mnu.diengiai = context.Request.Form["diengiai"];
+                    mnu.c_donhang_id = context.Request.Form["c_donhang_id"];
+                    mnu.ngaychi = ngaychi;
+                    mnu.c_packinginvoice_id = context.Request.Form["c_packinginvoice_id"];
+                    mnu.obj_code = context.Request.Form["c_nhapxuat_id"];
+                    mnu.loaiphieu = ltt;
+                    mnu.loaiphieu2 = lp2;
+                    mnu.isdatcoc = istiencoc;
+                    mnu.thue = thue;
+                    mnu.mota = context.Request.Form["mota"];
+                    mnu.hoatdong = true;
+                    mnu.ngaytao = DateTime.Now;
+                    mnu.ngaycapnhat = DateTime.Now;
+                    mnu.nguoitao = UserUtils.getUser(context);
+                    mnu.nguoicapnhat = UserUtils.getUser(context);
 
                     db.c_chitietthuchis.InsertOnSubmit(mnu);
                 }

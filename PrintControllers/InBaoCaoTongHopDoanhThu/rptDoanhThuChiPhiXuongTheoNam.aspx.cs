@@ -81,6 +81,7 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             
             declare @tblPhieuChi table (
                 thang int,
+                chenhLechTyGiaDSBH decimal(18,2), 
                 dsoVTXuatChoBPCtyKhac decimal(18,2), 
                 tienBHXHBHLDNghiViec decimal(18,2),
                 dienNuocRacCtyHaca decimal(18,2), 
@@ -104,6 +105,7 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             insert into @tblPhieuChi
             select 
                 MONTH(tc.ngay_giaonop) as thang,
+                (case when dtc.loaiphieu2 = 'chenhLechTyGiaDSBH' then dtc.sotien else 0 end),
                 (case when dtc.loaiphieu2 = 'dsoVTXuatChoBPCtyKhac' then dtc.sotien else 0 end),
                 (case when dtc.loaiphieu2 = 'tienBHXHBHLDNghiViec' then dtc.sotien else 0 end), 
                 (case when dtc.loaiphieu2 = 'dienNuocRacCtyHaca' then dtc.sotien else 0 end),
@@ -132,14 +134,12 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
 
             declare @tblNhapLieu table (
                 thang int, 
-                noDauNam decimal(18,2),
-                chenhLechTyGia decimal(18,2)
+                noDauNam decimal(18,2)
             )
             insert into @tblNhapLieu
             select 
                 tc.thang,
-                tc.noDauNam,
-				tc.chenhLechTyGia
+                tc.noDauNam
             from rpt_tonghopdoanhthuchiphi tc
             where 
                 tc.nam = @nam
@@ -161,18 +161,18 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
 	            (select sum(tien) from @tbl where thang = 11) as a_1_11,
 	            (select sum(tien) from @tbl where thang = 12) as a_1_12,
                 
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 1) as a_1BS1_1,
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 2) as a_1BS1_2,
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 3) as a_1BS1_3,
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 4) as a_1BS1_4,
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 5) as a_1BS1_5,
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 6) as a_1BS1_6,
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 7) as a_1BS1_7,
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 8) as a_1BS1_8,
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 9) as a_1BS1_9,
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 10) as a_1BS1_10,
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 11) as a_1BS1_11,
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = 12) as a_1BS1_12,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 1) as a_1BS1_1,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 2) as a_1BS1_2,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 3) as a_1BS1_3,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 4) as a_1BS1_4,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 5) as a_1BS1_5,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 6) as a_1BS1_6,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 7) as a_1BS1_7,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 8) as a_1BS1_8,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 9) as a_1BS1_9,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 10) as a_1BS1_10,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 11) as a_1BS1_11,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 12) as a_1BS1_12,
                 
                 (select sum(dsoVTXuatChoBPCtyKhac) from @tblPhieuChi where thang = 1) as a_2_1,
 	            (select sum(dsoVTXuatChoBPCtyKhac) from @tblPhieuChi where thang = 2) as a_2_2,

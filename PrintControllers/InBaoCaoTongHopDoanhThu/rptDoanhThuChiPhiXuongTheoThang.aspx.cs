@@ -84,6 +84,7 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             ) > 0
             
             declare @tblPhieuChi table (
+                chenhLechTyGiaDSBH decimal(18,2),
                 dsoVTXuatChoBPCtyKhac decimal(18,2), 
                 tienBHXHBHLDNghiViec decimal(18,2),
                 dienNuocRacCtyHaca decimal(18,2), 
@@ -104,6 +105,7 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 khieuNai decimal(18,2),
                 cuocGuiMauKiemDinh decimal(18,2),
                 
+                GCchenhLechTyGiaDSBH nvarchar(MAX), 
                 GCdsoVTXuatChoBPCtyKhac nvarchar(MAX), 
                 GCtienBHXHBHLDNghiViec nvarchar(MAX),
                 GCdienNuocRacCtyHaca nvarchar(MAX), 
@@ -126,6 +128,7 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             )
             insert into @tblPhieuChi
             select
+                (case when dtc.loaiphieu2 = 'chenhLechTyGiaDSBH' then dtc.sotien else 0 end),
                 (case when dtc.loaiphieu2 = 'dsoVTXuatChoBPCtyKhac' then dtc.sotien else 0 end),
                 (case when dtc.loaiphieu2 = 'tienBHXHBHLDNghiViec' then dtc.sotien else 0 end), 
                 (case when dtc.loaiphieu2 = 'dienNuocRacCtyHaca' then dtc.sotien else 0 end),
@@ -145,7 +148,8 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 (case when dtc.loaiphieu2 = 'trich20PheLieu' then dtc.sotien else 0 end),
                 (case when dtc.loaiphieu2 = 'KhieuNai' then dtc.sotien else 0 end), 
                 (case when dtc.loaiphieu2 = 'cuocGuiMauKiemDinh' then dtc.sotien else 0 end),
-
+                
+                (case when dtc.loaiphieu2 = 'chenhLechTyGiaDSBH' then dtc.diengiai else '' end),
                 (case when dtc.loaiphieu2 = 'dsoVTXuatChoBPCtyKhac' then dtc.diengiai else '' end),
                 (case when dtc.loaiphieu2 = 'tienBHXHBHLDNghiViec' then dtc.diengiai else '' end), 
                 (case when dtc.loaiphieu2 = 'dienNuocRacCtyHaca' then dtc.diengiai else '' end),
@@ -174,18 +178,16 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
 
             declare @tblNhapLieu table (
                 thang int, 
-                noDauNam decimal(18,2),
-                chenhLechTyGia decimal(18,2)
+                noDauNam decimal(18,2)
             )
             insert into @tblNhapLieu
             select 
                 tc.thang,
-                tc.noDauNam,
-                tc.chenhLechTyGia
+                tc.noDauNam
             from rpt_tonghopdoanhthuchiphi tc
             where 
                 tc.nam = @nam
-                and tc.thang <= @thang
+                and tc.thang = 1
                 and tc.xuongId = @xuongId
 
             select 
@@ -195,8 +197,8 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 (select sum(tien) from @tbl) as a1,
                 '' as gc_a1,
                 
-                (select sum(chenhLechTyGia) from @tblNhapLieu where thang = @thang) as a1BS1,
-                '' as gc_a1BS1,
+                (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where chenhLechTyGiaDSBH != 0) as a1BS1,
+                substring((select ', ' + GCchenhLechTyGiaDSBH from @tblPhieuChi where chenhLechTyGiaDSBH != 0 FOR XML PATH ('')),2,100000) as gc_a1BS1,
 
                 (select sum(dsoVTXuatChoBPCtyKhac) from @tblPhieuChi where dsoVTXuatChoBPCtyKhac > 0) as a2,
                 substring((select ', ' + GCdsoVTXuatChoBPCtyKhac from @tblPhieuChi where dsoVTXuatChoBPCtyKhac > 0 FOR XML PATH ('')),2,100000) as gc_a2,
