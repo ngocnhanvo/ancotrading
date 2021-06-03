@@ -376,8 +376,13 @@ public static class UserUtils
 
             var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
 
-            if (donhang.discount.GetValueOrDefault(0) > 0 & donhang.phanbodiscount.GetValueOrDefault(false) == true)
-                phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + donhang.discount.GetValueOrDefault(0));
+            if (donhang.discount.GetValueOrDefault(0) > 0)
+            {
+                if (donhang.phanbodiscount.GetValueOrDefault(false))
+                    phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + donhang.discount.GetValueOrDefault(0));
+                else
+                    phiDiscount = ddonhang.phi.GetValueOrDefault(0);
+            }
 
             gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
             if (giaNhap2BD > -1)
