@@ -18,6 +18,6 @@ public class Startup
             hubConfiguration.EnableDetailedErrors = true;
             hubConfiguration.EnableJavaScriptProxies = true;
             app.RunSignalR(hubConfiguration);
-        }
+        });
     }
 }
