@@ -9,12 +9,15 @@ public class Startup
 {
     public void Configuration(IAppBuilder app)
     {
-        app.UseCors(CorsOptions.AllowAll);
-        
-        var hubConfiguration = new HubConfiguration();
-        hubConfiguration.EnableJSONP = true;
-        hubConfiguration.EnableDetailedErrors = true;
-        hubConfiguration.EnableJavaScriptProxies = true;
-        app.RunSignalR(hubConfiguration);
+        app.Map("/signalr", map =>
+        {
+            app.UseCors(CorsOptions.AllowAll);
+
+            var hubConfiguration = new HubConfiguration();
+            hubConfiguration.EnableJSONP = true;
+            hubConfiguration.EnableDetailedErrors = true;
+            hubConfiguration.EnableJavaScriptProxies = true;
+            app.RunSignalR(hubConfiguration);
+        }
     }
 }
