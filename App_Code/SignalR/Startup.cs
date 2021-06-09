@@ -9,12 +9,12 @@ public class Startup
 {
     public void Configuration(IAppBuilder app)
     {
+        app.UseCors(CorsOptions.AllowAll);
+        
         var hubConfiguration = new HubConfiguration();
         hubConfiguration.EnableJSONP = true;
         hubConfiguration.EnableDetailedErrors = true;
         hubConfiguration.EnableJavaScriptProxies = true;
-        app.MapSignalR(hubConfiguration);
-
-        app.UseCors(CorsOptions.AllowAll);
+        app.RunSignalR(hubConfiguration);
     }
 }
