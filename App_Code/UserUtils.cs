@@ -378,7 +378,7 @@ public static class UserUtils
 
             if (donhang.discount.GetValueOrDefault(0) > 0)
             {
-                if (donhang.phanbodiscount.GetValueOrDefault(false))
+                if (dondathang.discount.GetValueOrDefault(0) <= 0)
                     phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + donhang.discount.GetValueOrDefault(0));
                 else
                     phiDiscount = ddonhang.phi.GetValueOrDefault(0);
@@ -390,8 +390,8 @@ public static class UserUtils
                 if (maNCC != "VINHGIA")
                 {
 					gianhap = gianhap2;
-                    giachuan = jqGridHelper.Utils.Round3(gianhap, -2);
-                    gianhap = jqGridHelper.Utils.Round3(gianhap + (phiDiscount * tygia), -2);
+                    giachuan = jqGridHelper.Utils.Round5(gianhap, -2);
+                    gianhap = jqGridHelper.Utils.Round5(gianhap + (phiDiscount * tygia), -2);
                 }
                 else
                 {
@@ -402,7 +402,7 @@ public static class UserUtils
             }
             else
             {
-                gianhap = jqGridHelper.Utils.Round3(gianhap + phiDiscount * tygia, -2);
+                gianhap = jqGridHelper.Utils.Round5(gianhap + phiDiscount * tygia, -2);
             }
 
             var ddsdh = new c_dongdsdh();
@@ -483,7 +483,7 @@ public static class UserUtils
                             decimal tienVND = 0;
                             if (get_giaPB > 1)
                             {
-                                tienVND = jqGridHelper.Utils.Round3(vnn1 * get_giaPB, -2);
+                                tienVND = jqGridHelper.Utils.Round5(vnn1 * get_giaPB, -2);
                             }
                             else
                             {
@@ -531,7 +531,7 @@ public static class UserUtils
                                 decimal tienVND = 0;
                                 if (get_giaPB > 1)
                                 {
-                                    tienVND = jqGridHelper.Utils.Round3(tien * get_giaPB, -2); ;
+                                    tienVND = jqGridHelper.Utils.Round5(tien * get_giaPB, -2); ;
                                 }
                                 else
                                 {
