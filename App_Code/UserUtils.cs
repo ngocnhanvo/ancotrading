@@ -294,11 +294,17 @@ public static class UserUtils
     public static string createPI(HttpContext context, c_donhang donhang, List<dongDatHang> dsSanPham,  LinqDBDataContext db)
     {
 
-        String selSCT = @"SELECT (sct.tiento + '/' + CAST(sct.so_duocgan as nvarchar(32)) + '/' + hauto) as sochungtu 
-						 FROM md_sochungtu sct, md_loaichungtu lct 
-						 WHERE sct.md_loaichungtu_id = lct.md_loaichungtu_id AND lct.kieu_doituong = N'PI'";
+        // String selSCT = @"SELECT (sct.tiento + '/' + CAST(sct.so_duocgan as nvarchar(32)) + '/' + hauto) as sochungtu 
+						 // FROM md_sochungtu sct, md_loaichungtu lct 
+						 // WHERE sct.md_loaichungtu_id = lct.md_loaichungtu_id AND lct.kieu_doituong = N'PI'";
 
-        String sochungtu = (String)mdbc.ExecuteScalar(selSCT);
+        // String sochungtu = (String)mdbc.ExecuteScalar(selSCT);
+		
+		var sctObject = db.md_sochungtus
+			.Join(db.md_loaichungtus, sct => sct.md_loaichungtu_id, lct => lct.md_loaichungtu_id, (sct, lct) => new { sct, lct })
+			.Where(s=>s.lct.kieu_doituong == "PI" & s.sct.tiento == "DSDH").FirstOrDefault();
+			
+		String sochungtu = sctObject == null ? "" : string.Format(@"{0}/{1}/{2}", sctObject.sct.tiento, sctObject.sct.so_duocgan, sctObject.sct.hauto);
 
         var dsPartner = dsSanPham.Select(p => p.md_doitackinhdoanh_id).Distinct().ToList();
 
