@@ -55,24 +55,37 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
                     tang = pTang == null ? 0 : pTang.Value;
                     giam = pGiam == null ? 0 : pGiam.Value;
 
-                    total = (decimal)mdbc.ExecuteScalar(@"
-                        select 
-	                        cast(
-                                A.amount - 
-                                (A.amount * isnull((select discount from c_donhang where c_donhang_id = @c_donhang_id), 0) / 100) 
-                                as decimal(18, 2)
-	                        )
+                    double totalDB = (double)mdbc.ExecuteScalar(@"
+                        declare @discount numeric(18, 6) = isnull((select discount from c_donhang where c_donhang_id = @c_donhang_id), 0)
+                        select a.total -
+                        cast(a.total * @discount / 100 as decimal(18, 2)) 
                         from (
-                            select
-                                sum(soluong * (isnull(giachuan, giafob) + isnull(phi, 0) - isnull(giachuan, giafob) * isnull(discount, 0) / 100)) as amount 
-                            from 
-                                c_dongdonhang
-                            where 
-                                c_donhang_id = @c_donhang_id
-                        )A
+	                        select sum(amount) as total
+	                        from (
+		                        select a.hehang, a.amount - round(a.amount * a.discount / 100, 2) as amount
+		                        from (
+			                        select a.hehang, a.discount, sum(a.amount) as amount
+			                        from (
+				                        select
+					                        dh.soluong * (isnull(dh.giachuan, dh.giafob)) as amount,
+					                        isnull(dh.discount, 0) as discount,
+					                        isnull(dh.phi, 0) as phi,
+					                        SUBSTRING(sp.ma_sanpham,0,3) as hehang
+				                        from 
+					                        c_dongdonhang dh
+					                        left join md_sanpham sp on sp.md_sanpham_id = dh.md_sanpham_id
+				                        where 
+					                        c_donhang_id = @c_donhang_id
+			                        )a
+			                        group by hehang, discount
+		                        )a
+	                        )a
+                        )a
                     "
                     , "@c_donhang_id"
                     , c_id[i]);
+
+                    total = (decimal)totalDB;
                     total = total + tang - giam;
                     total_all += total;
                 }
@@ -149,6 +162,7 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
 				, isnull(ddh.giachuan, ddh.giafob) as giafob
                 , ddh.discount as disHH
 				, dh.totalcbm
+                , dh.discount_hehang_value
 				, convert(decimal(18,2) ,dh.discount) as discount
 				, trl.ten_trongluong
 				, dg.sl_outer
@@ -351,8 +365,16 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
         var startRowHH = -1;
         var lstHH = new List<int>();
         var lstPO = new List<int>();
+        string discount_hehang_value = "-1";
+        List<Dictionary<string, object>> nnl = null;
         for (int i = 0; i < dt.Rows.Count; i++)
         {
+            if (discount_hehang_value == "-1")
+            {
+                discount_hehang_value = dt.Rows[i]["discount_hehang_value"].ToString();
+                nnl = string.IsNullOrEmpty(discount_hehang_value) ? null : Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(discount_hehang_value);
+            }
+
             var msp = dt.Rows[i]["ma_sanpham"].ToString();
             var chungloai = msp.Substring(0, 2);
             var chungloaiTT = i == dt.Rows.Count - 1 ? chungloai : dt.Rows[i + 1]["ma_sanpham"].ToString().Substring(0, 2);
@@ -437,70 +459,83 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
 
                 if (chungloai != chungloaiTT | i == dt.Rows.Count - 1 | soPO != soPOTT)
                 {
-                    string gthh = dt.Rows[i]["disHH"] + "";
-                    gthh = string.IsNullOrEmpty(gthh) ? "0" : gthh;
-                    var rowHeight = gthh == "0" ? 0 : 20;
-                    var rowToTalHeHang = s1.CreateRow(row);
-                    rowToTalHeHang.HeightInPoints = rowHeight;
-                    rowToTalHeHang.CreateCell(2).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
-                    rowToTalHeHang.GetCell(2).CellStyle = leftBold;
-                    s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 1));
-                    string fmlSum = string.Format(@"SUM(VNN{0}:VNN{1})", startRowHH, row);
-                    rowToTalHeHang.CreateCell(3).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "D"));
-                    rowToTalHeHang.GetCell(3).CellStyle = number2Bold;
-                    rowToTalHeHang.CreateCell(4).SetCellValue("pcs/sets");
-                    rowToTalHeHang.GetCell(4).CellStyle = leftBold;
-                    rowToTalHeHang.CreateCell(6).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "G"));
-                    rowToTalHeHang.GetCell(6).CellStyle = number2Bold;
-                    row++;
-                    count_row++;
-                    count_row_tt++;
+                    if (nnl != null)
+                    {
+                        string gthh = dt.Rows[i]["disHH"] + "";
+                        gthh = string.IsNullOrEmpty(gthh) ? "0" : gthh;
+                        var rowHeight = gthh == "0" ? 0 : 20;
+                        var rowToTalHeHang = s1.CreateRow(row);
+                        rowToTalHeHang.HeightInPoints = rowHeight;
+                        rowToTalHeHang.CreateCell(2).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
+                        rowToTalHeHang.GetCell(2).CellStyle = leftBold;
+                        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 1));
+                        string fmlSum = string.Format(@"SUM(VNN{0}:VNN{1})", startRowHH, row);
+                        rowToTalHeHang.CreateCell(3).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "D"));
+                        rowToTalHeHang.GetCell(3).CellStyle = number2Bold;
+                        rowToTalHeHang.CreateCell(4).SetCellValue("pcs/sets");
+                        rowToTalHeHang.GetCell(4).CellStyle = leftBold;
+                        rowToTalHeHang.CreateCell(6).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "G"));
+                        rowToTalHeHang.GetCell(6).CellStyle = number2Bold;
+                        row++;
+                        count_row++;
+                        count_row_tt++;
 
-                    var rowDisHeHang = s1.CreateRow(row);
-                    rowDisHeHang.HeightInPoints = rowHeight;
-                    rowDisHeHang.CreateCell(2).SetCellValue(string.Format(@"Discount ({0}%):", gthh));
-                    rowDisHeHang.GetCell(2).CellStyle = leftBold;
-                    s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 1));
-                    rowDisHeHang.CreateCell(6).CellFormula = string.Format("G{0}*{1}/100", row, gthh);
-                    rowDisHeHang.GetCell(6).CellStyle = number2Bold;
-                    row++;
-                    count_row++;
-                    count_row_tt++;
+                        var rowDisHeHang = s1.CreateRow(row);
+                        rowDisHeHang.HeightInPoints = rowHeight;
+                        rowDisHeHang.CreateCell(2).SetCellValue(string.Format(@"Discount ({0}%):", gthh));
+                        rowDisHeHang.GetCell(2).CellStyle = leftBold;
+                        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 1));
+                        rowDisHeHang.CreateCell(6).CellFormula = string.Format("ROUND(G{0}*{1}/100, 2)", row, gthh);
+                        rowDisHeHang.GetCell(6).CellStyle = number2Bold;
+                        row++;
+                        count_row++;
+                        count_row_tt++;
 
-                    var rowTotalHeHang = s1.CreateRow(row);
-                    rowTotalHeHang.HeightInPoints = rowHeight;
-                    rowTotalHeHang.CreateCell(2).SetCellValue(string.Format("Total ({0}):", lstHH.Count + 1));
-                    rowTotalHeHang.GetCell(2).CellStyle = leftBold;
-                    s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 1));
-                    rowTotalHeHang.CreateCell(3).CellFormula = string.Format("D{0}", row - 1);
-                    rowTotalHeHang.GetCell(3).CellStyle = number2Bold;
-                    rowTotalHeHang.CreateCell(6).CellFormula = string.Format("G{0} - G{1}", row - 1, row);
-                    rowTotalHeHang.GetCell(6).CellStyle = number2Bold;
-                    row++;
-                    count_row++;
-                    count_row_tt++;
+                        var rowTotalHeHang = s1.CreateRow(row);
+                        rowTotalHeHang.HeightInPoints = rowHeight;
+                        rowTotalHeHang.CreateCell(2).SetCellValue(string.Format("Total ({0}):", lstHH.Count + 1));
+                        rowTotalHeHang.GetCell(2).CellStyle = leftBold;
+                        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 1));
+                        rowTotalHeHang.CreateCell(3).CellFormula = string.Format("D{0}", row - 1);
+                        rowTotalHeHang.GetCell(3).CellStyle = number2Bold;
+                        rowTotalHeHang.CreateCell(6).CellFormula = string.Format("G{0} - G{1}", row - 1, row);
+                        rowTotalHeHang.GetCell(6).CellStyle = number2Bold;
+                        row++;
+                        count_row++;
+                        count_row_tt++;
 
-                    startRowHH = row + 1;
-                    lstHH.Add(row);
+                        startRowHH = row + 1;
+                        lstHH.Add(row);
+                    }
                 }
 
                 if (soPO != soPOTT | i == dt.Rows.Count - 1)
                 {
+                    discount_hehang_value = "-1";
+
                     var discountPO = dt.Rows[i]["discount"] + "";
                     discountPO = discountPO.Replace(".00", "");
 
                     string sumQuantity = "", sumAmount = "";
-                    foreach (var iHH in lstHH)
+                    if (nnl != null)
                     {
-                        sumQuantity += string.Format("D{0}+", iHH);
-                        sumAmount += string.Format("G{0}+", iHH);
+                        foreach (var iHH in lstHH)
+                        {
+                            sumQuantity += string.Format("D{0}+", iHH);
+                            sumAmount += string.Format("G{0}+", iHH);
+                        }
+                        sumQuantity += "0";
+                        sumAmount += "0";
                     }
-                    sumQuantity += "0";
-                    sumAmount += "0";
+                    else
+                    {
+                        sumQuantity += string.Format("SUM(D{0}:D{1})", startRowHH, row);
+                        sumAmount += string.Format("SUM(G{0}:G{1})", startRowHH, row);
+                    }
                     //vi tri row dau tien
                     int m = row - count_row + 1, sub_row = 0, discount_row = 0;
                     //start tong cong 1
-                    s1.CreateRow(row).CreateCell(2).SetCellValue(string.Format("Sub Total PO ({0}):", lstPO.Count + 1));
+                    s1.CreateRow(row).CreateCell(2).SetCellValue(string.Format("Sub Total:", lstPO.Count + 1));
                     s1.GetRow(row).CreateCell(3).CellFormula = string.Format("{0}", sumQuantity);
                     s1.GetRow(row).CreateCell(6).CellFormula = string.Format("{0}", sumAmount);
                     s1.GetRow(row).CreateCell(14).SetCellValue(discountPO);
@@ -623,7 +658,7 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
                         sumToTalPO += string.Format(@"G{0}+", rowHH + 1);
                     }
                     sumToTalPO += "0";
-                    s1.CreateRow(row).CreateCell(2).SetCellValue(string.Format("Total PO ({0}):", lstPO.Count + 1));
+                    s1.CreateRow(row).CreateCell(2).SetCellValue(string.Format("Total ({0}):", lstPO.Count + 1));
                     s1.GetRow(row).CreateCell(3).CellFormula = string.Format("D{0}", sub_row);
                     s1.GetRow(row).CreateCell(6).CellFormula = string.Format("G{0}-G{1}+G{2}-G{3}", sub_row, sub_row + 1, sub_row + 2, sub_row + 3);
                     // style

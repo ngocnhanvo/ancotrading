@@ -4,7 +4,9 @@ public class AvariablePrj
     public partial class lstImage
     {
         public int row { get; set; }
+        public int rowLast { get; set; }
         public int column { get; set; }
+        public int columnLast { get; set; }
         public string link { get; set; }
         public float heightCell { get; set; }
         public float widthCell { get; set; }
@@ -22,5 +24,30 @@ public class AvariablePrj
         public float left { get; set; }
         public float top { get; set; }
         public bool? bold { get; set; }
+    }
+
+    public partial class lstTextReplace
+    {
+        public string oldT { get; set; }
+        public string newT { get; set; }
+        public int row { get; set; }
+        public int column { get; set; }
+    }
+
+    public partial class lstFormula
+    {
+        public int col { get; set; }
+        public int row { get; set; }
+        public string formula { get; set; }
+        public int levelFML { get; set; }
+        public string format { get; set; }
+        public float? defaultHeight { get; set; }
+    }
+
+    public partial class lstFontSize
+    {
+        public int col { get; set; }
+        public int row { get; set; }
+        public float fontSize { get; set; }
     }
 }

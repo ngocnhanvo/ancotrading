@@ -845,9 +845,13 @@
                 beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 },
+                afterSubmit: function(rs, postdata){
+                    return showMsgDialog(rs);
+                },
                 errorTextFormat:function(data) { 
                     return 'Lỗi: ' + data.responseText 
-            }"
+                }
+            "
             ViewFormOptions="
                 beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 

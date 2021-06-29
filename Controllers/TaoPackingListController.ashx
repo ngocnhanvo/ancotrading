@@ -67,12 +67,14 @@ public class TaoPackingListController : IHttpHandler {
             p.noidi = md_cangbien_id;
 
             double discountHH = 0;
+            var lstHH = new List<Dictionary<string, object>>();
             foreach (DataRow item in dt.Rows)
             {
 
                 String c_dongnhapxuat_id = item["c_dongnhapxuat_id"].ToString();
                 c_dongpklinv line = new c_dongpklinv();
                 c_dongnhapxuat dongnx = db.c_dongnhapxuats.Single(dnx => dnx.c_dongnhapxuat_id.Equals(c_dongnhapxuat_id));
+                var nx = db.c_nhapxuats.Single(dnx => dnx.c_nhapxuat_id.Equals(dongnx.c_nhapxuat_id));
                 var dongdonhang = db.c_dongdonhangs.Single(ddh => ddh.c_dongdonhang_id.Equals(item["c_dongdonhang_id"]));
                 var donhang = db.c_donhangs.Single(dh => dh.c_donhang_id.Equals(dongdonhang.c_donhang_id));
                 string c_danhsachdathang_id = db.c_dongdsdhs.Where(s => s.c_dongdsdh_id == dongnx.c_dongdsdh_id).Select(s => s.c_danhsachdathang_id).FirstOrDefault();
@@ -91,18 +93,30 @@ public class TaoPackingListController : IHttpHandler {
                 line.gia = dongnx.dongia;
 
                 line.thanhtien = dongnx.slthuc_nhapxuat * dongnx.dongia;
-
+                
+                //discountHH += (double)line.thanhtien.GetValueOrDefault(0) * discountHH_DH / 100;
+                
+                var discountPO = UserUtils.getDiscountgPO(donhang, null, 0);
                 var discountHH_DH = (double)UserUtils.getDiscountgPO(donhang, dongdonhang, 1);
-                discountHH += (double)line.thanhtien.GetValueOrDefault(0) * discountHH_DH / 100;
+
+                lstHH.Add(new Dictionary<string, object>() {
+                    { "code_cl", dongdonhang.code_cl },
+                    { "po", dongdonhang.c_donhang_id },
+                    { "discount_hehang", donhang.discount_hehang.GetValueOrDefault(false) },
+                    { "thanhtien", line.thanhtien  },
+                    { "discountHH", discountHH_DH },
+                    { "discountPO", discountPO },
+                    { "containerSeal", nx.container + "/" + nx.soseal }
+                });
 
                 line.nhacungungid = dongdonhang.nhacungungid;
                 line.v2 = dongdonhang.v2;
                 line.soluong_ddh = dongdonhang.soluong;
                 line.c_nhapxuat_id = dongnx.c_nhapxuat_id;
                 line.c_danhsachdathang_id = c_danhsachdathang_id;
+
                 
-                var discountPO = UserUtils.getDiscountgPO(donhang, null);
-                totaldiscount += (line.thanhtien.Value * discountPO) / 100;
+                //totaldiscount += Math.Round((line.thanhtien.Value * discountPO) / 100, 2);
                 totalnet += line.thanhtien.Value;
 
                 line.line = sothutu;
@@ -166,9 +180,38 @@ public class TaoPackingListController : IHttpHandler {
             p.diengiaicong_po = diendai_phitang;
             p.diengiaitru_po = diendai_phigiam;
 
-            totaldiscount = totaldiscount + (decimal)discountHH;
-            p.totaldis = Math.Round(totaldiscount, 2);
-            p.totalnet = Math.Round(totalnet, 2);
+            var lstHHStr = lstHH.Where(s=>(bool)s["discount_hehang"]).Select(s => new {
+                hh = s["code_cl"].ToString(),
+                po = s["po"].ToString(),
+                containerSeal = s["containerSeal"].ToString()
+            }).Distinct();
+
+            var lstPOStr = lstHH.Where(s=>!(bool)s["discount_hehang"]).Select(
+                s => new {
+                    po = s["po"].ToString(),
+                    containerSeal = s["containerSeal"].ToString()
+                }
+            ).Distinct();
+
+            foreach(var hhPO in lstHHStr)
+            {
+                var rowHHs = lstHH.Where(s => s["code_cl"].ToString() == hhPO.hh & s["po"].ToString() == hhPO.po & s["containerSeal"].ToString() == hhPO.containerSeal);
+                var tt = rowHHs.Sum(s => double.Parse(s["thanhtien"].ToString()));
+                var discount = rowHHs.Select(s => double.Parse(s["discountHH"].ToString())).FirstOrDefault();
+                totaldiscount = totaldiscount + (decimal)Math.Round(tt * discount / 100, 2);
+            }
+
+            foreach(var po in lstPOStr)
+            {
+                var rowHHs = lstHH.Where(s => s["po"].ToString() == po.po & s["containerSeal"].ToString() == po.containerSeal);
+                var tt = rowHHs.Sum(s => double.Parse(s["thanhtien"].ToString()));
+                var discount = rowHHs.Select(s => double.Parse(s["discountPO"].ToString())).FirstOrDefault();
+                totaldiscount = totaldiscount + (decimal)Math.Round(tt * discount / 100, 2);
+            }
+
+            //totaldiscount = totaldiscount + (decimal)discountHH;
+            p.totaldis = totaldiscount;
+            p.totalnet = totalnet;
             p.totalgross = p.totalnet - p.totaldis + (p.giatri_cong + p.giatricong_po) - (p.giatri_tru + p.giatritru_po);
 
             //tinh hoa hong phai tra khi tao invoice

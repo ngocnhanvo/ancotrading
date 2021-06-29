@@ -287,6 +287,7 @@ public class DanhSachDatHangController : IHttpHandler
                                 x.h2,
                                 x.h1,
                                 x.gianhap,
+								x.giachuan,
                                 ghichu_vachngan = EncodeHTML_DSDH(x.ghichu_vachngan),
                                 x.c_dongdsdh_id,
                                 x.c_dongdonhang_id,

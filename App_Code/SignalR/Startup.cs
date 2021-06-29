@@ -12,6 +12,7 @@ public class Startup
         app.UseCors(CorsOptions.AllowAll);
         
         var hubConfiguration = new HubConfiguration();
+        hubConfiguration.EnableJSONP = true;
         hubConfiguration.EnableDetailedErrors = true;
         hubConfiguration.EnableJavaScriptProxies = true;
         app.MapSignalR(hubConfiguration);

@@ -547,7 +547,7 @@
                  , edittype: 'text'
                  , editoptions: { readonly: 'readonly' }
                  , formatter: 'imagestatus'
-                 , align:'right'
+                 , align:'center'
                  , search : true
                  , stype : 'select'
                  , searchoptions:{sopt:['in'], value:'SOANTHAO,HIEULUC:SOẠN THẢO & HIỆU LỰC;:[ALL];SOANTHAO:SOẠN THẢO;HIEULUC:HIỆU LỰC;KETTHUC:KẾT THÚC' }
@@ -555,7 +555,7 @@
             },
 			{
                 fixed: true, name: 'khachhang'
-                , index: 'khachhang'
+                , index: 'khachhang.ma_dtkd'
                 , width: 100
                 , editable: false
                 , edittype: 'text'
@@ -766,7 +766,7 @@
             },
 			{
                  fixed: true, name: 'nguoilap'
-                 , index: 'kh.nguoilap'
+                 , index: 'nv.hoten'
                  , editable: false
                  , width: 100
                  , edittype: 'text'

@@ -32,7 +32,15 @@ namespace jqGridHelper
             decimal n = (decimal)Math.Pow(10, -decimals);
             return Math.Round(d / n, 0) * n;
         }
-		
+
+        public static decimal Round5(decimal d, int decimals)
+        {
+            if (decimals >= 0) return decimal.Round(d, decimals);
+
+            decimal n = (decimal)Math.Pow(10, -decimals);
+            return decimal.Ceiling(d / n) * n;
+        }
+
         public static void writeResult(int type, string message)
         {
             HttpContext.Current.Response.Clear();

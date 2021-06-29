@@ -18,7 +18,7 @@ public static class UserUtils
     //Mail Ke Toan NCU
     public static string mailKeToanNCU = "ketoanTEST@ancometal.com";
 
-    public static decimal get_gianhap(HttpContext context, string ma_dtkd_select, decimal gia_fob, decimal discount, decimal discount_vinhgia)
+    public static decimal get_gianhap(HttpContext context, string ma_dtkd_select, decimal gia_fob, decimal discount, decimal discount_vinhgia, LinqDBDataContext db)
     {
         //Tinh % theo nha cung ung
 
@@ -56,6 +56,12 @@ public static class UserUtils
         else if (new string[] { "ANCO1" }.Contains(ma_dtkd_select))
         {
             decimal tygia = 23000;
+            var tyGiaMua = db.rpt_tonghopdoanhthuchiphis.Where(s => s.xuongValue == ma_dtkd_select & s.nam == DateTime.Now.Year).FirstOrDefault();
+            if(tyGiaMua != null)
+            {
+                tygia = tyGiaMua.tyGiaMua.GetValueOrDefault(0) > 0 ? tyGiaMua.tyGiaMua.GetValueOrDefault(0) : tygia;
+            }
+
             decimal discountVNN = decimal.Parse("0.80");
             //Lay discount dac biet
             if (getptr == 1)
@@ -249,9 +255,12 @@ public static class UserUtils
                         where c.md_sanpham_id == sp.md_sanpham_id
                         select new { c.md_sanpham_id }).Count();
 
-        var HinhAnh = System.IO.File.Exists(
-            context.Server.MapPath(string.Format(@"~/images/products/fullsize/{0}.jpg", sp.ma_sanpham.Contains("F") ? sp.ma_sanpham.Substring(0, 11) : sp.ma_sanpham.Substring(0, 8)))
-            );
+        
+        var path = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
+        var HinhAnh = path != Public.imgNotFound;
+
+        if(HinhAnh)
+            HinhAnh = System.IO.File.Exists(ExcuteSignalRStatic.mapPathSignalR(string.Format("~/{0}", path)));
 
         if (countDG <= 0)
             msg += "Thiếu đóng gói,";
@@ -285,11 +294,17 @@ public static class UserUtils
     public static string createPI(HttpContext context, c_donhang donhang, List<dongDatHang> dsSanPham,  LinqDBDataContext db)
     {
 
-        String selSCT = @"SELECT (sct.tiento + '/' + CAST(sct.so_duocgan as nvarchar(32)) + '/' + hauto) as sochungtu 
-						 FROM md_sochungtu sct, md_loaichungtu lct 
-						 WHERE sct.md_loaichungtu_id = lct.md_loaichungtu_id AND lct.kieu_doituong = N'PI'";
+        // String selSCT = @"SELECT (sct.tiento + '/' + CAST(sct.so_duocgan as nvarchar(32)) + '/' + hauto) as sochungtu 
+						 // FROM md_sochungtu sct, md_loaichungtu lct 
+						 // WHERE sct.md_loaichungtu_id = lct.md_loaichungtu_id AND lct.kieu_doituong = N'PI'";
 
-        String sochungtu = (String)mdbc.ExecuteScalar(selSCT);
+        // String sochungtu = (String)mdbc.ExecuteScalar(selSCT);
+		
+		var sctObject = db.md_sochungtus
+			.Join(db.md_loaichungtus, sct => sct.md_loaichungtu_id, lct => lct.md_loaichungtu_id, (sct, lct) => new { sct, lct })
+			.Where(s=>s.lct.kieu_doituong == "PI" & s.sct.tiento == "DSDH").FirstOrDefault();
+			
+		String sochungtu = sctObject == null ? "" : string.Format(@"{0}/{1}/{2}", sctObject.sct.tiento, sctObject.sct.so_duocgan, sctObject.sct.hauto);
 
         var dsPartner = dsSanPham.Select(p => p.md_doitackinhdoanh_id).Distinct().ToList();
 
@@ -361,13 +376,19 @@ public static class UserUtils
             decimal giachuan = gianhap;
             //Neu doi tac la VINHGIA
             
-			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, 0, 0);
+			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, 0, 0, db);
             var giaNhap2BD = gianhap2;
-            decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2);
+            decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2, db);
 
             var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
-            if(donhang.discount.GetValueOrDefault(0) > 0)
-                phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + donhang.discount.GetValueOrDefault(0));
+
+            if (donhang.discount.GetValueOrDefault(0) > 0)
+            {
+                if (dondathang.discount.GetValueOrDefault(0) <= 0)
+                    phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + donhang.discount.GetValueOrDefault(0));
+                else
+                    phiDiscount = ddonhang.phi.GetValueOrDefault(0);
+            }
 
             gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
             if (giaNhap2BD > -1)
@@ -375,8 +396,8 @@ public static class UserUtils
                 if (maNCC != "VINHGIA")
                 {
 					gianhap = gianhap2;
-                    giachuan = jqGridHelper.Utils.Round3(gianhap, -2);
-                    gianhap = jqGridHelper.Utils.Round3(gianhap + (phiDiscount * tygia), -2);
+                    giachuan = jqGridHelper.Utils.Round5(gianhap, -2);
+                    gianhap = jqGridHelper.Utils.Round5(gianhap + (phiDiscount * tygia), -2);
                 }
                 else
                 {
@@ -387,7 +408,7 @@ public static class UserUtils
             }
             else
             {
-                gianhap = jqGridHelper.Utils.Round3(gianhap + phiDiscount * tygia, -2);
+                gianhap = jqGridHelper.Utils.Round5(gianhap + phiDiscount * tygia, -2);
             }
 
             var ddsdh = new c_dongdsdh();
@@ -464,11 +485,11 @@ public static class UserUtils
                             decimal vnn = Math.Round((cbm * 100) / donhang.totalcbm.Value, 0);
                             decimal vnn1 = Math.Round(pdonh.phi.Value * vnn / 100, 0);
 
-                            decimal get_giaPB = get_gianhap(context, cbm_ncc[0], -2, -2, -2);
+                            decimal get_giaPB = get_gianhap(context, cbm_ncc[0], -2, -2, -2, db);
                             decimal tienVND = 0;
                             if (get_giaPB > 1)
                             {
-                                tienVND = jqGridHelper.Utils.Round3(vnn1 * get_giaPB, -2);
+                                tienVND = jqGridHelper.Utils.Round5(vnn1 * get_giaPB, -2);
                             }
                             else
                             {
@@ -512,11 +533,11 @@ public static class UserUtils
                             if (md_doitackinhdoanh_id == row.id.ToString())
                             {
                                 decimal tien = decimal.Parse((row.tien.ToString()).ToString());
-                                decimal get_giaPB = UserUtils.get_gianhap(context, row.ma_dtkd, -2, -2, -2);
+                                decimal get_giaPB = UserUtils.get_gianhap(context, row.ma_dtkd, -2, -2, -2, db);
                                 decimal tienVND = 0;
                                 if (get_giaPB > 1)
                                 {
-                                    tienVND = jqGridHelper.Utils.Round3(tien * get_giaPB, -2); ;
+                                    tienVND = jqGridHelper.Utils.Round5(tien * get_giaPB, -2); ;
                                 }
                                 else
                                 {
@@ -566,7 +587,7 @@ public static class UserUtils
                         if (md_doitackinhdoanh_id == row.id.ToString())
                         {
                             decimal tien = decimal.Parse((row.tien.ToString()).ToString());
-                            decimal get_giaPB = get_gianhap(context, row.ma_dtkd, tien, 0, 0);
+                            decimal get_giaPB = get_gianhap(context, row.ma_dtkd, tien, 0, 0, db);
                             decimal tienVND = 0;
                             if (get_giaPB > 0)
                             {

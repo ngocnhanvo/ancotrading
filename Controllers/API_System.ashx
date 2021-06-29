@@ -27,8 +27,38 @@ public class API_System : IHttpHandler {
             case "loadPDF":
                 this.loadPDF(context);
                 break;
+            case "downloadFile":
+                this.downloadFile(context);
+                break;
         }
     }
+
+    public void downloadFile(HttpContext context)
+    {
+        string name = context.Request.QueryString["name"];
+        string type = context.Request.QueryString["type"];
+        string path = context.Request.QueryString["path"];
+        var remove = context.Request.QueryString["remove"] == "true";
+        path = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
+        if (File.Exists(path))
+        {
+            context.Response.Clear();
+            context.Response.Buffer = true;
+            context.Response.AddHeader("Content-Disposition", "attachment;filename=" + name);
+            context.Response.Charset = "";
+            context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            context.Response.WriteFile(path);
+            context.Response.Flush();
+            if(remove)
+                File.Delete(path);
+            context.Response.End();
+        }
+        else
+        {
+            context.Response.Write(string.Format("Không tìm thấy đường dẫn<br>{0}", path));
+        }
+    }
+
     public void loadPDF(HttpContext context)
     {
         var urlPDF = context.Request.QueryString["urlPDF"];
@@ -101,7 +131,8 @@ public class API_System : IHttpHandler {
     public void loadImageProduct(HttpContext context)
     {
         var msp = context.Request.QueryString["msp"];
-        var url = context.Server.MapPath("../" + ExcuteSignalRStatic.getImageProduct(msp));
+        var path = ExcuteSignalRStatic.getImageProduct(msp);
+        var url = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
         var lastIndex = url.LastIndexOf(".");
         var mimeType = url.Substring(lastIndex + 1).ToLower();
 

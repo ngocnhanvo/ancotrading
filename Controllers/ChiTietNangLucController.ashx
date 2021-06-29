@@ -45,8 +45,8 @@ public class ChiTietNangLucController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -57,51 +57,60 @@ public class ChiTietNangLucController : IHttpHandler
         { hd = true; }
         if (s.Equals("on") || s.Equals("true"))
         { st = true; }
-        
+
         String md_nhomnangluc_id = context.Request.Form["md_nhomnangluc_id"];
         md_nhomnangluc nnl = db.md_nhomnanglucs.Single(p => p.md_nhomnangluc_id.Equals(md_nhomnangluc_id));
         String dauma = nnl.hehang + "(" + nnl.nhom + ")";
 
         decimal nangsuat = decimal.Parse(context.Request.Form["nangxuat_tb"]);
         decimal sl_dadat = decimal.Parse(context.Request.Form["sl_dadat"]);
-        
-        
-        
-        c_chitietnangluc m = db.c_chitietnanglucs.Single(p => p.c_chitietnangluc_id == context.Request.Form["id"]);
-        m.md_nhomnangluc_id = context.Request.Form["md_nhomnangluc_id"];
-        //m.c_tuannangluc_id = context.Request.Form["c_tuannangluc_id"];
-        //m.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
-        m.tenhehang = db.md_chungloais.FirstOrDefault(p => p.code_cl.Equals(nnl.hehang) && p.hoatdong.Equals(true)).tv_ngan; // ten he hang = loai san pham cua nhom nang luc
-        m.dauma = dauma; // ghep ten he hang cua nhom nang luc
-        //m.thoigiannhan_dh = int.Parse(context.Request.Form["thoigiannhan_dh"]);
-        
-        m.nangxuat_tb = nangsuat;
-        m.sl_dadat = sl_dadat;
-        m.sl_conlai = nangsuat - sl_dadat;
-        //m.tinhtrang = context.Request.Form["tinhtrang"];
-        
-        
-        m.mota = context.Request.Form["mota"];
-        m.hoatdong = hd;
-        m.ngaycapnhat = DateTime.Now;
-        m.nguoicapnhat = UserUtils.getUser(context);
-        db.SubmitChanges();
-        if(st.Equals(true)){
-            string sql_uAll = @"update c_chitietnangluc
-					set nangxuat_tb = " + nangsuat + @", sl_conlai = "+nangsuat+@"
+        var m = db.c_chitietnanglucs.Single(p => p.c_chitietnangluc_id == context.Request.Form["id"]);
+
+        var chkExist = db.c_chitietnanglucs.Where(t => 
+            t.c_tuannangluc_id == m.c_tuannangluc_id 
+            & t.dauma == dauma 
+            & t.c_chitietnangluc_id != m.c_chitietnangluc_id).FirstOrDefault();
+        if (chkExist != null)
+        {
+            jqGridHelper.Utils.writeResult(0, string.Format("Đầu mã {0} đã tồn tại.", dauma));
+        }
+        else
+        {
+            m.md_nhomnangluc_id = context.Request.Form["md_nhomnangluc_id"];
+            //m.c_tuannangluc_id = context.Request.Form["c_tuannangluc_id"];
+            //m.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
+            m.tenhehang = db.md_chungloais.FirstOrDefault(p => p.code_cl.Equals(nnl.hehang) && p.hoatdong.Equals(true)).tv_ngan; // ten he hang = loai san pham cua nhom nang luc
+            m.dauma = dauma; // ghep ten he hang cua nhom nang luc
+                             //m.thoigiannhan_dh = int.Parse(context.Request.Form["thoigiannhan_dh"]);
+
+            m.nangxuat_tb = nangsuat;
+            m.sl_dadat = sl_dadat;
+            m.sl_conlai = nangsuat - sl_dadat;
+            //m.tinhtrang = context.Request.Form["tinhtrang"];
+
+
+            m.mota = context.Request.Form["mota"];
+            m.hoatdong = hd;
+            m.ngaycapnhat = DateTime.Now;
+            m.nguoicapnhat = UserUtils.getUser(context);
+            db.SubmitChanges();
+            if (st.Equals(true))
+            {
+                string sql_uAll = @"update c_chitietnangluc
+					set nangxuat_tb = " + nangsuat + @", sl_conlai = " + nangsuat + @"
 					where c_chitietnangluc_id in(
 						select c_chitietnangluc_id 
 						from c_chitietnangluc                      
-						where md_nhomnangluc_id = '" +md_nhomnangluc_id+"'"+
-							" and md_doitackinhdoanh_id = '"+m.md_doitackinhdoanh_id+"'"+
-							@" and c_tuannangluc_id in 
+						where md_nhomnangluc_id = '" + md_nhomnangluc_id + "'" +
+                                " and md_doitackinhdoanh_id = '" + m.md_doitackinhdoanh_id + "'" +
+                                @" and c_tuannangluc_id in 
 								(select c_tuannangluc_id from c_tuannangluc 
-								where ngaybatdau > (select ngaybatdau from c_tuannangluc where c_tuannangluc_id = '"+m.c_tuannangluc_id+@"'))
+								where ngaybatdau > (select ngaybatdau from c_tuannangluc where c_tuannangluc_id = '" + m.c_tuannangluc_id + @"'))
 							and sl_dadat = 0
 					)";
-            mdbc.ExcuteNonQuery(sql_uAll);
+                mdbc.ExcuteNonQuery(sql_uAll);
+            }
         }
-        
     }
 
     public void add(HttpContext context)
@@ -110,7 +119,7 @@ public class ChiTietNangLucController : IHttpHandler
         bool hd = false;
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-        
+
         // lay thong tin nhom nang luc
         String md_nhomnangluc_id = context.Request.Form["md_nhomnangluc_id"];
         md_nhomnangluc nnl = db.md_nhomnanglucs.Single(p => p.md_nhomnangluc_id.Equals(md_nhomnangluc_id));
@@ -118,37 +127,45 @@ public class ChiTietNangLucController : IHttpHandler
 
         decimal nangsuat = decimal.Parse(context.Request.Form["nangxuat_tb"]);
         decimal sl_dadat = decimal.Parse(context.Request.Form["sl_dadat"]);
-        
+
         // insert new //        
         String c_tuannangluc_id = context.Request.Form["c_tuannangluc_id"];
         String md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
-        c_chitietnangluc mnu = new c_chitietnangluc
+
+        var chkExist = db.c_chitietnanglucs.Where(s => s.c_tuannangluc_id == c_tuannangluc_id & s.dauma == dauma).FirstOrDefault();
+        if (chkExist != null)
         {
-            c_chitietnangluc_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
-            md_nhomnangluc_id = context.Request.Form["md_nhomnangluc_id"],
-            c_tuannangluc_id = context.Request.Form["c_tuannangluc_id"],
-            md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"],
-            tenhehang = db.md_chungloais.FirstOrDefault(p => p.code_cl.Equals(nnl.hehang) && p.hoatdong.Equals(true)).tv_ngan, // ten he hang = loai san pham cua nhom nang luc
-            dauma = dauma, // ghep ten he hang cua nhom nang luc
-            //thoigiannhan_dh = int.Parse(context.Request.Form["thoigiannhan_dh"]),
-            
-            nangxuat_tb = nangsuat,
-            sl_dadat = sl_dadat,
-            sl_conlai = nangsuat - sl_dadat,
-            //tinhtrang = context.Request.Form["tinhtrang"],
-            
-			ngaytao = DateTime.Now,
-            mota = context.Request.Form["mota"],
-            hoatdong = hd,
-            ngaycapnhat = DateTime.Now,
-            nguoicapnhat = UserUtils.getUser(context),
-            nguoitao = UserUtils.getUser(context)
-        };
+            jqGridHelper.Utils.writeResult(0, string.Format("Đầu mã {0} đã tồn tại.", dauma));
+        }
+        else
+        {
+            var mnu = new c_chitietnangluc
+            {
+                c_chitietnangluc_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                md_nhomnangluc_id = context.Request.Form["md_nhomnangluc_id"],
+                c_tuannangluc_id = context.Request.Form["c_tuannangluc_id"],
+                md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"],
+                tenhehang = db.md_chungloais.FirstOrDefault(p => p.code_cl.Equals(nnl.hehang) && p.hoatdong.Equals(true)).tv_ngan, // ten he hang = loai san pham cua nhom nang luc
+                dauma = dauma, // ghep ten he hang cua nhom nang luc
+                               //thoigiannhan_dh = int.Parse(context.Request.Form["thoigiannhan_dh"]),
 
-        db.c_chitietnanglucs.InsertOnSubmit(mnu);
-        db.SubmitChanges();
+                nangxuat_tb = nangsuat,
+                sl_dadat = sl_dadat,
+                sl_conlai = nangsuat - sl_dadat,
+                //tinhtrang = context.Request.Form["tinhtrang"],
+
+                ngaytao = DateTime.Now,
+                mota = context.Request.Form["mota"],
+                hoatdong = hd,
+                ngaycapnhat = DateTime.Now,
+                nguoicapnhat = UserUtils.getUser(context),
+                nguoitao = UserUtils.getUser(context)
+            };
+
+            db.c_chitietnanglucs.InsertOnSubmit(mnu);
+            db.SubmitChanges();
+        }
     }
-
 
     public void del(HttpContext context)
     {
@@ -176,7 +193,7 @@ public class ChiTietNangLucController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
         String sqlCount = @"SELECT COUNT(*) AS count 
         FROM c_chitietnangluc ctnl
 		left join md_nhomnangluc nnl on ctnl.md_nhomnangluc_id = nnl.md_nhomnangluc_id
@@ -193,7 +210,7 @@ public class ChiTietNangLucController : IHttpHandler
         else {
             sqlCount = String.Format(sqlCount, 0, filter);
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -234,7 +251,7 @@ public class ChiTietNangLucController : IHttpHandler
             WHERE 1=1 
             AND ctnl.c_tuannangluc_id = N'{0}' {1}
             )P where RowNum > @start AND RowNum < @end";
-        
+
         if (weekId != null)
         {
             strsql = String.Format(strsql, weekId, filter);
@@ -243,7 +260,7 @@ public class ChiTietNangLucController : IHttpHandler
         {
             strsql = String.Format(strsql, 0, filter);
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";

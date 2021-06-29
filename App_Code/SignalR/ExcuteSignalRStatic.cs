@@ -134,19 +134,31 @@ public static class ExcuteSignalRStatic
             string kd = ma_sanpham.Substring(0, 9);
             string image = mapPathSignalR("~/" + msLink);
             string clDTMS = string.Format(@"{0}-{1}-{2}.jpg", cl, dt, ms);
+            //Neu co hinh anh mau sac chinh xac cua bo F
+            if (File.Exists(image + ma_sanpham + ".jpg"))
+                msLink += ma_sanpham + ".jpg";
+            //Neu co hinh anh mau sac chinh xac cua bo S
             if (File.Exists(image + kd + ms + ".jpg"))
                 msLink += kd + ms + ".jpg";
-            else {
+            //Neu khong co hinh anh mau sac chinh xac cua bo F va S
+            else
+            {
                 bool haveImg = false;
 
                 if (type == 0)
                 {
+                    string kdCP = kd;
+                    var rgxMauSac3 = new System.Text.RegularExpressions.Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-F[0-9]-[0-9][0-9]$");
+                    if (rgxMauSac3.IsMatch(ma_sanpham)) {
+                        kdCP = ma_sanpham.Substring(0, 12);
+                    }
+                    
                     for (var i = 0; i < 99; i++)
                     {
                         var msCP = i < 10 ? "0" + i : i.ToString();
-                        if (File.Exists(image + kd + msCP + ".jpg"))
+                        if (File.Exists(image + kdCP + msCP + ".jpg"))
                         {
-                            msLink += kd + msCP + ".jpg";
+                            msLink += kdCP + msCP + ".jpg";
                             haveImg = true;
                             break;
                         }
@@ -180,21 +192,27 @@ public static class ExcuteSignalRStatic
             string ms = msp.Substring(12, 2);
             string kd = msp.Substring(0, 9);
             image = mapPathSignalR("~/" + msLink);
-
-            if (File.Exists(image + kd + ms + ".jpg"))
+            
+            //Neu co hinh anh mau sac cua F
+            if (File.Exists(image + msp + ".jpg"))
+                image = msLink + msp + ".jpg";
+            //Neu co hinh anh mau sac cua S
+            else if (File.Exists(image + kd + ms + ".jpg"))
                 image = msLink + kd + ms + ".jpg";
+            //Neu khong co hinh anh mau sac cua S va F thi lay hinh anh mac dinh cua san pham
             else
             {
-                if (!msp.Contains("-F"))
+                var rgxMauSac3 = new System.Text.RegularExpressions.Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-F[0-9]-[0-9][0-9]$");
+                if (rgxMauSac3.IsMatch(msp))
                 {
-                    image = msp.Substring(0, 8) + ".jpg";
+                    image = msp.Substring(0, 11) + ".jpg";
+                    image = Public.imgProduct + image;
                 }
                 else
                 {
-                    image = msp.Substring(0, 11) + ".jpg";
+                    image = msp.Substring(0, 8) + ".jpg";
+                    image = Public.imgProduct + image;
                 }
-
-                image = Public.imgProduct + image;
 
                 if (!File.Exists(mapPathSignalR("~/" + image)))
                     image = Public.imgNotFound;
@@ -213,8 +231,9 @@ public static class ExcuteSignalRStatic
         string image = "";
         try
         {
-            var mimeImg = color.Substring(color.LastIndexOf("."));
-            var colorFull = string.IsNullOrEmpty(mimeImg) ? color + ".jpg" : color;
+            var indexMimeImg = color.LastIndexOf(".");
+            var colorFull = indexMimeImg <= -1 ? color + ".jpg" : color;
+            var mimeImg = colorFull.Substring(colorFull.LastIndexOf("."));
             string msLink = Public.imgProduct;
             if (color.Length >= 11)
             {

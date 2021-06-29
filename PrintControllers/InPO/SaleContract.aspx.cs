@@ -44,32 +44,64 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
             }
             else
             {
-                decimal total_all = 0;
+                decimal total_all = 0, total = 0;
                 string[] c_id = c_donhang_id.Split(',');
-                for (int i = 0; i < c_id.Count(); i++)
+                for (int i = 0; i < c_id.Length; i++)
                 {
                     var pTang = (from p in db.c_phidonhangs where p.c_donhang_id.Equals(c_id[i]) && p.phitang.Equals(true) select p.phi).Sum();
                     var pGiam = (from p in db.c_phidonhangs where p.c_donhang_id.Equals(c_id[i]) && p.phitang.Equals(false) select p.phi).Sum();
-
-                    var diengiaicong = db.c_phidonhangs.FirstOrDefault(p => p.c_donhang_id.Equals(c_id[i]) && p.phitang.Equals(true));
-                    var diengiaitru = db.c_phidonhangs.FirstOrDefault(p => p.c_donhang_id.Equals(c_id[i]) && p.phitang.Equals(false));
 
                     decimal tang, giam;
                     tang = pTang == null ? 0 : pTang.Value;
                     giam = pGiam == null ? 0 : pGiam.Value;
 
-                    decimal total = (decimal)mdbc.ExecuteScalar("select totalamount from c_donhang where c_donhang_id = @c_donhang_id", "@c_donhang_id", c_id[i]);
+                    double totalDB = (double)mdbc.ExecuteScalar(@"
+                        declare @discount numeric(18, 6) = isnull((select discount from c_donhang where c_donhang_id = @c_donhang_id), 0)
+                        select a.total -
+                        cast(a.total * @discount / 100 as decimal(18, 2)) 
+                        from (
+	                        select sum(amount) as total
+	                        from (
+		                        select a.hehang, a.amount - round(a.amount * a.discount / 100, 2) as amount
+		                        from (
+			                        select a.hehang, a.discount, sum(a.amount) as amount
+			                        from (
+				                        select
+					                        dh.soluong * (isnull(dh.giachuan, dh.giafob)) as amount,
+					                        isnull(dh.discount, 0) as discount,
+					                        isnull(dh.phi, 0) as phi,
+					                        SUBSTRING(sp.ma_sanpham,0,3) as hehang
+				                        from 
+					                        c_dongdonhang dh
+					                        left join md_sanpham sp on sp.md_sanpham_id = dh.md_sanpham_id
+				                        where 
+					                        c_donhang_id = @c_donhang_id
+			                        )a
+			                        group by hehang, discount
+		                        )a
+	                        )a
+                        )a
+                    "
+                    , "@c_donhang_id"
+                    , c_id[i]);
+
+                    total = (decimal)totalDB;
                     total = total + tang - giam;
                     total_all += total;
                 }
+                
+                String totalWord = MoneyToWord.ConvertMoneyToText(total_all.ToString()).Replace("Dollars", "");
 
-
-                String totalWord = MoneyToWord.ConvertMoneyToText(String.Format("{0:#.00}", total_all)).Replace("Dollars", "").Replace("Cents", "").Replace("Cent", "");
                 int j = totalWord.LastIndexOf("and");
 
-                if ((j > 0) && (int.Parse(String.Format("{0:#.00}", total_all).Split('.')[1]) > 0))
+                if (totalWord.Contains("Cents") | totalWord.Contains("Cent"))
                 {
+                    totalWord = totalWord.Replace("Cents", "").Replace("Cent", "");
                     totalWord = totalWord.Insert(totalWord.Length, "cents");
+                }
+                else
+                {
+                    totalWord = totalWord.Replace("Cents", "").Replace("Cent", "");
                 }
 
                 String select = String.Format(@"SELECT *, CASE
@@ -121,8 +153,10 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
 					, sp.mota_tiengviet
 					, sp.mota_tienganh
 					, ddh.soluong
-					, ddh.giafob
+					, isnull(ddh.giachuan, ddh.giafob) as giafob
+                    , ddh.discount as disHH
 					, dh.totalcbm
+                    , dh.discount_hehang_value
 					, convert(decimal(18,2) ,dh.discount) as discount
 					, trl.ten_trongluong
 					, dg.sl_outer
@@ -150,39 +184,7 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
 					left join md_donvitinhsanpham dvt on dvt.md_donvitinhsanpham_id = sp.md_donvitinhsanpham_id
 					left join md_trongluong trl on trl.md_trongluong_id = dh.md_trongluong_id
 					where N'{0}' like  N'%'+dh.c_donhang_id+'%'
-					union
-					select null as ngaylap
-					, null as c_donhang_id
-					, '9999' as sochungtu
-					, null as ten_dtkd
-					, null as diachi
-					, null as tel
-					, null as fax 
-					, null as cang_n
-					, null as cang_x
-					, null as shipmenttime
-					, null as ten_paymentterm
-					, null as ma_sanpham
-					, null as mota_tiengviet
-					, null as mota_tienganh
-					, null as soluong
-					, null as giafob
-					, null as totalcbm
-					, null as discount
-					, null as ten_trongluong
-					, null as sl_outer
-					, null as sl_inner
-					, null as dvt_outer
-					, null as dvt_inner
-					, null as ten_dvt
-					, null as l1, null as w1, null as h1
-					, null as l2, null as w2, null as h2, null as v2
-					, null as n_w_outer
-					, null as n_w_inner
-					, null as t_thung_outer
-					, null as t_thung_inner
-					, null as money
-                    , null as thongtinnganhang
+					
 					)A)B order by B.sochungtu asc, B.ma_sanpham asc
 
 				", c_donhang_id == null ? "" : c_donhang_id, totalWord);
@@ -240,6 +242,12 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
         ICellStyle borderWrapSTT = ex_fm.getcell(12, false, true, "LRBT", "C", "T");
         //--
         ICellStyle signBold = ex_fm.getcell(12, true, true, "", "C", "C");
+        var number = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0");
+        var numberBold = ex_fm.getcell2(12, true, true, "", "R", "T", "#,##0");
+
+        var number2 = ex_fm.getcell2(12, false, true, "LRBT", "R", "T", "#,##0.00");
+        var number2Bold = ex_fm.getcell2(12, true, true, "", "R", "T", "#,##0.00");
+
         //--
         int heigh = 22;
         int row = 0;
@@ -331,7 +339,9 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
             int with = 5500;
             rowColumnHeader.CreateCell(cell).SetCellValue(d[i]);
             rowColumnHeader.GetCell(i).CellStyle = borderWrap;
-            if (i == 3)
+            if (new int[] { 4, 5 }.Contains(i))
+                with = 3000;
+            else if (i == 3)
                 with = 10000;
             else if (i == 0)
             {
@@ -349,63 +359,192 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
         row++;
         // -- Details
         // create column
-        string sochungtu = "", row_value = "";
+        string sochungtu = "";
         //thu tu tong cong // dem so dong hang cua tung sochungtu
-        int count_total = 1, count_row = 0, count_row_tt = 1;
+        int count_row = 0, count_row_tt = 1;
         // tap hop so luong dong tong cong // tap hop cac vi tri cua tong cong
-        string n_total = "", l_total = "", l_cbm = "";
+        string l_cbm = "";
         // create detail row
+
+        var startRowHH = -1;
+        var lstHH = new List<int>();
+        var lstPO = new List<int>();
+        string discount_hehang_value = "-1";
+        List<Dictionary<string, object>> nnl = null;
         for (int i = 0; i < dt.Rows.Count; i++)
         {
-            if (i == 0) //ke dong sochungtu dau tien
+            if (discount_hehang_value == "-1")
             {
-                if (dt.Rows[i]["sochungtu"].ToString() != sochungtu)
-                {
+                discount_hehang_value = dt.Rows[i]["discount_hehang_value"].ToString();
+                nnl = string.IsNullOrEmpty(discount_hehang_value) ? null : Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(discount_hehang_value);
+            }
 
-                    s1.CreateRow(row).CreateCell(0).SetCellValue("P/I No. " + dt.Rows[i]["sochungtu"].ToString());
-                    s1.GetRow(row).CreateCell(4).SetCellValue("FOB " + dt.Rows[i]["cang_x"].ToString());
+            var msp = dt.Rows[i]["ma_sanpham"].ToString();
+            var chungloai = msp.Substring(0, 2);
+            var chungloaiTT = i == dt.Rows.Count - 1 ? chungloai : dt.Rows[i + 1]["ma_sanpham"].ToString().Substring(0, 2);
 
-                    s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 3));
-                    s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 7));
-                    s1.GetRow(row).GetCell(0).CellStyle = leftBold;
-                    s1.GetRow(row).GetCell(4).CellStyle = borderWrap;
-                    s1.GetRow(row).CreateCell(8).CellStyle = borderonlyleft;
-                    s1.GetRow(row).HeightInPoints = 22;
-                    sochungtu = dt.Rows[i]["sochungtu"].ToString();
-                    row++;
-                }
+            var soPO = dt.Rows[i]["sochungtu"].ToString();
+            var soPOTT = i == dt.Rows.Count - 1 ? soPO : dt.Rows[i + 1]["sochungtu"].ToString();
+            var soPOTR = i == 0 ? soPO : dt.Rows[i - 1]["sochungtu"].ToString();
+
+            if (startRowHH == -1)
+                startRowHH = row + 2;
+
+            if (i == 0 | soPO != soPOTR) //ke dong sochungtu dau tien
+            {
+                s1.CreateRow(row).CreateCell(0).SetCellValue("P/I No. " + dt.Rows[i]["sochungtu"].ToString());
+                s1.GetRow(row).CreateCell(4).SetCellValue("FOB " + dt.Rows[i]["cang_x"].ToString());
+                CellRangeAddress cellRange03 = new CellRangeAddress(row, row, 0, 3);
+                CellRangeAddress cellRange47 = new CellRangeAddress(row, row, 4, 7);
+                s1.AddMergedRegion(cellRange03);
+                s1.AddMergedRegion(cellRange47);
+                s1.GetRow(row).GetCell(0).CellStyle = leftBold;
+                s1.GetRow(row).GetCell(4).CellStyle = borderWrap;
+                s1.GetRow(row).CreateCell(7).CellStyle = borderonlyleft;
+                s1.GetRow(row).HeightInPoints = 22;
+                ex_fm.set_border(cellRange03, "LRTB", hssfsheet);
+                ex_fm.set_border(cellRange47, "LRTB", hssfsheet);
+                //--
+                row++;
+                //--
+                //s1.CreateRow(row).CreateCell(0).SetCellValue("P/I No. " + dt.Rows[i]["sochungtu"].ToString());
+                //cellRange03 = new CellRangeAddress(row, row, 0, 3);
+                //cellRange47 = new CellRangeAddress(row, row, 4, 7);
+                //s1.AddMergedRegion(cellRange03);
+                //s1.AddMergedRegion(cellRange47);
+                //s1.GetRow(row).GetCell(0).CellStyle = leftBold;
+                //s1.GetRow(row).CreateCell(7).CellStyle = borderonlyleft;
+                //s1.GetRow(row).HeightInPoints = 22;
+                sochungtu = dt.Rows[i]["sochungtu"].ToString();
+                //ex_fm.set_border(cellRange03, "LRTB", hssfsheet);
+                //ex_fm.set_border(cellRange47, "LRTB", hssfsheet);
+                //row++;
             }
             else //ke dong sochungtu tiep theo
             {
-                if (dt.Rows[i]["sochungtu"].ToString() != dt.Rows[i - 1]["sochungtu"].ToString())
+
+            }
+
+            string[] e_value = { "num", "ma_sanpham", "", "mota_tienganh", "soluong", "ten_dvt", "giafob", "" };
+            if (dt.Rows[i]["sochungtu"].ToString() != "9999")
+            {
+                IRow row_t = s1.CreateRow(row); row_t.HeightInPoints = 60;
+                //
+                int cell_t = 0;
+                for (int j = 0; j < e_value.Length; j++)
                 {
-                    //tap hop row tong cong 
-                    n_total += count_total + " + ";
-                    //vi tri row dau tien
-                    int m = row - count_row + 1, sub_row = 0, discount_row = 0; ;
-                    //start tong cong 1
-                    s1.CreateRow(row).CreateCell(3).SetCellValue("Sub Total(" + count_total + "):");
-                    s1.GetRow(row).CreateCell(4).CellFormula = String.Format("SUM(E{0}:E{1})", m, row);
-                    s1.GetRow(row).CreateCell(7).CellFormula = String.Format("SUM(H{0}:H{1})", m, row);
-                    s1.GetRow(row).CreateCell(14).SetCellValue(dt.Rows[i - 1]["discount"].ToString());
-                    s1.SetColumnWidth(14, 0);
-                    // style
-                    s1.GetRow(row).GetCell(3).CellStyle = leftBold;
-                    s1.GetRow(row).GetCell(4).CellStyle = rightBoldSoLuong;
-                    s1.GetRow(row).GetCell(7).CellStyle = rightBold;
-                    for (int nht = 7; nht <= 7; nht++)
+                    if (j == 4 | j == 6)
+                        row_t.CreateCell(cell_t).SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
+                    else if (j == 7)
+                        row_t.CreateCell(cell_t).CellFormula = String.Format("E{0} * G{0}", row + 1);
+                    else if (e_value[j] == "")
+                        row_t.CreateCell(cell_t).SetCellValue("");
+                    else if (e_value[j] == "num")
+                        row_t.CreateCell(cell_t).SetCellValue(i + 1);
+                    else
+                        row_t.CreateCell(cell_t).SetCellValue(dt.Rows[i][e_value[j]].ToString());
+                    
+                    row_t.GetCell(cell_t).CellStyle = border;
+                    cell_t++;
+                }
+
+                s1.GetRow(row).GetCell(0).CellStyle = borderWrapSTT;
+                s1.GetRow(row).GetCell(4).CellStyle = borderright;
+                s1.GetRow(row).GetCell(6).CellStyle = borderright;
+                s1.GetRow(row).GetCell(7).CellStyle = number2;
+
+                row++;
+                count_row++;
+                count_row_tt++;
+
+                if (chungloai != chungloaiTT | i == dt.Rows.Count - 1 | soPO != soPOTT)
+                {
+                    if (nnl != null)
                     {
-                        s1.GetRow(row).GetCell(nht).CellStyle = rightBold;
-                        s1.GetRow(row).GetCell(nht).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+                        string gthh = dt.Rows[i]["disHH"] + "";
+                        gthh = string.IsNullOrEmpty(gthh) ? "0" : gthh;
+                        var rowHeight = gthh == "0" ? 0 : 20;
+                        var rowToTalHeHang = s1.CreateRow(row);
+                        rowToTalHeHang.HeightInPoints = rowHeight;
+                        rowToTalHeHang.CreateCell(3).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
+                        rowToTalHeHang.GetCell(3).CellStyle = leftBold;
+                        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 1));
+                        string fmlSum = string.Format(@"SUM(VNN{0}:VNN{1})", startRowHH, row);
+                        rowToTalHeHang.CreateCell(4).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "E"));
+                        rowToTalHeHang.GetCell(4).CellStyle = numberBold;
+                        rowToTalHeHang.CreateCell(5).SetCellValue("pcs/sets");
+                        rowToTalHeHang.GetCell(5).CellStyle = leftBold;
+                        rowToTalHeHang.CreateCell(7).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "H"));
+                        rowToTalHeHang.GetCell(7).CellStyle = number2Bold;
+                        row++;
+                        count_row++;
+                        count_row_tt++;
+
+                        var rowDisHeHang = s1.CreateRow(row);
+                        rowDisHeHang.HeightInPoints = rowHeight;
+                        rowDisHeHang.CreateCell(3).SetCellValue(string.Format(@"Discount ({0}%):", gthh));
+                        rowDisHeHang.GetCell(3).CellStyle = leftBold;
+                        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 1));
+                        rowDisHeHang.CreateCell(7).CellFormula = string.Format("ROUND(H{0}*{1}/100, 2)", row, gthh);
+                        rowDisHeHang.GetCell(7).CellStyle = number2Bold;
+                        row++;
+                        count_row++;
+                        count_row_tt++;
+
+                        var rowTotalHeHang = s1.CreateRow(row);
+                        rowTotalHeHang.HeightInPoints = rowHeight;
+                        rowTotalHeHang.CreateCell(3).SetCellValue(string.Format("Total ({0}):", lstHH.Count + 1));
+                        rowTotalHeHang.GetCell(3).CellStyle = leftBold;
+                        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 1));
+                        rowTotalHeHang.CreateCell(4).CellFormula = string.Format("E{0}", row - 1);
+                        rowTotalHeHang.GetCell(4).CellStyle = numberBold;
+                        rowTotalHeHang.CreateCell(7).CellFormula = string.Format("H{0} - H{1}", row - 1, row);
+                        rowTotalHeHang.GetCell(7).CellStyle = number2Bold;
+                        row++;
+                        count_row++;
+                        count_row_tt++;
+
+                        startRowHH = row + 1;
+                        lstHH.Add(row);
                     }
-                    if (dt.Rows[i - 1]["discount"].ToString() != "0")
+                }
+
+                if (soPO != soPOTT | i == dt.Rows.Count - 1)
+                {
+                    discount_hehang_value = "-1";
+                    var discountPO = dt.Rows[i]["discount"] + "";
+                    discountPO = discountPO.Replace(".00", "");
+
+                    string sumQuantity = "", sumAmount = "";
+                    if (nnl != null)
                     {
-                        s1.GetRow(row).HeightInPoints = 22;
+                        foreach (var iHH in lstHH)
+                        {
+                            sumQuantity += string.Format("E{0}+", iHH);
+                            sumAmount += string.Format("H{0}+", iHH);
+                        }
+                        sumQuantity += "0";
+                        sumAmount += "0";
                     }
                     else
                     {
-                        s1.GetRow(row).HeightInPoints = 0;
+                        sumQuantity += string.Format(@"SUM(E{0}:E{1})", startRowHH, row);
+                        sumAmount += string.Format(@"SUM(H{0}:H{1})", startRowHH , row);
                     }
+                    
+                    //vi tri row dau tien
+                    int m = row - count_row + 1, sub_row = 0, discount_row = 0;
+                    //start tong cong 1
+                    s1.CreateRow(row).CreateCell(3).SetCellValue(string.Format("Sub Total:", lstPO.Count + 1));
+                    s1.GetRow(row).CreateCell(4).CellFormula = string.Format("{0}", sumQuantity);
+                    s1.GetRow(row).CreateCell(7).CellFormula = string.Format("{0}", sumAmount);
+                    s1.GetRow(row).CreateCell(14).SetCellValue(discountPO);
+                    s1.SetColumnWidth(14, 0);
+                    // style
+                    s1.GetRow(row).GetCell(3).CellStyle = leftBold;
+                    s1.GetRow(row).GetCell(4).CellStyle = numberBold;
+                    s1.GetRow(row).GetCell(7).CellStyle = number2Bold;
+
                     row++;
                     l_cbm += row + ",";
                     sub_row = row;
@@ -413,13 +552,13 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
 
                     //start giam gia
                     m = row - count_row + 1;
-                    s1.CreateRow(row).CreateCell(3).SetCellValue("Discount(" + dt.Rows[i - 1]["discount"].ToString() + "%):");
+
+                    s1.CreateRow(row).CreateCell(3).SetCellValue("Discount PO (" + discountPO + "%):");
                     s1.GetRow(row).CreateCell(7).CellFormula = String.Format("ROUND(H{0}*O{1}/100,2)", row, row);
                     s1.GetRow(row).GetCell(3).CellStyle = leftBold;
-                    s1.GetRow(row).GetCell(7).CellStyle = rightBold;
-                    s1.GetRow(row).GetCell(7).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
-                    s1.GetRow(row).HeightInPoints = 0;
-                    if (dt.Rows[i - 1]["discount"].ToString() != "0")
+                    s1.GetRow(row).GetCell(7).CellStyle = number2Bold;
+
+                    if (discountPO != "0" & !string.IsNullOrEmpty(discountPO))
                     {
                         s1.GetRow(row).HeightInPoints = 22;
                     }
@@ -432,97 +571,43 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
                     //end
 
                     //start phi cong tru
-                    string c_donhang_id = "", chuoi_ct = "0";
-                    var phidonhang = db.c_phidonhangs.Where(s => s.c_donhang_id == dt.Rows[i - 1]["c_donhang_id"].ToString());
-                    if (phidonhang.Count() > 0)
+                    string chuoi_ct = "0";
+                    var phidonhang = db.c_phidonhangs.Where(s => s.c_donhang_id == dt.Rows[i]["c_donhang_id"].ToString()).ToList();
+                    if (phidonhang.Count > 0)
                     {
                         string vitri_ct = "-0";
-                        foreach (c_phidonhang pdh in phidonhang)
+                        var loaiPhi = phidonhang.FirstOrDefault().phitang;
+                        if (phidonhang.Count == 1)
                         {
-                            int check_exit = 0;
-                            if (c_donhang_id == dt.Rows[i - 1]["c_donhang_id"].ToString())
+                            phidonhang.Add(new c_phidonhang()
                             {
-                                check_exit = 1;
-                            }
-                            else
+                                phitang = !loaiPhi,
+                                phi = 0,
+                            });
+                        }
+
+                        foreach (var pdh in phidonhang.OrderByDescending(s => s.phitang))
+                        {
+                            //start phi cong va tru
+                            m = row - count_row + 1;
+                            string plus = "+";
+                            int check_plus = 0;
+                            if (pdh.phitang != true)
                             {
-                                c_donhang_id = dt.Rows[i - 1]["c_donhang_id"].ToString();
-                                check_exit = 0;
+                                plus = "-";
+                                check_plus = 1;
                             }
 
-                            if (check_exit == 0)
-                            {
-                                String select_congtru = String.Format(@"
-										select  sum(A.cong) as sl_cong, sum(A.tru) as sl_tru from (
-											select dh.phi, dh.mota
-											, case when dh.phitang = 1 then 1 else 0 end as cong
-											, case when dh.phitang = 0 then 1 else 0 end as tru
-											from c_phidonhang dh where  N'{0}' like N'%' + dh.c_donhang_id + '%'
-											group by dh.phi, dh.mota, dh.phitang
-											)A
-										", c_donhang_id);
-                                DataTable dt_ct = mdbc.GetData(select_congtru);
+                            s1.CreateRow(row).CreateCell(3).SetCellValue("(" + plus + ")" + pdh.mota + ":");
+                            s1.GetRow(row).CreateCell(7).SetCellValue((double)pdh.phi);
+                            s1.GetRow(row).CreateCell(14).SetCellValue(check_plus);
 
-                                if (dt_ct.Rows[0]["sl_cong"].ToString() == "0")
-                                {
-                                    //start phi cong
-                                    m = row - count_row + 1;
-                                    s1.CreateRow(row).CreateCell(3).SetCellValue("(+):");
-                                    s1.GetRow(row).CreateCell(7).SetCellValue(0);
-                                    s1.GetRow(row).CreateCell(14).SetCellValue(0);
-
-                                    s1.GetRow(row).GetCell(3).CellStyle = leftBold;
-                                    s1.GetRow(row).GetCell(7).CellStyle = rightBold;
-                                    s1.GetRow(row).GetCell(7).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
-                                    s1.GetRow(row).HeightInPoints = 0;
-                                    row++;
-                                    vitri_ct += "+H" + row;
-                                    //end
-                                }
-
-                                if (dt_ct.Rows[0]["sl_cong"].ToString() != "0" | dt_ct.Rows[0]["sl_tru"].ToString() != "0")
-                                {
-                                    //start phi cong va tru
-                                    m = row - count_row + 1;
-                                    string plus = "+";
-                                    int check_plus = 0;
-                                    if (pdh.phitang != true)
-                                    {
-                                        plus = "-";
-                                        check_plus = 1;
-                                    }
-
-                                    s1.CreateRow(row).CreateCell(3).SetCellValue("(" + plus + ")" + pdh.mota + ":");
-                                    s1.GetRow(row).CreateCell(7).SetCellValue((double)pdh.phi);
-                                    s1.GetRow(row).CreateCell(14).SetCellValue(check_plus);
-
-                                    s1.GetRow(row).GetCell(3).CellStyle = leftBold;
-                                    s1.GetRow(row).GetCell(7).CellStyle = rightBold;
-                                    s1.GetRow(row).GetCell(7).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
-                                    s1.GetRow(row).HeightInPoints = 22;
-                                    row++;
-                                    vitri_ct += plus + "H" + row;
-                                    //end
-                                }
-
-                                if (dt_ct.Rows[0]["sl_tru"].ToString() == "0")
-                                {
-                                    //start phi tru
-                                    m = row - count_row + 1;
-                                    s1.CreateRow(row).CreateCell(3).SetCellValue("(-):");
-                                    s1.GetRow(row).CreateCell(7).SetCellValue(0);
-                                    s1.GetRow(row).CreateCell(14).SetCellValue(1);
-
-                                    s1.GetRow(row).GetCell(3).CellStyle = leftBold;
-                                    s1.GetRow(row).GetCell(7).CellStyle = rightBold;
-                                    s1.GetRow(row).GetCell(7).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
-                                    s1.GetRow(row).HeightInPoints = 0;
-                                    row++;
-                                    vitri_ct += "-H" + row;
-                                    //end
-                                }
-                                chuoi_ct = vitri_ct;
-                            }
+                            s1.GetRow(row).GetCell(3).CellStyle = leftBold;
+                            s1.GetRow(row).GetCell(7).CellStyle = number2Bold;
+                            s1.GetRow(row).HeightInPoints = pdh.phi > 0 ? 22 : 0;
+                            row++;
+                            vitri_ct += plus + "H" + row;
+                            //end    
                         }
                     }
                     else
@@ -534,11 +619,10 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
                         s1.GetRow(row).CreateCell(14).SetCellValue(0);
 
                         s1.GetRow(row).GetCell(3).CellStyle = leftBold;
-                        s1.GetRow(row).GetCell(7).CellStyle = rightBold;
-                        s1.GetRow(row).GetCell(7).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+                        s1.GetRow(row).GetCell(7).CellStyle = number2Bold;
                         s1.GetRow(row).HeightInPoints = 0;
                         row++;
-                        chuoi_ct += "+H" + row;
+                        chuoi_ct += "+G" + row;
                         //end
 
                         //start phi tru
@@ -548,120 +632,61 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
                         s1.GetRow(row).CreateCell(14).SetCellValue(0);
 
                         s1.GetRow(row).GetCell(3).CellStyle = leftBold;
-                        s1.GetRow(row).GetCell(7).CellStyle = rightBold;
-                        s1.GetRow(row).GetCell(7).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+                        s1.GetRow(row).GetCell(7).CellStyle = number2Bold;
                         s1.GetRow(row).HeightInPoints = 0;
                         row++;
-                        chuoi_ct += "-H" + row;
+                        chuoi_ct += "-G" + row;
                         //end
                     }
+
                     //end
 
                     //start tong cong 2
+
                     m = row - count_row + 1;
-                    s1.CreateRow(row).CreateCell(3).SetCellValue("Total(" + count_total + "):");
-                    s1.GetRow(row).CreateCell(4).CellFormula = String.Format("E{0}", sub_row);
-                    s1.GetRow(row).CreateCell(7).CellFormula = String.Format("H{0} - H{1} + {2}", sub_row, discount_row, chuoi_ct);
+                    string sumToTalPO = "";
+                    for (var iHH = 0; iHH < lstHH.Count; iHH++)
+                    {
+                        var rowHH = lstHH[iHH];
+                        sumToTalPO += string.Format(@"G{0}+", rowHH + 1);
+                    }
+                    sumToTalPO += "0";
+                    s1.CreateRow(row).CreateCell(3).SetCellValue(string.Format("Total ({0}):", lstPO.Count + 1));
+                    s1.GetRow(row).CreateCell(4).CellFormula = string.Format("E{0}", sub_row);
+                    s1.GetRow(row).CreateCell(7).CellFormula = string.Format("H{0}-H{1}+H{2}-H{3}", sub_row, sub_row + 1, sub_row + 2, sub_row + 3);
                     // style
                     s1.GetRow(row).GetCell(3).CellStyle = leftBold;
-                    s1.GetRow(row).GetCell(4).CellStyle = rightBoldSoLuong;
-                    s1.GetRow(row).GetCell(7).CellStyle = rightBold;
-                    s1.GetRow(row).GetCell(7).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+                    s1.GetRow(row).GetCell(4).CellStyle = numberBold;
+                    s1.GetRow(row).GetCell(7).CellStyle = number2Bold;
                     s1.GetRow(row).HeightInPoints = 22;
                     row++;
-                    l_total += row + ",";
+                    lstPO.Add(row);
+                    lstHH.Clear();
+                    startRowHH = -1;
                     //end
-
-                    // ke dong sochungtu
-                    if (dt.Rows[i]["sochungtu"].ToString() != "9999")
-                    {
-                        s1.CreateRow(row).CreateCell(0).SetCellValue("P/I No. " + dt.Rows[i]["sochungtu"].ToString());
-                        s1.GetRow(row).CreateCell(4).SetCellValue("FOB " + dt.Rows[i]["cang_x"].ToString());
-
-                        s1.GetRow(row).GetCell(0).CellStyle = leftBold;
-                        s1.GetRow(row).GetCell(4).CellStyle = borderWrap;
-                        CellRangeAddress cellRange04 = new CellRangeAddress(row, row, 0, 3);
-                        CellRangeAddress cellRange58 = new CellRangeAddress(row, row, 4, 7);
-                        s1.AddMergedRegion(cellRange04);
-                        s1.AddMergedRegion(cellRange58);
-                        ex_fm.set_border(cellRange04, "LRTB", hssfsheet);
-                        ex_fm.set_border(cellRange58, "LRTB", hssfsheet);
-
-                        s1.GetRow(row).CreateCell(8).CellStyle = borderonlyleft;
-                        s1.GetRow(row).HeightInPoints = 22;
-
-                    }
-                    count_total++;
-                    row++;
-                    count_row = 0;
-                    sochungtu = dt.Rows[i]["sochungtu"].ToString();
                 }
-            }
-            string[] e_value = { "", "ma_sanpham", "", "mota_tienganh", "soluong", "ten_dvt", "giafob", "" };
-            if (dt.Rows[i]["sochungtu"].ToString() != "9999")
-            {
-                IRow row_t = s1.CreateRow(row); row_t.HeightInPoints = 60;
-                //
-                int cell_t = 0;
-                for (int j = 0; j < e_value.Count(); j++)
-                {
-                    if (j == 0)
-                        row_t.CreateCell(cell_t).SetCellValue(count_row_tt);
-                    else if (j == 4 | j == 6)
-                        row_t.CreateCell(cell_t).SetCellValue(double.Parse(dt.Rows[i][e_value[j]].ToString()));
-                    else if (j == 7)
-                        row_t.CreateCell(cell_t).CellFormula = String.Format("E{0} * G{0}", row + 1);
-                    else if (e_value[j] == "")
-                        row_t.CreateCell(cell_t).SetCellValue("");
-                    else
-                        row_t.CreateCell(cell_t).SetCellValue(dt.Rows[i][e_value[j]].ToString()); ;
-                    cell_t++;
-                }
-
-                try
-                {
-                    for (int n = 0; n <= cell_t + 1; n++)
-                    {
-                        //  table style
-                        row_t.GetCell(n).CellStyle.WrapText = true;
-                        row_t.GetCell(n).CellStyle = border;
-                    }
-                }
-                catch { }
-                s1.GetRow(row).GetCell(0).CellStyle = borderWrapSTT;
-                s1.GetRow(row).GetCell(4).CellStyle = borderrightSoLuong;
-                s1.GetRow(row).GetCell(6).CellStyle = borderright;
-                s1.GetRow(row).GetCell(7).CellStyle = borderright;
-                s1.GetRow(row).GetCell(7).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
-                row++;
-                count_row++;
-                count_row_tt++;
             }
         }
         //tru so dong du
-        row--;
-        // tap hop 
-        string numbel_total = n_total.Substring(0, n_total.Length - 3), get_locate_soluong = "", get_locate_thanhtien = "";
-        string[] locate_total = l_total.Split(',');
-        string[] locate_cbm = l_cbm.Split(',');
-        for (int i = 0; i < locate_total.Count() - 1; i++)
+        string totalTxt = "", sumQuantityAll = "", sumAmountAll = "";
+        for (var i = 0; i < lstPO.Count; i++)
         {
-            get_locate_soluong += "E" + locate_total[i] + "+";
-            get_locate_thanhtien += "H" + locate_total[i] + "+";
+            var rowPO = lstPO[i];
+            totalTxt += string.Format("({0})+", i + 1);
+            sumQuantityAll += string.Format(@"E{0}+", rowPO);
+            sumAmountAll += string.Format(@"H{0}+", rowPO);
         }
-        //
-        string new_get_locate_thanhtien = get_locate_thanhtien.Substring(0, get_locate_thanhtien.Length - 1);
-        string new_get_locate_soluong = get_locate_soluong.Substring(0, get_locate_soluong.Length - 1);
-        //
-        //start tong cong total
-        s1.CreateRow(row).CreateCell(3).SetCellValue("Total(" + numbel_total + "):");
-        s1.GetRow(row).CreateCell(4).CellFormula = String.Format(new_get_locate_soluong);
-        s1.GetRow(row).CreateCell(7).CellFormula = String.Format(new_get_locate_thanhtien);
-        // style
+        sumQuantityAll += "0";
+        sumAmountAll += "0";
+        totalTxt = totalTxt.Length > 0 ? totalTxt.Substring(0, totalTxt.Length - 1) : "";
+
+        s1.CreateRow(row).CreateCell(3).SetCellValue(string.Format(@"Total {0}:", totalTxt));
         s1.GetRow(row).GetCell(3).CellStyle = leftBold;
-        s1.GetRow(row).GetCell(4).CellStyle = rightBoldSoLuong;
-        s1.GetRow(row).GetCell(7).CellStyle = rightBold;
-        s1.GetRow(row).GetCell(7).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+        s1.GetRow(row).CreateCell(4).CellFormula = string.Format(sumQuantityAll);
+        s1.GetRow(row).GetCell(4).CellStyle = numberBold;
+        s1.GetRow(row).CreateCell(7).CellFormula = string.Format(sumAmountAll);
+        s1.GetRow(row).GetCell(7).CellStyle = number2Bold;
+
         s1.GetRow(row).HeightInPoints = 22;
         row++;
         s1.CreateRow(row).CreateCell(0).SetCellValue("Say:USD " + dt.Rows[0]["money"].ToString().Replace("Dollars", ""));

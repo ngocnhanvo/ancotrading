@@ -773,14 +773,39 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
         for (int i = 0; i < c.Length; i++)
         {
-            var rowCreate = s1.CreateRow(row);
-            rowCreate.CreateCell(1).SetCellValue(c[i]);
-            rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
-
             var rich_text = "";
             rich_text = i == 0 ? "{0}" : (i == 1 ? "Address: {1}" : (i == 2 ? "Tel: {2}                          Fax: {3}" : "{4}"));
             rich_text = string.Format(rich_text, dt.Rows[0]["ten_dtkd"], dt.Rows[0]["diachi"], dt.Rows[0]["tel"], dt.Rows[0]["fax"], c_value[i] == "" ? "" : dt.Rows[0][c_value[i]]);
-            rowCreate.CreateCell(2).SetCellValue(rich_text);
+
+            IRow rowCreate = null;
+            if (!config.isPDF.GetValueOrDefault(false))
+            {
+                if (!new int[] { 1, 2 }.Contains(i))
+                {
+                    rowCreate = s1.CreateRow(row);
+                    rowCreate.CreateCell(1).SetCellValue(c[i]);
+                    rowCreate.GetCell(1).SetCellValue(c[i]);
+                    rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
+                    rowCreate.CreateCell(2).SetCellValue(rich_text);
+                    height = 22;
+                }
+                else
+                {
+                    row = row - 1;
+                    rowCreate = s1.GetRow(row);
+                    rowCreate.GetCell(2).SetCellValue(rowCreate.GetCell(2).StringCellValue + "\n" + rich_text);
+                    height = 50;
+                }
+            }
+            else
+            {
+                rowCreate = s1.CreateRow(row);
+                rowCreate.CreateCell(1).SetCellValue(c[i]);
+                rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
+                rowCreate.CreateCell(2).SetCellValue(rich_text);
+                height = 22;
+            }
+            
             rowCreate.GetCell(2).CellStyle = i > 2 ? celltext : cellBold;
 
             if (new int[] { 0, 1, 2, 3, 5, 6 }.Contains(i))
@@ -1265,7 +1290,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         cellUn.SetFont(funderline);
         cellUn.Alignment = HorizontalAlignment.Center;
         cellUn.VerticalAlignment = VerticalAlignment.Top;
-        s1.GetRow(2).GetCell(0).CellStyle = cellUn;
+        s1.GetRow(3).GetCell(0).CellStyle = cellUn;
 
         s1 = config.PrintExcel((HSSFSheet)s1, row);
 
@@ -1282,45 +1307,44 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
     public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName)
     {
-        var workbook = new Spire.Xls.Workbook();
         //xuất Excel không áp dụng Spire.Xls
-        if (type != "pdf")
-        {
-            foreach (var item in lstimage)
-            {
-                var image = System.Drawing.Image.FromFile(item.link);
-                MemoryStream ms = new MemoryStream();
-                //pull the memory stream from the image (I need this for the byte array later)
-                image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                image.Dispose();
-                //the drawing patriarch will hold the anchor and the master information
-                IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
-                //store the coordinates of which cell and where in the cell the image goes
-                int intx1 = item.column - 1;
-                int inty1 = item.row;
-                int intx2 = item.column;
-                int inty2 = 1 + item.row;
+        //if (type != "pdf")
+        //{
+        //    foreach (var item in lstimage)
+        //    {
+        //        var image = System.Drawing.Image.FromFile(item.link);
+        //        MemoryStream ms = new MemoryStream();
+        //        //pull the memory stream from the image (I need this for the byte array later)
+        //        image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+        //        image.Dispose();
+        //        //the drawing patriarch will hold the anchor and the master information
+        //        IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
+        //        //store the coordinates of which cell and where in the cell the image goes
+        //        int intx1 = item.column - 1;
+        //        int inty1 = item.row;
+        //        int intx2 = item.column;
+        //        int inty2 = 1 + item.row;
 
-                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
-                //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
-                anchor.AnchorType = 0;
-                //add the byte array and encode it for the excel file
-                int index = hsswb.AddPicture(ms.ToArray(), PictureType.JPEG);
-                IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
-            }
+        //        HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
+        //        //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
+        //        anchor.AnchorType = 0;
+        //        //add the byte array and encode it for the excel file
+        //        int index = hsswb.AddPicture(ms.ToArray(), PictureType.JPEG);
+        //        IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+        //    }
 
-            MemoryStream exportData = new MemoryStream();
-            hsswb.Write(exportData);
-            hsswb.Clear();
+        //    MemoryStream exportData = new MemoryStream();
+        //    hsswb.Write(exportData);
+        //    hsswb.Clear();
 
-            Response.ContentType = "application/vnd.ms-excel";
-            Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
-            Response.Clear();
-            Response.BinaryWrite(exportData.GetBuffer());
-            Response.End();
-        }
-        //xuất Excel có áp dụng Spire.Xls
-        else
+        //    Response.ContentType = "application/vnd.ms-excel";
+        //    Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
+        //    Response.Clear();
+        //    Response.BinaryWrite(exportData.GetBuffer());
+        //    Response.End();
+        //}
+        ////xuất Excel có áp dụng Spire.Xls
+        //else
         {
             var fileName = "PO_" + c_donhang_id + "_" + Guid.NewGuid().ToString();
             string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
@@ -1330,17 +1354,36 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             hsswb.Write(xfile);
             xfile.Close();
             xfile.Dispose();
-
+            
             if (type == "pdf")
             {
                 var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
-
                 var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstimage, lstText);
                 File.Delete(url);
-
                 Response.Write(result);
                 if (result.Length <= 0)
                     Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width&remove=true", fileName));
+            }
+            else
+            {
+                var urlXls = url.Replace(fileName + ".xls", fileName + "1.xls");
+                var excel = new OfficeToPDF.ExcelConverter();
+                foreach (var img in lstimage)
+                    img.column -= 1;
+                excel.lstImage = lstimage;
+                excel.lstText = lstText;
+                var result = excel.ConvertInterop(url, urlXls, null);
+                File.Delete(url);
+                Response.Write(result);
+                if (result.Length <= 0)
+                {
+                    var data = "";
+                    data += "oper=downloadFile";
+                    data += string.Format("&name={0}", saveAsFileName);
+                    data += string.Format("&path=ReportPdf/{0}1.xls", fileName);
+                    data += string.Format("&remove=true");
+                    Response.Redirect(string.Format("../../Controllers/API_System.ashx?{0}", data));
+                }
             }
         }
     }

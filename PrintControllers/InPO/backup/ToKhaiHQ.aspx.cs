@@ -92,6 +92,7 @@ public partial class PrintControllers_IToKhaiHQ_Default : System.Web.UI.Page
 					, ddh.soluong
 					, ddh.giafob
 					, dh.totalcbm
+                    , dh.discount_hehang_value
 					, convert(decimal(18,2),dh.discount) as discount
 					, dh.discount as discount1
 					, trl.ten_trongluong

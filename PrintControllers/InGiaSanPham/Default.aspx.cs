@@ -14,7 +14,7 @@ public partial class PrintControllers_InGiaSanPham_Default : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         String md_phienbangia_id = Request.QueryString["md_phienbangia_id"];
-        String sql = "select pbg.ten_phienbangia, sp.ma_sanpham, gia, gsp.mota from md_sanpham sp, md_giasanpham gsp, md_phienbangia pbg where sp.md_sanpham_id = gsp.md_sanpham_id AND pbg.md_phienbangia_id = gsp.md_phienbangia_id AND pbg.md_phienbangia_id = @md_phienbangia_id order by sp.ma_sanpham asc";
+        String sql = "select pbg.ten_phienbangia, sp.ma_sanpham, gsp.gia, gsp.phi, gsp.mota from md_sanpham sp, md_giasanpham gsp, md_phienbangia pbg where sp.md_sanpham_id = gsp.md_sanpham_id AND pbg.md_phienbangia_id = gsp.md_phienbangia_id AND pbg.md_phienbangia_id = @md_phienbangia_id order by sp.ma_sanpham asc";
         DataTable dt = mdbc.GetData(sql, "@md_phienbangia_id", md_phienbangia_id);
         
         if (dt.Rows.Count != 0)
@@ -41,15 +41,32 @@ public partial class PrintControllers_InGiaSanPham_Default : System.Web.UI.Page
 
         row1.CreateCell(0).SetCellValue("Mã sản phẩm");
         row1.CreateCell(1).SetCellValue("Giá");
-        row1.CreateCell(2).SetCellValue("Mã Khách Hàng");
+		row1.CreateCell(2).SetCellValue("Phí");
+		row1.CreateCell(3).SetCellValue("Tổng Giá");
+        row1.CreateCell(4).SetCellValue("Mã Khách Hàng");
 
         for (int i = 0; i < dt.Rows.Count; i++)
         {
 			var row = i + 1;
             s1.CreateRow(row).CreateCell(0).SetCellValue(dt.Rows[i]["ma_sanpham"].ToString());
-            s1.GetRow(row).CreateCell(1).SetCellValue(double.Parse(dt.Rows[i]["gia"].ToString()));
+			
+			var gia = double.Parse(dt.Rows[i]["gia"].ToString());
+            s1.GetRow(row).CreateCell(1).SetCellValue(gia);
 			s1.GetRow(row).GetCell(1).CellStyle = cellBold2;
-            s1.GetRow(row).CreateCell(2).SetCellValue(dt.Rows[i]["mota"].ToString());
+
+            var colPhi = dt.Rows[i]["phi"] + "";
+            if (string.IsNullOrWhiteSpace(colPhi))
+                colPhi = "0";
+
+            var phi = double.Parse(colPhi);
+			s1.GetRow(row).CreateCell(2).SetCellValue(phi);
+			s1.GetRow(row).GetCell(2).CellStyle = cellBold2;
+			
+			var tonggia = gia + phi;
+			s1.GetRow(row).CreateCell(3).SetCellValue(tonggia);
+			s1.GetRow(row).GetCell(3).CellStyle = cellBold2;
+			
+            s1.GetRow(row).CreateCell(4).SetCellValue(dt.Rows[i]["mota"].ToString());
         }
 
         return hssfworkbook;

@@ -811,7 +811,7 @@ function Chitudong(action) {
             }, 
             {
                  fixed: true, name: 'nguoi_giaonop'
-                 , index: 'vnguoi_giaonop'
+                 , index: 'tc.nguoi_giaonop'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
