@@ -1,4 +1,4 @@
-//Update at 08/11/2020 23:05:10
+//Update at 18/05/2021 02:02:02
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 
 
-[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="ancotradingTest2018ver2")]
+[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="vinhgia")]
 public partial class LinqDBDataContext : System.Data.Linq.DataContext
 {
 private static System.Data.Linq.Mapping.MappingSource mappingSource = new AttributeMappingSource();
@@ -8867,6 +8867,7 @@ private System.Nullable<decimal> _giachuan;
 private System.Nullable<double> _discount;
 private string _barcode;
 private System.Nullable<decimal> _phi;
+private System.Nullable<bool> _editphi;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -8953,6 +8954,8 @@ partial void OnbarcodeChanging(string value);
 partial void OnbarcodeChanged();
 partial void OnphiChanging(System.Nullable<decimal> value);
 partial void OnphiChanged();
+partial void OneditphiChanging(System.Nullable<bool> value);
+partial void OneditphiChanged();
 #endregion
 public c_dongdonhang()
 {
@@ -9737,6 +9740,25 @@ this.OnphiChanged();
 }
 }
 }
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_editphi", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @editphi
+{
+get
+{
+return this._editphi;
+}
+set
+{
+if ((this._editphi != value))
+{
+this.OneditphiChanging(value);
+this.SendPropertyChanging();
+this._editphi = value;
+this.SendPropertyChanged("editphi");
+this.OneditphiChanged();
+}
+}
+}
 public event PropertyChangingEventHandler PropertyChanging;
 public event PropertyChangedEventHandler PropertyChanged;
 protected virtual void SendPropertyChanging()
@@ -9799,8 +9821,6 @@ private string _trangthai;
 private string _docquyen;
 private System.Nullable<decimal> _giachuan;
 private System.Nullable<double> _discount;
-private string _barcode;
-private System.Nullable<decimal> _phi;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -9883,10 +9903,6 @@ partial void OngiachuanChanging(System.Nullable<decimal> value);
 partial void OngiachuanChanged();
 partial void OndiscountChanging(System.Nullable<double> value);
 partial void OndiscountChanged();
-partial void OnbarcodeChanging(string value);
-partial void OnbarcodeChanged();
-partial void OnphiChanging(System.Nullable<decimal> value);
-partial void OnphiChanged();
 #endregion
 public c_dongdonhangqr()
 {
@@ -10630,44 +10646,6 @@ this.SendPropertyChanging();
 this._discount = value;
 this.SendPropertyChanged("discount");
 this.OndiscountChanged();
-}
-}
-}
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_barcode", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
-public string @barcode
-{
-get
-{
-return this._barcode;
-}
-set
-{
-if ((this._barcode != value))
-{
-this.OnbarcodeChanging(value);
-this.SendPropertyChanging();
-this._barcode = value;
-this.SendPropertyChanged("barcode");
-this.OnbarcodeChanged();
-}
-}
-}
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_phi", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
-public System.Nullable<decimal> @phi
-{
-get
-{
-return this._phi;
-}
-set
-{
-if ((this._phi != value))
-{
-this.OnphiChanging(value);
-this.SendPropertyChanging();
-this._phi = value;
-this.SendPropertyChanged("phi");
-this.OnphiChanged();
 }
 }
 }
@@ -14998,7 +14976,6 @@ private string _phienbangiacu;
 private System.Nullable<bool> _discount_hehang;
 private string _discount_hehang_value;
 private System.Nullable<bool> _discount_hehang2;
-private System.Nullable<bool> _phanbodiscount;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -15111,8 +15088,6 @@ partial void Ondiscount_hehang_valueChanging(string value);
 partial void Ondiscount_hehang_valueChanged();
 partial void Ondiscount_hehang2Changing(System.Nullable<bool> value);
 partial void Ondiscount_hehang2Changed();
-partial void OnphanbodiscountChanging(System.Nullable<bool> value);
-partial void OnphanbodiscountChanged();
 #endregion
 public c_donhangqr()
 {
@@ -16141,25 +16116,6 @@ this.SendPropertyChanging();
 this._discount_hehang2 = value;
 this.SendPropertyChanged("discount_hehang2");
 this.Ondiscount_hehang2Changed();
-}
-}
-}
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_phanbodiscount", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
-public System.Nullable<bool> @phanbodiscount
-{
-get
-{
-return this._phanbodiscount;
-}
-set
-{
-if ((this._phanbodiscount != value))
-{
-this.OnphanbodiscountChanging(value);
-this.SendPropertyChanging();
-this._phanbodiscount = value;
-this.SendPropertyChanged("phanbodiscount");
-this.OnphanbodiscountChanged();
 }
 }
 }

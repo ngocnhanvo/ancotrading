@@ -257,7 +257,7 @@ public class rptPaymentRequest : DevExpress.XtraReports.UI.XtraReport
             this.xrLabel18.SizeF = new System.Drawing.SizeF(745F, 23.00001F);
             this.xrLabel18.StylePriority.UseFont = false;
             this.xrLabel18.StylePriority.UseTextAlignment = false;
-            this.xrLabel18.Text = "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam";
+            this.xrLabel18.Text = "Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam";
             this.xrLabel18.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             // 
             // xrLabel17
@@ -269,7 +269,7 @@ public class rptPaymentRequest : DevExpress.XtraReports.UI.XtraReport
             this.xrLabel17.SizeF = new System.Drawing.SizeF(745F, 23.00001F);
             this.xrLabel17.StylePriority.UseFont = false;
             this.xrLabel17.StylePriority.UseTextAlignment = false;
-            this.xrLabel17.Text = "In favour of: ANCO COMPANY LTD.";
+            this.xrLabel17.Text = "In favour of: VINH GIA COMPANY LTD.";
             this.xrLabel17.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             // 
             // xrLabel16

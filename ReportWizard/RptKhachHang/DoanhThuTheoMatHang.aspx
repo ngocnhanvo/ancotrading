@@ -49,8 +49,8 @@
      </style>
 <div style="background:white; padding:5px;">
     <table style="width:100%">
-        <tr><td colspan=2 align="center" style="width:100%"><span style="font-size: 18px; font-weight:bold">ANCO COMPANY LIMITED</span></td> </tr>
-        <tr><td colspan=2 align="center" style="width:100%"><span style="font-size: 14px; ">3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam</span></td></tr>
+        <tr><td colspan=2 align="center" style="width:100%"><span style="font-size: 18px; font-weight:bold">VINH GIA COMPANY LIMITED</span></td> </tr>
+        <tr><td colspan=2 align="center" style="width:100%"><span style="font-size: 14px; ">Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam</span></td></tr>
         <tr><td colspan=2 align="center" style="width:100%"><span style="font-size: 14px; ">Tel.: (84-274) 740 973 Fax: (84-274) 740 621 Email: cpyanco@hcm.vnn.vn</span></td></tr>
         <tr><td colspan=2 style="width:100%"> </td></tr>
         <tr><td colspan=2 align="center" style="width:100%"><span style="font-size: 18px; font-weight:bold">TỔNG HỢP DOANH THU THEO TỪNG MẶT HÀNG </span></td></tr>

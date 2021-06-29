@@ -284,7 +284,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         , cb.ten_cangbien
                         , pmt.ten_paymentterm
                         , dh.ghichu
-                        , ('In favor of ANCO COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
+                        , ('In favor of VINH GIA COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
 						, ddh.v2 as cbm
                         , (sp.trongluong * ddh.soluong) as trongluong
                         , (case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
@@ -453,7 +453,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
         columnHeaders.Add(new columnHeader()
         {
-            text = "ANCO Item No.",
+            text = "VINH GIA Item No.",
             value = "ma_sanpham",
             columnAt = 1,
             width = 6000
@@ -755,7 +755,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , ""
             , ""
             , "The Payer:"
-            , "ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:"
+            , "VINH GIA Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:"
             , "Customer's order no:"
             , "Commodity:"
             , "Item nos., description, packing, quantity, unit price and amount:"
@@ -1246,7 +1246,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         s1.GetRow(row).GetCell(0).CellStyle = signBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 4));
         //
-        s1.GetRow(row).CreateCell(5).SetCellValue("ANCO COMPANY LTD.");
+        s1.GetRow(row).CreateCell(5).SetCellValue("VINH GIA COMPANY LTD.");
         s1.GetRow(row).HeightInPoints = height;
         s1.GetRow(row).GetCell(5).CellStyle = signBold;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 12));

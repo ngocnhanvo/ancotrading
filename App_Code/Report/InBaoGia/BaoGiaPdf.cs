@@ -101,13 +101,13 @@ public class BaoGiaPdf
             Font times_13 = new Font(bfTimes, 13, Font.BOLD, BaseColor.BLACK);
             Font times_15 = new Font(bfTimes, 15, Font.BOLD, BaseColor.BLACK);
 
-            Paragraph pCompany = new Paragraph("ANCO COMPANY LIMITED", times_13);
+            Paragraph pCompany = new Paragraph("VINH GIA COMPANY LIMITED", times_13);
             pCompany.Alignment = 1;
 
-            Paragraph pAddress = new Paragraph("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam", times_8);
+            Paragraph pAddress = new Paragraph("Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam", times_8);
             pAddress.Alignment = 1;
 
-            Paragraph pInfo = new Paragraph("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com", times_8);
+            Paragraph pInfo = new Paragraph("Tel: (84-235) 3567393   Fax: (84-235) 3567494", times_8);
             pInfo.Alignment = 1;
 
             Paragraph pTitle = new Paragraph("QUOTATION", times_15);
@@ -490,12 +490,12 @@ public class BaoGiaPdf
             tabFooter.AddCell(cellPayment);
 
             tabFooter.AddCell(new Phrase("Bank Details:", times_8));
-            PdfPCell cellBank01 = new PdfPCell((new Phrase("1. In favor ANCO COMPANY LTD. Account no. : 007.137.0321634 At bank: Joint Stock Commercial Bank For Foreign Trade of Vietnam (VIETCOMBANK),  29 Ben Chuong Duong St., Dist. 1, Hochiminh City, Vietnam. Tel: (84-28) 38297245, Fax: (84-28) 38297228, Swift code: BFTVVNVX007.", times_8)));
+            PdfPCell cellBank01 = new PdfPCell((new Phrase("1. In favor VINH GIA COMPANY LTD. Account no. : 007.137.0321634 At bank: Joint Stock Commercial Bank For Foreign Trade of Vietnam (VIETCOMBANK),  29 Ben Chuong Duong St., Dist. 1, Hochiminh City, Vietnam. Tel: (84-28) 38297245, Fax: (84-28) 38297228, Swift code: BFTVVNVX007.", times_8)));
             cellBank01.Colspan = 2;
             tabFooter.AddCell(cellBank01);
 
             tabFooter.AddCell(new Phrase("", times_8));
-            PdfPCell cellBank02 = new PdfPCell((new Phrase("2. In favor of ANCO COMPANY LTD. Account no. : 001-395698-101 (USD). At bank: HSBC   Hochiminh City Branch , Metropolitan Building, 235 Dong Khoi St., Dist. 1, Tel.: (84-028) 35203051, Fax: (84-028) 38230530, Swift code: HSBCVNVXHochiminh City, Vietnam. ", times_8)));
+            PdfPCell cellBank02 = new PdfPCell((new Phrase("2. In favor of VINH GIA COMPANY LTD. Account no. : 001-395698-101 (USD). At bank: HSBC   Hochiminh City Branch , Metropolitan Building, 235 Dong Khoi St., Dist. 1, Tel.: (84-028) 35203051, Fax: (84-028) 38230530, Swift code: HSBCVNVXHochiminh City, Vietnam. ", times_8)));
             cellBank02.Colspan = 2;
             tabFooter.AddCell(cellBank02);
 

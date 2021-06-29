@@ -421,7 +421,7 @@
         <CanGrow>true</CanGrow>
         <Left>1in</Left>
         <Height>0.25in</Height>
-        <Value>CÔNG TY TNHH ANCO BÌNH DƯƠNG</Value>
+        <Value>CÔNG TY TNHH VINH GIA BÌNH DƯƠNG</Value>
       </Textbox>
       <Table Name="table1">
         <DataSetName>anco_test_importDataSet_rpt_donhangtemDSDH</DataSetName>

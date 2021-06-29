@@ -419,7 +419,7 @@ public class rptBaoCaoQuanTri : DevExpress.XtraReports.UI.XtraReport
         this.xrLabel3.StylePriority.UseFont = false;
         this.xrLabel3.StylePriority.UsePadding = false;
         this.xrLabel3.StylePriority.UseTextAlignment = false;
-        this.xrLabel3.Text = "Tel.: (84-274) 740 973 Fax: (84-274) 740 621 Email: anco@ancopottery.com";
+        this.xrLabel3.Text = "Tel: (84-235) 3567393   Fax: (84-235) 3567494";
         this.xrLabel3.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
         // 
         // xrLabel1
@@ -433,7 +433,7 @@ public class rptBaoCaoQuanTri : DevExpress.XtraReports.UI.XtraReport
         this.xrLabel1.StylePriority.UseFont = false;
         this.xrLabel1.StylePriority.UsePadding = false;
         this.xrLabel1.StylePriority.UseTextAlignment = false;
-        this.xrLabel1.Text = "ANCO COMPANY LIMITED";
+        this.xrLabel1.Text = "VINH GIA COMPANY LIMITED";
         this.xrLabel1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
         // 
         // xrLabel4

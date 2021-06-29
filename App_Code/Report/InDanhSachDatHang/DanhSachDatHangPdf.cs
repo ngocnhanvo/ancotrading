@@ -96,13 +96,13 @@ public class DanhSachDatHangPdf
             Font times_13 = new Font(bfTimes, 13, Font.BOLD, BaseColor.BLACK);
             Font times_15 = new Font(bfTimes, 15, Font.BOLD, BaseColor.BLACK);
 
-            Paragraph pCompany = new Paragraph("ANCO COMPANY LIMITED", times_13);
+            Paragraph pCompany = new Paragraph("VINH GIA COMPANY LIMITED", times_13);
             pCompany.Alignment = 1;
 
-            Paragraph pAddress = new Paragraph("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam", times_8);
+            Paragraph pAddress = new Paragraph("Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam", times_8);
             pAddress.Alignment = 1;
 
-            Paragraph pInfo = new Paragraph("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com", times_8);
+            Paragraph pInfo = new Paragraph("Tel: (84-235) 3567393   Fax: (84-235) 3567494", times_8);
             pInfo.Alignment = 1;
 
             Paragraph pTitle = new Paragraph("ĐƠN ĐẶT HÀNG", times_15);

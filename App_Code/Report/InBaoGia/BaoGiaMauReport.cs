@@ -163,13 +163,13 @@ public class BaoGiaMauReport
         IPicture signaturePicturelogo = patriarchlogo.CreatePicture(anchorlogo, indexlogo);
 
         // set A1
-        s1.CreateRow(0).CreateCell(0).SetCellValue("ANCO COMPANY LIMITED");
+        s1.CreateRow(0).CreateCell(0).SetCellValue("VINH GIA COMPANY LIMITED");
 
         // set A2
-        s1.CreateRow(1).CreateCell(0).SetCellValue("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
+        s1.CreateRow(1).CreateCell(0).SetCellValue("Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam");
 
         // set A3
-        s1.CreateRow(2).CreateCell(0).SetCellValue("Tel.: (84-274) 3740 973   Fax:  (84–274) 3740 621  Email: anco@ancopottery.com");
+        s1.CreateRow(2).CreateCell(0).SetCellValue("Tel: (84-235) 3567393   Fax: (84-235) 3567494");
 
         // set A4
         s1.CreateRow(3).CreateCell(0).SetCellValue("QUOTATION");
@@ -661,14 +661,14 @@ public class BaoGiaMauReport
 
 
 
-        s1.GetRow(totalLine * 8 + 24 + detailsCount).CreateCell(1).SetCellValue("In  favor ANCO COMPANY LTD."
+        s1.GetRow(totalLine * 8 + 24 + detailsCount).CreateCell(1).SetCellValue("In  favor VINH GIA COMPANY LTD."
                                                                                   + "\r\nAccount no. : 007.137.0321634"
                                                                                   + "\r\nAt bank: Joint Stock Commercial Bank For Foreign Trade of Vietnam (VIETCOMBANK),"
                                                                                   + "\r\n10 Vo Van Kiet St., Dist. 1, Hochiminh City, Vietnam."
                                                                                   + "\r\nTel.: (84-28) 38297245,"
                                                                                   + "\r\nFax: (84-28) 38297228,"
                                                                                   + "\r\nSwift code: BFTVVNVX007.");
-        //s1.GetRow(totalLine * 8 + 19 + detailsCount).CreateCell(1).SetCellValue(@"2. In favor of ANCO COMPANY LTD. Account no. : 001-395698-101 (USD). At bank: HSBC   Hochiminh City Branch , Metropolitan Building, 235 Dong Khoi St., Dist. 1, Tel.: (84-028) 35203051, Fax: (84-028) 38230530, Swift code: HSBCVNVXHochiminh City, Vietnam. ");
+        //s1.GetRow(totalLine * 8 + 19 + detailsCount).CreateCell(1).SetCellValue(@"2. In favor of VINH GIA COMPANY LTD. Account no. : 001-395698-101 (USD). At bank: HSBC   Hochiminh City Branch , Metropolitan Building, 235 Dong Khoi St., Dist. 1, Tel.: (84-028) 35203051, Fax: (84-028) 38230530, Swift code: HSBCVNVXHochiminh City, Vietnam. ");
         s1.GetRow(totalLine * 8 + 25 + detailsCount).CreateCell(1).SetCellValue(DateTime.Parse(dtDetails.Rows[0]["ngayhethan"].ToString()).ToString("dd/MMM/yyyy"));
 
         s1.GetRow(totalLine * 8 + 10 + detailsCount).HeightInPoints = 30;

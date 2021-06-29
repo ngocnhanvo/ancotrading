@@ -137,7 +137,7 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
 					, (ddh.l2 + ddh.w2) * (ddh.w2 * ddh.h2) / 5400 as t_thung_outer
 					, (ddh.l1 + ddh.w1) * (ddh.w1 * ddh.h1) / 5400 as t_thung_inner
 					, '{1}' as money
-                    , (select 'In favor of ANCO COMPANY LTD. Account No. : ' + thongtin from md_nganhang where dh.md_nganhang_id = md_nganhang_id) as thongtinnganhang
+                    , (select 'In favor of VINH GIA COMPANY LTD. Account No. : ' + thongtin from md_nganhang where dh.md_nganhang_id = md_nganhang_id) as thongtinnganhang
 					from c_dongdonhang ddh
 					left join c_donhang dh on dh.c_donhang_id = ddh.c_donhang_id
 					left join md_sanpham sp on sp.md_sanpham_id = ddh.md_sanpham_id
@@ -284,14 +284,14 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
         }
 
         //set A6 - A12
-        string[] c = { "The Seller:", "The Buyer:", "The Payer:", "ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:", "Customer's order no.:", "Item nos., description, packing, quantity, unit price and amount:" };
+        string[] c = { "The Seller:", "The Buyer:", "The Payer:", "VINH GIA Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:", "Customer's order no.:", "Item nos., description, packing, quantity, unit price and amount:" };
         string[] c_value = { "", "" };
         for (int i = 0; i < c.Count(); i++)
         {
             s1.CreateRow(row).CreateCell(0).SetCellValue(c[i]);
             string rich_text = " {0} \n {1} \n Tel:{2} \n Fax{3}";
             if (i == 0)
-                rich_text = "ANCO COMPANY LTD. \n 3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam";
+                rich_text = "VINH GIA COMPANY LTD. \n Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam";
             HSSFRichTextString rich = new HSSFRichTextString(String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString()));
             if (i <= 2)
             {
@@ -323,7 +323,7 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
         // set A13 - All
         // -- Header
         int cell = 0;
-        string[] d = { "No", "ANCO Item No.:", "Customer Item No.", "Description of goods", "Quantity pcs,sets", "", "FOB price (USD)", "Amount (USD)" };
+        string[] d = { "No", "VINH GIA Item No.:", "Customer Item No.", "Description of goods", "Quantity pcs,sets", "", "FOB price (USD)", "Amount (USD)" };
         IRow rowColumnHeader = s1.CreateRow(row);
         rowColumnHeader.HeightInPoints = 47;
         for (int i = 0; i < d.Count(); i++)

@@ -163,7 +163,7 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
 				, (ddh.l2 + ddh.w2) * (ddh.w2 * ddh.h2) / 5400 as t_thung_outer
 				, (ddh.l1 + ddh.w1) * (ddh.w1 * ddh.h1) / 5400 as t_thung_inner
 				, '{1}' as money
-                , (select 'ANCO COMPANY LTD. Account No. : ' + thongtin from md_nganhang where dh.md_nganhang_id = md_nganhang_id) as thongtinnganhang
+                , (select 'VINH GIA COMPANY LTD. Account No. : ' + thongtin from md_nganhang where dh.md_nganhang_id = md_nganhang_id) as thongtinnganhang
 				, '{2}' as sochungtu_th
 				, '{3}' as chungloai_th
 				from c_dongdonhang ddh
@@ -240,7 +240,7 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
         int heigh = 22;
         int row = 0;
         //set A1 - A3
-        string[] a = { "ANCO COMPANY LIMITED", "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam", "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com", "COMMERCIAL INVOICE" };
+        string[] a = { "VINH GIA COMPANY LIMITED", "Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam", "Tel: (84-235) 3567393   Fax: (84-235) 3567494", "COMMERCIAL INVOICE" };
         for (int i = 0; i < a.Count(); i++)
         {
             s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
@@ -693,7 +693,7 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
 
         //set A6 - A12
         string[] f = { "Infavour of:", "Add:", " " };
-        string[] f_value = { "thongtinnganhang", "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam", "Account no.:007.137.0321634 At bank: Joint Stock Commercial Bank For Foreign Trade of Vietnam (VIETCOMBANK), 10 Vo Van Kiet street , Dist.1 , Ho Chi Minh City ,Vietnam. Tel.: (84-28) 38297245, Fax: (84-28) 38297228, Swift code: BFTVVNVX007" };
+        string[] f_value = { "thongtinnganhang", "Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam", "Account no.:007.137.0321634 At bank: Joint Stock Commercial Bank For Foreign Trade of Vietnam (VIETCOMBANK), 10 Vo Van Kiet street , Dist.1 , Ho Chi Minh City ,Vietnam. Tel.: (84-28) 38297245, Fax: (84-28) 38297228, Swift code: BFTVVNVX007" };
         for (int i = 0; i < f.Count(); i++)
         {
             s1.CreateRow(row).CreateCell(0).SetCellValue(f[i]);
@@ -720,7 +720,7 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
             row++;
         }
         //
-        s1.CreateRow(row).CreateCell(3).SetCellValue("ANCO COMPANY LTD");
+        s1.CreateRow(row).CreateCell(3).SetCellValue("VINH GIA COMPANY LTD");
         s1.GetRow(row).GetCell(3).CellStyle = signBold;
         s1.GetRow(row).HeightInPoints = 22;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 3, 6));

@@ -682,7 +682,7 @@ public class rptInCTTemBB : DevExpress.XtraReports.UI.XtraReport
             this.xrLabel16.StylePriority.UseFont = false;
             this.xrLabel16.StylePriority.UsePadding = false;
             this.xrLabel16.StylePriority.UseTextAlignment = false;
-            this.xrLabel16.Text = "CÔNG TY TNHH ANCO BÌNH DƯƠNG";
+            this.xrLabel16.Text = "CÔNG TY TNHH VINH GIA BÌNH DƯƠNG";
             this.xrLabel16.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             // 
             // ReportFooter

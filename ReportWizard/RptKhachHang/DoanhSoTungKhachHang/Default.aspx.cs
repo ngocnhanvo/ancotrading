@@ -64,7 +64,7 @@
 		// int row = 0;
 		// //Logo
 		// //private String logoPath, productImagePath;
-		// String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "anco_logo_print.png");
+		// String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "VINHGIA_logo_print.png");
 		// //String productImagePath = Server.MapPath("~/images/products/fullsize/");
 		// System.Drawing.Image logo = System.Drawing.Image.FromFile(logoPath);
         // MemoryStream mslogo = new MemoryStream();
@@ -78,8 +78,8 @@
         // IPicture signaturePicturelogo = patriarchlogo.CreatePicture(anchorlogo, indexlogo);
 		
 		// List<string> headerLst = new List<string>();
-		// headerLst.Add("ANCO COMPANY LIMITED","3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
-		// headerLst.Add("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com");
+		// headerLst.Add("VINH GIA COMPANY LIMITED","Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam");
+		// headerLst.Add("Tel: (84-235) 3567393   Fax: (84-235) 3567494");
 		// headerLst.Add("PROFORMA INVOICE");
 		
 		// IRow rowHeader = s1.CreateRow(0);

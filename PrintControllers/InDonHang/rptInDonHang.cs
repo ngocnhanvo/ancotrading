@@ -413,7 +413,7 @@ public class rptInDonHang : DevExpress.XtraReports.UI.XtraReport
         // 
         // xrPictureBox1
         // 
-        this.xrPictureBox1.ImageUrl = "~\\images\\anco_logo_print.png";
+        this.xrPictureBox1.ImageUrl = "~\\images\\VINHGIA_logo_print.png";
         this.xrPictureBox1.LocationFloat = new DevExpress.Utils.PointFloat(168.7918F, 0F);
         this.xrPictureBox1.Name = "xrPictureBox1";
         this.xrPictureBox1.SizeF = new System.Drawing.SizeF(80.20834F, 54.25002F);
@@ -440,7 +440,7 @@ public class rptInDonHang : DevExpress.XtraReports.UI.XtraReport
         this.xrLabel4.SizeF = new System.Drawing.SizeF(809.205F, 22.20834F);
         this.xrLabel4.StylePriority.UseFont = false;
         this.xrLabel4.StylePriority.UseTextAlignment = false;
-        this.xrLabel4.Text = "Tel.:  (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com";
+        this.xrLabel4.Text = "Tel.:  (Tel: (84-235) 3567393   Fax: (84-235) 3567494";
         this.xrLabel4.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
         // 
         // xrLabel2
@@ -452,7 +452,7 @@ public class rptInDonHang : DevExpress.XtraReports.UI.XtraReport
         this.xrLabel2.SizeF = new System.Drawing.SizeF(809.205F, 22.20834F);
         this.xrLabel2.StylePriority.UseFont = false;
         this.xrLabel2.StylePriority.UseTextAlignment = false;
-        this.xrLabel2.Text = "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam";
+        this.xrLabel2.Text = "Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam";
         this.xrLabel2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
         // 
         // xrLabel1
@@ -464,7 +464,7 @@ public class rptInDonHang : DevExpress.XtraReports.UI.XtraReport
         this.xrLabel1.SizeF = new System.Drawing.SizeF(326.9174F, 54.25002F);
         this.xrLabel1.StylePriority.UseFont = false;
         this.xrLabel1.StylePriority.UseTextAlignment = false;
-        this.xrLabel1.Text = "ANCO COMPANY LIMITED";
+        this.xrLabel1.Text = "VINH GIA COMPANY LIMITED";
         this.xrLabel1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
         // 
         // xrLabel10
@@ -800,7 +800,7 @@ public class rptInDonHang : DevExpress.XtraReports.UI.XtraReport
         this.xrLabel47.SizeF = new System.Drawing.SizeF(410.4165F, 45.9166F);
         this.xrLabel47.StylePriority.UseFont = false;
         this.xrLabel47.StylePriority.UseTextAlignment = false;
-        this.xrLabel47.Text = "ANCO COMPANY LTD.";
+        this.xrLabel47.Text = "VINH GIA COMPANY LTD.";
         this.xrLabel47.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
         // 
         // xrLabel46
@@ -1046,7 +1046,7 @@ public class rptInDonHang : DevExpress.XtraReports.UI.XtraReport
         this.xrLabel17.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
         this.xrLabel17.SizeF = new System.Drawing.SizeF(809.207F, 23.00003F);
         this.xrLabel17.StylePriority.UseTextAlignment = false;
-        this.xrLabel17.Text = "ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and" +
+        this.xrLabel17.Text = "VINH GIA Company agrees to sale and the Buyer agrees to buy the goods under terms and" +
             " conditions as follows:";
         this.xrLabel17.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
         // 

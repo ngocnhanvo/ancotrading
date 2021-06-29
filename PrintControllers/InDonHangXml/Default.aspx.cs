@@ -29,7 +29,7 @@ public partial class PrintControllers_InDonHangXml_Default : System.Web.UI.Page
                                     1 as c_donhang_id, dh.sochungtu, dh.ngaylap, 49 as nguoilap, 455 as diachi
                                     , cb.ma_cangbien, (select bg.sobaogia from c_baogia bg where c_baogia_id = dh.c_baogia_id) as soorder
                                     , dtkd.diachi, dh.discount, dh.shipmenttime
-                                    , (pmt.ten_paymentterm + ' In favor of ANCO COMPANY LTD. Account no. : ' + ngh.thongtin) as paymentterm
+                                    , (pmt.ten_paymentterm + ' In favor of VINH GIA COMPANY LTD. Account no. : ' + ngh.thongtin) as paymentterm
                                     , dh.shipmentdate, dh.portdischarge, (dh.sochungtu + ' / '+ dsdh.sochungtu) as payer, 1 as ten_kichthuoc, 1 as ma_iso, 7 as ten_trongluong
                                     , 49 as nguoitao1, dsdh.ngaytao as ngaytao1, 1 as md_trangthai_id
                                     -- Dong don hang

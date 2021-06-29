@@ -3,12 +3,12 @@
     <table style="width:100%; text-align:center">
         <tr>
             <td>
-                <!--<img src="images/anco_logo_print.png" width="80" height="50"/> -->
+                <!--<img src="images/VINHGIA_logo_print.png" width="80" height="50"/> -->
             </td>
             <td>
-                <b style="font-size:15px">ANCO COMPANY LIMITED</b><br />
-                3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam <br />
-                Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com
+                <b style="font-size:15px">VINH GIA COMPANY LIMITED</b><br />
+                Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam <br />
+                Tel: (84-235) 3567393   Fax: (84-235) 3567494
             </td>
         </tr>
         <tr>

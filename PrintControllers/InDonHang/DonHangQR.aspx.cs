@@ -183,7 +183,7 @@ public partial class PrintControllers_InDonHang_DonHangQR : System.Web.UI.Page
 														, ddh.sl_outer , ddh.sl_inner
 														, (case ddh.sl_outer when 0 then ' ' else (cast(ddh.sl_outer as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) end) as ten_donggoi
 														, ddh.soluong, dvt.ten_dvt as dvt_sp, ddh.giafob
-														, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch , convert(varchar, dh.shipmenttime, 106) as shipmenttime, cb.ten_cangbien, pmt.ten_paymentterm, (' In favor of ANCO COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
+														, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch , convert(varchar, dh.shipmenttime, 106) as shipmenttime, cb.ten_cangbien, pmt.ten_paymentterm, (' In favor of VINH GIA COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
 														, ddh.v2 as cbm, (sp.trongluong * ddh.soluong) as trongluong
 														, (ddh.soluong * ddh.giafob) as amount,(case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
 														, N'{8}' as no_cont
@@ -286,7 +286,7 @@ public partial class PrintControllers_InDonHang_DonHangQR : System.Web.UI.Page
 		int row = 0;
 		//Logo
 		//private String logoPath, productImagePath;
-		String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "anco_logo_print.png");
+		String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "VINHGIA_logo_print.png");
 		//String productImagePath = Server.MapPath("~/images/products/fullsize/");
 		System.Drawing.Image logo = System.Drawing.Image.FromFile(logoPath);
         MemoryStream mslogo = new MemoryStream();
@@ -300,7 +300,7 @@ public partial class PrintControllers_InDonHang_DonHangQR : System.Web.UI.Page
         IPicture signaturePicturelogo = patriarchlogo.CreatePicture(anchorlogo, indexlogo);
 		//
 		//set A1 - A4
-		string[] a = { "ANCO COMPANY LIMITED","3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam","Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com","PROFORMA INVOICE"};
+		string[] a = { "VINH GIA COMPANY LIMITED","Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam","Tel: (84-235) 3567393   Fax: (84-235) 3567494","PROFORMA INVOICE"};
 		for(int i = 0; i < a.Count(); i++)
 		{		
 			s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
@@ -338,7 +338,7 @@ public partial class PrintControllers_InDonHang_DonHangQR : System.Web.UI.Page
 			row++;
 		}
 		//set A7 - A11
-		string[] c = {"The Buyer:","The Payer:","ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:","Customer's order no.:","Commodity:","Item nos., description, packing, quantity, unit price and amount:"};
+		string[] c = {"The Buyer:","The Payer:","VINH GIA Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:","Customer's order no.:","Commodity:","Item nos., description, packing, quantity, unit price and amount:"};
 		string[] c_value = {"","payer","","customer_order_no","commodity",""};
 		for(int i = 0; i < c.Count(); i++)
 		{		
@@ -379,7 +379,7 @@ public partial class PrintControllers_InDonHang_DonHangQR : System.Web.UI.Page
 		// set A13 - All
 		// -- Header
 		int cell = 0;
-		string[] d = { "No.","ANCO Item No.","Picture - Only for shape ref.","Customer Item No."
+		string[] d = { "No.","VINH GIA Item No.","Picture - Only for shape ref.","Customer Item No."
 		,"Description","Packing inner/master",""
 		,"Nbr of Packs","Quantity (sets/pcs)",""
 		,"FOB price (USD)","CBM","Amount (USD)"
@@ -658,7 +658,7 @@ public partial class PrintControllers_InDonHang_DonHangQR : System.Web.UI.Page
 		s1.GetRow(row).GetCell(0).CellStyle = signBold;
 		s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 4));
 		//
-		s1.GetRow(row).CreateCell(5).SetCellValue("ANCO COMPANY LTD.");
+		s1.GetRow(row).CreateCell(5).SetCellValue("VINH GIA COMPANY LTD.");
 		s1.GetRow(row).GetCell(5).CellStyle = signBold;
 		s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 12));
 		row ++;

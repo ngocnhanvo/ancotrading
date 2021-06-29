@@ -282,7 +282,7 @@ namespace XtraReportSerialization
             this.sophieu.StylePriority.UseFont = false;
             this.sophieu.StylePriority.UsePadding = false;
             this.sophieu.StylePriority.UseTextAlignment = false;
-            this.sophieu.Text = "Số phiếu";
+            this.sophieu.Text = "S??? phi???u";
             this.sophieu.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.sophieu.Weight = 0.74000015538689645D;
             // 
@@ -299,7 +299,7 @@ namespace XtraReportSerialization
             this.ngay_giaonhan.StylePriority.UseFont = false;
             this.ngay_giaonhan.StylePriority.UsePadding = false;
             this.ngay_giaonhan.StylePriority.UseTextAlignment = false;
-            this.ngay_giaonhan.Text = "Ngày giao nhận";
+            this.ngay_giaonhan.Text = "Ng??y giao nh???n";
             this.ngay_giaonhan.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.ngay_giaonhan.Weight = 0.70000012518840571D;
             // 
@@ -316,7 +316,7 @@ namespace XtraReportSerialization
             this.soPO.StylePriority.UseFont = false;
             this.soPO.StylePriority.UsePadding = false;
             this.soPO.StylePriority.UseTextAlignment = false;
-            this.soPO.Text = "Mã Sản Phẩm";
+            this.soPO.Text = "M?? S???n Ph???m";
             this.soPO.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             this.soPO.Weight = 1.2000002121078053D;
             // 
@@ -333,7 +333,7 @@ namespace XtraReportSerialization
             this.thanhtienPN.StylePriority.UseFont = false;
             this.thanhtienPN.StylePriority.UsePadding = false;
             this.thanhtienPN.StylePriority.UseTextAlignment = false;
-            this.thanhtienPN.Text = "Số PO";
+            this.thanhtienPN.Text = "S??? PO";
             this.thanhtienPN.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.thanhtienPN.Weight = 0.800000197261869D;
             // 
@@ -367,7 +367,7 @@ namespace XtraReportSerialization
             this.phicong.StylePriority.UseFont = false;
             this.phicong.StylePriority.UsePadding = false;
             this.phicong.StylePriority.UseTextAlignment = false;
-            this.phicong.Text = "Phí cộng";
+            this.phicong.Text = "Ph?? c???ng";
             this.phicong.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.phicong.Weight = 0.82000017607681086D;
             // 
@@ -384,7 +384,7 @@ namespace XtraReportSerialization
             this.phitru.StylePriority.UseFont = false;
             this.phitru.StylePriority.UsePadding = false;
             this.phitru.StylePriority.UseTextAlignment = false;
-            this.phitru.Text = "Phí trừ";
+            this.phitru.Text = "Ph?? tr???";
             this.phitru.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.phitru.Weight = 0.82000017132335812D;
             // 
@@ -401,7 +401,7 @@ namespace XtraReportSerialization
             this.thanhtien.StylePriority.UseFont = false;
             this.thanhtien.StylePriority.UsePadding = false;
             this.thanhtien.StylePriority.UseTextAlignment = false;
-            this.thanhtien.Text = "Mô tả";
+            this.thanhtien.Text = "M?? t???";
             this.thanhtien.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.thanhtien.Weight = 1.1000001922323774D;
             // 
@@ -578,7 +578,7 @@ namespace XtraReportSerialization
             this.xrTableCell18.StylePriority.UseFont = false;
             this.xrTableCell18.StylePriority.UsePadding = false;
             this.xrTableCell18.StylePriority.UseTextAlignment = false;
-            this.xrTableCell18.Text = "Tổng cộng cuối cùng:";
+            this.xrTableCell18.Text = "T???ng c???ng cu???i c??ng:";
             this.xrTableCell18.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.xrTableCell18.Weight = 3.4400008425328985D;
             // 
@@ -612,7 +612,7 @@ namespace XtraReportSerialization
             this.sumPhiCong.StylePriority.UseFont = false;
             this.sumPhiCong.StylePriority.UsePadding = false;
             this.sumPhiCong.StylePriority.UseTextAlignment = false;
-            this.sumPhiCong.Text = "Phí cộng";
+            this.sumPhiCong.Text = "Ph?? c???ng";
             this.sumPhiCong.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.sumPhiCong.Weight = 0.820000176076811D;
             // 
@@ -631,7 +631,7 @@ namespace XtraReportSerialization
             this.sumPhiTru.StylePriority.UseFont = false;
             this.sumPhiTru.StylePriority.UsePadding = false;
             this.sumPhiTru.StylePriority.UseTextAlignment = false;
-            this.sumPhiTru.Text = "Phí trừ";
+            this.sumPhiTru.Text = "Ph?? tr???";
             this.sumPhiTru.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.sumPhiTru.Weight = 0.8200001713233579D;
             // 
@@ -650,7 +650,7 @@ namespace XtraReportSerialization
             this.sumThanhTien.StylePriority.UseFont = false;
             this.sumThanhTien.StylePriority.UsePadding = false;
             this.sumThanhTien.StylePriority.UseTextAlignment = false;
-            this.sumThanhTien.Text = "Mô tả";
+            this.sumThanhTien.Text = "M?? t???";
             this.sumThanhTien.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.sumThanhTien.Weight = 1.1000001922323774D;
             // 
@@ -768,7 +768,7 @@ namespace XtraReportSerialization
             this.xrLabel7.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.xrLabel7.SizeF = new System.Drawing.SizeF(100F, 23F);
             this.xrLabel7.StylePriority.UseTextAlignment = false;
-            this.xrLabel7.Text = "Từ ngày";
+            this.xrLabel7.Text = "T??? ng??y";
             this.xrLabel7.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // xrLabel6
@@ -779,7 +779,7 @@ namespace XtraReportSerialization
             this.xrLabel6.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.xrLabel6.SizeF = new System.Drawing.SizeF(130.2083F, 23F);
             this.xrLabel6.StylePriority.UseTextAlignment = false;
-            this.xrLabel6.Text = "Bình dương, ngày";
+            this.xrLabel6.Text = "B??nh d????ng, ng??y";
             this.xrLabel6.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // tungay
@@ -816,7 +816,7 @@ namespace XtraReportSerialization
             this.xrLabel9.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.xrLabel9.SizeF = new System.Drawing.SizeF(100F, 23F);
             this.xrLabel9.StylePriority.UseTextAlignment = false;
-            this.xrLabel9.Text = "Đến ngày";
+            this.xrLabel9.Text = "?????n ng??y";
             this.xrLabel9.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // xrLabel2
@@ -827,7 +827,7 @@ namespace XtraReportSerialization
             this.xrLabel2.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.xrLabel2.SizeF = new System.Drawing.SizeF(1169F, 23F);
             this.xrLabel2.StylePriority.UseTextAlignment = false;
-            this.xrLabel2.Text = "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam";
+            this.xrLabel2.Text = "Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam";
             this.xrLabel2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // xrLabel1
@@ -840,7 +840,7 @@ namespace XtraReportSerialization
             this.xrLabel1.SizeF = new System.Drawing.SizeF(1169F, 23F);
             this.xrLabel1.StylePriority.UseFont = false;
             this.xrLabel1.StylePriority.UseTextAlignment = false;
-            this.xrLabel1.Text = "ANCO COMPANY LIMITED";
+            this.xrLabel1.Text = "VINH GIA COMPANY LIMITED";
             this.xrLabel1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // xrLabel3
@@ -851,7 +851,7 @@ namespace XtraReportSerialization
             this.xrLabel3.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.xrLabel3.SizeF = new System.Drawing.SizeF(1169F, 22.99999F);
             this.xrLabel3.StylePriority.UseTextAlignment = false;
-            this.xrLabel3.Text = "Tel.: (84-274) 740 973 Fax: (84-274) 740 621 Email: anco@ancopottery.com";
+            this.xrLabel3.Text = "Tel: (84-235) 3567393   Fax: (84-235) 3567494";
             this.xrLabel3.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // today
@@ -877,7 +877,7 @@ namespace XtraReportSerialization
             this.xrLabel4.SizeF = new System.Drawing.SizeF(1169F, 23.00002F);
             this.xrLabel4.StylePriority.UseFont = false;
             this.xrLabel4.StylePriority.UseTextAlignment = false;
-            this.xrLabel4.Text = "GIÁ TRỊ TIỀN HÀNG ĐÃ NHẬP";
+            this.xrLabel4.Text = "GI?? TR??? TI???N H??NG ???? NH???P";
             this.xrLabel4.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // GroupFooter1
@@ -947,7 +947,7 @@ namespace XtraReportSerialization
             this.xrTableCell20.StylePriority.UseFont = false;
             this.xrTableCell20.StylePriority.UsePadding = false;
             this.xrTableCell20.StylePriority.UseTextAlignment = false;
-            this.xrTableCell20.Text = "Tổng cộng theo NCU:";
+            this.xrTableCell20.Text = "T???ng c???ng theo NCU:";
             this.xrTableCell20.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.xrTableCell20.Weight = 3.4400008425328985D;
             // 
@@ -981,7 +981,7 @@ namespace XtraReportSerialization
             this.sumPhiCongNCC.StylePriority.UseFont = false;
             this.sumPhiCongNCC.StylePriority.UsePadding = false;
             this.sumPhiCongNCC.StylePriority.UseTextAlignment = false;
-            this.sumPhiCongNCC.Text = "Phí cộng";
+            this.sumPhiCongNCC.Text = "Ph?? c???ng";
             this.sumPhiCongNCC.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.sumPhiCongNCC.Weight = 0.820000176076811D;
             // 
@@ -1000,7 +1000,7 @@ namespace XtraReportSerialization
             this.sumPhiTruNCC.StylePriority.UseFont = false;
             this.sumPhiTruNCC.StylePriority.UsePadding = false;
             this.sumPhiTruNCC.StylePriority.UseTextAlignment = false;
-            this.sumPhiTruNCC.Text = "Phí trừ";
+            this.sumPhiTruNCC.Text = "Ph?? tr???";
             this.sumPhiTruNCC.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.sumPhiTruNCC.Weight = 0.8200001713233579D;
             // 
@@ -1019,7 +1019,7 @@ namespace XtraReportSerialization
             this.sumThanhTienNCC.StylePriority.UseFont = false;
             this.sumThanhTienNCC.StylePriority.UsePadding = false;
             this.sumThanhTienNCC.StylePriority.UseTextAlignment = false;
-            this.sumThanhTienNCC.Text = "Mô tả";
+            this.sumThanhTienNCC.Text = "M?? t???";
             this.sumThanhTienNCC.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             this.sumThanhTienNCC.Weight = 1.1000001922323774D;
             // 
@@ -1199,7 +1199,7 @@ namespace XtraReportSerialization
             this.xrTableCell10.StylePriority.UseBorderColor = false;
             this.xrTableCell10.StylePriority.UseBorders = false;
             this.xrTableCell10.StylePriority.UseTextAlignment = false;
-            this.xrTableCell10.Text = "Số phiếu";
+            this.xrTableCell10.Text = "S??? phi???u";
             this.xrTableCell10.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell10.Weight = 0.53653042963591524D;
             // 
@@ -1214,7 +1214,7 @@ namespace XtraReportSerialization
             this.xrTableCell9.StylePriority.UseBorderColor = false;
             this.xrTableCell9.StylePriority.UseBorders = false;
             this.xrTableCell9.StylePriority.UseTextAlignment = false;
-            this.xrTableCell9.Text = "Ngày giao\r\nnhận";
+            this.xrTableCell9.Text = "Ng??y giao\r\nnh???n";
             this.xrTableCell9.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell9.Weight = 0.50752875192838487D;
             // 
@@ -1228,7 +1228,7 @@ namespace XtraReportSerialization
             this.xrTableCell8.StylePriority.UseBorderColor = false;
             this.xrTableCell8.StylePriority.UseBorders = false;
             this.xrTableCell8.StylePriority.UseTextAlignment = false;
-            this.xrTableCell8.Text = "Số PO";
+            this.xrTableCell8.Text = "S??? PO";
             this.xrTableCell8.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell8.Weight = 0.87004928274825089D;
             // 
@@ -1243,7 +1243,7 @@ namespace XtraReportSerialization
             this.xrTableCell6.StylePriority.UseBorderColor = false;
             this.xrTableCell6.StylePriority.UseBorders = false;
             this.xrTableCell6.StylePriority.UseTextAlignment = false;
-            this.xrTableCell6.Text = "Thành tiền\r\nP/N";
+            this.xrTableCell6.Text = "Th??nh ti???n\r\nP/N";
             this.xrTableCell6.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell6.Weight = 0.5800328586856538D;
             // 
@@ -1273,7 +1273,7 @@ namespace XtraReportSerialization
             this.xrTableCell11.StylePriority.UseBorderColor = false;
             this.xrTableCell11.StylePriority.UseBorders = false;
             this.xrTableCell11.StylePriority.UseTextAlignment = false;
-            this.xrTableCell11.Text = "Phí cộng";
+            this.xrTableCell11.Text = "Ph?? c???ng";
             this.xrTableCell11.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell11.Weight = 0.5945337055808888D;
             // 
@@ -1288,7 +1288,7 @@ namespace XtraReportSerialization
             this.xrTableCell12.StylePriority.UseBorderColor = false;
             this.xrTableCell12.StylePriority.UseBorders = false;
             this.xrTableCell12.StylePriority.UseTextAlignment = false;
-            this.xrTableCell12.Text = "Phí trừ";
+            this.xrTableCell12.Text = "Ph?? tr???";
             this.xrTableCell12.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell12.Weight = 0.59453369034026593D;
             // 
@@ -1304,7 +1304,7 @@ namespace XtraReportSerialization
             this.xrTableCell7.StylePriority.UseBorderColor = false;
             this.xrTableCell7.StylePriority.UseBorders = false;
             this.xrTableCell7.StylePriority.UseTextAlignment = false;
-            this.xrTableCell7.Text = "Thành tiền";
+            this.xrTableCell7.Text = "Th??nh ti???n";
             this.xrTableCell7.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell7.Weight = 0.79754519900904186D;
             // 
@@ -1318,7 +1318,7 @@ namespace XtraReportSerialization
             this.xrTableCell2.StylePriority.UseBorderColor = false;
             this.xrTableCell2.StylePriority.UseBorders = false;
             this.xrTableCell2.StylePriority.UseTextAlignment = false;
-            this.xrTableCell2.Text = "Đã trả";
+            this.xrTableCell2.Text = "???? tr???";
             this.xrTableCell2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell2.Weight = 0.79754520819491947D;
             // 
@@ -1332,7 +1332,7 @@ namespace XtraReportSerialization
             this.xrTableCell14.StylePriority.UseBorderColor = false;
             this.xrTableCell14.StylePriority.UseBorders = false;
             this.xrTableCell14.StylePriority.UseTextAlignment = false;
-            this.xrTableCell14.Text = "Còn lại";
+            this.xrTableCell14.Text = "C??n l???i";
             this.xrTableCell14.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell14.Weight = 0.79754519724435469D;
             // 
@@ -1346,7 +1346,7 @@ namespace XtraReportSerialization
             this.xrTableCell4.StylePriority.UseBorderColor = false;
             this.xrTableCell4.StylePriority.UseBorders = false;
             this.xrTableCell4.StylePriority.UseTextAlignment = false;
-            this.xrTableCell4.Text = "Số INV";
+            this.xrTableCell4.Text = "S??? INV";
             this.xrTableCell4.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell4.Weight = 0.58003286537965326D;
             // 
@@ -1361,7 +1361,7 @@ namespace XtraReportSerialization
             this.xrTableCell16.StylePriority.UseBorderColor = false;
             this.xrTableCell16.StylePriority.UseBorders = false;
             this.xrTableCell16.StylePriority.UseTextAlignment = false;
-            this.xrTableCell16.Text = "Tổng giá trị\r\ncuối cùng của INV";
+            this.xrTableCell16.Text = "T???ng gi?? tr???\r\ncu???i c??ng c???a INV";
             this.xrTableCell16.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell16.Weight = 0.57340868811065415D;
             // 
@@ -1373,7 +1373,7 @@ namespace XtraReportSerialization
             this.xrTableCell17.Name = "xrTableCell17";
             this.xrTableCell17.StylePriority.UseBorderColor = false;
             this.xrTableCell17.StylePriority.UseTextAlignment = false;
-            this.xrTableCell17.Text = "Ghi chú";
+            this.xrTableCell17.Text = "Ghi ch??";
             this.xrTableCell17.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             this.xrTableCell17.Weight = 0.52850550491690429D;
             // 
@@ -1387,7 +1387,7 @@ namespace XtraReportSerialization
             this.xrLabel11.SizeF = new System.Drawing.SizeF(151.4584F, 23F);
             this.xrLabel11.StylePriority.UseFont = false;
             this.xrLabel11.StylePriority.UseTextAlignment = false;
-            this.xrLabel11.Text = "Tên cơ sở cung ứng:";
+            this.xrLabel11.Text = "T??n c?? s??? cung ???ng:";
             this.xrLabel11.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             // 
             // ma_dtkd

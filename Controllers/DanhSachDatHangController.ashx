@@ -15,7 +15,7 @@ public class DanhSachDatHangController : IHttpHandler
 {
     private LinqDBDataContext db = new LinqDBDataContext();
     public String path = HttpContext.Current.Server.MapPath("~/FileSendMail/");
-    public String logoPath = HttpContext.Current.Server.MapPath("~/images/anco_logo_print.png");
+    public String logoPath = HttpContext.Current.Server.MapPath("~/images/VINHGIA_logo_print.png");
     public String productImagePath = HttpContext.Current.Server.MapPath("~/images/products/fullsize/");
 
     public string[] arrNCC = new string[] { "VINHGIA", "ANCO2" };

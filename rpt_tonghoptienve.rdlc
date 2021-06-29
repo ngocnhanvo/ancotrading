@@ -187,7 +187,7 @@
         <CanGrow>true</CanGrow>
         <Left>1.625in</Left>
         <Height>0.25in</Height>
-        <Value>Tel.: (84-650) 740 973 Fax: (84-650) 740 621 Email: anco@ancopottery.com</Value>
+        <Value>Tel: (84-235) 3567393   Fax: (84-235) 3567494</Value>
       </Textbox>
       <Textbox Name="textbox23">
         <Top>0.375in</Top>
@@ -203,7 +203,7 @@
         <CanGrow>true</CanGrow>
         <Left>1.625in</Left>
         <Height>0.25in</Height>
-        <Value>3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam</Value>
+        <Value>Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam</Value>
       </Textbox>
       <Textbox Name="textbox24">
         <Top>1.0625in</Top>
@@ -238,7 +238,7 @@
         <CanGrow>true</CanGrow>
         <Left>1.625in</Left>
         <Height>0.25in</Height>
-        <Value>ANCO COMPANY LIMITED</Value>
+        <Value>VINH GIA COMPANY LIMITED</Value>
       </Textbox>
       <Table Name="table1">
         <DataSetName>anco_test_importDataSet_rpt_tonghoptienve</DataSetName>

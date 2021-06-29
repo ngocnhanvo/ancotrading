@@ -199,7 +199,7 @@ public class QuotationController : IHttpHandler
         String fileName = manv + "BaoGia-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + ".xls";
         String fileNamePdf = manv + "BaoGia-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + ".pdf";
         String path = context.Server.MapPath("~/FileSendMail/");
-        String logoPath = context.Server.MapPath("~/images/anco_logo_print.png");
+        String logoPath = context.Server.MapPath("~/images/VINHGIA_logo_print.png");
         String productImagePath = context.Server.MapPath("~/images/products/fullsize/");
         MemoryStream ms = new MemoryStream();
 

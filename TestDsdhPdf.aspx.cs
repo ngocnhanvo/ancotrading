@@ -13,7 +13,7 @@ public partial class TestDsdhPdf : System.Web.UI.Page
             //String manv = UserUtils.getUser(Context);
             String fileName = "DanhSachDatHang-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + ".pdf";
             String path = Server.MapPath("~/FileSendMail/");
-            String logoPath = Server.MapPath("~/images/anco_logo_print.png");
+            String logoPath = Server.MapPath("~/images/VINHGIA_logo_print.png");
             String productImagePath = Server.MapPath("~/images/products/fullsize/");
 
             DanhSachDatHangPdf rptPI = new DanhSachDatHangPdf(piId, logoPath, productImagePath);

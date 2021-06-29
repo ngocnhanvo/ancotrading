@@ -113,7 +113,8 @@ public class NhomNangLucImport : ImportOriginal
     public void Update()
     {
         md_nhomnangluc o = db.md_nhomnanglucs.FirstOrDefault(p => p.nhom.Equals(maNhom) && p.hehang.Equals(heHang));
-        o.hehang = heHang;
+        o.md_chungloai_id = md_chungloai_id;
+		o.hehang = heHang;
         o.mota_tiengviet = moTaTiengViet;
         o.hscode = hsCode;
 		o.thoigianlamhang = tGLH;

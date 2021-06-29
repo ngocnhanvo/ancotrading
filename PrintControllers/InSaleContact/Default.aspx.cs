@@ -400,7 +400,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         s1.AddMergedRegion(new CellRangeAddress(3, 3, 0, 1));
         s1.GetRow(3).HeightInPoints = 55;
 
-        HSSFRichTextString richSeller = new HSSFRichTextString("ANCO COMPANY LTD. \n3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
+        HSSFRichTextString richSeller = new HSSFRichTextString("VINH GIA COMPANY LTD. \nNorthern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam");
         s1.GetRow(3).CreateCell(2).SetCellValue(richSeller);
         s1.GetRow(3).GetCell(2).CellStyle = style12TopBold;
         s1.AddMergedRegion(new CellRangeAddress(3, 3, 2, 7));
@@ -425,7 +425,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         s1.AddMergedRegion(new CellRangeAddress(6, 6, 0, 1));
         s1.GetRow(6).HeightInPoints = 21;
 
-        s1.CreateRow(7).CreateCell(0).SetCellValue("ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:");
+        s1.CreateRow(7).CreateCell(0).SetCellValue("VINH GIA Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:");
         s1.GetRow(7).GetCell(0).CellStyle = style12;
         s1.AddMergedRegion(new CellRangeAddress(7, 7, 0, 7));
         s1.GetRow(7).HeightInPoints = 33;
@@ -444,7 +444,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         s1.CreateRow(10).CreateCell(0).SetCellValue("No");
         s1.GetRow(10).GetCell(0).CellStyle = styleCenterBorder12Bold;
 
-        s1.GetRow(10).CreateCell(1).SetCellValue("ANCO Item No.");
+        s1.GetRow(10).CreateCell(1).SetCellValue("VINH GIA Item No.");
         s1.GetRow(10).GetCell(1).CellStyle = styleCenterBorder12Bold;
 
         s1.GetRow(10).CreateCell(2).SetCellValue("Customer Item No.");

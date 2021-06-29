@@ -353,17 +353,17 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
         print.FitHeight = (short)0;
 
 
-        s1.CreateRow(0).CreateCell(0).SetCellValue("ANCO COMPANY LIMITED");
+        s1.CreateRow(0).CreateCell(0).SetCellValue("VINH GIA COMPANY LIMITED");
         s1.GetRow(0).GetCell(0).CellStyle = styleCenter18Bold;
         s1.AddMergedRegion(new CellRangeAddress(0, 0, 0, 7));
         s1.GetRow(0).HeightInPoints = 30;
 
-        s1.CreateRow(1).CreateCell(0).SetCellValue("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
+        s1.CreateRow(1).CreateCell(0).SetCellValue("Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam");
         s1.GetRow(1).GetCell(0).CellStyle = styleCenter12;
         s1.AddMergedRegion(new CellRangeAddress(1, 1, 0, 7));
         s1.GetRow(1).HeightInPoints = 22;
 
-        s1.CreateRow(2).CreateCell(0).SetCellValue("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com");
+        s1.CreateRow(2).CreateCell(0).SetCellValue("Tel: (84-235) 3567393   Fax: (84-235) 3567494");
         s1.GetRow(2).GetCell(0).CellStyle = styleCenterBorderBottom12;
         s1.GetRow(2).CreateCell(1).CellStyle = styleCenterBorderBottom12;
         s1.GetRow(2).CreateCell(2).CellStyle = styleCenterBorderBottom12;
@@ -828,7 +828,7 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
         s1.GetRow(r).HeightInPoints = 22;
 
         r++;
-        s1.CreateRow(r).CreateCell(3).SetCellValue("ANCO COMPANY LTD");
+        s1.CreateRow(r).CreateCell(3).SetCellValue("VINH GIA COMPANY LTD");
         s1.AddMergedRegion(new CellRangeAddress(r, r, 3, 7));
         s1.GetRow(r).GetCell(3).CellStyle = styleCenter16Bold;
         s1.GetRow(r).HeightInPoints = 22;

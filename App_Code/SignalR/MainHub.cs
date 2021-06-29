@@ -693,7 +693,7 @@ public class MainHub : Hub
                         md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
                         string path = ExcuteSignalRStatic.mapPathSignalR("~/FileSendMail/");
                         String fileNameXLS = nv.manv + "-Quotation-" + DateTime.Now.ToString("mmhh-dd-MM-yyyy") + ".xls";
-                        String logoPath = ExcuteSignalRStatic.mapPathSignalR("~/images/anco_logo_print.png");
+                        String logoPath = ExcuteSignalRStatic.mapPathSignalR("~/images/VINHGIA_logo_print.png");
                         String productImagePath = ExcuteSignalRStatic.mapPathSignalR("~/images/products/fullsize/");
                         var rptQO = new Objects.BaoGiaMauReport_QRCode(db, mnu.c_baogia_id, logoPath, productImagePath, "qr");
 
@@ -1025,7 +1025,7 @@ public class MainHub : Hub
                 var ms = new MemoryStream();
                 string path = ExcuteSignalRStatic.mapPathSignalR("~/FileSendMail/");
                 String fileNameXLS = nv.manv + "-Inquiry-" + DateTime.Now.ToString("mmhh-dd-MM-yyyy") + ".xls";
-                String logoPath = ExcuteSignalRStatic.mapPathSignalR("~/images/anco_logo_print.png");
+                String logoPath = ExcuteSignalRStatic.mapPathSignalR("~/images/VINHGIA_logo_print.png");
                 String productImagePath = ExcuteSignalRStatic.mapPathSignalR("~/images/products/fullsize/");
 
                 string html_span = "<span style=\"font-size: 11.0pt; font-family: 'Calibri','sans-serif'\">{0}</span>";

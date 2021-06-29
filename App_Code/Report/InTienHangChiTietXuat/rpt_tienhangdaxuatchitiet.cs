@@ -473,7 +473,7 @@ public partial class rpt_tienhangdaxuatchitiet : DevExpress.XtraReports.UI.XtraR
         this.xrLabel2.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
         this.xrLabel2.SizeF = new System.Drawing.SizeF(927F, 23F);
         this.xrLabel2.StylePriority.UseTextAlignment = false;
-        this.xrLabel2.Text = "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam";
+        this.xrLabel2.Text = "Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam";
         this.xrLabel2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
         // 
         // xrLabel1
@@ -485,7 +485,7 @@ public partial class rpt_tienhangdaxuatchitiet : DevExpress.XtraReports.UI.XtraR
         this.xrLabel1.SizeF = new System.Drawing.SizeF(850.0001F, 23F);
         this.xrLabel1.StylePriority.UseFont = false;
         this.xrLabel1.StylePriority.UseTextAlignment = false;
-        this.xrLabel1.Text = "ANCO COMPANY LIMITED";
+        this.xrLabel1.Text = "VINH GIA COMPANY LIMITED";
         this.xrLabel1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
         // 
         // xrLabel3
@@ -495,7 +495,7 @@ public partial class rpt_tienhangdaxuatchitiet : DevExpress.XtraReports.UI.XtraR
         this.xrLabel3.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
         this.xrLabel3.SizeF = new System.Drawing.SizeF(927F, 23F);
         this.xrLabel3.StylePriority.UseTextAlignment = false;
-        this.xrLabel3.Text = "Tel.: (84-274) 740 973 Fax: (84-274) 740 621 Email: anco@ancopottery.com";
+        this.xrLabel3.Text = "Tel: (84-235) 3567393   Fax: (84-235) 3567494";
         this.xrLabel3.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
         // 
         // today

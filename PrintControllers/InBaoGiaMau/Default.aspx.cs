@@ -17,7 +17,7 @@ public partial class PrintControllers_InBaoGiaMau_Default : System.Web.UI.Page
         try
         {
             String c_baogia_id = Request.QueryString["c_baogia_id"];
-            String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "anco_logo_print.png");
+            String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "VINHGIA_logo_print.png");
             String imgPath = Server.MapPath("~/images/products/fullsize/");
             BaoGiaMauReport rptBaoGia = new BaoGiaMauReport(c_baogia_id, logoPath, imgPath);
             HSSFWorkbook wb = rptBaoGia.CreateWBQuotation();

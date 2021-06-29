@@ -189,9 +189,9 @@ public class ExportExcel
         List<string> lstHeader = new List<string>();
         if (haveTTAnco == true)
         {
-            lstHeader.Add("ANCO COMPANY LIMITED");
-            lstHeader.Add("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
-            lstHeader.Add("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com");
+            lstHeader.Add("VINH GIA COMPANY LIMITED");
+            lstHeader.Add("Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam");
+            lstHeader.Add("Tel: (84-235) 3567393   Fax: (84-235) 3567494");
         }
         lstHeader.Add(title);
         for (int i = 0; i < lstHeader.Count; i++)
@@ -293,7 +293,7 @@ public class ExportExcel
             //Logo
             if (LogoRpt.hasLogo.GetValueOrDefault(true))
             {
-                string logoPath = Path.Combine(HttpContext.Current.Server.MapPath("~/images/"), "anco_logo_print.png");
+                string logoPath = Path.Combine(HttpContext.Current.Server.MapPath("~/images/"), "VINHGIA_logo_print.png");
                 //String productImagePath = Server.MapPath("~/images/products/fullsize/");
                 var logo = System.Drawing.Image.FromFile(logoPath);
                 var mslogo = new MemoryStream();
@@ -318,9 +318,9 @@ public class ExportExcel
             }
 
             string[] a = {
-                "ANCO COMPANY LIMITED",
-                "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam",
-                "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com",
+                "VINH GIA COMPANY LIMITED",
+                "Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam",
+                "Tel: (84-235) 3567393   Fax: (84-235) 3567494",
                 string.IsNullOrEmpty(title) ? "PROFORMA INVOICE" : title
             };
 

@@ -716,7 +716,7 @@ public class rptBL : DevExpress.XtraReports.UI.XtraReport
             this.xrLabel8.SizeF = new System.Drawing.SizeF(526.2915F, 22.20834F);
             this.xrLabel8.StylePriority.UseFont = false;
             this.xrLabel8.StylePriority.UseTextAlignment = false;
-            this.xrLabel8.Text = "ANCO COMPANY LTD .,";
+            this.xrLabel8.Text = "VINH GIA COMPANY LTD .,";
             this.xrLabel8.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             // 
             // xrLabel39
@@ -776,7 +776,7 @@ public class rptBL : DevExpress.XtraReports.UI.XtraReport
             this.xrLabel1.SizeF = new System.Drawing.SizeF(725.6249F, 23.00002F);
             this.xrLabel1.StylePriority.UseFont = false;
             this.xrLabel1.StylePriority.UseTextAlignment = false;
-            this.xrLabel1.Text = "ANCO COMPANY LIMITED";
+            this.xrLabel1.Text = "VINH GIA COMPANY LIMITED";
             this.xrLabel1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // xrLabel2
@@ -788,7 +788,7 @@ public class rptBL : DevExpress.XtraReports.UI.XtraReport
             this.xrLabel2.SizeF = new System.Drawing.SizeF(725.6249F, 22.20834F);
             this.xrLabel2.StylePriority.UseFont = false;
             this.xrLabel2.StylePriority.UseTextAlignment = false;
-            this.xrLabel2.Text = "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam";
+            this.xrLabel2.Text = "Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam";
             this.xrLabel2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // xrLabel38
@@ -802,7 +802,7 @@ public class rptBL : DevExpress.XtraReports.UI.XtraReport
             this.xrLabel38.StylePriority.UseBorders = false;
             this.xrLabel38.StylePriority.UseFont = false;
             this.xrLabel38.StylePriority.UseTextAlignment = false;
-            this.xrLabel38.Text = "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com";
+            this.xrLabel38.Text = "Tel: (84-235) 3567393   Fax: (84-235) 3567494";
             this.xrLabel38.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // TopMargin

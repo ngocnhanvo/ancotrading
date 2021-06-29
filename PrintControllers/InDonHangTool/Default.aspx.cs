@@ -259,7 +259,7 @@ public partial class PrintControllers_InDonHangTool_Default : System.Web.UI.Page
                     ) as giafob
                     , cast('{2}' as decimal(18,2)) as dis
                     , N'{3}' as discount_hehang_value
-					, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch , dh.shipmenttime, cb.ten_cangbien, pmt.ten_paymentterm, (' In favor of ANCO COMPANY LTD. Account No. : ' + replace(ngh.thongtin,'''','''''')) as mota
+					, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch , dh.shipmenttime, cb.ten_cangbien, pmt.ten_paymentterm, (' In favor of VINH GIA COMPANY LTD. Account No. : ' + replace(ngh.thongtin,'''','''''')) as mota
 					, ddh.v2 as cbm, (sp.trongluong * ddh.soluong) as trongluong
                     ,(case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
 					, (case dg.sl_inner when 0 then ' ' else (cast(dg.sl_inner as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as sl_inner_

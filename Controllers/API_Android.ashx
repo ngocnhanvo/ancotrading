@@ -839,7 +839,7 @@ public class API_Android : IHttpHandler {
 
                         String path = context.Server.MapPath("~/FileSendMail/");
                         String fileNameXLS = nv.manv + "-Quotation-" + DateTime.Now.ToString("mmhh-dd-MM-yyyy") + ".xls";
-                        String logoPath = context.Server.MapPath("~/images/anco_logo_print.png");
+                        String logoPath = context.Server.MapPath("~/images/VINHGIA_logo_print.png");
                         String productImagePath = context.Server.MapPath("~/images/products/fullsize/");
                         BaoGiaMauReport_QRCode rptQO;
                         //if (nv.manv == "ancoqr")
@@ -1558,13 +1558,13 @@ public class BaoGiaMauReport_QRCode
         IPicture signaturePicturelogo = patriarchlogo.CreatePicture(anchorlogo, indexlogo);
 
         // set A1
-        s1.CreateRow(0).CreateCell(0).SetCellValue("ANCO COMPANY LIMITED");
+        s1.CreateRow(0).CreateCell(0).SetCellValue("VINH GIA COMPANY LIMITED");
 
         // set A2
-        s1.CreateRow(1).CreateCell(0).SetCellValue("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
+        s1.CreateRow(1).CreateCell(0).SetCellValue("Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam");
 
         // set A3
-        s1.CreateRow(2).CreateCell(0).SetCellValue("Tel.: (84-274) 3740 973   Fax:  (84–274) 3740 621  Email: anco@ancopottery.com");
+        s1.CreateRow(2).CreateCell(0).SetCellValue("Tel: (84-235) 3567393   Fax: (84-235) 3567494");
 
         // set A4
         s1.CreateRow(3).CreateCell(0).SetCellValue("QUOTATION");

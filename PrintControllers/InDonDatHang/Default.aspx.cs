@@ -16,7 +16,7 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
         {
             type = Request.QueryString["type"];
             c_danhsachdathang_id = Request.QueryString["c_danhsachdathang_id"];
-            String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "anco_logo_print.png");
+            String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "VINHGIA_logo_print.png");
             String imgPath = Server.MapPath("~/images/products/fullsize/");
             DanhSachDatHangReport rptDSDH = new DanhSachDatHangReport(c_danhsachdathang_id, logoPath, imgPath);
 			rptDSDH.guiNCC = Request.QueryString["DSDHG"] == "False";

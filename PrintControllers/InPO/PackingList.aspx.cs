@@ -364,7 +364,7 @@ public partial class PrintControllers_PackingList_Default : System.Web.UI.Page
         int heigh = 22;
         int row = 0;
         //set A1 - A3
-        string[] a = { "ANCO COMPANY LIMITED", "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam", "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com", "PACKING LIST" };
+        string[] a = { "VINH GIA COMPANY LIMITED", "Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam", "Tel: (84-235) 3567393   Fax: (84-235) 3567494", "PACKING LIST" };
         for (int i = 0; i < a.Count(); i++)
         {
             s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
@@ -684,7 +684,7 @@ public partial class PrintControllers_PackingList_Default : System.Web.UI.Page
             row++;
         }
 
-        s1.CreateRow(row).CreateCell(3).SetCellValue("ANCO COMPANY LTD");
+        s1.CreateRow(row).CreateCell(3).SetCellValue("VINH GIA COMPANY LTD");
         s1.GetRow(row).GetCell(3).CellStyle = signBold;
         s1.GetRow(row).HeightInPoints = 22;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 3, 6));

@@ -733,7 +733,7 @@ public class BaoGiaReport
         row++;
         s1.CreateRow(row).CreateCell(0).SetCellValue("Bank Details:");
         s1.GetRow(row).GetCell(0).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(1).SetCellValue("In  favor ANCO COMPANY LTD.");
+        s1.GetRow(row).CreateCell(1).SetCellValue("In  favor VINH GIA COMPANY LTD.");
         s1.GetRow(row).GetCell(1).CellStyle = celltext;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
 

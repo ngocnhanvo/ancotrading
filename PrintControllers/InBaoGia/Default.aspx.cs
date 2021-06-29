@@ -28,7 +28,7 @@ public partial class PrintControllers_InBaoGia_Default : System.Web.UI.Page
         //try
         {
             c_baogia_id = Request.QueryString["c_baogia_id"];
-            String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "anco_logo_print.png");
+            String logoPath = System.IO.Path.Combine(Server.MapPath("~/images/"), "VINHGIA_logo_print.png");
             String imgPath = Public.imgProducts;
 
             var bg = db.c_baogias.FirstOrDefault(p => p.c_baogia_id.Equals(c_baogia_id));

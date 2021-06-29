@@ -5,8 +5,8 @@ using System.Web;
 
 public class Customer
 {
-    public static String getCompany = "ANCO COMPANY LIMITED";
-    public static String getAddress = "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam";
-    public static String getContact = "Tel: (84-650) 3740.973 - Fax: (84-650) 3740.621 - Email: anco@ancopottery.com";
-    public static String getLogo = "anco_logo_print.png";
+    public static String getCompany = "VINH GIA COMPANY LIMITED";
+    public static String getAddress = "Northern Chu Lai Industrial Zone, Tam Hiep Commune, Nui Thanh District, Quang Nam Province, Viet Nam";
+    public static String getContact = "Tel: (84-235) 3567393 - Fax: (84-235) 3567494";
+    public static String getLogo = "VINHGIA_logo_print.png";
 }
