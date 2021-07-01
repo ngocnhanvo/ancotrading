@@ -150,7 +150,7 @@ public class CreateQuotationFromExcel : IHttpHandler
     public Dictionary<string, string> ReadExCel(HttpContext context) {
         var result = new Dictionary<string, string>();
         string msg = "";
-        bool ok = false;
+        bool ok = true;
         try {
             int j = filePath.LastIndexOf(".");
             if(filePath.Substring(j) != ".xls") {
@@ -164,13 +164,10 @@ public class CreateQuotationFromExcel : IHttpHandler
                 ok = false;
                 msg = msg.Substring(6);
             }
-            else
-            {
-                ok = true;
-            }
         }
-        catch {
-            msg = "Không tìm thấy tập tin.";
+        catch (Exception ex) {
+			ok = false;
+            msg = ex.Message;
         }
         result["msg"] = msg;
         result["ok"] = ok.ToString().ToLower();
