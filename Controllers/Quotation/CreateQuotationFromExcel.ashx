@@ -131,7 +131,7 @@ public class CreateQuotationFromExcel : IHttpHandler
 					}
 					else
 					{
-						msg += string.Format(@"<div style='color:red'>Báo giá khởi tạo thất bại ""{0}""</div>", sochungtu);
+						msg += string.Format(@"<div style='color:red'>Báo giá khởi tạo thất bại ""{0}"", có thể sheet đầu tiên đã bị ẩn</div>", sochungtu);
 						db.c_baogias.DeleteOnSubmit(mnu);
 						db.SubmitChanges();
 					}
