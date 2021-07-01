@@ -127,11 +127,12 @@ public class CreateQuotationFromExcel : IHttpHandler
                         var ok = result["ok"] == "true";
                         if (ok)
                         {
+							msg += string.Format(@"<div style='color:blue'>Đã tạo thành công báo giá ""{0}""</div>", sochungtu);
                             db.SubmitChanges();
-                            msg += string.Format(@"<div style='color:blue'>Đã tạo thành công báo giá ""{0}""</div>", sochungtu);
                         }
                         else
                         {
+							msg += string.Format(@"<div style='color:red'>Báo giá khởi tạo thất bại ""{0}""</div>", sochungtu);
                             db.c_baogias.DeleteOnSubmit(mnu);
                             db.SubmitChanges();
                         }
