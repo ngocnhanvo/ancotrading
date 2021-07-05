@@ -392,7 +392,7 @@ public static class UserUtils
 
             gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
 
-            if (maNCC == "ANCO1" & giachuan > 0)
+            if (maNCC == "ANCO1" & giachuan > -1)
                 gianhap2 = -1;
 
             if (giaNhap2BD > -1)
