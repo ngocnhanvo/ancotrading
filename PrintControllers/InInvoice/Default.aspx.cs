@@ -989,7 +989,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         s1.GetRow(r).CreateCell(1).SetCellValue(@"3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
         s1.GetRow(r).GetCell(1).CellStyle = style12;
 
-        s1.GetRow(r).HeightInPoints = 22;
+        s1.GetRow(r).HeightInPoints = 44;
         s1.AddMergedRegion(new CellRangeAddress(r, r, 1, 6));
 
 
