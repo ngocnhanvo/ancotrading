@@ -61,88 +61,83 @@ public class CreateQuotationFromExcel : IHttpHandler
             if (gia_db_str.Equals("on") || gia_db_str.Equals("true"))
             { gia_db = true; }
 
-            try
-            {
-                if (String.IsNullOrEmpty(msg))
-                {
-                    #region add c_baogia
-                    String sochungtu = jqGridHelper.Utils.taoChungTuQO(khachhang_v, 1, DateTime.ParseExact(ngaybaogia_v, "dd/MM/yyyy", null).Year.ToString());
-                    c_baogia mnu = new c_baogia
-                    {
-                        c_baogia_id = id,
-                        sobaogia = sochungtu,
-                        md_doitackinhdoanh_id = khachhang_v,
-                        shipmenttime = int.Parse(shipmenttime),
-                        ngaybaogia = DateTime.ParseExact(ngaybaogia_v, "dd/MM/yyyy", null),
-                        ngayhethan = DateTime.ParseExact(ngayhethan_v, "dd/MM/yyyy", null),
-                        md_trongluong_id = ptrongluong_v,
-                        md_cangbien_id = cangbien,
-                        md_dongtien_id = pdongtien_v,
-                        md_kichthuoc_id = pkichthuoc_v,
-                        totalcbm = 0,
-                        totalcbf = 0,
-                        totalquo = 0,
-                        isform = true,
-                        moq_item_color = "",
-                        md_trangthai_id = "SOANTHAO",
-                        chkPBGCu = chkPBGCu,
-                        phienbangiacu = phienbangiacu,
 
-                        nguoitao = UserUtils.getUser(context),
-                        nguoicapnhat = UserUtils.getUser(context),
-                        mota = "",
-                        hoatdong = true,
-                        gia_db = gia_db,
-                        ngaytao = DateTime.Now,
-                        ngaycapnhat = DateTime.Now
-                    };
+			if (msg.Length <= 0)
+			{
+				#region add c_baogia
+				String sochungtu = jqGridHelper.Utils.taoChungTuQO(khachhang_v, 1, DateTime.ParseExact(ngaybaogia_v, "dd/MM/yyyy", null).Year.ToString());
+				c_baogia mnu = new c_baogia
+				{
+					c_baogia_id = id,
+					sobaogia = sochungtu,
+					md_doitackinhdoanh_id = khachhang_v,
+					shipmenttime = int.Parse(shipmenttime),
+					ngaybaogia = DateTime.ParseExact(ngaybaogia_v, "dd/MM/yyyy", null),
+					ngayhethan = DateTime.ParseExact(ngayhethan_v, "dd/MM/yyyy", null),
+					md_trongluong_id = ptrongluong_v,
+					md_cangbien_id = cangbien,
+					md_dongtien_id = pdongtien_v,
+					md_kichthuoc_id = pkichthuoc_v,
+					totalcbm = 0,
+					totalcbf = 0,
+					totalquo = 0,
+					isform = true,
+					moq_item_color = "",
+					md_trangthai_id = "SOANTHAO",
+					chkPBGCu = chkPBGCu,
+					phienbangiacu = phienbangiacu,
 
-                    if (mnu.ngaybaogia >= mnu.ngayhethan)
-                    {
-                        msg = "Ngày báo giá không đuợc lớn hơn ngày hết hạn!";
-                    }
-                    else if (mnu.md_doitackinhdoanh_id == "c010dd297f3ee5797e426176e8685b2c")
-                    {
-                        msg = "Khách Hàng: Không được bỏ trống!";
-                    }
-                    else if (chkPBGCu == true & String.IsNullOrEmpty(phienbangiacu))
-                    {
-                        msg = "\"Phiên bảng giá cũ\" không thể bỏ trống.";
-                    }
+					nguoitao = UserUtils.getUser(context),
+					nguoicapnhat = UserUtils.getUser(context),
+					mota = "",
+					hoatdong = true,
+					gia_db = gia_db,
+					ngaytao = DateTime.Now,
+					ngaycapnhat = DateTime.Now
+				};
 
-                    md_doitackinhdoanh doitac = db.md_doitackinhdoanhs.FirstOrDefault(p => p.md_doitackinhdoanh_id.Equals(mnu.md_doitackinhdoanh_id));
-                    md_banggia bga = db.md_banggias.Where(s => s.ten_banggia.Contains(doitac.ma_dtkd + "-FOB")).FirstOrDefault();
+				if (mnu.ngaybaogia >= mnu.ngayhethan)
+				{
+					msg = "Ngày báo giá không đuợc lớn hơn ngày hết hạn!";
+				}
+				else if (mnu.md_doitackinhdoanh_id == "c010dd297f3ee5797e426176e8685b2c")
+				{
+					msg = "Khách Hàng: Không được bỏ trống!";
+				}
+				else if (chkPBGCu == true & String.IsNullOrEmpty(phienbangiacu))
+				{
+					msg = "\"Phiên bảng giá cũ\" không thể bỏ trống.";
+				}
 
-                    if (bga == null & gia_db == true)
-                    {
-                        msg = "Khách hàng " + doitac.ma_dtkd + " không có bảng giá đặc biệt";
-                    }
+				md_doitackinhdoanh doitac = db.md_doitackinhdoanhs.FirstOrDefault(p => p.md_doitackinhdoanh_id.Equals(mnu.md_doitackinhdoanh_id));
+				md_banggia bga = db.md_banggias.Where(s => s.ten_banggia.Contains(doitac.ma_dtkd + "-FOB")).FirstOrDefault();
 
-                    if (String.IsNullOrEmpty(msg))
-                    {
-                        db.c_baogias.InsertOnSubmit(mnu);
-                        db.SubmitChanges();
-                        var result = ReadExCel(context);
-                        msg = result["msg"];
-                        var ok = result["ok"] == "true";
-                        if (ok)
-                        {
-                            db.SubmitChanges();
-                            msg += string.Format(@"<div style='color:blue'>Đã tạo thành công báo giá ""{0}""</div>", sochungtu);
-                        }
-                        else
-                        {
-                            db.c_baogias.DeleteOnSubmit(mnu);
-                            db.SubmitChanges();
-                        }
-                    }
-                    #endregion
-                }
-            }
-            catch (Exception ex)
-            {
-                msg = ex.Message;
-            }
+				if (bga == null & gia_db == true)
+				{
+					msg = "Khách hàng " + doitac.ma_dtkd + " không có bảng giá đặc biệt";
+				}
+
+				if (msg.Length <= 0)
+				{
+					db.c_baogias.InsertOnSubmit(mnu);
+					db.SubmitChanges();
+					var result = ReadExCel(context);
+					msg = result["msg"];
+					var ok = result["ok"] == "true";
+					if (ok)
+					{
+						msg += string.Format(@"<div style='color:blue'>Đã tạo thành công báo giá ""{0}""</div>", sochungtu);
+						db.SubmitChanges();
+					}
+					else
+					{
+						msg += string.Format(@"<div style='color:red'>Báo giá khởi tạo thất bại ""{0}"", có thể sheet đầu tiên đã bị ẩn</div>", sochungtu);
+						db.c_baogias.DeleteOnSubmit(mnu);
+						db.SubmitChanges();
+					}
+				}
+				#endregion
+			}
         }
         catch (Exception ex)
         {
@@ -155,7 +150,7 @@ public class CreateQuotationFromExcel : IHttpHandler
     public Dictionary<string, string> ReadExCel(HttpContext context) {
         var result = new Dictionary<string, string>();
         string msg = "";
-        bool ok = false;
+        bool ok = true;
         try {
             int j = filePath.LastIndexOf(".");
             if(filePath.Substring(j) != ".xls") {
@@ -169,13 +164,10 @@ public class CreateQuotationFromExcel : IHttpHandler
                 ok = false;
                 msg = msg.Substring(6);
             }
-            else
-            {
-                ok = true;
-            }
         }
-        catch {
-            msg = "Không tìm thấy tập tin.";
+        catch (Exception ex) {
+			ok = false;
+            msg = ex.Message;
         }
         result["msg"] = msg;
         result["ok"] = ok.ToString().ToLower();
