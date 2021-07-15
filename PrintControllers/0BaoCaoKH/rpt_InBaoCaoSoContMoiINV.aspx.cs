@@ -50,7 +50,7 @@ public partial class PrintControllers_0BaoCaoKH_rpt_InBaoCaoSoContMoiINV : Syste
             declare @denngayStr nvarchar(MAX) = N'{1}';
 
             declare @tungay datetime = convert(datetime, @tungayStr + N' 00:00:00', 103)
-            declare @denngay datetime = convert(datetime, @tungayStr + N' 23:59:59', 103)            
+            declare @denngay datetime = convert(datetime, @denngayStr + N' 23:59:59', 103)            
 
             declare @tblINV table (idINV nvarchar(32), soINV nvarchar(32))
             insert @tblINV
