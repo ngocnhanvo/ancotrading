@@ -13,8 +13,8 @@
     LinqDBDataContext dbc = new LinqDBDataContext();
     String manv = UserUtils.getUser(Context);
     nhanvien nv = dbc.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
-    String sql = String.Format("select * from md_baocao bc, md_phanquyenbaocao pqbc where bc.md_baocao_id = pqbc.md_baocao_id and bc.hoatdong = 1 AND pqbc.manv = @manv AND bc.md_module_id='BAOCAOKH'");
-    String sqlAdmin = "select * from md_baocao where md_module_id='BAOCAOKH' and hoatdong = 1";
+    String sql = String.Format("select * from md_baocao bc, md_phanquyenbaocao pqbc where bc.md_baocao_id = pqbc.md_baocao_id and bc.hoatdong = 1 AND pqbc.manv = @manv AND bc.md_module_id='BAOCAOKH' order by bc.ten_baocao");
+    String sqlAdmin = "select * from md_baocao where md_module_id='BAOCAOKH' and hoatdong = 1 order by ten_baocao";
     System.Data.DataTable dt = new System.Data.DataTable();
 
     if (nv.isadmin.Value)
@@ -81,6 +81,11 @@
             case 1002:
                 actionKhachHang("Báo cáo số lượng PO theo INV từng KH"
                     , "PrintControllers/0BaoCaoKH/rpt_SoLuongPOTheoINVTungKH.aspx"
+                    , startdate, enddate, doitackinhdoanh_id);
+                break;
+            case 1003:
+                actionKhachHang("Báo cáo số cont tương ứng mỗi INV"
+                    , "PrintControllers/0BaoCaoKH/rpt_InBaoCaoSoContMoiINV.aspx"
                     , startdate, enddate, doitackinhdoanh_id);
                 break;
 
@@ -263,6 +268,10 @@
                 break;
             case 1002:
                 $('#lblReportNameKH').html("Báo cáo số lượng PO theo INV từng KH");
+                $("#tr_dtkd", frmID).css({ "display": "none" });
+                break;
+            case 1003:
+                $('#lblReportNameKH').html("Báo cáo số cont tương ứng mỗi INV");
                 $("#tr_dtkd", frmID).css({ "display": "none" });
                 break;
 
