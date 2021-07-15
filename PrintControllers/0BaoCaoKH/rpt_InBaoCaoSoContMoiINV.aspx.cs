@@ -60,9 +60,9 @@ public partial class PrintControllers_0BaoCaoKH_rpt_InBaoCaoSoContMoiINV : Syste
 
             declare @tblINV_DT table (idINV nvarchar(32), soINV nvarchar(32), idINVDT nvarchar(32), idDNX nvarchar(32), soPI nvarchar(32))
             insert @tblINV_DT
-            select inv.idINV, inv.soINV, dinv.c_dongpklinv_id, dinv.c_dongnhapxuat_id, dsdh.sochungtu
+            select inv.idINV, inv.soINV, dinv.c_dongpklinv_id, dinv.c_dongnhapxuat_id, dh.sochungtu
             from c_dongpklinv (nolock) dinv 
-            left join c_danhsachdathang (nolock) dsdh on dinv.c_danhsachdathang_id = dsdh.c_danhsachdathang_id
+            left join c_donhang (nolock) dh on dinv.c_donhang_id = dh.c_donhang_id
             inner join @tblINV inv on dinv.c_packinginvoice_id = inv.idINV
 
             select distinct 
