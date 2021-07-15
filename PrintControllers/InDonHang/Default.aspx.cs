@@ -1371,7 +1371,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                 foreach (var img in lstimage)
                     img.column -= 1;
                 excel.lstImage = lstimage;
-                excel.lstText = lstText;
+                //excel.lstText = lstText;
                 var result = excel.ConvertInterop(url, urlXls, null);
                 File.Delete(url);
                 Response.Write(result);
