@@ -1290,7 +1290,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         cellUn.SetFont(funderline);
         cellUn.Alignment = HorizontalAlignment.Center;
         cellUn.VerticalAlignment = VerticalAlignment.Top;
-        s1.GetRow(3).GetCell(0).CellStyle = cellUn;
+        s1.GetRow(2).GetCell(0).CellStyle = cellUn;
+		s1.GetRow(3).GetCell(0).CellStyle = cellUn;
 
         s1 = config.PrintExcel((HSSFSheet)s1, row);
 

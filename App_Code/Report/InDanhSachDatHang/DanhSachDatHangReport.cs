@@ -964,7 +964,8 @@ public class DanhSachDatHangReport
         cellUn.SetFont(funderline);
         cellUn.Alignment = HorizontalAlignment.Center;
         cellUn.VerticalAlignment = VerticalAlignment.Top;
-        s1.GetRow(2).GetCell(0).CellStyle = cellUn;
+		s1.GetRow(2).GetCell(0).CellStyle = cellUn;
+        s1.GetRow(3).GetCell(0).CellStyle = cellUn;
 
         s1 = ConfigExcel.PrintExcel((HSSFSheet)s1, row);
         s1.PrintSetup.Landscape = true;

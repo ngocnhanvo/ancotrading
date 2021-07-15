@@ -159,7 +159,7 @@
 %>
 <html>
 <head>
-<title>An Co Emanagement 3.0</title>
+<title>Vinh Gia Emanagement 3.0</title>
 
 <!-- jQuery Core -->
 <script src="jQuery/Core/jquery-1.7.1.min.js" type="text/javascript"></script>
@@ -577,7 +577,7 @@
 
 	<div class="ui-layout-north">
 	    <div style="position:absolute; top:0px; right:100px; width:220px; padding:6px; "><us1:UserNameProfile ID="UserNameProfile1" runat="server" /></div>
-		<div style="position: absolute; top: 0px; right: 3px; background: url('images/anco_logo_25px.png') no-repeat; width: 70px; height: 25px;"></div>
+		<div style="position: absolute; top: 1px; right: 3px; background: url('images/vinhgia_logo_25px.png') no-repeat; width: 70px; height: 25px;"></div>
 		<!-- toolbar -->
 		<!-- content -->
 		<div id="ribbon">
@@ -848,7 +848,7 @@
 			<DIV id="first_panel" class="tab-panel">
 				<DIV class="ui-layout-center"style="position: relative; background: url('images/anco_background.png')">
 					<div style="text-align: center">
-						<img style="padding-top: 130px" src="images/anco_banner.png" />
+						<img style="padding-top: 130px" src="images/vinhgia_banner.png" />
 					</div>
 				</DIV>
 			</DIV>

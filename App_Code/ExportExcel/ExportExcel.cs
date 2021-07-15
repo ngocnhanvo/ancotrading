@@ -305,9 +305,9 @@ public class ExportExcel
                 anchorLogo.Dy1 = LogoRpt.dy1.GetValueOrDefault(10);
                 anchorLogo.Dx2 = LogoRpt.dx2.GetValueOrDefault(600);
                 anchorLogo.Dy2 = LogoRpt.dy2.GetValueOrDefault(253);
-                anchorLogo.Col1 = LogoRpt.cell1.GetValueOrDefault(4);
+                anchorLogo.Col1 = LogoRpt.cell1.GetValueOrDefault(0);
                 anchorLogo.Row1 = LogoRpt.row1.GetValueOrDefault(1);
-                anchorLogo.Col2 = LogoRpt.cell2.GetValueOrDefault(4);
+                anchorLogo.Col2 = LogoRpt.cell2.GetValueOrDefault(0);
                 anchorLogo.Row2 = LogoRpt.row2.GetValueOrDefault(1);
 
                 anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;

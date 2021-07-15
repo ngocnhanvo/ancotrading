@@ -124,37 +124,36 @@ namespace jqGridHelper
 
                 if (data.Rows.Count == 0)//neu chua co don hang nao cua khach nay
                 {
-
-                    result = "001/" + makhachhang + "-" + namchungtu.Substring(2, 2);
+                    result = "001/" + makhachhang + "-VG-" + namchungtu.Substring(2, 2);
                 }
                 else
                 {
                     //nam = (!namht.Equals(namct) ? namht.Substring(2, 2) : namct.Substring(2, 2));
-                    result = genericNumberDoc(ctdh) + "/" + makhachhang + "-" + namchungtu.Substring(2, 2);
+                    result = genericNumberDoc(ctdh) + "/" + makhachhang + "-VG-" + namchungtu.Substring(2, 2);
                 }
             }
             else if (isdonhangmau == 1)//la don hang mau
             {
                 if (data.Rows.Count == 0)//neu chua co don hang nao cua khach nay
                 {
-                    result = "001/" + makhachhang + "_SR-" + namchungtu.Substring(2, 2);
+                    result = "001/" + makhachhang + "-VG_SR-" + namchungtu.Substring(2, 2);
                 }
                 else
                 {
                     //nam = (!namht.Equals(namct) ? namht.Substring(2, 2) : namct.Substring(2, 2));
-                    result = genericNumberDoc(ctmau) + "/" + makhachhang + "_SR-" + namchungtu.Substring(2, 2);
+                    result = genericNumberDoc(ctmau) + "/" + makhachhang + "-VG_SR-" + namchungtu.Substring(2, 2);
                 }
             }
             else if (isdonhangmau == 2) // la don hang tmp
             {
                 if (data.Rows.Count == 0)//neu chua co don hang nao cua khach nay
                 {
-                    result = "001/" + makhachhang + "_TI-" + namchungtu.Substring(2, 2);
+                    result = "001/" + makhachhang + "-VG_TI-" + namchungtu.Substring(2, 2);
                 }
                 else
                 {
                     //nam = (!namht.Equals(namct) ? namht.Substring(2, 2) : namct.Substring(2, 2));
-                    result = genericNumberDoc(ctmau) + "/" + makhachhang + "_TI-" + namchungtu.Substring(2, 2);
+                    result = genericNumberDoc(ctmau) + "/" + makhachhang + "-VG_TI-" + namchungtu.Substring(2, 2);
                 }
             }
 

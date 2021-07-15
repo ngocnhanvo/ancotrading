@@ -83,6 +83,11 @@
                     , "PrintControllers/0BaoCaoKH/rpt_SoLuongPOTheoINVTungKH.aspx"
                     , startdate, enddate, doitackinhdoanh_id);
                 break;
+            case 1003:
+                actionKhachHang("Báo cáo số cont tương ứng mỗi INV"
+                    , "PrintControllers/0BaoCaoKH/rpt_InBaoCaoSoContMoiINV.aspx"
+                    , startdate, enddate, doitackinhdoanh_id);
+                break;
 
             case 100:
                 actionKhachHang("Tổng hợp khiếu nại"
@@ -263,6 +268,10 @@
                 break;
             case 1002:
                 $('#lblReportNameKH').html("Báo cáo số lượng PO theo INV từng KH");
+                $("#tr_dtkd", frmID).css({ "display": "none" });
+                break;
+            case 1003:
+                $('#lblReportNameKH').html("Báo cáo số cont tương ứng mỗi INV");
                 $("#tr_dtkd", frmID).css({ "display": "none" });
                 break;
 

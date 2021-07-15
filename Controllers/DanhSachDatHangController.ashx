@@ -18,7 +18,7 @@ public class DanhSachDatHangController : IHttpHandler
     public String logoPath = HttpContext.Current.Server.MapPath("~/images/VINHGIA_logo_print.png");
     public String productImagePath = HttpContext.Current.Server.MapPath("~/images/products/fullsize/");
 
-    public string[] arrNCC = new string[] { "VINHGIA", "ANCO2" };
+    public string[] arrNCC = new string[] { "VINHGIA" };
     public void ProcessRequest(HttpContext context)
     {
         String action, oper;
@@ -116,41 +116,41 @@ public class DanhSachDatHangController : IHttpHandler
             mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
         }
 
-        mdtkdId = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == "ANCO2").Select(s => s.md_doitackinhdoanh_id).FirstOrDefault();
-        dsdhs = db.c_danhsachdathangs.Where(s => lst.Contains(s.trangthai) & s.md_doitackinhdoanh_id == mdtkdId & s.md_trangthai_id != "HIEULUC");
-        item = new Dictionary<string, object>();
-        item["result"] = dsdhs.Select(s => new { s.c_danhsachdathang_id }).ToList();
-        string msgANCO2 = Extension.GetModule(
-            Extension.API_ANCO2 + "?oper=getListDSDH",
-            item
-        );
-        if (!msgANCO2.Contains("false##"))
-        {
-            var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(msgANCO2);
-            foreach (var a in dsdhs)
-            {
-                string trangthai = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).Select(s => s["trangthai"] + "").FirstOrDefault();
-                if (!string.IsNullOrEmpty(trangthai))
-                {
-                    a.trangthai = trangthai;
-                }
-                else
-                {
-                    if (a.trangthai != "CHUAGUI" & !string.IsNullOrEmpty(a.trangthai))
-                        a.trangthai = "TUCHOI";
-                    else
-                        a.trangthai = "CHUAGUI";
-                }
-            }
+        // mdtkdId = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == "ANCO2").Select(s => s.md_doitackinhdoanh_id).FirstOrDefault();
+        // dsdhs = db.c_danhsachdathangs.Where(s => lst.Contains(s.trangthai) & s.md_doitackinhdoanh_id == mdtkdId & s.md_trangthai_id != "HIEULUC");
+        // item = new Dictionary<string, object>();
+        // item["result"] = dsdhs.Select(s => new { s.c_danhsachdathang_id }).ToList();
+        // string msgANCO2 = Extension.GetModule(
+            // Extension.API_ANCO2 + "?oper=getListDSDH",
+            // item
+        // );
+        // if (!msgANCO2.Contains("false##"))
+        // {
+            // var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(msgANCO2);
+            // foreach (var a in dsdhs)
+            // {
+                // string trangthai = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).Select(s => s["trangthai"] + "").FirstOrDefault();
+                // if (!string.IsNullOrEmpty(trangthai))
+                // {
+                    // a.trangthai = trangthai;
+                // }
+                // else
+                // {
+                    // if (a.trangthai != "CHUAGUI" & !string.IsNullOrEmpty(a.trangthai))
+                        // a.trangthai = "TUCHOI";
+                    // else
+                        // a.trangthai = "CHUAGUI";
+                // }
+            // }
 
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateSLDaDatTrenPO");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER TrigUpdateSoPI");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateGoiHDLH");
-            db.SubmitChanges();
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateSLDaDatTrenPO");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER TrigUpdateSoPI");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
-        }
+            // mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateSLDaDatTrenPO");
+            // mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER TrigUpdateSoPI");
+            // mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateGoiHDLH");
+            // db.SubmitChanges();
+            // mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateSLDaDatTrenPO");
+            // mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER TrigUpdateSoPI");
+            // mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
+        // }
 
         context.Response.Write(msgVINHGIA);
     }

@@ -236,8 +236,8 @@ public class BaoGiaReport
         int row = 0;
         config.endHeader = 20;
         config.LogoRpt = new ExportExcel.Logoreport() {
-            cell1 = 5,
-            cell2 = 5,
+            cell1 = 0,
+            cell2 = 0,
             dx1 = 450,
             dx2 = 1000
         };
