@@ -93,6 +93,15 @@
                 , editable:true
                 , edittype: 'text'
             },
+			{
+                fixed: true, name: 'otp'
+                , label: 'OTP'
+                , index: 'otp'
+                , width: 100
+                , editable:false
+                , edittype: 'text'
+                , hidden: false
+            },
             {
                 fixed: true, name: 'diachi'
                 , label: 'Địa Chỉ'
@@ -122,15 +131,6 @@
                 , align: 'center'
                 , editoptions:{ value:'True:False', defaultValue: 'True' }
                 , formatter: 'checkbox'
-            },
-            {
-                fixed: true, name: 'otp'
-                , label: 'OTP'
-                , index: 'otp'
-                , width: 100
-                , editable:false
-                , edittype: 'text'
-                , hidden: false
             },
             {
                 fixed: true, name: 'ngaytao'
