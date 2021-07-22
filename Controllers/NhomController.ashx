@@ -4,6 +4,7 @@ using System;
 using System.Web;
 using System.Data.Linq;
 using System.Linq;
+using System.Data;
 
 public class NhomController : IHttpHandler
 {
@@ -45,8 +46,8 @@ public class NhomController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -56,12 +57,12 @@ public class NhomController : IHttpHandler
 
         md_nhom m = db.md_nhoms.Single(p => p.md_nhom_id == context.Request.Form["id"]);
         m.tennhom = context.Request.Form["tennhom"];
-        
+
         m.mota = context.Request.Form["mota"];
         m.hoatdong = hd;
         m.nguoicapnhat = UserUtils.getUser(context);
         m.ngaycapnhat = DateTime.Now;
-        
+
         db.SubmitChanges();
     }
 
@@ -76,7 +77,7 @@ public class NhomController : IHttpHandler
         {
             md_nhom_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
             tennhom = context.Request.Form["tennhom"],
-            
+
             mota = context.Request.Form["mota"],
             hoatdong = hd,
             nguoitao = UserUtils.getUser(context),
@@ -93,11 +94,16 @@ public class NhomController : IHttpHandler
     public void del(HttpContext context)
     {
         String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-        String sql = "delete md_nhom where md_nhom_id IN (" + id + ")";
-        mdbc.ExcuteNonQuery(sql);
+        //id = id.Insert(0, "'");
+        //id = id.Insert(id.Length, "'");
+        //id = id.Replace(",", "','");
+        //String sql = "delete md_nhom where md_nhom_id IN (" + id + ")";
+        //mdbc.ExcuteNonQuery(sql);
+
+        var ids = id.Split(',');
+        db.md_nhoms.DeleteAllOnSubmit(db.md_nhoms.Where(s => ids.Contains(s.md_nhom_id)));
+        db.md_chitietnhoms.DeleteAllOnSubmit(db.md_chitietnhoms.Where(s => ids.Contains(s.md_nhom_id)));
+        db.SubmitChanges();
     }
 
     public void load(HttpContext context)
