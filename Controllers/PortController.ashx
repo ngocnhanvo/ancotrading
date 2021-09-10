@@ -22,6 +22,9 @@ public class PortController : IHttpHandler
             case "getoption":
                 this.getSelectOption(context);
                 break;
+            case "getoptionAll":
+                this.getSelectOptionAllActive(context);
+                break;
             default:
                 switch (oper)
                 {
@@ -45,6 +48,13 @@ public class PortController : IHttpHandler
     public void getSelectOption(HttpContext context)
     {
         String sql = "select md_cangbien_id, ten_cangbien from md_cangbien where hoatdong = 1 order by ten_cangbien asc";
+        SelectHtmlControl s = new SelectHtmlControl(sql);
+        context.Response.Write(s.ToOptionNullFirst());
+    }
+
+    public void getSelectOptionAllActive(HttpContext context)
+    {
+        String sql = "select md_cangbien_id, ten_cangbien from md_cangbien order by ten_cangbien asc";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToOptionNullFirst());
     }

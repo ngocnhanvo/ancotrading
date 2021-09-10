@@ -468,7 +468,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'select'
-                 , editoptions: { dataUrl: 'Controllers/PortController.ashx?action=getoption' }
+                 , editoptions: { dataUrl: 'Controllers/PortController.ashx?action=getoptionAll' }
                  , formoptions: { colpos: 1, rowpos: 11 }
             },
             {
