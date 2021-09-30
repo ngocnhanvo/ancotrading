@@ -152,7 +152,7 @@ public class DanhSachDatHangController : IHttpHandler
             mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
         }
 
-        context.Response.Write(msgVINHGIA);
+        context.Response.Write(msgVINHGIA + msgANCO2);
     }
 
     private void guidonhangSendMail(HttpContext context, List<Dictionary<string, object>> lstMail, nhanvien nv, GoogleMail mail, string madtkd)
