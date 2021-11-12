@@ -118,10 +118,17 @@ public class DongDonHangController : IHttpHandler
             string docquyen = context.Request.Form["docquyen"];
             // Lấy đóng gói của sản phẩm
             String md_donggoi_id = context.Request.Form["md_donggoi_id"];
+			
+			var phiVal = decimal.Parse(context.Request.Form["phi"]);
+			
             if (md_donggoi_id == null)
             {
                 jqGridHelper.Utils.writeResult(0, "Bạn chưa chọn đóng gói");
             }
+			else if(phiVal < 0) 
+			{
+				jqGridHelper.Utils.writeResult(0, "Phí phải lớn hơn hoặc bằng 0");
+			}
             else
             {
                 md_donggoi donggoi = db.md_donggois.Single(p => p.md_donggoi_id.Equals(md_donggoi_id));
@@ -139,7 +146,7 @@ public class DongDonHangController : IHttpHandler
                     {
                         m.giafob = decimal.Parse(context.Request.Form["giafob"]);
                     }
-                    m.phi = decimal.Parse(context.Request.Form["phi"]);
+                    m.phi = phiVal;
                     m.soluong = decimal.Parse(context.Request.Form["soluong"]);
                     m.soluong_conlai = decimal.Parse(context.Request.Form["soluong"]);
 
@@ -335,6 +342,15 @@ public class DongDonHangController : IHttpHandler
             next = false;
             jqGridHelper.Utils.writeResult(0, "Không có thông tin của sản phẩm.!");
         }
+		
+		string phi = context.Request.Form["phi"];
+		var phiVal = decimal.Parse(string.IsNullOrEmpty(phi) ? "0" : phi);
+		
+		if(phiVal < 0) 
+		{
+			next = false;
+            jqGridHelper.Utils.writeResult(0, "Phí phải lớn hơn hoặc bằng 0.!");
+		}
 
         if (donhang.isdonhangtmp != null)
         {
@@ -395,9 +411,8 @@ public class DongDonHangController : IHttpHandler
             {
                 mnu = Public.DiscountHehangValue(donhang.discount_hehang_value, mnu, db);
             }
-
-            string phi = context.Request.Form["phi"];
-            mnu.phi = decimal.Parse(string.IsNullOrEmpty(phi) ? "0" : phi);
+			
+            mnu.phi = phiVal;
             mnu.soluong = decimal.Parse(context.Request.Form["soluong"]);
             mnu.soluong_conlai = decimal.Parse(context.Request.Form["soluong"]);
             mnu.soluong_daxuat = 0;
