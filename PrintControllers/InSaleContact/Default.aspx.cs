@@ -911,7 +911,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         s1.GetRow(r).GetCell(0).CellStyle = style12Top;
         s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 1));
 
-        s1.GetRow(r).CreateCell(2).SetCellValue("By " + paymentterm + " Account No.: " + nganhang);
+        //s1.GetRow(r).CreateCell(2).SetCellValue("By " + paymentterm + " Account No.: " + nganhang);
         s1.GetRow(r).GetCell(2).CellStyle = style12Top;
         s1.AddMergedRegion(new CellRangeAddress(r, r, 2, 7));
         s1.GetRow(r).HeightInPoints = 90;
