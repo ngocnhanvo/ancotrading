@@ -88,6 +88,11 @@
                     , "PrintControllers/0BaoCaoKH/rpt_InBaoCaoSoContMoiINV.aspx"
                     , startdate, enddate, doitackinhdoanh_id);
                 break;
+            case 1004:
+                actionKhachHang("Báo cáo doanh số từng khách hàng theo nhà cung ứng/hệ hàng"
+                    , "PrintControllers/0BaoCaoKH/rpt_DoanhSoTungKHTheoNCCtrenHH.aspx"
+                    , startdate, enddate, doitackinhdoanh_id, null, thongketheo);
+                break;
 
             case 100:
                 actionKhachHang("Tổng hợp khiếu nại"
@@ -235,7 +240,7 @@
 			rptURL += "&hehang_id=" + hehang_id;
         }
 
-        if(baocaotheo != "NULL" & hehang_id != null) {
+        if(baocaotheo != "NULL" & baocaotheo != null) {
 			rptURL += "&baocaotheo=" + baocaotheo;
 		}
 		
@@ -273,6 +278,11 @@
             case 1003:
                 $('#lblReportNameKH').html("Báo cáo số cont tương ứng mỗi INV");
                 $("#tr_dtkd", frmID).css({ "display": "none" });
+                break;
+            case 1004:
+                $('#lblReportNameKH').html("Báo cáo doanh số từng khách hàng theo nhà cung ứng / hệ hàng");
+                $("#tr_dtkd", frmID).css({ "display": "" });
+                $("#tr_thongketheo").css({ "display": "" });
                 break;
 
             case 100:
