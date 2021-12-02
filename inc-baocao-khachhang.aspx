@@ -516,12 +516,14 @@
                         <option value="IN">Packing list - Invoice</option>
                         </select></td>
                 </tr>
-                <tr id="tr_thongketheo" >
+                <tr id="tr_thongketheo">
                     <td>Thống kê theo</td>
-                    <td><select name="thongketheo", id="thongketheo">
+                    <td>
+                        <select name="thongketheo" id="thongketheo">
 						    <option value="PO">Đơn hàng (PO)</option>
 						    <option value="IN" selected="selected">Packing list - Invoice</option>
-                        </select></td>
+                        </select>
+                    </td>
                 </tr>
                 <tr id="tr_thuchi" >
                     <td>Chọn loại phiếu</td>

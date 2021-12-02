@@ -77,11 +77,19 @@
         let denngayBCNCU = $("#denngayBCNCU", frmID).val();
         let ncu = $("#md_doitackinhdoanh_id", frmID).val();
         let cdxem = $("#chedoxem", frmID).val();
+        let thongketheo = $("#thongketheo", frmID).val();
+
         let queryString = "?startdate=" + tungayBCNCU + "&enddate=" + denngayBCNCU;
         queryString = queryString + "&cdxem=" + cdxem;
-        if (ncu != "NULL") {
+
+        if (ncu != "NULL" & ncu != null) {
             queryString = queryString + "&doitackinhdoanh_id=" + ncu;
         }
+
+        if (thongketheo != "NULL" & thongketheo != null) {
+            queryString = queryString + "&thongketheo=" + thongketheo;
+        }
+
         return queryString;
     }
 
@@ -93,6 +101,7 @@
         let tungayDisplay = $('#tungayBCNCU', frmID).parent().parent();
         let denngayDisplay = $('#denngayBCNCU', frmID).parent().parent();
         let loaiBaoCaoDisplay = $('#loaiBaoCao', frmID).parent().parent();
+        let thongketheo = $("#thongketheo", frmID).val();
 
         let cheDoXemBThoacKT = $('.cheDoXemBThoacKT');
 
@@ -112,7 +121,7 @@
         namDisplay.hide();
         thangDisplay.hide();
         loaiBaoCaoDisplay.hide();
-
+        thongketheo.parent().parent().hide();
         cheDoXemBThoacKT.hide();
         tungayDisplay.show();
         denngayDisplay.show();
@@ -137,6 +146,17 @@
                 ncuDisplayFilter(['ANCO1', 'ANCO2']);
                 $('#lblReportNameNCU').html("Báo cáo tổng hợp doanh thu - chi phí của xưởng");
                 break;
+            case 1003:
+                ncuDisplay.hide();
+                thongketheo.parent().parent().show();
+                $('#lblReportNameNCU').html("Báo cáo doanh số ncu theo hệ hàng");
+                break;
+            case 1004:
+                ncuDisplay.hide();
+                thongketheo.parent().parent().show();
+                $('#lblReportNameNCU').html("Báo cáo doanh số ncu theo từng tháng");
+                break;
+
 			case 100:
                 $('#lblReportNameNCU').html("Tổng hợp tiền hàng đã xuất chi tiết");
                 break;
@@ -256,6 +276,12 @@
                 url = "PrintControllers/InBaoCaoTongHopDoanhThu/rptDoanhThuXuongTheoThang.aspx" + qstring;
             window.open(url);
         }
+        else if (reportid == 1003) {
+            window.open("PrintControllers/0BaoCaoNCU/rpt_DoanhSoNCUTheoHeHang.aspx" + qstring);
+        }
+        else if (reportid == 1004) {
+            window.open("PrintControllers/0BaoCaoNCU/rpt_DoanhSoNCUTheoTungThang.aspx" + qstring);
+        }
     }
 
     function nhapLieuBaoCaoNCC()
@@ -329,6 +355,15 @@
             <tr>
                 <td class="td100">Chọn NCU</td>
                 <td><uc3:Cbm id="doitackinhdoanh" runat="server"/></td>
+            </tr>
+            <tr id="tr_thongketheo">
+                <td>Thống kê theo</td>
+                <td>
+                    <select name="thongketheo" id="thongketheo">
+						<option value="PO">Đơn hàng (PO)</option>
+						<option value="IN" selected="selected">Packing list - Invoice</option>
+                    </select>
+                </td>
             </tr>
             <tr class="cheDoXemBThoacKT">
                 <td class="td100">Chọn chế độ xem</td>
