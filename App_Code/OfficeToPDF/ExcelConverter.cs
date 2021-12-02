@@ -835,13 +835,13 @@ namespace OfficeToPDF
                     }
 
                     // Allow for re-calculation to be skipped
-                    if (skipRecalculation)
-                    {
-                        app.Calculation = XlCalculation.xlCalculationManual;
-                        app.CalculateBeforeSave = false;
-                    }
-                    else
-                        app.Calculation = XlCalculation.xlCalculationAutomatic;
+                    //if (skipRecalculation)
+                    //{
+                    //    app.Calculation = XlCalculation.xlCalculationManual;
+                    //    app.CalculateBeforeSave = false;
+                    //}
+                    //else
+                    app.Calculation = XlCalculation.xlCalculationAutomatic;
 
                     if (mimeTypeOutput == "pdf")
                     {
@@ -1578,13 +1578,13 @@ namespace OfficeToPDF
                     }
 
                     // Allow for re-calculation to be skipped
-                    if (skipRecalculation)
-                    {
-                        app.Calculation = XlCalculation.xlCalculationManual;
-                        app.CalculateBeforeSave = false;
-                    }
-                    else
-                        app.Calculation = XlCalculation.xlCalculationAutomatic;
+                    //if (skipRecalculation)
+                    //{
+                    //    app.Calculation = XlCalculation.xlCalculationAutomatic;
+                    //    app.CalculateBeforeSave = false;
+                    //}
+                    //else
+                    app.Calculation = XlCalculation.xlCalculationAutomatic;
 
                     workbook.SaveAs(tmpFile, fmt, Type.Missing, Type.Missing, Type.Missing, false, XlSaveAsAccessMode.xlNoChange, Type.Missing, false, Type.Missing, Type.Missing, Type.Missing);
 
