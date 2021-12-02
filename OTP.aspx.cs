@@ -36,7 +36,7 @@ public partial class OTP : System.Web.UI.Page
             string otp_created = dt.Rows[0]["otp_created"] + "";
             if (host.Contains("118.69.76.143"))
             {
-                if(remote.ToLower() != "true")
+                if (remote.ToLower() != "true")
                     msg = "Tài khoản không thể truy cập từ xa.";
                 else
                 {
