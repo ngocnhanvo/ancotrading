@@ -93,7 +93,7 @@
                 , editable:true
                 , edittype: 'text'
             },
-			{
+            {
                 fixed: true, name: 'otp'
                 , label: 'OTP'
                 , index: 'otp'
@@ -107,7 +107,7 @@
                 , label: 'Địa Chỉ'
                 , index: 'diachi'
                 , width: 100 
-                , editable:true
+                , editable: true
                 , edittype: 'text'
             },
             {
@@ -115,21 +115,65 @@
                 , label: 'Admin'
                 , index: 'isadmin'
                 , width: 100
-                , editable:true
+                , editable: true
                 , edittype: 'checkbox'
                 , align: 'center'
-                , editoptions:{ value:'True:False', defaultValue: 'True' }
+                , editoptions: { value:'True:False', defaultValue: 'False' }
                 , formatter: 'checkbox'
             },
 			{
                 fixed: true, name: 'remote'
                 , label: 'Remote'
                 , index: 'remote'
-                , width: 100
-                , editable:true
+                , width: 80
+                , editable: true
                 , edittype: 'checkbox'
                 , align: 'center'
-                , editoptions:{ value:'True:False', defaultValue: 'True' }
+                , editoptions: { value:'True:False', defaultValue: 'True' }
+                , formatter: 'checkbox'
+            },
+            {
+                fixed: true, name: 'canOTP'
+                , label: 'Cần OTP'
+                , index: 'canOTP'
+                , width: 80
+                , editable: true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions: { value:'True:False', defaultValue: 'True' }
+                , formatter: 'checkbox'
+            },
+            {
+                fixed: true, name: 'suaGia'
+                , label: 'Sửa giá PO'
+                , index: 'suaGia'
+                , width: 80
+                , editable: true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions: { value:'True:False', defaultValue: 'False' }
+                , formatter: 'checkbox'
+            },
+            {
+                fixed: true, name: 'hieuLucDH'
+                , label: 'Hiệu lực PO'
+                , index: 'hieuLucDH'
+                , width: 80
+                , editable: true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions: { value:'True:False', defaultValue: 'False' }
+                , formatter: 'checkbox'
+            },
+            {
+                fixed: true, name: 'themPhiSauHL'
+                , label: 'Thêm phí (sau HL)'
+                , index: 'themPhiSauHL'
+                , width: 80
+                , editable: true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions: { value:'True:False', defaultValue: 'False' }
                 , formatter: 'checkbox'
             },
             {

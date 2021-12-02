@@ -21,52 +21,56 @@ public partial class Login : System.Web.UI.Page
         if (dt.Rows.Count != 0)
         {
             string username = dt.Rows[0]["manv"].ToString();
-            string remote = dt.Rows[0]["remote"] + "";
+            var remote = (dt.Rows[0]["remote"] + "").ToLower() == "true";
+            var canOTP = (dt.Rows[0]["canOTP"] + "").ToLower() == "true";
             if (host.Contains("118.69.76.143"))
             {
-                if(remote.ToLower() != "true")
+                if (!remote)
                     msg = "Tài khoản không thể truy cập từ xa.";
                 else
                 {
-                    char[] charArr = "0123456789".ToCharArray();
-                    var lstRD = new List<string>();
-                    Random objran = new Random();
-                    int noofcharacters = 6;
-                    for (int i = 0; i < noofcharacters; i++)
+                    if (canOTP)
                     {
-                        //It will not allow Repetation of Characters
-                        int pos = objran.Next(1, charArr.Length);
-                        if (!lstRD.Contains(charArr.GetValue(pos).ToString()))
-                            lstRD.Add(charArr.GetValue(pos).ToString());
+                        char[] charArr = "0123456789".ToCharArray();
+                        var lstRD = new List<string>();
+                        Random objran = new Random();
+                        int noofcharacters = 6;
+                        for (int i = 0; i < noofcharacters; i++)
+                        {
+                            //It will not allow Repetation of Characters
+                            int pos = objran.Next(1, charArr.Length);
+                            if (!lstRD.Contains(charArr.GetValue(pos).ToString()))
+                                lstRD.Add(charArr.GetValue(pos).ToString());
+                            else
+                                i--;
+                        }
+                        string body = "";
+                        string strrandom = string.Join(" ", lstRD);
+                        body += username + "[" + strrandom + "]";
+                        sql = "update nhanvien set otp = @otp, otp_created = getdate() where manv = @manv";
+                        mdbc.ExcuteNonQuery(sql, "@manv", username, "@otp", strrandom.Replace(" ", ""));
+
+                        string ErrorMessage = "";
+                        try
+                        {
+                            //TwilioClient.Init(Public.accountSid, Public.authToken);
+                            //CreateMessageOptions options = new CreateMessageOptions(new Twilio.Types.PhoneNumber("+84935385878"));
+                            //options.Body = body;
+                            //options.From = new Twilio.Types.PhoneNumber(Public.fromTwillo);
+                            //ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+                            //var message = MessageResource.Create(options);
+                            //ErrorMessage = message.ErrorMessage;
+                        }
+                        catch
+                        {
+
+                        }
+
+                        if (string.IsNullOrEmpty(ErrorMessage))
+                            Response.Redirect("OTP.aspx?us=" + username, true);
                         else
-                            i--;
+                            msg = ErrorMessage;
                     }
-					string body = "";
-					string strrandom = string.Join(" ", lstRD);
-					body += username + "[" + strrandom + "]";
-                    sql = "update nhanvien set otp = @otp, otp_created = getdate() where manv = @manv";
-                    mdbc.ExcuteNonQuery(sql, "@manv", username, "@otp", strrandom.Replace(" ",""));
-
-                    string ErrorMessage = "";
-                    try
-                    {
-                        //TwilioClient.Init(Public.accountSid, Public.authToken);
-                        //CreateMessageOptions options = new CreateMessageOptions(new Twilio.Types.PhoneNumber("+84935385878"));
-                        //options.Body = body;
-                        //options.From = new Twilio.Types.PhoneNumber(Public.fromTwillo);
-                        //ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
-                        //var message = MessageResource.Create(options);
-                        //ErrorMessage = message.ErrorMessage;
-                    }
-                    catch
-                    {
-
-                    }
-
-                    if (string.IsNullOrEmpty(ErrorMessage))
-                        Response.Redirect("OTP.aspx?us=" + username, true);
-                    else
-                        msg = ErrorMessage;
                 }
             }
 
