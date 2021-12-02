@@ -80,7 +80,7 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoTungThang : S
 			            and civ.ngay_motokhai >= @tungay
 			            and civ.ngay_motokhai <= @denngay
                         and civ.md_doitackinhdoanh_id like N'%{2}%'
-	            group by cl.code_cl, civ.md_doitackinhdoanh_id, cdiv.nhacungungid, ncc.ma_dtkd
+	            group by cl.code_cl, civ.md_doitackinhdoanh_id, cdiv.nhacungungid, ncc.ma_dtkd, civ.ngay_motokhai
 		"
         , tungay
         , denngay
@@ -112,7 +112,7 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoTungThang : S
 			                and civ.shipmenttime >= @tungay
 			                and civ.shipmenttime <= @denngay
                             and civ.md_doitackinhdoanh_id like N'%{2}%'
-	                group by cl.code_cl, civ.md_doitackinhdoanh_id, cdiv.nhacungungid, ncc.ma_dtkd
+	                group by cl.code_cl, civ.md_doitackinhdoanh_id, cdiv.nhacungungid, ncc.ma_dtkd, civ.shipmenttime
 		    "
             , tungay
             , denngay
