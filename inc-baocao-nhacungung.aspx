@@ -77,7 +77,7 @@
         let denngayBCNCU = $("#denngayBCNCU", frmID).val();
         let ncu = $("#md_doitackinhdoanh_id", frmID).val();
         let cdxem = $("#chedoxem", frmID).val();
-        let thongketheo = $("#thongketheo", frmID).val();
+        let baocaotheo = $("#thongketheo", frmID).val();
 
         let queryString = "?startdate=" + tungayBCNCU + "&enddate=" + denngayBCNCU;
         queryString = queryString + "&cdxem=" + cdxem;
@@ -87,7 +87,7 @@
         }
 
         if (thongketheo != "NULL" & thongketheo != null) {
-            queryString = queryString + "&thongketheo=" + thongketheo;
+            queryString = queryString + "&baocaotheo=" + baocaotheo;
         }
 
         return queryString;
