@@ -185,7 +185,7 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoTungThang : S
                 (select sum(tien) from @tbl where thang = 9 and nccVal = 'NAMAN') as [naman_t9],
                 (select sum(tien) from @tbl where thang = 10 and nccVal = 'NAMAN') as [naman_t10],
                 (select sum(tien) from @tbl where thang = 11 and nccVal = 'NAMAN') as [naman_t11],
-                (select sum(tien) from @tbl where thang = 12 and nccVal = 'NAMAN') as [naman_t12],
+                (select sum(tien) from @tbl where thang = 12 and nccVal = 'NAMAN') as [naman_t12]
         ";
         //throw new ArgumentNullException(sql);
         return sql;
