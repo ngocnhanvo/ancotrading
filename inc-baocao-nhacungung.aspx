@@ -101,7 +101,7 @@
         let tungayDisplay = $('#tungayBCNCU', frmID).parent().parent();
         let denngayDisplay = $('#denngayBCNCU', frmID).parent().parent();
         let loaiBaoCaoDisplay = $('#loaiBaoCao', frmID).parent().parent();
-        let thongketheo = $("#thongketheo", frmID).val();
+        let thongketheoDisplay = $("#tr_thongketheo", frmID);
 
         let cheDoXemBThoacKT = $('.cheDoXemBThoacKT');
 
@@ -121,7 +121,7 @@
         namDisplay.hide();
         thangDisplay.hide();
         loaiBaoCaoDisplay.hide();
-        thongketheo.parent().parent().hide();
+        thongketheoDisplay.hide();
         cheDoXemBThoacKT.hide();
         tungayDisplay.show();
         denngayDisplay.show();
@@ -148,12 +148,12 @@
                 break;
             case 1003:
                 ncuDisplay.hide();
-                thongketheo.parent().parent().show();
+                thongketheoDisplay.show();
                 $('#lblReportNameNCU').html("Báo cáo doanh số ncu theo hệ hàng");
                 break;
             case 1004:
                 ncuDisplay.hide();
-                thongketheo.parent().parent().show();
+                thongketheoDisplay.show();
                 $('#lblReportNameNCU').html("Báo cáo doanh số ncu theo từng tháng");
                 break;
 
