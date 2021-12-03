@@ -110,6 +110,7 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoHeHang : Syst
 			                and civ.shipmenttime >= @tungay
 			                and civ.shipmenttime <= @denngay
                             and civ.md_doitackinhdoanh_id like N'%{2}%'
+                            and cl.code_cl in (51,52,62,66,65,74)
 	                group by cl.code_cl, civ.md_doitackinhdoanh_id, cdiv.nhacungungid, ncc.ma_dtkd
 		    "
             , tungay
