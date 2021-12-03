@@ -67,7 +67,7 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoTungThang : S
             select 
 	            cl.code_cl, 
 	            civ.md_doitackinhdoanh_id,
-	            sum(cdiv.thanhtien) as thanhtien,
+	            sum(isnull(cdiv.thanhtien, 0)) as thanhtien,
 	            cdiv.nhacungungid,
 	            ncc.ma_dtkd,
                 DATEPART(MONTH, civ.ngay_motokhai) as thang
@@ -99,7 +99,7 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoTungThang : S
                 select 
 	                cl.code_cl, 
 	                civ.md_doitackinhdoanh_id,
-	                sum(cdiv.giafob * cdiv.soluong - cdiv.giafob * cdiv.soluong * civ.discount / 100) as thanhtien,
+	                sum(cdiv.giafob * cdiv.soluong - cdiv.giafob * cdiv.soluong * isnull(civ.discount, 0) / 100) as thanhtien,
 	                cdiv.nhacungungid,
 	                ncc.ma_dtkd,
                     DATEPART(MONTH, civ.shipmenttime) as thang
