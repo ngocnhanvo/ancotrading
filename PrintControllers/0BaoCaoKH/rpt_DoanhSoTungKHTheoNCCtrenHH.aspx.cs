@@ -97,23 +97,7 @@ public partial class PrintControllers_0BaoCaoKH_rpt_DoanhSoTungKHTheoNCCtrenHH :
 			            and civ.ngay_motokhai >= @tungay
 			            and civ.ngay_motokhai <= @denngay
                         and civ.md_doitackinhdoanh_id like N'%{2}%'
-                        and cl.code_cl in (51,52,62,66,65,74)
 	            group by cl.code_cl, civ.md_doitackinhdoanh_id, cdiv.nhacungungid, ncc.ma_dtkd
-
-            select a.*
-            from (
-                select 
-	                1 as Number, a.codeCL, kh.ma_dtkd as kh, qg.ten_quocgia as qg, 
-	                (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'ANCO1') as anco1, 
-	                (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'ANCO2') as anco2,
-	                (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'ANBINH') as anbinh, 
-	                (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'VINHGIA') as vinhgia,
-	                (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'NAMAN') as naman
-                from @tbl a
-                left join md_doitackinhdoanh kh on a.khId = kh.md_doitackinhdoanh_id
-                left join md_quocgia qg on kh.md_quocgia_id = qg.md_quocgia_id
-            )a
-            order by a.kh, a.codeCL
 		"
         , tungay
         , denngay
@@ -145,28 +129,30 @@ public partial class PrintControllers_0BaoCaoKH_rpt_DoanhSoTungKHTheoNCCtrenHH :
 			                and civ.shipmenttime <= @denngay
                             and civ.md_doitackinhdoanh_id like N'%{2}%'
 	                group by cl.code_cl, civ.md_doitackinhdoanh_id, cdiv.nhacungungid, ncc.ma_dtkd
-
-                select a.*
-                from (
-                    select 
-	                    1 as Number, a.codeCL, kh.ma_dtkd as kh, qg.ten_quocgia as qg, 
-	                    (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'ANCO1') as anco1, 
-	                    (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'ANCO2') as anco2,
-	                    (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'ANBINH') as anbinh, 
-	                    (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'VINHGIA') as vinhgia,
-	                    (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'NAMAN') as naman
-                    from @tbl a
-                    left join md_doitackinhdoanh kh on a.khId = kh.md_doitackinhdoanh_id
-                    left join md_quocgia qg on kh.md_quocgia_id = qg.md_quocgia_id
-                )a
-                order by a.kh, a.codeCL
 		    "
             , tungay
             , denngay
             , string.IsNullOrWhiteSpace(khachhang) ? "%" : khachhang
             );
         }
-        //throw new ArgumentNullException(sql);
+
+        sql += @"
+            select a.*
+            from (
+                select 
+	                1 as Number, a.codeCL, kh.ma_dtkd as kh, qg.ten_quocgia as qg, 
+	                (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'ANCO1') as anco1, 
+	                (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'ANCO2') as anco2,
+	                (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'ANBINH') as anbinh, 
+	                (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'VINHGIA') as vinhgia,
+	                (select sum(tien) from @tbl where codeCL = a.codeCL and khId = a.khId and nccVal = 'NAMAN') as naman
+                from @tbl a
+                left join md_doitackinhdoanh kh on a.khId = kh.md_doitackinhdoanh_id
+                left join md_quocgia qg on kh.md_quocgia_id = qg.md_quocgia_id
+            )a
+            order by a.kh, a.codeCL
+        ";
+
         return sql;
     }
 }
