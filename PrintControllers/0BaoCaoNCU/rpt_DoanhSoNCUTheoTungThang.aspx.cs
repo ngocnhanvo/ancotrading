@@ -47,6 +47,35 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoTungThang : S
 
         int lastRow = tbl.Rows.Count - 1;
 
+        var nccVals = tbl.AsEnumerable().Select(s => s.Field<string>("nccVal")).Distinct().ToList();
+
+        for (int i = 1; i <= 12; i++)
+        {
+            tbl.Columns.Add("tien_t" + i, Type.GetType("System.Decimal"));
+        }
+
+        var tblCopy = tbl.Copy();
+        var lstTbl = tblCopy.AsEnumerable().ToList();
+        nccVals = lstTbl.Select(s => s.Field<string>("nccVal")).Distinct().ToList();
+
+        tbl.Rows.Clear();
+
+        foreach (var nccVal in nccVals)
+        {
+            var rowTBL = tbl.NewRow();
+            rowTBL["nccVal"] = nccVal;
+
+            for (int i = 1; i <= 12; i++)
+            {
+                var tien = lstTbl.Where(s =>
+                    s.Field<string>("nccVal") == nccVal & s.Field<int>("thang") == i).Sum(s => s.Field<decimal?>("tien").GetValueOrDefault(0));
+
+                rowTBL["tien_t" + i] = tien;
+            }
+
+            tbl.Rows.Add(rowTBL);
+        }
+
         foreach (DataRow row in tbl.Rows)
         {
             row["homnay"] = DateTime.Now.ToString("dd/MM/yyyy");
@@ -80,7 +109,6 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoTungThang : S
 			            and civ.ngay_motokhai >= @tungay
 			            and civ.ngay_motokhai <= @denngay
                         and civ.md_doitackinhdoanh_id like N'%{2}%'
-                        and cl.code_cl in (51,52,62,66,65,74)
 	            group by cl.code_cl, civ.md_doitackinhdoanh_id, cdiv.nhacungungid, ncc.ma_dtkd, civ.ngay_motokhai
 		"
         , tungay
@@ -122,73 +150,18 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoTungThang : S
         }
 
         sql += @"
-            select
-	            (select sum(tien) from @tbl where thang = 1 and nccVal = 'ANCO1') as [anco1_t1], 
-	            (select sum(tien) from @tbl where thang = 2 and nccVal = 'ANCO1') as [anco1_t2], 
-	            (select sum(tien) from @tbl where thang = 3 and nccVal = 'ANCO1') as [anco1_t3], 
-	            (select sum(tien) from @tbl where thang = 4 and nccVal = 'ANCO1') as [anco1_t4], 
-	            (select sum(tien) from @tbl where thang = 5 and nccVal = 'ANCO1') as [anco1_t5], 
-                (select sum(tien) from @tbl where thang = 6 and nccVal = 'ANCO1') as [anco1_t6],
-                (select sum(tien) from @tbl where thang = 7 and nccVal = 'ANCO1') as [anco1_t7],
-                (select sum(tien) from @tbl where thang = 8 and nccVal = 'ANCO1') as [anco1_t8],
-                (select sum(tien) from @tbl where thang = 9 and nccVal = 'ANCO1') as [anco1_t9],
-                (select sum(tien) from @tbl where thang = 10 and nccVal = 'ANCO1') as [anco1_t10],
-                (select sum(tien) from @tbl where thang = 11 and nccVal = 'ANCO1') as [anco1_t11],
-                (select sum(tien) from @tbl where thang = 12 and nccVal = 'ANCO1') as [anco1_t12],
+                declare @tblOrder table(val nvarchar(MAX), ord int)
 
-	            (select sum(tien) from @tbl where thang = 1 and nccVal = 'ANCO2') as [anco2_t1], 
-	            (select sum(tien) from @tbl where thang = 2 and nccVal = 'ANCO2') as [anco2_t2], 
-	            (select sum(tien) from @tbl where thang = 3 and nccVal = 'ANCO2') as [anco2_t3], 
-	            (select sum(tien) from @tbl where thang = 4 and nccVal = 'ANCO2') as [anco2_t4], 
-	            (select sum(tien) from @tbl where thang = 5 and nccVal = 'ANCO2') as [anco2_t5], 
-                (select sum(tien) from @tbl where thang = 6 and nccVal = 'ANCO2') as [anco2_t6],
-                (select sum(tien) from @tbl where thang = 7 and nccVal = 'ANCO2') as [anco2_t7],
-                (select sum(tien) from @tbl where thang = 8 and nccVal = 'ANCO2') as [anco2_t8],
-                (select sum(tien) from @tbl where thang = 9 and nccVal = 'ANCO2') as [anco2_t9],
-                (select sum(tien) from @tbl where thang = 10 and nccVal = 'ANCO2') as [anco2_t10],
-                (select sum(tien) from @tbl where thang = 11 and nccVal = 'ANCO2') as [anco2_t11],
-                (select sum(tien) from @tbl where thang = 12 and nccVal = 'ANCO2') as [anco2_t12],
+                insert @tblOrder
+                select 'ANCO1', 1
+                union select 'ANCO2', 2
+                union select 'ANBINH', 3
+                union select 'VINHGIA', 4
+                union select 'NAMAN', 5
 
-	            (select sum(tien) from @tbl where thang = 1 and nccVal = 'ANBINH') as [anbinh_t1], 
-	            (select sum(tien) from @tbl where thang = 2 and nccVal = 'ANBINH') as [anbinh_t2], 
-	            (select sum(tien) from @tbl where thang = 3 and nccVal = 'ANBINH') as [anbinh_t3], 
-	            (select sum(tien) from @tbl where thang = 4 and nccVal = 'ANBINH') as [anbinh_t4], 
-	            (select sum(tien) from @tbl where thang = 5 and nccVal = 'ANBINH') as [anbinh_t5], 
-                (select sum(tien) from @tbl where thang = 6 and nccVal = 'ANBINH') as [anbinh_t6],
-                (select sum(tien) from @tbl where thang = 7 and nccVal = 'ANBINH') as [anbinh_t7],
-                (select sum(tien) from @tbl where thang = 8 and nccVal = 'ANBINH') as [anbinh_t8],
-                (select sum(tien) from @tbl where thang = 9 and nccVal = 'ANBINH') as [anbinh_t9],
-                (select sum(tien) from @tbl where thang = 10 and nccVal = 'ANBINH') as [anbinh_t10],
-                (select sum(tien) from @tbl where thang = 11 and nccVal = 'ANBINH') as [anbinh_t11],
-                (select sum(tien) from @tbl where thang = 12 and nccVal = 'ANBINH') as [anbinh_t12],
-
-	            (select sum(tien) from @tbl where thang = 1 and nccVal = 'VINHGIA') as [vinhgia_t1], 
-	            (select sum(tien) from @tbl where thang = 2 and nccVal = 'VINHGIA') as [vinhgia_t2], 
-	            (select sum(tien) from @tbl where thang = 3 and nccVal = 'VINHGIA') as [vinhgia_t3], 
-	            (select sum(tien) from @tbl where thang = 4 and nccVal = 'VINHGIA') as [vinhgia_t4], 
-	            (select sum(tien) from @tbl where thang = 5 and nccVal = 'VINHGIA') as [vinhgia_t5], 
-                (select sum(tien) from @tbl where thang = 6 and nccVal = 'VINHGIA') as [vinhgia_t6],
-                (select sum(tien) from @tbl where thang = 7 and nccVal = 'VINHGIA') as [vinhgia_t7],
-                (select sum(tien) from @tbl where thang = 8 and nccVal = 'VINHGIA') as [vinhgia_t8],
-                (select sum(tien) from @tbl where thang = 9 and nccVal = 'VINHGIA') as [vinhgia_t9],
-                (select sum(tien) from @tbl where thang = 10 and nccVal = 'VINHGIA') as [vinhgia_t10],
-                (select sum(tien) from @tbl where thang = 11 and nccVal = 'VINHGIA') as [vinhgia_t11],
-                (select sum(tien) from @tbl where thang = 12 and nccVal = 'VINHGIA') as [vinhgia_t12],
-
-	            (select sum(tien) from @tbl where thang = 1 and nccVal = 'NAMAN') as [naman_t1], 
-	            (select sum(tien) from @tbl where thang = 2 and nccVal = 'NAMAN') as [naman_t2], 
-	            (select sum(tien) from @tbl where thang = 3 and nccVal = 'NAMAN') as [naman_t3], 
-	            (select sum(tien) from @tbl where thang = 4 and nccVal = 'NAMAN') as [naman_t4], 
-	            (select sum(tien) from @tbl where thang = 5 and nccVal = 'NAMAN') as [naman_t5], 
-                (select sum(tien) from @tbl where thang = 6 and nccVal = 'NAMAN') as [naman_t6],
-                (select sum(tien) from @tbl where thang = 7 and nccVal = 'NAMAN') as [naman_t7],
-                (select sum(tien) from @tbl where thang = 8 and nccVal = 'NAMAN') as [naman_t8],
-                (select sum(tien) from @tbl where thang = 9 and nccVal = 'NAMAN') as [naman_t9],
-                (select sum(tien) from @tbl where thang = 10 and nccVal = 'NAMAN') as [naman_t10],
-                (select sum(tien) from @tbl where thang = 11 and nccVal = 'NAMAN') as [naman_t11],
-                (select sum(tien) from @tbl where thang = 12 and nccVal = 'NAMAN') as [naman_t12]
-        ";
-        //throw new ArgumentNullException(sql);
+                select * from @tbl a
+                order by isnull((select top 1 ord from @tblOrder where a.nccVal = val), 6)
+            ";
         return sql;
     }
 }

@@ -47,6 +47,41 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoHeHang : Syst
 
         int lastRow = tbl.Rows.Count - 1;
 
+        
+
+        var chungLoais = tbl.AsEnumerable().Select(s => s.Field<string>("codeCL")).Distinct().ToList();
+        var nccVals = tbl.AsEnumerable().Select(s => s.Field<string>("nccVal")).Distinct().ToList();
+
+
+        foreach (var chungLoai in chungLoais)
+        {
+            tbl.Columns.Add("tien_" + chungLoai, Type.GetType("System.Decimal"));
+        }
+
+        var tblCopy = tbl.Copy();
+        var lstTbl = tblCopy.AsEnumerable().ToList();
+        chungLoais = lstTbl.Select(s => s.Field<string>("codeCL")).Distinct().OrderBy(s=>s).ToList();
+        nccVals = lstTbl.Select(s => s.Field<string>("nccVal")).Distinct().ToList();
+
+        tbl.Rows.Clear();
+
+        foreach (var nccVal in nccVals)
+        {
+            var rowTBL = tbl.NewRow();
+            rowTBL["nccVal"] = nccVal;
+
+            foreach (var chungLoai in chungLoais)
+            {
+                var tien = lstTbl.Where(s =>
+                    s.Field<string>("nccVal") == nccVal & s.Field<string>("codeCL") == chungLoai).Sum(s => s.Field<decimal?>("tien").GetValueOrDefault(0));
+
+                rowTBL["tien_" + chungLoai] = tien;
+                rowTBL["codeCL"] = string.Join("(##)", chungLoais);
+            }
+
+            tbl.Rows.Add(rowTBL);
+        }
+
         foreach (DataRow row in tbl.Rows)
         {
             row["homnay"] = DateTime.Now.ToString("dd/MM/yyyy");
@@ -110,7 +145,6 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoHeHang : Syst
 			                and civ.shipmenttime >= @tungay
 			                and civ.shipmenttime <= @denngay
                             and civ.md_doitackinhdoanh_id like N'%{2}%'
-                            and cl.code_cl in (51,52,62,66,65,74)
 	                group by cl.code_cl, civ.md_doitackinhdoanh_id, cdiv.nhacungungid, ncc.ma_dtkd
 		    "
             , tungay
@@ -120,42 +154,18 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoHeHang : Syst
         }
 
         sql += @"
-            select
-	            (select sum(tien) from @tbl where codeCL = '51' and nccVal = 'ANCO1') as [anco1_51], 
-	            (select sum(tien) from @tbl where codeCL = '52' and nccVal = 'ANCO1') as [anco1_52], 
-	            (select sum(tien) from @tbl where codeCL = '62' and nccVal = 'ANCO1') as [anco1_62], 
-	            (select sum(tien) from @tbl where codeCL = '66' and nccVal = 'ANCO1') as [anco1_66], 
-	            (select sum(tien) from @tbl where codeCL = '65' and nccVal = 'ANCO1') as [anco1_65], 
-                (select sum(tien) from @tbl where codeCL = '74' and nccVal = 'ANCO1') as [anco1_74],
+                declare @tblOrder table(val nvarchar(MAX), ord int)
 
-	            (select sum(tien) from @tbl where codeCL = '51' and nccVal = 'ANCO2') as [anco2_51], 
-	            (select sum(tien) from @tbl where codeCL = '52' and nccVal = 'ANCO2') as [anco2_52], 
-	            (select sum(tien) from @tbl where codeCL = '62' and nccVal = 'ANCO2') as [anco2_62], 
-	            (select sum(tien) from @tbl where codeCL = '66' and nccVal = 'ANCO2') as [anco2_66], 
-	            (select sum(tien) from @tbl where codeCL = '65' and nccVal = 'ANCO2') as [anco2_65], 
-                (select sum(tien) from @tbl where codeCL = '74' and nccVal = 'ANCO2') as [anco2_74],
+                insert @tblOrder
+                select 'ANCO1', 1
+                union select 'ANCO2', 2
+                union select 'ANBINH', 3
+                union select 'VINHGIA', 4
+                union select 'NAMAN', 5
 
-	            (select sum(tien) from @tbl where codeCL = '51' and nccVal = 'ANBINH') as [anbinh_51], 
-	            (select sum(tien) from @tbl where codeCL = '52' and nccVal = 'ANBINH') as [anbinh_52], 
-	            (select sum(tien) from @tbl where codeCL = '62' and nccVal = 'ANBINH') as [anbinh_62], 
-	            (select sum(tien) from @tbl where codeCL = '66' and nccVal = 'ANBINH') as [anbinh_66], 
-	            (select sum(tien) from @tbl where codeCL = '65' and nccVal = 'ANBINH') as [anbinh_65], 
-                (select sum(tien) from @tbl where codeCL = '74' and nccVal = 'ANBINH') as [anbinh_74],
-
-	            (select sum(tien) from @tbl where codeCL = '51' and nccVal = 'VINHGIA') as [vinhgia_51], 
-	            (select sum(tien) from @tbl where codeCL = '52' and nccVal = 'VINHGIA') as [vinhgia_52], 
-	            (select sum(tien) from @tbl where codeCL = '62' and nccVal = 'VINHGIA') as [vinhgia_62], 
-	            (select sum(tien) from @tbl where codeCL = '66' and nccVal = 'VINHGIA') as [vinhgia_66], 
-	            (select sum(tien) from @tbl where codeCL = '65' and nccVal = 'VINHGIA') as [vinhgia_65], 
-                (select sum(tien) from @tbl where codeCL = '74' and nccVal = 'VINHGIA') as [vinhgia_74],
-
-	            (select sum(tien) from @tbl where codeCL = '51' and nccVal = 'NAMAN') as [naman_51], 
-	            (select sum(tien) from @tbl where codeCL = '52' and nccVal = 'NAMAN') as [naman_52], 
-	            (select sum(tien) from @tbl where codeCL = '62' and nccVal = 'NAMAN') as [naman_62], 
-	            (select sum(tien) from @tbl where codeCL = '66' and nccVal = 'NAMAN') as [naman_66], 
-	            (select sum(tien) from @tbl where codeCL = '65' and nccVal = 'NAMAN') as [naman_65], 
-                (select sum(tien) from @tbl where codeCL = '74' and nccVal = 'NAMAN') as [naman_74]
-        ";
+                select * from @tbl a
+                order by isnull((select top 1 ord from @tblOrder where a.nccVal = val), 6)
+            ";
         //throw new ArgumentNullException(sql);
         return sql;
     }
