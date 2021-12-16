@@ -93,23 +93,33 @@ public partial class PrintControllers_0BaoCaoNCU_rpt_DoanhSoNCUTheoTungThang : S
             declare @tbl table (codeCL nvarchar(32), khId nvarchar(32), tien decimal(18,2), nccId nvarchar(32), nccVal nvarchar(32), thang int)
 
             insert into @tbl
-            select 
-	            cl.code_cl, 
-	            civ.md_doitackinhdoanh_id,
-	            sum(isnull(cdiv.thanhtien, 0)) as thanhtien,
-	            cdiv.nhacungungid,
-	            ncc.ma_dtkd,
-                DATEPART(MONTH, civ.ngay_motokhai) as thang
-	        from c_packinginvoice civ, c_dongpklinv cdiv, md_sanpham sp, md_chungloai cl, md_doitackinhdoanh ncc
-	            where civ.c_packinginvoice_id = cdiv.c_packinginvoice_id
-			            and cdiv.md_sanpham_id = sp.md_sanpham_id
-			            and sp.md_chungloai_id = cl.md_chungloai_id
-			            and cdiv.nhacungungid = ncc.md_doitackinhdoanh_id
-			            and civ.md_trangthai_id = 'HIEULUC'
-			            and civ.ngay_motokhai >= @tungay
-			            and civ.ngay_motokhai <= @denngay
-                        and civ.md_doitackinhdoanh_id like N'%{2}%'
-	            group by cl.code_cl, civ.md_doitackinhdoanh_id, cdiv.nhacungungid, ncc.ma_dtkd, civ.ngay_motokhai
+			select 
+				a.code_cl,
+				a.md_doitackinhdoanh_id,
+				sum(a.thanhtien - a.thanhtien * a.discount / 100) as thanhtien,
+				a.nhacungungid,
+				a.ma_dtkd,
+				a.thang
+			from (
+				select 
+					cl.code_cl, 
+					civ.md_doitackinhdoanh_id,
+					isnull(cdiv.thanhtien, 0) as thanhtien,
+					isnull((select top 1 dh.discount from c_donhang dh where dh.c_donhang_id = cdiv.c_donhang_id), 0) as discount,
+					cdiv.nhacungungid,
+					ncc.ma_dtkd,
+					DATEPART(MONTH, civ.ngay_motokhai) as thang
+				from c_packinginvoice civ, c_dongpklinv cdiv, md_sanpham sp, md_chungloai cl, md_doitackinhdoanh ncc
+				where civ.c_packinginvoice_id = cdiv.c_packinginvoice_id
+					and cdiv.md_sanpham_id = sp.md_sanpham_id
+					and sp.md_chungloai_id = cl.md_chungloai_id
+					and cdiv.nhacungungid = ncc.md_doitackinhdoanh_id
+					and civ.md_trangthai_id = 'HIEULUC'
+					and civ.ngay_motokhai >= @tungay
+					and civ.ngay_motokhai <= @denngay
+					and civ.md_doitackinhdoanh_id like N'%{2}%'
+			) a
+			group by a.code_cl, a.md_doitackinhdoanh_id, a.nhacungungid, a.ma_dtkd, a.thang
 		"
         , tungay
         , denngay
