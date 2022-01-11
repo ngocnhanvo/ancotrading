@@ -17,15 +17,21 @@ public class PriceFOBController : IHttpHandler {
 
         String productId = context.Request.QueryString["productId"];
 
-        String sqlCount = "SELECT COUNT(*) AS count " +
-            " FROM md_sanpham sp, md_banggia bg, md_phienbangia pbg, md_giasanpham gsp, md_dongtien dt " +
-            " WHERE gsp.md_phienbangia_id = pbg.md_phienbangia_id " +
-            " AND pbg.md_banggia_id  = bg.md_banggia_id " +
-            " AND bg.md_dongtien_id = dt.md_dongtien_id" +
-            " AND gsp.hoatdong = 1" +
-            " AND bg.banggiaban = 1" +
-            " AND sp.md_sanpham_id = N'{0}'" +
-            " AND gsp.md_sanpham_id = N'{0}'";
+        String sqlCount = @"
+			SELECT 
+				COUNT(1) AS count
+            FROM 
+				md_sanpham sp, md_banggia bg, md_phienbangia pbg, md_giasanpham gsp, md_dongtien dt
+            WHERE 
+				gsp.md_phienbangia_id = pbg.md_phienbangia_id
+				AND pbg.md_trangthai_id = 'HIEULUC'
+				AND pbg.md_banggia_id  = bg.md_banggia_id
+				AND bg.md_dongtien_id = dt.md_dongtien_id
+				AND gsp.hoatdong = 1
+				AND bg.banggiaban = 1
+				AND sp.md_sanpham_id = N'{0}'
+				AND gsp.md_sanpham_id = N'{0}'
+		";
 
         if (productId != null)
         {
@@ -62,28 +68,38 @@ public class PriceFOBController : IHttpHandler {
             sidx = "gia";
         }
 
-        string strsql = "select * from( " +
-            " select gsp.md_giasanpham_id, pbg.ten_phienbangia, sp.ma_sanpham, gsp.gia, dt.ma_iso, pbg.ngay_hieuluc, " +
-            " gsp.ngaytao, gsp.nguoitao, gsp.ngaycapnhat, " +
-            " gsp.nguoicapnhat, gsp.mota, gsp.hoatdong, " +
-            " ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            " FROM md_sanpham sp, md_banggia bg, md_phienbangia pbg, md_giasanpham gsp, md_dongtien dt " +
-            " WHERE gsp.md_phienbangia_id = pbg.md_phienbangia_id " +
-            " AND pbg.md_banggia_id  = bg.md_banggia_id " +
-            " AND bg.md_dongtien_id = dt.md_dongtien_id" +
-            " AND gsp.hoatdong = 1" +
-            " AND bg.banggiaban = 1" +
-            " AND sp.md_sanpham_id = N'{0}'" +
-            " AND gsp.md_sanpham_id = N'{0}')P " +
-            " WHERE RowNum > @start AND RowNum < @end";
+        string strsql = @"
+			select * 
+			from(
+				select 
+					gsp.md_giasanpham_id, pbg.ten_phienbangia, 
+					sp.ma_sanpham, gsp.gia, dt.ma_iso, pbg.ngay_hieuluc, 
+					gsp.ngaytao, gsp.nguoitao, gsp.ngaycapnhat, 
+					gsp.nguoicapnhat, gsp.mota, gsp.hoatdong, 
+					ROW_NUMBER() OVER (ORDER BY {1} {2}) as RowNum
+				FROM 
+					md_sanpham sp, md_banggia bg, md_phienbangia pbg, md_giasanpham gsp, md_dongtien dt
+				WHERE 
+					gsp.md_phienbangia_id = pbg.md_phienbangia_id
+					AND pbg.md_trangthai_id = 'HIEULUC'
+					AND pbg.md_banggia_id = bg.md_banggia_id
+					AND pbg.md_banggia_id = bg.md_banggia_id
+					AND bg.md_dongtien_id = dt.md_dongtien_id
+					AND gsp.hoatdong = 1
+					AND bg.banggiaban = 1
+					AND sp.md_sanpham_id = N'{0}'
+					AND gsp.md_sanpham_id = N'{0}'
+			)P
+            WHERE RowNum > @start AND RowNum < @end
+		";
 
         if (productId != null)
         {
-            strsql = string.Format(strsql, productId);
+            strsql = string.Format(strsql, productId, sidx, sord);
         }
         else
         {
-            strsql = string.Format(strsql, 0);
+            strsql = string.Format(strsql, 0, sidx, sord);
         }
 
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
