@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using System.Reflection;
 using System.Net;
 using System.Text;
-
+using QRCoder;
 /// <summary>
 /// Summary description for Extension
 /// </summary>
@@ -211,5 +211,35 @@ public static class Extension
         var sr = new StreamReader(request.GetResponse().GetResponseStream());
         string result = sr.ReadToEnd();
         return result;
+    }
+
+    public static Dictionary<string, string> infoAncoPoterry()
+    {
+        var result = new Dictionary<string, string>();
+        var json = File.ReadAllText(ExcuteSignalRStatic.mapPathSignalR("~/App_Data/JSON/ancopottery.com.json"));
+        result = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+        return result;
+    }
+
+    public static void createQRCodeFromProduct(string ma_sanpham, QRCodeGenerator qrGenerator)
+    {
+        if(qrGenerator == null)
+            qrGenerator = new QRCodeGenerator();
+
+        var infoAncoPoterry = Extension.infoAncoPoterry();
+        var link = string.Format(@"{0}/{1}", infoAncoPoterry["website"], infoAncoPoterry["detail"]);
+        var folder = ExcuteSignalRStatic.mapPathSignalR(infoAncoPoterry["folderQRCode"]);
+        var file = folder + "/" + ma_sanpham + ".jpg";
+        link = link.Replace("[code]", ma_sanpham);
+        var qrCode = qrGenerator.CreateQrCode(link, QRCodeGenerator.ECCLevel.M);
+
+        if (File.Exists(file))
+            File.Delete(file);
+
+        using (var bitMap = qrCode.GetGraphic(20))
+        {
+            bitMap.Save(file, System.Drawing.Imaging.ImageFormat.Jpeg);
+            bitMap.Dispose();
+        }
     }
 }
