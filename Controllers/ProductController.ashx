@@ -9,11 +9,12 @@ using System.IO;
 using System.Collections.Generic;
 using jqGridHelper;
 using System.Data;
-
+using QRCoder;
 
 public class ProductController : IHttpHandler
 {
     private LinqDBDataContext db = new LinqDBDataContext();
+    private QRCodeGenerator qrGenerator = new QRCodeGenerator();
 
     public void ProcessRequest(HttpContext context)
     {
@@ -183,8 +184,12 @@ public class ProductController : IHttpHandler
                         }
                         else
                         {
-                            if(trangthai == "NHD")
+                            if (trangthai == "NHD")
                                 sp.ngayngunghd = DateTime.Now;
+                            else if (trangthai == "DHD")
+                            {
+                                Extension.createQRCodeFromProduct(sp.ma_sanpham, qrGenerator);
+                            }
                             sp.trangthai = trangthai;
                             db.SubmitChanges();
                         }
@@ -691,10 +696,10 @@ public class ProductController : IHttpHandler
             xml += "<cell><![CDATA[" + row["ma_hscode"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hscode"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["chucnangsp"] + "]]></cell>";
-            
+
             var nxn = row["ngayxacnhan"] + "";
             xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", string.IsNullOrEmpty(nxn) ? "" : DateTime.Parse(nxn).ToString("dd/MM/yyyy"));
-            
+
             xml += "<cell><![CDATA[" + row["hinhthucban"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
 
