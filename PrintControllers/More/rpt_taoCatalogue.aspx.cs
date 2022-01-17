@@ -300,6 +300,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
             {
                 countR++;
                 var maCai = sp.ma_sanpham.Substring(0, 9) + cai.md_bo_detail + sp.ma_sanpham.Substring(11);
+                throw new Exception(maCai);
                 var spCai = db.md_sanphams.Where(s => s.ma_sanpham == maCai).FirstOrDefault();
                 var cellRow = s1.CreateRow(row + countR).CreateCell(5);
                 cellRow.SetCellValue(string.Format(@"Size {0}:", cai.md_bo_detail));
