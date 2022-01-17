@@ -284,15 +284,33 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
                 boMain = db.md_bos.Where(s => s.ma_bo == strSize & s.ma_bo_cha == strSize).FirstOrDefault();
             else
             {
-                boMain = db.md_bos.Where(s => s.ma_bo == strSize & s.ma_bo_cha == "S6").FirstOrDefault();
-                if(boMain == null)
-                    boMain = db.md_bos.Where(s => s.ma_bo == strSize & s.ma_bo_cha == "S5").FirstOrDefault();
-                else if (boMain == null)
-                    boMain = db.md_bos.Where(s => s.ma_bo == strSize & s.ma_bo_cha == "S4").FirstOrDefault();
-                else if (boMain == null)
-                    boMain = db.md_bos.Where(s => s.ma_bo == strSize & s.ma_bo_cha == "S3").FirstOrDefault();
-                else if (boMain == null)
-                    boMain = db.md_bos.Where(s => s.ma_bo == strSize & s.ma_bo_cha == "S2").FirstOrDefault();
+                var maBoCha = "S6";
+                var maS = sp.ma_sanpham.Substring(0, 9) + maBoCha + sp.ma_sanpham.Substring(11);
+                var spS = db.md_sanphams.Where(s => s.ma_sanpham == maS).FirstOrDefault();
+                if(spS == null)
+                {
+                    maBoCha = "S5";
+                    maS = sp.ma_sanpham.Substring(0, 9) + maBoCha + sp.ma_sanpham.Substring(11);
+                    spS = db.md_sanphams.Where(s => s.ma_sanpham == maS).FirstOrDefault();
+                }
+                if (spS == null)
+                {
+                    maBoCha = "S4";
+                    maS = sp.ma_sanpham.Substring(0, 9) + maBoCha + sp.ma_sanpham.Substring(11);
+                    spS = db.md_sanphams.Where(s => s.ma_sanpham == maS).FirstOrDefault();
+                }
+                if (spS == null)
+                {
+                    maBoCha = "S3";
+                    maS = sp.ma_sanpham.Substring(0, 9) + maBoCha + sp.ma_sanpham.Substring(11);
+                    spS = db.md_sanphams.Where(s => s.ma_sanpham == maS).FirstOrDefault();
+                }
+                if (spS == null)
+                {
+                    maBoCha = "S2";
+                }
+
+                boMain = db.md_bos.Where(s => s.ma_bo == strSize & s.ma_bo_cha == maBoCha).FirstOrDefault();
             }
 
             int countR = 0;
