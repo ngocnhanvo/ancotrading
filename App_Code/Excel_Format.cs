@@ -26,7 +26,8 @@ using NPOI.HSSF.Record.AutoFilter;
 public class Excel_Format
 {
 	HSSFWorkbook hssfworkbook = null;
-	public Excel_Format(HSSFWorkbook hssf)
+    public string fontFamily { get; set; }
+    public Excel_Format(HSSFWorkbook hssf)
     {
 		hssfworkbook = hssf;
 	}
@@ -38,8 +39,8 @@ public class Excel_Format
 			font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
 		}
 		font.FontHeightInPoints = (short)size;
-		
-		return font;
+        font.FontName = fontFamily == null ? "Arial" : fontFamily;
+        return font;
     }
 	
 	public ICellStyle getcell(short size, bool bold, bool wraptext, string border, string HorAlign, string VerAlign)  

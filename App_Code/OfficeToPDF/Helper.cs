@@ -15,6 +15,16 @@ public static class Helper
             System.IO.File.Delete(path);
     }
 
+    public static int getPage(HttpContext context)
+    {
+        int kq = 1;
+        if (!string.IsNullOrWhiteSpace(context.Request.QueryString["page"]))
+        {
+            kq = int.Parse(context.Request.QueryString["page"]);
+        }
+        return kq;
+    }
+
     public static void removeDirectoryWithPath(string path)
     {
         if (System.IO.Directory.Exists(path))
@@ -73,10 +83,10 @@ public static class Helper
     {
         string filter = "";
         jqGridHelper.Filter f = new jqGridHelper.Filter();
-        bool _search = bool.Parse(context.Request.QueryString["_search"]);
+        bool _search = bool.Parse(context.Request.Params["_search"]);
         if (_search)
         {
-            String _filters = context.Request.QueryString["filters"];
+            String _filters = context.Request.Params["filters"];
             if (_filters != null & _filters != "")
             {
                 f = jqGridHelper.Filter.CreateFilter(_filters);

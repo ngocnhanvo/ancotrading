@@ -221,6 +221,16 @@ public static class Extension
         return result;
     }
 
+    public static string DropTrailingZeros(this decimal value)
+    {
+        return value.ToString("#,#0.####");
+    }
+
+    public static string DropTrailingZeros(this decimal? value)
+    {
+        return value.GetValueOrDefault(0).ToString("#,#0.####");
+    }
+
     public static void createQRCodeFromProduct(string ma_sanpham, QRCodeGenerator qrGenerator)
     {
         if(qrGenerator == null)
@@ -241,5 +251,14 @@ public static class Extension
             bitMap.Save(file, System.Drawing.Imaging.ImageFormat.Jpeg);
             bitMap.Dispose();
         }
+    }
+
+    public static T NextOf<T>(this IList<T> list, T item)
+    {
+        var indexOf = list.IndexOf(item);
+        if (indexOf >= list.Count - 1)
+            return default(T);
+        else
+            return list[indexOf + 1];
     }
 }

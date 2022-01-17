@@ -163,14 +163,14 @@
 
 <!-- jQuery Core -->
 <script src="jQuery/Core/jquery-1.7.1.min.js" type="text/javascript"></script>
+<script src="Scripts/detectZoom.js" type="text/javascript"></script>
+<%=script %>
 <!--/ jQuery Core -->
 
 <!-- jQuery UI -->
-<script src="jQuery/UI/js/jquery-ui-1.8.18.custom.min.js"
-	type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" media="screen"
-	href="jQuery/UI/css/humanity/jquery-ui-1.8.21.custom.css" />
-	
+<script src="jQuery/UI/js/jquery-ui-1.8.18.custom.min.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="jQuery/UI/css/humanity/jquery-ui-1.8.21.custom.css" />
+<link rel="stylesheet" type="text/css" href="Fonts/FontAwesome/fontawesome_all.css" />
 <!--/ jQuery UI -->
 
 <!-- jQuery LightBox -->

@@ -8,11 +8,12 @@ using NetServ.Net.Json;
 using System.IO;
 using System.Collections.Generic;
 using jqGridHelper;
+using QRCoder;
 
 public class ProductSOANTHAOController : IHttpHandler
 {
     private LinqDBDataContext db = new LinqDBDataContext();
-
+    private QRCodeGenerator qrGenerator = new QRCodeGenerator();
     public void ProcessRequest(HttpContext context)
     {
         String action, oper;
@@ -23,7 +24,7 @@ public class ProductSOANTHAOController : IHttpHandler
             case "updatestatus":
                 this.UpdateStatus(context);
                 break;
-			case "updatestatusALL":
+            case "updatestatusALL":
                 this.UpdateStatusALL(context);
                 break;
             case "getSinglePicture":
@@ -57,12 +58,12 @@ public class ProductSOANTHAOController : IHttpHandler
                 break;
         }
     }
-	
+
     public void UpdateStatus(HttpContext context)
     {
         String msg = "";
         try
-        {   
+        {
             String id = context.Request.QueryString["md_sanpham_id"];
             String trangthai = context.Request.QueryString["trangthai"];
             md_sanpham sp = db.md_sanphams.FirstOrDefault(p => p.md_sanpham_id.Equals(id));
@@ -72,9 +73,9 @@ public class ProductSOANTHAOController : IHttpHandler
                 switch (trangthai)
                 {
                     case "DHD":
-						msg = UserUtils.checkHieuLucProduct(context, sp, db);	
+                        msg = UserUtils.checkHieuLucProduct(context, sp, db);
                         next = string.IsNullOrEmpty(msg) ? true : false;
-						msg = string.IsNullOrEmpty(msg) ? "Đã chuyển trạng thái sản phẩm thành Đang hoạt động!" : msg;
+                        msg = string.IsNullOrEmpty(msg) ? "Đã chuyển trạng thái sản phẩm thành Đang hoạt động!" : msg;
                         break;
                     case "NHD":
                         msg = "Đã chuyển trạng thái sản phẩm thành Ngưng hoạt động!";
@@ -87,18 +88,23 @@ public class ProductSOANTHAOController : IHttpHandler
                         next = false;
                         break;
                 }
-				
+
                 if (next)
                 {
                     sp.trangthai = trangthai;
-					if(trangthai == "NHD")
-						sp.ngayngunghd = DateTime.Now;
-					db.SubmitChanges();
+                    if(trangthai == "NHD")
+                        sp.ngayngunghd = DateTime.Now;
+                    else if(trangthai == "DHD")
+                    {
+                        Extension.createQRCodeFromProduct(sp.ma_sanpham, qrGenerator);
+                    }
+
+                    db.SubmitChanges();
                 }
             }
             else
             {
-               msg = "Mã hàng không tồn tại!";
+                msg = "Mã hàng không tồn tại!";
             }
         }
         catch (Exception ex)
@@ -108,20 +114,20 @@ public class ProductSOANTHAOController : IHttpHandler
 
         context.Response.Write(msg);
     }
-	
-	public void UpdateStatusALL(HttpContext context)
+
+    public void UpdateStatusALL(HttpContext context)
     {
         String msg = "";
         //try
-        {   
+        {
             string trangthai = context.Request.QueryString["trangthai"];
-			string filters = context.Request.Form["filters"];
-			if(filters != null & filters != "") {
-				Filter f = Filter.CreateFilter(filters);
-				filters = f.ToScript();
-			}
-			
-			string from_sql = string.Format(@"
+            string filters = context.Request.Form["filters"];
+            if(filters != null & filters != "") {
+                Filter f = Filter.CreateFilter(filters);
+                filters = f.ToScript();
+            }
+
+            string from_sql = string.Format(@"
 				from md_sanpham sp 
 				left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id 
 				left join md_doitackinhdoanh ncc on sp.nhacungung = ncc.md_doitackinhdoanh_id 
@@ -133,51 +139,53 @@ public class ProductSOANTHAOController : IHttpHandler
 				left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id 
 				where sp.hoatdong = 1 and sp.trangthai = N'SOANTHAO' {0} 
 			", filters);
-			string ngayngunghd = "";
-			string sql = "";
-			int count = 0;
-			if(trangthai != "DHD")
-			{
-				ngayngunghd = "sp.ngayngunghd = getDate()";
-				sql = string.Format(@"update sp 
+            string ngayngunghd = "";
+            string sql = "";
+            int count = 0;
+            if(trangthai != "DHD")
+            {
+                ngayngunghd = "sp.ngayngunghd = getDate()";
+                sql = string.Format(@"update sp 
 				set sp.trangthai = N'{0}' ,{2}
 				{1}
 				", trangthai, from_sql, ngayngunghd );
-				
-				string sql_count = string.Format(@"
+
+                string sql_count = string.Format(@"
 				select count(1) as count
 				{0}
 				", from_sql);
-				count = (int)mdbc.ExecuteScalar(sql_count);
-				mdbc.ExcuteNonQuery(sql);
-				msg = count +" dòng đã cập nhật thành công!";
-			}
-			else 
-			{
-				sql = string.Format(@"
+                count = (int)mdbc.ExecuteScalar(sql_count);
+                mdbc.ExcuteNonQuery(sql);
+                msg = count +" dòng đã cập nhật thành công!";
+            }
+            else
+            {
+                sql = string.Format(@"
 					select md_sanpham_id
 					{0}
 				", from_sql);
-				System.Data.DataTable dt = mdbc.GetData(sql);
-				foreach (System.Data.DataRow row in dt.Rows)
-				{
-					string spId = row["md_sanpham_id"] + "";
-					var sp = db.md_sanphams.Where(s=>s.md_sanpham_id == spId).FirstOrDefault();
-					string msgDT = UserUtils.checkHieuLucProduct(context, sp, db);
-					if(string.IsNullOrEmpty(msgDT)) {
-						sp.trangthai = "DHD";
-						msg += string.Format(@"<div style='color: blue'>mã SP:{0} đã chuyển sang Đang hoạt động</div>", sp.ma_sanpham);
-					}
-					else {
-						msg += string.Format(@"<div>mã SP:{0} {1}</div>", sp.ma_sanpham, msgDT);
-					}	
-				}
-				db.SubmitChanges();
-			}
+                System.Data.DataTable dt = mdbc.GetData(sql);
+                foreach (System.Data.DataRow row in dt.Rows)
+                {
+                    string spId = row["md_sanpham_id"] + "";
+                    var sp = db.md_sanphams.Where(s=>s.md_sanpham_id == spId).FirstOrDefault();
+                    string msgDT = "";
+                    msg = UserUtils.checkHieuLucProduct(context, sp, db);
+                    if(string.IsNullOrEmpty(msgDT)) {
+                        Extension.createQRCodeFromProduct(sp.ma_sanpham, qrGenerator);
+                        sp.trangthai = "DHD";
+                        msg += string.Format(@"<div style='color: blue'>mã SP:{0} đã chuyển sang Đang hoạt động</div>", sp.ma_sanpham);
+                    }
+                    else {
+                        msg += string.Format(@"<div>mã SP:{0} {1}</div>", sp.ma_sanpham, msgDT);
+                    }
+                }
+                db.SubmitChanges();
+            }
         }
         //catch (Exception ex)
         {
-           // msg = ex.Message;
+            // msg = ex.Message;
         }
 
         context.Response.Write(msg);
@@ -206,7 +214,7 @@ public class ProductSOANTHAOController : IHttpHandler
 
         String getMaSP = "select ma_sanpham from md_sanpham where md_sanpham_id = @md_sanpham_id  ";
         ma_sanpham = (String)mdbc.ExecuteScalar(getMaSP, "@md_sanpham_id", md_sanpham_id);
-        
+
         String result = "";
 
         String getImage = String.Format("select url from md_anhsanpham where filter LIKE N'{0}%' ", ma_sanpham.Substring(0, 8));
@@ -322,14 +330,14 @@ public class ProductSOANTHAOController : IHttpHandler
 
         context.Response.Write(json);
     }
-    
+
     public void getSelectOption(HttpContext context)
     {
         String sql = "select md_sanpham_id, mota_tiengviet from md_sanpham where hoatdong = 1 and trangthai != 'NHD' ";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
+
     public void edit(HttpContext context)
     {
         try
@@ -347,7 +355,7 @@ public class ProductSOANTHAOController : IHttpHandler
             l_ = decimal.Parse(context.Request.Form["l_cm"]);
             w_ = decimal.Parse(context.Request.Form["w_cm"]);
             h_ = decimal.Parse(context.Request.Form["h_cm"]);
-			string nxn = context.Request.Form["ngayxacnhan"];
+            string nxn = context.Request.Form["ngayxacnhan"];
             md_sanpham m = db.md_sanphams.Single(p => p.md_sanpham_id == context.Request.Form["id"]);
             m.ma_sanpham = context.Request.Form["ma_sanpham"];
             //m.ma_sanphamcu = context.Request.Form["ma_sanphamcu"];
@@ -367,10 +375,10 @@ public class ProductSOANTHAOController : IHttpHandler
             m.l_cm = l_;
             m.w_cm = w_;
             m.h_cm = h_;
-			if(!string.IsNullOrEmpty(nxn))
-				m.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
-			else
-				m.ngayxacnhan = null;
+            if(!string.IsNullOrEmpty(nxn))
+                m.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
+            else
+                m.ngayxacnhan = null;
             m.trongluong = decimal.Parse(context.Request.Form["trongluong"]);
             m.dientich = decimal.Parse(context.Request.Form["dientich"]);
             m.md_nhomnangluc_id = context.Request.Form["md_nhomnangluc_id"];
@@ -378,16 +386,16 @@ public class ProductSOANTHAOController : IHttpHandler
             //m.cmp_park = decimal.Parse(context.Request.Form["cmp_park"]);
             //m.sanpham_docquyen = docquyen;
             m.md_chungloai_id = context.Request.Form["md_chungloai_id"];
-			m.hinhthucban = context.Request.Form["hinhthucban"];
+            m.hinhthucban = context.Request.Form["hinhthucban"];
             m.ghichu = context.Request.Form["ghichu"];
             m.nhacungung = context.Request.Form["tenncc"];
-			m.mota = context.Request.Form["mota"];
+            m.mota = context.Request.Form["mota"];
 
             m.hoatdong = hd;
             m.ngaycapnhat = DateTime.Now;
             int check = (from sp in db.md_sanphams
                          where sp.ma_sanpham.Equals(context.Request.Form["ma_sanpham"]) && !sp.md_sanpham_id.Equals(context.Request.Form["id"])
-                        select new { sp.ma_sanpham }).Count();
+                         select new { sp.ma_sanpham }).Count();
             if (check == 0)
             {
                 db.SubmitChanges();
@@ -418,7 +426,7 @@ public class ProductSOANTHAOController : IHttpHandler
             l_ = decimal.Parse(context.Request.Form["l_cm"]);
             w_ = decimal.Parse(context.Request.Form["w_cm"]);
             h_ = decimal.Parse(context.Request.Form["h_cm"]);
-			string nxn = context.Request.Form["ngayxacnhan"];
+            string nxn = context.Request.Form["ngayxacnhan"];
             md_sanpham mnu = new md_sanpham
             {
                 md_sanpham_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
@@ -426,7 +434,7 @@ public class ProductSOANTHAOController : IHttpHandler
                 //ma_sanphamcu = context.Request.Form["ma_sanphamcu"],
                 //mota_tiengviet = context.Request.Form["mota_tiengviet"],
                 //mota_tienganh = context.Request.Form["mota_tienganh"],
-                
+
                 //ma_vach = context.Request.Form["ma_vach"],
                 md_donvitinhsanpham_id = context.Request.Form["tendvt"],
                 l_inch = l_ == 0 ? 0 : decimal.Multiply(l_, Convert.ToDecimal(0.393700787)),
@@ -455,11 +463,11 @@ public class ProductSOANTHAOController : IHttpHandler
                 ngaytao = DateTime.Now,
                 ngaycapnhat = DateTime.Now
             };
-			if(!string.IsNullOrEmpty(nxn))
-				mnu.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
+            if(!string.IsNullOrEmpty(nxn))
+                mnu.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
             int check = (from sp in db.md_sanphams
-                        where sp.ma_sanpham.Equals(context.Request.Form["ma_sanpham"])
-                        select new { sp.ma_sanpham}).Count();
+                         where sp.ma_sanpham.Equals(context.Request.Form["ma_sanpham"])
+                         select new { sp.ma_sanpham}).Count();
             if (check == 0)
             {
                 db.md_sanphams.InsertOnSubmit(mnu);
@@ -469,7 +477,7 @@ public class ProductSOANTHAOController : IHttpHandler
             else {
                 jqGridHelper.Utils.writeResult(0, "Đã tồn tại mã hàng này!");
             }
-            
+
         }catch(Exception ex){
             jqGridHelper.Utils.writeResult(0, ex.Message);
         }
@@ -502,7 +510,7 @@ public class ProductSOANTHAOController : IHttpHandler
     {
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
-        
+
         //// filter
         String filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
@@ -512,8 +520,8 @@ public class ProductSOANTHAOController : IHttpHandler
             Filter f = Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
-        
+
+
         string sqlCount = string.Format(@"
             SELECT COUNT(1) AS count 
             FROM 
@@ -531,7 +539,7 @@ public class ProductSOANTHAOController : IHttpHandler
                 {0}
                 AND sp.hoatdong = 1 AND sp.trangthai = 'SOANTHAO'"
         , filter);
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -557,7 +565,7 @@ public class ProductSOANTHAOController : IHttpHandler
         {
             sidx = "sp.ma_sanpham";
         }
-        
+
         string strsql = string.Format(@"
             select * from( 
                 SELECT
@@ -630,10 +638,10 @@ public class ProductSOANTHAOController : IHttpHandler
             xml += "<cell><![CDATA[" + row["ma_hscode"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hscode"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["chucnangsp"] + "]]></cell>";
-            
+
             var nxn = row["ngayxacnhan"] + "";
             xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", string.IsNullOrEmpty(nxn) ? "" : DateTime.Parse(nxn).ToString("dd/MM/yyyy"));
-            
+
             xml += "<cell><![CDATA[" + row["hinhthucban"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
 
