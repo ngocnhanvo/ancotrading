@@ -226,6 +226,14 @@ public static class Extension
         return value.ToString("#,#0.####");
     }
 
+    public static NPOI.SS.UserModel.IRow CreateRowVNN(this NPOI.SS.UserModel.ISheet s, int row)
+    {
+        var rowVNN = s.GetRow(row);
+        if (rowVNN == null)
+            rowVNN = s.CreateRow(row);
+        return rowVNN;
+    }
+
     public static string DropTrailingZeros(this decimal? value)
     {
         return value.GetValueOrDefault(0).ToString("#,#0.####");

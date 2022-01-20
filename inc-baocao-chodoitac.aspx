@@ -168,11 +168,14 @@
 </div>
 
 <script type="text/javascript">
+    
     format_taocatalog_sanpham.create($('#presentSelectProducts'));
 
     format_taocatalog_mausac.create($('#presentSelectColors'));
 
     format_taocatalog_kieudang.create($('#presentSelectPatterns'));
+
+
 
     $('#layoutHangHoa').change(function () {
         let print = $(this).find('option:selected').attr('print');
