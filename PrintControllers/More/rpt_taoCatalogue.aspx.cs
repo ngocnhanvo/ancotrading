@@ -282,8 +282,15 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
                 }
                 dtCount++;
             }
+
+            var nextItem = lstCLs.NextOf(item);
+            if (nextItem != null)
+            {
+                s1.SetRowBreak(row);
+                row++;
+            }
         }
-        
+
 
         var printCf = new PrintAnco2();
         printCf.isPDF = kieuIn == "1";
@@ -301,13 +308,13 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         s1.SetMargin(NPOI.SS.UserModel.MarginType.HeaderMargin, 0.23);
         s1.SetMargin(NPOI.SS.UserModel.MarginType.FooterMargin, 0.23);
 
-        //hssfworkbook.SetPrintArea(
-        //    hssfworkbook.GetSheetIndex(s1.SheetName), //sheet index
-        //    0, //start column
-        //    10,
-        //    0, //start row
-        //    s1.LastRowNum
-        //);
+        hssfworkbook.SetPrintArea(
+            hssfworkbook.GetSheetIndex(s1.SheetName), //sheet index
+            0, //start column
+            inNgang ? 19 : 9,
+            0, //start row
+            row
+        );
 
         string DisplayName = "Presenttation";
 

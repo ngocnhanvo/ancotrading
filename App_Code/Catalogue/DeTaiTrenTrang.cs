@@ -64,7 +64,14 @@ namespace Catalogue
             anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
             int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
             var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
-            signaturePicturelogo.Resize(inNgang ? 1.2 : 1);
+
+            if (img.Width <= 200 & img.Height <= 150)
+                signaturePicturelogo.Resize(1.2);
+            else if (img.Width <= 300 & img.Height <= 300)
+                signaturePicturelogo.Resize(0.6);
+            else
+                signaturePicturelogo.Resize(0.5);
+
             s1.CreateRowVNN(row - 1).CreateCell(col1).SetCellValue(msCL.ta_ngan);
 
         end:;
@@ -75,7 +82,7 @@ namespace Catalogue
         {
             dtsRow spR = null;
             row += 3;
-            var space = inNgang ? 7 : 4;
+            var space = 6;
             #region Đề tài 1
             spR = msCLs.Skip(0).Take(1).FirstOrDefault();
             createProduct_Landscape(row, spR, 0);
@@ -86,26 +93,33 @@ namespace Catalogue
             createProduct_Landscape(row, spR, space);
             #endregion Đề tài 2
 
+            if (!inNgang)
+                row += 20;
+
             #region Đề tài 3
             spR = msCLs.Skip(2).Take(1).FirstOrDefault();
-            createProduct_Landscape(row, spR, space * 2);
+            createProduct_Landscape(row, spR, inNgang ? space * 2 : 0);
             #endregion Đề tài 3
 
-            row += 30;
+            if (inNgang)
+                row += 30;
 
             #region Đề tài 4
             spR = msCLs.Skip(3).Take(1).FirstOrDefault();
-            createProduct_Landscape(row, spR, 0);
+            createProduct_Landscape(row, spR, inNgang ? 0 : space);
             #endregion Đề tài 4
+
+            if (!inNgang)
+                row += 20;
 
             #region Đề tài 5
             spR = msCLs.Skip(4).Take(1).FirstOrDefault();
-            createProduct_Landscape(row, spR, space);
+            createProduct_Landscape(row, spR, inNgang ? space : 0);
             #endregion Đề tài 5
 
             #region Đề tài 6
             spR = msCLs.Skip(5).Take(1).FirstOrDefault();
-            createProduct_Landscape(row, spR, space * 2);
+            createProduct_Landscape(row, spR, inNgang ? space * 2 : space);
             #endregion Đề tài 6
 
             row += inNgang ? 14 : 12;
@@ -116,7 +130,7 @@ namespace Catalogue
         {
             dtsRow spR = null;
             row += 6;
-            var space = inNgang ? 9 : 6;
+            var space = 6;
             #region Đề tài 1
             spR = msCLs.Skip(0).Take(1).FirstOrDefault();
             createProduct_Landscape(row, spR, 0);

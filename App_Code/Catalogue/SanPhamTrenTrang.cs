@@ -62,8 +62,10 @@ namespace Catalogue
                 int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
                 var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
 
-                if(img.Width <= 300 & img.Height <= 300)
+                if(img.Width <= 200 & img.Height <= 150)
                     signaturePicturelogo.Resize(1.2);
+                else if (img.Width <= 300 & img.Height <= 300)
+                    signaturePicturelogo.Resize(0.8);
             }
 
             string qrCodePath = ExcuteSignalRStatic.mapPathSignalR("~/images/qrcode/") + spR.ma_sanpham + ".jpg";
@@ -267,28 +269,32 @@ namespace Catalogue
 
         public int add3In1Pages(int row, List<spsRow> msCLs)
         {
+            int more = 0;
             spsRow spR = null;
-            row += 5;
+            row += 4;
             #region Sản Phẩm 1
             spR = msCLs.Skip(0).Take(1).FirstOrDefault();
             createProduct_Landscape(row, spR, 0);
             #endregion Sản Phẩm 1
 
-            row += 15;
+            row += 16;
+            
 
             #region Sản Phẩm 2
             spR = msCLs.Skip(1).Take(1).FirstOrDefault();
             createProduct_Landscape(row, spR, 0);
+            more += spR == null ? 5 : 0;
             #endregion Sản Phẩm 2
 
-            row += 15;
+            row += 16;
 
             #region Sản Phẩm 3
             spR = msCLs.Skip(2).Take(1).FirstOrDefault();
             createProduct_Landscape(row, spR, 0);
+            //more += spR == null ? 2 : 0;
             #endregion Sản Phẩm 3
 
-            row += 11;
+            row += 13 + more;
 
             return row;
         }
