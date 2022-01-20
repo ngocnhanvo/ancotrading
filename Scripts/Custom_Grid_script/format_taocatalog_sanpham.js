@@ -254,6 +254,13 @@ var format_taocatalog_sanpham = {
                             id_elem.val('');
                             id_elem.prev().val('');
                         }
+
+                        $('#presentSelectColors').val('');
+                        $('#presentSelectColorsCP').val('');
+
+                        $('#presentSelectPatterns').val('');
+                        $('#presentSelectPatternsCP').val('');
+
                         $('#dlg_gridSmal_2').dialog("destroy").remove();
                     }
                 },

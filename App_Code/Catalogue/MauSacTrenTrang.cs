@@ -22,6 +22,11 @@ namespace Catalogue
             public string ta_ngan { get; set; }
         }
 
+        public LinqDBDataContext db { get; set; }
+        public int layoutDVT { get; set; }
+        public int layoutMauSac { get; set; }
+        public bool inNgang { get; set; }
+
         public HSSFWorkbook hssfworkbook = null;
         public Excel_Format ex_fm = null;
         public ISheet s1 = null;
@@ -31,198 +36,121 @@ namespace Catalogue
 
         public List<mssRow> msCLs { get; set; }
 
-        public int add6ColorIn1Pages(int row, List<mssRow> msCLs)
+        public int createProduct_Landscape(int row, mssRow msCL, int col1)
         {
-            int space = 10;
-            row += 2;
-            mssRow msCL = null;
-            string imgPath = "";
+            var khoangCachChuVaHinh = 4;
 
-            #region Màu 1
-            msCL = msCLs.Skip(0).Take(1).FirstOrDefault();
-            if (msCL != null)
+            if (msCL == null)
+                goto end;
+
+            string imgPath = ExcuteSignalRStatic.mapPathSignalR(string.Format(@"~/{0}/{1}-{2}-{3}.jpg", Public.imgColor, msCL.code_cl, msCL.code_dt, msCL.code_mau));
+            if (!File.Exists(imgPath))
             {
-                imgPath = ExcuteSignalRStatic.mapPathSignalR(string.Format(@"~/{0}/{1}-{2}-{3}.jpg", Public.imgColor, msCL.code_cl, msCL.code_dt, msCL.code_mau));
-                if (!File.Exists(imgPath))
-                {
-                    imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + Public.imgNotFound);
-                }
-                var img = System.Drawing.Image.FromFile(imgPath);
-                var mslogo = new MemoryStream();
-                img.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                var patriarchlogo = s1.CreateDrawingPatriarch();
-                var anchorLogo = new HSSFClientAnchor();
-                anchorLogo.Dx1 = 150;
-                anchorLogo.Dy1 = 10;
-                anchorLogo.Dx2 = 900;
-                anchorLogo.Dy2 = 253;
-                anchorLogo.Col1 = 0;
-                anchorLogo.Row1 = row;
-                anchorLogo.Col2 = 4;
-                anchorLogo.Row2 = row + 11;
-                anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
-                int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
-                var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
-                s1.CreateRow(row - 1).CreateCell(0).SetCellValue(msCL.ta_ngan);
+                imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + Public.imgNotFound);
             }
-            #endregion Màu 1
+            var img = System.Drawing.Image.FromFile(imgPath);
+            var mslogo = new MemoryStream();
+            img.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-            #region Màu 2
-            msCL = msCLs.Skip(1).Take(1).FirstOrDefault();
-            if (msCL != null)
-            {
-                imgPath = ExcuteSignalRStatic.mapPathSignalR(string.Format(@"~/{0}/{1}-{2}-{3}.jpg", Public.imgColor, msCL.code_cl, msCL.code_dt, msCL.code_mau));
-                if (!File.Exists(imgPath))
-                {
-                    imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + Public.imgNotFound);
-                }
+            var patriarchlogo = s1.CreateDrawingPatriarch();
+            var anchorLogo = new HSSFClientAnchor();
+            anchorLogo.Dx1 = 150;
+            anchorLogo.Dy1 = 10;
+            anchorLogo.Dx2 = 900;
+            anchorLogo.Dy2 = 253;
+            anchorLogo.Col1 = col1;
+            anchorLogo.Row1 = row;
+            anchorLogo.Col2 = col1 + khoangCachChuVaHinh;
+            anchorLogo.Row2 = row + 11;
+            anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
+            int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
+            var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
+            signaturePicturelogo.Resize(inNgang ? 1.2 : 1);
+            s1.CreateRowVNN(row - 1).CreateCell(col1).SetCellValue(msCL.ta_ngan);
 
-                var img = System.Drawing.Image.FromFile(imgPath);
-                var mslogo = new MemoryStream();
-                img.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
+            end:;
+            return row;
+        }
 
-                var patriarchlogo = s1.CreateDrawingPatriarch();
-                var anchorLogo = new HSSFClientAnchor();
-                anchorLogo.Dx1 = 150;
-                anchorLogo.Dy1 = 10;
-                anchorLogo.Dx2 = 900;
-                anchorLogo.Dy2 = 253;
-                anchorLogo.Col1 = 6;
-                anchorLogo.Row1 = row;
-                anchorLogo.Col2 = 10;
-                anchorLogo.Row2 = row + 11;
-                anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
-                int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
-                var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
-                s1.GetRow(row - 1).CreateCell(6).SetCellValue(msCL.ta_ngan);
-            }
-            #endregion Màu 2
+        public int add6In1Pages(int row, List<mssRow> msCLs)
+        {
+            mssRow spR = null;
+            row += 3;
+            var space = inNgang ? 7 : 4;
+            #region Màu sắc 1
+            spR = msCLs.Skip(0).Take(1).FirstOrDefault();
+            createProduct_Landscape(row, spR, 0);
+            #endregion Màu sắc 1
 
-            #region Màu 3
-            msCL = msCLs.Skip(2).Take(1).FirstOrDefault();
-            if (msCL != null)
-            {
-                imgPath = ExcuteSignalRStatic.mapPathSignalR(string.Format(@"~/{0}/{1}-{2}-{3}.jpg", Public.imgColor, msCL.code_cl, msCL.code_dt, msCL.code_mau));
-                if (!File.Exists(imgPath))
-                {
-                    imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + Public.imgNotFound);
-                }
+            #region Màu sắc 2
+            spR = msCLs.Skip(1).Take(1).FirstOrDefault();
+            createProduct_Landscape(row, spR, space);
+            #endregion Màu sắc 2
 
-                var img = System.Drawing.Image.FromFile(imgPath);
-                var mslogo = new MemoryStream();
-                img.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
+            #region Màu sắc 3
+            spR = msCLs.Skip(2).Take(1).FirstOrDefault();
+            createProduct_Landscape(row, spR, space*2);
+            #endregion Màu sắc 3
 
-                var patriarchlogo = s1.CreateDrawingPatriarch();
-                var anchorLogo = new HSSFClientAnchor();
-                anchorLogo.Dx1 = 150;
-                anchorLogo.Dy1 = 10;
-                anchorLogo.Dx2 = 900;
-                anchorLogo.Dy2 = 253;
-                anchorLogo.Col1 = 0;
-                anchorLogo.Row1 = row + 12 + space;
-                anchorLogo.Col2 = 4;
-                anchorLogo.Row2 = row + 11 + 12 + space;
-                anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
-                int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
-                var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
-                s1.CreateRow(row + 12 - 1 + space).CreateCell(0).SetCellValue(msCL.ta_ngan);
-            }
-            #endregion
+            row += 30;
 
-            #region Màu 4
-            msCL = msCLs.Skip(3).Take(1).FirstOrDefault();
-            if (msCL != null)
-            {
-                imgPath = ExcuteSignalRStatic.mapPathSignalR(string.Format(@"~/{0}/{1}-{2}-{3}.jpg", Public.imgColor, msCL.code_cl, msCL.code_dt, msCL.code_mau));
-                if (!File.Exists(imgPath))
-                {
-                    imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + Public.imgNotFound);
-                }
-
-                var img = System.Drawing.Image.FromFile(imgPath);
-                var mslogo = new MemoryStream();
-                img.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                var patriarchlogo = s1.CreateDrawingPatriarch();
-                var anchorLogo = new HSSFClientAnchor();
-                anchorLogo.Dx1 = 150;
-                anchorLogo.Dy1 = 10;
-                anchorLogo.Dx2 = 900;
-                anchorLogo.Dy2 = 253;
-                anchorLogo.Col1 = 6;
-                anchorLogo.Row1 = row + 12 + space;
-                anchorLogo.Col2 = 10;
-                anchorLogo.Row2 = row + 11 + 12 + space;
-                anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
-                int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
-                var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
-                s1.GetRow(row + 12 - 1 + space).CreateCell(6).SetCellValue(msCL.ta_ngan);
-            }
-            #endregion Màu 4
-
-            #region Màu 5
-            msCL = msCLs.Skip(4).Take(1).FirstOrDefault();
-            if (msCL != null)
-            {
-                imgPath = ExcuteSignalRStatic.mapPathSignalR(string.Format(@"~/{0}/{1}-{2}-{3}.jpg", Public.imgColor, msCL.code_cl, msCL.code_dt, msCL.code_mau));
-                if (!File.Exists(imgPath))
-                {
-                    imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + Public.imgNotFound);
-                }
-
-                var img = System.Drawing.Image.FromFile(imgPath);
-                var mslogo = new MemoryStream();
-                img.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                var patriarchlogo = s1.CreateDrawingPatriarch();
-                var anchorLogo = new HSSFClientAnchor();
-                anchorLogo.Dx1 = 150;
-                anchorLogo.Dy1 = 10;
-                anchorLogo.Dx2 = 900;
-                anchorLogo.Dy2 = 253;
-                anchorLogo.Col1 = 0;
-                anchorLogo.Row1 = row + 12 * 2 + space * 2;
-                anchorLogo.Col2 = 4;
-                anchorLogo.Row2 = row + 11 + 12 * 2 + space * 2;
-                anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
-                int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
-                var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
-                s1.CreateRow(row + 12 * 2 - 1 + space * 2).CreateCell(0).SetCellValue(msCL.ta_ngan);
-            }
-            #endregion Màu 5
-
-            #region Màu 6
-            msCL = msCLs.Skip(5).Take(1).FirstOrDefault();
-            if (msCL != null)
-            {
-                imgPath = ExcuteSignalRStatic.mapPathSignalR(string.Format(@"~/{0}/{1}-{2}-{3}.jpg", Public.imgColor, msCL.code_cl, msCL.code_dt, msCL.code_mau));
-                if (!File.Exists(imgPath))
-                {
-                    imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + Public.imgNotFound);
-                }
-                var img = System.Drawing.Image.FromFile(imgPath);
-                var mslogo = new MemoryStream();
-                img.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                var patriarchlogo = s1.CreateDrawingPatriarch();
-                var anchorLogo = new HSSFClientAnchor();
-                anchorLogo.Dx1 = 150;
-                anchorLogo.Dy1 = 10;
-                anchorLogo.Dx2 = 900;
-                anchorLogo.Dy2 = 253;
-                anchorLogo.Col1 = 6;
-                anchorLogo.Row1 = row + 12 * 2 + space * 2;
-                anchorLogo.Col2 = 10;
-                anchorLogo.Row2 = row + 11 + 12 * 2 + space * 2;
-                anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
-                int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
-                var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
-                s1.GetRow(row + 12 * 2 - 1 + space * 2).CreateCell(6).SetCellValue(msCL.ta_ngan);
-            }
-            #endregion Màu 6
+            #region Màu sắc 4
+            spR = msCLs.Skip(3).Take(1).FirstOrDefault();
+            createProduct_Landscape(row, spR, 0);
+            #endregion Màu sắc 4
             
-            row = row + 11 + 12 * 2 + 1 + space * 2;
+            #region Màu sắc 5
+            spR = msCLs.Skip(4).Take(1).FirstOrDefault();
+            createProduct_Landscape(row, spR, space);
+            #endregion Màu sắc 5
+
+            #region Màu sắc 6
+            spR = msCLs.Skip(5).Take(1).FirstOrDefault();
+            createProduct_Landscape(row, spR, space*2);
+            #endregion Màu sắc 6
+
+            row += inNgang ? 14 : 12;
+            return row;
+        }
+
+        public int add4In1Pages(int row, List<mssRow> msCLs)
+        {
+            mssRow spR = null;
+            row += 6;
+            var space = inNgang ? 9 : 6;
+            #region Màu sắc 1
+            spR = msCLs.Skip(0).Take(1).FirstOrDefault();
+            createProduct_Landscape(row, spR, 0);
+            #endregion Màu sắc 1
+
+            #region Màu sắc 2
+            spR = msCLs.Skip(1).Take(1).FirstOrDefault();
+            createProduct_Landscape(row, spR, space);
+            #endregion Màu sắc 2
+
+            row += 30;
+
+            #region Màu sắc 3
+            spR = msCLs.Skip(2).Take(1).FirstOrDefault();
+            createProduct_Landscape(row, spR, 0);
+            #endregion Màu sắc 3
+
+            #region Màu sắc 4
+            spR = msCLs.Skip(3).Take(1).FirstOrDefault();
+            createProduct_Landscape(row, spR, space);
+            #endregion Màu sắc 4
+
+            row += inNgang ? 14 : 12;
+            return row;
+        }
+
+        public int addRowInPage(int row, List<mssRow> msCLs)
+        {
+            if (layoutMauSac == 4)
+                row = add4In1Pages(row, msCLs);
+            else if (layoutMauSac == 6)
+                row = add6In1Pages(row, msCLs);
+
             return row;
         }
     }
