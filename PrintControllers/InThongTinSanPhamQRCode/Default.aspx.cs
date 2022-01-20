@@ -9,12 +9,9 @@ using NPOI.SS.UserModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using NPOI.HSSF.UserModel;
 using NPOI.HPSF;
 using NPOI.POIFS.FileSystem;
-using NPOI.SS.UserModel;
 using NPOI.SS.Util;
-using System.Data;
 using HSSFUtils;
 using NPOI.HSSF;
 using NPOI.HSSF.Util;
@@ -79,7 +76,12 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
             foreach (DataColumn col in dt.Columns)
             {
                 rowHeader.CreateCell(i).SetCellValue(col.ColumnName);
-                s1.SetColumnWidth(i, 6000);
+
+                if (col.ColumnName == "QRCode")
+                    s1.SetColumnWidth(i, 2200);
+                else
+                    s1.SetColumnWidth(i, 6000);
+
                 s1.GetRow(1).GetCell(i).CellStyle = cellHeader1;
                 i++;
 
@@ -100,7 +102,7 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
                 rowDetails.CreateCell(6).SetCellValue(" ");
                 rowDetails.CreateCell(7).SetCellValue(" ");
                 rowDetails.CreateCell(8).SetCellValue(" ");
-
+                rowDetails.HeightInPoints = (float)38.4;
                 string qrCodePath = ExcuteSignalRStatic.mapPathSignalR("~/images/qrcode/") + ma_sanpham + ".jpg";
                 if (File.Exists(qrCodePath))
                 {
@@ -110,14 +112,14 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
 
                     var patriarchlogo = s1.CreateDrawingPatriarch();
                     var anchorLogo = new HSSFClientAnchor();
-                    anchorLogo.Dx1 = 100;
-                    anchorLogo.Dy1 = 10;
-                    anchorLogo.Dx2 = 900;
+                    anchorLogo.Dx1 = 50;
+                    anchorLogo.Dy1 = 5;
+                    anchorLogo.Dx2 = 1000;
                     anchorLogo.Dy2 = 0;
                     anchorLogo.Col1 = 1;
                     anchorLogo.Row1 = iRow;
                     anchorLogo.Col2 = 1;
-                    anchorLogo.Row2 = iRow;
+                    anchorLogo.Row2 = iRow + 1;
                     anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
                     int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
                     var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
