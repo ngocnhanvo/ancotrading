@@ -65,7 +65,7 @@ namespace Catalogue
                 if(img.Width <= 200 & img.Height <= 150)
                     signaturePicturelogo.Resize(1.2);
                 else if (img.Width <= 300 & img.Height <= 300)
-                    signaturePicturelogo.Resize(0.8);
+                    signaturePicturelogo.Resize(0.6);
             }
 
             string qrCodePath = ExcuteSignalRStatic.mapPathSignalR("~/images/qrcode/") + spR.ma_sanpham + ".jpg";
