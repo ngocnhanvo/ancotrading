@@ -344,7 +344,7 @@ namespace Catalogue
             createProduct_Landscape(row, spR, 10);
             #endregion Sản Phẩm 2
 
-            row += 17;
+            row += 16;
 
             #region Sản Phẩm 3
             spR = msCLs.Skip(2).Take(1).FirstOrDefault();
@@ -356,7 +356,7 @@ namespace Catalogue
             createProduct_Landscape(row, spR, 10);
             #endregion Sản Phẩm 4
 
-            row += 17;
+            row += 16;
 
             #region Sản Phẩm 5
             spR = msCLs.Skip(4).Take(1).FirstOrDefault();
