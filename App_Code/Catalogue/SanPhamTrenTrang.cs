@@ -356,7 +356,7 @@ namespace Catalogue
             createProduct_Landscape(row, spR, 10);
             #endregion Sản Phẩm 4
 
-            row += 20;
+            row += 17;
 
             #region Sản Phẩm 5
             spR = msCLs.Skip(4).Take(1).FirstOrDefault();
