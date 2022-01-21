@@ -9,12 +9,9 @@ using NPOI.SS.UserModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using NPOI.HSSF.UserModel;
 using NPOI.HPSF;
 using NPOI.POIFS.FileSystem;
-using NPOI.SS.UserModel;
 using NPOI.SS.Util;
-using System.Data;
 using HSSFUtils;
 using NPOI.HSSF;
 using NPOI.HSSF.Util;
@@ -41,8 +38,15 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
 
         String sql = string.Format(@"
 		select
-			sp.ma_sanpham as [Mã Số Anco], '' as [Kích thước hàng ShowRoom], '' as [Kích thước hàng], 
-			'' as [Inner], '' as [Master], '' as [Pallet size], '' as [Q'ty/cont], '' as [Biến tấu]
+			sp.ma_sanpham as [Mã Số Anco], 
+            '' as [QRCode], 
+            '' as [Kích thước hàng ShowRoom], 
+            '' as [Kích thước hàng], 
+			'' as [Inner], 
+            '' as [Master], 
+            '' as [Pallet size], 
+            '' as [Q'ty/cont], 
+            '' as [Biến tấu]
 		from 
 			md_sanpham sp
 		where sp.ma_sanpham like '{0}' {1}
@@ -62,7 +66,7 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
             ICellStyle cellcenter = ex_fm.getcell(9, false, true, "", "C", "T");
 
             s1.CreateRow(0).CreateCell(0).SetCellValue("THÔNG TIN SẢN PHẨM QRCODE");
-            CellRangeAddress cellRange01 = new CellRangeAddress(0, 0, 0, 7);
+            CellRangeAddress cellRange01 = new CellRangeAddress(0, 0, 0, 8);
             s1.AddMergedRegion(cellRange01);
             s1.GetRow(0).HeightInPoints = 30;
             s1.GetRow(0).GetCell(0).CellStyle = cellHeader;
@@ -72,7 +76,12 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
             foreach (DataColumn col in dt.Columns)
             {
                 rowHeader.CreateCell(i).SetCellValue(col.ColumnName);
-                s1.SetColumnWidth(i, 6000);
+
+                if (col.ColumnName == "QRCode")
+                    s1.SetColumnWidth(i, 2200);
+                else
+                    s1.SetColumnWidth(i, 6000);
+
                 s1.GetRow(1).GetCell(i).CellStyle = cellHeader1;
                 i++;
 
@@ -92,6 +101,30 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
                 rowDetails.CreateCell(5).SetCellValue(" ");
                 rowDetails.CreateCell(6).SetCellValue(" ");
                 rowDetails.CreateCell(7).SetCellValue(" ");
+                rowDetails.CreateCell(8).SetCellValue(" ");
+                rowDetails.HeightInPoints = (float)38.4;
+                string qrCodePath = ExcuteSignalRStatic.mapPathSignalR("~/images/qrcode/") + ma_sanpham + ".jpg";
+                if (File.Exists(qrCodePath))
+                {
+                    var qrcodeIMG = System.Drawing.Image.FromFile(qrCodePath);
+                    var mslogo = new MemoryStream();
+                    qrcodeIMG.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                    var patriarchlogo = s1.CreateDrawingPatriarch();
+                    var anchorLogo = new HSSFClientAnchor();
+                    anchorLogo.Dx1 = 50;
+                    anchorLogo.Dy1 = 5;
+                    anchorLogo.Dx2 = 1000;
+                    anchorLogo.Dy2 = 0;
+                    anchorLogo.Col1 = 1;
+                    anchorLogo.Row1 = iRow;
+                    anchorLogo.Col2 = 1;
+                    anchorLogo.Row2 = iRow + 1;
+                    anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
+                    int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
+                    var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
+                }
+
                 string bc = ma_sanpham.Substring(9, 2);
 
                 var dgsp = (from a in db.md_sanphams
@@ -120,11 +153,11 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
 
                 if (bc.Substring(0, 1) != "0" & bc != "S1" & bc.Substring(0, 1) != "F")
                 {
-                    rowDetails.GetCell(3).SetCellValue(dgsp == null ? "" : dgsp.inner);
-                    rowDetails.GetCell(4).SetCellValue(dgsp == null ? "" : dgsp.outer);
-                    rowDetails.GetCell(5).SetCellValue(dgsp == null ? "" : dgsp.palletSize);
-                    rowDetails.GetCell(6).SetCellValue(dgsp == null ? "" : dgsp.qutyPerCont);
-                    rowDetails.GetCell(7).SetCellValue(bc);
+                    rowDetails.GetCell(4).SetCellValue(dgsp == null ? "" : dgsp.inner);
+                    rowDetails.GetCell(5).SetCellValue(dgsp == null ? "" : dgsp.outer);
+                    rowDetails.GetCell(6).SetCellValue(dgsp == null ? "" : dgsp.palletSize);
+                    rowDetails.GetCell(7).SetCellValue(dgsp == null ? "" : dgsp.qutyPerCont);
+                    rowDetails.GetCell(8).SetCellValue(bc);
 
                     //var bodetail = db.md_bos.Where()
                     string start = ma_sanpham.Substring(0, 9) + "S";
@@ -157,7 +190,7 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
                                 }
                             }
                         }
-                        rowDetails.GetCell(2).SetCellValue(string.Join("\n", lstVal));
+                        rowDetails.GetCell(3).SetCellValue(string.Join("\n", lstVal));
                     }
                 }
                 else
@@ -166,23 +199,23 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
                     if (sp != null)
                     {
                         bool hinhTron = isRound(sp.md_kieudang_id, db);
-                        rowDetails.GetCell(1).SetCellValue(sp.l_cm.GetValueOrDefault(0).ToString("#,#0.0") + "x" +
+                        rowDetails.GetCell(3).SetCellValue(sp.l_cm.GetValueOrDefault(0).ToString("#,#0.0") + "x" +
                         sp.w_cm.GetValueOrDefault(0).ToString("#,#0.0") + "x" + sp.h_cm.GetValueOrDefault(0).ToString("#,#0.0") + "H cm");
 
                         if (hinhTron == true)
                         {
-                            rowDetails.GetCell(2).SetCellValue("D" + sp.l_cm.GetValueOrDefault(0).ToString("#,#0.#") + "- H" + sp.h_cm.GetValueOrDefault(0).ToString("#,#0.#") + " cm");
+                            rowDetails.GetCell(3).SetCellValue("D" + sp.l_cm.GetValueOrDefault(0).ToString("#,#0.#") + "- H" + sp.h_cm.GetValueOrDefault(0).ToString("#,#0.#") + " cm");
                         }
                         else
                         {
-                            rowDetails.GetCell(2).SetCellValue("L" + sp.l_cm.GetValueOrDefault(0).ToString("#,#0.#") + "- W" +
+                            rowDetails.GetCell(3).SetCellValue("L" + sp.l_cm.GetValueOrDefault(0).ToString("#,#0.#") + "- W" +
                             sp.w_cm.GetValueOrDefault(0).ToString("#,#0.#") + "- H" + sp.h_cm.GetValueOrDefault(0).ToString("#,#0.#") + " cm");
                         }
-                        rowDetails.GetCell(3).SetCellValue(dgsp == null ? "" : dgsp.inner);
-                        rowDetails.GetCell(4).SetCellValue(dgsp == null ? "" : dgsp.outer);
-                        rowDetails.GetCell(5).SetCellValue(dgsp == null ? "" : dgsp.palletSize);
-                        rowDetails.GetCell(6).SetCellValue(dgsp == null ? "" : dgsp.qutyPerCont);
-                        rowDetails.GetCell(7).SetCellValue(bc);
+                        rowDetails.GetCell(4).SetCellValue(dgsp == null ? "" : dgsp.inner);
+                        rowDetails.GetCell(5).SetCellValue(dgsp == null ? "" : dgsp.outer);
+                        rowDetails.GetCell(6).SetCellValue(dgsp == null ? "" : dgsp.palletSize);
+                        rowDetails.GetCell(7).SetCellValue(dgsp == null ? "" : dgsp.qutyPerCont);
+                        rowDetails.GetCell(8).SetCellValue(bc);
                     }
                 }
 
