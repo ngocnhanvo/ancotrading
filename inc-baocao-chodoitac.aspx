@@ -42,6 +42,16 @@
     .width100percent {
         width: 100%;
     }
+
+    .lamMoiCatalog {
+        float: right;
+        right: 10px;
+        position: relative;
+        cursor: pointer;
+        text-decoration: underline;
+        color: blue;
+        user-select: none;
+    }
 </style>
 
 <div style="overflow:auto;">
@@ -115,8 +125,22 @@
         </tr>
 
         <tr>
+            <td>
+                <label>Hiển thị giá FOB</label>
+            </td>
+            <td>
+                <select id="layoutGiaFOB">
+                    <option value="1">Không</option>
+                    <option value="2">Có</option>
+                </select>
+            </td>
+        </tr>
+
+        <tr>
             <td colspan="2">
                 <b>II. Bước 2</b>
+
+                <span class="lamMoiCatalog">Làm mới</span>
             </td>
         </tr>
 
@@ -175,6 +199,16 @@
 
     format_taocatalog_kieudang.create($('#presentSelectPatterns'));
 
+    $('.lamMoiCatalog').click(function () {
+        $('#presentSelectProductsCP').val('');
+        $('#presentSelectProducts').val('');
+
+        $('#presentSelectColorsCP').val('');
+        $('#presentSelectColors').val('');
+
+        $('#presentSelectPatternsCP').val('');
+        $('#presentSelectPatterns').val('');
+    });
 
 
     $('#layoutHangHoa').change(function () {
@@ -228,6 +262,7 @@
         addFormData(mapForm, "layoutMauSac", $('#layoutMauSac').val());
         addFormData(mapForm, "layoutDetai", $('#layoutDetai').val());
         addFormData(mapForm, "layoutDVT", $('#layoutDVT').val());
+        addFormData(mapForm, "layoutGiaFOB", $('#layoutGiaFOB').val());
 
         document.body.appendChild(mapForm);
 
