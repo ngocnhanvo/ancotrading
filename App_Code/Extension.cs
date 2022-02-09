@@ -241,6 +241,7 @@ public static class Extension
         if(!File.Exists(file))
         {
             var w = new StreamWriter(file, false, Encoding.Unicode);
+            w.Write("[]");
             w.Flush();
             w.Close();
             w.Dispose();
@@ -248,9 +249,17 @@ public static class Extension
 
         var text = File.ReadAllText(file);
         text = string.IsNullOrWhiteSpace(text) ? "[]" : text;
-        var items = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(text);
-        var item = new Dictionary<string, string>();
-        item[id] = string.Join(",", sps.Select(s => s.ma_sanpham).ToList());
+        var items = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(text);
+        var item = new Dictionary<string, object>();
+
+        var item_lst = new List<Dictionary<string, string>>();
+        foreach (var sp in sps) {
+            var item_lst_item = new Dictionary<string, string>();
+            item_lst_item["code"] = sp.ma_sanpham;
+            item_lst_item["image"] = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
+            item_lst.Add(item_lst_item);
+        }
+        item[id] = item_lst;
         items.Add(item);
 
         File.WriteAllText(file, JsonConvert.SerializeObject(items, Newtonsoft.Json.Formatting.Indented));
@@ -272,7 +281,7 @@ public static class Extension
         text = string.IsNullOrWhiteSpace(text) ? "[]" : text;
         var items = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(text);
         var item = items.Where(s => s.Keys.Contains(id)).FirstOrDefault();
-        return item == null ? "" : item[id];
+        return item == null ? "[]" : item[id];
     }
 
     public static string DropTrailingZeros(this decimal? value)
