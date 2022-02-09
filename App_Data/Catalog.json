@@ -1,8 +1,42 @@
 [
   {
-    "33fce6ca": "51-14900-03-69,51-14900-04-53,51-14900-04-69,51-25900-02-53,51-25900-02-69,51-53700-S1-69,51-53800-S1-53,51-53800-S1-69,62-01506-03-06"
-  },
-  {
-    "2a0f19ec": "51-14900-03-69,51-14900-04-53,51-14900-04-69,51-25900-02-53,51-25900-02-69,51-53700-S1-69,51-53800-S1-53,51-53800-S1-69,62-01506-03-06"
+    "269612d6": [
+      {
+        "code": "51-14900-03-69",
+        "image": "images/products/fullsize/51-14900.jpg"
+      },
+      {
+        "code": "51-14900-04-53",
+        "image": "images/products/mausac/51-14900-53.jpg"
+      },
+      {
+        "code": "51-14900-04-69",
+        "image": "images/products/fullsize/51-14900.jpg"
+      },
+      {
+        "code": "51-25900-02-53",
+        "image": "images/products/fullsize/51-25900.jpg"
+      },
+      {
+        "code": "51-25900-02-69",
+        "image": "images/products/fullsize/51-25900.jpg"
+      },
+      {
+        "code": "51-53700-S1-69",
+        "image": "images/products/fullsize/51-53700.jpg"
+      },
+      {
+        "code": "51-53800-S1-53",
+        "image": "images/products/fullsize/51-53800.jpg"
+      },
+      {
+        "code": "51-53800-S1-69",
+        "image": "images/products/fullsize/51-53800.jpg"
+      },
+      {
+        "code": "62-01506-03-06",
+        "image": "images/products/fullsize/default.jpg"
+      }
+    ]
   }
 ]
