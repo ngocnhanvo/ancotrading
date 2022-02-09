@@ -50,7 +50,16 @@ public class MainHub : Hub
 
     public void getProductsByIdInCatalog(string id)
     {
-        Clients.Caller.getProductsByIdInCatalog(Extension.readFileCatalog(id));
+		string val = "";
+		try 
+		{
+			val = Extension.readFileCatalog(id);
+		}
+		catch(Exception ex) 
+		{
+			val = ex.Message;
+		}
+		Clients.Caller.getProductsByIdInCatalog(val);
     }
 
     public void SizeInfo(string ma_sanpham)
