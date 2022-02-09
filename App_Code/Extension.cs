@@ -262,7 +262,7 @@ public static class Extension
         item[id] = item_lst;
         item["time"] = DateTime.Now;
         items.Add(item);
-
+        items = items.Where(s => (s["time"] as DateTime?).Value.AddDays(7) >= DateTime.Now).ToList();
         File.WriteAllText(file, JsonConvert.SerializeObject(items, Newtonsoft.Json.Formatting.Indented));
         return id;
     }
@@ -281,6 +281,7 @@ public static class Extension
         var text = File.ReadAllText(file);
         text = string.IsNullOrWhiteSpace(text) ? "[]" : text;
         var items = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(text);
+        
         var item = items.Where(s => s.Keys.Contains(id)).FirstOrDefault();
         return item == null ? "[]" : JsonConvert.SerializeObject(item[id]);
     }
