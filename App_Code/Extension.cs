@@ -279,9 +279,9 @@ public static class Extension
 
         var text = File.ReadAllText(file);
         text = string.IsNullOrWhiteSpace(text) ? "[]" : text;
-        var items = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(text);
+        var items = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(text);
         var item = items.Where(s => s.Keys.Contains(id)).FirstOrDefault();
-        return item == null ? "[]" : item[id];
+        return item == null ? "[]" : JsonConvert.SerializeObject(item[id]);
     }
 
     public static string DropTrailingZeros(this decimal? value)
