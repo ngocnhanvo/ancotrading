@@ -234,6 +234,47 @@ public static class Extension
         return rowVNN;
     }
 
+    public static string createFileCatalog(List<Catalogue.SanPhamTrenTrang.spsRow> sps)
+    {
+        string id = Helper.getNewId().Substring(0, 8);
+        var file = ExcuteSignalRStatic.mapPathSignalR("~/App_Data/Catalog.json");
+        if(!File.Exists(file))
+        {
+            var w = new StreamWriter(file, false, Encoding.Unicode);
+            w.Flush();
+            w.Close();
+            w.Dispose();
+        }
+
+        var text = File.ReadAllText(file);
+        text = string.IsNullOrWhiteSpace(text) ? "[]" : text;
+        var items = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(text);
+        var item = new Dictionary<string, string>();
+        item[id] = string.Join(",", sps.Select(s => s.ma_sanpham).ToList());
+        items.Add(item);
+
+        File.WriteAllText(file, JsonConvert.SerializeObject(items, Newtonsoft.Json.Formatting.Indented));
+        return id;
+    }
+
+    public static string readFileCatalog(string id)
+    {
+        var file = ExcuteSignalRStatic.mapPathSignalR("~/App_Data/Catalog.json");
+        if (!File.Exists(file))
+        {
+            var w = new StreamWriter(file, false, Encoding.Unicode);
+            w.Flush();
+            w.Close();
+            w.Dispose();
+        }
+
+        var text = File.ReadAllText(file);
+        text = string.IsNullOrWhiteSpace(text) ? "[]" : text;
+        var items = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(text);
+        var item = items.Where(s => s.Keys.Contains(id)).FirstOrDefault();
+        return item == null ? "" : item[id];
+    }
+
     public static string DropTrailingZeros(this decimal? value)
     {
         return value.GetValueOrDefault(0).ToString("#,#0.####");

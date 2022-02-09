@@ -73,7 +73,7 @@ namespace Catalogue
             else
                 signaturePicturelogo.Resize(0.5);
 
-            s1.CreateRowVNN(row - 1).CreateCell(col1).SetCellValue(msCL.ta_ngan);
+            //s1.CreateRowVNN(row - 1).CreateCell(col1).SetCellValue(msCL.ta_ngan);
 
             end:;
             return row;

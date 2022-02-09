@@ -22,6 +22,7 @@ namespace Catalogue
         public LinqDBDataContext db { get; set; }
         public int layoutDVT { get; set; }
         public int layoutHangHoa { get; set; }
+        public int layoutGiaFOB { get; set; }
         public bool inNgang { get; set; }
 
         public ICellStyle s12_Bold_notWrapT_notBorder_LEFT = null;
@@ -90,8 +91,24 @@ namespace Catalogue
                 var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
             }
 
+            md_giasanpham gsp = null;
+            if (layoutGiaFOB == 2)
+            {
+                gsp = (from a in db.md_giasanphams
+                          join b in db.md_phienbangias on a.md_phienbangia_id equals b.md_phienbangia_id
+                          join c in db.md_banggias on b.md_banggia_id equals c.md_banggia_id
+                          where
+                            a.md_sanpham_id == spR.md_sanpham_id
+                            & a.hoatdong == true
+                            & c.banggiaban == true
+                            & c.ten_banggia.Substring(0, 5).StartsWith("FOB-")
+                            & b.ngay_hieuluc <= DateTime.Now
+                          orderby b.ngay_hieuluc descending
+                          select a).FirstOrDefault();
+            }
+
             var cellRow5 = s1.CreateRowVNN(row).CreateCell(col1 + khoangCachChuVaHinh);
-            cellRow5.SetCellValue("ITEM NO.:" + spR.ma_sanpham);
+            cellRow5.SetCellValue("ITEM NO.: " + spR.ma_sanpham);
             cellRow5.CellStyle = s12_Bold_notWrapT_notBorder_LEFT;
 
             var strSize = spR.ma_sanpham.Substring(9, 2);
@@ -181,6 +198,13 @@ namespace Catalogue
 
                 var cellRow9 = s1.CreateRowVNN(row + 4).CreateCell(col1 + khoangCachChuVaHinh);
                 cellRow9.SetCellValue(qtyCont);
+
+                if (gsp != null)
+                {
+                    var cellRow10 = s1.CreateRowVNN(row + 5).CreateCell(col1 + khoangCachChuVaHinh);
+                    cellRow10.SetCellValue(string.Format("FOB PRICE: {0} USD", gsp.gia.GetValueOrDefault(0).ToString("#,#0.00")));
+                    cellRow10.CellStyle = s12_Bold_notWrapT_notBorder_LEFT;
+                }
             }
             else
             {
@@ -261,6 +285,13 @@ namespace Catalogue
 
                 cellRow2 = s1.CreateRowVNN(row + countR + 3).CreateCell(col1 + khoangCachChuVaHinh);
                 cellRow2.SetCellValue(qtyCont);
+
+                if (gsp != null)
+                {
+                    cellRow2 = s1.CreateRowVNN(row + countR + 4).CreateCell(col1 + khoangCachChuVaHinh);
+                    cellRow2.SetCellValue(string.Format("FOB PRICE: {0} USD", gsp.gia.GetValueOrDefault(0).ToString("#,#0.00")));
+                    cellRow2.CellStyle = s12_Bold_notWrapT_notBorder_LEFT;
+                }
             }
 
             end:;
@@ -283,7 +314,7 @@ namespace Catalogue
             #region Sản Phẩm 2
             spR = msCLs.Skip(1).Take(1).FirstOrDefault();
             createProduct_Landscape(row, spR, 0);
-            more += spR == null ? 5 : 0;
+            //more += spR == null ? 1 : 0;
             #endregion Sản Phẩm 2
 
             row += 16;
@@ -291,10 +322,12 @@ namespace Catalogue
             #region Sản Phẩm 3
             spR = msCLs.Skip(2).Take(1).FirstOrDefault();
             createProduct_Landscape(row, spR, 0);
-            //more += spR == null ? 2 : 0;
+
+            //if(more <= 0)
+                //more += spR == null ? 1 : 0;
             #endregion Sản Phẩm 3
 
-            row += 13 + more;
+            row += 10 + more;
 
             return row;
         }
@@ -368,7 +401,7 @@ namespace Catalogue
             createProduct_Landscape(row, spR, 10);
             #endregion Sản Phẩm 6
 
-            row += 11;
+            row += 9;
             return row;
         }
 

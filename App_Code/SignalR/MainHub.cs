@@ -48,6 +48,11 @@ public class MainHub : Hub
         Clients.Caller.Login(response);
     }
 
+    public void getProductsByIdInCatalog(string id)
+    {
+        Clients.Caller.getProductsByIdInCatalog(Extension.readFileCatalog(id));
+    }
+
     public void SizeInfo(string ma_sanpham)
     {
         var response = new Dictionary<string, object>()

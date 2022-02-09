@@ -61,11 +61,11 @@ public class DongDonHangController : IHttpHandler
                 string gia_sp = "1";
                 string dtkd_id = db.c_donhangs.FirstOrDefault(p => p.c_donhang_id.Equals(c_donhang_id)).md_doitackinhdoanh_id;
                 if (donhang.gia_db == true)
-                    gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@ngaytinhgia", donhang.ngaylap);
+                    gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@ngaytinhgia", donhang.ngaylap.Value.ToString("yyyy-MM-dd"));
                 else if (donhang.isdonhangtmp == true)
-                    gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia_Mau", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@loai_bg", true, "@ngaytinhgia", donhang.ngaylap, "@mau", 1);
+                    gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia_Mau", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@loai_bg", true, "@ngaytinhgia", donhang.ngaylap.Value.ToString("yyyy-MM-dd"), "@mau", 1);
                 else
-                    gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@loai_bg", true, "@ngaytinhgia", donhang.ngaylap);
+                    gia_sp = (string)mdbc.ExecuteScalarProcedure("getMoTaGia", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", dtkd_id, "@loai_bg", true, "@ngaytinhgia", donhang.ngaylap.Value.ToString("yyyy-MM-dd"));
 
                 context.Response.Write(gia_sp);
             }
