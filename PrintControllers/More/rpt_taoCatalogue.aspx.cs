@@ -174,10 +174,14 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         row++;
         var row2 = s1.CreateRow(row);
         var text = "http://www.ancopottery.com/Views/QRCode/v2/CatalogueDetails.aspx?id=" + idCatalog;
-        row2.CreateCell(0).SetCellValue(text);
         HSSFHyperlink link = new HSSFHyperlink(HyperlinkType.Url);
         link.Address = text;
-        row2.GetCell(0).Hyperlink = link;
+        link.FirstColumn = 0;
+        link.LastColumn = maxColumn;
+        link.FirstRow = row;
+        link.LastRow = row;
+        row2.CreateCell(1).SetCellValue(text);
+        row2.GetCell(1).Hyperlink = link;
         ICellStyle cellUn = hssfworkbook.CreateCellStyle();
         IFont funderline = hssfworkbook.CreateFont();
         funderline.Underline = FontUnderlineType.Single;
@@ -185,12 +189,10 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         funderline.FontName = "Arial";
         funderline.Color = IndexedColors.Blue.Index;
         cellUn.SetFont(funderline);
-        cellUn.Alignment = HorizontalAlignment.Center;
-        cellUn.VerticalAlignment = VerticalAlignment.Top;
+        cellUn.Alignment = HorizontalAlignment.Left;
         cellUn.WrapText = false;
-        row2.GetCell(0).CellStyle = cellUn;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, maxColumn));
-
+        row2.GetCell(1).CellStyle = cellUn;
+        
         row++;
         return row;
     }
@@ -416,7 +418,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         {
             if (printCf.isPDF.GetValueOrDefault(false))
             {
-                Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../FileUpload/{0}.pdf&zoomprint=0.999&zoom=page-width&remove=true&namedown={1}", filename, DisplayName));
+                Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../FileUpload/{0}.pdf&zoomprint=0.999&zoom=page-width&remove=false&namedown={1}", filename, DisplayName));
             }
             else
             {
