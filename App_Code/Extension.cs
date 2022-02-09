@@ -260,6 +260,7 @@ public static class Extension
             item_lst.Add(item_lst_item);
         }
         item[id] = item_lst;
+        item["time"] = DateTime.Now;
         items.Add(item);
 
         File.WriteAllText(file, JsonConvert.SerializeObject(items, Newtonsoft.Json.Formatting.Indented));
