@@ -125,14 +125,11 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         row4.CreateCell(1).SetCellValue("");
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, maxColumn));
         //Dòng 5
-        if (laplai == 0)
-        {
-            row++;
-            var row5 = s1.CreateRow(row);
-            row5.CreateCell(0).SetCellValue("PRESENTATION");
-            row5.GetCell(0).CellStyle = s18_notBold_notWrapT_notBorder_CENTER;
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 0, maxColumn));
-        }
+        row++;
+        var row5 = s1.CreateRow(row);
+        row5.CreateCell(0).SetCellValue("PRESENTATION");
+        row5.GetCell(0).CellStyle = s18_notBold_notWrapT_notBorder_CENTER;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, maxColumn));
         //Dòng 6
         if (laplai >= 0)
         {
@@ -143,14 +140,11 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
             s1.AddMergedRegion(new CellRangeAddress(row, row, 0, maxColumn));
         }
         //Dòng 7
-        if (laplai >= 0)
-        {
-            row++;
-            var row7 = s1.CreateRowVNN(row);
-            row7.CreateCell(0).SetCellValue("Port of loading: " + cangBien);
-            row7.GetCell(0).CellStyle = s11_notBold_notWrapT_notBorder_CENTER;
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 0, maxColumn));
-        }
+        row++;
+        var row7 = s1.CreateRowVNN(row);
+        row7.CreateCell(0).SetCellValue("Port of loading: " + cangBien);
+        row7.GetCell(0).CellStyle = s11_notBold_notWrapT_notBorder_CENTER;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, maxColumn));
 
         if(laplai > 0)
         {
@@ -163,9 +157,21 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         return row;
     }
 
-    public int addRowFooter(int row)
+    public int addRowFooter(int row, int laplai, int layoutHH)
     {
-        row++;
+        if(!inNgang)
+        {
+            row += 7;
+        }
+        else
+        {
+            if (layoutHH == 4)
+                row += 10;
+            else
+                row += 4;
+        }
+
+
         var row1 = s1.CreateRow(row);
         row1.CreateCell(0).SetCellValue("For your selection, order and further inquiry, please click here:");
         row1.GetCell(0).CellStyle = s18_notBold_notWrapT_notBorder_CENTER_Arial;
@@ -180,8 +186,8 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         link.LastColumn = maxColumn;
         link.FirstRow = row;
         link.LastRow = row;
-        row2.CreateCell(1).SetCellValue(text);
-        row2.GetCell(1).Hyperlink = link;
+        row2.CreateCell(0).SetCellValue(text);
+        row2.GetCell(0).Hyperlink = link;
         ICellStyle cellUn = hssfworkbook.CreateCellStyle();
         IFont funderline = hssfworkbook.CreateFont();
         funderline.Underline = FontUnderlineType.Single;
@@ -189,10 +195,10 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         funderline.FontName = "Arial";
         funderline.Color = IndexedColors.Blue.Index;
         cellUn.SetFont(funderline);
-        cellUn.Alignment = HorizontalAlignment.Left;
+        cellUn.Alignment = HorizontalAlignment.Center;
         cellUn.WrapText = false;
-        row2.GetCell(1).CellStyle = cellUn;
-        
+        row2.GetCell(0).CellStyle = cellUn;
+        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, maxColumn));
         row++;
         return row;
     }
@@ -209,7 +215,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
 
         inNgang = new int[] { 4, 6 }.Contains(layoutHangHoa);
 
-        maxColumn = inNgang ? 18 : 10;
+        maxColumn = inNgang ? 19 : 10;
 
         hssfworkbook = new HSSFWorkbook();
         ex_fm = new Excel_Format(hssfworkbook);
@@ -295,11 +301,13 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
                 if (spCount % layoutHangHoa == 0 | spCount == spcls.Count)
                 {
                     row = addRowHeader(row, item, laplai);
-                    laplai++;
+                    
                     var lstms = spcls.Skip(spTime * layoutHangHoa).Take(layoutHangHoa).ToList();
 
                     row = sptt.addRowInPage(row, lstms);
-                    row = addRowFooter(row);
+                    row = addRowFooter(row, laplai, layoutHangHoa);
+
+                    laplai++;
 
                     if (spCount < spcls.Count)
                     {
@@ -383,11 +391,11 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         s1.PrintSetup.FitWidth = 1;
         s1.PrintSetup.FitHeight = 0;
         s1.SetMargin(NPOI.SS.UserModel.MarginType.TopMargin, 0.23);
-        s1.SetMargin(NPOI.SS.UserModel.MarginType.BottomMargin, 0.23);
+        s1.SetMargin(NPOI.SS.UserModel.MarginType.BottomMargin, 0);
         s1.SetMargin(NPOI.SS.UserModel.MarginType.LeftMargin, 0.23);
         s1.SetMargin(NPOI.SS.UserModel.MarginType.RightMargin, 0.23);
         s1.SetMargin(NPOI.SS.UserModel.MarginType.HeaderMargin, 0.23);
-        s1.SetMargin(NPOI.SS.UserModel.MarginType.FooterMargin, 0.23);
+        s1.SetMargin(NPOI.SS.UserModel.MarginType.FooterMargin, 0);
 
         hssfworkbook.SetPrintArea(
             hssfworkbook.GetSheetIndex(s1.SheetName), //sheet index

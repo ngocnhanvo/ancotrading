@@ -41,7 +41,21 @@ namespace Catalogue
             var khoangCachChuVaHinh = 4;
 
             if (spR == null)
+            {
+                var cellRowAdd = s1.CreateRowVNN(row).CreateCell(col1 + khoangCachChuVaHinh);
+                cellRowAdd.SetCellValue(" ");
+                cellRowAdd.CellStyle = s12_Bold_notWrapT_notBorder_LEFT;
+
+                if (layoutGiaFOB == 2)
+                {
+                    cellRowAdd = s1.CreateRowVNN(row + 1).CreateCell(col1 + khoangCachChuVaHinh);
+                    cellRowAdd.SetCellValue(string.Format(" "));
+                    cellRowAdd.CellStyle = s12_Bold_notWrapT_notBorder_LEFT;
+                }
+
                 goto end;
+            }
+
             string imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImage(spR.ma_sanpham, 0)["msLink"]);
             if (File.Exists(imgPath))
             {
@@ -300,9 +314,9 @@ namespace Catalogue
 
         public int add3In1Pages(int row, List<spsRow> msCLs)
         {
-            int more = 0;
             spsRow spR = null;
             row += 4;
+            
             #region Sản Phẩm 1
             spR = msCLs.Skip(0).Take(1).FirstOrDefault();
             createProduct_Landscape(row, spR, 0);
@@ -322,12 +336,9 @@ namespace Catalogue
             #region Sản Phẩm 3
             spR = msCLs.Skip(2).Take(1).FirstOrDefault();
             createProduct_Landscape(row, spR, 0);
-
-            //if(more <= 0)
-                //more += spR == null ? 1 : 0;
             #endregion Sản Phẩm 3
 
-            row += 10 + more;
+            row += 9;
 
             return row;
         }
@@ -346,7 +357,7 @@ namespace Catalogue
             createProduct_Landscape(row, spR, 10);
             #endregion Sản Phẩm 2
 
-            row += 28;
+            row += 18;
 
             #region Sản Phẩm 3
             spR = msCLs.Skip(2).Take(1).FirstOrDefault();
@@ -358,14 +369,14 @@ namespace Catalogue
             createProduct_Landscape(row, spR, 10);
             #endregion Sản Phẩm 4
 
-            row += 11;
+            row += 9;
             return row;
         }
 
         public int add6In1Pages(int row, List<spsRow> msCLs)
         {
             spsRow spR = null;
-            row += 4;
+            row += 3;
 
             #region Sản Phẩm 1
             spR = msCLs.Skip(0).Take(1).FirstOrDefault();
@@ -377,7 +388,7 @@ namespace Catalogue
             createProduct_Landscape(row, spR, 10);
             #endregion Sản Phẩm 2
 
-            row += 16;
+            row += 14;
 
             #region Sản Phẩm 3
             spR = msCLs.Skip(2).Take(1).FirstOrDefault();
@@ -389,7 +400,7 @@ namespace Catalogue
             createProduct_Landscape(row, spR, 10);
             #endregion Sản Phẩm 4
 
-            row += 16;
+            row += 14;
 
             #region Sản Phẩm 5
             spR = msCLs.Skip(4).Take(1).FirstOrDefault();
@@ -401,7 +412,7 @@ namespace Catalogue
             createProduct_Landscape(row, spR, 10);
             #endregion Sản Phẩm 6
 
-            row += 9;
+            row += 8;
             return row;
         }
 
