@@ -165,11 +165,27 @@ namespace Catalogue
                         );
                 }
 
-                palletSize = string.Format(@"Pallet size: L{0} - W{1} - H{2} cm",
+                string cmValPallet = "", inchValPallet = "";
+
+                cmValPallet = string.Format(@"L{0} - W{1} - H{2} cm",
                     dg.l2_mix.DropTrailingZeros(),
                     dg.w2_mix.DropTrailingZeros(),
                     dg.h2_mix.DropTrailingZeros()
                     );
+
+                decimal cmToInch = (decimal)0.3937;
+                cmValPallet = string.Format(@"L{0} - W{1} - H{2} inch",
+                    (dg.l2_mix.GetValueOrDefault(0) * cmToInch).ToString("#,#0.##"),
+                    (dg.w2_mix.GetValueOrDefault(0) * cmToInch).DropTrailingZeros(),
+                    (dg.h2_mix.GetValueOrDefault(0) * cmToInch).DropTrailingZeros()
+                    );
+
+                if (layoutDVT == 1)
+                    palletSize = cmValPallet;
+                else if (layoutDVT == 2)
+                    palletSize = inchValPallet;
+                else
+                    palletSize = string.Format(@"{0} | {1}", cmValPallet, inchValPallet));
 
                 if (dg.soluonggoi_ctn_20 > 0 & dg.soluonggoi_ctn > 0)
                     qtyCont = string.Format(@"Q'ty/cont: {0} pal/20""; {1} pal/40""", dg.soluonggoi_ctn_20.DropTrailingZeros(), dg.soluonggoi_ctn.DropTrailingZeros());
@@ -208,7 +224,7 @@ namespace Catalogue
                 cellRow7.SetCellValue(donggoi);
 
                 var cellRow8 = s1.CreateRowVNN(row + 3).CreateCell(col1 + khoangCachChuVaHinh);
-                cellRow8.SetCellValue(palletSize);
+                cellRow8.SetCellValue("Pallet size: " + palletSize);
 
                 var cellRow9 = s1.CreateRowVNN(row + 4).CreateCell(col1 + khoangCachChuVaHinh);
                 cellRow9.SetCellValue(qtyCont);
