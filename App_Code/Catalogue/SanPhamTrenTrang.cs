@@ -185,7 +185,7 @@ namespace Catalogue
                 else if (layoutDVT == 2)
                     palletSize = inchValPallet;
                 else
-                    palletSize = string.Format(@"{0} | {1}", cmValPallet, inchValPallet));
+                    palletSize = string.Format(@"{0} | {1}", cmValPallet, inchValPallet);
 
                 if (dg.soluonggoi_ctn_20 > 0 & dg.soluonggoi_ctn > 0)
                     qtyCont = string.Format(@"Q'ty/cont: {0} pal/20""; {1} pal/40""", dg.soluonggoi_ctn_20.DropTrailingZeros(), dg.soluonggoi_ctn.DropTrailingZeros());
