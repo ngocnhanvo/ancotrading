@@ -175,9 +175,9 @@ namespace Catalogue
 
                 decimal cmToInch = (decimal)0.3937;
                 inchValPallet = string.Format(@"L{0}"" - W{1}"" - H{2}""",
-                    (dg.l2_mix.GetValueOrDefault(0) * cmToInch).ToString("#,#0.##"),
-                    (dg.w2_mix.GetValueOrDefault(0) * cmToInch).ToString("#,#0.##"),
-                    (dg.h2_mix.GetValueOrDefault(0) * cmToInch).ToString("#,#0.##")
+                    (dg.l2_mix.GetValueOrDefault(0) * cmToInch).ToString("#,#0.#"),
+                    (dg.w2_mix.GetValueOrDefault(0) * cmToInch).ToString("#,#0.#"),
+                    (dg.h2_mix.GetValueOrDefault(0) * cmToInch).ToString("#,#0.#")
                     );
 
                 if (layoutDVT == 1)
