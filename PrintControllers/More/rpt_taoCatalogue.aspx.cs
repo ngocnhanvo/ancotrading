@@ -186,7 +186,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         link.LastColumn = maxColumn;
         link.FirstRow = row;
         link.LastRow = row;
-        row2.CreateCell(0).SetCellValue(text);
+        row2.CreateCell(0).SetCellValue("http://www.ancopottery.com/presentation");
         row2.GetCell(0).Hyperlink = link;
         ICellStyle cellUn = hssfworkbook.CreateCellStyle();
         IFont funderline = hssfworkbook.CreateFont();
