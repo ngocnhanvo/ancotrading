@@ -311,7 +311,7 @@ namespace Catalogue
                 cellRow2.SetCellValue(donggoi);
 
                 cellRow2 = s1.CreateRowVNN(row + countR + 2).CreateCell(col1 + khoangCachChuVaHinh);
-                cellRow2.SetCellValue(palletSize);
+                cellRow2.SetCellValue("Pallet size: " + palletSize);
 
                 cellRow2 = s1.CreateRowVNN(row + countR + 3).CreateCell(col1 + khoangCachChuVaHinh);
                 cellRow2.SetCellValue(qtyCont);

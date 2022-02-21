@@ -328,6 +328,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
             {
                 if (msCount % layoutMauSac == 0 | msCount == mscls.Count)
                 {
+					row = addRowHeader(row, item, laplai);
                     s1.CreateRow(row).CreateCell(0).SetCellValue("Available color:");
                     s1.GetRow(row).GetCell(0).CellStyle = s11_Bold_notWrapT_notBorder_LEFT;
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 10));
@@ -355,6 +356,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
             {
                 if (dtCount % layoutDetai == 0 | dtCount == dtcls.Count)
                 {
+					row = addRowHeader(row, item, laplai);
                     s1.CreateRow(row).CreateCell(0).SetCellValue("Available pattern:");
                     s1.GetRow(row).GetCell(0).CellStyle = s11_Bold_notWrapT_notBorder_LEFT;
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 10));
