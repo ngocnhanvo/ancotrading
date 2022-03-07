@@ -150,4 +150,43 @@ public static class Helper
             HttpContext.Current.Response.Redirect(url);
         }
     }
+
+    public static md_bo layBoLonNhat(LinqDBDataContext db, string giaTriBo, string ma_sanpham)
+    {
+        md_bo boMain = null;
+        if (giaTriBo.StartsWith("S"))
+            boMain = db.md_bos.Where(s => s.ma_bo == giaTriBo & s.ma_bo_cha == giaTriBo).FirstOrDefault();
+        else
+        {
+            var maBoCha = "S6";
+            var maS = ma_sanpham.Substring(0, 9) + maBoCha + ma_sanpham.Substring(11);
+            var spS = db.md_sanphams.Where(s => s.ma_sanpham == maS).FirstOrDefault();
+            if (spS == null)
+            {
+                maBoCha = "S5";
+                maS = ma_sanpham.Substring(0, 9) + maBoCha + ma_sanpham.Substring(11);
+                spS = db.md_sanphams.Where(s => s.ma_sanpham == maS).FirstOrDefault();
+            }
+            if (spS == null)
+            {
+                maBoCha = "S4";
+                maS = ma_sanpham.Substring(0, 9) + maBoCha + ma_sanpham.Substring(11);
+                spS = db.md_sanphams.Where(s => s.ma_sanpham == maS).FirstOrDefault();
+            }
+            if (spS == null)
+            {
+                maBoCha = "S3";
+                maS = ma_sanpham.Substring(0, 9) + maBoCha + ma_sanpham.Substring(11);
+                spS = db.md_sanphams.Where(s => s.ma_sanpham == maS).FirstOrDefault();
+            }
+            if (spS == null)
+            {
+                maBoCha = "S2";
+            }
+
+            boMain = db.md_bos.Where(s => s.ma_bo == giaTriBo & s.ma_bo_cha == maBoCha).FirstOrDefault();
+        }
+
+        return boMain;
+    }
 }
