@@ -7,6 +7,7 @@ using NPOI.SS.Util;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using QRCoder;
 
 namespace Catalogue
 {
@@ -18,12 +19,13 @@ namespace Catalogue
             public string ma_sanpham { get; set; }
             public string mota_tiengviet { get; set; }
         }
-
+        QRCodeGenerator qrGenerator = new QRCodeGenerator();
         public LinqDBDataContext db { get; set; }
         public int layoutDVT { get; set; }
         public int layoutHangHoa { get; set; }
         public int layoutGiaFOB { get; set; }
         public bool inNgang { get; set; }
+        public string idCatalog { get; set; }
 
         public ICellStyle s12_Bold_notWrapT_notBorder_LEFT = null;
 
@@ -60,9 +62,9 @@ namespace Catalogue
             if (File.Exists(imgPath))
             {
                 var img = System.Drawing.Image.FromFile(imgPath);
-                var mslogo = new MemoryStream();
-                img.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
-
+                var msAvatar = new MemoryStream();
+                img.Save(msAvatar, System.Drawing.Imaging.ImageFormat.Jpeg);
+                
                 var patriarchlogo = s1.CreateDrawingPatriarch();
                 var anchorLogo = new HSSFClientAnchor();
                 anchorLogo.Dx1 = 150;
@@ -74,22 +76,46 @@ namespace Catalogue
                 anchorLogo.Col2 = col1 + 3;
                 anchorLogo.Row2 = row + 9;
                 anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
-                int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
+                int indexlogo = hssfworkbook.AddPicture(msAvatar.ToArray(), PictureType.JPEG);
                 var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
 
                 if(img.Width <= 200 & img.Height <= 150)
                     signaturePicturelogo.Resize(1.2);
                 else if (img.Width <= 300 & img.Height <= 300)
                     signaturePicturelogo.Resize(0.6);
+
+                msAvatar.Close();
+                msAvatar.Dispose();
+                img.Dispose();
             }
 
-            string qrCodePath = ExcuteSignalRStatic.mapPathSignalR("~/images/qrcode/") + spR.ma_sanpham + ".jpg";
-            if (File.Exists(qrCodePath))
+            var msQRCode = new MemoryStream();
+            if (idCatalog == null)
             {
-                var qrcodeIMG = System.Drawing.Image.FromFile(qrCodePath);
-                var mslogo = new MemoryStream();
-                qrcodeIMG.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
+                string qrCodePath = ExcuteSignalRStatic.mapPathSignalR("~/images/qrcode/") + spR.ma_sanpham + ".jpg";
+                if (File.Exists(qrCodePath))
+                {
+                    var qrcodeIMG = System.Drawing.Image.FromFile(qrCodePath);
 
+                    qrcodeIMG.Save(msQRCode, System.Drawing.Imaging.ImageFormat.Jpeg);
+                }
+            }
+            else
+            {
+                var infoAncoPoterry = Extension.infoAncoPoterry();
+                var link = string.Format(@"{0}/{1}", infoAncoPoterry["website"], infoAncoPoterry["detail"]);
+                link = link.Replace("[code]", spR.ma_sanpham);
+                var qrCode = qrGenerator.CreateQrCode(link, QRCodeGenerator.ECCLevel.M);
+
+                using (var bitMap = qrCode.GetGraphic(20))
+                {
+                    bitMap.Save(msQRCode, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    bitMap.Dispose();
+                }
+            }
+
+            if (msQRCode.Length > 0)
+            {
                 var patriarchlogo = s1.CreateDrawingPatriarch();
                 var anchorLogo = new HSSFClientAnchor();
                 anchorLogo.Dx1 = 100;
@@ -101,8 +127,10 @@ namespace Catalogue
                 anchorLogo.Col2 = col1 + khoangCachChuVaHinh;
                 anchorLogo.Row2 = row;
                 anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
-                int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
+                int indexlogo = hssfworkbook.AddPicture(msQRCode.ToArray(), PictureType.JPEG);
                 var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
+                msQRCode.Close();
+                msQRCode.Dispose();
             }
 
             md_giasanpham gsp = null;

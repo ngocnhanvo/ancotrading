@@ -107,6 +107,13 @@
 
                 });
                 break;
+            case 8:
+                frmEl.hide();
+                $('#reportviewer').html('<div id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>');
+                $('#reportviewer').load('Tool/TinhGiaBoTheoPhanTram.aspx', function () {
+
+                });
+                break;
         }
     }
 
@@ -422,6 +429,7 @@
         <button style="text-align:left;" onclick="createTool(this, 5)">Xóa / Hủy đề tài</button>
         <button style="text-align:left;" onclick="createTool(this, 6)">Xóa / Hủy chủng loại</button>
         <button style="text-align:left;" onclick="createTool(this, 7)">Tùy chỉnh mẫu In</button>
+        <button style="text-align:left;" onclick="createTool(this, 8)">Tính giá bộ theo %</button>
     </div>
 </div>
 

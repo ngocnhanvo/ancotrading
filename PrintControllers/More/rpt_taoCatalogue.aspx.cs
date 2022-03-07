@@ -278,6 +278,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
             var codeCLs = lstSps.Select(s => s.ma_sanpham.Substring(0, 2)).Distinct().ToList();
             lstCLs = db.md_chungloais.Where(s => codeCLs.Contains(s.code_cl)).OrderBy(s => s.code_cl).ToList();
             idCatalog = Extension.createFileCatalog(lstSps);
+            sptt.idCatalog = idCatalog;
         }
 
         if (!string.IsNullOrWhiteSpace(dts))
