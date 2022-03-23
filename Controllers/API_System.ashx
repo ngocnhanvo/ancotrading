@@ -15,6 +15,9 @@ public class API_System : IHttpHandler {
         string oper = context.Request.QueryString["oper"];
         switch (oper)
         {
+            case "loadImageProductWeb":
+                this.loadImageProductWeb(context);
+                break;
             case "loadImageProduct":
                 this.loadImageProduct(context);
                 break;
@@ -111,6 +114,28 @@ public class API_System : IHttpHandler {
     {
         var msp = context.Request.QueryString["msp"];
         var url = context.Server.MapPath("../" + Public.imgPattern + msp + ".jpg");
+        var lastIndex = url.LastIndexOf(".");
+        var mimeType = url.Substring(lastIndex + 1).ToLower();
+
+        if (!File.Exists(url))
+            url = context.Server.MapPath("../" + Public.imgNotFound);
+
+        using (var fileStream = new FileStream(url, FileMode.Open))
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                fileStream.CopyTo(memoryStream);
+                context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+                context.Response.BinaryWrite(memoryStream.ToArray());
+            }
+        }
+    }
+    
+    public void loadImageProductWeb(HttpContext context)
+    {
+        var msp = context.Request.QueryString["msp"];
+        var path = ExcuteSignalRStatic.getImageProductWeb(msp);
+        var url = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
         var lastIndex = url.LastIndexOf(".");
         var mimeType = url.Substring(lastIndex + 1).ToLower();
 

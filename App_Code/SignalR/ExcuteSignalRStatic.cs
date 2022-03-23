@@ -181,6 +181,42 @@ public static class ExcuteSignalRStatic
         return response;
     }
 
+    public static string getImageProductWeb(string msp)
+    {
+        string image = "";
+        try
+        {
+            string msLink = "images/products/website/";
+            string cl = msp.Substring(0, 2);
+            string dt = msp.Substring(6, 2);
+            string ms = msp.Substring(12, 2);
+            string kd = msp.Substring(0, 9);
+            image = mapPathSignalR("~/" + msLink);
+
+            //Neu co hinh anh mau sac cua F
+            if (File.Exists(image + msp + ".jpg"))
+                image = msLink + msp + ".jpg";
+            else if (File.Exists(image + msp + ".png"))
+                image = msLink + msp + ".png";
+            //Neu co hinh anh mau sac cua S
+            else if (File.Exists(image + kd + ms + ".jpg"))
+                image = msLink + kd + ms + ".jpg";
+            else if (File.Exists(image + kd + ms + ".png"))
+                image = msLink + kd + ms + ".png";
+            //Neu khong co hinh anh mau sac cua S va F thi lay hinh anh mac dinh cua san pham
+            else
+            {
+                image = Public.imgNotFound;
+            }
+        }
+        catch
+        {
+            image = Public.imgNotFound;
+        }
+
+        return image;
+    }
+
     public static string getImageProduct(string msp)
     {
         string image = "";
