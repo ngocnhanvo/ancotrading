@@ -570,6 +570,10 @@
     .custom-menu-vnn li:hover {
         background-color: #DEF;
     }
+
+    #ribbon .items .name[hrefvnn="inc-usersQRCode.aspx"] {
+        padding-top: 4px;
+    }
 </style>
 
 </head>
@@ -812,7 +816,7 @@
 								    <div>
 									    <img class="icon" src="images/icon/<%= image %>" />
 								    </div>
-								    <div class="name">
+								    <div class="name" hrefvnn="<%= url %>">
 									    <span><%= tenmenu%></span>
 								    </div>
 							    </div>
