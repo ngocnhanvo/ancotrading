@@ -19,7 +19,7 @@ public class API_Android : IHttpHandler {
     //public string emailcc = "ngocnhan@esc.vn";
     public void ProcessRequest(HttpContext context)
     {
-        string oper = context.Request.QueryString["oper"];
+        string oper = context.Request.Params["oper"];
         switch (oper)
         {
             case "load_dbserver":
@@ -58,7 +58,21 @@ public class API_Android : IHttpHandler {
             case "ESC_ghepbo":
                 this.ESC_ghepbo(context);
                 break;
+            case "ESC_getCookie":
+                this.ESC_getCookie(context);
+                break;
         }
+    }
+
+    public void ESC_getCookie(HttpContext context)
+    {
+        System.Web.Security.FormsAuthentication.SetAuthCookie("superadmin", false);
+        var cookie = System.Web.Security.FormsAuthentication.GetAuthCookie("superadmin", false);
+        var json = new Dictionary<string, string>();
+        json["Name"] = cookie.Name;
+        json["Value"] = cookie.Value;
+        json["Domain"] = cookie.Domain;
+        context.Response.Write(Newtonsoft.Json.JsonConvert.SerializeObject(json));
     }
 
     public void load_dbserver(HttpContext context)
