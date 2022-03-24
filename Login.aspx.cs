@@ -23,7 +23,7 @@ public partial class Login : System.Web.UI.Page
             string username = dt.Rows[0]["manv"].ToString();
             var remote = (dt.Rows[0]["remote"] + "").ToLower() == "true";
             var canOTP = (dt.Rows[0]["canOTP"] + "").ToLower() == "true";
-            if (host.Contains("118.69.76.143"))
+            if (host.Contains("14.161.40.208"))
             {
                 if (!remote)
                     msg = "Tài khoản không thể truy cập từ xa.";
