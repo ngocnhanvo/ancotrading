@@ -200,59 +200,59 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where chenhLechTyGiaDSBH != 0) as a1BS1,
                 substring((select ', ' + GCchenhLechTyGiaDSBH from @tblPhieuChi where chenhLechTyGiaDSBH != 0 FOR XML PATH ('')),2,100000) as gc_a1BS1,
 
-                (select sum(dsoVTXuatChoBPCtyKhac) from @tblPhieuChi where dsoVTXuatChoBPCtyKhac > 0) as a2,
-                substring((select ', ' + GCdsoVTXuatChoBPCtyKhac from @tblPhieuChi where dsoVTXuatChoBPCtyKhac > 0 FOR XML PATH ('')),2,100000) as gc_a2,
+                (select sum(dsoVTXuatChoBPCtyKhac) from @tblPhieuChi where dsoVTXuatChoBPCtyKhac != 0) as a2,
+                substring((select ', ' + GCdsoVTXuatChoBPCtyKhac from @tblPhieuChi where dsoVTXuatChoBPCtyKhac != 0 FOR XML PATH ('')),2,100000) as gc_a2,
 				
-				(select sum(tienBHXHBHLDNghiViec) from @tblPhieuChi where tienBHXHBHLDNghiViec > 0) as a2BS1,
-                substring((select ', ' + GCtienBHXHBHLDNghiViec from @tblPhieuChi where tienBHXHBHLDNghiViec > 0 FOR XML PATH ('')),2,100000) as gc_a2BS1,
+				(select sum(tienBHXHBHLDNghiViec) from @tblPhieuChi where tienBHXHBHLDNghiViec != 0) as a2BS1,
+                substring((select ', ' + GCtienBHXHBHLDNghiViec from @tblPhieuChi where tienBHXHBHLDNghiViec != 0 FOR XML PATH ('')),2,100000) as gc_a2BS1,
 				
-                (select sum(tienPheLieu) from @tblPhieuChi where tienPheLieu > 0) as a3,
-                substring((select ', ' + GCtienPheLieu from @tblPhieuChi where tienPheLieu > 0 FOR XML PATH ('')),2,100000) as gc_a3,
+                (select sum(tienPheLieu) from @tblPhieuChi where tienPheLieu != 0) as a3,
+                substring((select ', ' + GCtienPheLieu from @tblPhieuChi where tienPheLieu != 0 FOR XML PATH ('')),2,100000) as gc_a3,
 
-                (select sum(nopTamUng) from @tblPhieuChi where nopTamUng > 0) as a4,
-                substring((select ', ' + GCnopTamUng from @tblPhieuChi where nopTamUng > 0 FOR XML PATH ('')),2,100000) as gc_a4,
+                (select sum(nopTamUng) from @tblPhieuChi where nopTamUng != 0) as a4,
+                substring((select ', ' + GCnopTamUng from @tblPhieuChi where nopTamUng != 0 FOR XML PATH ('')),2,100000) as gc_a4,
 
-                (select sum(VTBBPLTNK) from @tblPhieuChi where VTBBPLTNK > 0) as b1,
-                substring((select ', ' + GCVTBBPLTNK from @tblPhieuChi where VTBBPLTNK > 0 FOR XML PATH ('')),2,100000) as gc_b1,
+                (select sum(VTBBPLTNK) from @tblPhieuChi where VTBBPLTNK != 0) as b1,
+                substring((select ', ' + GCVTBBPLTNK from @tblPhieuChi where VTBBPLTNK != 0 FOR XML PATH ('')),2,100000) as gc_b1,
 
-                (select sum(chiPhiXuatKhau) from @tblPhieuChi where chiPhiXuatKhau > 0) as b2,
-                substring((select ', ' + GCchiPhiXuatKhau from @tblPhieuChi where chiPhiXuatKhau > 0 FOR XML PATH ('')),2,100000) as gc_b2,
+                (select sum(chiPhiXuatKhau) from @tblPhieuChi where chiPhiXuatKhau != 0) as b2,
+                substring((select ', ' + GCchiPhiXuatKhau from @tblPhieuChi where chiPhiXuatKhau != 0 FOR XML PATH ('')),2,100000) as gc_b2,
 
-                (select sum(chiPhiHCNS) from @tblPhieuChi where chiPhiHCNS > 0) as b3,
-                substring((select ', ' + GCchiPhiHCNS from @tblPhieuChi where chiPhiHCNS > 0 FOR XML PATH ('')),2,100000) as gc_b3,
+                (select sum(chiPhiHCNS) from @tblPhieuChi where chiPhiHCNS != 0) as b3,
+                substring((select ', ' + GCchiPhiHCNS from @tblPhieuChi where chiPhiHCNS != 0 FOR XML PATH ('')),2,100000) as gc_b3,
 
-                (select sum(luongNV) from @tblPhieuChi where luongNV > 0) as b4,
-                substring((select ', ' + GCluongNV from @tblPhieuChi where luongNV > 0 FOR XML PATH ('')),2,100000) as gc_b4,
+                (select sum(luongNV) from @tblPhieuChi where luongNV != 0) as b4,
+                substring((select ', ' + GCluongNV from @tblPhieuChi where luongNV != 0 FOR XML PATH ('')),2,100000) as gc_b4,
 
-                (select sum(luongCN) from @tblPhieuChi where luongCN > 0) as b5,
-                substring((select ', ' + GCluongCN from @tblPhieuChi where luongCN > 0 FOR XML PATH ('')),2,100000) as gc_b5,
+                (select sum(luongCN) from @tblPhieuChi where luongCN != 0) as b5,
+                substring((select ', ' + GCluongCN from @tblPhieuChi where luongCN != 0 FOR XML PATH ('')),2,100000) as gc_b5,
 
-                (select sum(phiCDBHXHNV) from @tblPhieuChi where phiCDBHXHNV > 0) as b6,
-                substring((select ', ' + GCphiCDBHXHNV from @tblPhieuChi where phiCDBHXHNV > 0 FOR XML PATH ('')),2,100000) as gc_b6,
+                (select sum(phiCDBHXHNV) from @tblPhieuChi where phiCDBHXHNV != 0) as b6,
+                substring((select ', ' + GCphiCDBHXHNV from @tblPhieuChi where phiCDBHXHNV != 0 FOR XML PATH ('')),2,100000) as gc_b6,
 
-                (select sum(phiCDBHXHCN) from @tblPhieuChi where phiCDBHXHCN > 0) as b7,
-                substring((select ', ' + GCphiCDBHXHCN from @tblPhieuChi where phiCDBHXHCN > 0 FOR XML PATH ('')),2,100000) as gc_b7,
+                (select sum(phiCDBHXHCN) from @tblPhieuChi where phiCDBHXHCN != 0) as b7,
+                substring((select ', ' + GCphiCDBHXHCN from @tblPhieuChi where phiCDBHXHCN != 0 FOR XML PATH ('')),2,100000) as gc_b7,
 
-                (select sum(thuongLeTetNV) from @tblPhieuChi where thuongLeTetNV > 0) as b8,
-                substring((select ', ' + GCthuongLeTetNV from @tblPhieuChi where thuongLeTetNV > 0 FOR XML PATH ('')),2,100000) as gc_b8,
+                (select sum(thuongLeTetNV) from @tblPhieuChi where thuongLeTetNV != 0) as b8,
+                substring((select ', ' + GCthuongLeTetNV from @tblPhieuChi where thuongLeTetNV != 0 FOR XML PATH ('')),2,100000) as gc_b8,
 
-                (select sum(thuongLeTetCN) from @tblPhieuChi where thuongLeTetCN > 0) as b9,
-                substring((select ', ' + GCthuongLeTetCN from @tblPhieuChi where thuongLeTetCN > 0 FOR XML PATH ('')),2,100000) as gc_b9,
+                (select sum(thuongLeTetCN) from @tblPhieuChi where thuongLeTetCN != 0) as b9,
+                substring((select ', ' + GCthuongLeTetCN from @tblPhieuChi where thuongLeTetCN != 0 FOR XML PATH ('')),2,100000) as gc_b9,
 
-                (select sum(chiTienMatKhac) from @tblPhieuChi where chiTienMatKhac > 0) as b10,
-                substring((select ', ' + GCchiTienMatKhac from @tblPhieuChi where chiTienMatKhac > 0 FOR XML PATH ('')),2,100000) as gc_b10,
+                (select sum(chiTienMatKhac) from @tblPhieuChi where chiTienMatKhac != 0) as b10,
+                substring((select ', ' + GCchiTienMatKhac from @tblPhieuChi where chiTienMatKhac != 0 FOR XML PATH ('')),2,100000) as gc_b10,
 
                 (select sum(tien) from @tblHoaHong) as b11,
                 '' as gc_b11,
 
-                (select sum(KhieuNai) from @tblPhieuChi where KhieuNai > 0) as b12,
-                substring((select ', ' + GCKhieuNai from @tblPhieuChi where KhieuNai > 0 FOR XML PATH ('')),2,100000) as gc_b12,
+                (select sum(KhieuNai) from @tblPhieuChi where KhieuNai != 0) as b12,
+                substring((select ', ' + GCKhieuNai from @tblPhieuChi where KhieuNai != 0 FOR XML PATH ('')),2,100000) as gc_b12,
 
-                (select sum(cuocGuiMauKiemDinh) from @tblPhieuChi where cuocGuiMauKiemDinh > 0) as b13,
-                substring((select ', ' + GCcuocGuiMauKiemDinh from @tblPhieuChi where cuocGuiMauKiemDinh > 0 FOR XML PATH ('')),2,100000) as gc_b13,
+                (select sum(cuocGuiMauKiemDinh) from @tblPhieuChi where cuocGuiMauKiemDinh != 0) as b13,
+                substring((select ', ' + GCcuocGuiMauKiemDinh from @tblPhieuChi where cuocGuiMauKiemDinh != 0 FOR XML PATH ('')),2,100000) as gc_b13,
 
-                (select sum(tamUngLuongCN) from @tblPhieuChi where tamUngLuongCN > 0) as b14,
-                substring((select ', ' + GCtamUngLuongCN from @tblPhieuChi where tamUngLuongCN > 0 FOR XML PATH ('')),2,100000) as gc_b14
+                (select sum(tamUngLuongCN) from @tblPhieuChi where tamUngLuongCN != 0) as b14,
+                substring((select ', ' + GCtamUngLuongCN from @tblPhieuChi where tamUngLuongCN != 0 FOR XML PATH ('')),2,100000) as gc_b14
 		"
         , thang
         , nam

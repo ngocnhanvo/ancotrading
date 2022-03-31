@@ -34,7 +34,7 @@ public partial class OTP : System.Web.UI.Page
             string username = dt.Rows[0]["manv"].ToString();
             string remote = dt.Rows[0]["remote"] + "";
             string otp_created = dt.Rows[0]["otp_created"] + "";
-            if (host.Contains("14.161.40.208"))
+            if (host.Contains(Extension.API_IPWanApp))
             {
                 if (remote.ToLower() != "true")
                     msg = "Tài khoản không thể truy cập từ xa.";
