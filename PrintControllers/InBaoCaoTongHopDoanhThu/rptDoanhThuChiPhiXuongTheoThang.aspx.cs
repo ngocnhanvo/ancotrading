@@ -242,6 +242,9 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 (select sum(chiTienMatKhac) from @tblPhieuChi where chiTienMatKhac != 0) as b10,
                 substring((select ', ' + GCchiTienMatKhac from @tblPhieuChi where chiTienMatKhac != 0 FOR XML PATH ('')),2,100000) as gc_b10,
 
+                (select sum(trich20PheLieu) from @tblPhieuChi where trich20PheLieu != 0) as b10BS1,
+                substring((select ', ' + GCtrich20PheLieu from @tblPhieuChi where trich20PheLieu != 0 FOR XML PATH ('')),2,100000) as gc_b10BS1,
+
                 (select sum(tien) from @tblHoaHong) as b11,
                 '' as gc_b11,
 
