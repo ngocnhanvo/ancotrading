@@ -206,6 +206,9 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
 				(select sum(tienBHXHBHLDNghiViec) from @tblPhieuChi where tienBHXHBHLDNghiViec != 0) as a2BS1,
                 substring((select ', ' + GCtienBHXHBHLDNghiViec from @tblPhieuChi where tienBHXHBHLDNghiViec != 0 FOR XML PATH ('')),2,100000) as gc_a2BS1,
 				
+				(select sum(dienNuocRacCtyHaca) from @tblPhieuChi where dienNuocRacCtyHaca != 0) as a2BS2,
+                substring((select ', ' + GCdienNuocRacCtyHaca from @tblPhieuChi where dienNuocRacCtyHaca != 0 FOR XML PATH ('')),2,100000) as gc_a2BS2,
+				
                 (select sum(tienPheLieu) from @tblPhieuChi where tienPheLieu != 0) as a3,
                 substring((select ', ' + GCtienPheLieu from @tblPhieuChi where tienPheLieu != 0 FOR XML PATH ('')),2,100000) as gc_a3,
 

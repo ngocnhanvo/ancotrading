@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="inc-donggoi-sanpham.aspx.cs" Inherits="inc_donggoi_sanpham" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="inc-donggoi-sanpham-soanthao.aspx.cs" Inherits="inc_donggoi_sanpham_soanthao" %>
 <%@ Register src="jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
 <script>
 	function ChangeStatus() {
