@@ -78,7 +78,9 @@ public partial class Login : System.Web.UI.Page
                                     string sqlUserSendMail = "select * from nhanvien where manv = @manv and hoatdong = 1";
                                     DataTable dtUserSendMail = mdbc.GetData(sqlUserSendMail, "@manv", "admin@email");
                                     if (dtUserSendMail.Rows.Count <= 0)
-                                        ErrorMessage = "Không tìm thấy tài khoản email mặc định (admin@email)";
+                                    {
+                                        //ErrorMessage = "Không tìm thấy tài khoản email mặc định (admin@email)";
+                                    }
                                     else
                                     {
                                         var emailUserSendMail = (dtUserSendMail.Rows[0]["email"] + "");
