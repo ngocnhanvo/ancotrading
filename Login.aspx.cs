@@ -23,6 +23,12 @@ public partial class Login : System.Web.UI.Page
             string username = dt.Rows[0]["manv"].ToString();
             var remote = (dt.Rows[0]["remote"] + "").ToLower() == "true";
             var canOTP = (dt.Rows[0]["canOTP"] + "").ToLower() == "true";
+            var email = (dt.Rows[0]["email"] + "");
+            var email_pass = (dt.Rows[0]["email_pass"] + "");
+            var otp = (dt.Rows[0]["otp"] as string);
+            var otp_created = (dt.Rows[0]["otp_created"] as DateTime?);
+            var hoten = (dt.Rows[0]["hoten"] + "");
+
             if (host.Contains(Extension.API_IPWanApp))
             {
                 if (!remote)
@@ -31,45 +37,98 @@ public partial class Login : System.Web.UI.Page
                 {
                     if (canOTP)
                     {
-                        char[] charArr = "0123456789".ToCharArray();
-                        var lstRD = new List<string>();
-                        Random objran = new Random();
-                        int noofcharacters = 6;
-                        for (int i = 0; i < noofcharacters; i++)
+                        if (!string.IsNullOrWhiteSpace(otp) & otp_created != null)
                         {
-                            //It will not allow Repetation of Characters
-                            int pos = objran.Next(1, charArr.Length);
-                            if (!lstRD.Contains(charArr.GetValue(pos).ToString()))
-                                lstRD.Add(charArr.GetValue(pos).ToString());
+                            var limitOTPTime = otp_created.Value.AddMinutes(2);
+                            if (DateTime.Now <= limitOTPTime)
+                            {
+                                var totalsecond = Math.Ceiling((limitOTPTime - DateTime.Now).TotalSeconds);
+                                msg = string.Format("Mã OTP chỉ được cấp 2 phút 1 lần, bạn hãy chờ thêm {0} giây nữa.", totalsecond);
+                            }
+                        }
+
+                        if (msg.Length <= 0)
+                        {
+                            char[] charArr = "0123456789".ToCharArray();
+                            var lstRD = new List<string>();
+                            Random objran = new Random();
+                            int noofcharacters = 6;
+                            for (int i = 0; i < noofcharacters; i++)
+                            {
+                                //It will not allow Repetation of Characters
+                                int pos = objran.Next(1, charArr.Length);
+                                if (!lstRD.Contains(charArr.GetValue(pos).ToString()))
+                                    lstRD.Add(charArr.GetValue(pos).ToString());
+                                else
+                                    i--;
+                            }
+
+                            string strrandom = string.Join(" ", lstRD);
+                            string strOpt = strrandom.Replace(" ", "");
+                            sql = "update nhanvien set otp = @otp, otp_created = getdate() where manv = @manv";
+                            mdbc.ExcuteNonQuery(sql, "@manv", username, "@otp", strOpt);
+
+                            string ErrorMessage = "";
+                            try
+                            {
+                                if (string.IsNullOrWhiteSpace(email))
+                                    ErrorMessage = "Không tìm thấy email của bạn";
+                                else
+                                {
+                                    string sqlUserSendMail = "select * from nhanvien where manv = @manv and hoatdong = 1";
+                                    DataTable dtUserSendMail = mdbc.GetData(sqlUserSendMail, "@manv", "admin@email");
+                                    if (dtUserSendMail.Rows.Count <= 0)
+                                        ErrorMessage = "Không tìm thấy tài khoản email mặc định (admin@email)";
+                                    else
+                                    {
+                                        var emailUserSendMail = (dtUserSendMail.Rows[0]["email"] + "");
+                                        var email_passUserSendMail = (dtUserSendMail.Rows[0]["email_pass"] + "");
+                                        if (string.IsNullOrWhiteSpace(emailUserSendMail))
+                                            ErrorMessage = "Không tìm thấy email của tài khoản mặc định.";
+                                        else if (string.IsNullOrWhiteSpace(email))
+                                            ErrorMessage = "tài khoản mặc định chưa được thiết lập mật khẩu email.";
+                                        else
+                                        {
+                                            string sqlSMTP = "select top 1 * from md_smtp where macdinh = 1";
+                                            DataTable dtSMTP = mdbc.GetData(sqlSMTP);
+                                            if (dtSMTP.Rows.Count > 0)
+                                            {
+                                                var smtpserver = dtSMTP.Rows[0]["smtpserver"] + "";
+                                                var port = int.Parse((dtSMTP.Rows[0]["port"] + "").ToLower());
+                                                var mail = new GoogleMail(emailUserSendMail, email_passUserSendMail, smtpserver, port);
+                                                string ngayCapOTP = DateTime.Now.ToString("dd/MM/yyyy");
+                                                string gioCapOTP = DateTime.Now.ToString("HH:mm");
+
+                                                string noidung = "";
+                                                noidung += string.Format(@"Xin chào ""{0}"", mật danh ""{1}""<br/><br/>", hoten, username);
+                                                noidung += string.Format(@"Mật khẩu (OTP) để đăng nhập hệ thống của bạn là <b>{0}</b>.<br/><br/>", strOpt);
+                                                noidung += string.Format(@"Mật khẩu (OTP) này được cấp vào ngày {0} lúc {1}.<br/><br/>", ngayCapOTP, gioCapOTP);
+                                                noidung += string.Format(@"Lưu ý, nếu không phải là bạn, xin đừng cung cấp mã này cho bất cứ ai.<br/><br/>");
+                                                noidung += string.Format(@"ANCO COMPANY LIMITED.");
+
+                                                string tieude = "";
+                                                tieude += string.Format("OTP đăng nhập ANCO TRADING được cấp vào ngày {0} lúc {1}", ngayCapOTP, gioCapOTP);
+
+                                                mail.Send(emailUserSendMail, email, "", "", tieude, noidung, "");
+                                            }
+                                            else
+                                            {
+                                                ErrorMessage = "Không tìm thấy thiết lập SMTP cho email.";
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ErrorMessage = ex.Message;
+                            }
+
+                            if (string.IsNullOrEmpty(ErrorMessage))
+                                Response.Redirect("OTP.aspx?us=" + username, true);
                             else
-                                i--;
+                                msg = ErrorMessage;
                         }
-                        string body = "";
-                        string strrandom = string.Join(" ", lstRD);
-                        body += username + "[" + strrandom + "]";
-                        sql = "update nhanvien set otp = @otp, otp_created = getdate() where manv = @manv";
-                        mdbc.ExcuteNonQuery(sql, "@manv", username, "@otp", strrandom.Replace(" ", ""));
-
-                        string ErrorMessage = "";
-                        try
-                        {
-                            //TwilioClient.Init(Public.accountSid, Public.authToken);
-                            //CreateMessageOptions options = new CreateMessageOptions(new Twilio.Types.PhoneNumber("+84935385878"));
-                            //options.Body = body;
-                            //options.From = new Twilio.Types.PhoneNumber(Public.fromTwillo);
-                            //ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
-                            //var message = MessageResource.Create(options);
-                            //ErrorMessage = message.ErrorMessage;
-                        }
-                        catch
-                        {
-
-                        }
-
-                        if (string.IsNullOrEmpty(ErrorMessage))
-                            Response.Redirect("OTP.aspx?us=" + username, true);
-                        else
-                            msg = ErrorMessage;
                     }
                 }
             }
