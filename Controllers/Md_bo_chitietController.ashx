@@ -45,36 +45,46 @@ public class Md_bo_chitietController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String id = context.Request.Form["id"];
+        var soluong = context.Request.Form["soluong"];
         md_bo_chitiet mnu = db.md_bo_chitiets.FirstOrDefault(s=>s.md_bo_chitiet_id == id);
-        mnu.md_bo_detail = context.Request.Form["md_bo_detail"];   
-		mnu.mota = context.Request.Form["mota"];
-		mnu.hoatdong = true;
-		mnu.ngaytao = DateTime.Now;
-		mnu.ngaycapnhat = DateTime.Now;
-		mnu.nguoitao = UserUtils.getUser(context);
-		mnu.nguoicapnhat = UserUtils.getUser(context);
-        
+        mnu.md_bo_detail = context.Request.Form["md_bo_detail"];
+
+        if (!string.IsNullOrWhiteSpace(soluong))
+            mnu.soluong = int.Parse(soluong);
+
+        mnu.mota = context.Request.Form["mota"];
+        mnu.hoatdong = true;
+        mnu.ngaytao = DateTime.Now;
+        mnu.ngaycapnhat = DateTime.Now;
+        mnu.nguoitao = UserUtils.getUser(context);
+        mnu.nguoicapnhat = UserUtils.getUser(context);
+
         db.SubmitChanges();
     }
 
     public void add(HttpContext context)
     {
+        var soluong = context.Request.Form["soluong"];
+
         md_bo_chitiet mnu = new md_bo_chitiet();
         mnu.md_bo_chitiet_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss"));
         mnu.md_bo_id = context.Request.Form["md_bo_id"];
         mnu.md_bo_detail = context.Request.Form["md_bo_detail"];
-            
-		mnu.mota = context.Request.Form["mota"];
-		mnu.hoatdong = true;
-		mnu.ngaytao = DateTime.Now;
-		mnu.ngaycapnhat = DateTime.Now;
-		mnu.nguoitao = UserUtils.getUser(context);
-		mnu.nguoicapnhat = UserUtils.getUser(context);
+
+        if (!string.IsNullOrWhiteSpace(soluong))
+            mnu.soluong = int.Parse(soluong);
+
+        mnu.mota = context.Request.Form["mota"];
+        mnu.hoatdong = true;
+        mnu.ngaytao = DateTime.Now;
+        mnu.ngaycapnhat = DateTime.Now;
+        mnu.nguoitao = UserUtils.getUser(context);
+        mnu.nguoicapnhat = UserUtils.getUser(context);
 
         db.md_bo_chitiets.InsertOnSubmit(mnu);
         db.SubmitChanges();
@@ -85,10 +95,10 @@ public class Md_bo_chitietController : IHttpHandler
     {
         String id = context.Request.Form["id"];
         md_bo_chitiet mnu = db.md_bo_chitiets.FirstOrDefault(s=>s.md_bo_chitiet_id == id);
-		if(mnu != null) {
-			db.md_bo_chitiets.DeleteOnSubmit(mnu);
-			db.SubmitChanges();
-		}
+        if(mnu != null) {
+            db.md_bo_chitiets.DeleteOnSubmit(mnu);
+            db.SubmitChanges();
+        }
     }
 
     public void load(HttpContext context)
@@ -100,7 +110,7 @@ public class Md_bo_chitietController : IHttpHandler
         String sqlCount = @"SELECT COUNT(*) AS count FROM md_bo bc, md_bo_chitiet bct
             WHERE bc.md_bo_id = bct.md_bo_id
             AND bct.md_bo_id  = N'{0}'";
-        
+
         if (cateId != null)
         {
             sqlCount = string.Format(sqlCount, cateId);
@@ -109,7 +119,7 @@ public class Md_bo_chitietController : IHttpHandler
         {
             sqlCount = string.Format(sqlCount, 0);
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -137,7 +147,7 @@ public class Md_bo_chitietController : IHttpHandler
         }
 
         string strsql = @"select * from( 
-            select bct.md_bo_chitiet_id, bct.md_bo_id, bct.md_bo_detail, bct.ngaytao, bct.nguoitao, bct.ngaycapnhat,
+            select bct.md_bo_chitiet_id, bct.md_bo_id, bct.md_bo_detail, bct.soluong, bct.ngaytao, bct.nguoitao, bct.ngaycapnhat,
             bct.nguoicapnhat, bct.mota, bct.hoatdong, ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + @") as RowNum
             FROM md_bo bc, md_bo_chitiet bct
             WHERE bc.md_bo_id = bct.md_bo_id
@@ -152,7 +162,7 @@ public class Md_bo_chitietController : IHttpHandler
         {
             strsql = string.Format(strsql, 0);
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
@@ -165,12 +175,13 @@ public class Md_bo_chitietController : IHttpHandler
             xml += "<cell><![CDATA[" + row[0] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[1] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[2] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[3].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[4] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[5].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[6] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[3] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[4].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[5] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[6].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row[7] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[9] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

@@ -291,7 +291,7 @@ public static class ExcuteSignalRStatic
         return image;
     }
 
-    public static dynamic getTextFromInner(string inner, string outer, string slinner, string slouter)
+    public static AvariablePrj.OutPutInnerOuter getTextFromInner(string inner, string outer, string slinner, string slouter)
     {
         string packingText = "", sizeText = "", quantity = "";
 
@@ -343,12 +343,12 @@ public static class ExcuteSignalRStatic
         else
             outer = " ";
 
-        return new {
-            packingText,
-            sizeText,
-            inner,
-            outer,
-            quantity
+        return new AvariablePrj.OutPutInnerOuter {
+            packingText = packingText,
+            sizeText = sizeText,
+            inner = inner,
+            outer = outer,
+            quantity = quantity
         };
     }
 

@@ -191,7 +191,7 @@
             SortName="md_bo_detail" 
 			SortOrder="asc"
             UrlFileAction="Controllers/Md_bo_chitietController.ashx" 
-            ColNames="['md_bo_chitiet_id', 'md_bo_id', 'Mã cái', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Ghi chú', 'Hoạt động']"
+            ColNames="['md_bo_chitiet_id', 'md_bo_id', 'Mã cái', 'Số lượng', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Ghi chú', 'Hoạt động']"
             RowNumbers="true"
             OndblClickRow = "function(rowid) { 
 				$('#edit_grid_ds_md_bo_chitiet').click();
@@ -221,6 +221,15 @@
                  , width: 100
                  , edittype: 'text'
                  , editrules:{ required:true }
+            },
+            {
+                 fixed: true, name: 'soluong'
+                 , index: 'bct.soluong'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions:{ defaultValue: '1' }
+				 , align: 'right'
             },
             {
                 fixed: true, name: 'ngaytao'

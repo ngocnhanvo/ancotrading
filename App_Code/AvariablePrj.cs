@@ -55,4 +55,13 @@ public class AvariablePrj
         public int row { get; set; }
         public float fontSize { get; set; }
     }
+
+    public partial class OutPutInnerOuter
+    {
+        public string packingText { get; set; }
+        public string sizeText { get; set; }
+        public string inner { get; set; }
+        public string outer { get; set; }
+        public string quantity { get; set; }
+    }
 }
