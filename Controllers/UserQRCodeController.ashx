@@ -49,7 +49,8 @@ public class UserQRCodeController : IHttpHandler {
         string ma_sanpham = context.Request.Form["msp"];
         string arr_sanpham = "'" + ma_sanpham + "'";
         string msg = "";
-
+        var lstSps = new List<string>();
+        lstSps.Add(ma_sanpham);
         try
         {
             ma_sanpham = ma_sanpham.Split(new[] { '\r', '\n' }).FirstOrDefault();
@@ -92,6 +93,7 @@ public class UserQRCodeController : IHttpHandler {
                     {
                         string sanpham_add = msp_0009 + bct.md_bo_detail + msp_1103;
                         arr_sanpham += ",'" + sanpham_add + "'";
+                        lstSps.Add(sanpham_add);
                     }
                 }
 
@@ -207,14 +209,14 @@ public class UserQRCodeController : IHttpHandler {
 	                    where 1=1
 	                        and sp.hoatdong = 1 
 	                        and sp.trangthai = 'DHD'
-                            and substring(sp.ma_sanpham, 0, 7) = '{0}'
+                            and sp.ma_sanpham in {2}
                     ) A
                     left join md_detai (nolock) dtai on dtai.code_cl = '{1}' and dtai.code_dt = A.detai
                     left join md_mausac (nolock) msac on msac.code_cl = '{1}' and msac.code_dt = A.detai and msac.code_mau = A.mausac
                     where 
                         A.todetai = '{0}'
                         order by A.detai, A.bientau, A.mausac
-				", msp.Substring(0, 6), chungloai);
+				", msp.Substring(0, 6), chungloai, arr_sanpham);
 
                 var dt_detail = mdbc.GetData(sql_detail);
                 var arrBienTau = new List<string>();
