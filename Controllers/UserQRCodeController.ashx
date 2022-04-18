@@ -412,6 +412,8 @@ public class UserQRCodeController : IHttpHandler {
             {
                 var json = new Dictionary<string, string>();
                 json["user"] = user.contactEmail;
+                json["companyName"] = user.companyName;
+                json["contactPerson"] = user.contactPerson;
                 json["ngaytao"] = user.ngaytao.Value.ToString("dd/MM/yyyy");
                 token = JsonConvert.SerializeObject(json);
             }
