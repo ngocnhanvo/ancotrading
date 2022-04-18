@@ -167,6 +167,9 @@ public class ChungLoaiController : IHttpHandler
             m.code_cl = context.Request.Form["code_cl"];
             m.tv_ngan = context.Request.Form["tv_ngan"];
             m.ta_ngan = context.Request.Form["ta_ngan"];
+            m.titleWeb = context.Request.Form["titleWeb"];
+            m.titleSubWeb = context.Request.Form["titleSubWeb"];
+            m.dacTinhCL = context.Request.Form["dacTinhCL"];
 			m.nhomchungloai = context.Request.Form["nhomchungloai"];
             //m.tv_dai = context.Request.Form["tv_dai"];
             //m.ta_dai = context.Request.Form["ta_dai"];
@@ -202,6 +205,9 @@ public class ChungLoaiController : IHttpHandler
                 ta_ngan = context.Request.Form["ta_ngan"],
 				nhomchungloai = context.Request.Form["nhomchungloai"],
                 trangthai = "SOANTHAO",
+                titleWeb = context.Request.Form["titleWeb"],
+                titleSubWeb = context.Request.Form["titleSubWeb"],
+                dacTinhCL = context.Request.Form["dacTinhCL"],
                 //tv_dai = context.Request.Form["tv_dai"],
                 //ta_dai = context.Request.Form["ta_dai"],
 
@@ -274,7 +280,7 @@ public class ChungLoaiController : IHttpHandler
         }
 
         string strsql = "select * from( " +
-            " select cl.md_chungloai_id, cl.trangthai, cl.code_cl, cl.tv_ngan, cl.ta_ngan, cl.tv_dai, cl.ta_dai, cl.ngaytao, cl.nguoitao, cl.ngaycapnhat, cl.nguoicapnhat, cl.mota, cl.hoatdong, ncl.code_ncl " +
+            " select cl.md_chungloai_id, cl.trangthai, cl.code_cl, cl.tv_ngan, cl.ta_ngan, cl.titleWeb, cl.titleSubWeb, cl.dacTinhCL, cl.tv_dai, cl.ta_dai, cl.ngaytao, cl.nguoitao, cl.ngaycapnhat, cl.nguoicapnhat, cl.mota, cl.hoatdong, ncl.code_ncl " +
             " , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
             " FROM md_chungloai cl left join md_nhomchungloai ncl on cl.nhomchungloai = ncl.md_nhomchungloai_id where 1=1 {0}" +
             " )P where RowNum > @start AND RowNum < @end";
@@ -296,13 +302,16 @@ public class ChungLoaiController : IHttpHandler
             xml += "<cell><![CDATA[" + row[4] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[5] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[6] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[7].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[7] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[9].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[10] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[9] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[10].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row[11] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[12] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row[13] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[12].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[13] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[14] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[15] + "]]></cell>";
+			xml += "<cell><![CDATA[" + row[16] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

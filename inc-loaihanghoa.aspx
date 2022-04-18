@@ -144,8 +144,7 @@
             SortName="cl.code_cl" 
             SortOrder="desc"
 			BtnPrint="funcPrintNT"
-            UrlFileAction="Controllers/ChungLoaiController.ashx" 
-            ColNames="['md_chungloai', 'Trạng thái', 'Code Chủng Loại', 'Tiếng Việt', 'Tiếng Anh', 'Tiếng Việt Dài', 'Tiếng Anh Dài',  'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Ghi chú', 'Hoạt động', 'Thuộc nhóm']"
+            UrlFileAction="Controllers/ChungLoaiController.ashx"
             RowNumbers="true"
 			FuncChangeStatus="ChangeStatus"
             OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid, { 
@@ -160,6 +159,7 @@
             ColModel = "[
             {
                 fixed: true, name: 'md_chungloai_id'
+                , label: 'md_chungloai_id'
                 , index: 'cl.md_chungloai_id'
                 , width: 100
                 , hidden: true 
@@ -169,6 +169,7 @@
             },
 			{
                 fixed: true, name: 'trangthai'
+                , label: 'Trạng thái'
                 , index: 'sp.trangthai'
                 , width: 100
                 , editable:false
@@ -180,6 +181,7 @@
             },
             {
                 fixed: true, name: 'code_cl'
+                , label: 'Code Chủng Loại'
                 , index: 'cl.code_cl'
                 , width: 110
                 , edittype: 'text'
@@ -189,6 +191,7 @@
             },
             {
                  fixed: true, name: 'tv_ngan'
+                 , label: 'Tiếng Việt'
                  , index: 'cl.tv_ngan'
                  , editable: true
                  , width: 250
@@ -197,6 +200,7 @@
             },
             {
                 fixed: true, name: 'ta_ngan'
+                , label: 'Tiếng Anh'
                 , index: 'cl.ta_ngan'
                 , width: 250
                 , edittype: 'text'
@@ -204,7 +208,32 @@
                 , editrules: { required:true }
             },
             {
+                fixed: true, name: 'titleWeb'
+                , label: 'Tiêu Đề Web'
+                , index: 'cl.titleWeb'
+                , width: 120
+                , edittype: 'text'
+                , editable:true
+            },
+            {
+                fixed: true, name: 'titleSubWeb'
+                , label: 'Tiêu Đề Dài Web'
+                , index: 'cl.titleWeb'
+                , width: 120
+                , edittype: 'text'
+                , editable:true
+            },
+            {
+                fixed: true, name: 'dacTinhCL'
+                , label: 'Đặc tính'
+                , index: 'cl.dacTinhCL'
+                , width: 120
+                , edittype: 'text'
+                , editable:true
+            },
+            {
                 fixed: true, name: 'tv_dai'
+                , label: 'Tiếng Việt Dài'
                 , index: 'cl.tv_dai'
                 , width: 250
                 , edittype: 'text'
@@ -213,6 +242,7 @@
             },
             {
                 fixed: true, name: 'ta_dai'
+                , label: 'Tiếng Anh Dài'
                 , index: 'cl.ta_dai'
                 , width: 250
                 , edittype: 'text'
@@ -221,6 +251,7 @@
             },
             {
                 fixed: true, name: 'ngaytao'
+                , label: 'Ngày Tạo'
                 , index: 'cl.ngaytao'
                 , width: 100
                 , editable:false
@@ -229,6 +260,7 @@
             },
             {
                 fixed: true, name: 'nguoitao'
+                , label: 'Người Tạo'
                 , index: 'cl.nguoitao'
                 , width: 100
                 , editable:false
@@ -237,6 +269,7 @@
             },
             {
                 fixed: true, name: 'ngaycapnhat'
+                , label: 'Ngày Cập Nhật'
                 , index: 'cl.ngaycapnhat'
                 , width: 100
                 , editable:false
@@ -245,6 +278,7 @@
             },
             {
                 fixed: true, name: 'nguoicapnhat'
+                , label: 'Người Cập Nhật'
                 , index: 'cl.nguoicapnhat'
                 , width: 100
                 , editable:false
@@ -253,6 +287,7 @@
             },
             {
                 fixed: true, name: 'mota'
+                , label: 'Ghi Chú'
                 , index: 'cl.mota'
                 , width: 100
                 , editable:true
@@ -260,6 +295,7 @@
             },
             {
                 fixed: true, name: 'hoatdong', hidden: true
+                , label: 'Hoạt Động'
                 , index: 'cl.hoatdong'
                 , width: 100
                 , editable:true
@@ -272,6 +308,7 @@
                 fixed: true
 				, name: 'nhomchungloai'
                 , index: 'cl.nhomchungloai'
+                , label: 'Thuộc Nhóm'
                 , width: 100
                 , editable:true
                 , edittype: 'select'
