@@ -317,7 +317,7 @@ public class UserQRCodeController : IHttpHandler {
         }
         catch(Exception ex)
         {
-            msg = "0" + ex;
+            msg = "0" +  string.Join("','", lstSps);
         }
 
         context.Response.Write(msg);
