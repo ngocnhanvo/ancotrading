@@ -60,7 +60,7 @@ public class ProductWebController : IHttpHandler
             var sps = db.md_sanphams
                     .Where(s => s.md_chungloai_id == chungloai.md_chungloai_id & s.website == true & s.hoatdong == true & s.trangthai == "DHD")
                     .OrderBy(s => s.ma_sanpham)
-                    .Select(s => new productCatalog { code = s.ma_sanpham, image = "", shape = s.md_kieudang_id })
+                    .Select(s => new productCatalog { code = s.ma_sanpham, image = "", shape = s.md_kieudang_id, titleWeb = "", titleSubWeb = "", dacTinhCL = "" })
                     .ToList();
 
             foreach(var sp in sps)
