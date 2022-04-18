@@ -104,8 +104,13 @@ public class API_System : IHttpHandler {
             using (var memoryStream = new MemoryStream())
             {
                 fileStream.CopyTo(memoryStream);
+                var array = memoryStream.ToArray();
+                fileStream.Close();
+                fileStream.Dispose();
+                memoryStream.Close();
+                memoryStream.Dispose();
                 context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
-                context.Response.BinaryWrite(memoryStream.ToArray());
+                context.Response.BinaryWrite(array);
             }
         }
     }
@@ -125,12 +130,17 @@ public class API_System : IHttpHandler {
             using (var memoryStream = new MemoryStream())
             {
                 fileStream.CopyTo(memoryStream);
+                var array = memoryStream.ToArray();
+                fileStream.Close();
+                fileStream.Dispose();
+                memoryStream.Close();
+                memoryStream.Dispose();
                 context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
-                context.Response.BinaryWrite(memoryStream.ToArray());
+                context.Response.BinaryWrite(array);
             }
         }
     }
-    
+
     public void loadImageProductWeb(HttpContext context)
     {
         var msp = context.Request.QueryString["msp"];
@@ -147,8 +157,13 @@ public class API_System : IHttpHandler {
             using (var memoryStream = new MemoryStream())
             {
                 fileStream.CopyTo(memoryStream);
+                var array = memoryStream.ToArray();
+                fileStream.Close();
+                fileStream.Dispose();
+                memoryStream.Close();
+                memoryStream.Dispose();
                 context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
-                context.Response.BinaryWrite(memoryStream.ToArray());
+                context.Response.BinaryWrite(array);
             }
         }
     }
@@ -169,8 +184,13 @@ public class API_System : IHttpHandler {
             using (var memoryStream = new MemoryStream())
             {
                 fileStream.CopyTo(memoryStream);
+                var array = memoryStream.ToArray();
+                fileStream.Close();
+                fileStream.Dispose();
+                memoryStream.Close();
+                memoryStream.Dispose();
                 context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
-                context.Response.BinaryWrite(memoryStream.ToArray());
+                context.Response.BinaryWrite(array);
             }
         }
     }
