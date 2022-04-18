@@ -220,8 +220,8 @@
                 , label: 'Tiêu Đề Dài Web'
                 , index: 'cl.titleWeb'
                 , width: 120
-                , edittype: 'text'
-                , editable:true
+                , edittype: 'textarea'
+                , editable: true
             },
             {
                 fixed: true, name: 'dacTinhCL'
