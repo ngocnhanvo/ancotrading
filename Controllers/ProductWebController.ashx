@@ -18,6 +18,9 @@ public class ProductWebController : IHttpHandler
         public string code { get; set; }
         public string image { get; set; }
         public string shape { get; set; }
+        public string titleWeb { get; set; }
+        public string titleSubWeb { get; set; }
+        public string dacTinhCL { get; set; }
     }
     private LinqDBDataContext db = new LinqDBDataContext();
 
@@ -64,6 +67,10 @@ public class ProductWebController : IHttpHandler
             {
                 sp.image = ExcuteSignalRStatic.getImageProductWeb(sp.code);
                 sp.shape = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.shape).Select(s => s.ten_ta).FirstOrDefault();
+                sp.titleWeb = chungloai.titleWeb;
+                sp.titleSubWeb = chungloai.titleSubWeb;
+                sp.dacTinhCL = chungloai.dacTinhCL;
+
                 if (sp.shape == "Rd.")
                     sp.shape = "Round Shape";
                 else if (sp.shape == "Sq.")
