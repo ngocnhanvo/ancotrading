@@ -67,7 +67,7 @@ public class ProductWebController : IHttpHandler
             {
                 sp.image = ExcuteSignalRStatic.getImageProductWeb(sp.code);
                 sp.shape = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.shape).Select(s => s.ten_ta).FirstOrDefault();
-                sp.titleWeb = "123213";
+                sp.titleWeb = chungloai.titleWeb;
                 sp.titleSubWeb = chungloai.titleSubWeb;
                 sp.dacTinhCL = chungloai.dacTinhCL;
 
