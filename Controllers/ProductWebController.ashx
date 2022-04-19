@@ -87,7 +87,7 @@ public class ProductWebController : IHttpHandler
                     sp.titleWeb = chungloai.titleWeb;
                     sp.titleSubWeb = chungloai.titleSubWeb;
                     sp.dacTinhCL = chungloai.dacTinhCL;
-                    sp.
+                    sp.title = chungloai.ta_ngan == null ? "" : chungloai.ta_ngan;
 
                     if (sp.shape == "Rd.")
                         sp.shape = "Round Shape";
