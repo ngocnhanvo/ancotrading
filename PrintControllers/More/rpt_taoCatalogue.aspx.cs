@@ -179,14 +179,14 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
 
         row++;
         var row2 = s1.CreateRow(row);
-        var text = "http://www.ancopottery.com/Views/QRCode/v2/CatalogueDetails.aspx?id=" + idCatalog;
+        var text = "http://www.ancopottery.com/presentation?id=" + idCatalog;
         HSSFHyperlink link = new HSSFHyperlink(HyperlinkType.Url);
         link.Address = text;
         link.FirstColumn = 0;
         link.LastColumn = maxColumn;
         link.FirstRow = row;
         link.LastRow = row;
-        row2.CreateCell(0).SetCellValue("http://www.ancopottery.com/presentation");
+        row2.CreateCell(0).SetCellValue(text);
         row2.GetCell(0).Hyperlink = link;
         ICellStyle cellUn = hssfworkbook.CreateCellStyle();
         IFont funderline = hssfworkbook.CreateFont();

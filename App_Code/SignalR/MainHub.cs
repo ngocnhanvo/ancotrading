@@ -1065,14 +1065,14 @@ public class MainHub : Hub
 
                 body += string.Format(html_span, "- Our company's name: " + ten_dtkd);
                 body += "<br>";
-                body += string.Format(html_span, "- Our address: " + address);
-                body += "<br>";
+                //body += string.Format(html_span, "- Our address: " + address);
+                //body += "<br>";
                 body += string.Format(html_span, "- Our email's address: " + email);
                 body += "<br>";
                 body += string.Format(html_span, "- Person contact: " + nguoilienhe);
                 body += "<br>";
-                body += string.Format(html_span, "- Customer's brief introduction: " + note);
-                body += "<br>";
+                //body += string.Format(html_span, "- Customer's brief introduction: " + note);
+                //body += "<br>";
                 body += "<br>";
 
                 body += string.Format(html_span, "We look forward to receiving your quotation.");

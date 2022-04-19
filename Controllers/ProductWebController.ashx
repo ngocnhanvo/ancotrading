@@ -50,7 +50,20 @@ public class ProductWebController : IHttpHandler
     {
         string msg = "";
         var title = context.Request.Form["title"].ToLower().Trim();
-        var chungloai = db.md_chungloais.Where(s => s.ta_ngan.ToLower().Trim() == title).FirstOrDefault();
+        var idPresent = context.Request.Form["idPresent"].ToLower().Trim();
+        var code = context.Request.Form["code"].ToLower().Trim();
+        md_chungloai chungloai = null;
+        if(!string.IsNullOrWhiteSpace(code))
+        {
+            var spCode = db.md_sanphams.Where(s => s.ma_sanpham.ToLower().Trim() == code).FirstOrDefault();
+            if(spCode != null)
+            {
+                chungloai = db.md_chungloais.Where(s => s.md_chungloai_id == spCode.md_chungloai_id).FirstOrDefault();
+            }
+        }
+        else
+            chungloai = db.md_chungloais.Where(s => s.ta_ngan.ToLower().Trim() == title).FirstOrDefault();
+
         if(chungloai == null)
         {
             msg = "0" + string.Format(@"""{0}"" Collecttion is not found", title);
