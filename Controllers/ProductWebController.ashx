@@ -18,6 +18,7 @@ public class ProductWebController : IHttpHandler
         public string code { get; set; }
         public string image { get; set; }
         public string shape { get; set; }
+        public string title { get; set; }
         public string titleWeb { get; set; }
         public string titleSubWeb { get; set; }
         public string dacTinhCL { get; set; }
@@ -49,50 +50,59 @@ public class ProductWebController : IHttpHandler
     public void getList(HttpContext context)
     {
         string msg = "";
-        var title = context.Request.Form["title"].ToLower().Trim();
-        var idPresent = context.Request.Form["idPresent"].ToLower().Trim();
-        var code = context.Request.Form["code"].ToLower().Trim();
-        md_chungloai chungloai = null;
-        if(!string.IsNullOrWhiteSpace(code))
+
+        try
         {
-            var spCode = db.md_sanphams.Where(s => s.ma_sanpham.ToLower().Trim() == code).FirstOrDefault();
-            if(spCode != null)
+            var title = context.Request.Form["title"].ToLower().Trim();
+            var idPresent = context.Request.Form["idPresent"].ToLower().Trim();
+            var code = context.Request.Form["code"].ToLower().Trim();
+            md_chungloai chungloai = null;
+            if (!string.IsNullOrWhiteSpace(code))
             {
-                chungloai = db.md_chungloais.Where(s => s.md_chungloai_id == spCode.md_chungloai_id).FirstOrDefault();
+                var spCode = db.md_sanphams.Where(s => s.ma_sanpham.ToLower().Trim() == code).FirstOrDefault();
+                if (spCode != null)
+                {
+                    chungloai = db.md_chungloais.Where(s => s.md_chungloai_id == spCode.md_chungloai_id).FirstOrDefault();
+                }
+            }
+            else
+                chungloai = db.md_chungloais.Where(s => s.ta_ngan.ToLower().Trim() == title).FirstOrDefault();
+
+            if (chungloai == null)
+            {
+                msg = "0" + string.Format(@"""{0}"" Collecttion is not found", title);
+            }
+            else
+            {
+                var sps = db.md_sanphams
+                        .Where(s => s.md_chungloai_id == chungloai.md_chungloai_id & s.website == true & s.hoatdong == true & s.trangthai == "DHD")
+                        .OrderBy(s => s.ma_sanpham)
+                        .Select(s => new productCatalog { code = s.ma_sanpham, image = "", shape = s.md_kieudang_id, titleWeb = "", titleSubWeb = "", dacTinhCL = "" })
+                        .ToList();
+
+                foreach (var sp in sps)
+                {
+                    sp.image = ExcuteSignalRStatic.getImageProductWeb(sp.code);
+                    sp.shape = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.shape).Select(s => s.ten_ta).FirstOrDefault();
+                    sp.titleWeb = chungloai.titleWeb;
+                    sp.titleSubWeb = chungloai.titleSubWeb;
+                    sp.dacTinhCL = chungloai.dacTinhCL;
+                    sp.
+
+                    if (sp.shape == "Rd.")
+                        sp.shape = "Round Shape";
+                    else if (sp.shape == "Sq.")
+                        sp.shape = "Squard Shape";
+                    else
+                        sp.shape = sp.shape + " Shape";
+                }
+
+                msg = "1" + Newtonsoft.Json.JsonConvert.SerializeObject(sps);
             }
         }
-        else
-            chungloai = db.md_chungloais.Where(s => s.ta_ngan.ToLower().Trim() == title).FirstOrDefault();
-
-        if(chungloai == null)
+        catch(Exception ex)
         {
-            msg = "0" + string.Format(@"""{0}"" Collecttion is not found", title);
-        }
-        else
-        {
-            var sps = db.md_sanphams
-                    .Where(s => s.md_chungloai_id == chungloai.md_chungloai_id & s.website == true & s.hoatdong == true & s.trangthai == "DHD")
-                    .OrderBy(s => s.ma_sanpham)
-                    .Select(s => new productCatalog { code = s.ma_sanpham, image = "", shape = s.md_kieudang_id, titleWeb = "", titleSubWeb = "", dacTinhCL = "" })
-                    .ToList();
-
-            foreach(var sp in sps)
-            {
-                sp.image = ExcuteSignalRStatic.getImageProductWeb(sp.code);
-                sp.shape = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.shape).Select(s => s.ten_ta).FirstOrDefault();
-                sp.titleWeb = chungloai.titleWeb;
-                sp.titleSubWeb = chungloai.titleSubWeb;
-                sp.dacTinhCL = chungloai.dacTinhCL;
-
-                if (sp.shape == "Rd.")
-                    sp.shape = "Round Shape";
-                else if (sp.shape == "Sq.")
-                    sp.shape = "Squard Shape";
-                else
-                    sp.shape = sp.shape + " Shape";
-            }
-
-            msg = "1" + Newtonsoft.Json.JsonConvert.SerializeObject(sps);
+            msg = "0" + ex.Message;
         }
 
         context.Response.Write(msg);
