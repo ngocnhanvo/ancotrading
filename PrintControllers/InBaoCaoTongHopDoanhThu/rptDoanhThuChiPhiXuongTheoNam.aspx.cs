@@ -77,8 +77,8 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
 			declare @tblTienDSBH table (tien decimal(18,2), thang int)
             insert into @tblTienDSBH
 			select
-				(sum(tien) from @tbl where thang = a.thang) + 
-				(select SUM(a.phicong - a.phitru) from (select distinct phicong, phitru, nxid from @tbl where thang = a.thang)a) 
+				(select sum(tien) from @tbl where thang = a.thang) + 
+				(select sum(a.phicong - a.phitru) from (select distinct phicong, phitru, nxid from @tbl where thang = a.thang)a),
 				thang
 				from @tbl a
 				group by a.thang
@@ -170,18 +170,18 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             select 
                 @nam as nam,
                 (select top 1 noDauNam from @tblNhapLieu where thang = 1) as noDauNam,
-                (select sum(tien) from @tbl where thang = 1) as a_1_1,
-                (select sum(tien) from @tbl where thang = 2) as a_1_2,
-                (select sum(tien) from @tbl where thang = 3) as a_1_3,
-                (select sum(tien) from @tbl where thang = 4) as a_1_4,
-                (select sum(tien) from @tbl where thang = 5) as a_1_5,
-                (select sum(tien) from @tbl where thang = 6) as a_1_6,
-                (select sum(tien) from @tbl where thang = 7) as a_1_7,
-                (select sum(tien) from @tbl where thang = 8) as a_1_8,
-                (select sum(tien) from @tbl where thang = 9) as a_1_9,
-                (select sum(tien) from @tbl where thang = 10) as a_1_10,
-                (select sum(tien) from @tbl where thang = 11) as a_1_11,
-                (select sum(tien) from @tbl where thang = 12) as a_1_12,
+                (select sum(tien) from @tblTienDSBH where thang = 1) as a_1_1,
+                (select sum(tien) from @tblTienDSBH where thang = 2) as a_1_2,
+                (select sum(tien) from @tblTienDSBH where thang = 3) as a_1_3,
+                (select sum(tien) from @tblTienDSBH where thang = 4) as a_1_4,
+                (select sum(tien) from @tblTienDSBH where thang = 5) as a_1_5,
+                (select sum(tien) from @tblTienDSBH where thang = 6) as a_1_6,
+                (select sum(tien) from @tblTienDSBH where thang = 7) as a_1_7,
+                (select sum(tien) from @tblTienDSBH where thang = 8) as a_1_8,
+                (select sum(tien) from @tblTienDSBH where thang = 9) as a_1_9,
+                (select sum(tien) from @tblTienDSBH where thang = 10) as a_1_10,
+                (select sum(tien) from @tblTienDSBH where thang = 11) as a_1_11,
+                (select sum(tien) from @tblTienDSBH where thang = 12) as a_1_12,
     
                 (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 1) as a_1BS1_1,
                 (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where thang = 2) as a_1BS1_2,
