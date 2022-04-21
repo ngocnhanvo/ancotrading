@@ -56,14 +56,13 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 civ.ngay_motokhai between @tungay and @denngay
                 and civ.md_trangthai_id = 'HIEULUC'
             -----------------------------------
-            declare @tbl table (tien decimal(18,2), thang int)
+			declare @tbl table (tien decimal(18,2), phicong decimal(18,2), phitru decimal(18,2), nxid nvarchar(32), thang int)
             insert into @tbl
-			select
-				sum(A.tien),
-				A.thang
-			from (
 				select
-					(cdnx.slthuc_nhapxuat * cdnx.dongia) - (cdnx.slthuc_nhapxuat * cdnx.dongia) * cnx.discount / 100 + cnx.phicong - cnx.phitru as tien,
+					(cdnx.slthuc_nhapxuat * cdnx.dongia) - (cdnx.slthuc_nhapxuat * cdnx.dongia) * isnull(cnx.discount, 0) / 100 as tien,
+					phicong,
+					cnx.phitru,
+					cnx.c_nhapxuat_id,
 					MONTH(civ.ngay_motokhai) as thang
 				from 
 					c_dongnhapxuat cdnx, c_nhapxuat cnx, c_dongnhapxuat cdnx2, c_dongpklinv cdiv, @tblINV civ
@@ -74,9 +73,16 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
 					and cdnx.c_dongnhapxuat_id = cdnx2.dongnhapxuat_ref
 					and cdnx2.c_dongnhapxuat_id = cdiv.c_dongnhapxuat_id
 					and civ.id = cdiv.c_packinginvoice_id
-			)A
-			group by A.thang
             -----------------------------------
+			declare @tblTienDSBH table (tien decimal(18,2), thang int)
+            insert into @tblTienDSBH
+			select
+				(sum(tien) from @tbl where thang = a.thang) + 
+				(sum(phicong - phitru) from @tbl where thang = a.thang group by nxid),
+				thang
+				from @tbl a
+				group by a.thang
+			-----------------------------------
             declare @tblDongINV_HoaHong table (c_packinginvoice_id nvarchar(32))
             insert into @tblDongINV_HoaHong
             select distinct cdiv.c_packinginvoice_id

@@ -61,10 +61,13 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 civ.ngay_motokhai between @tungay and @denngay
                 and civ.md_trangthai_id = 'HIEULUC' 
 				
-            declare @tbl table (tien decimal(18,2))
+            declare @tbl table (tien decimal(18,2), phicong decimal(18,2), phitru decimal(18,2), nxid nvarchar(32))
             insert into @tbl
 			select
-				sum((cdnx.slthuc_nhapxuat * cdnx.dongia) - (cdnx.slthuc_nhapxuat * cdnx.dongia) * cnx.discount / 100 + cnx.phicong - cnx.phitru)
+				(cdnx.slthuc_nhapxuat * cdnx.dongia) - (cdnx.slthuc_nhapxuat * cdnx.dongia) * isnull(cnx.discount, 0) / 100 as tien,
+				cnx.phicong,
+				cnx.phitru,
+				cnx.c_nhapxuat_id
             from 
 				c_dongnhapxuat cdnx, c_nhapxuat cnx, c_dongnhapxuat cdnx2, c_dongpklinv cdiv, @tblINV civ
 			where 
@@ -74,6 +77,11 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
 				and cdnx.c_dongnhapxuat_id = cdnx2.dongnhapxuat_ref
 				and cdnx2.c_dongnhapxuat_id = cdiv.c_dongnhapxuat_id
 				and civ.id = cdiv.c_packinginvoice_id
+				
+			declare @tblTienDSBH table (tien decimal(18,2))
+            insert into @tblTienDSBH
+			select
+				(sum(tien) from @tbl) + (sum(phicong - phitru) from @tbl group by nxid) 
 
             declare @tblHoaHong table (tien decimal(18,2), thang int)
             insert into @tblHoaHong
@@ -199,7 +207,7 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 @thang_nam as thang_nam,
                 (select sum(noDauNam) from @tblNhapLieu where thang = 1) as noDauNam,
 	            
-                (select sum(tien) from @tbl) as a1,
+                (select sum(tien) from @tblTienDSBH) as a1,
                 '' as gc_a1,
                 
                 (select sum(chenhLechTyGiaDSBH) from @tblPhieuChi where chenhLechTyGiaDSBH != 0) as a1BS1,
