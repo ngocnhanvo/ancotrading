@@ -64,7 +64,7 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             declare @tbl table (tien decimal(18,2))
             insert into @tbl
 			select
-				sum((cdnx.slthuc_nhapxuat * cdnx.dongia) - (cdnx.slthuc_nhapxuat * cdnx.dongia) * cnx.discount / 100)
+				sum((cdnx.slthuc_nhapxuat * cdnx.dongia) - (cdnx.slthuc_nhapxuat * cdnx.dongia) * cnx.discount / 100 + cnx.phicong - cnx.phitru)
             from 
 				c_dongnhapxuat cdnx, c_nhapxuat cnx, c_dongnhapxuat cdnx2, c_dongpklinv cdiv, @tblINV civ
 			where 
