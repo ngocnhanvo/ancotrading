@@ -78,7 +78,7 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             insert into @tblTienDSBH
 			select
 				(sum(tien) from @tbl where thang = a.thang) + 
-				(sum(phicong - phitru) from @tbl where thang = a.thang group by nxid),
+				(select SUM(a.phicong - a.phitru) from (select distinct phicong, phitru, nxid from @tbl where thang = a.thang)a) 
 				thang
 				from @tbl a
 				group by a.thang

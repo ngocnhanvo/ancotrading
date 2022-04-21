@@ -81,7 +81,8 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
 			declare @tblTienDSBH table (tien decimal(18,2))
             insert into @tblTienDSBH
 			select
-				(sum(tien) from @tbl) + (sum(phicong - phitru) from @tbl group by nxid) 
+				(select sum(tien) from @tbl) + 
+				(select SUM(a.phicong - a.phitru) from (select distinct phicong, phitru, nxid from @tbl)a) 
 
             declare @tblHoaHong table (tien decimal(18,2), thang int)
             insert into @tblHoaHong
