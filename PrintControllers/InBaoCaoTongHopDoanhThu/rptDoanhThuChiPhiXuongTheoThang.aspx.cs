@@ -49,17 +49,8 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             declare @nam int = {1};
             declare @thang_nam nvarchar(32) = N'{0}/{1}'
             declare @xuongId nvarchar(32) = N'{2}'
-
-            declare @tbl table (tien decimal(18,2))
-            insert into @tbl
-            select nx.grandtotal as tien
-            from c_nhapxuat (nolock) nx 
-            where 
-	            ngay_giaonhan between @tungay and @denngay
-	            and nx.md_doitackinhdoanh_id = @xuongId
-                and nx.md_trangthai_id = 'HIEULUC'
-            
-            declare @tblINV table (id varchar(32), tienhoahong decimal(18,2), ngay_motokhai datetime)
+			
+			declare @tblINV table (id varchar(32), tienhoahong decimal(18,2), ngay_motokhai datetime)
             insert into @tblINV
             select 
                 civ.c_packinginvoice_id, 
@@ -68,7 +59,21 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             from c_packinginvoice civ
             where 
                 civ.ngay_motokhai between @tungay and @denngay
-                and civ.md_trangthai_id = 'HIEULUC'              
+                and civ.md_trangthai_id = 'HIEULUC' 
+				
+            declare @tbl table (tien decimal(18,2))
+            insert into @tbl
+			select
+				sum((cdnx.slthuc_nhapxuat * cdnx.dongia) - (cdnx.slthuc_nhapxuat * cdnx.dongia) * cnx.discount / 100)
+            from 
+				c_dongnhapxuat cdnx, c_nhapxuat cnx, c_dongnhapxuat cdnx2, c_dongpklinv cdiv, @tblINV civ
+			where 
+				cnx.c_nhapxuat_id = cdnx.c_nhapxuat_id
+				and cnx.md_doitackinhdoanh_id = @xuongId
+				and cnx.md_loaichungtu_id = 'NK'
+				and cdnx.c_dongnhapxuat_id = cdnx2.dongnhapxuat_ref
+				and cdnx2.c_dongnhapxuat_id = cdiv.c_dongnhapxuat_id
+				and civ.id = cdiv.c_packinginvoice_id
 
             declare @tblHoaHong table (tien decimal(18,2), thang int)
             insert into @tblHoaHong
