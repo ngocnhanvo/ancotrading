@@ -59,17 +59,23 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             declare @tbl table (tien decimal(18,2), thang int)
             insert into @tbl
 			select
-				sum((cdnx.slthuc_nhapxuat * cdnx.dongia) - (cdnx.slthuc_nhapxuat * cdnx.dongia) * cnx.discount / 100),
-				MONTH(civ.ngay_motokhai) as thang
-            from 
-				c_dongnhapxuat cdnx, c_nhapxuat cnx, c_dongnhapxuat cdnx2, c_dongpklinv cdiv, @tblINV civ
-			where 
-				cnx.c_nhapxuat_id = cdnx.c_nhapxuat_id
-				and cnx.md_doitackinhdoanh_id = @xuongId
-				and cnx.md_loaichungtu_id = 'NK'
-				and cdnx.c_dongnhapxuat_id = cdnx2.dongnhapxuat_ref
-				and cdnx2.c_dongnhapxuat_id = cdiv.c_dongnhapxuat_id
-				and civ.id = cdiv.c_packinginvoice_id
+				sum(A.tien),
+				A.thang
+			from (
+				select
+					(cdnx.slthuc_nhapxuat * cdnx.dongia) - (cdnx.slthuc_nhapxuat * cdnx.dongia) * cnx.discount / 100 as tien,
+					MONTH(civ.ngay_motokhai) as thang
+				from 
+					c_dongnhapxuat cdnx, c_nhapxuat cnx, c_dongnhapxuat cdnx2, c_dongpklinv cdiv, @tblINV civ
+				where 
+					cnx.c_nhapxuat_id = cdnx.c_nhapxuat_id
+					and cnx.md_doitackinhdoanh_id = @xuongId
+					and cnx.md_loaichungtu_id = 'NK'
+					and cdnx.c_dongnhapxuat_id = cdnx2.dongnhapxuat_ref
+					and cdnx2.c_dongnhapxuat_id = cdiv.c_dongnhapxuat_id
+					and civ.id = cdiv.c_packinginvoice_id
+			)A
+			group by A.thang
             -----------------------------------
             declare @tblDongINV_HoaHong table (c_packinginvoice_id nvarchar(32))
             insert into @tblDongINV_HoaHong
