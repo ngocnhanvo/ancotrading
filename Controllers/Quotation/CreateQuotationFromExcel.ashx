@@ -180,11 +180,12 @@ public class CreateQuotationFromExcel : IHttpHandler
         int totalCount = cellCollection.Rows.Count;
         int rowErr = 0, rowAdd = 0;
         string msg = "";
+		bool choPhepImport = true;
         for (int i = 0; i < totalCount; i++)
         {
             string khachhang_id = context.Request.Form["khachhang_v"];
             string ma_sanpham = "", docquyen = "", kiemtraDQ = "0";
-            decimal soluong = 0, giafob = 0;
+            decimal soluong = 1, giafob = 0;
             try
             {
                 Row row = cellCollection.Rows[i];
@@ -192,10 +193,16 @@ public class CreateQuotationFromExcel : IHttpHandler
 				if(row.GetCell(0) != null)
 					ma_sanpham = row.GetCell(0).Value.ToString();
 				
-				if(row.GetCell(1) != null)
-					kiemtraDQ = row.GetCell(1).Value.ToString();
+				try
+				{
+					if(row.GetCell(1) != null)
+						kiemtraDQ = row.GetCell(1).Value.ToString();
+				} catch 
+				{ 
+				
+				}
                 
-				try { soluong = decimal.Parse(row.GetCell(1).Value.ToString()); } catch { }
+				//try { soluong = decimal.Parse(row.GetCell(1).Value.ToString()); } catch { }
 
                 ma_sanpham = ma_sanpham.Replace(" ", "");
                 md_sanpham sp = db.md_sanphams.FirstOrDefault(s => s.ma_sanpham == ma_sanpham);
@@ -215,6 +222,7 @@ public class CreateQuotationFromExcel : IHttpHandler
                             docquyen = check_hanghoadocquyen(sp.md_sanpham_id, khachhang_id);
 							if(kiemtraDQ != "1" & docquyen != "") 
 							{
+								choPhepImport = false;
 								msg += string.Format(@"<div style='color:red'>Sản phẩm ""{0}"" được bán độc quyền.</div>", ma_sanpham);
 							}
 							else 
@@ -340,7 +348,9 @@ public class CreateQuotationFromExcel : IHttpHandler
 
         if (rowAdd == 0)
             msg = "false#" + msg;
-
+		else if(msg.Length > 0 & !choPhepImport)
+			msg = "false#" + msg;
+			
         return msg;
     }
 
