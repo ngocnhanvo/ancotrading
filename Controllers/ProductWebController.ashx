@@ -54,6 +54,10 @@ public class ProductWebController : IHttpHandler
         try
         {
             var title = context.Request.Form["title"].ToLower().Trim();
+            var a1 = context.Request.Form["a1"];
+            var a2 = context.Request.Form["a2"];
+            var a3 = context.Request.Form["a3"];
+            var a4 = context.Request.Form["a4"];
             var idPresent = context.Request.Form["idPresent"].ToLower().Trim();
             var code = context.Request.Form["code"].ToLower().Trim();
             md_chungloai chungloai = null;
@@ -74,11 +78,36 @@ public class ProductWebController : IHttpHandler
             }
             else
             {
+
                 var sps = db.md_sanphams
                         .Where(s => s.md_chungloai_id == chungloai.md_chungloai_id & s.website == true & s.hoatdong == true & s.trangthai == "DHD")
                         .OrderBy(s => s.ma_sanpham)
                         .Select(s => new productCatalog { code = s.ma_sanpham, image = "", shape = s.md_kieudang_id, titleWeb = "", titleSubWeb = "", dacTinhCL = "" })
                         .ToList();
+
+                if(!string.IsNullOrWhiteSpace(a1))
+                {
+                    a1 = a1.Trim();
+                    sps = sps.Where(s => s.code.Substring(0, 2).StartsWith(a1)).ToList();
+                }
+
+                if(!string.IsNullOrWhiteSpace(a2))
+                {
+                    a2 = a2.Trim();
+                    sps = sps.Where(s => s.code.Substring(3, 5).StartsWith(a2)).ToList();
+                }
+
+                if(!string.IsNullOrWhiteSpace(a3))
+                {
+                    a3 = a3.Trim();
+                    sps = sps.Where(s => s.code.Substring(9, 2).StartsWith(a3)).ToList();
+                }
+
+                if(!string.IsNullOrWhiteSpace(a4))
+                {
+                    a4 = a4.Trim();
+                    sps = sps.Where(s => s.code.Substring(12, 2).StartsWith(a4)).ToList();
+                }
 
                 foreach (var sp in sps)
                 {
