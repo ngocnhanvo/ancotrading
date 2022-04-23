@@ -153,7 +153,7 @@ public class ProductWebController : IHttpHandler
                 }
             }
 
-            sps = sps.Distinct().OrderBy(s=>s.code).ToList();
+            sps = sps.GroupBy(s=>s.code).Select(s=>s.First()).OrderBy(s=>s.code).ToList();
 
         end:;
 
