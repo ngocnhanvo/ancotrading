@@ -31,7 +31,7 @@
             {
                  fixed: true, name: 'chungloai'
                  , index: 'clt.chungloai' 
-                 , label: 'Chủng loại'
+                 , label: 'Chủng loại (a0)'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -40,7 +40,7 @@
             {
                  fixed: true, name: 'kieudang'
                  , index: 'clt.kieudang' 
-                 , label: 'Kiểu dáng'
+                 , label: 'Kiểu dáng  (a1)'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -49,7 +49,7 @@
             {
                  fixed: true, name: 'detai'
                  , index: 'clt.detai' 
-                 , label: 'Đề tài'
+                 , label: 'Đề tài (a2)'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -58,7 +58,7 @@
             {
                  fixed: true, name: 'bocai'
                  , index: 'clt.bocai' 
-                 , label: 'Bộ cái'
+                 , label: 'Bộ cái (a3)'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -67,7 +67,7 @@
             {
                  fixed: true, name: 'mausac'
                  , index: 'clt.mausac' 
-                 , label: 'Màu sắc'
+                 , label: 'Màu sắc (a4)'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
