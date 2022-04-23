@@ -50,7 +50,7 @@ public class UserQRCodeController : IHttpHandler {
         string arr_sanpham = "'" + ma_sanpham + "'";
         string msg = "";
         var lstSps = new List<string>();
-        
+
         try
         {
             lstSps.Add(ma_sanpham.Substring(0, ma_sanpham.Length - 3));
@@ -84,10 +84,17 @@ public class UserQRCodeController : IHttpHandler {
                 //dong 7, dong 8, dong 9
                 if (bc.Substring(0, 1) != "0" & bc != "S1")
                 {
-                    //Tim` bo S cua san pham
+                    var arrBoChas = new string[] {
+                        "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9",
+                        "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9"
+                    };
+                    //Tim` bo cha cua san pham
                     string msp_0009 = sp.ma_sanpham.Substring(0, 9), msp_1103 = sp.ma_sanpham.Substring(11, 3);
-                    string ma_bo_cha = db.md_sanphams.Where(s => s.ma_sanpham.Substring(0, 9) == msp_0009
-                    & s.ma_sanpham.Substring(11, 3) == msp_1103 & s.ma_sanpham.Substring(9, 2).Contains("S")).Select(s => s.ma_sanpham.Substring(9, 2)).FirstOrDefault();
+                    string ma_bo_cha = db.md_sanphams.Where(s =>
+                            s.ma_sanpham.Substring(0, 9) == msp_0009
+                            & s.ma_sanpham.Substring(11, 3) == msp_1103
+                            & arrBoChas.Contains(s.ma_sanpham.Substring(9, 2))
+                        ).Select(s => s.ma_sanpham.Substring(9, 2)).FirstOrDefault();
                     //Lay cac ma cai thuoc bo cua san pham
                     string md_bo_id = db.md_bos.Where(s => s.ma_bo == bc & s.ma_bo_cha == ma_bo_cha).Select(s => s.md_bo_id).FirstOrDefault();
                     foreach (var bct in db.md_bo_chitiets.Where(s => s.md_bo_id == md_bo_id))
