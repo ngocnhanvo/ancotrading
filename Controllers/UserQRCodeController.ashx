@@ -309,7 +309,7 @@ public class UserQRCodeController : IHttpHandler {
                 json["dong16"] = dong16;
 
                 var url = context.Request.Url;
-                json["image"] = "Controllers/API_System.ashx?oper=loadImageProduct&msp=" + msp;
+                json["image"] = ExcuteSignalRStatic.getImageProduct(msp);
                 json["detai"] = detai_json;
                 json["bientau"] = bientau_json;
                 json["mausac"] = mausac_json;
