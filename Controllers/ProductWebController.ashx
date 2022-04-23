@@ -67,7 +67,9 @@ public class ProductWebController : IHttpHandler
                 {
                     sps.Add(new productCatalog()
                     {
-                        code = item["code"]
+                        code = item["code"],
+                        titleWeb = "",
+                        titleSubWeb = ""
                     });
                 }
 
@@ -141,7 +143,9 @@ public class ProductWebController : IHttpHandler
                         sps.Add(new productCatalog()
                         {
                             code = row["ma_sanpham"].ToString(),
-                            shape = row["md_kieudang_id"].ToString()
+                            shape = row["md_kieudang_id"].ToString(),
+                            titleWeb = a1,
+                            titleSubWeb = a2
                         });
                     }
                 }
