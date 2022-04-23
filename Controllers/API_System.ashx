@@ -213,7 +213,6 @@ public class API_System : IHttpHandler {
         {
                 context.Response.ContentType = "text/plain";
                 context.Response.Write(ex.Message);
-                return;
         }
 
         context.Response.End();
