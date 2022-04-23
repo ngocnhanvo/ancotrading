@@ -153,10 +153,10 @@ public class ProductWebController : IHttpHandler
                 }
             }
 
-        end:;
-
             sps = sps.Distinct().OrderBy(s=>s.code).ToList();
             throw new Exception(Newtonsoft.Json.JsonConvert.SerializeObject(sps));
+
+        end:;
 
             foreach (var sp in sps)
             {
