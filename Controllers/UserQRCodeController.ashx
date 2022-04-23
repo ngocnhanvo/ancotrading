@@ -282,7 +282,7 @@ public class UserQRCodeController : IHttpHandler {
                     {
                         lstSpsMss.Add(new Dictionary<string, string>() {
                             { "ma_sanpham", mspColor },
-                            { "image", ExcuteSignalRStatic.getImageProductWeb(mspColor) }
+                            { "image", ExcuteSignalRStatic.getImageProduct(mspColor) }
                         });
                     }
                 }
@@ -319,7 +319,7 @@ public class UserQRCodeController : IHttpHandler {
                 json["dong16"] = dong16;
 
                 var url = context.Request.Url;
-                json["image"] = ExcuteSignalRStatic.getImageProductWeb(msp);
+                json["image"] = ExcuteSignalRStatic.getImageProduct(msp);
                 json["imageColor"] = JsonConvert.SerializeObject(lstSpsMss);
                 json["detai"] = detai_json;
                 json["bientau"] = bientau_json;
