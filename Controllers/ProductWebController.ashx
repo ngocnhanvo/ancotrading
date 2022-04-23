@@ -154,7 +154,6 @@ public class ProductWebController : IHttpHandler
             }
 
             sps = sps.Distinct().OrderBy(s=>s.code).ToList();
-            throw new Exception("ERR" + Newtonsoft.Json.JsonConvert.SerializeObject(sps));
 
         end:;
 
