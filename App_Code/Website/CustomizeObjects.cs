@@ -30,7 +30,7 @@ public class CustomizeObjects
 
         var jsonData = JsonConvert.DeserializeObject<List<Dictionary<string,object>>>(json);
 
-        var mnmidData = jsonData.Where(s => s["ID"].ToString() == "24").Select(s=>s["Data"].ToString()).FirstOrDefault();
+        var mnmidData = jsonData.Where(s => (int)s["ID"] == 24).Select(s=>s["Data"].ToString()).FirstOrDefault();
 
         if (string.IsNullOrEmpty(mnmidData))
         {
