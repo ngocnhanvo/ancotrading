@@ -130,9 +130,10 @@ public class ProductWebController : IHttpHandler
                             AND sp.trangthai in ('DHD')
                             AND sp.ma_sanpham like N'{0}'
                         ",
-                        dklsp,
-                        code
+                        dklsp
                     );
+
+                    throw new Exception(sql);
 
                     var dt = mdbc.GetData(sql);
                     foreach (DataRow row in dt.Rows)
