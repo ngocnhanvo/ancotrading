@@ -189,7 +189,18 @@ public class API_System : IHttpHandler {
                 fileStream.Dispose();
                 memoryStream.Close();
                 memoryStream.Dispose();
+
+                context.Response.Clear();
+                context.Response.ClearContent();
+                context.Response.ClearHeaders();
+                context.Response.Cache.SetCacheability(HttpCacheability.Public);
+                context.Response.Cache.SetExpires(DateTime.MinValue);
+
                 context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+                context.Response.AddHeader("content-disposition", "inline; filename=" + msp);
+                context.Response.Buffer = true;
+                context.Response.Charset = "";
+
                 context.Response.BinaryWrite(array);
             }
         }
