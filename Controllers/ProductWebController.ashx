@@ -110,7 +110,8 @@ public class ProductWebController : IHttpHandler
                                     code = row["ma_sanpham"].ToString(),
                                     shape = row["md_kieudang_id"].ToString(),
                                     titleWeb = mn1.text,
-                                    titleSubWeb = mn2.text
+                                    titleSubWeb = mn2.text,
+                                    dacTinhCL = mn2.dactinh
                                 });
                             }
                         }
