@@ -106,7 +106,9 @@ public class ProductWebController : IHttpHandler
                                 sps.Add(new productCatalog()
                                 {
                                     code = row["ma_sanpham"].ToString(),
-                                    shape = row["md_kieudang_id"].ToString()
+                                    shape = row["md_kieudang_id"].ToString(),
+                                    title = mn1.text,
+                                    titleWeb = mn2.text
                                 });
                             }
                         }
