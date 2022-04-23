@@ -277,12 +277,12 @@ public class UserQRCodeController : IHttpHandler {
                         mausac_json += detai_bientau_mausac + " : " + msTA + ",";
                     }
 
-                    var mspColor = sp.ma_sanpham.Substring(0, 13) + row_dt["mausac"];
+                    var mspColor = sp.ma_sanpham.Substring(0, 12) + row_dt["mausac"];
                     if (lstSpsMss.Where(s => s["ma_sanpham"] == mspColor).Count() <= 0)
                     {
                         lstSpsMss.Add(new Dictionary<string, string>() {
                             { "ma_sanpham", mspColor },
-                            { "mau_sac", ExcuteSignalRStatic.getImageProductWeb(mspColor) }
+                            { "image", ExcuteSignalRStatic.getImageProductWeb(mspColor) }
                         });
                     }
                 }
