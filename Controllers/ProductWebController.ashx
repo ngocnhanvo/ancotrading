@@ -115,7 +115,6 @@ public class ProductWebController : IHttpHandler
             }
             else
             {
-                    throw new Exception(Newtonsoft.Json.JsonConvert.SerializeObject(menuWeb));
                 var mnA1 = menuWeb.Where(s => s.text == a1).Select(s => s.menuChild).FirstOrDefault();
                 var dieuKienLocSP = mnA1.Where(s => s.text == a2).Select(s => s.href).FirstOrDefault();
                 var arrDieuKienLocSP = dieuKienLocSP.Split(new string[] { " | " }, StringSplitOptions.RemoveEmptyEntries);
