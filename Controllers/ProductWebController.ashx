@@ -84,9 +84,9 @@ public class ProductWebController : IHttpHandler
                 {
                     foreach (var mn2 in mn1.menuChild)
                     {
-                        var arrDieuKienLocSP = mn2.href.Split(new string[] { " | " }, StringSplitOptions.RemoveEmptyEntries);
+                        var arrDieuKienLocSP2 = mn2.href.Split(new string[] { " | " }, StringSplitOptions.RemoveEmptyEntries);
 
-                        foreach (var dklsp in arrDieuKienLocSP)
+                        foreach (var dklsp in arrDieuKienLocSP2)
                         {
                             string sql = string.Format(@"
                                 select sp.ma_sanpham, sp.md_kieudang_id
@@ -105,54 +105,57 @@ public class ProductWebController : IHttpHandler
                             var dt = mdbc.GetData(sql);
                             foreach (DataRow row in dt.Rows)
                             {
+                                a1 = mn1.text;
+                                a2 = mn2.text;
                                 sps.Add(new productCatalog()
                                 {
                                     code = row["ma_sanpham"].ToString(),
                                     shape = row["md_kieudang_id"].ToString(),
-                                    titleWeb = mn1.text,
-                                    titleSubWeb = mn2.text,
-                                    dacTinhCL = mn2.dactinh
+                                    titleWeb = a1,
+                                    titleSubWeb = a2
                                 });
+
+                                break;
                             }
                         }
                     }
                 }
             }
-            else
+
+            var mnA1 = menuWeb.Where(s => s.text == a1).Select(s => s.menuChild).FirstOrDefault();
+            var dieuKienLocSP = mnA1.Where(s => s.text == a2).Select(s => s.href).FirstOrDefault();
+            var arrDieuKienLocSP = dieuKienLocSP.Split(new string[] { " | " }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var dklsp in arrDieuKienLocSP)
             {
-                var mnA1 = menuWeb.Where(s => s.text == a1).Select(s => s.menuChild).FirstOrDefault();
-                var dieuKienLocSP = mnA1.Where(s => s.text == a2).Select(s => s.href).FirstOrDefault();
-                var arrDieuKienLocSP = dieuKienLocSP.Split(new string[] { " | " }, StringSplitOptions.RemoveEmptyEntries);
+                string sql = string.Format(@"
+                    select sp.ma_sanpham, sp.md_kieudang_id
+                    from md_sanpham sp
+                    where 1=1
+                        AND sp.hoatdong = 1 
+                        AND sp.website = 1 
+                        AND sp.trangthai in ('DHD')
+                        AND sp.ma_sanpham like N'{0}'
+                    ",
+                    dklsp
+                );
 
-                foreach (var dklsp in arrDieuKienLocSP)
+                var dt = mdbc.GetData(sql);
+                foreach (DataRow row in dt.Rows)
                 {
-                    string sql = string.Format(@"
-                        select sp.ma_sanpham, sp.md_kieudang_id
-                        from md_sanpham sp
-                        where 1=1
-                            AND sp.hoatdong = 1 
-                            AND sp.website = 1 
-                            AND sp.trangthai in ('DHD')
-                            AND sp.ma_sanpham like N'{0}'
-                        ",
-                        dklsp
-                    );
-
-                    var dt = mdbc.GetData(sql);
-                    foreach (DataRow row in dt.Rows)
+                    sps.Add(new productCatalog()
                     {
-                        sps.Add(new productCatalog()
-                        {
-                            code = row["ma_sanpham"].ToString(),
-                            shape = row["md_kieudang_id"].ToString(),
-                            titleWeb = a1,
-                            titleSubWeb = a2
-                        });
-                    }
+                        code = row["ma_sanpham"].ToString(),
+                        shape = row["md_kieudang_id"].ToString(),
+                        titleWeb = a1,
+                        titleSubWeb = a2
+                    });
                 }
             }
 
         end:;
+
+            sps = sps.Distinct().ToList();
 
             foreach (var sp in sps)
             {
