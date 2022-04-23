@@ -50,6 +50,7 @@ public class UserQRCodeController : IHttpHandler {
         string arr_sanpham = "'" + ma_sanpham + "'";
         string msg = "";
         var lstSps = new List<string>();
+        var lstSpsMss = new List<Dictionary<string, string>>();
 
         try
         {
@@ -275,6 +276,15 @@ public class UserQRCodeController : IHttpHandler {
                         msTA = msTA.Replace("\n", " ");
                         mausac_json += detai_bientau_mausac + " : " + msTA + ",";
                     }
+
+                    var mspColor = sp.ma_sanpham.Substring(0, 13) + row_dt["mausac"];
+                    if (lstSpsMss.Where(s => s["ma_sanpham"] == mspColor).Count() <= 0)
+                    {
+                        lstSpsMss.Add(new Dictionary<string, string>() {
+                            { "ma_sanpham", mspColor },
+                            { "mau_sac", ExcuteSignalRStatic.getImageProductWeb(mspColor) }
+                        });
+                    }
                 }
 
                 if (detai_json != "")
@@ -310,6 +320,7 @@ public class UserQRCodeController : IHttpHandler {
 
                 var url = context.Request.Url;
                 json["image"] = ExcuteSignalRStatic.getImageProductWeb(msp);
+                json["imageColor"] = JsonConvert.SerializeObject(lstSpsMss);
                 json["detai"] = detai_json;
                 json["bientau"] = bientau_json;
                 json["mausac"] = mausac_json;
