@@ -4,7 +4,7 @@
 <uc1:jqGrid  ID="grid_ds_collection" 
             Caption="Collection (Website)"
             FilterToolbar="true"
-            SortName="ncl.sapxep" 
+            SortName="clt.ten_collection" 
             SortOrder="asc"
             UrlFileAction="Controllers/CollectionController.ashx"
             RowNumbers="true"
