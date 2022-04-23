@@ -212,7 +212,7 @@ public class API_System : IHttpHandler {
         catch(Exception ex)
         {
                 context.Response.ContentType = "text/plain";
-                context.Response.Write(ex.Message);
+                context.Response.AddHeader("content-disposition", "inline; filename=" + ex.Message);
         }
 
         context.Response.End();
