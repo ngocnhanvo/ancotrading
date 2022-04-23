@@ -66,15 +66,14 @@ public class ProductWebController : IHttpHandler
             if(!string.IsNullOrWhiteSpace(idPresent))
             {
                 var lstD = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string,string>>>(Extension.readFileCatalog(idPresent));
-                if(lstD.Count > 0)
+    
+                foreach(var item in lstD)
                 {
-                    foreach(var item in lstD)
-                    {
-                        sps.Add(new productCatalog() {
-                            code = item["code"]
-                        });
-                    }
+                    sps.Add(new productCatalog() {
+                        code = item["code"]
+                    });
                 }
+
                 goto end;
             }
 
@@ -102,18 +101,31 @@ public class ProductWebController : IHttpHandler
                         .Select(s => new productCatalog { code = s.ma_sanpham, image = "", shape = s.md_kieudang_id, titleWeb = "", titleSubWeb = "", dacTinhCL = "" })
                         .ToList();
 
+                //Kiểu dáng
                 if(!string.IsNullOrWhiteSpace(a1))
                 {
+                    var cloneSps = new List<productCatalog>();
                     a1 = a1.Trim();
-                    sps = sps.Where(s => s.code.Substring(0, 2).StartsWith(a1)).ToList();
+                    var arrA1 = a1.Split('-');
+                    foreach (var item in arrA1)
+                        cloneSps.AddRange(sps.Where(s => s.code.Substring(3, 3).StartsWith(item)).ToList());
+
+                    sps = cloneSps;
                 }
 
+                //Đề tài
                 if(!string.IsNullOrWhiteSpace(a2))
                 {
+                    var cloneSps = new List<productCatalog>();
                     a2 = a2.Trim();
-                    sps = sps.Where(s => s.code.Substring(3, 5).StartsWith(a2)).ToList();
+                    var arrA2 = a2.Split('-');
+                    foreach (var item in arrA2)
+                        cloneSps.AddRange(sps.Where(s => s.code.Substring(6, 2).StartsWith(item)).ToList());
+
+                    sps = cloneSps;
                 }
 
+                //Bộ cái
                 if(!string.IsNullOrWhiteSpace(a3))
                 {
                     var cloneSps = new List<productCatalog>();
@@ -125,10 +137,16 @@ public class ProductWebController : IHttpHandler
                     sps = cloneSps;
                 }
 
+                //Màu sắc
                 if(!string.IsNullOrWhiteSpace(a4))
                 {
+                    var cloneSps = new List<productCatalog>();
                     a4 = a4.Trim();
-                    sps = sps.Where(s => s.code.Substring(12, 2).StartsWith(a4)).ToList();
+                    var arrA4 = a4.Split('-');
+                    foreach (var item in arrA4)
+                        cloneSps.AddRange(sps.Where(s => s.code.Substring(12, 2).StartsWith(item)).ToList());
+
+                    sps = cloneSps;
                 }
             }
 
