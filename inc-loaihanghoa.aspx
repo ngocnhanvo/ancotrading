@@ -207,30 +207,7 @@
                 , editable:true
                 , editrules: { required:true }
             },
-            {
-                fixed: true, name: 'titleWeb'
-                , label: 'Tiêu Đề Web'
-                , index: 'cl.titleWeb'
-                , width: 120
-                , edittype: 'text'
-                , editable:true
-            },
-            {
-                fixed: true, name: 'titleSubWeb'
-                , label: 'Tiêu Đề Dài Web'
-                , index: 'cl.titleWeb'
-                , width: 120
-                , edittype: 'textarea'
-                , editable: true
-            },
-            {
-                fixed: true, name: 'dacTinhCL'
-                , label: 'Đặc tính'
-                , index: 'cl.dacTinhCL'
-                , width: 120
-                , edittype: 'text'
-                , editable:true
-            },
+            
             {
                 fixed: true, name: 'tv_dai'
                 , label: 'Tiếng Việt Dài'

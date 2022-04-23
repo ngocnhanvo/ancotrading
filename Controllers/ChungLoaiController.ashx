@@ -17,7 +17,7 @@ public class ChungLoaiController : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
-			case "updatestatus":
+            case "updatestatus":
                 this.UpdateStatus(context);
                 break;
             case "getoption":
@@ -26,9 +26,9 @@ public class ChungLoaiController : IHttpHandler
             case "getcolorref":
                 this.getAllColor(context);
                 break;
-			case "nhomchungloai":
-				this.nhomchungloai(context);
-				break;
+            case "nhomchungloai":
+                this.nhomchungloai(context);
+                break;
             default:
                 switch (oper)
                 {
@@ -48,54 +48,54 @@ public class ChungLoaiController : IHttpHandler
                 break;
         }
     }
-	
-	public void UpdateStatus(HttpContext context)
+
+    public void UpdateStatus(HttpContext context)
     {
         String msg = "";
         try
-        {   
+        {
             String id = context.Request.QueryString["md_chungloai_id"];
             String trangthai = context.Request.QueryString["trangthai"];
             md_chungloai sp = db.md_chungloais.FirstOrDefault(p => p.md_chungloai_id.Equals(id));
 
             if (sp != null | trangthai == "TOACTIVE")
-			{
-				bool next = true;
-				switch (trangthai)
-				{
-					case "HIEULUC":
-						msg = "Đã chuyển trạng thái chủng loại sản phẩm thành \"Hiệu lực\"!";
-						break;
-					case "SOANTHAO":
-						msg = "Đã chuyển trạng thái chủng loại sản phẩm thành Soạn thảo!";
-						break;
-					case "TOACTIVE":
-						msg = "Đã chuyển tất cả chủng loại sản phẩm \"soạn thảo\" sang \"Hiệu lực\"!";
-						break;
-					default:
-						msg = "Không xác định được trạng thái của chủng loại sản phẩm!";
-						next = false;
-						break;
-				}
+            {
+                bool next = true;
+                switch (trangthai)
+                {
+                    case "HIEULUC":
+                        msg = "Đã chuyển trạng thái chủng loại sản phẩm thành \"Hiệu lực\"!";
+                        break;
+                    case "SOANTHAO":
+                        msg = "Đã chuyển trạng thái chủng loại sản phẩm thành Soạn thảo!";
+                        break;
+                    case "TOACTIVE":
+                        msg = "Đã chuyển tất cả chủng loại sản phẩm \"soạn thảo\" sang \"Hiệu lực\"!";
+                        break;
+                    default:
+                        msg = "Không xác định được trạng thái của chủng loại sản phẩm!";
+                        next = false;
+                        break;
+                }
 
-				if (next)
-				{
-					if (trangthai.Equals("TOACTIVE"))
-					{
-						String update = "update md_chungloai set trangthai = 'HIEULUC' where trangthai='SOANTHAO'";
-						mdbc.ExcuteNonQuery(update);
-					}
-					else
-					{	
-						sp.trangthai = trangthai;
-						db.SubmitChanges();
-					}
-				}
-			}
-			else
-			{
-				msg = "Chưa chọn Chủng loại SP hoặc Chủng loại SP không tồn tại!";
-			}
+                if (next)
+                {
+                    if (trangthai.Equals("TOACTIVE"))
+                    {
+                        String update = "update md_chungloai set trangthai = 'HIEULUC' where trangthai='SOANTHAO'";
+                        mdbc.ExcuteNonQuery(update);
+                    }
+                    else
+                    {
+                        sp.trangthai = trangthai;
+                        db.SubmitChanges();
+                    }
+                }
+            }
+            else
+            {
+                msg = "Chưa chọn Chủng loại SP hoặc Chủng loại SP không tồn tại!";
+            }
         }
         catch (Exception ex)
         {
@@ -105,7 +105,7 @@ public class ChungLoaiController : IHttpHandler
         context.Response.Write(msg);
     }
 
-    public void getAllColor(HttpContext context) { 
+    public void getAllColor(HttpContext context) {
         LinqDBDataContext db = new LinqDBDataContext();
         string hehangid = context.Request.Form["hehang"].ToString();
         var hh = db.md_chungloais.Single(h => h.md_chungloai_id.Equals(hehangid));
@@ -115,48 +115,48 @@ public class ChungLoaiController : IHttpHandler
         string res = "";
         foreach (DataRow item in data.Rows)
         {
-            
+
             res += "<option value=\""+item[0].ToString()+"\">"+item[1].ToString()+"</option>";
         }
         context.Response.Write(res);
     }
-    
+
     public void nhomchungloai(HttpContext context)
     {
         String sql = "select md_nhomchungloai_id, code_ncl from md_nhomchungloai where 1=1 order by sapxep asc";
         DataTable data = mdbc.GetData(sql);
         string res = "<select>";
-		res += "<option value=\"\"></option>";
+        res += "<option value=\"\"></option>";
         foreach (DataRow item in data.Rows)
         {
             res += "<option value=\""+item[0].ToString()+"\">"+item[1].ToString()+"</option>";
         }
-		res += "</select>";
+        res += "</select>";
         context.Response.Write(res);
     }
-    
-	public void getSelectOption(HttpContext context)
+
+    public void getSelectOption(HttpContext context)
     {
         String sql = "select md_chungloai_id, code_cl from md_chungloai where hoatdong = 1 order by code_cl desc";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-	
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
         bool hd = false;
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-        
+
         String chungloai_id = context.Request.Form["id"];
         String code_cl = context.Request.Form["code_cl"];
-        
-        
+
+
         var lst = (from o in db.md_chungloais
-                  where o.code_cl.Equals(code_cl) && !o.md_chungloai_id.Equals(chungloai_id)
-                  select new { o.md_chungloai_id });
-        
+                   where o.code_cl.Equals(code_cl) && !o.md_chungloai_id.Equals(chungloai_id)
+                   select new { o.md_chungloai_id });
+
         if (lst.Count() != 0)
         {
             jqGridHelper.Utils.writeResult(0, "Đã có code chủng loại này!");
@@ -167,10 +167,10 @@ public class ChungLoaiController : IHttpHandler
             m.code_cl = context.Request.Form["code_cl"];
             m.tv_ngan = context.Request.Form["tv_ngan"];
             m.ta_ngan = context.Request.Form["ta_ngan"];
-            m.titleWeb = context.Request.Form["titleWeb"];
-            m.titleSubWeb = context.Request.Form["titleSubWeb"];
-            m.dacTinhCL = context.Request.Form["dacTinhCL"];
-			m.nhomchungloai = context.Request.Form["nhomchungloai"];
+            //m.titleWeb = context.Request.Form["titleWeb"];
+            //m.titleSubWeb = context.Request.Form["titleSubWeb"];
+            //m.dacTinhCL = context.Request.Form["dacTinhCL"];
+            m.nhomchungloai = context.Request.Form["nhomchungloai"];
             //m.tv_dai = context.Request.Form["tv_dai"];
             //m.ta_dai = context.Request.Form["ta_dai"];
 
@@ -188,7 +188,7 @@ public class ChungLoaiController : IHttpHandler
         bool hd = false;
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-        
+
         String code_cl = context.Request.Form["code_cl"];
         var lst = from o in db.md_chungloais where o.code_cl.Equals(code_cl) select o;
         if (lst.Count() != 0)
@@ -203,11 +203,11 @@ public class ChungLoaiController : IHttpHandler
                 code_cl = context.Request.Form["code_cl"],
                 tv_ngan = context.Request.Form["tv_ngan"],
                 ta_ngan = context.Request.Form["ta_ngan"],
-				nhomchungloai = context.Request.Form["nhomchungloai"],
+                nhomchungloai = context.Request.Form["nhomchungloai"],
                 trangthai = "SOANTHAO",
-                titleWeb = context.Request.Form["titleWeb"],
-                titleSubWeb = context.Request.Form["titleSubWeb"],
-                dacTinhCL = context.Request.Form["dacTinhCL"],
+                //titleWeb = context.Request.Form["titleWeb"],
+                //titleSubWeb = context.Request.Form["titleSubWeb"],
+                //dacTinhCL = context.Request.Form["dacTinhCL"],
                 //tv_dai = context.Request.Form["tv_dai"],
                 //ta_dai = context.Request.Form["ta_dai"],
 
@@ -249,10 +249,10 @@ public class ChungLoaiController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
         String sqlCount = "SELECT COUNT(*) AS count FROM md_chungloai cl where 1=1 {0} ";
         sqlCount = string.Format(sqlCount, filter);
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -280,12 +280,12 @@ public class ChungLoaiController : IHttpHandler
         }
 
         string strsql = "select * from( " +
-            " select cl.md_chungloai_id, cl.trangthai, cl.code_cl, cl.tv_ngan, cl.ta_ngan, cl.titleWeb, cl.titleSubWeb, cl.dacTinhCL, cl.tv_dai, cl.ta_dai, cl.ngaytao, cl.nguoitao, cl.ngaycapnhat, cl.nguoicapnhat, cl.mota, cl.hoatdong, ncl.code_ncl " +
+            " select cl.md_chungloai_id, cl.trangthai, cl.code_cl, cl.tv_ngan, cl.ta_ngan, cl.tv_dai, cl.ta_dai, cl.ngaytao, cl.nguoitao, cl.ngaycapnhat, cl.nguoicapnhat, cl.mota, cl.hoatdong, ncl.code_ncl " +
             " , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
             " FROM md_chungloai cl left join md_nhomchungloai ncl on cl.nhomchungloai = ncl.md_nhomchungloai_id where 1=1 {0}" +
             " )P where RowNum > @start AND RowNum < @end";
         strsql = string.Format(strsql, filter);
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
@@ -302,16 +302,13 @@ public class ChungLoaiController : IHttpHandler
             xml += "<cell><![CDATA[" + row[4] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[5] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[6] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[7] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[7].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[9] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[10].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[9].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[10] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[11] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[12].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[12] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[13] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[14] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[15] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row[16] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";
