@@ -100,7 +100,9 @@ public class ProductWebController : IHttpHandler
                 if(!string.IsNullOrWhiteSpace(a3))
                 {
                     a3 = a3.Trim();
-                    sps = sps.Where(s => s.code.Substring(9, 2).StartsWith(a3)).ToList();
+                    var arrA3 = a3.Split('-');
+                    foreach(var item in arrA3)
+                        sps = sps.Where(s => s.code.Substring(9, 2).StartsWith(item)).ToList();
                 }
 
                 if(!string.IsNullOrWhiteSpace(a4))
