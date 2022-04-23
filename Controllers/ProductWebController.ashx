@@ -107,8 +107,8 @@ public class ProductWebController : IHttpHandler
                                 {
                                     code = row["ma_sanpham"].ToString(),
                                     shape = row["md_kieudang_id"].ToString(),
-                                    title = mn1.text,
-                                    titleWeb = mn2.text
+                                    titleWeb = mn1.text,
+                                    titleSubWeb = mn2.text
                                 });
                             }
                         }
