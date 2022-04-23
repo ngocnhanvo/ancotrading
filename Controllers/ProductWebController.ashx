@@ -156,6 +156,7 @@ public class ProductWebController : IHttpHandler
         end:;
 
             sps = sps.Distinct().OrderBy(s=>s.code).ToList();
+            throw new Exception(Newtonsoft.Json.JsonConvert.SerializeObject(sps));
 
             foreach (var sp in sps)
             {
