@@ -50,17 +50,35 @@ public class ProductWebController : IHttpHandler
     public void getList(HttpContext context)
     {
         string msg = "";
+        var a1 = context.Request.Form["a1"];
+        var a2 = context.Request.Form["a2"];
+        var a3 = context.Request.Form["a3"];
+        var a4 = context.Request.Form["a4"];
+        var sps = new List<productCatalog>();
+        md_chungloai chungloai = null;
 
         try
         {
             var title = context.Request.Form["title"].ToLower().Trim();
-            var a1 = context.Request.Form["a1"];
-            var a2 = context.Request.Form["a2"];
-            var a3 = context.Request.Form["a3"];
-            var a4 = context.Request.Form["a4"];
             var idPresent = context.Request.Form["idPresent"].ToLower().Trim();
             var code = context.Request.Form["code"].ToLower().Trim();
-            md_chungloai chungloai = null;
+
+            if(!string.IsNullOrWhiteSpace(idPresent))
+            {
+                var lstD = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string,string>>>(Extension.readFileCatalog(idPresent));
+                if(lstD.Count > 0)
+                {
+                    foreach(var item in lstD)
+                    {
+                        sps.Add(new productCatalog() {
+                            code = item["code"]
+                        });
+                    }
+                }
+                goto end;
+            }
+
+
             if (!string.IsNullOrWhiteSpace(code))
             {
                 var spCode = db.md_sanphams.Where(s => s.ma_sanpham.ToLower().Trim() == code).FirstOrDefault();
@@ -78,8 +96,7 @@ public class ProductWebController : IHttpHandler
             }
             else
             {
-
-                var sps = db.md_sanphams
+                sps = db.md_sanphams
                         .Where(s => s.md_chungloai_id == chungloai.md_chungloai_id & s.website == true & s.hoatdong == true & s.trangthai == "DHD")
                         .OrderBy(s => s.ma_sanpham)
                         .Select(s => new productCatalog { code = s.ma_sanpham, image = "", shape = s.md_kieudang_id, titleWeb = "", titleSubWeb = "", dacTinhCL = "" })
@@ -113,26 +130,25 @@ public class ProductWebController : IHttpHandler
                     a4 = a4.Trim();
                     sps = sps.Where(s => s.code.Substring(12, 2).StartsWith(a4)).ToList();
                 }
-
-                foreach (var sp in sps)
-                {
-                    sp.image = ExcuteSignalRStatic.getImageProductWeb(sp.code);
-                    sp.shape = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.shape).Select(s => s.ten_ta).FirstOrDefault();
-                    sp.titleWeb = chungloai.titleWeb;
-                    sp.titleSubWeb = chungloai.titleSubWeb;
-                    sp.dacTinhCL = chungloai.dacTinhCL;
-                    sp.title = chungloai.ta_ngan == null ? "" : chungloai.ta_ngan;
-
-                    if (sp.shape == "Rd.")
-                        sp.shape = "Round Shape";
-                    else if (sp.shape == "Sq.")
-                        sp.shape = "Squard Shape";
-                    else
-                        sp.shape = sp.shape + " Shape";
-                }
-
-                msg = "1" + Newtonsoft.Json.JsonConvert.SerializeObject(sps);
             }
+
+        end:;
+
+            foreach (var sp in sps)
+            {
+                sp.image = ExcuteSignalRStatic.getImageProductWeb(sp.code);
+                sp.shape = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.shape).Select(s => s.ten_ta).FirstOrDefault();
+                sp.title = chungloai == null ? "" : chungloai.ta_ngan == null ? "" : chungloai.ta_ngan;
+
+                if (sp.shape == "Rd.")
+                    sp.shape = "Round Shape";
+                else if (sp.shape == "Sq.")
+                    sp.shape = "Squard Shape";
+                else
+                    sp.shape = sp.shape + " Shape";
+            }
+
+            msg = "1" + Newtonsoft.Json.JsonConvert.SerializeObject(sps);
         }
         catch(Exception ex)
         {
