@@ -87,8 +87,8 @@ public class ProductWebController : IHttpHandler
                         foreach (var dklsp in arrDieuKienLocSP)
                         {
                             string sql = string.Format(@"
-                                select ma_sanpham, md_kieudang_id
-                                from md_sanpham 
+                                select sp.ma_sanpham, sp.md_kieudang_id
+                                from md_sanpham sp
                                 where 1=1
                                     AND sp.hoatdong = 1 
                                     AND sp.website = 1 
@@ -122,8 +122,8 @@ public class ProductWebController : IHttpHandler
                 foreach (var dklsp in arrDieuKienLocSP)
                 {
                     string sql = string.Format(@"
-                        select ma_sanpham, md_kieudang_id
-                        from md_sanpham 
+                        select sp.ma_sanpham, sp.md_kieudang_id
+                        from md_sanpham sp
                         where 1=1
                             AND sp.hoatdong = 1 
                             AND sp.website = 1 
