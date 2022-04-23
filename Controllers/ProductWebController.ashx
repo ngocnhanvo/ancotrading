@@ -155,7 +155,7 @@ public class ProductWebController : IHttpHandler
 
         end:;
 
-            sps = sps.Distinct().ToList();
+            sps = sps.Distinct().OrderBy(s=>s.code).ToList();
 
             foreach (var sp in sps)
             {
