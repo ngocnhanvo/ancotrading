@@ -99,10 +99,13 @@ public class ProductWebController : IHttpHandler
 
                 if(!string.IsNullOrWhiteSpace(a3))
                 {
-                    //a3 = a3.Trim();
-                    //var arrA3 = a3.Split('-');
-                    //foreach(var item in arrA3)
-                    //    sps = sps.Where(s => s.code.Substring(9, 2).StartsWith(item)).ToList();
+                    var cloneSps = new List<productCatalog>();
+                    a3 = a3.Trim();
+                    var arrA3 = a3.Split('-');
+                    foreach (var item in arrA3)
+                        cloneSps.AddRange(sps.Where(s => s.code.Substring(9, 2).StartsWith(item)).ToList());
+
+                    sps = cloneSps;
                 }
 
                 if(!string.IsNullOrWhiteSpace(a4))
