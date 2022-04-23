@@ -275,15 +275,17 @@ public class UserQRCodeController : IHttpHandler {
                         msTA = msTA.Replace(System.Environment.NewLine, " ");
                         msTA = msTA.Replace("\n", " ");
                         mausac_json += detai_bientau_mausac + " : " + msTA + ",";
-                    }
 
-                    var mspColor = sp.ma_sanpham.Substring(0, 12) + row_dt["mausac"];
-                    if (lstSpsMss.Where(s => s["ma_sanpham"] == mspColor).Count() <= 0)
-                    {
-                        lstSpsMss.Add(new Dictionary<string, string>() {
-                            { "ma_sanpham", mspColor },
-                            { "image", ExcuteSignalRStatic.getImageProduct(mspColor) }
-                        });
+                        var mspColor = sp.ma_sanpham.Substring(0, 12) + row_dt["mausac"];
+                        if (lstSpsMss.Where(s => s["ma_sanpham"] == mspColor).Count() <= 0)
+                        {
+                            lstSpsMss.Add(new Dictionary<string, string>() {
+                                { "id", detai_bientau_mausac },
+                                { "val", msTA },
+                                { "ma_sanpham", mspColor },
+                                { "image", ExcuteSignalRStatic.getImageProduct(mspColor) }
+                            });
+                        }
                     }
                 }
 
