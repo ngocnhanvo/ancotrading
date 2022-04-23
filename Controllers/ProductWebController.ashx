@@ -165,7 +165,7 @@ public class ProductWebController : IHttpHandler
         }
         catch (Exception ex)
         {
-            msg = "0" + ex.Message;
+            msg = "0" + ex;
         }
 
         context.Response.Write(msg);
