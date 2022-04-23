@@ -52,24 +52,21 @@ public class ProductWebController : IHttpHandler
         string msg = "";
         var a1 = context.Request.Form["a1"];
         var a2 = context.Request.Form["a2"];
-        var a3 = context.Request.Form["a3"];
-        var a4 = context.Request.Form["a4"];
         var sps = new List<productCatalog>();
-        md_chungloai chungloai = null;
 
         try
         {
-            var title = context.Request.Form["title"].ToLower().Trim();
             var idPresent = context.Request.Form["idPresent"].ToLower().Trim();
             var code = context.Request.Form["code"].ToLower().Trim();
 
-            if(!string.IsNullOrWhiteSpace(idPresent))
+            if (!string.IsNullOrWhiteSpace(idPresent))
             {
-                var lstD = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string,string>>>(Extension.readFileCatalog(idPresent));
-    
-                foreach(var item in lstD)
+                var lstD = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(Extension.readFileCatalog(idPresent));
+
+                foreach (var item in lstD)
                 {
-                    sps.Add(new productCatalog() {
+                    sps.Add(new productCatalog()
+                    {
                         code = item["code"]
                     });
                 }
@@ -77,76 +74,75 @@ public class ProductWebController : IHttpHandler
                 goto end;
             }
 
+            var menuWeb = CustomizeObjects.getMenuProductsWeb();
 
             if (!string.IsNullOrWhiteSpace(code))
             {
-                var spCode = db.md_sanphams.Where(s => s.ma_sanpham.ToLower().Trim() == code).FirstOrDefault();
-                if (spCode != null)
+                foreach (var mn1 in menuWeb)
                 {
-                    chungloai = db.md_chungloais.Where(s => s.md_chungloai_id == spCode.md_chungloai_id).FirstOrDefault();
+                    foreach (var mn2 in mn1.menuChild)
+                    {
+                        var arrDieuKienLocSP = mn2.href.Split(new string[] { " | " }, StringSplitOptions.RemoveEmptyEntries);
+
+                        foreach (var dklsp in arrDieuKienLocSP)
+                        {
+                            string sql = string.Format(@"
+                                select ma_sanpham, md_kieudang_id
+                                from md_sanpham 
+                                where 1=1
+                                    AND sp.hoatdong = 1 
+                                    AND sp.website = 1 
+                                    AND sp.trangthai in ('DHD')
+                                    AND sp.ma_sanpham like N'{0}'
+                                    AND sp.ma_sanpham = N'{1}'
+                                ",
+                                dklsp,
+                                code
+                            );
+
+                            var dt = mdbc.GetData(sql);
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                sps.Add(new productCatalog()
+                                {
+                                    code = row["ma_sanpham"].ToString(),
+                                    shape = row["md_kieudang_id"].ToString()
+                                });
+                            }
+                        }
+                    }
                 }
             }
             else
-                chungloai = db.md_chungloais.Where(s => s.ta_ngan.ToLower().Trim() == title).FirstOrDefault();
-
-            if (chungloai == null)
             {
-                msg = "0" + string.Format(@"""{0}"" Collecttion is not found", title);
-            }
-            else
-            {
-                sps = db.md_sanphams
-                        .Where(s => s.md_chungloai_id == chungloai.md_chungloai_id & s.website == true & s.hoatdong == true & s.trangthai == "DHD")
-                        .OrderBy(s => s.ma_sanpham)
-                        .Select(s => new productCatalog { code = s.ma_sanpham, image = "", shape = s.md_kieudang_id, titleWeb = "", titleSubWeb = "", dacTinhCL = "" })
-                        .ToList();
+                var mnA1 = menuWeb.Where(s => s.text == a1).Select(s => s.menuChild).FirstOrDefault();
+                var dieuKienLocSP = mnA1.Where(s => s.text == a2).Select(s => s.href).FirstOrDefault();
+                var arrDieuKienLocSP = dieuKienLocSP.Split(new string[] { " | " }, StringSplitOptions.RemoveEmptyEntries);
 
-                //Kiểu dáng
-                if(!string.IsNullOrWhiteSpace(a1))
+                foreach (var dklsp in arrDieuKienLocSP)
                 {
-                    var cloneSps = new List<productCatalog>();
-                    a1 = a1.Trim();
-                    var arrA1 = a1.Split('-');
-                    foreach (var item in arrA1)
-                        cloneSps.AddRange(sps.Where(s => s.code.Substring(3, 3).StartsWith(item)).ToList());
+                    string sql = string.Format(@"
+                        select ma_sanpham, md_kieudang_id
+                        from md_sanpham 
+                        where 1=1
+                            AND sp.hoatdong = 1 
+                            AND sp.website = 1 
+                            AND sp.trangthai in ('DHD')
+                            AND sp.ma_sanpham like N'{0}'
+                        ",
+                        dklsp,
+                        code
+                    );
 
-                    sps = cloneSps;
-                }
-
-                //Đề tài
-                if(!string.IsNullOrWhiteSpace(a2))
-                {
-                    var cloneSps = new List<productCatalog>();
-                    a2 = a2.Trim();
-                    var arrA2 = a2.Split('-');
-                    foreach (var item in arrA2)
-                        cloneSps.AddRange(sps.Where(s => s.code.Substring(6, 2).StartsWith(item)).ToList());
-
-                    sps = cloneSps;
-                }
-
-                //Bộ cái
-                if(!string.IsNullOrWhiteSpace(a3))
-                {
-                    var cloneSps = new List<productCatalog>();
-                    a3 = a3.Trim();
-                    var arrA3 = a3.Split('-');
-                    foreach (var item in arrA3)
-                        cloneSps.AddRange(sps.Where(s => s.code.Substring(9, 2).StartsWith(item)).ToList());
-
-                    sps = cloneSps;
-                }
-
-                //Màu sắc
-                if(!string.IsNullOrWhiteSpace(a4))
-                {
-                    var cloneSps = new List<productCatalog>();
-                    a4 = a4.Trim();
-                    var arrA4 = a4.Split('-');
-                    foreach (var item in arrA4)
-                        cloneSps.AddRange(sps.Where(s => s.code.Substring(12, 2).StartsWith(item)).ToList());
-
-                    sps = cloneSps;
+                    var dt = mdbc.GetData(sql);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        sps.Add(new productCatalog()
+                        {
+                            code = row["ma_sanpham"].ToString(),
+                            shape = row["md_kieudang_id"].ToString()
+                        });
+                    }
                 }
             }
 
@@ -156,7 +152,6 @@ public class ProductWebController : IHttpHandler
             {
                 sp.image = ExcuteSignalRStatic.getImageProductWeb(sp.code);
                 sp.shape = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.shape).Select(s => s.ten_ta).FirstOrDefault();
-                sp.title = chungloai == null ? "" : chungloai.ta_ngan == null ? "" : chungloai.ta_ngan;
 
                 if (sp.shape == "Rd.")
                     sp.shape = "Round Shape";
@@ -168,7 +163,7 @@ public class ProductWebController : IHttpHandler
 
             msg = "1" + Newtonsoft.Json.JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex.Message;
         }
