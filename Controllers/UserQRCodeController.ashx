@@ -55,6 +55,7 @@ public class UserQRCodeController : IHttpHandler {
             var content = context.Request.Form["content"];
             if (content.Length > 0)
             {
+                content = content.Replace("%26", "&").Replace("%3F", "?");
                 string url = ExcuteSignalRStatic.mapPathSignalR("~/App_Data/MenuProductWeb.json");
                 System.IO.File.WriteAllText(url, content);
                 msg = "1Update successfully";
