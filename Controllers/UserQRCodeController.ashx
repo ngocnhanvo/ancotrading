@@ -44,6 +44,30 @@ public class UserQRCodeController : IHttpHandler {
         }
     }
 
+    public void updateMenuProductWeb(HttpContext context)
+    {
+        string msg = "";
+        try
+        {
+            var content = context.Request.Form["content"];
+            if (content.Length > 0)
+            {
+                string url = ExcuteSignalRStatic.mapPathSignalR("~/App_Data/MenuProductWeb.json");
+                System.IO.File.WriteAllText(url, content);
+                msg = "1Update successfully";
+            }
+            else
+            {
+                msg = "0Update fail";
+            }
+        }
+        catch(Exception ex)
+        {
+            msg = "0" + ex.Message;
+        }
+        context.Response.Write(msg);
+    }
+
     public void getInfo(HttpContext context)
     {
         string ma_sanpham = context.Request.Form["msp"];
@@ -419,7 +443,7 @@ public class UserQRCodeController : IHttpHandler {
             var contactPass = context.Request.Form["contactPass"];
             var headerOrigin = context.Request.Form["headerOrigin"];
             var type = context.Request.Form["type"];
-            
+
             //Kiểm tra đang nhập của trang admin trên website
             if (type == "2")
             {
