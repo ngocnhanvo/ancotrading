@@ -319,7 +319,7 @@ public class DeTaiMainController : IHttpHandler
             from (
                 SELECT 
                     dt.md_detai_id, dt.trangthai, cl.code_cl, dt.code_dt, 
-                    dt.tv_ngan, dt.ta_ngan, dt.tv_dai, dt.ta_dai, dt.ta_nganWeb
+                    dt.tv_ngan, dt.ta_ngan, dt.tv_dai, dt.ta_dai, dt.ta_nganWeb,
                     dt.hinhthucban, dt.ngaytao, dt.nguoitao, dt.ngaycapnhat, 
                     dt.nguoicapnhat, dt.mota, dt.hoatdong,
                     ROW_NUMBER() OVER (ORDER BY {0} {1} ) as RowNum
