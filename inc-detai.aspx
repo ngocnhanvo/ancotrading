@@ -297,7 +297,7 @@
 				fixed: true, name: 'ta_nganWeb'
 				, index: 'dt.ta_nganWeb'
                 , label: 'Tên Anh (Web)'
-				, width: 250
+				, width: 120
 				, edittype: 'text'
 				, editable: false
 				, hidden: false
