@@ -85,7 +85,7 @@ public class CustomizeObjects
                 menuPL0.Add(itemMN0);
             }
 
-            menuPL0 = menuPL0.Where(s => s.text == "Product").Select(s => s.menuChild).FirstOrDefault();
+            menuPL0 = menuPL0.Where(s => s.href == "#products").Select(s => s.menuChild).FirstOrDefault();
         }
 
         return menuPL0;
