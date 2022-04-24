@@ -18,6 +18,7 @@ public class ProductWebController : IHttpHandler
         public string code { get; set; }
         public string image { get; set; }
         public string shape { get; set; }
+        public string detaiTA { get; set; }
         public string title { get; set; }
         public string titleWeb { get; set; }
         public string titleSubWeb { get; set; }
@@ -129,8 +130,10 @@ public class ProductWebController : IHttpHandler
             foreach (var dklsp in arrDieuKienLocSP)
             {
                 string sql = string.Format(@"
-                    select sp.ma_sanpham, sp.md_kieudang_id
-                    from md_sanpham sp
+                    select 
+                        sp.ma_sanpham, sp.md_kieudang_id
+                    from 
+                        md_sanpham sp
                     where 1=1
                         AND sp.hoatdong = 1 
                         AND sp.website = 1 
@@ -159,8 +162,11 @@ public class ProductWebController : IHttpHandler
 
             foreach (var sp in sps)
             {
+                var codeCL = sp.code.Substring(0, 2);
+                var codeDT = sp.code.Substring(6, 2);
                 sp.image = ExcuteSignalRStatic.getImageProductWeb(sp.code);
                 sp.shape = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.shape).Select(s => s.ten_ta).FirstOrDefault();
+                sp.detaiTA = db.md_detais.Where(s => s.code_cl == codeCL & s.code_dt == codeDT).Select(s => s.ta_nganWeb).FirstOrDefault();
 
                 if (sp.shape == "Rd.")
                     sp.shape = "Round Shape";
