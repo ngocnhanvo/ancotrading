@@ -1,5 +1,5 @@
 {
   "website": "http://www.ancopottery.com",
-  "detail": "Views/QRCode/v2/CatalogueDetailsProduct.aspx?code=[code]",
+  "detail": "presentation?code=[code]",
   "folderQRCode": "~/images/qrcode"
 }
