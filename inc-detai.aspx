@@ -299,7 +299,7 @@
                 , label: 'Tên Anh (Web)'
 				, width: 120
 				, edittype: 'text'
-				, editable: false
+				, editable: true
 				, hidden: false
             },
 			{
