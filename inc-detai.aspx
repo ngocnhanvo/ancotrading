@@ -193,7 +193,6 @@
             UrlFileAction="Controllers/DeTaiMainController.ashx" 
 			BtnPrint="funcPrintDeTai"
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 65);"
-            ColNames="['md_detai_id', 'Trạng thái', 'Chủng loại', 'Code Đề tài', 'Tên Tiếng Việt', 'Tên Tiếng Anh', 'Tên Tiếng Việt Dài', 'Tên Tiếng Anh Dài', 'Hình Thức Bán', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Ghi chú', 'Hoạt động']"
             RowNumbers="true"
             FilterToolbar="true"
 			FuncChangeStatus="ChangeStatus"
@@ -221,6 +220,7 @@
             {
                 fixed: true, name: 'md_detai_id'
                 , index: 'md_detai_id'
+                , label: 'md_detai_id'
                 , width: 100
                 , hidden: true 
                 , editable:true
@@ -230,6 +230,7 @@
 			{
 				fixed: true, name: 'trangthai'
 				, index: 'dt.trangthai'
+                , label: 'Trạng thái'
 				, width: 100
 				, editable:false
 				, formatter:'imagestatus'
@@ -241,8 +242,10 @@
 				, sortable: true
 			},
             {
-				fixed: true, name: 'md_chungloai_id'
+				fixed: true
+                , name: 'md_chungloai_id'
 				, index: 'cl.code_cl'
+                , label: 'Chủng loại'
 				, editable: true
 				, width: 100
 				, edittype: 'select'
@@ -251,6 +254,7 @@
 			{
                  fixed: true, name: 'code_dt'
                  , index: 'code_dt'
+                 , label: 'Code Đề tài'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -258,6 +262,7 @@
             {
                  fixed: true, name: 'tv_ngan'
                  , index: 'dt.tv_ngan'
+                 , label: 'Tên Tiếng Việt'
                  , editable: true
                  , width: 250
                  , edittype: 'text'
@@ -265,6 +270,7 @@
             {
                  fixed: true, name: 'ta_ngan'
                  , index: 'dt.ta_ngan'
+                 , label: 'Tên Tiếng Anh'
                  , editable: true
                  , width: 250
                  , edittype: 'text'
@@ -272,6 +278,7 @@
             {
 				fixed: true, name: 'tv_dai'
 				, index: 'dt.tv_dai'
+                , label: 'Tên Tiếng Việt Dài'
 				, width: 250
 				, edittype: 'text'
 				, editable: false
@@ -280,14 +287,25 @@
             {
                 fixed: true, name: 'ta_dai'
                 , index: 'dt.ta_dai'
+                , label: 'Tên Tiếng Anh Dài'
                 , width: 250
                 , edittype: 'text'
                 , editable:false
 				, hidden: true
             },
+            {
+				fixed: true, name: 'ta_nganWeb'
+				, index: 'dt.ta_nganWeb'
+                , label: 'Tên Anh (Web)'
+				, width: 250
+				, edittype: 'text'
+				, editable: false
+				, hidden: false
+            },
 			{
                 fixed: true, name: 'hinhthucban'
                 , index: 'dt.hinhthucban'
+                , label: 'Hình Thức Bán'
                 , width: 120
                 , edittype: 'select'
 				, editoptions: { value: selectHinhThucBan }
@@ -297,6 +315,7 @@
             {
                 fixed: true, name: 'ngaytao'
                 , index: 'dt.ngaytao'
+                , label: 'Ngày Tạo'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
@@ -305,6 +324,7 @@
             {
                 fixed: true, name: 'nguoitao'
                 , index: 'dt.nguoitao'
+                , label: 'Người Tạo'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
@@ -313,6 +333,7 @@
             {
                 fixed: true, name: 'ngaycapnhat'
                 , index: 'dt.ngaycapnhat'
+                , label: 'Ngày Cập Nhật'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
@@ -321,6 +342,7 @@
             {
                 fixed: true, name: 'nguoicapnhat'
                 , index: 'dt.nguoicapnhat'
+                , label: 'Người Cập Nhật'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
@@ -329,6 +351,7 @@
             {
                 fixed: true, name: 'mota'
                 , index: 'dt.mota'
+                , label: 'Ghi chú'
                 , width: 100
                 , editable:true
                 , edittype: 'textarea'
@@ -337,6 +360,7 @@
             {
                 fixed: true, name: 'hoatdong', hidden: true
                 , index: 'dt.hoatdong'
+                , label: 'Hoạt động'
                 , width: 100
                 , editable:true
                 , edittype: 'checkbox'

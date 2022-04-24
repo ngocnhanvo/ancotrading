@@ -17,7 +17,7 @@ public class DeTaiMainController : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
-			case "updatestatus":
+            case "updatestatus":
                 this.UpdateStatus(context);
                 break;
             case "getoption":
@@ -45,7 +45,7 @@ public class DeTaiMainController : IHttpHandler
                 break;
         }
     }
-	
+
     public void HinhAnh(HttpContext context){
         string msg = "";
         if (context.Request.Files.Count != 0)
@@ -68,7 +68,7 @@ public class DeTaiMainController : IHttpHandler
                                 msg += "<div style='color:blue'>" + fileName + ": upload thành công.</div>";
                             }
                             else {
-                               msg += "<div style='color:red'>" + fileName + ": không tồn tại đề tài này</div>"; 
+                                msg += "<div style='color:red'>" + fileName + ": không tồn tại đề tài này</div>";
                             }
                         }
                         else {
@@ -90,84 +90,88 @@ public class DeTaiMainController : IHttpHandler
         context.Response.Write(msg);
     }
 
-	public void UpdateStatus(HttpContext context)
+    public void UpdateStatus(HttpContext context)
     {
         String msg = "";
         try
-        {   
+        {
             String id = context.Request.QueryString["md_detai_id"];
             String trangthai = context.Request.QueryString["trangthai"];
             md_detai sp = db.md_detais.FirstOrDefault(p => p.md_detai_id.Equals(id));
-			
-			//// filter
-            String filter = "";
-			bool _search = bool.Parse(context.Request.QueryString["_search"]);
-			if (_search)
-			{
-				String _filters = context.Request.QueryString["filters"];
-				Filter f = Filter.CreateFilter(_filters);
-				filter = f.ToScript();
-			}
-			
-			String sqlGetProductId = @"
-			SELECT dt.md_detai_id 
-			FROM md_detai dt, md_chungloai cl 
-			WHERE 1=1 
-			AND dt.md_chungloai_id = cl.md_chungloai_id 
-            {1}
-			{0}";
-			var ttcp = new string[] { "TOACTIVE", "TOACTIVENHD" };
-            if (sp != null | ttcp.Contains(trangthai))
-			{
-				bool next = true;
-				switch (trangthai)
-				{
-					case "HIEULUC":
-						msg = "Đã chuyển trạng thái đề tài thành \"Hiệu lực\"!";
-						break;
-					case "SOANTHAO":
-						msg = "Đã chuyển trạng thái đề tài thành \"Soạn thảo\"!";
-						break;
-                    case "NHD":
-						msg = "Đã chuyển trạng thái đề tài thành \"Ngưng hoạt động\"!";
-						break;
-					case "TOACTIVE":
-						msg = "Đã chuyển tất cả đề tài được lọc từ \"soạn thảo\" sang \"Hiệu lực\"!";
-						break;
-					case "TOACTIVENHD":
-						msg = "Đã chuyển tất cả đề tài được lọc từ \"Ngưng hoạt động\" sang \"Hiệu lực\"!";
-						break;
-					default:
-						msg = "Không xác định được trạng thái của đề tài!";
-						next = false;
-						break;
-				}
 
-				if (next)
-				{
-					if (trangthai.Equals("TOACTIVE"))
-					{
-						sqlGetProductId = String.Format(sqlGetProductId, filter, "AND dt.trangthai = 'SOANTHAO'");
-						String sqlUpdateToHIEULUC = "update md_detai set trangthai = 'HIEULUC' where md_detai_id IN(" + sqlGetProductId + ")";
-						mdbc.ExcuteNonQuery(sqlUpdateToHIEULUC);
-					}
-					else if (trangthai.Equals("TOACTIVENHD"))
-					{
-						sqlGetProductId = String.Format(sqlGetProductId, filter, "AND dt.trangthai = 'NHD'");
-						String sqlUpdateToHIEULUC = "update md_detai set trangthai = 'HIEULUC' where md_detai_id IN(" + sqlGetProductId + ")";
-						mdbc.ExcuteNonQuery(sqlUpdateToHIEULUC);
-					}
-					else
-					{	
-						sp.trangthai = trangthai;
-						db.SubmitChanges();
-					}
-				}
-			}
-			else
-			{
-				msg = "Chưa chọn đề tài hoặc đề tài không tồn tại!";
-			}
+            //// filter
+            String filter = "";
+            bool _search = bool.Parse(context.Request.QueryString["_search"]);
+            if (_search)
+            {
+                String _filters = context.Request.QueryString["filters"];
+                Filter f = Filter.CreateFilter(_filters);
+                filter = f.ToScript();
+            }
+
+            String sqlGetProductId = @"
+			    SELECT 
+                    dt.md_detai_id 
+			    FROM 
+                    md_detai dt, md_chungloai cl 
+			    WHERE 
+                    1=1 
+			        AND dt.md_chungloai_id = cl.md_chungloai_id 
+                    {1}
+			        {0}";
+
+            var ttcp = new string[] { "TOACTIVE", "TOACTIVENHD" };
+            if (sp != null | ttcp.Contains(trangthai))
+            {
+                bool next = true;
+                switch (trangthai)
+                {
+                    case "HIEULUC":
+                        msg = "Đã chuyển trạng thái đề tài thành \"Hiệu lực\"!";
+                        break;
+                    case "SOANTHAO":
+                        msg = "Đã chuyển trạng thái đề tài thành \"Soạn thảo\"!";
+                        break;
+                    case "NHD":
+                        msg = "Đã chuyển trạng thái đề tài thành \"Ngưng hoạt động\"!";
+                        break;
+                    case "TOACTIVE":
+                        msg = "Đã chuyển tất cả đề tài được lọc từ \"soạn thảo\" sang \"Hiệu lực\"!";
+                        break;
+                    case "TOACTIVENHD":
+                        msg = "Đã chuyển tất cả đề tài được lọc từ \"Ngưng hoạt động\" sang \"Hiệu lực\"!";
+                        break;
+                    default:
+                        msg = "Không xác định được trạng thái của đề tài!";
+                        next = false;
+                        break;
+                }
+
+                if (next)
+                {
+                    if (trangthai.Equals("TOACTIVE"))
+                    {
+                        sqlGetProductId = String.Format(sqlGetProductId, filter, "AND dt.trangthai = 'SOANTHAO'");
+                        String sqlUpdateToHIEULUC = "update md_detai set trangthai = 'HIEULUC' where md_detai_id IN(" + sqlGetProductId + ")";
+                        mdbc.ExcuteNonQuery(sqlUpdateToHIEULUC);
+                    }
+                    else if (trangthai.Equals("TOACTIVENHD"))
+                    {
+                        sqlGetProductId = String.Format(sqlGetProductId, filter, "AND dt.trangthai = 'NHD'");
+                        String sqlUpdateToHIEULUC = "update md_detai set trangthai = 'HIEULUC' where md_detai_id IN(" + sqlGetProductId + ")";
+                        mdbc.ExcuteNonQuery(sqlUpdateToHIEULUC);
+                    }
+                    else
+                    {
+                        sp.trangthai = trangthai;
+                        db.SubmitChanges();
+                    }
+                }
+            }
+            else
+            {
+                msg = "Chưa chọn đề tài hoặc đề tài không tồn tại!";
+            }
         }
         catch (Exception ex)
         {
@@ -183,8 +187,8 @@ public class DeTaiMainController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -203,12 +207,13 @@ public class DeTaiMainController : IHttpHandler
         m.ta_ngan = context.Request.Form["ta_ngan"];
         m.tv_dai = context.Request.Form["tv_dai"];
         m.ta_dai = context.Request.Form["ta_dai"];
+        m.ta_nganWeb = context.Request.Form["ta_nganWeb"];
         m.hinhthucban = context.Request.Form["hinhthucban"];
         m.mota = context.Request.Form["mota"];
         m.hoatdong = hd;
         m.nguoicapnhat = UserUtils.getUser(context);
         m.ngaycapnhat = DateTime.Now;
-        
+
         db.SubmitChanges();
     }
 
@@ -232,9 +237,10 @@ public class DeTaiMainController : IHttpHandler
             ta_ngan = context.Request.Form["ta_ngan"],
             tv_dai = context.Request.Form["tv_dai"],
             ta_dai = context.Request.Form["ta_dai"],
-			hinhthucban = context.Request.Form["hinhthucban"],
-			trangthai = "SOANTHAO",
-            
+            ta_nganWeb = context.Request.Form["ta_nganWeb"],
+            hinhthucban = context.Request.Form["hinhthucban"],
+            trangthai = "SOANTHAO",
+
             mota = context.Request.Form["mota"],
             hoatdong = hd,
             nguoitao = UserUtils.getUser(context),
@@ -257,31 +263,32 @@ public class DeTaiMainController : IHttpHandler
         String sql = "delete md_detai where md_detai_id IN (" + id + ")";
         mdbc.ExcuteNonQuery(sql);
     }
-	
-	public void load(HttpContext context)
+
+    public void load(HttpContext context)
     {
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
 
         //// filter
-        String filter = "";
+        string filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
         if (_search)
         {
-            String _filters = context.Request.QueryString["filters"];
+            string _filters = context.Request.QueryString["filters"];
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
-        String sqlCount = "SELECT COUNT(*) AS count " + 
-            " FROM md_detai dt, md_chungloai cl " +
-            " WHERE dt.md_chungloai_id = cl.md_chungloai_id " +
-            " " + filter;
-        
+
+        string sqlCount = string.Format(@"
+            SELECT COUNT(1) AS count 
+            FROM md_detai dt, md_chungloai cl
+            WHERE dt.md_chungloai_id = cl.md_chungloai_id ",
+            filter);
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
-        String sidx = context.Request.QueryString["sidx"];
-        String sord = context.Request.QueryString["sord"];
+        string sidx = context.Request.QueryString["sidx"];
+        string sord = context.Request.QueryString["sord"];
         int total_page;
         int count = (int)mdbc.ExecuteScalar(sqlCount);
         int start, end;
@@ -303,21 +310,32 @@ public class DeTaiMainController : IHttpHandler
         {
             sidx = "cl.code_cl, dt.code_dt";
         }
-		else {
-			sidx = sidx + " " + sord;
-		}
+        else {
+            sidx = sidx + " " + sord;
+        }
 
-        string strsql = "select * from( " +
-            " SELECT dt.md_detai_id, dt.trangthai, cl.code_cl, dt.code_dt, dt.tv_ngan, dt.ta_ngan " +
-            " , dt.tv_dai, dt.ta_dai " +
-            " , dt.hinhthucban, dt.ngaytao, dt.nguoitao, dt.ngaycapnhat, dt.nguoicapnhat, dt.mota, dt.hoatdong " +
-            " , ROW_NUMBER() OVER (ORDER BY " + sidx + " ) as RowNum " +
-            " FROM md_detai dt, md_chungloai cl " +
-            " WHERE dt.md_chungloai_id = cl.md_chungloai_id " +
-            " " + filter +
-            " )P where RowNum > @start AND RowNum < @end";
-        
-        
+        string strsql = string.Format(@"
+            select * 
+            from (
+                SELECT 
+                    dt.md_detai_id, dt.trangthai, cl.code_cl, dt.code_dt, dt.tv_ngan, dt.ta_ngan, dt.tv_dai, dt.ta_dai, 
+                    dt.hinhthucban, dt.ngaytao, dt.nguoitao, dt.ngaycapnhat, dt.nguoicapnhat, dt.mota, dt.hoatdong,
+                    ROW_NUMBER() OVER (ORDER BY {0} {1} ) as RowNum
+                FROM 
+                    md_detai dt, 
+                    md_chungloai cl
+                WHERE 
+                    dt.md_chungloai_id = cl.md_chungloai_id
+                    {2}
+            )P 
+            where 
+                RowNum > @start AND RowNum < @end",
+            sidx,
+            sord,
+            filter
+        );
+
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
@@ -335,6 +353,7 @@ public class DeTaiMainController : IHttpHandler
             xml += "<cell><![CDATA[" + row["ta_ngan"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tv_dai"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ta_dai"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["ta_nganWeb"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hinhthucban"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
