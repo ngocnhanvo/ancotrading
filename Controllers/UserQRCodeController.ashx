@@ -17,6 +17,9 @@ public class UserQRCodeController : IHttpHandler {
 
         switch (oper)
         {
+            case "updateMenuProductWeb":
+                this.updateMenuProductWeb(context);
+                break;
             case "getInfo":
                 this.getInfo(context);
                 break;
