@@ -237,8 +237,8 @@ public class UserController : IHttpHandler {
             )P 
             where 
                 RowNum > @start AND RowNum < @end",
-            sord,
             sidx,
+            sord,
             filter
         );
 
