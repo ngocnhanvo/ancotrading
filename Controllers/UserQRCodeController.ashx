@@ -457,6 +457,10 @@ public class UserQRCodeController : IHttpHandler {
                 {
                     msg = "Fail! Invalid Username or Password";
                 }
+                else if(!nhanvien.website.GetValueOrDefault(false))
+                {
+                    msg = "Fail! User have not permission for website";
+                }
                 else
                 {
                     var json = new Dictionary<string, string>();

@@ -36,20 +36,20 @@ public class UserController : IHttpHandler {
                 break;
         }
     }
-    
+
     public void getSelectOption(HttpContext context)
     {
         String sql = "select MANV, MANV as ten from NHANVIEN where hoatdong = 1 order by manv asc";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
         String ad = context.Request.Form["isadmin"].ToLower();
         bool hd = false;
-        
+
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
 
@@ -66,9 +66,10 @@ public class UserController : IHttpHandler {
         bool suaGia = context.Request.Form["suaGia"].ToLower() == "true";
         bool hieuLucDH = context.Request.Form["hieuLucDH"].ToLower() == "true";
         bool themPhiSauHL = context.Request.Form["themPhiSauHL"].ToLower() == "true";
+        bool website = context.Request.Form["website"].ToLower() == "true";
 
         String mk = context.Request.Form["matkhau"];
-        
+
         nhanvien u = db.nhanviens.Single(p => p.manv == context.Request.Form["id"]);
         u.matkhau = mk != "" ? Security.EncodeMd5Hash(mk) : u.matkhau;
         u.mavt = context.Request.Form["tenvt"];
@@ -81,15 +82,16 @@ public class UserController : IHttpHandler {
         u.diachi = context.Request.Form["diachi"];
         u.isadmin = bool.Parse(ad);
         u.hoatdong = hd;
-		u.remote = remote;
+        u.remote = remote;
         u.canOTP = canOTP;
         u.suaGia = suaGia;
         u.hieuLucDH = hieuLucDH;
         u.themPhiSauHL = themPhiSauHL;
-        
+        u.website = website;
+
         u.ngaycapnhat = DateTime.Now;
         u.nguoicapnhat = UserUtils.getUser(context);
-        
+
         db.SubmitChanges();
     }
 
@@ -109,12 +111,13 @@ public class UserController : IHttpHandler {
         {
             ad = "false";
         }
-		
-		bool remote = context.Request.Form["remote"].ToLower() == "true";
+
+        bool remote = context.Request.Form["remote"].ToLower() == "true";
         bool canOTP = context.Request.Form["canOTP"].ToLower() == "true";
         bool suaGia = context.Request.Form["suaGia"].ToLower() == "true";
         bool hieuLucDH = context.Request.Form["hieuLucDH"].ToLower() == "true";
         bool themPhiSauHL = context.Request.Form["themPhiSauHL"].ToLower() == "true";
+        bool website = context.Request.Form["website"].ToLower() == "true";
 
         String manv = context.Request.Form["manv"];
 
@@ -133,14 +136,15 @@ public class UserController : IHttpHandler {
                 dienthoai = context.Request.Form["dienthoai"],
                 diachi = context.Request.Form["diachi"],
                 isadmin = bool.Parse(ad),
-				remote = remote,
+                remote = remote,
                 canOTP = canOTP,
                 suaGia = suaGia,
                 hieuLucDH = hieuLucDH,
                 themPhiSauHL = themPhiSauHL,
+                website = website,
                 mota = context.Request.Form["mota"],
                 hoatdong = hd,
-	
+
                 nguoitao = UserUtils.getUser(context),
                 nguoicapnhat = UserUtils.getUser(context),
                 ngaytao = DateTime.Now,
@@ -154,7 +158,7 @@ public class UserController : IHttpHandler {
         {
             jqGridHelper.Utils.writeResult(0, "Tài khoản đã tồn tại.!");
         }
-        
+
     }
 
 
@@ -183,7 +187,16 @@ public class UserController : IHttpHandler {
             filter = f.ToScript();
         }
 
-        String sqlCount = "SELECT COUNT(*) AS count from nhanvien nv left join vaitro vt on nv.mavt = vt.mavt where 1=1 " + filter;
+        string sqlCount = string.Format(@"
+            SELECT 
+                COUNT(1) AS count 
+            from 
+                nhanvien nv 
+                left join vaitro vt on nv.mavt = vt.mavt 
+            where 
+                1=1 {0}",
+            filter);
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -210,9 +223,26 @@ public class UserController : IHttpHandler {
             sidx = "nv.manv";
         }
 
-        string strsql = "select * from( select nv.*, vt.tenvt as tenvt, ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum from nhanvien nv left join vaitro vt on nv.mavt = vt.mavt where 1=1 " + filter + "  )P where RowNum > @start AND RowNum < @end";
+        string strsql = string.Format(@"
+            select 
+                P.* 
+            from ( 
+                select 
+                    nv.*, vt.tenvt as tenvt, ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum 
+                from 
+                    nhanvien nv 
+                    left join vaitro vt on nv.mavt = vt.mavt 
+                where 
+                    1=1 {2}  
+            )P 
+            where 
+                RowNum > @start AND RowNum < @end",
+            sord,
+            sidx,
+            filter
+        );
 
-        System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
+        var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
         xml += "<page>" + page + "</page>";
@@ -238,8 +268,8 @@ public class UserController : IHttpHandler {
             xml += "<cell><![CDATA[" + row["suaGia"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hieuLucDH"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["themPhiSauHL"] + "]]></cell>";
-            
-            
+            xml += "<cell><![CDATA[" + row["website"] + "]]></cell>";
+
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
