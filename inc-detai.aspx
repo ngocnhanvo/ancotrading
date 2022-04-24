@@ -296,7 +296,7 @@
             {
 				fixed: true, name: 'ta_nganWeb'
 				, index: 'dt.ta_nganWeb'
-                , label: 'Tên Anh (Web)'
+                , label: 'Tiếng Anh (Web)'
 				, width: 120
 				, edittype: 'text'
 				, editable: true
