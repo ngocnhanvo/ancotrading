@@ -166,6 +166,10 @@ public class ProductWebController : IHttpHandler
                     sp.shape = "Round Shape";
                 else if (sp.shape == "Sq.")
                     sp.shape = "Squard Shape";
+                else if (sp.shape == "Rect.")
+                    sp.shape = "Rectangular Shape";
+                else if (sp.shape == "Sta.")
+                    sp.shape = "Star Shape";
                 else
                     sp.shape = sp.shape + " Shape";
             }

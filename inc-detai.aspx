@@ -196,17 +196,9 @@
             RowNumbers="true"
             FilterToolbar="true"
 			FuncChangeStatus="ChangeStatus"
-            OndblClickRow = "function(rowid) { /*$(this).jqGrid('editGridRow', rowid,{
-                beforeShowForm: function (formid) {
-                formid.closest('div.ui-jqdialog').dialogCenter(); 
-            }
-            , afterSubmit: function(rs, postdata) {
-              return showMsgDialog(rs);
-            }
-            , errorTextFormat:function(data) { 
-                return 'Lỗi: ' + data.responseText 
-            }
-            } );*/ }"
+            OndblClickRow = "function(rowid) {
+                $('#edit_grid_ds_detaimain').click();
+            }"
             OnSelectRow = "function(ids) {
 		            if(ids != null) {
                         let rowSel = $('#grid_ds_detaimain').jqGrid('getRowData', ids);
