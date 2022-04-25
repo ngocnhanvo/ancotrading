@@ -26,7 +26,7 @@
 
 <script>
     $(function () {
-        var uploader = new plupload.Uploader({
+        var uploaderApp = new plupload.Uploader({
             runtimes: 'gears,html5,flash,silverlight,browserplus',
             browse_button: 'pickfiles',
             container: 'lay-center-upload',
@@ -38,35 +38,35 @@
 		]
         });
 
-        uploader.bind('Init', function (up, params) {
+        uploaderApp.bind('Init', function (up, params) {
             //$('#filelist').html("<div>Current runtime: " + params.runtime + "</div>");
         });
 
         $('#uploadfiles').click(function (e) {
-            uploader.start();
+            uploaderApp.start();
             e.preventDefault();
         });
 
         $('#resetall').click(function (e) {
             $('#filelist *').remove();
-            uploader.splice();
-            uploader.refresh();
+            uploaderApp.splice();
+            uploaderApp.refresh();
         });
 
         $(".delete_pending_file").live('click', function () {
             var file_id = $(this).attr('id');
-            var file = uploader.getFile(file_id);
+            var file = uploaderApp.getFile(file_id);
 
             if (file !== undefined) {
-                uploader.removeFile(file);
+                uploaderApp.removeFile(file);
                 $('#file_' + file_id).remove();
             }
             return false;
         });
 
-        uploader.init();
+        uploaderApp.init();
 
-        uploader.bind('FilesAdded', function (up, files) {
+        uploaderApp.bind('FilesAdded', function (up, files) {
             $.each(files, function (i, file) {
                 $('#filelist').append(
                 '<div style="padding:8px" class="ui-widget ui-state-default ui-corner-all ui-button-text-only" id="file_' + file.id + '">' + file.name +
@@ -78,25 +78,27 @@
                 );
             });
 
-            up.refresh(); // Reposition Flash/Silverlight
+            up.refresh();
         });
 
-        uploader.bind('UploadProgress', function (up, file) {
+        uploaderApp.bind('UploadProgress', function (up, file) {
             $('#file_' + file.id + " .progress-container").html(file.percent + "%");
         });
 
-        uploader.bind('Error', function (up, err) {
-//            $('#filelist').append("<div>Error: " + err.code +
-//			    ", Message: " + err.message +
-//			    (err.file ? ", File: " + err.file.name : "") +
-//			    "</div>"
-//		  );
+        uploaderApp.bind('Error', function (up, err) {
             alert(err.message);
-            up.refresh(); // Reposition Flash/Silverlight
+            up.refresh();
         });
 
-        uploader.bind('FileUploaded', function (up, file) {
-            $('#' + file.id + " b").html("100%");
+        uploaderApp.bind('FileUploaded', function (up, file, info) {
+            let res = info.response.toString();
+            if (res.startWiths('false#')) {
+                alert(res.substr(6));
+                $('#' + file.id + " b").html("error");
+            }
+            else {
+                $('#' + file.id + " b").html("100%");
+            }
         });
     });
 </script>

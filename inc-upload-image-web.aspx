@@ -96,12 +96,13 @@
 
         uploaderWeb.bind('FileUploaded', function (up, file, info) {
             let res = info.response.toString();
-            if (res.startWiths('false#'))
+            if (res.startWiths('false#')) {
                 alert(res.substr(6));
-        });
-
-        uploaderWeb.bind('FileUploaded', function (up, file) {
-            $('#' + file.id + " b").html("100%");
+                $('#' + file.id + " b").html("error");
+            }
+            else {
+                $('#' + file.id + " b").html("100%");
+            }
         });
     });
 </script>
