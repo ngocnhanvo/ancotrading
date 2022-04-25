@@ -102,10 +102,10 @@ namespace Catalogue
             }
             else
             {
-                var link = string.Format(@"http://www.ancopottery.com/presentation?code={0}&id={1}", spR.ma_sanpham, idCatalog);
+                var link = string.Format(@"http://www.ancopottery.com/presemtation?code={0}&id={1}", spR.ma_sanpham, idCatalog);
                 var qrCode = qrGenerator.CreateQrCode(link, QRCodeGenerator.ECCLevel.M);
-
-                using (var bitMap = qrCode.GetGraphic(30))
+                
+                using (var bitMap = qrCode.GetGraphic(100))
                 {
                     bitMap.Save(msQRCode, System.Drawing.Imaging.ImageFormat.Jpeg);
                     bitMap.Dispose();
