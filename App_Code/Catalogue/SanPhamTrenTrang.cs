@@ -102,9 +102,7 @@ namespace Catalogue
             }
             else
             {
-                var infoAncoPoterry = Extension.infoAncoPoterry();
-                var link = string.Format(@"{0}/{1}&id={2}", infoAncoPoterry["website"], infoAncoPoterry["detail"], idCatalog);
-                link = link.Replace("[code]", spR.ma_sanpham);
+                var link = string.Format(@"http://www.ancopottery.com/presentation?code={0}&id={1}", spR.ma_sanpham, idCatalog);
                 var qrCode = qrGenerator.CreateQrCode(link, QRCodeGenerator.ECCLevel.M);
 
                 using (var bitMap = qrCode.GetGraphic(20))
