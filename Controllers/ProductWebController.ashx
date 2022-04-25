@@ -125,13 +125,15 @@ public class ProductWebController : IHttpHandler
                 }
             }
 
-            var mnA1 = menuWeb.Where(s => s.text == a1).Select(s => s.menuChild).FirstOrDefault();
-            var dieuKienLocSP = mnA1.Where(s => s.text == a2).Select(s => s.href).FirstOrDefault();
-            var arrDieuKienLocSP = dieuKienLocSP.Split(new string[] { " | " }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var dklsp in arrDieuKienLocSP)
+            if (!string.IsNullOrWhiteSpace(a1) & !string.IsNullOrWhiteSpace(a2))
             {
-                string sql = string.Format(@"
+                var mnA1 = menuWeb.Where(s => s.text == a1).Select(s => s.menuChild).FirstOrDefault();
+                var dieuKienLocSP = mnA1.Where(s => s.text == a2).Select(s => s.href).FirstOrDefault();
+                var arrDieuKienLocSP = dieuKienLocSP.Split(new string[] { " | " }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var dklsp in arrDieuKienLocSP)
+                {
+                    string sql = string.Format(@"
                     select 
                         sp.ma_sanpham, sp.md_kieudang_id
                     from 
@@ -142,23 +144,24 @@ public class ProductWebController : IHttpHandler
                         AND sp.trangthai in ('DHD')
                         AND sp.ma_sanpham like N'{0}'
                     ",
-                    dklsp
-                );
+                        dklsp
+                    );
 
-                var dt = mdbc.GetData(sql);
-                foreach (DataRow row in dt.Rows)
-                {
-                    sps.Add(new productCatalog()
+                    var dt = mdbc.GetData(sql);
+                    foreach (DataRow row in dt.Rows)
                     {
-                        code = row["ma_sanpham"].ToString(),
-                        shape = row["md_kieudang_id"].ToString(),
-                        titleWeb = a1,
-                        titleSubWeb = a2
-                    });
+                        sps.Add(new productCatalog()
+                        {
+                            code = row["ma_sanpham"].ToString(),
+                            shape = row["md_kieudang_id"].ToString(),
+                            titleWeb = a1,
+                            titleSubWeb = a2
+                        });
+                    }
                 }
             }
 
-            sps = sps.GroupBy(s=>s.code).Select(s=>s.First()).OrderBy(s=>s.code).ToList();
+            sps = sps.GroupBy(s => s.code).Select(s => s.First()).OrderBy(s => s.code).ToList();
 
         end:;
 
