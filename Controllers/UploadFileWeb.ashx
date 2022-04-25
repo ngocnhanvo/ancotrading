@@ -23,8 +23,9 @@ public class UploadFileWeb : IHttpHandler
 
                 var rgxMauSac2 = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-[0-9][0-9]$");
                 var rgxMauSac3 = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-F[0-9]-[0-9][0-9]$");
-                
-                if (rgxMauSac2.IsMatch(filterName) | rgxMauSac3.IsMatch(filterName))
+                var rgxMauSac4 = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-G[0-9]-[0-9][0-9]$");
+
+                if (rgxMauSac2.IsMatch(filterName) | rgxMauSac3.IsMatch(filterName) | rgxMauSac4.IsMatch(filterName))
                 {
                     files[i - 1].SaveAs(Public.imgWebsites + files[i - 1].FileName);
                     context.Response.Write(Public.imgWebsites + files[i - 1].FileName);
