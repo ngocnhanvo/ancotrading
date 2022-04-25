@@ -67,12 +67,13 @@ public class ProductWebController : IHttpHandler
 
                 foreach (var item in lstD)
                 {
-                    sps.Add(new productCatalog()
-                    {
-                        code = item["code"],
-                        titleWeb = "",
-                        titleSubWeb = ""
-                    });
+                    if (!isCode | (isCode & item["code"] == code))
+                        sps.Add(new productCatalog()
+                        {
+                            code = item["code"],
+                            titleWeb = "",
+                            titleSubWeb = ""
+                        });
                 }
 
                 if(!isCode)
