@@ -102,9 +102,8 @@ namespace Catalogue
             }
             else
             {
-                var link = "http://www.ancopottery.com/presentation?code="+ spR.ma_sanpham + "&id=" + idCatalog;
+                var link = "http://www.ancopottery.com/presetation?code="+ spR.ma_sanpham + "&id=" + idCatalog;
                 var qrCode = qrGenerator.CreateQrCode(link, QRCodeGenerator.ECCLevel.Q);
-                throw new Exception(link);
 
                 using (var bitMap = qrCode.GetGraphic(10))
                 {
