@@ -59,8 +59,9 @@ public class ProductWebController : IHttpHandler
         {
             var idPresent = context.Request.Form["idPresent"].ToLower().Trim();
             var code = context.Request.Form["code"].ToLower().Trim();
-
-            if (!string.IsNullOrWhiteSpace(idPresent))
+            var isPresent = !string.IsNullOrWhiteSpace(idPresent);
+            var isCode = !string.IsNullOrWhiteSpace(code);
+            if (isPresent)
             {
                 var lstD = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(Extension.readFileCatalog(idPresent));
 
@@ -74,12 +75,13 @@ public class ProductWebController : IHttpHandler
                     });
                 }
 
-                goto end;
+                if(!isCode)
+                    goto end;
             }
 
             var menuWeb = CustomizeObjects.getMenuProductsWeb();
 
-            if (!string.IsNullOrWhiteSpace(code))
+            if (isCode)
             {
                 foreach (var mn1 in menuWeb)
                 {
