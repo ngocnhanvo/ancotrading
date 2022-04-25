@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using Newtonsoft.Json;
 using NPOI.HSSF.UserModel;
@@ -102,7 +102,7 @@ namespace Catalogue
             }
             else
             {
-                var link = string.Format("http://www.ancopottery.com/presentation?code={0}&id={1}", spR.ma_sanpham, idCatalog);
+                var link = "http://www.ancopottery.com/presentation?code="+ spR.ma_sanpham + "&id=" + idCatalog;
                 var qrCode = qrGenerator.CreateQrCode(link, QRCodeGenerator.ECCLevel.M);
                 
                 using (var bitMap = qrCode.GetGraphic(100))
