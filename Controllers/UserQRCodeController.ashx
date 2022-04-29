@@ -311,7 +311,8 @@ public class UserQRCodeController : IHttpHandler {
                                 { "id", detai_bientau_mausac },
                                 { "val", msTA },
                                 { "ma_sanpham", mspColor },
-                                { "image", ExcuteSignalRStatic.getImageProduct(mspColor) }
+								{ "image", "/Controllers/API_System.ashx?oper=loadImageProduct&msp=" + mspColor }
+                                //{ "image", ExcuteSignalRStatic.getImageProduct(mspColor) }
                             });
                         }
                     }
