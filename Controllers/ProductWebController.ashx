@@ -163,11 +163,16 @@ public class ProductWebController : IHttpHandler
             }
 
             sps = sps.GroupBy(s => s.code).Select(s => s.First())
+				//theo chung loai
 				.OrderBy(s => s.code.Substring(0,2))
+				//theo de tai
 				.ThenBy(s => s.code.Substring(6,2))
-				.ThenBy(s => s.code.Substring(3,3))
-				.ThenBy(s => s.code.Substring(9,2))
-				.ThenBy(s => s.code.Substring(12))
+				//theo mau sac
+				.ThenBy(s => s.code.Substring(12)) 
+				//theo kieu dang
+				.ThenBy(s => s.code.Substring(3,3)) 
+				//theo bo cai
+				.ThenBy(s => s.code.Substring(9,2)) 
 				.ToList();
 
         end:;
