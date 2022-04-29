@@ -164,8 +164,8 @@ public class ProductWebController : IHttpHandler
 
             sps = sps.GroupBy(s => s.code).Select(s => s.First())
 				.OrderBy(s => s.code.Substring(0,2))
-				.ThenBy(s => s.code.Substring(3,3))
 				.ThenBy(s => s.code.Substring(6,2))
+				.ThenBy(s => s.code.Substring(3,3))
 				.ThenBy(s => s.code.Substring(9,2))
 				.ThenBy(s => s.code.Substring(12))
 				.ToList();
