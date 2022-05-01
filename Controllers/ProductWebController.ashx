@@ -182,7 +182,7 @@ public class ProductWebController : IHttpHandler
                 var codeCL = sp.code.Substring(0, 2);
                 var codeDT = sp.code.Substring(6, 2);
                 //sp.image = ExcuteSignalRStatic.getImageProductWeb(sp.code);
-				sp.image = string.Format("Controllers/API_System?oper=loadImageProductWeb&msp={0}", sp.code);
+				sp.image = string.Format("Controllers/API_System.ashx?oper=loadImageProductWeb&msp={0}", sp.code);
                 sp.shape = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.shape).Select(s => s.ten_ta).FirstOrDefault();
                 sp.detaiTA = db.md_detais.Where(s => s.code_cl == codeCL & s.code_dt == codeDT).Select(s => s.ta_nganWeb).FirstOrDefault();
 
