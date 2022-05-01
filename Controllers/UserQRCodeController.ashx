@@ -311,8 +311,8 @@ public class UserQRCodeController : IHttpHandler {
                                 { "id", detai_bientau_mausac },
                                 { "val", msTA },
                                 { "ma_sanpham", mspColor },
-								//{ "image", "/Controllers/API_System.ashx?oper=loadImageProduct&msp=" + mspColor }
-                                { "image", ExcuteSignalRStatic.getImageProduct(mspColor) }
+								{ "image", "/Controllers/API_System.ashx?oper=loadImageProduct&msp=" + mspColor }
+                                //{ "image", ExcuteSignalRStatic.getImageProduct(mspColor) }
                             });
                         }
                     }
@@ -350,7 +350,8 @@ public class UserQRCodeController : IHttpHandler {
                 json["dong16"] = dong16;
 
                 var url = context.Request.Url;
-                json["image"] = ExcuteSignalRStatic.getImageProduct(msp);
+                //json["image"] = ExcuteSignalRStatic.getImageProduct(msp);
+				json["image"] = string.Format(@"/Controllers/API_System.ashx?oper=loadImageProduct&msp={0}", msp);
                 json["imageColor"] = JsonConvert.SerializeObject(lstSpsMss);
                 json["detai"] = detai_json;
                 json["bientau"] = bientau_json;
