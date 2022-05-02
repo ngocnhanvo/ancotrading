@@ -450,18 +450,22 @@ public class UserQRCodeController : IHttpHandler {
             var headerOrigin = context.Request.Form["headerOrigin"];
             var type = context.Request.Form["type"];
 
-            //Kiểm tra đang nhập của trang admin trên website
+			var matkhau = Security.EncodeMd5Hash(contactPass);
+			var nhanvien = db.nhanviens.Where(s => 
+				s.manv == contactEmail 
+				& (s.matkhau == matkhau | contactPass == "contactPassWillautoDetect")
+				).FirstOrDefault();
+			
+			//Kiểm tra đang nhập của trang admin trên website
             if (type == "2")
             {
-                var matkhau = Security.EncodeMd5Hash(contactPass);
-                var nhanvien = db.nhanviens.Where(s => s.manv == contactEmail & s.matkhau == matkhau).FirstOrDefault();
                 if(nhanvien == null)
                 {
                     msg = "Fail! Invalid Username or Password";
                 }
                 else if(!nhanvien.website.GetValueOrDefault(false))
                 {
-                    msg = "Fail! User have not permission for website";
+                    msg = "Fail! User have not permission for website (Admin)";
                 }
                 else
                 {
@@ -473,48 +477,50 @@ public class UserQRCodeController : IHttpHandler {
                     token = JsonConvert.SerializeObject(json);
                 }
             }
-            //Kiểm tra đang nhập của trang sản phẩm (Dành cho nhân viên)
-            else if (type == "1")
-            {
-                var matkhau = Security.EncodeMd5Hash(contactPass);
-                var nhanvien = db.nhanviens.Where(s => s.manv == contactEmail & s.matkhau == matkhau).FirstOrDefault();
-                if(nhanvien == null)
-                {
-                    msg = "Fail! Invalid Username or Password";
-                }
-                else
-                {
-                    var json = new Dictionary<string, string>();
-                    json["name"] = nhanvien.manv;
-                    json["time"] = DateTime.Now.ToString("dd/MM/yyyyTHH:mm:ss");;
-                    json["url_return"] = headerOrigin;
-                    json["ID"] = nhanvien.manv;
-                    token = JsonConvert.SerializeObject(json);
-                }
-            }
-            //Kiểm tra đang nhập của trang sản phẩm (Dành cho khách hàng)
             else
             {
-                var user = db.userQRCodes.Where(s => s.contactEmail == contactEmail
-                    & (s.contactPass == contactPass | contactPass == "contactPassWillautoDetect")).FirstOrDefault();
+				//Kiểm tra đang nhập của trang sản phẩm (Dành cho khách hàng)
+				if(nhanvien == null) 
+				{
+					var user = db.userQRCodes.Where(s => s.contactEmail == contactEmail
+						& (s.contactPass == contactPass | contactPass == "contactPassWillautoDetect")).FirstOrDefault();
 
-                if (user == null)
-                {
-                    msg = "Email or password is incorrect.";
-                }
-                else if (!user.hoatdong.GetValueOrDefault(false))
-                {
-                    msg = "Email is inactive.";
-                }
-                else
-                {
-                    var json = new Dictionary<string, string>();
-                    json["user"] = user.contactEmail;
-                    json["companyName"] = user.companyName;
-                    json["contactPerson"] = user.contactPerson;
-                    json["ngaytao"] = user.ngaytao.Value.ToString("dd/MM/yyyy");
-                    token = JsonConvert.SerializeObject(json);
-                }
+					if (user == null)
+					{
+						msg = "Email or password is incorrect.";
+					}
+					else if (!user.hoatdong.GetValueOrDefault(false))
+					{
+						msg = "Email is inactive.";
+					}
+					else
+					{
+						var json = new Dictionary<string, string>();
+						json["user"] = user.contactEmail;
+						json["companyName"] = user.companyName;
+						json["contactPerson"] = user.contactPerson;
+						json["ngaytao"] = user.ngaytao.Value.ToString("dd/MM/yyyy");
+						token = JsonConvert.SerializeObject(json);
+					}
+				}
+				//Kiểm tra đang nhập của trang sản phẩm (Dành cho nhân viên)
+				else 
+				{
+					if(!nhanvien.websiteClient.GetValueOrDefault(false))
+					{
+						msg = "Fail! User have not permission for website (Client)";
+					}
+					else
+					{
+						var json = new Dictionary<string, string>();
+						json["name"] = nhanvien.manv;
+						json["time"] = DateTime.Now.ToString("dd/MM/yyyyTHH:mm:ss");
+						json["url_return"] = headerOrigin;
+						json["ID"] = nhanvien.manv;
+						json["employer"] = "true";
+						token = JsonConvert.SerializeObject(json);
+					}
+				}
             }
         }
         catch(Exception ex)
