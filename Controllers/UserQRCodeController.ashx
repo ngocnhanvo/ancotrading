@@ -514,6 +514,7 @@ public class UserQRCodeController : IHttpHandler {
 					{
 						var json = new Dictionary<string, string>();
 						json["name"] = nhanvien.manv;
+						json["user"] = nhanvien.manv;
 						json["time"] = DateTime.Now.ToString("dd/MM/yyyyTHH:mm:ss");
 						json["url_return"] = headerOrigin;
 						json["ID"] = nhanvien.manv;
