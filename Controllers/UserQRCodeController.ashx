@@ -516,7 +516,7 @@ public class UserQRCodeController : IHttpHandler {
 						json["user"] = nhanvien.manv;
 						json["companyName"] = "";
 						json["contactPerson"] = nhanvien.hoten;
-						json["ngaytao"] = user.ngaytao.Value.ToString("dd/MM/yyyy");
+						json["ngaytao"] = DateTime.Now.ToString("dd/MM/yyyy");
 						
 						json["name"] = nhanvien.manv;
 						json["time"] = DateTime.Now.ToString("dd/MM/yyyyTHH:mm:ss");
