@@ -187,6 +187,17 @@
                 , editoptions: { value:'True:False', defaultValue: 'False' }
                 , formatter: 'checkbox'
             },
+			{
+                fixed: true, name: 'websiteClient'
+                , label: 'Website (Client)'
+                , index: 'websiteClient'
+                , width: 80
+                , editable: true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions: { value:'True:False', defaultValue: 'False' }
+                , formatter: 'checkbox'
+            },
             {
                 fixed: true, name: 'ngaytao'
                 , label: 'Ngày Tạo'

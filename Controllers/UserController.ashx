@@ -67,7 +67,8 @@ public class UserController : IHttpHandler {
         bool hieuLucDH = context.Request.Form["hieuLucDH"].ToLower() == "true";
         bool themPhiSauHL = context.Request.Form["themPhiSauHL"].ToLower() == "true";
         bool website = context.Request.Form["website"].ToLower() == "true";
-
+		bool websiteClient = context.Request.Form["websiteClient"].ToLower() == "true";
+		
         String mk = context.Request.Form["matkhau"];
 
         nhanvien u = db.nhanviens.Single(p => p.manv == context.Request.Form["id"]);
@@ -88,6 +89,7 @@ public class UserController : IHttpHandler {
         u.hieuLucDH = hieuLucDH;
         u.themPhiSauHL = themPhiSauHL;
         u.website = website;
+		u.websiteClient = websiteClient;
 
         u.ngaycapnhat = DateTime.Now;
         u.nguoicapnhat = UserUtils.getUser(context);
@@ -118,7 +120,8 @@ public class UserController : IHttpHandler {
         bool hieuLucDH = context.Request.Form["hieuLucDH"].ToLower() == "true";
         bool themPhiSauHL = context.Request.Form["themPhiSauHL"].ToLower() == "true";
         bool website = context.Request.Form["website"].ToLower() == "true";
-
+		bool websiteClient = context.Request.Form["websiteClient"].ToLower() == "true";
+		
         String manv = context.Request.Form["manv"];
 
         nhanvien nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
@@ -142,6 +145,7 @@ public class UserController : IHttpHandler {
                 hieuLucDH = hieuLucDH,
                 themPhiSauHL = themPhiSauHL,
                 website = website,
+				websiteClient = websiteClient,
                 mota = context.Request.Form["mota"],
                 hoatdong = hd,
 
@@ -269,6 +273,7 @@ public class UserController : IHttpHandler {
             xml += "<cell><![CDATA[" + row["hieuLucDH"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["themPhiSauHL"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["website"] + "]]></cell>";
+			xml += "<cell><![CDATA[" + row["websiteClient"] + "]]></cell>";
 
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
