@@ -513,12 +513,17 @@ public class UserQRCodeController : IHttpHandler {
 					else
 					{
 						var json = new Dictionary<string, string>();
-						json["name"] = nhanvien.manv;
 						json["user"] = nhanvien.manv;
+						json["companyName"] = "";
+						json["contactPerson"] = nhanvien.hoten;
+						json["ngaytao"] = user.ngaytao.Value.ToString("dd/MM/yyyy");
+						
+						json["name"] = nhanvien.manv;
 						json["time"] = DateTime.Now.ToString("dd/MM/yyyyTHH:mm:ss");
 						json["url_return"] = headerOrigin;
 						json["ID"] = nhanvien.manv;
 						json["employer"] = "true";
+						
 						token = JsonConvert.SerializeObject(json);
 					}
 				}
