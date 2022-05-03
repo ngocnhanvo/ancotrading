@@ -470,6 +470,7 @@ public class UserQRCodeController : IHttpHandler {
                 else
                 {
                     var json = new Dictionary<string, string>();
+					json["employer"] = "";
                     json["name"] = nhanvien.manv;
                     json["time"] = DateTime.Now.ToString("dd/MM/yyyyTHH:mm:ss");;
                     json["url_return"] = headerOrigin;
@@ -499,6 +500,7 @@ public class UserQRCodeController : IHttpHandler {
                         json["user"] = user.contactEmail;
                         json["companyName"] = user.companyName;
                         json["contactPerson"] = user.contactPerson;
+						json["employer"] = "";
                         json["ngaytao"] = user.ngaytao.Value.ToString("dd/MM/yyyy");
                         token = JsonConvert.SerializeObject(json);
                     }
