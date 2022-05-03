@@ -116,7 +116,7 @@
                     , editoptions: { 
                         dataInit : function (elem) {
                             setTimeout(function () {
-                                //$(elem).prop('disabled', true);
+                                /*$(elem).prop('disabled', true);*/
                             }, 50);
                         },
                     }
