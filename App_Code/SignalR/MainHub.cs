@@ -694,7 +694,7 @@ public class MainHub : Hub
                         foreach (var row in d)
                         {
                             decimal gia_fob = 0;
-                            try { gia_fob = decimal.Parse(row.gia_fob.Replace("$", "").Replace(" ", "")); } catch { }
+                            try { gia_fob = decimal.Parse(row.price.Replace("$", "").Replace(" ", "")); } catch { }
                             exec.add_ctbg(row.ma_sanpham, maxOrder, gia_fob, mnuqr.c_baogiaqr_id, username, dtkd.md_doitackinhdoanh_id, db, "qr", row.soluong);
                         }
                         db.SubmitChanges();
@@ -875,7 +875,7 @@ public class MainHub : Hub
                 foreach (var row in d)
                 {
                     decimal gia_fob = 0;
-                    try { gia_fob = decimal.Parse(row.gia_fob.Replace("$", "").Replace(" ", "")); } catch { }
+                    try { gia_fob = decimal.Parse(row.price.Replace("$", "").Replace(" ", "")); } catch { }
                     exec.add_ctdonhang(row.ma_sanpham, row.soluong.ToString(), maxOrder, gia_fob, mnu.c_donhangqr_id, username, dtkd.md_doitackinhdoanh_id, db, "qr");
                 }
                 db.SubmitChanges();
