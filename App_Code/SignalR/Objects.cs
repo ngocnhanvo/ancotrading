@@ -23,7 +23,7 @@ public class Objects
     public partial class Json_product
     {
         public string ma_sanpham;
-        public string gia_fob;
+        public string price;
         public string image;
         public string soluong;
         public string detai_mausac;
