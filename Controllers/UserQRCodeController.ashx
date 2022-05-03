@@ -311,7 +311,7 @@ public class UserQRCodeController : IHttpHandler {
                                 { "id", detai_bientau_mausac },
                                 { "val", msTA },
                                 { "ma_sanpham", mspColor },
-								{ "image", "/Controllers/API_System.ashx?oper=loadImageProduct&msp=" + mspColor }
+                                { "image", "/Controllers/API_System.ashx?oper=loadImageProduct&msp=" + mspColor }
                                 //{ "image", ExcuteSignalRStatic.getImageProduct(mspColor) }
                             });
                         }
@@ -351,7 +351,7 @@ public class UserQRCodeController : IHttpHandler {
 
                 var url = context.Request.Url;
                 //json["image"] = ExcuteSignalRStatic.getImageProduct(msp);
-				json["image"] = string.Format(@"/Controllers/API_System.ashx?oper=loadImageProduct&msp={0}", msp);
+                json["image"] = string.Format(@"/Controllers/API_System.ashx?oper=loadImageProduct&msp={0}", msp);
                 json["imageColor"] = JsonConvert.SerializeObject(lstSpsMss);
                 json["detai"] = detai_json;
                 json["bientau"] = bientau_json;
@@ -450,13 +450,13 @@ public class UserQRCodeController : IHttpHandler {
             var headerOrigin = context.Request.Form["headerOrigin"];
             var type = context.Request.Form["type"];
 
-			var matkhau = Security.EncodeMd5Hash(contactPass);
-			var nhanvien = db.nhanviens.Where(s => 
-				s.manv == contactEmail 
-				& (s.matkhau == matkhau | contactPass == "contactPassWillautoDetect")
-				).FirstOrDefault();
-			
-			//Kiểm tra đang nhập của trang admin trên website
+            var matkhau = Security.EncodeMd5Hash(contactPass);
+            var nhanvien = db.nhanviens.Where(s =>
+                s.manv == contactEmail
+                & (s.matkhau == matkhau | contactPass == "contactPassWillautoDetect")
+                ).FirstOrDefault();
+
+            //Kiểm tra đang nhập của trang admin trên website
             if (type == "2")
             {
                 if(nhanvien == null)
@@ -479,54 +479,54 @@ public class UserQRCodeController : IHttpHandler {
             }
             else
             {
-				//Kiểm tra đang nhập của trang sản phẩm (Dành cho khách hàng)
-				if(nhanvien == null) 
-				{
-					var user = db.userQRCodes.Where(s => s.contactEmail == contactEmail
-						& (s.contactPass == contactPass | contactPass == "contactPassWillautoDetect")).FirstOrDefault();
+                //Kiểm tra đang nhập của trang sản phẩm (Dành cho khách hàng)
+                if(nhanvien == null)
+                {
+                    var user = db.userQRCodes.Where(s => s.contactEmail == contactEmail
+                        & (s.contactPass == contactPass | contactPass == "contactPassWillautoDetect")).FirstOrDefault();
 
-					if (user == null)
-					{
-						msg = "Email or password is incorrect.";
-					}
-					else if (!user.hoatdong.GetValueOrDefault(false))
-					{
-						msg = "Email is inactive.";
-					}
-					else
-					{
-						var json = new Dictionary<string, string>();
-						json["user"] = user.contactEmail;
-						json["companyName"] = user.companyName;
-						json["contactPerson"] = user.contactPerson;
-						json["ngaytao"] = user.ngaytao.Value.ToString("dd/MM/yyyy");
-						token = JsonConvert.SerializeObject(json);
-					}
-				}
-				//Kiểm tra đang nhập của trang sản phẩm (Dành cho nhân viên)
-				else 
-				{
-					if(!nhanvien.websiteClient.GetValueOrDefault(false))
-					{
-						msg = "Fail! User have not permission for website (Client)";
-					}
-					else
-					{
-						var json = new Dictionary<string, string>();
-						json["user"] = nhanvien.manv;
-						json["companyName"] = "";
-						json["contactPerson"] = nhanvien.hoten;
-						json["ngaytao"] = DateTime.Now.ToString("dd/MM/yyyy");
-						json["employer"] = "true";
-						
-						json["name"] = nhanvien.manv;
-						json["time"] = DateTime.Now.ToString("dd/MM/yyyyTHH:mm:ss");
-						json["url_return"] = headerOrigin;
-						json["ID"] = nhanvien.manv;
-						
-						token = JsonConvert.SerializeObject(json);
-					}
-				}
+                    if (user == null)
+                    {
+                        msg = "Email or password is incorrect.";
+                    }
+                    else if (!user.hoatdong.GetValueOrDefault(false))
+                    {
+                        msg = "Email is inactive.";
+                    }
+                    else
+                    {
+                        var json = new Dictionary<string, string>();
+                        json["user"] = user.contactEmail;
+                        json["companyName"] = user.companyName;
+                        json["contactPerson"] = user.contactPerson;
+                        json["ngaytao"] = user.ngaytao.Value.ToString("dd/MM/yyyy");
+                        token = JsonConvert.SerializeObject(json);
+                    }
+                }
+                //Kiểm tra đang nhập của trang sản phẩm (Dành cho nhân viên)
+                else
+                {
+                    if(!nhanvien.websiteClient.GetValueOrDefault(false))
+                    {
+                        msg = "Fail! User have not permission for website (Client)";
+                    }
+                    else
+                    {
+                        var json = new Dictionary<string, string>();
+                        json["user"] = nhanvien.manv;
+                        json["companyName"] = "";
+                        json["contactPerson"] = nhanvien.hoten;
+                        json["ngaytao"] = DateTime.Now.ToString("dd/MM/yyyy");
+                        json["employer"] = "true";
+
+                        json["name"] = nhanvien.manv;
+                        json["time"] = DateTime.Now.ToString("dd/MM/yyyyTHH:mm:ss");
+                        json["url_return"] = headerOrigin;
+                        json["ID"] = nhanvien.manv;
+
+                        token = JsonConvert.SerializeObject(json);
+                    }
+                }
             }
         }
         catch(Exception ex)
@@ -565,12 +565,22 @@ public class UserQRCodeController : IHttpHandler {
                 }
                 else
                 {
-                    var pass = System.Web.Security.Membership.GeneratePassword(6, 1);
-                    pass = pass.Replace("&", "VA");
-                    pass = pass.Replace("+", "CO");
-                    pass = pass.Replace("%", "PT");
-                    pass = pass.Replace("?", "HO");
-                    pass = "12" + pass + "21";
+                    string pass = kh.contactPass;
+                    if (string.IsNullOrWhiteSpace(pass))
+                    {
+                        pass = System.Web.Security.Membership.GeneratePassword(6, 1);
+
+                        pass = pass.Replace("&", "VA");
+                        pass = pass.Replace("+", "CO");
+                        pass = pass.Replace("%", "PT");
+                        pass = pass.Replace("?", "HO");
+                        pass = pass.Replace("{", "N1");
+                        pass = pass.Replace("}", "N2");
+                        pass = pass.Replace("[", "N3");
+                        pass = pass.Replace("]", "N4");
+                        pass = "12" + pass + "21";
+                    }
+
                     var tempCP = temp;
                     var lst = tempCP.Split(new string[] { "\n", "\r" }, StringSplitOptions.None).ToList();
                     var sb = lst[0];

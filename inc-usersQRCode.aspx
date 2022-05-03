@@ -85,7 +85,7 @@
                     fixed: true
                     , name: 'userQRCode_id'
                     , label: 'Id'
-                    , index: 'userQRCode_id'
+                    , index: 'userQRCode_id'usersQRCode
                     , width: 100 
                     , editable: false
                     , edittype: 'text'
@@ -116,7 +116,7 @@
                     , editoptions: { 
                         dataInit : function (elem) {
                             setTimeout(function () {
-                                $(elem).prop('disabled', true);
+                                //$(elem).prop('disabled', true);
                             }, 50);
                         },
                     }
