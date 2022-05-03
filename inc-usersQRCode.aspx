@@ -85,7 +85,7 @@
                     fixed: true
                     , name: 'userQRCode_id'
                     , label: 'Id'
-                    , index: 'userQRCode_id'usersQRCode
+                    , index: 'userQRCode_id'
                     , width: 100 
                     , editable: false
                     , edittype: 'text'
