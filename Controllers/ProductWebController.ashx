@@ -58,10 +58,15 @@ public class ProductWebController : IHttpHandler
         try
         {
             var idPresent = context.Request.Form["idPresent"].ToLower().Trim();
+			var isPresent = !string.IsNullOrWhiteSpace(idPresent);
+			
             var code = context.Request.Form["code"].ToLower().Trim();
-            var isPresent = !string.IsNullOrWhiteSpace(idPresent);
             var isCode = !string.IsNullOrWhiteSpace(code);
-            if (isPresent)
+            
+			var key = context.Request.Form["key"].ToLower().Trim();
+            var isKey = !string.IsNullOrWhiteSpace(key);
+            
+			if (isPresent)
             {
                 var lstD = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(Extension.readFileCatalog(idPresent));
 
@@ -161,6 +166,33 @@ public class ProductWebController : IHttpHandler
                     }
                 }
             }
+			else if(isKey) 
+			{
+				string sql = string.Format(@"
+                    select 
+                        sp.ma_sanpham, sp.md_kieudang_id
+                    from 
+                        md_sanpham sp
+                    where 1=1
+                        AND sp.hoatdong = 1
+                        AND sp.trangthai in ('DHD')
+                        AND sp.ma_sanpham like N'{0}'
+                    ",
+					key
+				);
+
+				var dt = mdbc.GetData(sql);
+				foreach (DataRow row in dt.Rows)
+				{
+					sps.Add(new productCatalog()
+					{
+						code = row["ma_sanpham"].ToString(),
+						shape = row["md_kieudang_id"].ToString(),
+						titleWeb = a1,
+						titleSubWeb = a2
+					});
+				}
+			}
 
             sps = sps.GroupBy(s => s.code).Select(s => s.First())
 				//theo chung loai
