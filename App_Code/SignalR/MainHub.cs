@@ -956,7 +956,7 @@ public class MainHub : Hub
                     {
                         body += "<tr><td><b>" + string.Format(html_span, row.ma_sanpham) + "</b></td>";
                         body += "<td></td>";
-                        body += "<td>" + string.Format(html_span, row.gia_fob) + "</td></tr>";
+                        body += "<td>" + string.Format(html_span, row.price) + "</td></tr>";
                     }
                     body += "</table>";
                     body += "<br><br>";
