@@ -57,6 +57,8 @@ public class ProductWebController : IHttpHandler
 
         try
         {
+            var employer = context.Request.Form["employer"];
+
             var idPresent = context.Request.Form["idPresent"].ToLower().Trim();
 			var isPresent = !string.IsNullOrWhiteSpace(idPresent);
 			
@@ -98,17 +100,20 @@ public class ProductWebController : IHttpHandler
                         foreach (var dklsp in arrDieuKienLocSP2)
                         {
                             string sql = string.Format(@"
-                                select sp.ma_sanpham, sp.md_kieudang_id
-                                from md_sanpham sp
+                                select 
+                                    sp.ma_sanpham, sp.md_kieudang_id
+                                from 
+                                    md_sanpham sp
                                 where 1=1
-                                    AND sp.hoatdong = 1 
-                                    AND sp.website = 1 
+                                    AND sp.hoatdong = 1
                                     AND sp.trangthai in ('DHD')
                                     AND sp.ma_sanpham like N'{0}'
                                     AND sp.ma_sanpham = N'{1}'
+                                    {2}
                                 ",
                                 dklsp,
-                                code
+                                code,
+                                employer == "true" ? "" : "AND sp.website = 1"
                             );
 
                             var dt = mdbc.GetData(sql);
