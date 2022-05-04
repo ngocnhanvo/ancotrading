@@ -151,6 +151,8 @@ public class ProductWebController : IHttpHandler
                                 code
                             );
 
+                    throw new Exception(sql);
+
                     var dt = mdbc.GetData(sql);
                     foreach (DataRow row in dt.Rows)
                     {
