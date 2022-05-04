@@ -60,15 +60,15 @@ public class ProductWebController : IHttpHandler
             var employer = context.Request.Form["employer"];
 
             var idPresent = context.Request.Form["idPresent"].ToLower().Trim();
-			var isPresent = !string.IsNullOrWhiteSpace(idPresent);
-			
+            var isPresent = !string.IsNullOrWhiteSpace(idPresent);
+
             var code = context.Request.Form["code"].ToLower().Trim();
             var isCode = !string.IsNullOrWhiteSpace(code);
-            
-			var key = context.Request.Form["key"].ToLower().Trim();
+
+            var key = context.Request.Form["key"].ToLower().Trim();
             var isKey = !string.IsNullOrWhiteSpace(key);
-            
-			if (isPresent)
+
+            if (isPresent)
             {
                 var lstD = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(Extension.readFileCatalog(idPresent));
 
@@ -91,6 +91,7 @@ public class ProductWebController : IHttpHandler
 
             if (isCode)
             {
+                var spsDTs = new List<productCatalog>();
                 foreach (var mn1 in menuWeb)
                 {
                     foreach (var mn2 in mn1.menuChild)
@@ -121,7 +122,7 @@ public class ProductWebController : IHttpHandler
                             {
                                 a1 = mn1.text;
                                 a2 = mn2.text;
-                                sps.Add(new productCatalog()
+                                spsDTs.Add(new productCatalog()
                                 {
                                     code = row["ma_sanpham"].ToString(),
                                     shape = row["md_kieudang_id"].ToString(),
@@ -134,6 +135,38 @@ public class ProductWebController : IHttpHandler
                         }
                     }
                 }
+
+                if (employer == "true" & spsDTs.Count <= 0)
+                {
+                    string sql = string.Format(@"
+                                select 
+                                    sp.ma_sanpham, sp.md_kieudang_id
+                                from 
+                                    md_sanpham sp
+                                where 1=1
+                                    AND sp.hoatdong = 1
+                                    AND sp.trangthai in ('DHD')
+                                    AND sp.ma_sanpham = N'{0}'
+                                ",
+                                code
+                            );
+
+                    var dt = mdbc.GetData(sql);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        spsDTs.Add(new productCatalog()
+                        {
+                            code = row["ma_sanpham"].ToString(),
+                            shape = row["md_kieudang_id"].ToString(),
+                            titleWeb = a1,
+                            titleSubWeb = a2
+                        });
+
+                        break;
+                    }
+                }
+
+                sps.AddRange(spsDTs);
             }
 
             if (!string.IsNullOrWhiteSpace(a1) & !string.IsNullOrWhiteSpace(a2))
@@ -171,9 +204,9 @@ public class ProductWebController : IHttpHandler
                     }
                 }
             }
-			else if(isKey) 
-			{
-				string sql = string.Format(@"
+            else if(isKey)
+            {
+                string sql = string.Format(@"
                     select 
                         sp.ma_sanpham, sp.md_kieudang_id
                     from 
@@ -183,34 +216,34 @@ public class ProductWebController : IHttpHandler
                         AND sp.trangthai in ('DHD')
                         AND sp.ma_sanpham like N'{0}'
                     ",
-					key
-				);
+                    key
+                );
 
-				var dt = mdbc.GetData(sql);
-				foreach (DataRow row in dt.Rows)
-				{
-					sps.Add(new productCatalog()
-					{
-						code = row["ma_sanpham"].ToString(),
-						shape = row["md_kieudang_id"].ToString(),
-						titleWeb = a1,
-						titleSubWeb = a2
-					});
-				}
-			}
+                var dt = mdbc.GetData(sql);
+                foreach (DataRow row in dt.Rows)
+                {
+                    sps.Add(new productCatalog()
+                    {
+                        code = row["ma_sanpham"].ToString(),
+                        shape = row["md_kieudang_id"].ToString(),
+                        titleWeb = a1,
+                        titleSubWeb = a2
+                    });
+                }
+            }
 
             sps = sps.GroupBy(s => s.code).Select(s => s.First())
-				//theo chung loai
-				.OrderBy(s => s.code.Substring(0,2))
-				//theo de tai
-				.ThenBy(s => s.code.Substring(6,2))
-				//theo mau sac
-				.ThenBy(s => s.code.Substring(12)) 
-				//theo kieu dang
-				.ThenBy(s => s.code.Substring(3,3)) 
-				//theo bo cai
-				.ThenBy(s => s.code.Substring(9,2)) 
-				.ToList();
+                //theo chung loai
+                .OrderBy(s => s.code.Substring(0,2))
+                //theo de tai
+                .ThenBy(s => s.code.Substring(6,2))
+                //theo mau sac
+                .ThenBy(s => s.code.Substring(12))
+                //theo kieu dang
+                .ThenBy(s => s.code.Substring(3,3))
+                //theo bo cai
+                .ThenBy(s => s.code.Substring(9,2))
+                .ToList();
 
         end:;
 
@@ -219,7 +252,7 @@ public class ProductWebController : IHttpHandler
                 var codeCL = sp.code.Substring(0, 2);
                 var codeDT = sp.code.Substring(6, 2);
                 //sp.image = ExcuteSignalRStatic.getImageProductWeb(sp.code);
-				sp.image = string.Format("Controllers/API_System.ashx?oper=loadImageProductWeb&msp={0}", sp.code);
+                sp.image = string.Format("Controllers/API_System.ashx?oper=loadImageProductWeb&msp={0}", sp.code);
                 sp.shape = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.shape).Select(s => s.ten_ta).FirstOrDefault();
                 sp.detaiTA = db.md_detais.Where(s => s.code_cl == codeCL & s.code_dt == codeDT).Select(s => s.ta_nganWeb).FirstOrDefault();
 
