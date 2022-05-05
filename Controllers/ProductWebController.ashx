@@ -151,8 +151,6 @@ public class ProductWebController : IHttpHandler
                                 code
                             );
 
-                    throw new Exception(sql);
-
                     var dt = mdbc.GetData(sql);
                     foreach (DataRow row in dt.Rows)
                     {
@@ -167,7 +165,6 @@ public class ProductWebController : IHttpHandler
                         break;
                     }
                 }
-
                 sps.AddRange(spsDTs);
             }
 
@@ -234,20 +231,22 @@ public class ProductWebController : IHttpHandler
                 }
             }
 
+        end:;
+
+            throw new Exception(sps.Count.ToString());
+
             sps = sps.GroupBy(s => s.code).Select(s => s.First())
                 //theo chung loai
-                .OrderBy(s => s.code.Substring(0,2))
+                .OrderBy(s => s.code.Substring(0, 2))
                 //theo de tai
-                .ThenBy(s => s.code.Substring(6,2))
+                .ThenBy(s => s.code.Substring(6, 2))
                 //theo mau sac
                 .ThenBy(s => s.code.Substring(12))
                 //theo kieu dang
-                .ThenBy(s => s.code.Substring(3,3))
+                .ThenBy(s => s.code.Substring(3, 3))
                 //theo bo cai
-                .ThenBy(s => s.code.Substring(9,2))
+                .ThenBy(s => s.code.Substring(9, 2))
                 .ToList();
-
-        end:;
 
             foreach (var sp in sps)
             {
@@ -274,7 +273,7 @@ public class ProductWebController : IHttpHandler
         }
         catch (Exception ex)
         {
-            msg = "0" + ex;
+            msg = "0" + ex.Message;
         }
 
         context.Response.Write(msg);
