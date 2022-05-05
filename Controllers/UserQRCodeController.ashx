@@ -590,7 +590,7 @@ public class UserQRCodeController : IHttpHandler {
 
                     lst.RemoveAt(0);
                     var bd = string.Join("\n", lst);
-                    bd = bd.Replace("@[NAME]", kh.companyName);
+                    bd = bd.Replace("@[NAME]", kh.contactPerson);
                     bd = bd.Replace("@[PASS]", pass);
                     mail.Send(
                         kh.contactEmail
