@@ -233,8 +233,6 @@ public class ProductWebController : IHttpHandler
 
         end:;
 
-            throw new Exception(sps.Count.ToString());
-
             sps = sps.GroupBy(s => s.code).Select(s => s.First())
                 //theo chung loai
                 .OrderBy(s => s.code.Substring(0, 2))
