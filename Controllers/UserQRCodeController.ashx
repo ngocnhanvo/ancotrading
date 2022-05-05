@@ -470,7 +470,7 @@ public class UserQRCodeController : IHttpHandler {
                 else
                 {
                     var json = new Dictionary<string, string>();
-					json["employer"] = "";
+                    json["employer"] = "";
                     json["name"] = nhanvien.manv;
                     json["time"] = DateTime.Now.ToString("dd/MM/yyyyTHH:mm:ss");;
                     json["url_return"] = headerOrigin;
@@ -500,7 +500,7 @@ public class UserQRCodeController : IHttpHandler {
                         json["user"] = user.contactEmail;
                         json["companyName"] = user.companyName;
                         json["contactPerson"] = user.contactPerson;
-						json["employer"] = "";
+                        json["employer"] = "";
                         json["ngaytao"] = user.ngaytao.Value.ToString("dd/MM/yyyy");
                         token = JsonConvert.SerializeObject(json);
                     }
@@ -622,10 +622,13 @@ public class UserQRCodeController : IHttpHandler {
     public void edit(HttpContext context)
     {
         string msg = "";
+        var contactEmail = context.Request.Form["contactEmail"];
+        var contactPass = context.Request.Form["contactPass"];
+        var companyName = context.Request.Form["companyName"];
+        var contactPerson = context.Request.Form["contactPerson"];
+
         try
         {
-            var contactEmail = context.Request.Form["contactEmail"];
-			var contactPass = context.Request.Form["contactPass"];
             var hoatdong = context.Request.Form["hoatdong"].ToLower() == "true";
             var nv = db.userQRCodes.Where(s => s.contactEmail == contactEmail).FirstOrDefault();
             if (nv == null)
@@ -634,7 +637,9 @@ public class UserQRCodeController : IHttpHandler {
             }
             else
             {
-				nv.contactPass = contactPass;
+                nv.companyName = companyName;
+                nv.contactPerson = contactPerson;
+                nv.contactPass = contactPass;
                 nv.hoatdong = hoatdong;
             }
             db.SubmitChanges();
@@ -656,7 +661,7 @@ public class UserQRCodeController : IHttpHandler {
         try
         {
             var contactEmail = context.Request.Form["contactEmail"];
-			var contactPass = context.Request.Form["contactPass"];
+            var contactPass = context.Request.Form["contactPass"];
             var companyName = context.Request.Form["companyName"];
             var contactPerson = context.Request.Form["contactPerson"];
             var contactMessage = context.Request.Form["contactMessage"];
@@ -669,7 +674,7 @@ public class UserQRCodeController : IHttpHandler {
                 nv = new userQRCode();
                 nv.userQRCode_id = Helper.getNewId();
                 nv.contactEmail = contactEmail;
-				nv.contactPass = contactPass;
+                nv.contactPass = contactPass;
                 nv.companyName = companyName;
                 nv.contactPerson = contactPerson;
                 nv.contactMessage = contactMessage;
