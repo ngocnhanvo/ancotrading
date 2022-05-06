@@ -91,18 +91,18 @@ public class MauSacWebController : IHttpHandler {
         string strsql = string.Format(@"
             select * from( 
                 SELECT
-	                sp.md_sanpham_id
-                    , sp.ma_sanpham
-                    , sp.hoatdongWeb
+	                msw.md_sanpham_id
+                    , msw.ma_sanpham
+                    , msw.hoatdongWeb
 	                , ROW_NUMBER() OVER (ORDER BY {0} {1} ) as RowNum 
                 FROM 
-	                md_sanpham sp           
+	                md_sanpham msw           
                 WHERE 
 	                1=1
-                    AND sp.md_sanpham_id != '{2}'
-                    AND substring(sp.ma_sanpham, 0, 12) = (select substring(sp2.ma_sanpham, 0, 12) from md_sanpham sp2 where sp2.md_sanpham_id = N'{2}')
-                    AND sp.hoatdong = 1
-                    AND sp.trangthai in ('DHD')
+                    AND msw.md_sanpham_id != '{2}'
+                    AND substring(msw.ma_sanpham, 0, 12) = (select substring(sp2.ma_sanpham, 0, 12) from md_sanpham sp2 where sp2.md_sanpham_id = N'{2}')
+                    AND msw.hoatdong = 1
+                    AND msw.trangthai in ('DHD')
                     {3}
             )P WHERE RowNum > @start AND RowNum < @end"
             , sidx

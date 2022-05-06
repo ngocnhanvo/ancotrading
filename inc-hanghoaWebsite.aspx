@@ -1548,7 +1548,7 @@
 
             <div id="nav-tabs-6">
 		        <uc1:jqGrid  ID="grid_ds_mausacWeb"
-                    SortName="cxh.md_cangxuathang_id" 
+                    SortName="msw.ma_sanpham" 
                     UrlFileAction="Controllers/MauSacWebController.ashx" 
                     RowNumbers="true"
                     ColModel = "[
