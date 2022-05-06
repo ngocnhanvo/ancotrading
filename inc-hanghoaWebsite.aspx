@@ -750,7 +750,7 @@
 				                
 				                if($('#grid_ds_mausacWeb').jqGrid('getGridParam','records') &gt; 0 )
 			                    {
-				                    $('#grid_ds_mausacWeb').jqGrid('setGridParam',{url:'Controllers/CangXuatHangController.ashx?&productId='+ids,page:1});
+				                    $('#grid_ds_mausacWeb').jqGrid('setGridParam',{url:'Controllers/MauSacWebController.ashx?&productId='+ids,page:1});
 				                    $('#grid_ds_mausacWeb').jqGrid().trigger('reloadGrid');
 				                } 
 				                
