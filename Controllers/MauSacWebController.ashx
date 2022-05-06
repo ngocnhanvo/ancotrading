@@ -49,13 +49,13 @@ public class MauSacWebController : IHttpHandler {
         String sqlCount = string.Format(@"
             SELECT COUNT(1) AS count 
             FROM 
-	            md_sanpham sp
+	            md_sanpham msw
             WHERE 
 	            1=1
-                AND sp.md_sanpham_id != '{0}'
-                AND substring(sp.ma_sanpham, 0, 12) = (select substring(sp2.ma_sanpham, 0, 12) from md_sanpham sp2 where sp2.md_sanpham_id = N'{0}')
-                AND sp.hoatdong = 1
-                AND sp.trangthai in ('DHD')
+                AND msw.md_sanpham_id != '{0}'
+                AND substring(msw.ma_sanpham, 0, 12) = (select substring(sp2.ma_sanpham, 0, 12) from md_sanpham sp2 where sp2.md_sanpham_id = N'{0}')
+                AND msw.hoatdong = 1
+                AND msw.trangthai in ('DHD')
                 {1}
             "
             , md_sanpham_id
@@ -85,7 +85,7 @@ public class MauSacWebController : IHttpHandler {
 
         if (sidx.Equals("") || sidx == null)
         {
-            sidx = "sp.ma_sanpham";
+            sidx = "msw.ma_sanpham";
         }
 
         string strsql = string.Format(@"
