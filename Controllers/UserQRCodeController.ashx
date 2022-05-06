@@ -252,6 +252,7 @@ public class UserQRCodeController : IHttpHandler {
 	                        and sp.hoatdong = 1 
 	                        and sp.trangthai = 'DHD'
                             and substring(sp.ma_sanpham, 0, 12) in ('{2}')
+                            and isnull(sp.hoatdongWeb, 1) = 1
                     ) A
                     left join md_detai (nolock) dtai on dtai.code_cl = '{1}' and dtai.code_dt = A.detai
                     left join md_mausac (nolock) msac on msac.code_cl = '{1}' and msac.code_dt = A.detai and msac.code_mau = A.mausac
