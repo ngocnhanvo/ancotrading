@@ -1569,6 +1569,7 @@
                         , width: 100
                         , hidden: false 
                         , editable: true
+                        , editoptions: { readonly: 'readonly' }
                         , edittype: 'text'
                     },
                     {
