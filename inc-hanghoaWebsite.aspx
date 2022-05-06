@@ -780,7 +780,7 @@
 			                    $('#grid_ds_khachhangdocquyen_spWeb').jqGrid('setGridParam',{url:'Controllers/QuyDinhVoiKhachHangController.ashx?&productId='+ids,page:1});
 			                    $('#grid_ds_khachhangdocquyen_spWeb').jqGrid().trigger('reloadGrid');		
 			                    
-			                    $('#grid_ds_mausacWeb').jqGrid('setGridParam',{url:'Controllers/CangXuatHangController.ashx?&productId='+ids,page:1});
+			                    $('#grid_ds_mausacWeb').jqGrid('setGridParam',{url:'Controllers/MauSacWebController.ashx?&productId='+ids,page:1});
 			                    $('#grid_ds_mausacWeb').jqGrid().trigger('reloadGrid');
 			                    
 			                    $('#grid_ds_bientauWeb').jqGrid('setGridParam',{url:'Controllers/BienTauController.ashx?&productId='+ids,page:1});
