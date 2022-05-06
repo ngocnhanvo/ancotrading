@@ -125,7 +125,8 @@ public class UserQRCodeController : IHttpHandler {
                             & arrBoChas.Contains(s.ma_sanpham.Substring(9, 2))
                         )
                         .Select(s => s.ma_sanpham.Substring(9, 2))
-                        .OrderBy(s=>s)
+                        .OrderBy(s=>s == bc ? 0 : 1)
+                        .ThenBy(s=>s)
                         .FirstOrDefault();
 
                     //Lay cac ma cai thuoc bo cua san pham
