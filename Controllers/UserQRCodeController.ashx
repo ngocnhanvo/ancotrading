@@ -123,7 +123,11 @@ public class UserQRCodeController : IHttpHandler {
                             s.ma_sanpham.Substring(0, 9) == msp_0009
                             & s.ma_sanpham.Substring(11, 3) == msp_1103
                             & arrBoChas.Contains(s.ma_sanpham.Substring(9, 2))
-                        ).Select(s => s.ma_sanpham.Substring(9, 2)).FirstOrDefault();
+                        )
+                        .Select(s => s.ma_sanpham.Substring(9, 2))
+                        .OrderBy(s=>s)
+                        .FirstOrDefault();
+
                     //Lay cac ma cai thuoc bo cua san pham
                     string md_bo_id = db.md_bos.Where(s => s.ma_bo == bc & s.ma_bo_cha == ma_bo_cha).Select(s => s.md_bo_id).FirstOrDefault();
                     foreach (var bct in db.md_bo_chitiets.Where(s => s.md_bo_id == md_bo_id))
