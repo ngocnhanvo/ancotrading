@@ -1575,7 +1575,7 @@
                     {
                         fixed: true, name: 'hoatdongWeb'
                         , index: 'msw.hoatdongWeb'
-                        , label: 'Hoạt động'
+                        , label: 'Hoạt động (Web)'
                         , width: 100
                         , editable:true
                         , edittype: 'checkbox'

@@ -288,7 +288,7 @@
             {
 				fixed: true, name: 'ta_nganWeb'
 				, index: 'dt.ta_nganWeb'
-                , label: 'Tiếng Anh (Web)'
+                , label: 'In/out door (Web)'
 				, width: 120
 				, edittype: 'text'
 				, editable: true
