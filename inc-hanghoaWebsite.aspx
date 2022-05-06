@@ -32,7 +32,7 @@
                         $("#grid_ds_quycachdonggoiWeb").setGridHeight(h + 4 - 80);
                         $("#grid_ds_giafobWeb").setGridHeight(h + 4 - 80);
                         $("#grid_ds_khachhangdocquyen_spWeb").setGridHeight(h + 4 - 80);
-                        $("#grid_ds_cangxuathangWeb").setGridHeight(h + 4 - 80);
+                        $("#grid_ds_mausacWeb").setGridHeight(h + 4 - 80);
                         $("#grid_ds_bientauWeb").setGridHeight(h + 4 - 80);
                         $("#grid_ds_gianoiWeb").setGridHeight(h + 4 - 80);
                         $("#grid_ds_nhacungungmacdinhWeb").setGridHeight(h + 4 - 80);
@@ -54,7 +54,7 @@
                     $("#grid_ds_quycachdonggoiWeb").setGridWidth(w);
                     $("#grid_ds_giafobWeb").setGridWidth(w);
                     $("#grid_ds_khachhangdocquyen_spWeb").setGridWidth(w);
-                    $("#grid_ds_cangxuathangWeb").setGridWidth(w);
+                    $("#grid_ds_mausacWeb").setGridWidth(w);
                     $("#grid_ds_bientauWeb").setGridWidth(w);
                     $("#grid_ds_gianoiWeb").setGridWidth(w);
                     $("#grid_ds_nhacungungmacdinhWeb").setGridWidth(w);
@@ -748,10 +748,10 @@
 				                    $('#grid_ds_khachhangdocquyen_spWeb').jqGrid().trigger('reloadGrid');
 				                } 
 				                
-				                if($('#grid_ds_cangxuathangWeb').jqGrid('getGridParam','records') &gt; 0 )
+				                if($('#grid_ds_mausacWeb').jqGrid('getGridParam','records') &gt; 0 )
 			                    {
-				                    $('#grid_ds_cangxuathangWeb').jqGrid('setGridParam',{url:'Controllers/CangXuatHangController.ashx?&productId='+ids,page:1});
-				                    $('#grid_ds_cangxuathangWeb').jqGrid().trigger('reloadGrid');
+				                    $('#grid_ds_mausacWeb').jqGrid('setGridParam',{url:'Controllers/CangXuatHangController.ashx?&productId='+ids,page:1});
+				                    $('#grid_ds_mausacWeb').jqGrid().trigger('reloadGrid');
 				                } 
 				                
 				                if($('#grid_ds_bientauWeb').jqGrid('getGridParam','records') &gt; 0 )
@@ -780,8 +780,8 @@
 			                    $('#grid_ds_khachhangdocquyen_spWeb').jqGrid('setGridParam',{url:'Controllers/QuyDinhVoiKhachHangController.ashx?&productId='+ids,page:1});
 			                    $('#grid_ds_khachhangdocquyen_spWeb').jqGrid().trigger('reloadGrid');		
 			                    
-			                    $('#grid_ds_cangxuathangWeb').jqGrid('setGridParam',{url:'Controllers/CangXuatHangController.ashx?&productId='+ids,page:1});
-			                    $('#grid_ds_cangxuathangWeb').jqGrid().trigger('reloadGrid');
+			                    $('#grid_ds_mausacWeb').jqGrid('setGridParam',{url:'Controllers/CangXuatHangController.ashx?&productId='+ids,page:1});
+			                    $('#grid_ds_mausacWeb').jqGrid().trigger('reloadGrid');
 			                    
 			                    $('#grid_ds_bientauWeb').jqGrid('setGridParam',{url:'Controllers/BienTauController.ashx?&productId='+ids,page:1});
 			                    $('#grid_ds_bientauWeb').jqGrid().trigger('reloadGrid');
@@ -1547,15 +1547,15 @@
 
 
             <div id="nav-tabs-6">
-		        <uc1:jqGrid  ID="grid_ds_cangxuathangWeb"
+		        <uc1:jqGrid  ID="grid_ds_mausacWeb"
                     SortName="cxh.md_cangxuathang_id" 
-                    UrlFileAction="Controllers/CangXuatHangController.ashx" 
-                    ColNames="['md_cangxuathang_id' , 'Mã SP', 'Tên Cảng Biển', 'Mặc Định', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
+                    UrlFileAction="Controllers/MauSacWebController.ashx" 
                     RowNumbers="true"
                     ColModel = "[
                     {
-                        fixed: true, name: 'md_cangxuathang_id'
-                        , index: 'cxh.md_cangxuathang_id'
+                        fixed: true, name: 'md_sanpham_id'
+                        , label: 'SP ID'
+                        , index: 'msw.md_sanpham_id'
                         , width: 100
                         , hidden: true 
                         , editable:true
@@ -1563,74 +1563,18 @@
                         , key: true
                     },
                     {
-                        fixed: true, name: 'md_sanpham_id'
-                        , index: 'cxh.md_sanpham_id'
+                        fixed: true, name: 'ma_sanpham'
+                        , index: 'msw.ma_sanpham'
+                        , label: 'Mã sản phẩm'
                         , width: 100
-                        , hidden: true 
-                        , editable:true
+                        , hidden: false 
+                        , editable: true
                         , edittype: 'text'
                     },
-                    
                     {
-                        fixed: true, name: 'md_cangbien_id'
-                        , index: 'cxh.md_cangbien_id'
-                        , width: 100
-                        , edittype: 'select'
-                        , editable:true
-                        , editoptions: { dataUrl: 'Controllers/PortController.ashx?action=getoption' }
-                    },
-                    {
-                        fixed: true, name: 'macdinh'
-                        , index: 'cxh.macdinh'
-                        , width: 100
-                        , edittype: 'checkbox'
-                        , editable:true
-                        , editoptions:{ value:'True:False', defaultValue: 'True' }
-                        , formatter: 'checkbox'
-                        , align: 'center'
-                    },
-                    {
-                        fixed: true, name: 'ngaytao'
-                        , index: 'cxh.ngaytao'
-                        , width: 100
-                        , editable:false
-                        , edittype: 'text'
-                        , hidden: true
-                    },
-                    {
-                        fixed: true, name: 'nguoitao'
-                        , index: 'cxh.nguoitao'
-                        , width: 100
-                        , editable:false
-                        , edittype: 'text'
-                        , hidden: true
-                    },
-                    {
-                        fixed: true, name: 'ngaycapnhat'
-                        , index: 'cxh.ngaycapnhat'
-                        , width: 100
-                        , editable:false
-                        , edittype: 'text'
-                        , hidden: true
-                    },
-                    {
-                        fixed: true, name: 'nguoicapnhat'
-                        , index: 'cxh.nguoicapnhat'
-                        , width: 100
-                        , editable:false
-                        , edittype: 'text'
-                        , hidden: true
-                    },
-                    {
-                        fixed: true, name: 'mota'
-                        , index: 'cxh.mota'
-                        , width: 100
-                        , editable:true
-                        , edittype: 'textarea'
-                    },
-                    {
-                        fixed: true, name: 'hoatdong', hidden: true
-                        , index: 'cxh.hoatdong'
+                        fixed: true, name: 'hoatdongWeb'
+                        , index: 'msw.hoatdongWeb'
+                        , label: 'Hoạt động'
                         , width: 100
                         , editable:true
                         , edittype: 'checkbox'
@@ -1640,48 +1584,11 @@
                     }
                     ]"
                     GridComplete = "var o = $(this).parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() + 4 - 80);  $(this).setGridWidth($(o).width()); "
-                    ShowAdd ="<%$ Code: DaoRules.GetRuleAdd(Context).ToString().ToLower() %>"
+                    ShowAdd ="false"
                     ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
-                    ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
+                    ShowDel = "false"
                     Height = "420"
-                    AddFormOptions="
-                        afterSubmit: function(rs, postdata){
-                           return showMsgDialog(rs);
-                        }
-                        , beforeShowForm: function (formid) {
-                            var masterId = $('#grid_ds_sanphamWeb').jqGrid('getGridParam', 'selrow');
-                            var forId = 'md_sanpham_id';
-                            if(masterId == null)
-                            {
-                                $(formid).parent().parent().parent().dialog('destroy').remove();
-                                alert('Hãy chọn một sản phẩm mới có thể tạo chi tiết.!');
-                            }else{
-                                $('#tr_' + forId + ' td.DataTD input#' + forId, formid).val(masterId);
-                                formid.closest('div.ui-jqdialog').dialogCenter();
-                            }
-                        }
-                        , beforeSubmit:function(postdata, formid){
-                            var masterId = $('#grid_ds_sanphamWeb').jqGrid('getGridParam', 'selrow');
-                            var forId = 'md_sanpham_id';
-                            if(masterId == null)
-                            {
-                                $(formid).parent().parent().parent().dialog('destroy').remove();
-                                return [false,'Hãy chọn một sản phẩm mới có thể tạo chi tiết.!'];
-                            }else{
-                                postdata.md_sanpham_id = masterId;
-                                return [true,'']; 
-                            }
-                        }
-                    "
                     EditFormOptions="
-                        beforeShowForm: function (formid) {
-                            formid.closest('div.ui-jqdialog').dialogCenter();
-                        },
-                        afterSubmit: function(rs, postdata){
-                           return showMsgDialog(rs);
-                        }
-                    "
-                    DelFormOptions="
                         beforeShowForm: function (formid) {
                             formid.closest('div.ui-jqdialog').dialogCenter();
                         },
@@ -1891,7 +1798,7 @@
 	createRightPanel('grid_ds_giafobWeb');
 	createRightPanel('grid_ds_gianoiWeb');
 	createRightPanel('grid_ds_khachhangdocquyen_spWeb');
-	createRightPanel('grid_ds_cangxuathangWeb');
+	createRightPanel('grid_ds_mausacWeb');
 	createRightPanel('grid_ds_bientauWeb');
 	createRightPanel('grid_ds_nhacungungmacdinhWeb');
 	$('#tab-product-detailsWeb').tabs();
