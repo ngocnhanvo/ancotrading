@@ -199,7 +199,7 @@ public class MainHub : Hub
                         }
                     }
 
-                    rowSP.image = string.Format("Controllers/API_System.ashx?oper=loadImageProductb&msp={0}", sp.ma_sanpham);
+                    rowSP.image = string.Format("Controllers/API_System.ashx?oper=loadImageProduct&msp={0}", sp.ma_sanpham);
                 }
             }
             response["Message"] = arrSP;
