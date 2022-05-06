@@ -808,8 +808,8 @@
 			    <li><a href="#nav-tabs-2">Giá FOB</a></li>
 			    <li><a href="#nav-tabs-3">Giá Nội</a></li>
 			    <li><a href="#nav-tabs-4">Quy Ðịnh Với Khách Hàng</a></li>
-			    <li><a href="#nav-tabs-5">Cảng Biển</a></li>
-			    <li><a href="#nav-tabs-6">Biến Tấu</a></li>
+			    <li><a href="#nav-tabs-5">Biến Tấu</a></li>
+                <li><a href="#nav-tabs-6">Màu Sắc</a></li>
 			    <li><a href="#nav-tabs-7">NCU</a></li>
 		</ul>  
 		    <div id="nav-tabs-1">
@@ -1452,7 +1452,101 @@
                     runat="server" />
             		   
 		    </div>
+		    
+		    
 		    <div id="nav-tabs-5">
+		        <uc1:jqGrid  ID="grid_ds_bientauWeb"
+                    SortName="sp.ma_sanpham" 
+                    UrlFileAction="Controllers/BienTauController.ashx" 
+                    ColNames="['md_bientau_id' , 'Mã SP', 'Biến tấu', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
+                    RowNumbers="true"
+                    OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid); }"
+                    ColModel = "[
+                    {
+                        fixed: true, name: 'md_bientau_id'
+                        , index: 'bt.md_bientau_id'
+                        , width: 100
+                        , hidden: true 
+                        , editable:true
+                        , edittype: 'text'
+                        , key: true
+                    },
+                    {
+                        fixed: true, name: 'ma_sanpham'
+                        , index: 'sp.ma_sanpham'
+                        , width: 100
+                        , editable:true
+                        , edittype: 'text'
+                    },
+                    
+                    {
+                        fixed: true, name: 'ma_sanpham_ref'
+                        , index: 'bt.ma_sanpham_ref'
+                        , width: 100
+                        , edittype: 'text'
+                        , editable:true
+                    },
+                    {
+                        fixed: true, name: 'ngaytao'
+                        , index: 'cxh.ngaytao'
+                        , width: 100
+                        , editable:false
+                        , edittype: 'text'
+                        , hidden: true
+                    },
+                    {
+                        fixed: true, name: 'nguoitao'
+                        , index: 'cxh.nguoitao'
+                        , width: 100
+                        , editable:false
+                        , edittype: 'text'
+                        , hidden: true
+                    },
+                    {
+                        fixed: true, name: 'ngaycapnhat'
+                        , index: 'cxh.ngaycapnhat'
+                        , width: 100
+                        , editable:false
+                        , edittype: 'text'
+                        , hidden: true
+                    },
+                    {
+                        fixed: true, name: 'nguoicapnhat'
+                        , index: 'cxh.nguoicapnhat'
+                        , width: 100
+                        , editable:false
+                        , edittype: 'text'
+                        , hidden: true
+                    },
+                    {
+                        fixed: true, name: 'mota'
+                        , index: 'cxh.mota'
+                        , width: 100
+                        , editable:true
+                        , edittype: 'textarea'
+                    },
+                    {
+                        fixed: true, name: 'hoatdong', hidden: true
+                        , index: 'cxh.hoatdong'
+                        , width: 100
+                        , editable:true
+                        , edittype: 'checkbox'
+                        , align: 'center'
+                        , editoptions:{ value:'True:False', defaultValue: 'True' }
+                        , formatter: 'checkbox'
+                    }
+                    ]"
+                    GridComplete = "var o = $(this).parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() + 4 - 80);  $(this).setGridWidth($(o).width()); "
+                    Height = "420"
+                    ViewFormOptions="width:900
+                                    , beforeShowForm: function (formid) {
+                                        formid.closest('div.ui-jqdialog').dialogCenter(); 
+                                    } "
+                    runat="server" />
+		    </div>
+
+
+            <div id="nav-tabs-6">
 		        <uc1:jqGrid  ID="grid_ds_cangxuathangWeb"
                     SortName="cxh.md_cangxuathang_id" 
                     UrlFileAction="Controllers/CangXuatHangController.ashx" 
@@ -1601,101 +1695,6 @@
                             formid.closest('div.ui-jqdialog').dialogCenter();
                         }
                     "
-                    runat="server" />
-		    </div>
-		    
-		    
-		    
-		    
-		    
-		    <div id="nav-tabs-6">
-		        <uc1:jqGrid  ID="grid_ds_bientauWeb"
-                    SortName="sp.ma_sanpham" 
-                    UrlFileAction="Controllers/BienTauController.ashx" 
-                    ColNames="['md_bientau_id' , 'Mã SP', 'Biến tấu', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
-                    RowNumbers="true"
-                    OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid); }"
-                    ColModel = "[
-                    {
-                        fixed: true, name: 'md_bientau_id'
-                        , index: 'bt.md_bientau_id'
-                        , width: 100
-                        , hidden: true 
-                        , editable:true
-                        , edittype: 'text'
-                        , key: true
-                    },
-                    {
-                        fixed: true, name: 'ma_sanpham'
-                        , index: 'sp.ma_sanpham'
-                        , width: 100
-                        , editable:true
-                        , edittype: 'text'
-                    },
-                    
-                    {
-                        fixed: true, name: 'ma_sanpham_ref'
-                        , index: 'bt.ma_sanpham_ref'
-                        , width: 100
-                        , edittype: 'text'
-                        , editable:true
-                    },
-                    {
-                        fixed: true, name: 'ngaytao'
-                        , index: 'cxh.ngaytao'
-                        , width: 100
-                        , editable:false
-                        , edittype: 'text'
-                        , hidden: true
-                    },
-                    {
-                        fixed: true, name: 'nguoitao'
-                        , index: 'cxh.nguoitao'
-                        , width: 100
-                        , editable:false
-                        , edittype: 'text'
-                        , hidden: true
-                    },
-                    {
-                        fixed: true, name: 'ngaycapnhat'
-                        , index: 'cxh.ngaycapnhat'
-                        , width: 100
-                        , editable:false
-                        , edittype: 'text'
-                        , hidden: true
-                    },
-                    {
-                        fixed: true, name: 'nguoicapnhat'
-                        , index: 'cxh.nguoicapnhat'
-                        , width: 100
-                        , editable:false
-                        , edittype: 'text'
-                        , hidden: true
-                    },
-                    {
-                        fixed: true, name: 'mota'
-                        , index: 'cxh.mota'
-                        , width: 100
-                        , editable:true
-                        , edittype: 'textarea'
-                    },
-                    {
-                        fixed: true, name: 'hoatdong', hidden: true
-                        , index: 'cxh.hoatdong'
-                        , width: 100
-                        , editable:true
-                        , edittype: 'checkbox'
-                        , align: 'center'
-                        , editoptions:{ value:'True:False', defaultValue: 'True' }
-                        , formatter: 'checkbox'
-                    }
-                    ]"
-                    GridComplete = "var o = $(this).parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() + 4 - 80);  $(this).setGridWidth($(o).width()); "
-                    Height = "420"
-                    ViewFormOptions="width:900
-                                    , beforeShowForm: function (formid) {
-                                        formid.closest('div.ui-jqdialog').dialogCenter(); 
-                                    } "
                     runat="server" />
 		    </div>
 		    
