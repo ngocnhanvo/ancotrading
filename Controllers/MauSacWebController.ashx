@@ -5,6 +5,7 @@ using System.Web;
 using System.Collections.Generic;
 using jqGridHelper;
 using System.Data;
+using System.Linq;
 
 public class MauSacWebController : IHttpHandler {
 
@@ -25,7 +26,26 @@ public class MauSacWebController : IHttpHandler {
 
     public void edit(HttpContext context)
     {
+        try
+        {
+            var db = new LinqDBDataContext();
+            var h = context.Request.Form["hoatdongWeb"].ToLower();
+            bool hd = false;
+            if (h.Equals("on") || h.Equals("true"))
+            { hd = true; }
 
+            var m = db.md_sanphams.Where(p => p.md_sanpham_id == context.Request.Form["id"]).FirstOrDefault();
+            if (m != null)
+            {
+                m.hoatdongWeb = hd;
+                db.SubmitChanges();
+                Utils.writeResult(1, "Cập nhật thành công!");
+            }
+        }
+        catch(Exception ex)
+        {
+            Utils.writeResult(0, ex.Message);
+        }
     }
 
     public void load(HttpContext context)
@@ -93,7 +113,7 @@ public class MauSacWebController : IHttpHandler {
                 SELECT
 	                msw.md_sanpham_id
                     , msw.ma_sanpham
-                    , msw.hoatdongWeb
+                    , isnull(msw.hoatdongWeb, 1) as hoatdongWeb
 	                , ROW_NUMBER() OVER (ORDER BY {0} {1} ) as RowNum 
                 FROM 
 	                md_sanpham msw           
