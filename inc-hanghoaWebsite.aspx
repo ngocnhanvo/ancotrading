@@ -632,6 +632,15 @@
 				, hidden: false
 			},
             {
+                fixed: true, name: 'inoutdoorWeb'
+                , label: 'In/out door (Web)'
+                , index: 'sp.inoutdoorWeb'
+                , width: 100
+                , edittype: 'textarea'
+                , editable:true
+                , hidden: false
+            },
+            {
                 fixed: true, name: 'ghichu'
                 , label: 'Ghi chú'
                 , index: 'sp.ghichu'
@@ -797,7 +806,7 @@
 		                }"
             Height = "420"
             ShowAdd ="false"
-            ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
+            ShowEdit ="<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
             ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
             runat="server" />
 </DIV>
@@ -820,7 +829,7 @@
                         , 'SL Inner', 'ÐVT Inner', 'L1', 'W1', 'H1'
                         , 'SL Outer', 'ÐVT Outer', 'L2', 'W2', 'H2', 'V2'
                         , 'SL gói/ctn40', 'VD', 'VN', 'VL'
-                        , 'Ghi Chú Vách Ngăn', 'Số Lượng', 'Mặc Ðịnh', 'In/out Door (Web)'
+                        , 'Ghi Chú Vách Ngăn', 'Số Lượng', 'Mặc Ðịnh'
                         , 'Ngày Tạo' , 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật'
                         , 'Mô tả', 'Hoạt động']"
                 RowNumbers="true"
@@ -987,6 +996,7 @@
                      , editable: true
                      , width: 100
                      , edittype: 'text'
+                     , formoptions:{colpos:2,rowpos:16}
                 },
                 {
                      fixed: true, name: 'soluong'
@@ -995,6 +1005,7 @@
                      , width: 100
                      , edittype: 'text'
                      , hidden: true
+                     , formoptions:{colpos:2,rowpos:17}
                      , align:'right'
                 },
                 {
@@ -1006,13 +1017,7 @@
                      , editoptions:{ value:'True:False', defaultValue: 'True' }
                      , edittype: 'checkbox'
                      , formatter: 'checkbox'
-                },
-                {
-                     fixed: true, name: 'inoutdoorWeb'
-                     , index: 'inoutdoorWeb'
-                     , editable: true
-                     , width: 100
-                     , edittype: 'text'
+                     , formoptions:{colpos:2,rowpos:18}
                 },
                 {
                     fixed: true, name: 'ngaytao'
@@ -1302,22 +1307,10 @@
                 }
                 ]"
                 GridComplete = "var o = $(this).parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() + 4 - 80);  $(this).setGridWidth($(o).width()); "
-                
-                ViewFormOptions="
-                    width:500
-                    , beforeShowForm: function (formid) {
-                        formid.closest('div.ui-jqdialog').dialogCenter(); 
-                    } 
-                "
-                EditFormOptions = "
-                    width:500
-                    , beforeShowForm: function (formid) {
-                        formid.closest('div.ui-jqdialog').dialogCenter(); 
-                    }
-                    , afterSubmit: function(rs, postdata) {
-                        return showMsgDialog(rs);
-                    }
-                "
+                ViewFormOptions="width:900
+                                , beforeShowForm: function (formid) {
+                                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                                } "
                 runat="server" />
 		    </div>
 		    
