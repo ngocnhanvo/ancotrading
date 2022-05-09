@@ -258,7 +258,7 @@ public class ProductWebController : IHttpHandler
                 if (sp.shape == "Rd.")
                     sp.shape = "Round Shape";
                 else if (sp.shape == "Sq.")
-                    sp.shape = "Squard Shape";
+                    sp.shape = "Square Shape";
                 else if (sp.shape == "Rect.")
                     sp.shape = "Rectangular Shape";
                 else if (sp.shape == "Sta.")
