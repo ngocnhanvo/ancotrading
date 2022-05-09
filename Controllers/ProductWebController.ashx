@@ -39,12 +39,30 @@ public class ProductWebController : IHttpHandler
             case "upWeb":
                 this.upWeb(context);
                 break;
+            case "edit":
+                this.edit(context);
+                break;
             case "del":
                 this.del(context);
                 break;
             default:
                 this.load(context);
                 break;
+        }
+    }
+
+    public void edit(HttpContext context)
+    {
+        try
+        {
+            var m = db.md_sanphams.Single(p => p.md_sanpham_id == context.Request.Form["id"]);
+            m.inoutdoorWeb = context.Request.Form["inoutdoorWeb"];
+            db.SubmitChanges();
+            jqGridHelper.Utils.writeResult(1, "Cập nhật thành công!");
+        }
+        catch (Exception ex)
+        {
+            jqGridHelper.Utils.writeResult(0, ex.Message);
         }
     }
 
@@ -402,7 +420,7 @@ public class ProductWebController : IHttpHandler
 	                , sp.L_inch, sp.W_inch, sp.H_inch, sp.L_cm, sp.W_cm, sp.H_cm, sp.Trongluong, sp.dientich, sp.thetich
 	                , (nnl.hehang + '('+ nnl.nhom +')') as nangluc
 	                , cl.code_cl, sp.ghichu, ncc.ma_dtkd
-	                , cb.ten_cangbien as cangbien, hscode.ma_hscode, hscode.hscode, sp.chucnangsp, sp.ngayxacnhan, sp.hinhthucban
+	                , cb.ten_cangbien as cangbien, hscode.ma_hscode, hscode.hscode, sp.chucnangsp, sp.ngayxacnhan, sp.hinhthucban, sp.inoutdoorWeb
 	                , sp.ngaytao, sp.nguoitao, sp.ngaycapnhat, sp.nguoicapnhat, sp.mota, sp.hoatdong
 	                , ROW_NUMBER() OVER (ORDER BY {0} {1} ) as RowNum 
                 FROM 
