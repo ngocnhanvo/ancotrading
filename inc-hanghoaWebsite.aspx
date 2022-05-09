@@ -636,7 +636,7 @@
                 , label: 'In/out door (Web)'
                 , index: 'sp.inoutdoorWeb'
                 , width: 100
-                , edittype: 'textarea'
+                , edittype: 'text'
                 , editable:true
                 , hidden: false
             },
