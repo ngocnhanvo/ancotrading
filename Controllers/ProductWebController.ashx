@@ -96,6 +96,7 @@ public class ProductWebController : IHttpHandler
                         sps.Add(new productCatalog()
                         {
                             code = item["code"],
+                            detaiTA = "",
                             titleWeb = "",
                             titleSubWeb = ""
                         });
@@ -120,7 +121,7 @@ public class ProductWebController : IHttpHandler
                         {
                             string sql = string.Format(@"
                                 select 
-                                    sp.ma_sanpham, sp.md_kieudang_id
+                                    sp.ma_sanpham, sp.md_kieudang_id, sp.inoutdoorWeb
                                 from 
                                     md_sanpham sp
                                 where 1=1
@@ -144,6 +145,7 @@ public class ProductWebController : IHttpHandler
                                 {
                                     code = row["ma_sanpham"].ToString(),
                                     shape = row["md_kieudang_id"].ToString(),
+                                    detaiTA = row["inoutdoorWeb"].ToString(),
                                     titleWeb = a1,
                                     titleSubWeb = a2
                                 });
@@ -158,7 +160,7 @@ public class ProductWebController : IHttpHandler
                 {
                     string sql = string.Format(@"
                                 select 
-                                    sp.ma_sanpham, sp.md_kieudang_id
+                                    sp.ma_sanpham, sp.md_kieudang_id, sp.inoutdoorWeb
                                 from 
                                     md_sanpham sp
                                 where 1=1
@@ -176,6 +178,7 @@ public class ProductWebController : IHttpHandler
                         {
                             code = row["ma_sanpham"].ToString(),
                             shape = row["md_kieudang_id"].ToString(),
+                            detaiTA = row["inoutdoorWeb"].ToString(),
                             titleWeb = a1,
                             titleSubWeb = a2
                         });
@@ -196,7 +199,7 @@ public class ProductWebController : IHttpHandler
                 {
                     string sql = string.Format(@"
                     select 
-                        sp.ma_sanpham, sp.md_kieudang_id
+                        sp.ma_sanpham, sp.md_kieudang_id, sp.inoutdoorWeb
                     from 
                         md_sanpham sp
                     where 1=1
@@ -215,6 +218,7 @@ public class ProductWebController : IHttpHandler
                         {
                             code = row["ma_sanpham"].ToString(),
                             shape = row["md_kieudang_id"].ToString(),
+                            detaiTA = row["inoutdoorWeb"].ToString(),
                             titleWeb = a1,
                             titleSubWeb = a2
                         });
@@ -225,7 +229,7 @@ public class ProductWebController : IHttpHandler
             {
                 string sql = string.Format(@"
                     select 
-                        sp.ma_sanpham, sp.md_kieudang_id
+                        sp.ma_sanpham, sp.md_kieudang_id, sp.inoutdoorWeb
                     from 
                         md_sanpham sp
                     where 1=1
@@ -243,6 +247,7 @@ public class ProductWebController : IHttpHandler
                     {
                         code = row["ma_sanpham"].ToString(),
                         shape = row["md_kieudang_id"].ToString(),
+                        detaiTA = row["inoutdoorWeb"].ToString(),
                         titleWeb = a1,
                         titleSubWeb = a2
                     });
@@ -271,7 +276,6 @@ public class ProductWebController : IHttpHandler
                 //sp.image = ExcuteSignalRStatic.getImageProductWeb(sp.code);
                 sp.image = string.Format("Controllers/API_System.ashx?oper=loadImageProductWeb&msp={0}", sp.code);
                 sp.shape = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.shape).Select(s => s.ten_ta).FirstOrDefault();
-                sp.detaiTA = db.md_detais.Where(s => s.code_cl == codeCL & s.code_dt == codeDT).Select(s => s.ta_nganWeb).FirstOrDefault();
 
                 if (sp.shape == "Rd.")
                     sp.shape = "Round Shape";
