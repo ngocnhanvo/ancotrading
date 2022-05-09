@@ -331,6 +331,7 @@
             SortOrder ="asc"
             UrlFileAction="Controllers/ProductWebController.ashx"
             RowNumbers="true"
+            OndblClickRow = "function(){ $('#edit_grid_ds_sanphamWeb').click(); }"
             FuncImportPicture = "function(){ add_tab('Upload Hình Ảnh Website', 'inc-upload-image-web.aspx') }"
             MultiSelect="true"
             ColModel = "[
