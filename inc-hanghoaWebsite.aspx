@@ -710,18 +710,18 @@
             }
             ]"
             FilterToolbar = "true"
-            ViewFormOptions = "width:900
+            ViewFormOptions = "width:500
                         , beforeShowForm: function (formid) {
                             formid.closest('div.ui-jqdialog').dialogCenter(); 
                         }"
-            EditFormOptions = "width:900
+            EditFormOptions = "width:500
                         , beforeShowForm: function (formid) {
                             formid.closest('div.ui-jqdialog').dialogCenter(); 
                         }
                         , afterSubmit: function(rs, postdata) {
                           return showMsgDialog(rs);
                         }"
-            AddFormOptions=" width:900
+            AddFormOptions=" width:500
                             , beforeShowForm: function (formid) {
                                 formid.closest('div.ui-jqdialog').dialogCenter(); 
                             }

@@ -292,7 +292,7 @@
 				, width: 120
 				, edittype: 'text'
 				, editable: true
-				, hidden: false
+				, hidden: true
             },
 			{
                 fixed: true, name: 'hinhthucban'
