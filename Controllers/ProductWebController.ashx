@@ -485,6 +485,7 @@ public class ProductWebController : IHttpHandler
             xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", string.IsNullOrEmpty(nxn) ? "" : DateTime.Parse(nxn).ToString("dd/MM/yyyy"));
 
             xml += "<cell><![CDATA[" + row["hinhthucban"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["inoutdoorWeb"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
 
             var ngaytao = row["ngaytao"] + "";
