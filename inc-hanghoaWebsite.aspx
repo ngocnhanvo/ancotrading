@@ -379,6 +379,7 @@
                  , edittype: 'text'
                  , editable:true
                  , editrules:{ required:true }
+                 , editoptions: { readonly: 'readonly' }
             },
             {
                 fixed: true, name: 'md_kieudang_id'
@@ -388,7 +389,7 @@
                 , edittype: 'select'
                 , editable:true
                 , editrules:{ required:true, edithidden:true }
-                , editoptions: { dataUrl: 'Controllers/KieuDangSanPhamController.ashx?action=getoption' }
+                , editoptions: { readonly: 'readonly', dataUrl: 'Controllers/KieuDangSanPhamController.ashx?action=getoption' }
             },
 			{
                 fixed: true, name: 'ma_kieudang'
@@ -398,6 +399,7 @@
                 , edittype: 'text'
                 , editable:false
                 , editrules:{ required:true }
+                , editoptions: { readonly: 'readonly' }
             },
             {
                 fixed: true, name: 'md_chucnang_id'
@@ -407,7 +409,7 @@
                 , edittype: 'select'
                 , editable:true
                 , editrules : { required:true, edithidden:true }
-                , editoptions: { dataUrl: 'Controllers/ChucNangSanPhamController.ashx?action=getoption' }
+                , editoptions: { readonly: 'readonly', dataUrl: 'Controllers/ChucNangSanPhamController.ashx?action=getoption' }
             },
 			{
                 fixed: true, name: 'ma_chucnang'
@@ -417,6 +419,7 @@
                 , edittype: 'text'
                 , editable:false
                 , editrules:{ required:true }
+                , editoptions: { readonly: 'readonly' }
             },
             {
                 fixed: true, name: 'mota_tiengviet'
@@ -425,6 +428,7 @@
                 , width: 100
                 , edittype: 'textarea'
                 , editable:false
+                , editoptions: { readonly: 'readonly' }
             },
             {
                 fixed: true, name: 'mota_tienganh'
@@ -433,6 +437,7 @@
                 , width: 100
                 , edittype: 'textarea'
                 , editable:false
+                , editoptions: { readonly: 'readonly' }
             },
             {
                 fixed: true, name: 'tendvt'
@@ -442,7 +447,7 @@
                 , align: 'center'
                 , edittype: 'select'
                 , editable:true
-                , editoptions: { dataUrl: 'Controllers/UnitProductController.ashx?action=getoption' }
+                , editoptions: { readonly: 'readonly', dataUrl: 'Controllers/UnitProductController.ashx?action=getoption' }
                 , stype:'select'
                 , searchoptions:{ sopt:['eq'], dataUrl: 'Controllers/UnitProductController.ashx?action=getsearchoption' }
 				, hidden: true 
@@ -456,6 +461,7 @@
                 , editable:false
                 , hidden:true
                 , editrules : { edithidden:true }
+                , editoptions: { readonly: 'readonly' }
             },
             {
                 fixed: true, name: 'w_inch'
@@ -466,6 +472,7 @@
                 , editable:false
                 , hidden:true
                 , editrules : { edithidden:true }
+                , editoptions: { readonly: 'readonly' }
             },
             {
                 fixed: true, name: 'h_inch'
@@ -476,6 +483,7 @@
                 , editable:false
                 , hidden:true
                 , editrules : { edithidden:true }
+                , editoptions: { readonly: 'readonly' }
             },
             {
                 fixed: true, name: 'l_cm'
@@ -486,7 +494,7 @@
                 , edittype: 'text'
                 , editable:true
                 , editrules : { number:true }
-                , editoptions:{ defaultValue: '0' }
+                , editoptions:{ readonly: 'readonly', defaultValue: '0' }
             },
             {
                 fixed: true, name: 'w_cm'
@@ -497,7 +505,7 @@
                 , edittype: 'text'
                 , editable:true
                 , editrules : { number:true }
-                , editoptions:{ defaultValue: '0' }
+                , editoptions:{ readonly: 'readonly', defaultValue: '0' }
             },
             {
                 fixed: true, name: 'h_cm'
@@ -508,7 +516,7 @@
                 , edittype: 'text'
                 , editable:true
                 , editrules : { number:true }
-                , editoptions:{ defaultValue: '0' }
+                , editoptions:{ readonly: 'readonly', defaultValue: '0' }
             },
             {
                 fixed: true, name: 'trongluong'
@@ -519,7 +527,7 @@
                 , edittype: 'text'
                 , editable:true
                 , editrules : { required:true, number:true }
-                , editoptions:{ defaultValue: '0' }
+                , editoptions:{ readonly: 'readonly', defaultValue: '0' }
             },
             {
                 fixed: true, name: 'dientich'
@@ -530,7 +538,7 @@
                 , edittype: 'text'
                 , editable:true
                 , editrules : { required:true, number:true }
-                , editoptions:{ defaultValue: '0' }
+                , editoptions:{ readonly: 'readonly', defaultValue: '0' }
             },
             {
                 fixed: true, name: 'thetich'
@@ -541,7 +549,7 @@
                 , edittype: 'text'
                 , editable:true
                 , editrules : { required:true, number:true }
-                , editoptions:{ defaultValue: '0' }
+                , editoptions:{ readonly: 'readonly', defaultValue: '0' }
             },
             {
                 fixed: true, name: 'md_nhomnangluc_id'
@@ -551,7 +559,7 @@
                 , edittype: 'select'
                 , editable:true
                 , editrules : { required:true }
-                , editoptions: { dataUrl: 'Controllers/NhomNangLucController.ashx?action=getoption' }
+                , editoptions: { readonly: 'readonly', dataUrl: 'Controllers/NhomNangLucController.ashx?action=getoption' }
                 , sortable: false
             },
             {
@@ -561,7 +569,7 @@
                 , width: 50
                 , edittype: 'select'
                 , editable:true
-                , editoptions: { dataUrl: 'Controllers/ChungLoaiController.ashx?action=getoption' }
+                , editoptions: { readonly: 'readonly', dataUrl: 'Controllers/ChungLoaiController.ashx?action=getoption' }
                 , hidden: true 
                 , editrules : { edithidden:true }
             },
@@ -572,7 +580,7 @@
                 , width: 50
                 , edittype: 'select'
                 , editable:true
-                , editoptions: { dataUrl: 'Controllers/PartnerController.ashx?action=getoption&isncc=1' }
+                , editoptions: { readonly: 'readonly', dataUrl: 'Controllers/PartnerController.ashx?action=getoption&isncc=1' }
                 , editrules:{ edithidden:true }
                 , hidden: true 
             },
@@ -583,7 +591,7 @@
                 , width: 50
                 , edittype: 'select'
                 , editable:false
-                , editoptions: { dataUrl: 'Controllers/PortController.ashx?action=getoption' }
+                , editoptions: { readonly: 'readonly', dataUrl: 'Controllers/PortController.ashx?action=getoption' }
                 , hidden: true 
             },
             {
@@ -593,7 +601,7 @@
                 , width: 50
                 , edittype: 'select'
                 , editable: true
-                , editoptions: { dataUrl: 'Controllers/HsCodeController.ashx?action=getoption' }
+                , editoptions: { readonly: 'readonly', dataUrl: 'Controllers/HsCodeController.ashx?action=getoption' }
                 , hidden: true 
             },
 			{
@@ -603,6 +611,7 @@
                 , width: 100
                 , editable: false
                 , hidden: false 
+                , editoptions: { readonly: 'readonly' }
             },
             {
                 fixed: true, name: 'chucnangsp'
@@ -611,6 +620,7 @@
                 , width: 100
                 , editable: false
                 , hidden: false 
+                , editoptions: { readonly: 'readonly' }
             },
 			{
                 fixed: true, name: 'ngayxacnhan'
@@ -619,7 +629,7 @@
                 , width: 100
                 , editable: true
 				, edittype: 'text'
-                , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+                , editoptions: { readonly: 'readonly', dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
                 , hidden: false 
             },
 			{
@@ -628,7 +638,7 @@
 				, index: 'sp.hinhthucban'
 				, width: 100
 				, edittype: 'select'
-				, editoptions: { value: selectHinhThucBan }
+				, editoptions: { readonly: 'readonly', value: selectHinhThucBan }
 				, editable:true
 				, hidden: false
 			},
@@ -650,6 +660,7 @@
                 , editable:true
                 , hidden: false 
                 , editrules : { edithidden:true }
+                , editoptions: { readonly: 'readonly' }
             },
             {
                 fixed: true, name: 'ngaytao'
@@ -695,6 +706,7 @@
                 , editable:true
                 , edittype: 'textarea'
                 , editrules:{ edithidden:true }
+                , editoptions: { readonly: 'readonly' }
                 , hidden: true 
             },
             {
@@ -705,7 +717,7 @@
                 , editable:true
                 , edittype: 'checkbox'
                 , align: 'center'
-                , editoptions:{ value:'True:False', defaultValue: 'True' }
+                , editoptions:{ readonly: 'readonly', value:'True:False', defaultValue: 'True' }
                 , formatter: 'checkbox'
             }
             ]"
