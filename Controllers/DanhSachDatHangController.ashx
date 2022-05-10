@@ -212,7 +212,7 @@ public class DanhSachDatHangController : IHttpHandler
         String manv = UserUtils.getUser(context);
         var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
         var smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
-        var mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value);
+        var mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
         var tmp = db.md_mailtemplates.FirstOrDefault(p => p.use_for.Equals("PI") && p.ten_template == "PI_VG");
         string msg = "", vnn_msg = "";
         string id = context.Request.Form["id"];
@@ -813,7 +813,7 @@ public class DanhSachDatHangController : IHttpHandler
                 tmp.content_mail = tmp.content_mail.Replace("[SOLUONGMAHANG]", countProduct.ToString());
                 tmp.content_mail = tmp.content_mail.Replace("[SOPO]", dsdh.so_po);
 
-                GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value);
+                GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
                 string resp = "";
                 var fileDDHs = new List<string>();
                 var fileDDHsKhongGia = new List<string>();
