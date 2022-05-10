@@ -291,7 +291,7 @@ public class QuotationController : IHttpHandler
         {
             try
             {
-                GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value);
+                GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
                 mail.Send(nv.email, doitac.email, nv.email_cc, "", tmp.subject_mail, tmp.content_mail.Replace("%0D", "<br/>"), path + fileName + ";" + path + fileNamePdf);
                 //File.Delete(path + fileName);
                 context.Response.Write(String.Format("Ðã gửi mail thành công đến:<br/>{0}<br/>{1}<br/>", nv.email_cc, doitac.email));
