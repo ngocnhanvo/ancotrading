@@ -83,8 +83,15 @@ public partial class PrintControllers_ExportQRCode_Default : System.Web.UI.Page
 		
 		String sql = string.Format(@"
 		select
-			sp.ma_sanpham as [Mã Số Anco], '' as [Kích thước hàng ShowRoom], '' as [Kích thước hàng], 
-			'' as [Inner], '' as [Master], '' as [Pallet size], '' as [Q'ty/cont], '' as [Biến tấu]
+			sp.ma_sanpham as [Mã Số Anco], 
+            N'http://www.ancopottery.com/presentation?code=' + sp.ma_sanpham as [QRCode], 
+            N'' as [Kích thước hàng ShowRoom], 
+            N'' as [Kích thước hàng], 
+			N'' as [Inner], 
+            N'' as [Master], 
+            N'' as [Pallet size], 
+            N'' as [Q'ty/cont], 
+            N'' as [Biến tấu]
 		from 
 			md_sanpham sp
 		where sp.ma_sanpham in ('{0}')
@@ -127,15 +134,17 @@ public partial class PrintControllers_ExportQRCode_Default : System.Web.UI.Page
             {
                 IRow rowDetails = s1.CreateRow(iRow);
                 string ma_sanpham = row["Mã Số Anco"].ToString();
+                string qrcodeLink = row["QRCode"].ToString();
                 rowDetails.CreateCell(0).SetCellValue(ma_sanpham);
-                rowDetails.CreateCell(1).SetCellValue(" ");
+                rowDetails.CreateCell(1).SetCellValue(qrcodeLink);
                 rowDetails.CreateCell(2).SetCellValue(" ");
 				rowDetails.CreateCell(3).SetCellValue(" ");
 				rowDetails.CreateCell(4).SetCellValue(" ");
 				rowDetails.CreateCell(5).SetCellValue(" ");
 				rowDetails.CreateCell(6).SetCellValue(" ");
 				rowDetails.CreateCell(7).SetCellValue(" ");
-				string bc = ma_sanpham.Substring(9, 2);
+                rowDetails.CreateCell(8).SetCellValue(" ");
+                string bc = ma_sanpham.Substring(9, 2);
 				
 				var dgsp = (from a in db.md_sanphams
 							   join b in db.md_donggoisanphams on a.md_sanpham_id equals b.md_sanpham_id
@@ -162,11 +171,11 @@ public partial class PrintControllers_ExportQRCode_Default : System.Web.UI.Page
 								
 				if (bc.Substring(0, 1) != "0" & bc != "S1" & bc.Substring(0, 1) != "F")
                 {
-                    rowDetails.GetCell(3).SetCellValue(dgsp == null ? "" : dgsp.inner);
-                    rowDetails.GetCell(4).SetCellValue(dgsp == null ? "" : dgsp.outer);
-                    rowDetails.GetCell(5).SetCellValue(dgsp == null ? "" : dgsp.palletSize);
-                    rowDetails.GetCell(6).SetCellValue(dgsp == null ? "" : dgsp.qutyPerCont);
-                    rowDetails.GetCell(7).SetCellValue(bc);
+                    rowDetails.GetCell(4).SetCellValue(dgsp == null ? "" : dgsp.inner);
+                    rowDetails.GetCell(5).SetCellValue(dgsp == null ? "" : dgsp.outer);
+                    rowDetails.GetCell(6).SetCellValue(dgsp == null ? "" : dgsp.palletSize);
+                    rowDetails.GetCell(7).SetCellValue(dgsp == null ? "" : dgsp.qutyPerCont);
+                    rowDetails.GetCell(8).SetCellValue(bc);
 
                     //var bodetail = db.md_bos.Where()
                     string start = ma_sanpham.Substring(0, 9) + "S";
@@ -199,7 +208,7 @@ public partial class PrintControllers_ExportQRCode_Default : System.Web.UI.Page
                                 }
                             }
                         }
-                        rowDetails.GetCell(2).SetCellValue(string.Join("\n", lstVal));
+                        rowDetails.GetCell(3).SetCellValue(string.Join("\n", lstVal));
                     }
                 }
                 else
@@ -208,23 +217,23 @@ public partial class PrintControllers_ExportQRCode_Default : System.Web.UI.Page
                     if (sp != null)
                     {
                         bool hinhTron = isRound(sp.md_kieudang_id, db);
-                        rowDetails.GetCell(1).SetCellValue(sp.l_cm.GetValueOrDefault(0).ToString("#,#0.0") + "x" +
+                        rowDetails.GetCell(3).SetCellValue(sp.l_cm.GetValueOrDefault(0).ToString("#,#0.0") + "x" +
                         sp.w_cm.GetValueOrDefault(0).ToString("#,#0.0") + "x" + sp.h_cm.GetValueOrDefault(0).ToString("#,#0.0") + "H cm");
 
                         if (hinhTron == true)
                         {
-                            rowDetails.GetCell(2).SetCellValue("D" + sp.l_cm.GetValueOrDefault(0).ToString("#,#0.#") + "- H" + sp.h_cm.GetValueOrDefault(0).ToString("#,#0.#") + " cm");
+                            rowDetails.GetCell(3).SetCellValue("D" + sp.l_cm.GetValueOrDefault(0).ToString("#,#0.#") + "- H" + sp.h_cm.GetValueOrDefault(0).ToString("#,#0.#") + " cm");
                         }
                         else
                         {
-                            rowDetails.GetCell(2).SetCellValue("L" + sp.l_cm.GetValueOrDefault(0).ToString("#,#0.#") + "- W" +
+                            rowDetails.GetCell(3).SetCellValue("L" + sp.l_cm.GetValueOrDefault(0).ToString("#,#0.#") + "- W" +
                             sp.w_cm.GetValueOrDefault(0).ToString("#,#0.#") + "- H" + sp.h_cm.GetValueOrDefault(0).ToString("#,#0.#") + " cm");
                         }
-						rowDetails.GetCell(3).SetCellValue(dgsp == null ? "" : dgsp.inner);
-                        rowDetails.GetCell(4).SetCellValue(dgsp == null ? "" : dgsp.outer);
-                        rowDetails.GetCell(5).SetCellValue(dgsp == null ? "" : dgsp.palletSize);
-                        rowDetails.GetCell(6).SetCellValue(dgsp == null ? "" : dgsp.qutyPerCont);
-                        rowDetails.GetCell(7).SetCellValue(bc);
+						rowDetails.GetCell(4).SetCellValue(dgsp == null ? "" : dgsp.inner);
+                        rowDetails.GetCell(5).SetCellValue(dgsp == null ? "" : dgsp.outer);
+                        rowDetails.GetCell(6).SetCellValue(dgsp == null ? "" : dgsp.palletSize);
+                        rowDetails.GetCell(7).SetCellValue(dgsp == null ? "" : dgsp.qutyPerCont);
+                        rowDetails.GetCell(8).SetCellValue(bc);
                     }
                 }
 				

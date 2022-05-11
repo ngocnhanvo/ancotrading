@@ -78,7 +78,7 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
                 rowHeader.CreateCell(i).SetCellValue(col.ColumnName);
 
                 if (col.ColumnName == "QRCode")
-                    s1.SetColumnWidth(i, 2200);
+                    s1.SetColumnWidth(i, 6000);
                 else
                     s1.SetColumnWidth(i, 6000);
 
@@ -94,7 +94,7 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
                 IRow rowDetails = s1.CreateRow(iRow);
                 string ma_sanpham = row["Mã Số Anco"].ToString();
                 rowDetails.CreateCell(0).SetCellValue(ma_sanpham);
-                rowDetails.CreateCell(1).SetCellValue(" ");
+                rowDetails.CreateCell(1).SetCellValue("http://www.ancopottery.com/presentation?code=" + ma_sanpham);
                 rowDetails.CreateCell(2).SetCellValue(" ");
                 rowDetails.CreateCell(3).SetCellValue(" ");
                 rowDetails.CreateCell(4).SetCellValue(" ");
@@ -103,27 +103,27 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
                 rowDetails.CreateCell(7).SetCellValue(" ");
                 rowDetails.CreateCell(8).SetCellValue(" ");
                 rowDetails.HeightInPoints = (float)38.4;
-                string qrCodePath = ExcuteSignalRStatic.mapPathSignalR("~/images/qrcode/") + ma_sanpham + ".jpg";
-                if (File.Exists(qrCodePath))
-                {
-                    var qrcodeIMG = System.Drawing.Image.FromFile(qrCodePath);
-                    var mslogo = new MemoryStream();
-                    qrcodeIMG.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
+                //string qrCodePath = ExcuteSignalRStatic.mapPathSignalR("~/images/qrcode/") + ma_sanpham + ".jpg";
+                //if (File.Exists(qrCodePath))
+                //{
+                //    var qrcodeIMG = System.Drawing.Image.FromFile(qrCodePath);
+                //    var mslogo = new MemoryStream();
+                //    qrcodeIMG.Save(mslogo, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                    var patriarchlogo = s1.CreateDrawingPatriarch();
-                    var anchorLogo = new HSSFClientAnchor();
-                    anchorLogo.Dx1 = 50;
-                    anchorLogo.Dy1 = 5;
-                    anchorLogo.Dx2 = 1000;
-                    anchorLogo.Dy2 = 0;
-                    anchorLogo.Col1 = 1;
-                    anchorLogo.Row1 = iRow;
-                    anchorLogo.Col2 = 1;
-                    anchorLogo.Row2 = iRow + 1;
-                    anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
-                    int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
-                    var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
-                }
+                //    var patriarchlogo = s1.CreateDrawingPatriarch();
+                //    var anchorLogo = new HSSFClientAnchor();
+                //    anchorLogo.Dx1 = 50;
+                //    anchorLogo.Dy1 = 5;
+                //    anchorLogo.Dx2 = 1000;
+                //    anchorLogo.Dy2 = 0;
+                //    anchorLogo.Col1 = 1;
+                //    anchorLogo.Row1 = iRow;
+                //    anchorLogo.Col2 = 1;
+                //    anchorLogo.Row2 = iRow + 1;
+                //    anchorLogo.AnchorType = (int)AnchorType.MoveDontResize;
+                //    int indexlogo = hssfworkbook.AddPicture(mslogo.ToArray(), PictureType.JPEG);
+                //    var signaturePicturelogo = patriarchlogo.CreatePicture(anchorLogo, indexlogo);
+                //}
 
                 string bc = ma_sanpham.Substring(9, 2);
 
