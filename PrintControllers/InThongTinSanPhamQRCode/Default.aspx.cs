@@ -66,7 +66,7 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
             ICellStyle cellcenter = ex_fm.getcell(9, false, true, "", "C", "T");
 
             s1.CreateRow(0).CreateCell(0).SetCellValue("THÔNG TIN SẢN PHẨM QRCODE");
-            CellRangeAddress cellRange01 = new CellRangeAddress(0, 0, 0, 8);
+            CellRangeAddress cellRange01 = new CellRangeAddress(0, 0, 0, 9);
             s1.AddMergedRegion(cellRange01);
             s1.GetRow(0).HeightInPoints = 30;
             s1.GetRow(0).GetCell(0).CellStyle = cellHeader;
