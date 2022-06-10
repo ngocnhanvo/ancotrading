@@ -339,6 +339,22 @@ public partial class Tool_XoaHangHoaNHD : System.Web.UI.Page
                                 }
                                 #endregion
 
+                                #region Xóa Hàng hóa độc quyền
+                                try
+                                {
+                                    foreach (md_hanghoadocquyen hhdq in db.md_hanghoadocquyens.Where(s => s.md_sanpham_id == sp.md_sanpham_id))
+                                    {
+                                        db.md_hanghoadocquyens.DeleteOnSubmit(hhdq);
+                                    }
+                                    db.SubmitChanges();
+                                    msgDT += string.Format("<div style='color: blue'>{0} đã hàng hóa độc quyền.</div>", sp.ma_sanpham);
+                                }
+                                catch (Exception ex1)
+                                {
+                                    msgDT += string.Format("<div style='color: red'>{0} xóa hàng hóa độc quyền lỗi {1}.</div>", sp.ma_sanpham, ex1.Message);
+                                }
+                                #endregion
+
                                 if (!msgDT.Contains("'color: red'"))
                                 {
                                     db.md_sanphams.DeleteOnSubmit(sp);

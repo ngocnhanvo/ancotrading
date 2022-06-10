@@ -243,7 +243,7 @@ public class UserQRCodeController : IHttpHandler {
                         msac.ta_ngan as mausac_ta
                     from (
 	                    select distinct 
-	                        substring(sp.ma_sanpham, 0, 12) as todetai, 
+	                        substring(sp.ma_sanpham, 0, 10) as todetai, 
 	                        substring(sp.ma_sanpham, 10, 2) as bientau,
 	                        substring(sp.ma_sanpham, 7, 2) as detai,
 	                        substring(sp.ma_sanpham, 13, 2) as mausac
@@ -259,7 +259,7 @@ public class UserQRCodeController : IHttpHandler {
                     where 
                         A.todetai = '{0}'
                         order by A.detai, A.bientau, A.mausac
-				", msp.Substring(0, 11), chungloai, string.Join("','", lstSps));
+				", msp.Substring(0, 9), chungloai, string.Join("','", lstSps));
 
                 var dt_detail = mdbc.GetData(sql_detail);
                 var arrBienTau = new List<string>();
