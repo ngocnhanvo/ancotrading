@@ -302,7 +302,7 @@ public class UserQRCodeController : IHttpHandler {
                     }
 
                     string detai_bientau_mausac = row_dt["detai"] + " - " + row_dt["bientau"] + " - " + row_dt["mausac"];
-                    if (!mausac_chk.Split(',').Contains(detai_bientau_mausac))
+                    if (!mausac_chk.Split(',').Contains(detai_bientau_mausac) & row_dt["bientau"] + "" == bc)
                     {
                         mausac_chk += detai_bientau_mausac + ",";
                         string msTA = row_dt["mausac_ta"].ToString();
