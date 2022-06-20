@@ -128,7 +128,7 @@ public class PhieuHanNgachController : IHttpHandler {
 
 			if (next)
 			{
-				GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value);
+				GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
 				mail.Send(nv.email, nguoinhan.email, nv.email_cc, "", "Phiếu hạn ngạch " + phn.sochungtu, string.Format("Phiếu hạn ngạch số: {0}<br/>Số danh sách đặt hàng: {1}<br/>Số đơn hàng: {2}", phn.sochungtu, phn.sodathang, dh.sochungtu), path + fileNamePdf);
 				msg = String.Format("Đã gửi mail thành công đến:<br/>{0}<br/>{1}<br/>", nv.email_cc, nguoinhan.email);
 			}
