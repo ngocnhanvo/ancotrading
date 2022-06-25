@@ -52,6 +52,15 @@ public class API_Data : IHttpHandler {
 			case "md_doitackinhdoanh":
                 this.md_doitackinhdoanh(context);
                 break;
+			case "md_cangxuathang":
+                this.md_cangxuathang(context);
+                break;
+			case "md_bientau":
+                this.md_bientau(context);
+                break;
+			case "md_nhacungungmacdinh":
+                this.md_nhacungungmacdinh(context);
+                break;
         }
     }
 
@@ -267,6 +276,57 @@ public class API_Data : IHttpHandler {
 		{
 			var lstMSP = doitackinhdoanhs.Split(',');
 			var sps = db.md_doitackinhdoanhs.Where(s => lstMSP.Contains(s.md_doitackinhdoanh_id)).ToList();
+			msg = "1" + JsonConvert.SerializeObject(sps);
+		}
+		catch(Exception ex) 
+		{
+			msg = "0" + ex;
+		}
+		context.Response.Write(msg);
+    }
+	
+	public void md_cangxuathang(HttpContext context)
+    {
+		var msg = "";
+        var sanphams = context.Request.Form["sanphams"];
+		try 
+		{
+			var lstMSP = sanphams.Split(',');
+			var sps = db.md_cangxuathangs.Where(s => lstMSP.Contains(s.md_sanpham_id)).ToList();
+			msg = "1" + JsonConvert.SerializeObject(sps);
+		}
+		catch(Exception ex) 
+		{
+			msg = "0" + ex;
+		}
+		context.Response.Write(msg);
+    }
+	
+	public void md_bientau(HttpContext context)
+    {
+		var msg = "";
+        var sanphams = context.Request.Form["sanphams"];
+		try 
+		{
+			var lstMSP = sanphams.Split(',');
+			var sps = db.md_bientaus.Where(s => lstMSP.Contains(s.md_sanpham_id)).ToList();
+			msg = "1" + JsonConvert.SerializeObject(sps);
+		}
+		catch(Exception ex) 
+		{
+			msg = "0" + ex;
+		}
+		context.Response.Write(msg);
+    }
+	
+	public void md_nhacungungmacdinh(HttpContext context)
+    {
+		var msg = "";
+        var sanphams = context.Request.Form["sanphams"];
+		try 
+		{
+			var lstMSP = sanphams.Split(',');
+			var sps = db.md_nhacungungmacdinhs.Where(s => lstMSP.Contains(s.md_sanpham_id)).ToList();
 			msg = "1" + JsonConvert.SerializeObject(sps);
 		}
 		catch(Exception ex) 
