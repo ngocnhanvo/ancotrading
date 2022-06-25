@@ -40,6 +40,12 @@ public class API_Data : IHttpHandler {
 			case "md_phanloaihh":
                 this.md_phanloaihh(context);
                 break;
+			case "md_donggoisanpham":
+                this.md_donggoisanpham(context);
+                break;
+			case "md_donggoi":
+                this.md_donggoi(context);
+                break;
         }
     }
 
@@ -187,6 +193,40 @@ public class API_Data : IHttpHandler {
 		{
 			var lstMSP = phanloaihhs.Split(',');
 			var sps = db.md_phanloaihhs.Where(s => lstMSP.Contains(s.md_phanloaihh_id)).ToList();
+			msg = "1" + JsonConvert.SerializeObject(sps);
+		}
+		catch(Exception ex) 
+		{
+			msg = "0" + ex;
+		}
+		context.Response.Write(msg);
+    }
+	
+	public void md_donggoisanpham(HttpContext context)
+    {
+		var msg = "";
+        var sanphams = context.Request.Form["sanphams"];
+		try 
+		{
+			var lstMSP = sanphams.Split(',');
+			var sps = db.md_donggoisanphams.Where(s => lstMSP.Contains(s.md_sanpham_id)).ToList();
+			msg = "1" + JsonConvert.SerializeObject(sps);
+		}
+		catch(Exception ex) 
+		{
+			msg = "0" + ex;
+		}
+		context.Response.Write(msg);
+    }
+	
+	public void md_donggoi(HttpContext context)
+    {
+		var msg = "";
+        var donggois = context.Request.Form["donggois"];
+		try 
+		{
+			var lstMSP = donggois.Split(',');
+			var sps = db.md_donggois.Where(s => lstMSP.Contains(s.md_donggoi_id)).ToList();
 			msg = "1" + JsonConvert.SerializeObject(sps);
 		}
 		catch(Exception ex) 
