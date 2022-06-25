@@ -24,10 +24,18 @@ public class API_Data : IHttpHandler {
 
     public void md_sanpham(HttpContext context)
     {
+		var msg = "";
         var ma_sanphams = context.Request.Form["ma_sanphams"];
-        var lstMSP = ma_sanphams.Split(',');
-        var sps = db.md_sanphams.Where(s => lstMSP.Contains(s.ma_sanpham)).ToList();
-        context.Response.Write(JsonConvert.SerializeObject(sps));
+		try {
+			var lstMSP = ma_sanphams.Split(',');
+			var sps = db.md_sanphams.Where(s => lstMSP.Contains(s.ma_sanpham)).ToList();
+			msg = "1" + JsonConvert.SerializeObject(sps);
+		}
+		catch(Exception ex) 
+		{
+			msg = "0" + ex;
+		}
+		context.Response.Write(msg);
     }
 
     public bool IsReusable {
