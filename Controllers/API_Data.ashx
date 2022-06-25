@@ -1,16 +1,13 @@
 ﻿<%@ WebHandler Language="C#" Class="API_Data" %>
 
 using System;
-using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
 using Newtonsoft.Json;
 
 public class API_Data : IHttpHandler {
-    public JavaScriptSerializer js = new JavaScriptSerializer();
     private LinqDBDataContext db = new LinqDBDataContext();
-    public string emailcc = "anco@ancopottery.com,info@ancopottery.com";
-    //public string emailcc = "ngocnhan@esc.vn";
     public void ProcessRequest(HttpContext context)
     {
         string oper = context.Request.QueryString["oper"];
