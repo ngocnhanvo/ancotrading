@@ -10,7 +10,7 @@ public class API_Data : IHttpHandler {
     private LinqDBDataContext db = new LinqDBDataContext();
     public void ProcessRequest(HttpContext context)
     {
-        string oper = context.Request.QueryString["oper"];
+        string oper = context.Request.Params["oper"];
         switch (oper)
         {
             case "md_sanpham":
