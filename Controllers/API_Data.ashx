@@ -84,6 +84,7 @@ public class API_Data : IHttpHandler {
             foreach(var sp in sps)
             {
                 sp.hinhanh = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
+				sp.hinhanhWeb = ExcuteSignalRStatic.getImageProductWeb(sp.ma_sanpham);
             }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
