@@ -500,6 +500,7 @@ public class HoaDonController : IHttpHandler
             from (
                 select 
                     hd.c_hoadon_id,
+                    hd.tiento,
                     hd.sophieu,
                     hd.ma_khachhang,
                     hd.ten_khachhang,
@@ -520,6 +521,12 @@ public class HoaDonController : IHttpHandler
                     hd.ghichu,
                     hd.so_inv,
                     hd.sotokhai_inv,
+                    hd.ngaytao,
+                    hd.nguoitao,
+                    hd.ngaycapnhat,
+                    hd.nguoicapnhat,
+                    hd.mota,
+                    hd.hoatdong,
                     ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum
                 FROM 
                     c_hoadon hd

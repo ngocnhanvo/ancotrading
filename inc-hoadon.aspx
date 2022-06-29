@@ -39,8 +39,8 @@
                   }); }"
             ColModel = "[
             {
-                fixed: true, name: 'c_nhapxuat_id'
-                , index: 'c_nhapxuat_id'
+                fixed: true, name: 'c_hoadon_id'
+                , index: 'c_hoadon_id'
                 , width: 100
                 , hidden: true 
                 , editable:true
@@ -49,6 +49,7 @@
             },
             {
                  fixed: true, name: 'md_trangthai_id'
+                 , label: 'Trạng thái'
                  , index: 'nx.md_trangthai_id'
                  , editable: false
                  , width: 100
@@ -57,46 +58,177 @@
                  , formatter:'imagestatus'
             },
             {
-                 fixed: true, name: 'sophieunx'
-                 , index: 'sophieunx'
+                 fixed: true, name: 'tiento'
+                 , label: 'Tiền tố'
+                 , index: 'tiento'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'select'
+                 , editoptions: { dataUrl: 'Controllers/WarehouseController.ashx?action=getoption', readonly:'readonly' }
+            },
+            {
+                 fixed: true, name: 'sophieu'
+                 , label: 'Số phiếu'
+                 , index: 'sophieu'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
                  , editoptions: { readonly:'readonly' }
             },
             {
-                 fixed: true, name: 'sophieu'
-                 , index: 'sophieu'
+                 fixed: true, name: 'ma_khachhang'
+                 , label: 'Mã KH'
+                 , index: 'ma_khachhang'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
-            },
-			{
-                 fixed: true, name: 'soseal'
-                 , index: 'soseal'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-                 , editrules:{ required:true }
-				 , formoptions: { label:'Số Seal' + ip_fd()}
+                 , editoptions: { readonly:'readonly' }
             },
             {
-                 fixed: true, name: 'container'
-                 , index: 'container'
+                 fixed: true, name: 'ten_khachhang'
+                 , label: 'Tên KH'
+                 , index: 'ma_khachhang'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
-                 , editrules:{ required:true }
-				 , formoptions: { label:'Số Container' + ip_fd()}
             },
             {
-                 fixed: true, name: 'loaicont'
-                 , index: 'loaicont'
+                 fixed: true, name: 'diachi_khachhang'
+                 , label: 'Địa chỉ'
+                 , index: 'ma_khachhang'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'email_khachhang'
+                 , label: 'Email'
+                 , index: 'email_khachhang'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'hinhthucthanhtoan'
+                 , label: 'Hình thức TT'
+                 , index: 'hinhthucthanhtoan'
                  , editable: true
                  , width: 100
                  , edittype: 'select'
-                 , editoptions: { value:'CONT20:Cont 20;CONT40:Cont 40;CONT45:Cont 45;40HC:40HC;LE:Cont Lẻ' }
-				 , formoptions: { label:'Loại Cont' + ip_fd()}
+                 , editoptions: { value:'CK:CK;TM:TM;CK/TM:CK/TM' }
+            },
+            {
+                 fixed: true, name: 'thue_vat'
+                 , label: 'VAT'
+                 , index: 'thue_vat'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'tienthue'
+                 , label: 'Tiền thuế'
+                 , index: 'tienthue'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'tygia'
+                 , label: 'Tỷ giá'
+                 , index: 'tygia'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'phicong'
+                 , label: 'Phí cộng'
+                 , index: 'phicong'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'phitru'
+                 , label: 'Phí trừ'
+                 , index: 'phitru'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'tuongduongUSD'
+                 , label: 'Tương đương USD'
+                 , index: 'tuongduongUSD'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'ngayhoadon'
+                 , label: 'Ngày hóa đơn'
+                 , index: 'ngayhoadon'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'mauso'
+                 , label: 'Mẫu số'
+                 , index: 'mauso'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'kyhieu'
+                 , label: 'Ký hiệu'
+                 , index: 'kyhieu'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'sohoadon'
+                 , label: 'Số hóa đơn'
+                 , index: 'sohoadon'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'ngayphathanh'
+                 , label: 'Ngày phát hành'
+                 , index: 'ngayphathanh'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+            },
+            {
+                 fixed: true, name: 'ghichu'
+                 , label: 'Ghi chú'
+                 , index: 'ghichu'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'so_inv'
+                 , label: 'Số INV'
+                 , index: 'so_inv'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'sotokhai_inv'
+                 , label: 'Số tờ khai INV'
+                 , index: 'sotokhai_inv'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
             },
 			{
                 fixed: true, name: 'ngaytao'
@@ -114,69 +246,6 @@
                 , editable:false
                 , edittype: 'text'
                 , editrules:{ edithidden : true }
-            },
-            {
-                 fixed: true, name: 'ngay_giaonhan'
-                 , index: 'ngay_giaonhan'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-            },
-            {
-                 fixed: true, name: 'md_doitackinhdoanh_id'
-                 , index: 'dtkd.ma_dtkd'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'select'
-                 , editoptions: { dataUrl: 'Controllers/PartnerController.ashx?action=getoption&isncc=0', readonly:'readonly' }
-                 
-            },
-            {
-                 fixed: true, name: 'nguoigiao'
-                 , index: 'nguoigiao'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-            },
-            {
-                 fixed: true, name: 'nguoinhan'
-                 , index: 'nguoinhan'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-            },
-            {
-                 fixed: true, name: 'sophieukhach'
-                 , index: 'sophieukhach'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-            },
-            {
-                 fixed: true, name: 'ngay_phieu'
-                 , index: 'ngay_phieu'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-            },
-            {
-                 fixed: true, name: 'nhapxuat_kho_id'
-                 , index: 'nhapxuat_kho_id'
-                 , editable: false
-                 , width: 100
-                 , edittype: 'select'
-                 , editoptions: { dataUrl: 'Controllers/WarehouseController.ashx?action=getoption', readonly:'readonly' }
-            },
-            
-            {
-                 fixed: true, name: 'md_loaichungtu_id'
-                 , index: 'md_loaichungtu_id'
-                 , editable: false
-                 , width: 100
-                 , edittype: 'select'
-                 , editoptions: { value:'NK:Nhập Kho;XK:Xuất Kho' }
             },
             {
                 fixed: true, name: 'ngaycapnhat'
