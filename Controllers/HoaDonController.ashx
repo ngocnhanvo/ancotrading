@@ -500,6 +500,7 @@ public class HoaDonController : IHttpHandler
             from (
                 select 
                     hd.c_hoadon_id,
+                    hd.md_trangthai_id,
                     hd.tiento,
                     hd.sophieu,
                     hd.ma_khachhang,

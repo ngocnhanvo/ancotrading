@@ -15,7 +15,7 @@
             center: {
                 onresize_end: function() {
                 var o = $("#lay-center-hoadon").height();
-                $("#grid_ds_chitietxuatkho").setGridHeight(o - 90);
+                $("#grid_ds_chitiethoadon").setGridHeight(o - 90);
                 }
             }
         })
@@ -64,7 +64,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'select'
-                 , editoptions: { dataUrl: 'Controllers/WarehouseController.ashx?action=getoption', readonly:'readonly' }
+                 , editoptions: { dataUrl: 'Controllers/HoaDonController.ashx?action=getoption' }
             },
             {
                  fixed: true, name: 'sophieu'
@@ -283,7 +283,7 @@
                 , formatter: 'checkbox'
             }
             ]"
-            GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
+            GridComplete = "let o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
             Height = "170"
             MultiSelect = "false"
             ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
@@ -311,7 +311,7 @@
             OnSelectRow = "function(ids) {
 		                if(ids == null) {
 			                ids=0;
-			                if($('#grid_ds_chitietxuatkho').jqGrid('getGridParam','records') &gt; 0 )
+			                if($('#grid_ds_chitiethoadon').jqGrid('getGridParam','records') &gt; 0 )
 			                {
 							
 								$.ajax({
@@ -324,8 +324,8 @@
 									}
 								});
 							
-				                $('#grid_ds_chitietxuatkho').jqGrid('setGridParam',{url:'Controllers/DongNhapXuatController.ashx?&whId='+ids,page:1});
-				                $('#grid_ds_chitietxuatkho').jqGrid().trigger('reloadGrid');
+				                $('#grid_ds_chitiethoadon').jqGrid('setGridParam',{url:'Controllers/DongNhapXuatController.ashx?&whId='+ids,page:1});
+				                $('#grid_ds_chitiethoadon').jqGrid().trigger('reloadGrid');
 				            } 
 				        } else {
 						
@@ -339,26 +339,26 @@
 								}
 							});
 							
-			                $('#grid_ds_chitietxuatkho').jqGrid('setGridParam',{url:'Controllers/DongNhapXuatController.ashx?&whId='+ids,page:1});
-			                $('#grid_ds_chitietxuatkho').jqGrid().trigger('reloadGrid');			
+			                $('#grid_ds_chitiethoadon').jqGrid('setGridParam',{url:'Controllers/HoaDonChiTietController.ashx?&whId='+ids,page:1});
+			                $('#grid_ds_chitiethoadon').jqGrid().trigger('reloadGrid');			
 		                } }"
             runat="server" />
 </DIV>
 
 <DIV class="ui-layout-center ui-widget-content" id="lay-center-hoadon" style="padding:0;"> 
-			<uc1:jqGrid  ID="grid_ds_chitietxuatkho" 
-			Caption = "Chi Tiết Xuất Kho"
+			<uc1:jqGrid  ID="grid_ds_chitiethoadon" 
+			Caption = "Chi Tiết Hóa Đơn"
             SortName="sp.ma_sanpham" 
             SortOrder="asc"
-            UrlFileAction="Controllers/DongNhapXuatController.ashx" 
-            ColNames="['c_dongnhapxuat_id', 'Nhập Xuất', 'Chi Tiết Đơn Hàng', 'STT', 'Mã SP', 'Mã SP', 'Mô Tả TV', 'Đơn Vị Tính', 'Số Lượng Phải Xuất', 'Số Lượng Thực Xuất', 'Đơn Giá', 'Số Kiện Thực Tế', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
+            UrlFileAction="Controllers/HoaDonChiTietController.ashx" 
             RowNumbers="true"
             FilterToolbar="true"
             OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid); }"
             ColModel = "[
             {
-                fixed: true, name: 'c_dongnhapxuat_id'
-                , index: 'c_dongnhapxuat_id'
+                fixed: true, name: 'c_hoadon_ct_id'
+                , index: 'hd.c_hoadon_ct_id'
+                , label: 'ID'
                 , width: 100
                 , hidden: true 
                 , editable:true
@@ -366,118 +366,75 @@
                 , key: true
             },
             {
-                 fixed: true, name: 'c_nhapxuat_id'
-                 , index: 'c_nhapxuat_id'
+                 fixed: true, name: 'c_hoadon_id'
+                 , label: 'HĐ ID'
+                 , index: 'hd.c_hoadon_id'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
                  , hidden : true
             },
             {
-                fixed: true, name: 'c_dongdonhang_id'
-                , index: 'c_dongdonhang_id'
+                fixed: true, name: 'ma_sanpham'
+                , label: 'Mã SP'
+                , index: 'hd.ma_sanpham'
                 , width: 100
                 , edittype: 'text'
                 , editable:true
-                , hidden: true
+                , editoptions: { readonly:'readonly' }
             },
             {
-                fixed: true, name: 'line'
-                , index: 'line'
+                fixed: true, name: 'ten_sanpham'
+                , label: 'Tên SP'
+                , index: 'hd.ten_sanpham'
+                , width: 100
+                , edittype: 'text'
+                , editable:true
+                , editoptions: { readonly:'readonly' }
+            },
+            {
+                fixed: true, name: 'ten_dvt'
+                , label: 'ĐVT'
+                , index: 'hd.ten_dvt'
                 , width: 50
                 , edittype: 'text'
                 , editable:true
-                , align:'right'
-            },
-            {
-                fixed: true, name: 'sanpham_id'
-                , index: 'sanpham_id'
-                , width: 100
-                , hidden: true 
-                , editable:true
-                , edittype: 'text'
-            },
-            {
-                fixed: true, name: 'ma_sanpham'
-                , index: 'sp.ma_sanpham'
-                , width: 100
-                , edittype: 'text'
-                , editable:true
-                , editoptions: { 
-                    dataInit : function (elem) { 
-                        $(elem).combogrid({
-                            searchIcon: true,
-                            width: '480px',
-                            url: 'Controllers/ProductController.ashx?action=getcombogrid',
-                            colModel: [
-                                { 'columnName': 'md_sanpham_id', 'width': '0', 'label': 'ID', hidden:true }
-                              , { 'columnName': 'ma_sanpham', 'width': '50', 'label': 'Mã SP', 'align':'left'}
-                              , { 'columnName': 'mota_tiengviet', 'width': '50', 'label': 'Mô Tả TV' , 'align':'left'}],
-                              select: function(event, ui) {
-                                    $(elem).val(ui.item.ma_sanpham);
-                                    $('#sanpham_id').val(ui.item.md_sanpham_id);
-                                    return false;
-                              }
-                        });
-                    } 
-                }
-            },
-            {
-                fixed: true, name: 'mota_tiengviet'
-                , index: 'mota_tiengviet'
-                , width: 200
-                , edittype: 'textarea'
-                , editable:true
-            },
-            {
-                fixed: true, name: 'md_donvitinh_id'
-                , index: 'md_donvitinh_id'
-                , width: 100
-                , edittype: 'select'
-                , editable:true
-                , editoptions: { dataUrl: 'Controllers/UnitProductController.ashx?action=getoption' }
                 , align:'center'
+                , editoptions: { readonly:'readonly' }
             },
             {
-                fixed: true, name: 'slphai_nhapxuat'
-                , index: 'slphai_nhapxuat'
+                fixed: true, name: 'soluong'
+                , label: 'Số lượng'
+                , index: 'hd.soluong'
                 , width: 100
                 , edittype: 'text'
                 , editable:true
                 , align:'right'
-                , formatter:'number'
-                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
-            },
-            {
-                fixed: true, name: 'slthuc_nhapxuat'
-                , index: 'slthuc_nhapxuat'
-                , width: 100
-                , edittype: 'text'
-                , editable:true
-                , align:'right'
-                , formatter:'number'
-                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
+                , editoptions: { readonly:'readonly' }
             },
             {
                 fixed: true, name: 'dongia'
-                , index: 'dongia'
+                , label: 'Đơn giá'
+                , index: 'hd.dongia'
                 , width: 100
                 , edittype: 'text'
-                , editable:true
+                , editable: true
+                , editoptions: { readonly:'readonly' }
                 , align:'right'
                 , formatter:'currency'
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
             },
             {
-                fixed: true, name: 'sokien_thucte'
-                , index: 'sokien_thucte'
+                fixed: true, name: 'thanhtien'
+                , label: 'Thành tiền'
+                , index: 'hd.thanhtien'
                 , width: 100
                 , edittype: 'text'
-                , editable:true
-                , editrules: { required: true, number:true, minValue: 0 }
+                , editable: true
+                , editoptions: { readonly:'readonly' }
                 , align:'right'
-                , formatter:'number'
-                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
+                , formatter:'currency'
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
             },
             {
                 fixed: true, name: 'ngaytao'
@@ -532,11 +489,11 @@
                 , editrules:{ edithidden : true }
             }
             ]"
-            GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
+            GridComplete = "let o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
             Height = "150"
             MultiSelect = "false" 
-            ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
-            ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
+            ShowEdit ="false"
+            ShowDel = "false"
             EditFormOptions="
                 beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
@@ -566,5 +523,5 @@
 
 <script type="text/javascript">
     createRightPanel('grid_ds_hoadon');
-    createRightPanel('grid_ds_chitietxuatkho');
+    createRightPanel('grid_ds_chitiethoadon');
 </script>
