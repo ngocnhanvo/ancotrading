@@ -348,7 +348,7 @@
 <DIV class="ui-layout-center ui-widget-content" id="lay-center-hoadon" style="padding:0;"> 
 			<uc1:jqGrid  ID="grid_ds_chitiethoadon" 
 			Caption = "Chi Tiết Hóa Đơn"
-            SortName="sp.ma_sanpham" 
+            SortName="hd.ma_sanpham" 
             SortOrder="asc"
             UrlFileAction="Controllers/HoaDonChiTietController.ashx" 
             RowNumbers="true"
