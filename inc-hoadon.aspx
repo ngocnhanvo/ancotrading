@@ -232,6 +232,7 @@
             },
 			{
                 fixed: true, name: 'ngaytao'
+                , label: 'Ngày tạo'
                 , index: 'ngaytao'
                 , width: 100
                 , editable:false
@@ -239,16 +240,19 @@
                 , hidden: true 
                 , editrules:{ edithidden : true }
             },
-			{
+            {
                 fixed: true, name: 'nguoitao'
+                , label: 'Người tạo'
                 , index: 'nguoitao'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
+                , hidden: true 
                 , editrules:{ edithidden : true }
             },
             {
                 fixed: true, name: 'ngaycapnhat'
+                , label: 'Ngày cập nhật'
                 , index: 'ngaycapnhat'
                 , width: 100
                 , editable:false
@@ -258,6 +262,7 @@
             },
             {
                 fixed: true, name: 'nguoicapnhat'
+                , label: 'Người cập nhật'
                 , index: 'nguoicapnhat'
                 , width: 100
                 , editable:false
@@ -267,6 +272,7 @@
             },
             {
                 fixed: true, name: 'mota'
+                , label: 'Mô tả'
                 , index: 'mota'
                 , width: 100
                 , editable:true
@@ -274,13 +280,13 @@
             },
             {
                 fixed: true, name: 'hoatdong', hidden: true
+                , label: 'Hoạt động'
                 , index: 'hoatdong'
                 , width: 100
                 , editable:true
                 , edittype: 'checkbox'
-                , align: 'center'
-                , editoptions:{ value:'True:False', defaultValue: 'True' }
-                , formatter: 'checkbox'
+                , editoptions:{ defaultValue: 'True' }
+                , editrules:{ edithidden : true }
             }
             ]"
             GridComplete = "let o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
@@ -387,7 +393,7 @@
                 fixed: true, name: 'ten_sanpham'
                 , label: 'Tên SP'
                 , index: 'hd.ten_sanpham'
-                , width: 100
+                , width: 120
                 , edittype: 'text'
                 , editable:true
                 , editoptions: { readonly:'readonly' }
@@ -438,6 +444,7 @@
             },
             {
                 fixed: true, name: 'ngaytao'
+                , label: 'Ngày tạo'
                 , index: 'ngaytao'
                 , width: 100
                 , editable:false
@@ -447,6 +454,7 @@
             },
             {
                 fixed: true, name: 'nguoitao'
+                , label: 'Người tạo'
                 , index: 'nguoitao'
                 , width: 100
                 , editable:false
@@ -456,6 +464,7 @@
             },
             {
                 fixed: true, name: 'ngaycapnhat'
+                , label: 'Ngày cập nhật'
                 , index: 'ngaycapnhat'
                 , width: 100
                 , editable:false
@@ -465,6 +474,7 @@
             },
             {
                 fixed: true, name: 'nguoicapnhat'
+                , label: 'Người cập nhật'
                 , index: 'nguoicapnhat'
                 , width: 100
                 , editable:false
@@ -474,13 +484,15 @@
             },
             {
                 fixed: true, name: 'mota'
+                , label: 'Mô tả'
                 , index: 'mota'
-                , width: 100
+                , width: 120
                 , editable:true
                 , edittype: 'textarea'
             },
             {
                 fixed: true, name: 'hoatdong', hidden: true
+                , label: 'Hoạt động'
                 , index: 'hoatdong'
                 , width: 100
                 , editable:true
