@@ -213,6 +213,37 @@ namespace jqGridHelper
             return result;
         }
 
+        public static string taoChungTuHoaDon(LinqDBDataContext db)
+        {
+            string result = "";
+            var mm = DateTime.Now.ToString("MM");
+            var yy = DateTime.Now.ToString("yy");
+            var hoadon = db.c_hoadons.Select(s => new {
+                ctdh = s.sophieu.Substring(0, 3),
+                thang = s.sophieu.Substring(4, 2),
+                nam = s.sophieu.Substring(7, 2)
+            })
+            .OrderByDescending(s=>s.nam)
+            .ThenByDescending(s=>s.thang)
+            .ThenByDescending(s=>s.ctdh)
+            .Take(1).FirstOrDefault();
+
+
+            if (hoadon == null)
+            {
+                result = "001/" + mm + "-" + yy;
+            }
+            else
+            {
+                if(hoadon.nam == yy & hoadon.thang == mm)
+                    result = genericNumberDoc(hoadon.ctdh) + "/" + hoadon.thang + "-" + hoadon.nam;
+                else
+                    result = "001/" + mm + "-" + yy;
+            }
+
+            return result;
+        }
+
         public static string genericNumberDoc(string doc)
         {
             try

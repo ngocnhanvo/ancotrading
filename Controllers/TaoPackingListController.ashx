@@ -30,6 +30,7 @@ public class TaoPackingListController : IHttpHandler {
             decimal totalnet = 0;
 
             var lst = new List<c_dongpklinv>();
+            var lstHD = new List<c_hoadon_ct>();
             String getAllLine = String.Format("SELECT (select c_donhang_id from c_dongdonhang where c_dongdonhang_id = dnx.c_dongdonhang_id) as c_donhang_id, nx.md_doitackinhdoanh_id, dnx.* " +
                 " FROM c_nhapxuat nx, c_dongnhapxuat dnx " +
                 " WHERE nx.c_nhapxuat_id = dnx.c_nhapxuat_id AND dnx.c_nhapxuat_id IN({0}) ", phieuxuatkho);
@@ -38,7 +39,10 @@ public class TaoPackingListController : IHttpHandler {
             DataTable dt = mdbc.GetData(getAllLine);
             String c_dongdonhang_id = dt.Rows[0]["c_dongdonhang_id"].ToString();
             String c_donhang_id = db.c_dongdonhangs.FirstOrDefault(ddh => ddh.c_dongdonhang_id.Equals(c_dongdonhang_id)).c_donhang_id;
-            String md_cangbien_id = db.c_donhangs.FirstOrDefault(dh => dh.c_donhang_id.Equals(c_donhang_id)).md_cangbien_id;
+            var donhangM = db.c_donhangs.FirstOrDefault(dh => dh.c_donhang_id.Equals(c_donhang_id));
+            String md_cangbien_id = donhangM.md_cangbien_id;
+            String md_doitackinhdoanh_id = donhangM.md_doitackinhdoanh_id;
+            var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == md_doitackinhdoanh_id).FirstOrDefault();
 
             c_packinginvoice p = new c_packinginvoice();
             p.c_packinginvoice_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddhhmmss"));
@@ -55,7 +59,7 @@ public class TaoPackingListController : IHttpHandler {
             p.giatri_tru = decimal.Parse(txtGiaTriTruLai);
             p.md_trangthai_id = "SOANTHAO";
             p.thanhtoanxong = false;
-            p.discount = UserUtils.getDiscountgPO(db.c_donhangs.FirstOrDefault(dh => dh.c_donhang_id.Equals(c_donhang_id)), null);
+            p.discount = UserUtils.getDiscountgPO(donhangM, null);
             p.totaldis = totalnet * p.discount / 100;
             p.ngay_phaitt = DateTime.Now;
 
@@ -65,6 +69,24 @@ public class TaoPackingListController : IHttpHandler {
             p.ngaycapnhat = DateTime.Now;
             p.hoatdong = true;
             p.noidi = md_cangbien_id;
+
+            var hoadon = new c_hoadon();
+            hoadon.c_hoadon_id = Helper.getNewId();
+            hoadon.sophieu = jqGridHelper.Utils.taoChungTuHoaDon(db);
+            hoadon.c_packinginvoice_id = p.c_packinginvoice_id;
+            hoadon.sotokhai_inv = p.so_pkl;
+            hoadon.so_inv = p.so_inv;
+            hoadon.md_doitackinhdoanh_id = donhangM.md_doitackinhdoanh_id;
+            hoadon.ma_khachhang = dtkd == null ? "" : dtkd.ma_dtkd;
+            hoadon.ten_khachhang = dtkd == null ? "" : dtkd.ten_dtkd;
+            hoadon.diachi_khachhang = dtkd == null ? "" : dtkd.diachi;
+            hoadon.email_khachhang = dtkd == null ? "" : dtkd.email;
+            hoadon.thue_vat = 0;
+            hoadon.tienthue = 0;
+            hoadon.hinhthucthanhtoan = "CK/TM";
+            hoadon.tygia = 23060;
+            hoadon.ngayhoadon = p.ngay_motokhai;
+            hoadon.ngayphathanh = p.ngay_motokhai;
 
             double discountHH = 0;
             var lstHH = new List<Dictionary<string, object>>();
@@ -93,9 +115,9 @@ public class TaoPackingListController : IHttpHandler {
                 line.gia = dongnx.dongia;
 
                 line.thanhtien = dongnx.slthuc_nhapxuat * dongnx.dongia;
-                
+
                 //discountHH += (double)line.thanhtien.GetValueOrDefault(0) * discountHH_DH / 100;
-                
+
                 var discountPO = UserUtils.getDiscountgPO(donhang, null, 0);
                 var discountHH_DH = (double)UserUtils.getDiscountgPO(donhang, dongdonhang, 1);
 
@@ -115,7 +137,7 @@ public class TaoPackingListController : IHttpHandler {
                 line.c_nhapxuat_id = dongnx.c_nhapxuat_id;
                 line.c_danhsachdathang_id = c_danhsachdathang_id;
 
-                
+
                 //totaldiscount += Math.Round((line.thanhtien.Value * discountPO) / 100, 2);
                 totalnet += line.thanhtien.Value;
 
@@ -126,6 +148,31 @@ public class TaoPackingListController : IHttpHandler {
                 line.ngaycapnhat = DateTime.Now;
                 line.hoatdong = true;
                 lst.Add(line);
+
+                var sp = db.md_sanphams.Where(s => s.md_sanpham_id == line.md_sanpham_id).FirstOrDefault();
+                var chucnang = db.md_chucnangs.Where(s => s.md_chucnang_id == sp.md_chucnang_id).FirstOrDefault();
+                var chungloai = db.md_chungloais.Where(s => s.md_chungloai_id == sp.md_chungloai_id).FirstOrDefault();
+                var dvt = db.md_donvitinhsanphams.Where(s=>s.md_donvitinhsanpham_id == sp.md_donvitinhsanpham_id).FirstOrDefault();
+                var dongHoaDon = new c_hoadon_ct();
+                dongHoaDon.c_hoadon_ct_id = Helper.getNewId();
+                dongHoaDon.c_hoadon_id = hoadon.c_hoadon_id;
+                dongHoaDon.sothutu = sothutu;
+                dongHoaDon.md_sanpham_id = line.md_sanpham_id;
+                dongHoaDon.ma_sanpham = sp.ma_sanpham;
+                dongHoaDon.ten_sanpham = chucnang.ten_tv + " " + chungloai.tv_ngan;
+                dongHoaDon.ten_dvt = dvt.ten_dvt;
+                dongHoaDon.soluong = line.soluong;
+                dongHoaDon.dongia = line.gia;
+                dongHoaDon.thanhtien = dongHoaDon.dongia * dongHoaDon.soluong;
+                var bocai = sp.ma_sanpham.Substring(9, 2);
+                if (dvt.ma_edi == "BO")
+                {
+                    if (!new char[] { 'F', 'G' }.Contains(bocai[0]))
+                        dongHoaDon.ten_dvt = dongHoaDon.ten_dvt + " " + bocai[1];
+                }
+
+                lstHD.Add(dongHoaDon);
+
                 sothutu += 10;
             }
 
@@ -221,6 +268,9 @@ public class TaoPackingListController : IHttpHandler {
             p.phantramhoahong = phantramhh;
             p.hoahongdatra = 0;
 
+            hoadon.phicong = p.giatri_cong;
+            hoadon.phitru = p.giatri_tru;
+
             try
             {
                 int check = (from inv in db.c_packinginvoices
@@ -230,7 +280,8 @@ public class TaoPackingListController : IHttpHandler {
                 {
                     db.c_dongpklinvs.InsertAllOnSubmit(lst);
                     db.c_packinginvoices.InsertOnSubmit(p);
-
+                    //db.c_hoadons.InsertOnSubmit(hoadon);
+                    db.c_hoadons.InsertOnSubmit(hoadon);
                     db.SubmitChanges();
 
                     var pk = db.c_packinginvoices.FirstOrDefault(pkl => pkl.c_packinginvoice_id.Equals(p.c_packinginvoice_id));

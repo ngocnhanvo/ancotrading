@@ -148,6 +148,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , hidden: true
             },
             {
                  fixed: true, name: 'phitru'
@@ -156,6 +157,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , hidden: true
             },
             {
                  fixed: true, name: 'tuongduongUSD'
