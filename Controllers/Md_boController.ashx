@@ -155,7 +155,7 @@ public class Md_boController : IHttpHandler
                     bc.ngaycapnhat,
                     bc.nguoicapnhat,
                     bc.mota,
-                    bc.hoatdong
+                    bc.hoatdong,
                     ROW_NUMBER() OVER ({0}) as RowNum
                 FROM md_bo bc WHERE 1=1 {1}
             ) P 
