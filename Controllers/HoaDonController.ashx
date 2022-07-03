@@ -257,11 +257,14 @@ public class HoaDonController : IHttpHandler
             {
                 if (column.DataType == System.Type.GetType("System.DateTime"))
                 {
-                    var date = row[column.ColumnName];
-                    if(object.ReferenceEquals(null, date))
+                    try
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)row[column.ColumnName]).ToString("dd/MM/yyyy"));
+                    }
+                    catch
+                    {
                         xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
-                    else
-                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)date).ToString("dd/MM/yyyy"));
+                    }
                 }
                 else
                     xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
