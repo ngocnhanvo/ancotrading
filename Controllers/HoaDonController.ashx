@@ -67,7 +67,7 @@ public class HoaDonController : IHttpHandler
                 hoadon.thue_vat = decimal.Parse(context.Request.Form["thue_vat"]);
                 hoadon.tienthue = Math.Round(tongTien.GetValueOrDefault(0) * hoadon.thue_vat.GetValueOrDefault(0) / 100, 0, MidpointRounding.AwayFromZero);
                 hoadon.hinhthucthanhtoan = context.Request.Form["hinhthucthanhtoan"];
-                hoadon.tygia = decimal.Parse(context.Request.Form["tygia"]); 
+                hoadon.tygia = decimal.Parse(context.Request.Form["tygia"]);
                 hoadon.ten_khachhang = context.Request.Form["ten_khachhang"];
                 hoadon.diachi_khachhang = context.Request.Form["diachi_khachhang"];
                 hoadon.email_khachhang = context.Request.Form["email_khachhang"];
@@ -255,8 +255,14 @@ public class HoaDonController : IHttpHandler
             xml += "<row>";
             foreach (System.Data.DataColumn column in dt.Columns)
             {
-                if(column.DataType == System.Type.GetType("System.DateTime"))
-                    xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)row[column.ColumnName]).ToString("dd/MM/yyyy"));
+                if (column.DataType == System.Type.GetType("System.DateTime"))
+                {
+                    var date = (DateTime?)row[column.ColumnName];
+                    if(date == null)
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
+                    else
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", date.Value.ToString("dd/MM/yyyy"));
+                }
                 else
                     xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
             }
