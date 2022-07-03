@@ -290,7 +290,7 @@ public class TaoPackingListController : IHttpHandler {
                 {
                     db.c_dongpklinvs.InsertAllOnSubmit(lst);
                     db.c_packinginvoices.InsertOnSubmit(p);
-                    //db.c_hoadons.InsertOnSubmit(hoadon);
+                    db.c_hoadon_cts.InsertAllOnSubmit(lstHD);
                     db.c_hoadons.InsertOnSubmit(hoadon);
                     db.SubmitChanges();
 
