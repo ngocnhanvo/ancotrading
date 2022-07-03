@@ -71,7 +71,7 @@
                  , label: 'Số phiếu'
                  , index: 'sophieu'
                  , editable: true
-                 , width: 40
+                 , width: 60
                  , edittype: 'text'
                  , editoptions: { readonly:'readonly' }
             },
