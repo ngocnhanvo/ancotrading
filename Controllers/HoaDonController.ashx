@@ -44,7 +44,7 @@ public class HoaDonController : IHttpHandler
 
     public void getSelectOption(HttpContext context)
     {
-        String sql = "select tiento, tiento from c_hoadontiento where hoatdong = 1 order by tiento";
+        String sql = "select tiento as id, tiento as name from c_hoadontiento where hoatdong = 1 order by tiento";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }

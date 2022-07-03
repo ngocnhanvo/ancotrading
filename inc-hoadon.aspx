@@ -317,7 +317,6 @@
                 , editable:true
                 , edittype: 'checkbox'
                 , editoptions:{ defaultValue: 'True' }
-                , editrules:{ edithidden : true }
             }
             ]"
             GridComplete = "let o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
