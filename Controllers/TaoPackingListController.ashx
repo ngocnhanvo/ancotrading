@@ -172,9 +172,8 @@ public class TaoPackingListController : IHttpHandler {
                 var bocai = sp.ma_sanpham.Substring(9, 2);
                 if (dvt.ma_edi == "set")
                 {
-                    dongHoaDon.ten_dvt = "Bộ";
-                    if (!new char[] { 'F', 'G' }.Contains(bocai[0]))
-                        dongHoaDon.ten_dvt = dongHoaDon.ten_dvt + " " + bocai[1];
+                    var ten_bo = db.md_bos.Where(s => s.ma_bo == bocai & s.ten_bo != null).Select(s=>s.ten_bo).FirstOrDefault();
+                    dongHoaDon.ten_dvt = ten_bo;
                 }
                 else
                     dongHoaDon.ten_dvt = "Cái";

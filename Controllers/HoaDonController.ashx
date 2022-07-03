@@ -100,14 +100,14 @@ public class HoaDonController : IHttpHandler
             var hoadon = db.c_hoadons.Where(s => s.c_hoadon_id == id).FirstOrDefault();
             if (hoadon == null)
                 msg = "Không tìm thấy đối tượng cần xóa";
-            else if (hoadon.md_trangthai_id == "HIEULUC")
+            else if (hoadon.md_trangthai_id != "SOANTHAO")
                 msg = "Hóa đơn đã hiệu lực";
             else
             {
                 var inv = db.c_packinginvoices.Where(s => s.c_packinginvoice_id == hoadon.c_packinginvoice_id).FirstOrDefault();
                 if(inv != null)
                 {
-                    if(inv.md_trangthai_id == "HIEULUC")
+                    if(inv.md_trangthai_id != "SOANTHAO")
                         msg = "INV liên kết với hóa đơn đã hiệu lực";
                     else
                     {
