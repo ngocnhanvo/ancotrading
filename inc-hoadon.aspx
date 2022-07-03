@@ -63,6 +63,7 @@
                  , index: 'tiento'
                  , editable: true
                  , width: 40
+                 , align: 'center'
                  , edittype: 'select'
                  , editoptions: { dataUrl: 'Controllers/HoaDonController.ashx?action=getoption' }
             },
@@ -72,6 +73,7 @@
                  , index: 'sophieu'
                  , editable: true
                  , width: 60
+                 , align: 'center'
                  , edittype: 'text'
                  , editoptions: { readonly:'readonly' }
             },
@@ -113,7 +115,8 @@
                  , label: 'Hình thức TT'
                  , index: 'hinhthucthanhtoan'
                  , editable: true
-                 , width: 100
+                 , width: 90
+                 , align: 'center'
                  , edittype: 'select'
                  , editoptions: { value:'CK:CK;TM:TM;CK/TM:CK/TM' }
             },
@@ -122,8 +125,11 @@
                  , label: 'VAT'
                  , index: 'thue_vat'
                  , editable: true
-                 , width: 100
+                 , width: 90
                  , edittype: 'text'
+                 , align: 'right'
+                 , formatter:'currency'
+                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 'auto', prefix: ''}
             },
             {
                  fixed: true, name: 'tienthue'
@@ -132,6 +138,9 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , align: 'right'
+                 , formatter:'currency'
+                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 'auto', prefix: ''}
             },
             {
                  fixed: true, name: 'tygia'
@@ -140,24 +149,31 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , align: 'right'
+                 , formatter:'currency'
+                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 'auto', prefix: ''}
             },
             {
-                 fixed: true, name: 'phicong'
+                 fixed: true, name: 'giamgia'
                  , label: 'Phí cộng'
                  , index: 'phicong'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
-                 , hidden: true
+                 , align: 'right'
+                 , formatter:'currency'
+                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 'auto', prefix: ''}
             },
             {
-                 fixed: true, name: 'phitru'
+                 fixed: true, name: 'philamhang'
                  , label: 'Phí trừ'
                  , index: 'phitru'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
-                 , hidden: true
+                 , align: 'right'
+                 , formatter:'currency'
+                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 'auto', prefix: ''}
             },
             {
                  fixed: true, name: 'tuongduongUSD'
@@ -166,6 +182,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , align: 'right'
             },
             {
                  fixed: true, name: 'ngayhoadon'
@@ -174,6 +191,8 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , align: 'center'
+                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
             },
             {
                  fixed: true, name: 'mauso'
@@ -182,6 +201,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , align: 'center'
             },
             {
                  fixed: true, name: 'kyhieu'
@@ -190,6 +210,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , align: 'center'
             },
             {
                  fixed: true, name: 'sohoadon'
@@ -198,6 +219,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , align: 'center'
             },
             {
                  fixed: true, name: 'ngayphathanh'
@@ -206,6 +228,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , align: 'center'
                  , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
             },
             {
@@ -226,7 +249,7 @@
             },
             {
                  fixed: true, name: 'sotokhai_inv'
-                 , label: 'Số tờ khai INV'
+                 , label: 'Số tờ khai HQ'
                  , index: 'sotokhai_inv'
                  , editable: true
                  , width: 100
@@ -430,7 +453,7 @@
                 , editoptions: { readonly:'readonly' }
                 , align:'right'
                 , formatter:'currency'
-                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 'auto', prefix: ''}
             },
             {
                 fixed: true, name: 'thanhtien'
@@ -442,7 +465,7 @@
                 , editoptions: { readonly:'readonly' }
                 , align:'right'
                 , formatter:'currency'
-                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 'auto', prefix: ''}
             },
             {
                 fixed: true, name: 'ngaytao'
