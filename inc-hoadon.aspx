@@ -52,7 +52,7 @@
                  , label: 'Trạng thái'
                  , index: 'nx.md_trangthai_id'
                  , editable: false
-                 , width: 100
+                 , width: 60
                  , edittype: 'text'
                  , align: 'center'
                  , formatter:'imagestatus'
@@ -147,7 +147,7 @@
                  , label: 'Tỷ giá'
                  , index: 'tygia'
                  , editable: true
-                 , width: 100
+                 , width: 60
                  , edittype: 'text'
                  , align: 'right'
                  , formatter:'currency'
@@ -155,10 +155,10 @@
             },
             {
                  fixed: true, name: 'giamgia'
-                 , label: 'Phí cộng'
-                 , index: 'phicong'
+                 , label: 'Giảm giá'
+                 , index: 'giamgia'
                  , editable: true
-                 , width: 100
+                 , width: 80
                  , edittype: 'text'
                  , align: 'right'
                  , formatter:'currency'
@@ -166,10 +166,10 @@
             },
             {
                  fixed: true, name: 'philamhang'
-                 , label: 'Phí trừ'
-                 , index: 'phitru'
+                 , label: 'Phí làm hàng'
+                 , index: 'philamhang'
                  , editable: true
-                 , width: 100
+                 , width: 80
                  , edittype: 'text'
                  , align: 'right'
                  , formatter:'currency'
@@ -180,7 +180,7 @@
                  , label: 'Tương đương USD'
                  , index: 'tuongduongUSD'
                  , editable: true
-                 , width: 100
+                 , width: 110
                  , edittype: 'text'
                  , align: 'right'
             },

@@ -74,7 +74,7 @@ public class TaoPackingListController : IHttpHandler {
             hoadon.c_hoadon_id = Helper.getNewId();
             hoadon.sophieu = jqGridHelper.Utils.taoChungTuHoaDon(db);
             hoadon.c_packinginvoice_id = p.c_packinginvoice_id;
-            hoadon.sotokhai_inv = p.so_pkl;
+            hoadon.sotokhai_inv = "";
             hoadon.so_inv = p.so_inv;
             hoadon.md_doitackinhdoanh_id = donhangM.md_doitackinhdoanh_id;
             hoadon.ma_khachhang = dtkd == null ? "" : dtkd.ma_dtkd;
