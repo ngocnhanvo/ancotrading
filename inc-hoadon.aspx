@@ -62,7 +62,7 @@
                  , label: 'Tiền tố'
                  , index: 'tiento'
                  , editable: true
-                 , width: 100
+                 , width: 40
                  , edittype: 'select'
                  , editoptions: { dataUrl: 'Controllers/HoaDonController.ashx?action=getoption' }
             },
@@ -71,7 +71,7 @@
                  , label: 'Số phiếu'
                  , index: 'sophieu'
                  , editable: true
-                 , width: 100
+                 , width: 40
                  , edittype: 'text'
                  , editoptions: { readonly:'readonly' }
             },
