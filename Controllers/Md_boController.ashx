@@ -61,10 +61,10 @@ public class Md_boController : IHttpHandler
         mnu.ma_bo_cha = context.Request.Form["ma_bo_cha"];
         mnu.ten_bo = context.Request.Form["ten_bo"];
 		mnu.mota = context.Request.Form["mota"];
-		mnu.hoatdong = true;
-		mnu.ngaytao = DateTime.Now;
+		//mnu.hoatdong = true;
+		//mnu.ngaytao = DateTime.Now;
 		mnu.ngaycapnhat = DateTime.Now;
-		mnu.nguoitao = UserUtils.getUser(context);
+		//mnu.nguoitao = UserUtils.getUser(context);
 		mnu.nguoicapnhat = UserUtils.getUser(context);
         
         db.SubmitChanges();
