@@ -187,6 +187,7 @@ public class HoaDonChiTietController : IHttpHandler
             xml += "</row>";
         }
         xml += "</rows>";
+        context.Response.Write(xml);
     }
 
     public bool IsReusable
