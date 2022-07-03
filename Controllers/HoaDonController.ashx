@@ -44,7 +44,7 @@ public class HoaDonController : IHttpHandler
 
     public void getSelectOption(HttpContext context)
     {
-        String sql = "select tiento, tiento from c_hoadontiento where hoatdong = 1";
+        String sql = "select tiento, tiento from c_hoadontiento where hoatdong = 1 order by tiento";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
@@ -62,7 +62,7 @@ public class HoaDonController : IHttpHandler
             {
                 var cthds = db.c_hoadon_cts.Where(s => s.c_hoadon_id == hoadon.c_hoadon_id).ToList();
                 var tongTien = cthds.Sum(s => s.dongia * s.soluong);
-                hoadon.md_trangthai_id = context.Request.Form["md_trangthai_id"];
+                //hoadon.md_trangthai_id = context.Request.Form["md_trangthai_id"];
                 hoadon.tiento = context.Request.Form["tiento"];
                 hoadon.thue_vat = decimal.Parse(context.Request.Form["thue_vat"]);
                 hoadon.tienthue = Math.Round(tongTien.GetValueOrDefault(0) * hoadon.thue_vat.GetValueOrDefault(0) / 100, 0, MidpointRounding.AwayFromZero);

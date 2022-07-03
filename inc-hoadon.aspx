@@ -163,6 +163,7 @@
                  , align: 'right'
                  , formatter:'currency'
                  , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 'auto', prefix: ''}
+                 , editoptions: { readonly:'readonly' }
             },
             {
                  fixed: true, name: 'philamhang'
@@ -174,6 +175,7 @@
                  , align: 'right'
                  , formatter:'currency'
                  , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 'auto', prefix: ''}
+                 , editoptions: { readonly:'readonly' }
             },
             {
                  fixed: true, name: 'tuongduongUSD'
@@ -183,6 +185,7 @@
                  , width: 110
                  , edittype: 'text'
                  , align: 'right'
+                 , editoptions: { readonly:'readonly' }
             },
             {
                  fixed: true, name: 'ngayhoadon'
@@ -193,6 +196,7 @@
                  , edittype: 'text'
                  , align: 'center'
                  , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+                 , editoptions: { readonly:'readonly' }
             },
             {
                  fixed: true, name: 'mauso'
@@ -230,6 +234,7 @@
                  , edittype: 'text'
                  , align: 'center'
                  , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+                 , editoptions: { readonly:'readonly' }
             },
             {
                  fixed: true, name: 'ghichu'
@@ -246,6 +251,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , editoptions: { readonly:'readonly' }
             },
             {
                  fixed: true, name: 'sotokhai_inv'
@@ -523,7 +529,6 @@
                 , editable:true
                 , edittype: 'checkbox'
                 , editoptions:{ defaultValue: 'True' }
-                , editrules:{ edithidden : true }
             }
             ]"
             GridComplete = "let o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
