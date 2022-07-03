@@ -268,6 +268,10 @@ public class TaoPackingListController : IHttpHandler {
             p.phantramhoahong = phantramhh;
             p.hoahongdatra = 0;
 
+            hoadon.tuongduongUSD = p.totalgross;
+            hoadon.tuongduongVND = p.totalgross * hoadon.tygia;
+            hoadon.giamgia = p.totaldis + p.giatri_tru + p.giatritru_po;
+            hoadon.philamhang = p.handling_fee + p.giatri_cong + p.giatricong_po;
             hoadon.phicong = p.giatri_cong;
             hoadon.phitru = p.giatri_tru;
 
