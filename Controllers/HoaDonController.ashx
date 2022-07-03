@@ -261,7 +261,7 @@ public class HoaDonController : IHttpHandler
                     if(date == null)
                         xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
                     else
-                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", (DateTime)date.ToString("dd/MM/yyyy"));
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)date).ToString("dd/MM/yyyy"));
                 }
                 else
                     xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
