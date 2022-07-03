@@ -35,7 +35,7 @@
                 fixed: true, name: 'tiento'
                 , label: 'Tiền tố'
                 , index: 'hd.tiento'
-                , width: 110
+                , width: 60
                 , edittype: 'text'
                 , editable:true
                 , align: 'center'
@@ -43,12 +43,12 @@
             },
             {
                 fixed: true, name: 'ten_tiento'
-                , label: 'Tiền tố'
+                , label: 'Tên tiền tố'
                 , index: 'hd.ten_tiento'
-                , width: 110
+                , width: 200
                 , edittype: 'text'
                 , editable:true
-                , align: 'center'
+                , align: 'left'
             },
             {
                 fixed: true, name: 'ngaytao'
@@ -90,7 +90,7 @@
                 fixed: true, name: 'mota'
                 , label: 'Ghi Chú'
                 , index: 'hd.mota'
-                , width: 100
+                , width: 200
                 , editable:true
                 , edittype: 'textarea'
             },
