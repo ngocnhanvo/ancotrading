@@ -68,8 +68,7 @@ public class HoaDonChiTietController : IHttpHandler
     {
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
-        bool isadmin = db.nhanviens.FirstOrDefault(p => p.manv.Equals(UserUtils.getUser(context))).isadmin.Value;
-
+        String whId = context.Request.QueryString["whId"];
         //// filter
         String filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
@@ -80,24 +79,11 @@ public class HoaDonChiTietController : IHttpHandler
             filter = f.ToScript();
         }
 
-        // phân quyền theo nhóm
-        String manv = UserUtils.getUser(context);
-        String strAccount = "";
-        System.Collections.Generic.List<String> lstAccount = LinqUtils.GetUserListInGroup(manv);
-        foreach (String item in lstAccount)
-        {
-            strAccount += String.Format(", '{0}'", item);
-        }
-        strAccount = String.Format("'{0}'{1}", manv, strAccount);
-
-
         String sqlCount = string.Format(@"
             SELECT COUNT(1) AS count
-			FROM c_hoadon hd
-            WHERE 1 = 1 {0}
-            ", filter);
-
-        sqlCount = String.Format(sqlCount, isadmin == true ? "" : " AND nx.nguoitao IN(" + strAccount + ") ");
+			FROM c_hoadon_ct hd
+            WHERE 1 = 1 and hd.c_hoadon_id = N'{0}' {1}
+            ", whId, filter);
 
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
@@ -122,7 +108,7 @@ public class HoaDonChiTietController : IHttpHandler
 
         if (sidx.Equals("") || sidx == null)
         {
-            sidx = "nx.c_nhapxuat_id";
+            sidx = "hd.c_hoadon_ct_id";
         }
 
         string strsql = string.Format(@"
@@ -149,15 +135,15 @@ public class HoaDonChiTietController : IHttpHandler
                     c_hoadon_ct hd
                 WHERE 
                     1=1
-                    {2}
+                    and hd.c_hoadon_id = N'{2}'
+                    {3}
             )P 
             where RowNum > @start AND RowNum < @end",
             sidx,
             sord,
+            whId,
             filter
         );
-
-        strsql = String.Format(strsql, isadmin == true ? "" : "AND nx.nguoitao IN(" + strAccount + ") ");
 
         var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";

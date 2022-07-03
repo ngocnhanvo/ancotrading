@@ -360,7 +360,7 @@
 									}
 								});
 							
-				                $('#grid_ds_chitiethoadon').jqGrid('setGridParam',{url:'Controllers/DongNhapXuatController.ashx?&whId='+ids,page:1});
+				                $('#grid_ds_chitiethoadon').jqGrid('setGridParam',{url:'Controllers/HoaDonChiTietController.ashx?&whId='+ids,page:1});
 				                $('#grid_ds_chitiethoadon').jqGrid().trigger('reloadGrid');
 				            } 
 				        } else {
@@ -386,7 +386,7 @@
 			Caption = "Chi Tiết Hóa Đơn"
             SortName="hd.ma_sanpham" 
             SortOrder="asc"
-            UrlFileAction="Controllers/HoaDonChiTietController.ashx" 
+            UrlFileAction="Controllers/HoaDonChiTietController.ashx?&whId=0" 
             RowNumbers="true"
             FilterToolbar="true"
             OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid); }"
