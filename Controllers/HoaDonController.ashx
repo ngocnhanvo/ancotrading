@@ -116,8 +116,8 @@ public class HoaDonController : IHttpHandler
 
                         db.c_hoadons.DeleteOnSubmit(hoadon);
                         db.c_hoadon_cts.DeleteAllOnSubmit(dongHDs);
-                        db.c_packinginvoices.DeleteOnSubmit(inv);
-                        db.c_dongpklinvs.DeleteAllOnSubmit(dongINVs);
+                        //db.c_packinginvoices.DeleteOnSubmit(inv);
+                        //db.c_dongpklinvs.DeleteAllOnSubmit(dongINVs);
                         db.SubmitChanges();
                     }
                 }
