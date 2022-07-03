@@ -26,7 +26,7 @@
 				$('#edit_grid_ds_md_bo').click();
             }"
             ColNames="[
-					'md_bo_id', 'Mã bộ', 'Thuộc bộ', 'Ngày Tạo'
+					'md_bo_id', 'Mã bộ', 'Thuộc bộ', 'Tên bộ', 'Ngày Tạo'
                     , 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật'
                     , 'Mô tả', 'Hoạt động', 'Ghi chú'
 			]"
@@ -66,6 +66,14 @@
                  fixed: true, name: 'ma_bo_cha'
                  , index: 'ma_bo_cha'
 				 , label: 'Thuộc bộ'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'ten_bo'
+                 , index: 'ten_bo'
+				 , label: 'Tên bộ'
                  , editable: true
                  , width: 100
                  , edittype: 'text'

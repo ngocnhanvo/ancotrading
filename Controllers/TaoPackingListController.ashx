@@ -166,16 +166,18 @@ public class TaoPackingListController : IHttpHandler {
                 dongHoaDon.md_sanpham_id = line.md_sanpham_id;
                 dongHoaDon.ma_sanpham = sp.ma_sanpham;
                 dongHoaDon.ten_sanpham = chucnang.ten_tv + " " + chungloai.tv_ngan;
-                dongHoaDon.ten_dvt = dvt.ten_dvt;
                 dongHoaDon.soluong = line.soluong;
                 dongHoaDon.dongia = line.gia;
                 dongHoaDon.thanhtien = dongHoaDon.dongia * dongHoaDon.soluong;
                 var bocai = sp.ma_sanpham.Substring(9, 2);
-                if (dvt.ma_edi == "BO")
+                if (dvt.ma_edi == "set")
                 {
+                    dongHoaDon.ten_dvt = "Bộ";
                     if (!new char[] { 'F', 'G' }.Contains(bocai[0]))
                         dongHoaDon.ten_dvt = dongHoaDon.ten_dvt + " " + bocai[1];
                 }
+                else
+                    dongHoaDon.ten_dvt = "Cái";
 
                 lstHD.Add(dongHoaDon);
 

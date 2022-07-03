@@ -58,7 +58,8 @@ public class Md_boController : IHttpHandler
         String id = context.Request.Form["id"];
         md_bo mnu = db.md_bos.FirstOrDefault(s=>s.md_bo_id == id);
         mnu.ma_bo = context.Request.Form["ma_bo"];
-        mnu.ma_bo_cha = context.Request.Form["ma_bo_cha"];   
+        mnu.ma_bo_cha = context.Request.Form["ma_bo_cha"];
+        mnu.ten_bo = context.Request.Form["ten_bo"];
 		mnu.mota = context.Request.Form["mota"];
 		mnu.hoatdong = true;
 		mnu.ngaytao = DateTime.Now;
@@ -75,7 +76,7 @@ public class Md_boController : IHttpHandler
         mnu.md_bo_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss"));
         mnu.ma_bo = context.Request.Form["ma_bo"];
         mnu.ma_bo_cha = context.Request.Form["ma_bo_cha"];
-            
+        mnu.ten_bo = context.Request.Form["ten_bo"];
 		mnu.mota = context.Request.Form["mota"];
 		mnu.hoatdong = true;
 		mnu.ngaytao = DateTime.Now;
@@ -141,13 +142,27 @@ public class Md_boController : IHttpHandler
             sidx = "bc.md_bo_id";
         }
 
-        string strsql = "select * from( " +
-            " select bc.* " +
-            " , ROW_NUMBER() OVER (" + orderby + ") as RowNum " +
-            " FROM md_bo bc WHERE 1=1 {0} " +
-            " )P where RowNum > @start AND RowNum < @end";
-        strsql = string.Format(strsql, filter);
-        System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
+        string strsql = @"
+            select * 
+            from (
+                select 
+                    bc.md_bo_id, 
+                    bc.ma_bo,
+                    bc.ma_bo_cha,
+                    bc.ten_bo,
+                    bc.ngaytao,
+                    bc.nguoitao,
+                    bc.ngaycapnhat,
+                    bc.nguoicapnhat,
+                    bc.mota,
+                    bc.hoatdong
+                    ROW_NUMBER() OVER ({0}) as RowNum
+                FROM md_bo bc WHERE 1=1 {1}
+            ) P 
+            where RowNum > @start AND RowNum < @end";
+        strsql = string.Format(strsql, orderby, filter);
+
+        var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
         xml += "<page>" + page + "</page>";
@@ -156,15 +171,22 @@ public class Md_boController : IHttpHandler
         foreach (System.Data.DataRow row in dt.Rows)
         {
             xml += "<row>";
-            xml += "<cell><![CDATA[" + row[0] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[1] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[2] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[4].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[5] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[6].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[7] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[9] + "]]></cell>";
+            foreach (System.Data.DataColumn column in dt.Columns)
+            {
+                if (column.DataType == System.Type.GetType("System.DateTime"))
+                {
+                    try
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)row[column.ColumnName]).ToString("dd/MM/yyyy"));
+                    }
+                    catch
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
+                    }
+                }
+                else
+                    xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
+            }
             xml += "</row>";
         }
         xml += "</rows>";
