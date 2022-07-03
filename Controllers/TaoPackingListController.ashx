@@ -87,6 +87,11 @@ public class TaoPackingListController : IHttpHandler {
             hoadon.tygia = 23060;
             hoadon.ngayhoadon = p.ngay_motokhai;
             hoadon.ngayphathanh = p.ngay_motokhai;
+            hoadon.nguoitao = p.nguoitao;
+            hoadon.nguoicapnhat = p.nguoicapnhat;
+            hoadon.ngaytao = DateTime.Now;
+            hoadon.ngaycapnhat = DateTime.Now;
+            hoadon.hoatdong = true;
 
             double discountHH = 0;
             var lstHH = new List<Dictionary<string, object>>();
@@ -274,7 +279,7 @@ public class TaoPackingListController : IHttpHandler {
             hoadon.philamhang = p.handling_fee + p.giatri_cong + p.giatricong_po;
             hoadon.phicong = p.giatri_cong;
             hoadon.phitru = p.giatri_tru;
-
+            
             try
             {
                 int check = (from inv in db.c_packinginvoices
