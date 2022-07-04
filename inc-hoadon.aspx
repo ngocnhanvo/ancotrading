@@ -21,7 +21,7 @@
         })
     });
 
-    function funcActiveHoaDon() {
+    function activeHoaDon() {
         let msg = "";
         let id = $('#grid_ds_hoadon').jqGrid('getGridParam', 'selrow');
 
@@ -153,7 +153,7 @@
 <uc1:jqGrid  ID="grid_ds_hoadon"
             Caption="Hóa đơn" 
             SortName="hd.ngaytao"
-            FuncActiveHoaDon="funcActiveHoaDon"
+            FuncActiveHoaDon="activeHoaDon"
             BtnPrint="printHoaDon"
             UrlFileAction="Controllers/HoaDonController.ashx"
             RowNumbers="true"
