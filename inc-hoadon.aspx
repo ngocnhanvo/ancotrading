@@ -59,10 +59,10 @@
                                 $("#btn-close").button("enable");
 
                                 if (result.startsWith('0')) {
-                                    result = `<div style='color:red'>${result.substr(1)}</div>`;
+                                    result = `<div style='color:red'>${result.substr(2)}</div>`;
                                 }
                                 else if (result.startsWith('1')) {
-                                    result = `<div style='color:blue'>${result.substr(1)}</div>`;
+                                    result = `<div style='color:blue'>${result.substr(2)}</div>`;
                                     $('#grid_ds_hoadon').jqGrid().trigger('reloadGrid');
                                 }
                                 $('#dialog-active-hoadon').find('#dialog-caution').html(result);
