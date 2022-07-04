@@ -21,6 +21,65 @@
         })
     });
 
+    function funcActivePI() {
+        let msg = "";
+        let id = $('#grid_ds_hoadon').jqGrid('getGridParam', 'selrow');
+
+        if (id == null) {
+            alert("Bạn hãy chọn 1 hóa đơn.!");
+        } else {
+            let sochungtu = $('#grid_ds_hoadon').jqGrid('getCell', id, 'sophieu');
+            msg = "Có phải bạn muốn hiệu lực hóa đơn '" + sochungtu + "'.?";
+            var p = '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><span id="dialog-caution">' + msg + '</span></p>';
+            var h3 = '<h3 style="padding: 10px" class="ui-state-highlight ui-corner-all">' + p + '<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div></h3>';
+
+            // append dialog-taoky to body
+            $('body').append('<div title="Thông Báo" id=\"dialog-active-pi\">' + h3 + '</div>');
+
+            // create new dialog
+            $('#dialog-active-hoadon').dialog({
+                modal: true
+                , open: function(event, ui) {
+                    //hide close button.
+                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                }
+                , buttons:
+                [
+                    {
+                        id: "btn-active-hoadon",
+                        text: "Có",
+                        click: function() {
+                            $("#wait").css("display", "block");
+                            $("#btn-active").button("disable");
+                            $("#btn-close").button("disable");
+                            $.get("Controllers/HoaDonController.ashx?action=active&id=" + id, function(result) {
+                                $("#wait").css("display", "none");
+                                $("#btn-close span").text("Thoát");
+                                $("#btn-close").button("enable");
+
+                                if (result.startWiths('0')) {
+                                    result = `<div style='color:red'>${result.substr(1)}</div>`;
+                                }
+                                else if (result.startWiths('1')) {
+                                    result = `<div style='color:blue'>${result.substr(1)}</div>`;
+                                    $('#grid_ds_hoadon').jqGrid().trigger('reloadGrid');
+                                }
+                                $('#dialog-active-hoadon').find('#dialog-caution').html(result);
+                            });
+                        }
+                    },
+                    {
+                        id: "btn-close-hoadon",
+                        text: "Không",
+                        click: function() {
+                            $(this).dialog("destroy").remove();
+                        }
+                    }
+                ]
+            });
+        }
+    }
+
     function printHoaDon() {
         var piId = $('#grid_ds_hoadon').jqGrid('getGridParam', 'selrow');
         var name = 'dialog-print-hoadon';
@@ -94,6 +153,7 @@
 <uc1:jqGrid  ID="grid_ds_hoadon"
             Caption="Hóa đơn" 
             SortName="hd.ngaytao"
+            FuncActivePI="funcActiveHoaDon"
             BtnPrint="printHoaDon"
             UrlFileAction="Controllers/HoaDonController.ashx"
             RowNumbers="true"

@@ -19,6 +19,9 @@ public class HoaDonController : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
+            case "active":
+                this.active(context);
+                break;
             case "getoption":
                 this.getSelectOption(context);
                 break;
@@ -47,6 +50,32 @@ public class HoaDonController : IHttpHandler
         String sql = "select tiento as id, tiento as name from c_hoadontiento where hoatdong = 1 order by tiento";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
+    }
+
+    public void active(HttpContext context)
+    {
+        string msg = "";
+        try
+        {
+            String id = context.Request.Form["id"];
+            var hoadon = db.c_hoadons.Where(s => s.c_hoadon_id == id).FirstOrDefault();
+            if (hoadon == null)
+                msg = "Không tìm thấy đối tượng cần sửa";
+            else
+            {
+                hoadon.md_trangthai_id = "HIEULUC";
+                db.SubmitChanges();
+            }
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        if(msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Hiệu lực thành công.");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     public void edit(HttpContext context)
