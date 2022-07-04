@@ -76,6 +76,8 @@ public class HoaDonController : IHttpHandler
             msg = string.Format("1{0}.", "Hiệu lực thành công");
         else
             msg = string.Format("0{0}.", msg);
+
+        context.Response.Write(msg);
     }
 
     public void edit(HttpContext context)
