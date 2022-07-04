@@ -128,7 +128,7 @@
                             alert('Chưa chọn cách in');
                             return;
                         }
-                        if (piId != null) {
+                        if (piId == null) {
                             alert('Chưa chọn hóa đơn');
                             return;
                         }
