@@ -312,7 +312,17 @@
         });
         /* - Hieu luc PI */
         <% } else { }%>
-        
+
+        <% if(!_funcActiveHoaDon.Equals("")) { %>
+        /* Hieu luc Hóa Đơn */
+        $("#<%=ID%>").jqGrid('navButtonAdd','#<%=ID%>-pager',{
+            caption:""
+            , title:"Hiệu lực hóa đơn"
+            , buttonicon: "icon-active-qo"
+            , onClickButton : <%= _funcActiveHoaDon %>
+        });
+        /* - Hieu luc PI */
+        <% } else { }%>
         
         <% if(!_funcActivePhieuXuat.Equals("")) { %>
         /* Hieu luc Phieu Xuat */

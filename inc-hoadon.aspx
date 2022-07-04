@@ -153,7 +153,7 @@
 <uc1:jqGrid  ID="grid_ds_hoadon"
             Caption="Hóa đơn" 
             SortName="hd.ngaytao"
-            FuncActivePI="funcActiveHoaDon"
+            FuncActiveHoaDon="funcActiveHoaDon"
             BtnPrint="printHoaDon"
             UrlFileAction="Controllers/HoaDonController.ashx"
             RowNumbers="true"

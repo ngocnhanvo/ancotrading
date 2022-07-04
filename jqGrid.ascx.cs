@@ -49,6 +49,7 @@ public partial class jqGrid : System.Web.UI.UserControl
         , _funcActiveQO = ""
         , _funcActivePO = ""
         , _funcActivePI = ""
+        , _funcActiveHoaDon = ""
         , _postData = ""
         , _funcNangLuc = ""
         , _funcViewCapacity = ""
@@ -175,6 +176,12 @@ public partial class jqGrid : System.Web.UI.UserControl
     {
         get { return _funcActivePI; }
         set { _funcActivePI = value; }
+    }
+
+    public String FuncActiveHoaDon
+    {
+        get { return _funcActiveHoaDon; }
+        set { _funcActiveHoaDon = value; }
     }
 
     public String FuncTaoPKLCungKH
