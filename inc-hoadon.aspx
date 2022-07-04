@@ -21,11 +21,80 @@
         })
     });
 
+    function printHoaDon() {
+        var piId = $('#grid_ds_hoadon').jqGrid('getGridParam', 'selrow');
+        var name = 'dialog-print-hoadon';
+        var title = 'Trích xuất dữ liệu';
+        var content = `
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <input id="print_TTHD" type="radio" name="rdoPrintType" value="print_TTHD" checked="checked" />
+                        <label for="print_TTHD">In thông tin hóa đơn</label> 
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="print_HDNFOBUSD" type="radio" name="rdoPrintType" value="print_HDNFOBUSD" />
+                        <label for="print_HDNFOBUSD">In hóa đơn nhập FOB USD</label> 
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="print_HDNFOBVND" type="radio" name="rdoPrintType" value="print_HDNFOBVND" />
+                        <label for="print_HDNFOBVND">In hóa đơn nhập FOB VND</label> 
+                    </td>
+                </tr>
+            </table>
+        `;
+
+        $('body').append(`<div title="${title}" id="${name}">${content}</div>`);
+        $('#' + name).dialog({
+			width: 500,
+            modal: true
+                , open: function(event, ui) {
+                    //hide close button.
+                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                }
+                , buttons: [
+                {
+                    id: "btn-print-ok",
+                    text: "In",
+                    click: function() {
+                        var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-hoadon').val();
+                        var printURL = "PrintControllers/";
+                        var windowSize = "width=700,height=700,scrollbars=yes";
+                        if (typeof printType != 'undefined') {
+                            alert('Chưa chọn cách in');
+                            return;
+                        }
+                        if (piId != null) {
+                            alert('Chưa chọn hóa đơn');
+                            return;
+                        }
+   
+                        printURL += `More/${printType}.aspx`;
+                        let params_ = '';
+                        window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "Chiết xuất hóa đơn", windowSize);
+                    }
+                }
+                , {
+                    id: "btn-print-close",
+                    text: "Thoát",
+                    click: function() {
+                        $(this).dialog("destroy").remove();
+                    }
+                }
+                ]
+        });
+    }
+
 </script>
 <DIV class="ui-layout-north ui-widget-content" id="layout-north-hoadon">
 <uc1:jqGrid  ID="grid_ds_hoadon"
             Caption="Hóa đơn" 
             SortName="hd.ngaytao"
+            BtnPrint="printHoaDon"
             UrlFileAction="Controllers/HoaDonController.ashx"
             RowNumbers="true"
             FilterToolbar="true"

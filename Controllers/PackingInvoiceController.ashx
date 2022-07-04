@@ -623,6 +623,21 @@ public class PackingInvoiceController : IHttpHandler
             m.nguoicapnhat = UserUtils.getUser(context);
             m.ngaycapnhat = DateTime.Now;
 
+            var hoadon = db.c_hoadons.Where(s => s.c_packinginvoice_id == m.c_packinginvoice_id).FirstOrDefault();
+            if (hoadon != null)
+            {
+                hoadon.ngayhoadon = m.ngay_motokhai;
+                hoadon.ngayphathanh = m.ngay_motokhai;
+                hoadon.tuongduongUSD = m.totalgross;
+                hoadon.tuongduongVND = m.totalgross * hoadon.tygia;
+                hoadon.giamgia = m.totaldis + m.giatri_tru + m.giatritru_po;
+                hoadon.philamhang = m.handling_fee + m.giatri_cong + m.giatricong_po;
+                hoadon.phicong = m.giatri_cong;
+                hoadon.phitru = m.giatri_tru;
+                hoadon.ngaycapnhat = m.ngaycapnhat;
+                hoadon.nguoicapnhat = m.nguoicapnhat;
+            }
+
             db.SubmitChanges();
         }
     }
@@ -681,30 +696,45 @@ public class PackingInvoiceController : IHttpHandler
 
     public void del(HttpContext context)
     {
+        string msg = "";
         try
         {
             String id = context.Request.Form["id"];
-            id = id.Insert(0, "'");
-            id = id.Insert(id.Length, "'");
-            id = id.Replace(",", "','");
-            String selActive = "select count(*) as count from c_packinginvoice where md_trangthai_id = 'HIEULUC' AND c_packinginvoice_id IN(" + id + ")";
-            int counActive = (int)mdbc.ExecuteScalar(selActive);
-            if (counActive != 0)
-            {
-                jqGridHelper.Utils.writeResult(0, "Không thể xóa khi trạng thái Packing List - Invoice là hiệu lực!");
-            }
+            var inv = db.c_packinginvoices.Where(s => s.c_packinginvoice_id == id).FirstOrDefault();
+            if (inv == null)
+                msg = "Không tìm thấy đối tượng cần xóa";
+            else if (inv.md_trangthai_id != "SOANTHAO")
+                msg = "Hóa đơn đã hiệu lực";
             else
             {
-                String sql = "delete c_packinginvoice where c_packinginvoice_id IN (" + id + ")";
-                String sqlDetails = "delete c_dongpklinv where  c_packinginvoice_id IN (" + id + ")";
-                mdbc.ExcuteNonQuery(sqlDetails);
-                mdbc.ExcuteNonQuery(sql);
+                var hoadon = db.c_hoadons.Where(s => s.c_packinginvoice_id == inv.c_packinginvoice_id).FirstOrDefault();
+                if(hoadon != null)
+                {
+                    if(hoadon.md_trangthai_id != "SOANTHAO")
+                        msg = "Hóa đơn liên kết với inv đã hiệu lực";
+                    else
+                    {
+                        var dongHDs = db.c_hoadon_cts.Where(s => s.c_hoadon_id == hoadon.c_hoadon_id).ToList();
+                        var dongINVs = db.c_dongpklinvs.Where(s => s.c_packinginvoice_id == inv.c_packinginvoice_id).ToList();
+
+                        db.c_hoadons.DeleteOnSubmit(hoadon);
+                        db.c_hoadon_cts.DeleteAllOnSubmit(dongHDs);
+                        db.c_packinginvoices.DeleteOnSubmit(inv);
+                        db.c_dongpklinvs.DeleteAllOnSubmit(dongINVs);
+                        db.SubmitChanges();
+                    }
+                }
             }
         }
         catch (Exception ex)
         {
-            jqGridHelper.Utils.writeResult(0, "Lỗi:" + ex.Message);
+            msg = ex.Message;
         }
+
+        if(msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Xóa thành công.");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     public void load(HttpContext context)
