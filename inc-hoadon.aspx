@@ -33,11 +33,12 @@
             var p = '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><span id="dialog-caution">' + msg + '</span></p>';
             var h3 = '<h3 style="padding: 10px" class="ui-state-highlight ui-corner-all">' + p + '<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div></h3>';
 
+            let name = 'dialog-active-hoadon';
             // append dialog-taoky to body
-            $('body').append('<div title="Thông Báo" id=\"dialog-active-pi\">' + h3 + '</div>');
+            $('body').append(`<div title="Thông Báo" id="${name}">${h3}</div>`);
 
             // create new dialog
-            $('#dialog-active-hoadon').dialog({
+            $(`#${name}`).dialog({
                 modal: true
                 , open: function(event, ui) {
                     //hide close button.
