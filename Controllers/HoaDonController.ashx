@@ -73,9 +73,9 @@ public class HoaDonController : IHttpHandler
         }
 
         if(msg.Length <= 0)
-            jqGridHelper.Utils.writeResult(1, "Hiệu lực thành công.");
+            msg = string.Format("1{0}.", "Hiệu lực thành công");
         else
-            jqGridHelper.Utils.writeResult(0, msg);
+            msg = string.Format("0{0}.", msg);
     }
 
     public void edit(HttpContext context)
