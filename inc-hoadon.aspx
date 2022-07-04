@@ -58,10 +58,10 @@
                                 $("#btn-close span").text("Thoát");
                                 $("#btn-close").button("enable");
 
-                                if (result.startWiths('0')) {
+                                if (result.startsWith('0')) {
                                     result = `<div style='color:red'>${result.substr(1)}</div>`;
                                 }
-                                else if (result.startWiths('1')) {
+                                else if (result.startsWith('1')) {
                                     result = `<div style='color:blue'>${result.substr(1)}</div>`;
                                     $('#grid_ds_hoadon').jqGrid().trigger('reloadGrid');
                                 }
