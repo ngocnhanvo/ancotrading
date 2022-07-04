@@ -50,7 +50,7 @@
 
         $('body').append(`<div title="${title}" id="${name}">${content}</div>`);
         $('#' + name).dialog({
-			width: 500,
+			width: 300,
             modal: true
                 , open: function(event, ui) {
                     //hide close button.
@@ -64,7 +64,7 @@
                         var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-hoadon').val();
                         var printURL = "PrintControllers/";
                         var windowSize = "width=700,height=700,scrollbars=yes";
-                        if (typeof printType != 'undefined') {
+                        if (typeof printType == 'undefined') {
                             alert('Chưa chọn cách in');
                             return;
                         }
