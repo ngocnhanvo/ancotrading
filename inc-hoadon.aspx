@@ -53,7 +53,7 @@
                             $("#wait").css("display", "block");
                             $("#btn-active").button("disable");
                             $("#btn-close").button("disable");
-                            $.post("Controllers/HoaDonController.ashx?action=active&id=" + id, function(result) {
+                            $.post("Controllers/HoaDonController.ashx?action=active", {id: id}, function(result) {
                                 $("#wait").css("display", "none");
                                 $("#btn-close span").text("Thoát");
                                 $("#btn-close").button("enable");
