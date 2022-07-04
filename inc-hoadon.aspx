@@ -21,7 +21,7 @@
         })
     });
 
-    function funcActivePI() {
+    function funcActiveHoaDon() {
         let msg = "";
         let id = $('#grid_ds_hoadon').jqGrid('getGridParam', 'selrow');
 
