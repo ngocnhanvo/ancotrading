@@ -74,8 +74,9 @@ public partial class PrintControllers_More_print_HDNFOBUSD : System.Web.UI.Page
 	            hd.ngayphathanh,
 	            hd.so_inv,
 	            hd.sotokhai_inv,
-                hd.tuongduongUSD + hd.tienthue as tongtien,
+                hd.tuongduongVND + hd.tienthue as tongtien,
 	            '' as tongtien_bangchu,
+                '' as taikhoan_thanhtoan,
                 '' as ghichu,
                 hd.giamgia,
                 hd.philamhang
