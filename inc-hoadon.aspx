@@ -241,6 +241,30 @@
                  , edittype: 'text'
             },
             {
+                 fixed: true, name: 'daidien_khachhang'
+                 , label: 'Người mua hàng'
+                 , index: 'daidien_khachhang'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'sotaikhoan_khachhang'
+                 , label: 'Số tài khoản'
+                 , index: 'sotaikhoan_khachhang'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'masothue_khachhang'
+                 , label: 'MST'
+                 , index: 'masothue_khachhang'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
                  fixed: true, name: 'hinhthucthanhtoan'
                  , label: 'Hình thức TT'
                  , index: 'hinhthucthanhtoan'
