@@ -65,7 +65,9 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
 	            hd.ngayphathanh,
 	            hd.so_inv,
 	            hd.sotokhai_inv,
-	            '' as ghichu
+	            '' as ghichu,
+                hd.giamgia,
+                hd.philamhang
             from c_hoadon hd
             left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
             where hd.c_hoadon_id = @id
