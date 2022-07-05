@@ -99,6 +99,7 @@ public class HoaDonController : IHttpHandler
                 hoadon.tienthue = Math.Round(tongTien.GetValueOrDefault(0) * hoadon.thue_vat.GetValueOrDefault(0) / 100, 0, MidpointRounding.AwayFromZero);
                 hoadon.hinhthucthanhtoan = context.Request.Form["hinhthucthanhtoan"];
                 hoadon.tygia = decimal.Parse(context.Request.Form["tygia"]);
+                hoadon.tuongduongVND = hoadon.tuongduongUSD.GetValueOrDefault(0) * hoadon.tygia.GetValueOrDefault(0);
                 hoadon.ten_khachhang = context.Request.Form["ten_khachhang"];
                 hoadon.diachi_khachhang = context.Request.Form["diachi_khachhang"];
                 hoadon.email_khachhang = context.Request.Form["email_khachhang"];

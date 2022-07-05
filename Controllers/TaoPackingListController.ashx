@@ -275,10 +275,10 @@ public class TaoPackingListController : IHttpHandler {
             p.phantramhoahong = phantramhh;
             p.hoahongdatra = 0;
 
-            hoadon.tuongduongUSD = p.totalgross;
-            hoadon.tuongduongVND = p.totalgross * hoadon.tygia;
-            hoadon.giamgia = p.totaldis + p.giatri_tru + p.giatritru_po;
-            hoadon.philamhang = p.handling_fee + p.giatri_cong + p.giatricong_po;
+            hoadon.tuongduongUSD = p.totalgross.GetValueOrDefault(0);
+            hoadon.tuongduongVND = p.totalgross.GetValueOrDefault(0) * hoadon.tygia.GetValueOrDefault(0);
+            hoadon.giamgia = p.totaldis.GetValueOrDefault(0) + p.giatri_tru.GetValueOrDefault(0) + p.giatritru_po.GetValueOrDefault(0);
+            hoadon.philamhang = p.handling_fee.GetValueOrDefault(0) + p.giatri_cong.GetValueOrDefault(0) + p.giatricong_po.GetValueOrDefault(0);
             hoadon.phicong = p.giatri_cong;
             hoadon.phitru = p.giatri_tru;
 
