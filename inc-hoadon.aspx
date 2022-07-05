@@ -480,6 +480,7 @@
             ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
             EditFormOptions="
                                 beforeShowForm: function (formid) {
+                                    formid.css({'max-height': (0.7*window.innerHeight) + 'px'});
                                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                                 }
                                 , afterSubmit: function(rs, postdata) {
