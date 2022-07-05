@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -31,7 +32,12 @@ public partial class PrintControllers_More_print_HDNFOBVND : System.Web.UI.Page
 
     public void viewReport(String SqlQuery)
     {
-
+        var tbl = ((DataSet)ReportViewer1.Report.DataSource).Tables[0];
+        foreach (DataRow row in tbl.Rows)
+        {
+            var tongtien = (decimal)row["tongtien"];
+            row["tongtien_bangchu"] = MoneyToWord.ConvertMoneyToTextVND(tongtien);
+        }
     }
 
     public string CreateSql(HttpContext context)
@@ -46,12 +52,15 @@ public partial class PrintControllers_More_print_HDNFOBVND : System.Web.UI.Page
 	            hd.ten_khachhang,
 	            hd.diachi_khachhang,
 	            hd.email_khachhang,
+                hd.daidien_khachhang,
+                hd.sotaikhoan_khachhang,
+                hd.masothue_khachhang,
 	            ct.ma_sanpham,
 	            ct.ten_sanpham,
 	            ct.ten_dvt,
 	            ct.soluong,
-	            ct.dongia,
-	            ct.thanhtien,
+	            cast(ct.dongia * hd.tygia as decimal(18, 0)) as dongia,
+	            cast(ct.thanhtien * hd.tygia as decimal(18, 0)) as thanhtien,
 	            hd.thue_vat,
 	            hd.tienthue,
 	            hd.tuongduongVND,
@@ -65,9 +74,12 @@ public partial class PrintControllers_More_print_HDNFOBVND : System.Web.UI.Page
 	            hd.ngayphathanh,
 	            hd.so_inv,
 	            hd.sotokhai_inv,
-	            '' as ghichu,
-                hd.giamgia,
-                hd.philamhang
+                hd.tuongduongVND + hd.tienthue as tongtien,
+	            '' as tongtien_bangchu,
+                '' as taikhoan_thanhtoan,
+                '' as ghichu,
+                cast(hd.giamgia * hd.tygia as decimal(18, 0)) as giamgia,
+	            cast(hd.philamhang * hd.tygia as decimal(18, 0)) as philamhang
             from c_hoadon hd
             left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
             where hd.c_hoadon_id = @id
