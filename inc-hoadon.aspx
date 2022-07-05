@@ -135,7 +135,7 @@
    
                         printURL += `More/${printType}.aspx`;
                         let params_ = '';
-                        window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "Chiết xuất hóa đơn", windowSize);
+                        window.open(printURL + "?id=" + piId + params_, "Chiết xuất hóa đơn", windowSize);
                     }
                 }
                 , {
