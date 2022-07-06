@@ -159,14 +159,9 @@
             UrlFileAction="Controllers/HoaDonController.ashx"
             RowNumbers="true"
             FilterToolbar="true"
-            OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid,{ 
-                                beforeShowForm: function (formid) {
-                                    formid.closest('div.ui-jqdialog').dialogCenter(); 
-                                }
-                                , afterSubmit: function(rs, postdata) {
-                                    return showMsgDialog(rs);
-                                }
-                  }); }"
+            OndblClickRow = "function(rowid) {
+                $('#edit_grid_ds_hoadon').click();
+            }"
             ColModel = "[
             {
                 fixed: true, name: 'c_hoadon_id'
