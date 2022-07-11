@@ -33,8 +33,6 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
     public void viewReport(String SqlQuery)
     {
         var tbl = ((DataSet)ReportViewer1.Report.DataSource).Tables[0];
-        tbl.Columns.Add("giamgia", Type.GetType("Decimal"));
-        tbl.Columns.Add("philamhang", Type.GetType("Decimal"));
         foreach (DataRow row in tbl.Rows)
         {
             var giamgia = tbl.AsEnumerable().Sum(s => s.Field<decimal>("gghd"));
@@ -78,7 +76,9 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
 	            hd.sotokhai_inv,
 	            '' as ghichu,
                 hd.giamgia as gghd,
-                hd.philamhang as plhhd
+                hd.philamhang as plhhd,
+                hd.giamgia,
+                hd.philamhang,
             from c_hoadon hd
             left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
             where hd.c_hoadon_id in ('{0}')
