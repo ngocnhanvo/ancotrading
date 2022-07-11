@@ -471,7 +471,6 @@
             ]"
             GridComplete = "let o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
             Height = "170"
-            MultiSelect = "false"
             ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
             ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
             EditFormOptions="
