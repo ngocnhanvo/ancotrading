@@ -33,6 +33,8 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
     public void viewReport(String SqlQuery)
     {
         var tbl = ((DataSet)ReportViewer1.Report.DataSource).Tables[0];
+        tbl.Columns.Add("giamgia", Type.GetType("Decimal"));
+        tbl.Columns.Add("philamhang", Type.GetType("Decimal"));
         foreach (DataRow row in tbl.Rows)
         {
             var giamgia = tbl.AsEnumerable().Sum(s => s.Field<decimal>("gghd"));
