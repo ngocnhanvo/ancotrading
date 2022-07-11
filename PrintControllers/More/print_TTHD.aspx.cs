@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -31,12 +32,21 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
 
     public void viewReport(String SqlQuery)
     {
+        var tbl = ((DataSet)ReportViewer1.Report.DataSource).Tables[0];
+        foreach (DataRow row in tbl.Rows)
+        {
+            var giamgia = tbl.AsEnumerable().Sum(s => s.Field<decimal>("gghd"));
+            row["giamgia"] = giamgia;
 
+            var philamhang = tbl.AsEnumerable().Sum(s => s.Field<decimal>("plhhd"));
+            row["philamhang"] = philamhang;
+        }
     }
 
     public string CreateSql(HttpContext context)
     {
         string id = context.Request.QueryString["id"];
+        var ids = id.Split(',');
 
         string sql = string.Format(@"	 
             declare @id nvarchar(32) = N'{0}'
@@ -66,13 +76,13 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
 	            hd.so_inv,
 	            hd.sotokhai_inv,
 	            '' as ghichu,
-                hd.giamgia,
-                hd.philamhang
+                hd.giamgia as gghd,
+                hd.philamhang as plhhd
             from c_hoadon hd
             left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
-            where hd.c_hoadon_id = @id
+            where hd.c_hoadon_id in ('{0}')
 		"
-        , id
+        , string.Join("','", ids)
         );
 
         //throw new ArgumentNullException(sql);
