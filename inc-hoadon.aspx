@@ -82,7 +82,7 @@
     }
 
     function printHoaDon() {
-        var piId = $('#grid_ds_hoadon').jqGrid('getGridParam', 'selrow');
+        var piId = $('#grid_ds_hoadon').jqGrid('getGridParam', 'selarrrow');
         var name = 'dialog-print-hoadon';
         var title = 'Trích xuất dữ liệu';
         var content = `
@@ -159,6 +159,7 @@
             UrlFileAction="Controllers/HoaDonController.ashx"
             RowNumbers="true"
             FilterToolbar="true"
+            MultiSelect="true"
             OndblClickRow = "function(rowid) {
                 $('#edit_grid_ds_hoadon').click();
             }"

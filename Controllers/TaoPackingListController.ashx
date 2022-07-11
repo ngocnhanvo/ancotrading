@@ -161,6 +161,7 @@ public class TaoPackingListController : IHttpHandler {
                 var sp = db.md_sanphams.Where(s => s.md_sanpham_id == line.md_sanpham_id).FirstOrDefault();
                 var chucnang = db.md_chucnangs.Where(s => s.md_chucnang_id == sp.md_chucnang_id).FirstOrDefault();
                 var chungloai = db.md_chungloais.Where(s => s.md_chungloai_id == sp.md_chungloai_id).FirstOrDefault();
+                var detai = db.md_detais.Where(s => s.code_cl == chungloai.code_cl & s.code_dt == sp.ma_sanpham.Substring(6, 2)).FirstOrDefault();
                 var dvt = db.md_donvitinhsanphams.Where(s=>s.md_donvitinhsanpham_id == sp.md_donvitinhsanpham_id).FirstOrDefault();
                 var dongHoaDon = new c_hoadon_ct();
                 dongHoaDon.c_hoadon_ct_id = Helper.getNewId();
@@ -168,7 +169,7 @@ public class TaoPackingListController : IHttpHandler {
                 dongHoaDon.sothutu = sothutu;
                 dongHoaDon.md_sanpham_id = line.md_sanpham_id;
                 dongHoaDon.ma_sanpham = sp.ma_sanpham;
-                dongHoaDon.ten_sanpham = chucnang.ten_tv + " " + chungloai.tv_ngan;
+                dongHoaDon.ten_sanpham = chucnang.ten_tv + " " + chungloai.tv_ngan + " " + detai.tv_ngan;
                 dongHoaDon.soluong = line.soluong;
                 dongHoaDon.dongia = line.gia;
                 dongHoaDon.thanhtien = dongHoaDon.dongia * dongHoaDon.soluong;

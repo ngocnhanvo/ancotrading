@@ -45,7 +45,7 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
 	            hd.ma_khachhang,
 	            hd.ten_khachhang,
 	            hd.diachi_khachhang,
-	            hd.email_khachhang,
+	            '' as email_khachhang,
 	            ct.ma_sanpham,
 	            ct.ten_sanpham,
 	            ct.ten_dvt,
