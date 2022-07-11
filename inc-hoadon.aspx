@@ -132,6 +132,11 @@
                             alert('Chưa chọn hóa đơn');
                             return;
                         }
+
+                        if (printType != print_TTHD & piId.length > 1) {
+                            alert('Chỉ được chọn 1 hóa đơn');
+                            return;
+                        }
    
                         printURL += `More/${printType}.aspx`;
                         let params_ = '';
