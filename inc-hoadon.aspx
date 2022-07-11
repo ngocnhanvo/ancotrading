@@ -133,7 +133,7 @@
                             return;
                         }
 
-                        if (printType != print_TTHD & piId.length > 1) {
+                        if (printType != 'print_TTHD' & piId.length > 1) {
                             alert('Chỉ được chọn 1 hóa đơn');
                             return;
                         }
