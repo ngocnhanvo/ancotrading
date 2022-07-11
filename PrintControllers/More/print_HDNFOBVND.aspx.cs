@@ -43,9 +43,8 @@ public partial class PrintControllers_More_print_HDNFOBVND : System.Web.UI.Page
     public string CreateSql(HttpContext context)
     {
         string id = context.Request.QueryString["id"];
-
-        string sql = string.Format(@"	 
-            declare @id nvarchar(32) = N'{0}'
+        var ids = id.Split(',');
+        string sql = string.Format(@"
             select 
 	            hd.tiento + '/' + hd.sophieu as sophieu,
 	            hd.ma_khachhang,
@@ -82,9 +81,9 @@ public partial class PrintControllers_More_print_HDNFOBVND : System.Web.UI.Page
 	            cast(hd.philamhang * hd.tygia as decimal(18, 0)) as philamhang
             from c_hoadon hd
             left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
-            where hd.c_hoadon_id = @id
+            where hd.c_hoadon_id in ('{0}')
 		"
-        , id
+        , string.Join("','", ids)
         );
 
         //throw new ArgumentNullException(sql);
