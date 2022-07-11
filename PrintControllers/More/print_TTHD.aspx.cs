@@ -47,6 +47,7 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
     {
         string id = context.Request.QueryString["id"];
         var ids = id.Split(',');
+        throw new Exception(string.Join("','", ids));
 
         string sql = string.Format(@"	 
             declare @id nvarchar(32) = N'{0}'
