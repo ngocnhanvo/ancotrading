@@ -273,7 +273,7 @@
                  , width: 100
                  , align: 'center'
                  , edittype: 'select'
-                 , editoptions: { dataUrl: 'Controllers/NganHangController.ashx?action=getoption' }
+                 , editoptions: { dataUrl: 'Controllers/NganHangController.ashx?action=getoption&fn=true' }
             },
             {
                  fixed: true, name: 'hinhthucthanhtoan'

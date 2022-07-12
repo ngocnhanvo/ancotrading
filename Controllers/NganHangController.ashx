@@ -21,7 +21,7 @@ public class NganHangController : IHttpHandler
                 this.getSelectOption(context);
                 break;
             default:
-                switch (oper) 
+                switch (oper)
                 {
                     case "del":
                         this.del(context);
@@ -42,9 +42,13 @@ public class NganHangController : IHttpHandler
 
     public void getSelectOption(HttpContext context)
     {
+        var firstNull = context.Request.QueryString["fn"];
         String sql = "select md_nganhang_id, ma_nganhang from md_nganhang where hoatdong = 1 order by ma_nganhang asc";
         SelectHtmlControl s = new SelectHtmlControl(sql);
-        context.Response.Write(s.ToString());
+        if(firstNull == "true")
+            context.Response.Write(s.ToOptionNullFirst());
+        else
+            context.Response.Write(s.ToString());
     }
 
 
@@ -134,7 +138,7 @@ public class NganHangController : IHttpHandler
         if (sidx.Equals("") || sidx == null)
         {
             sidx = "ngh.ma_nganhang";
-        }        
+        }
 
         string strsql = "select * from( " +
             " select ngh.* " +
