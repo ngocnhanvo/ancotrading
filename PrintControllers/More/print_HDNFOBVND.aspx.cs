@@ -75,12 +75,13 @@ public partial class PrintControllers_More_print_HDNFOBVND : System.Web.UI.Page
 	            hd.sotokhai_inv,
                 hd.tuongduongVND + hd.tienthue as tongtien,
 	            '' as tongtien_bangchu,
-                '' as taikhoan_thanhtoan,
+                nh.thongtin as taikhoan_thanhtoan,
                 '' as ghichu,
                 cast(hd.giamgia * hd.tygia as decimal(18, 0)) as giamgia,
 	            cast(hd.philamhang * hd.tygia as decimal(18, 0)) as philamhang
             from c_hoadon hd
-            left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
+                left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
+                left join md_nganhang nh on nh.md_nganhang_id = hd.nganhang
             where hd.c_hoadon_id in ('{0}')
 		"
         , string.Join("','", ids)

@@ -245,7 +245,7 @@ public class HoaDonController : IHttpHandler
                     hd.daidien_khachhang,
                     hd.sotaikhoan_khachhang,
                     hd.masothue_khachhang,
-                    hd.nganhang,
+                    nh.ten_nganhang,
                     hd.hinhthucthanhtoan,
                     hd.thue_vat,
                     hd.tienthue,
@@ -270,6 +270,7 @@ public class HoaDonController : IHttpHandler
                     ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum
                 FROM 
                     c_hoadon hd
+                    left join md_nganhang nh on nh.md_nganhang_id = hd.nganhang
                 WHERE 
                     1=1
                     {2}
