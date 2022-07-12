@@ -266,6 +266,16 @@
                  , edittype: 'text'
             },
             {
+                 fixed: true, name: 'nganhang'
+                 , label: 'Ngân hàng'
+                 , index: 'nganhang'
+                 , editable: true
+                 , width: 100
+                 , align: 'center'
+                 , edittype: 'select'
+                 , editoptions: { dataUrl: 'Controllers/NganHangController.ashx?action=getoption' }
+            },
+            {
                  fixed: true, name: 'hinhthucthanhtoan'
                  , label: 'Hình thức TT'
                  , index: 'hinhthucthanhtoan'

@@ -80,7 +80,7 @@ public class TaoPackingListController : IHttpHandler {
             hoadon.ma_khachhang = dtkd == null ? "" : dtkd.ma_dtkd;
             hoadon.ten_khachhang = dtkd == null ? "" : dtkd.ten_dtkd;
             hoadon.diachi_khachhang = dtkd == null ? "" : dtkd.diachi;
-            hoadon.email_khachhang = dtkd == null ? "" : dtkd.email;
+            //hoadon.email_khachhang = dtkd == null ? "" : dtkd.email;
             hoadon.daidien_khachhang = dtkd == null ? "" : dtkd.daidien;
             hoadon.sotaikhoan_khachhang = dtkd == null ? "" : dtkd.so_taikhoan;
             hoadon.masothue_khachhang = dtkd == null ? "" : dtkd.masothue;

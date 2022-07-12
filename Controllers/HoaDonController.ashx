@@ -101,6 +101,7 @@ public class HoaDonController : IHttpHandler
                 hoadon.ten_khachhang = context.Request.Form["ten_khachhang"];
                 hoadon.diachi_khachhang = context.Request.Form["diachi_khachhang"];
                 hoadon.email_khachhang = context.Request.Form["email_khachhang"];
+                hoadon.nganhang = context.Request.Form["nganhang"];
                 hoadon.daidien_khachhang = context.Request.Form["daidien"];
                 hoadon.sotaikhoan_khachhang = context.Request.Form["so_taikhoan"];
                 hoadon.masothue_khachhang = context.Request.Form["masothue"];
@@ -244,6 +245,7 @@ public class HoaDonController : IHttpHandler
                     hd.daidien_khachhang,
                     hd.sotaikhoan_khachhang,
                     hd.masothue_khachhang,
+                    hd.nganhang,
                     hd.hinhthucthanhtoan,
                     hd.thue_vat,
                     hd.tienthue,
