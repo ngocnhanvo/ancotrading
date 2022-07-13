@@ -58,11 +58,11 @@ public partial class PrintControllers_More_print_HDNFOBVND : System.Web.UI.Page
 	            ct.ten_sanpham,
 	            ct.ten_dvt,
 	            ct.soluong,
-	            cast(ct.dongia * hd.tygia as decimal(18, -2)) as dongia,
-	            cast(ct.thanhtien * hd.tygia as decimal(18, -2)) as thanhtien,
+	            round(ct.dongia * hd.tygia, -2) as dongia,
+	            round(ct.thanhtien * hd.tygia, -2) as thanhtien,
 	            hd.thue_vat,
-	            hd.tienthue,
-	            hd.tuongduongVND,
+	            round(hd.tienthue, -2) as tienthue,
+	            round(hd.tuongduongVND, -2) as tuongduongVND,
 	            hd.hinhthucthanhtoan,
 	            hd.tygia,
 	            hd.tuongduongUSD,
@@ -73,12 +73,12 @@ public partial class PrintControllers_More_print_HDNFOBVND : System.Web.UI.Page
 	            hd.ngayphathanh,
 	            hd.so_inv,
 	            hd.sotokhai_inv,
-                hd.tuongduongVND + hd.tienthue as tongtien,
+                round(hd.tuongduongVND, -2) + round(hd.tienthue, -2) as tongtien,
 	            '' as tongtien_bangchu,
                 nh.thongtin as taikhoan_thanhtoan,
                 '' as ghichu,
-                cast(hd.giamgia * hd.tygia as decimal(18, -2)) as giamgia,
-	            cast(hd.philamhang * hd.tygia as decimal(18, -2)) as philamhang
+                round(hd.giamgia * hd.tygia, -2) as giamgia,
+	            round(hd.philamhang * hd.tygia, -2) as philamhang
             from c_hoadon hd
                 left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
                 left join md_nganhang nh on nh.md_nganhang_id = hd.nganhang
