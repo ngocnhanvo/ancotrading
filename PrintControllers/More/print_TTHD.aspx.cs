@@ -44,10 +44,10 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
             else
                 sophieu = row["sophieu"].ToString();
 
-            var giamgia = tbl.AsEnumerable().Sum(s => s.Field<decimal>("gghd"));
+            var giamgia = tbl.AsEnumerable().Select(s=> new { sophieu = s.Field<decimal>("sophieu"), gghd = s.Field<decimal>("gghd") }).Distinct().Sum(s => s.gghd);
             row["giamgia"] = giamgia;
 
-            var philamhang = tbl.AsEnumerable().Sum(s => s.Field<decimal>("plhhd"));
+            var philamhang = tbl.AsEnumerable().Select(s => new { sophieu = s.Field<decimal>("sophieu"), plhhd = s.Field<decimal>("plhhd") }).Distinct().Sum(s => s.plhhd);
             row["philamhang"] = philamhang;
         }
     }
