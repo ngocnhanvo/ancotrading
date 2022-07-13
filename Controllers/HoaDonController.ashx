@@ -49,7 +49,7 @@ public class HoaDonController : IHttpHandler
     {
         String sql = "select tiento as id, tiento as name from c_hoadontiento where hoatdong = 1 order by tiento";
         SelectHtmlControl s = new SelectHtmlControl(sql);
-        context.Response.Write(s.ToString());
+        context.Response.Write(s.ToOptionNullFirst());
     }
 
     public void active(HttpContext context)
@@ -238,6 +238,7 @@ public class HoaDonController : IHttpHandler
                     hd.md_trangthai_id,
                     hd.tiento,
                     hd.sophieu,
+                    hd.so_inv,
                     hd.ma_khachhang,
                     hd.ten_khachhang,
                     hd.diachi_khachhang,
@@ -259,7 +260,6 @@ public class HoaDonController : IHttpHandler
                     hd.sohoadon,
                     hd.ngayphathanh,
                     hd.ghichu,
-                    hd.so_inv,
                     hd.sotokhai_inv,
                     hd.ngaytao,
                     hd.nguoitao,

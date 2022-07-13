@@ -209,6 +209,15 @@
                  , editoptions: { readonly:'readonly' }
             },
             {
+                 fixed: true, name: 'so_inv'
+                 , label: 'Số INV'
+                 , index: 'so_inv'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions: { readonly:'readonly' }
+            },
+            {
                  fixed: true, name: 'ma_khachhang'
                  , label: 'Mã KH'
                  , index: 'ma_khachhang'
@@ -408,15 +417,6 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
-            },
-            {
-                 fixed: true, name: 'so_inv'
-                 , label: 'Số INV'
-                 , index: 'so_inv'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-                 , editoptions: { readonly:'readonly' }
             },
             {
                  fixed: true, name: 'sotokhai_inv'
