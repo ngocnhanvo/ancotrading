@@ -38,8 +38,8 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
         {
             if (sophieu == row["sophieu"].ToString())
             {
-                row["tuongduongVND"] = null;
-                row["tuongduongUSD"] = null;
+                row["tuongduongVND"] = DBNull.Value;
+                row["tuongduongUSD"] = DBNull.Value;
             }
             else
                 sophieu = row["sophieu"].ToString();
