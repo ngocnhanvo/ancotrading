@@ -87,8 +87,8 @@ public partial class PrintControllers_More_print_HDNFOBVND : System.Web.UI.Page
 	            '' as tongtien_bangchu,
                 nh.thongtin as taikhoan_thanhtoan,
                 '' as ghichu,
-                round(hd.giamgia * hd.tygia, -2) as giamgia,
-	            round(hd.philamhang * hd.tygia, -2) as philamhang
+                round(isnull(hd.giamgia, 0) * hd.tygia, -2) as giamgia,
+	            round(isnull(hd.philamhang, 0) * hd.tygia, -2) as philamhang
             from c_hoadon hd
                 left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
                 left join md_nganhang nh on nh.md_nganhang_id = hd.nganhang
