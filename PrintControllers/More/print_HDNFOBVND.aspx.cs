@@ -59,7 +59,7 @@ public partial class PrintControllers_More_print_HDNFOBVND : System.Web.UI.Page
 	            ct.ten_dvt,
 	            ct.soluong,
 	            round(ct.dongia * hd.tygia, -2) as dongia,
-	            round(ct.thanhtien * hd.tygia, -2) as thanhtien,
+	            round(ct.dongia * hd.tygia, -2) * ct.soluong as thanhtien,
 	            hd.thue_vat,
 	            round(hd.tienthue, -2) as tienthue,
 	            round(hd.tuongduongVND, -2) as tuongduongVND,
