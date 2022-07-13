@@ -33,8 +33,17 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
     public void viewReport(String SqlQuery)
     {
         var tbl = ((DataSet)ReportViewer1.Report.DataSource).Tables[0];
+        var sophieu = "";
         foreach (DataRow row in tbl.Rows)
         {
+            if (sophieu == row["sophieu"].ToString())
+            {
+                row["tuongduongVND"] = null;
+                row["tuongduongUSD"] = null;
+            }
+            else
+                sophieu = row["sophieu"].ToString();
+
             var giamgia = tbl.AsEnumerable().Sum(s => s.Field<decimal>("gghd"));
             row["giamgia"] = giamgia;
 
