@@ -84,6 +84,7 @@ public partial class PrintControllers_More_print_HDNFOBUSD : System.Web.UI.Page
                 left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
                 left join md_nganhang nh on nh.md_nganhang_id = hd.nganhang
             where hd.c_hoadon_id = @id
+            order by ct.ma_sanpham
 		"
         , id
         );
