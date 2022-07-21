@@ -69,7 +69,7 @@ public partial class PrintControllers_More_print_TTHDVND : System.Web.UI.Page
 	            ct.ten_dvt,
 	            ct.soluong,
 	            ct.dongia,
-	            round(ct.dongia * hd.tygia, -2) as thanhtien,
+	            round(ct.dongia * ct.soluong * hd.tygia, -2) as thanhtien,
 	            hd.thue_vat,
 	            hd.tienthue,
 	            hd.tuongduongVND,
