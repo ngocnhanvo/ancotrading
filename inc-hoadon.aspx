@@ -95,6 +95,12 @@
                 </tr>
                 <tr>
                     <td>
+                        <input id="print_TTHDVND" type="radio" name="rdoPrintType" value="print_TTHDVND" />
+                        <label for="print_TTHDVND">In thông tin hóa đơn VNĐ</label> 
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         <input id="print_HDNFOBUSD" type="radio" name="rdoPrintType" value="print_HDNFOBUSD" />
                         <label for="print_HDNFOBUSD">In hóa đơn nhập FOB USD</label> 
                     </td>
@@ -102,7 +108,7 @@
                 <tr>
                     <td>
                         <input id="print_HDNFOBVND" type="radio" name="rdoPrintType" value="print_HDNFOBVND" />
-                        <label for="print_HDNFOBVND">In hóa đơn nhập FOB VND</label> 
+                        <label for="print_HDNFOBVND">In hóa đơn nhập FOB VNĐ</label> 
                     </td>
                 </tr>
             </table>
@@ -133,7 +139,7 @@
                             return;
                         }
 
-                        if (printType != 'print_TTHD' & piId.length > 1) {
+                        if (['print_TTHD','print_TTHDVND'].lastIndexOf(printType) <= -1 & piId.length > 1) {
                             alert('Chỉ được chọn 1 hóa đơn');
                             return;
                         }

@@ -360,33 +360,28 @@ public class ProductController : IHttpHandler
             sql = String.Format("select * from( SELECT *, ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum FROM md_sanpham WHERE ma_sanpham like '{0}'  AND trangthai != 'NHD' {1} )P", searchTerm, soanthao);
         }
 
-        System.Data.DataTable dt = mdbc.GetData(sql, "@start", start, "@end", end);
-        string json = "";
-        json += "{";
-        json += String.Format("\"page\":{0}, \"total\":{1}, \"records\":{2}", page, total_page, count);
+        var dt = mdbc.GetData(sql, "@start", start, "@end", end);
+        var jsonNew = new Dictionary<string, object>();
+        jsonNew["page"] = page;
+        jsonNew["total"] = total_page;
+        jsonNew["records"] = count;
+        var items = new List<Dictionary<string, object>>();
 
-        if (count != 0)
-        { json += ",\"rows\":["; }
-
-        foreach (System.Data.DataRow row in dt.Rows)
+        foreach (DataRow row in dt.Rows)
         {
-            json += "{";
-            json += String.Format("\"md_sanpham_id\":\"{0}\"", row["md_sanpham_id"]);
-            json += ",";
-            json += String.Format("\"ma_sanpham\":\"{0}\"", row["ma_sanpham"]);
-            json += ",";
-            json += String.Format("\"mota_tiengviet\":\"{0}\"", row["mota_tiengviet"]);
-            json += "},";
+            var item = new Dictionary<string, object>();
+            item["md_sanpham_id"] = row["md_sanpham_id"];
+            item["ma_sanpham"] = row["ma_sanpham"];
+            item["mota_tiengviet"] = row["mota_tiengviet"];
+            items.Add(item);
         }
 
-        if (count != 0)
-        {
-            json = json.Substring(0, json.Length - 1);
-            json += "]";
-        }
-        json += "}";
+        if (items.Count > 0)
+            jsonNew["rows"] = items;
+        else
+            jsonNew["rows"] = null;
 
-        context.Response.Write(json);
+        context.Response.Write(Newtonsoft.Json.JsonConvert.SerializeObject(jsonNew));
     }
 
     public void getSelectOption(HttpContext context)
