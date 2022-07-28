@@ -586,6 +586,27 @@ public class UserQRCodeController : IHttpHandler {
                         pass = pass.Replace("}", "N2");
                         pass = pass.Replace("[", "N3");
                         pass = pass.Replace("]", "N4");
+                        pass = pass.Replace("(", "N5");
+                        pass = pass.Replace(")", "N6");
+                        pass = pass.Replace("^", "A");
+                        pass = pass.Replace("@", "AC");
+                        pass = pass.Replace("#", "TH");
+                        pass = pass.Replace("*", "SA");
+                        pass = pass.Replace("|", "K1");
+                        pass = pass.Replace(":", "K2");
+                        pass = pass.Replace(";", "K3");
+                        pass = pass.Replace("\"", "K4");
+                        pass = pass.Replace("'", "K5");
+                        pass = pass.Replace("<", "K6");
+                        pass = pass.Replace(">", "K7");
+                        pass = pass.Replace("/", "K8");
+                        pass = pass.Replace(",", "K9");
+                        pass = pass.Replace(".", "L1");
+                        pass = pass.Replace("!", "L2");
+                        pass = pass.Replace("$", "L3");
+                        pass = pass.Replace("-", "L4");
+                        pass = pass.Replace("_", "L5");
+                        pass = pass.Replace("=", "L6");
                         pass = "12" + pass + "21";
                     }
 
