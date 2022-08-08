@@ -314,7 +314,7 @@
                     <option ncc="ANCO1,ANCO2" value="thuongLeTetNV">Thưởng lễ, tết nhân viên</option>
                     <option ncc="ANCO1,ANCO2" value="thuongLeTetCN">Thưởng tết công nhân</option>
                     <option ncc="ANCO2" value="tamUngLuongCN">Tạm ứng lương công nhân</option>
-                    <option ncc="ANCO1,ANCO2" value="chiTienMatKhac">Chi tiền mặt khác (phí kiểm hàng tre, thiết bị máy vi tính…)</option>
+                    <option ncc="ANCO1,ANCO2" value="chiTienMatKhac">Các khoản chi phí khác (phí kiểm hàng, thiết bị máy vi tính, khử trùng kho,...) </option>
                     <option ncc="ANCO2" value="trich20PheLieu">Trích 20% phế liệu</option>
                     <option ncc="ANCO1,ANCO2" value="KhieuNai">Khiếu nại</option>
                     <option ncc="ANCO1,ANCO2" value="cuocGuiMauKiemDinh">Cước gửi mẫu, kiểm định</option>
