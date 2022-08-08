@@ -380,12 +380,15 @@ function Chitudong(action) {
     }
 	
 	function inphieuchi(){
-        var ids = $('#grid_ds_chitietphaichi').jqGrid('getGridParam', 'selrow');
-        var cell = $('#grid_ds_chitietphaichi').getRowData(ids);
-        var str_tkco = cell['tk_co'].substring(0,3);
-        var printURL = "PrintControllers/";
-        var windowSize = "width=900,height=700,scrollbars=yes";
-        if( str_tkco == '112') {
+        let ids = $('#grid_ds_chitietphaichi').jqGrid('getGridParam', 'selrow');
+        let cell = $('#grid_ds_chitietphaichi').getRowData(ids);
+
+        //let str_tkco = cell['tk_co'].substring(0, 3);
+        let str_loaiphieu = cell['loai'].toString();
+        let printURL = "PrintControllers/";
+        let windowSize = "width=900,height=700,scrollbars=yes";
+        //if( str_tkco == '112') {
+        if (str_loaiphieu == 'CK') {
             printURL += 'InPhieuUyNhiemChi/';
             window.open(printURL + "?id=" + ids, "In phiếu ủy nhiệm chi", windowSize);
         }
@@ -395,13 +398,13 @@ function Chitudong(action) {
         }
     }
 	
-	    function inphieuchi1() {
-        var ids = $('#grid_ds_phaichi').jqGrid('getGridParam', 'selrow');
-        var cell = $('#grid_ds_phaichi').getRowData(ids);
-        var printURL = "PrintControllers/InPhieuUyNhiemChi1/";
-        var windowSize = "width=700,height=700,scrollbars=yes";
+    function inphieuchi1() {
+        let ids = $('#grid_ds_phaichi').jqGrid('getGridParam', 'selrow');
+        let cell = $('#grid_ds_phaichi').getRowData(ids);
+        let printURL = "PrintControllers/InPhieuUyNhiemChi1/";
+        let windowSize = "width=700,height=700,scrollbars=yes";
         window.open(printURL + "?id=" + ids, "In phiếu ủy nhiệm chi", windowSize);
-		}
+    }
 </script>
 
 <div class="ui-layout-south ui-widget-content" id="layout-south-phaichi">
@@ -420,7 +423,7 @@ function Chitudong(action) {
             ColNames="['c_chitietthuchi_id', 'Phiếu', 'Thu Chi', 'TK Nợ', 'TK Có', 'Số Tiền', 'Số Tiền Cộng', 'Thuế', 'Mã Đối Tác', 'Quy Đổi'
                 , 'Diễn Giải', 'Là tiền cọc', 'Phiếu nhập', 'Đơn Hàng', 'Invoice','Bộ Phận','Ngày Chi', 'Ngày Tạo', 'Người Tạo'
                 , 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động'
-                , 'cttc.md_doitackinhdoanh_id','Tên Đối Tác','Đại Diện' ,'Địa Chỉ', 'Số Tài Khoản','Ngân Hàng',]"
+                , 'cttc.md_doitackinhdoanh_id','Tên Đối Tác','Đại Diện' ,'Địa Chỉ', 'Số Tài Khoản','Ngân Hàng', 'Loại']"
             RowNumbers="true"
             OverrideAdd = "function(){addDetailPhaiChi('add')}"
             OndblClickRow = "function(){addDetailPhaiChi('edit')}"
@@ -625,7 +628,7 @@ function Chitudong(action) {
                 , editoptions:{ defaultValue: 'True' }
                 , editrules:{ edithidden : true }
             },
-			            {
+			{
                 fixed: true, name: 'md_doitackinhdoanh_id'
                 , index: 'cttc.md_doitackinhdoanh_id'
                 , width: 100
@@ -677,7 +680,15 @@ function Chitudong(action) {
                 , hidden: true 
                 , edittype: 'text'
                 , editable:true
-                , hidden: true
+                , editrules:{ edithidden:true }
+            },
+            {
+                fixed: true, name: 'loai'
+                , index: 'cttc.loai'
+                , width: 100
+                , hidden: true 
+                , edittype: 'text'
+                , editable: false
                 , editrules:{ edithidden:true }
             }
             ]"

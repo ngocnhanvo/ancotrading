@@ -423,7 +423,7 @@ public class ChiTietPhaiChiController : IHttpHandler
             " dtkd.ma_dtkd, dtkd.ten_dtkd, dtkd.daidien, dtkd.diachi, dtkd.so_taikhoan, dtkd.nganhang," +
             " (case when c_packinginvoice_id is null then '' else (select so_pkl from c_packinginvoice where c_packinginvoice_id = cttc.c_packinginvoice_id) end) as so_pkl, " +
             " bp.ten_bophan, cttc.ngaychi,cttc.ngaytao, cttc.nguoitao, cttc.ngaycapnhat, " +
-            " cttc.nguoicapnhat, cttc.mota, cttc.hoatdong, " +
+            " cttc.nguoicapnhat, cttc.mota, cttc.hoatdong, cttc.loai, " +
             " ROW_NUMBER() OVER (ORDER BY cttc.ngaytao asc) as RowNum " +
             " FROM c_chitietthuchi cttc " +
             " left join c_thuchi tc on cttc.c_thuchi_id = tc.c_thuchi_id left join c_nhapxuat nx on cttc.obj_code = nx.c_nhapxuat_id left join c_donhang dh on dh.c_donhang_id = nx.c_donhang_id left join md_doitackinhdoanh dtkd on dtkd.md_doitackinhdoanh_id =  cttc.md_doitackinhdoanh_id" +
@@ -483,6 +483,7 @@ public class ChiTietPhaiChiController : IHttpHandler
             xml += "<cell><![CDATA[" + row["diachi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["so_taikhoan"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nganhang"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["loai"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";
