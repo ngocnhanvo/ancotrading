@@ -59,7 +59,7 @@ public class PhaiChiController : IHttpHandler
     public void Getdoitac(HttpContext context)
     {
         string select = "<select>";
-        foreach (md_doitackinhdoanh dtkd in db.md_doitackinhdoanhs.ToList().OrderBy(p => p.ma_dtkd))
+        foreach (md_doitackinhdoanh dtkd in db.md_doitackinhdoanhs.Where(s=>s.hoatdong == true).OrderBy(p => p.ma_dtkd).ToList())
         {
             select += "<option value=\"" + dtkd.md_doitackinhdoanh_id + "\">" + dtkd.ma_dtkd + "</option>";
         }
@@ -67,6 +67,7 @@ public class PhaiChiController : IHttpHandler
 
         context.Response.Write(select);
     }
+
     public void Getdongtien(HttpContext context)
     {
         string select = "<select>";

@@ -355,7 +355,7 @@
                 , edittype: 'textarea'
             },
             {
-                fixed: true, name: 'hoatdong', hidden: true
+                fixed: true, name: 'hoatdong', hidden: false
                 , index: 'hoatdong'
                 , width: 100
                 , editable:true
@@ -363,6 +363,7 @@
                 , align: 'center'
                 , editoptions:{ value:'True:False', defaultValue: 'True' }
                 , formatter: 'checkbox'
+                , editrules:{ edithidden : true }
             }
             ]"
             Height = "420"
