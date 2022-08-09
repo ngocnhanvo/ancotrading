@@ -234,7 +234,7 @@ public class PartnerKeToanController : IHttpHandler
         LEFT JOIN md_khuvuc kv ON dtkd.md_khuvuc_id = kv.md_khuvuc_id
         LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id
 		LEFT JOIN md_nguondtkd ndt ON dtkd.md_nguondtkd_id = ndt.md_nguondtkd_id
-        WHERE 1=1 and dtkd.hoatdong = 1 {0} and ldt.ma_loaidtkd in ('NCCVT') " + filter;
+        WHERE 1=1 {0} and ldt.ma_loaidtkd in ('NCCVT') " + filter;
 
         if (isncc != null)
         {
@@ -285,7 +285,7 @@ public class PartnerKeToanController : IHttpHandler
             LEFT JOIN md_khuvuc kv ON dtkd.md_khuvuc_id = kv.md_khuvuc_id 
             LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id  
 			LEFT JOIN md_nguondtkd ndt ON dtkd.md_nguondtkd_id = ndt.md_nguondtkd_id
-            WHERE 1=1 and dtkd.hoatdong = 1 {0} and ldt.ma_loaidtkd in ('NCCVT') " + filter +
+            WHERE 1=1 {0} and ldt.ma_loaidtkd in ('NCCVT') " + filter +
             ")P WHERE RowNum > @start AND RowNum < @end";
         
         if (isncc != null)
