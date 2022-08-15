@@ -97,7 +97,14 @@ public partial class Login : System.Web.UI.Page
                                             {
                                                 var smtpserver = dtSMTP.Rows[0]["smtpserver"] + "";
                                                 var port = int.Parse((dtSMTP.Rows[0]["port"] + "").ToLower());
-                                                var mail = new GoogleMail(emailUserSendMail, email_passUserSendMail, smtpserver, port);
+                                                var ssl = false;
+                                                try
+                                                {
+                                                    ssl = (dtSMTP.Rows[0]["use_ssl"] + "").ToLower() == "true";
+                                                }
+                                                catch { }
+
+                                                var mail = new GoogleMail(emailUserSendMail, email_passUserSendMail, smtpserver, port, ssl);
                                                 string ngayCapOTP = DateTime.Now.ToString("dd/MM/yyyy");
                                                 string gioCapOTP = DateTime.Now.ToString("HH:mm");
 
