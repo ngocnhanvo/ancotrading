@@ -84,7 +84,7 @@ public class API_Data : IHttpHandler {
             foreach(var sp in sps)
             {
                 sp.hinhanh = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
-				sp.hinhanhWeb = ExcuteSignalRStatic.getImageProductWeb(sp.ma_sanpham);
+                sp.hinhanhWeb = ExcuteSignalRStatic.getImageProductWeb(sp.ma_sanpham);
             }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
@@ -357,7 +357,11 @@ public class API_Data : IHttpHandler {
         try
         {
             var lstMSP = sanphams.Split(',');
-            var sps = db.md_giasanphams.Where(s => lstMSP.Contains(s.md_sanpham_id)).ToList();
+            var bgBans = db.md_banggias.Where(s => s.banggiaban == true & s.ten_banggia.StartsWith("FOB")).ToList();
+            var bgIds = bgBans.Select(s => s.md_banggia_id).ToList();
+            var pbgBan = db.md_phienbangias.Where(s => bgIds.Contains(s.md_banggia_id) & s.md_trangthai_id == "HIEULUC").OrderByDescending(s=>s.ngay_hieuluc).FirstOrDefault();
+            var pbgId = pbgBan == null ? "" : pbgBan.md_phienbangia_id;
+            var sps = db.md_giasanphams.Where(s => lstMSP.Contains(s.md_sanpham_id) & s.md_phienbangia_id == pbgId).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch(Exception ex)
