@@ -122,7 +122,7 @@ public class API_Data : IHttpHandler {
                 {
                     stt++;
 
-                    var sp = db.md_sanphams.Where(s => s.md_sanpham_id == b.md_sanpham_id).FirstOrDefault();
+                    var sp = db.md_sanphams.Where(s => s.ma_sanpham == b.md_sanpham_id).FirstOrDefault();
                     var qcdg = db.md_donggoisanphams.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).FirstOrDefault();
                     var donggoi = db.md_donggois.Where(s => s.md_donggoi_id == qcdg.md_donggoi_id).FirstOrDefault();
                     var ncumd = db.md_nhacungungmacdinhs.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).FirstOrDefault();
