@@ -514,11 +514,13 @@ public class DongDonHangController : IHttpHandler
 
         string sqlCount = string.Format(@"
             SELECT COUNT(1) AS count
-            FROM c_dongdonhang ddh, c_donhang dh, md_sanpham sp, md_donggoi dg, md_doitackinhdoanh dtkd
-            WHERE ddh.c_donhang_id = dh.c_donhang_id
-            AND ddh.md_sanpham_id = sp.md_sanpham_id
-            AND ddh.md_donggoi_id = dg.md_donggoi_id
-            AND ddh.nhacungungid = dtkd.md_doitackinhdoanh_id
+            FROM c_dongdonhang ddh
+                left join c_donhang dh on ddh.c_donhang_id = dh.c_donhang_id
+                left join md_sanpham sp on ddh.md_sanpham_id = sp.md_sanpham_id
+                left join md_kieudang kd on kd.md_kieudang_id = sp.md_kieudang_id
+                left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
+                left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id
+                left join md_doitackinhdoanh dtkd on ddh.nhacungungid = dtkd.md_doitackinhdoanh_id
             AND dh.c_donhang_id = N'{0}' {1}",
             poId != null ? poId : "0",
             filter
