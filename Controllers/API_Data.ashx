@@ -128,6 +128,7 @@ public class API_Data : IHttpHandler {
                     var ncumd = db.md_nhacungungmacdinhs.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).FirstOrDefault();
                     var mnu1 = new c_dongdonhang();
                     mnu1.c_dongdonhang_id = Helper.getNewId();
+                    mnu1.c_donhang_id = mnu.c_donhang_id;
                     mnu1.sothutu = stt * 10;
                     mnu1.c_donhang_id = mnu.c_donhang_id;
                     mnu1.md_sanpham_id = b.md_sanpham_id;
