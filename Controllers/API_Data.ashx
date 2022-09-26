@@ -130,7 +130,6 @@ public class API_Data : IHttpHandler {
                     mnu1.c_dongdonhang_id = Helper.getNewId();
                     mnu1.c_donhang_id = mnu.c_donhang_id;
                     mnu1.sothutu = stt * 10;
-                    mnu1.c_donhang_id = mnu.c_donhang_id;
                     mnu1.md_sanpham_id = b.md_sanpham_id;
                     mnu1.ma_sanpham_khach = b.ma_sanpham_khach;
                     mnu1.giafob = b.gianhap;
