@@ -74,7 +74,40 @@ public class API_Data : IHttpHandler {
             case "NhanDonHang":
                 this.NhanDonHang(context);
                 break;
+            case "getList":
+                this.getList(context);
+                break;
         }
+    }
+
+    public void getList(HttpContext context)
+    {
+        string msg = "";
+        try
+        {
+            string strdata = context.Request.Form["data"];
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(strdata);
+            var result = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(data["result"] + "");
+            var lst = new List<Dictionary<string, object>>();
+            foreach (var a in result)
+            {
+                string po_lienket = a["po_lienket"] + "";
+                var dsdh = db.c_donhangs.Where(s => s.sochungtu == po_lienket).FirstOrDefault();
+                if (dsdh != null)
+                {
+                    var item = new Dictionary<string, object>();
+                    item["c_danhsachdathang_id"] = dsdh.c_danhsachdathang_id;
+                    item["trangthai"] = dsdh.md_trangthai_id == "HIEULUC" ? "DAHIEULUC" : "DAGUI";
+                    lst.Add(item);
+                }
+            }
+            msg = JsonConvert.SerializeObject(lst);
+        }
+        catch (Exception ex)
+        {
+            msg = "false##" + ex.Message;
+        }
+        context.Response.Write(msg);
     }
 
     public void NhanDonHang(HttpContext context)
@@ -130,7 +163,7 @@ public class API_Data : IHttpHandler {
                     mnu1.c_dongdonhang_id = Helper.getNewId();
                     mnu1.c_donhang_id = mnu.c_donhang_id;
                     mnu1.sothutu = stt * 10;
-                    mnu1.md_sanpham_id = b.md_sanpham_id;
+                    mnu1.md_sanpham_id = sp.md_sanpham_id;
                     mnu1.ma_sanpham_khach = b.ma_sanpham_khach;
                     mnu1.giafob = b.gianhap;
                     mnu1.giachuan = null;
