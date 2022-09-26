@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 public class API_Data : IHttpHandler {
@@ -70,7 +71,151 @@ public class API_Data : IHttpHandler {
             case "md_banggia":
                 this.md_banggia(context);
                 break;
+            case "NhanDonHang":
+                this.NhanDonHang(context);
+                break;
         }
+    }
+
+    public void NhanDonHang(HttpContext context)
+    {
+        string msg = "";
+
+        string strdata = context.Request.Form["data"];
+        try
+        {
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(strdata);
+            var result = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(data["result"] + "");
+            var dtkd = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == "NEXX DECOR").FirstOrDefault();
+            var cangbien = db.md_cangbiens.Where(s => s.ma_cangbien == "HCMP").FirstOrDefault();
+            var lstPO = new List<Dictionary<string, string>>();
+
+            foreach (var a in result)
+            {
+                var user = db.nhanviens.Where(s => s.email == a["email"] + "").FirstOrDefault();
+                var item = JsonConvert.DeserializeObject<c_danhsachdathang>(a["c_danhsachdathang"] + "");
+                var lstItem = JsonConvert.DeserializeObject<List<c_dongdsdh>>(a["c_dongdsdh"] + "");
+                //var lstItem2 = JsonConvert.DeserializeObject<List<c_phidathang>>(a["c_phidathang"] + "");
+
+                var mnu = new c_donhang();
+                mnu.c_donhang_id = Helper.getNewId();
+                mnu.md_trangthai_id = "SOANTHAO";
+                mnu.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id;
+                mnu.c_danhsachdathang_id = item.c_danhsachdathang_id;
+                mnu.sct_dsdh = item.sochungtu;
+                mnu.ngaylap = DateTime.Now;
+                mnu.nguoilap = user.manv;
+                mnu.shipmentdate = item.hangiaohang_po;
+                mnu.shipmenttime = item.hangiaohang_po;
+                mnu.discount = item.discount;
+                mnu.md_cangbien_id = cangbien.md_cangbien_id;
+                mnu.sochungtu = jqGridHelper.Utils.taoChungTuPO(dtkd.md_doitackinhdoanh_id, 0, mnu.ngaylap.Value.Year.ToString());
+                mnu.ngaytao = DateTime.Now;
+                mnu.ngaycapnhat = DateTime.Now;
+                mnu.nguoitao = user.manv;
+                mnu.nguoicapnhat = user.manv;
+                mnu.hoatdong = true;
+                db.c_donhangs.InsertOnSubmit(mnu);
+
+                int stt = 0;
+                foreach (var b in lstItem)
+                {
+                    stt++;
+
+                    var sp = db.md_sanphams.Where(s => s.md_sanpham_id == b.md_sanpham_id).FirstOrDefault();
+                    var qcdg = db.md_donggoisanphams.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).FirstOrDefault();
+                    var donggoi = db.md_donggois.Where(s => s.md_donggoi_id == qcdg.md_donggoi_id).FirstOrDefault();
+                    var ncumd = db.md_nhacungungmacdinhs.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).FirstOrDefault();
+                    var mnu1 = new c_dongdonhang();
+                    mnu1.c_dongdonhang_id = Helper.getNewId();
+                    mnu1.sothutu = stt * 10;
+                    mnu1.c_donhang_id = mnu.c_donhang_id;
+                    mnu1.md_sanpham_id = b.md_sanpham_id;
+                    mnu1.ma_sanpham_khach = b.ma_sanpham_khach;
+                    mnu1.giafob = b.gianhap;
+                    mnu1.giachuan = null;
+                    mnu1.discount = 0;
+                    mnu1.phi = 0;
+                    mnu1.barcode = "";
+                    mnu1.mota_tiengviet = sp.mota_tiengviet;
+                    mnu1.mota_tienganh = sp.mota_tienganh;
+                    mnu1.soluong = b.sl_dathang;
+                    mnu1.soluong_conlai = b.sl_dathang;
+                    mnu1.soluong_daxuat = 0;
+                    mnu1.soluong_dathang = 0;
+                    mnu1.nhacungungid = ncumd.md_doitackinhdoanh_id;
+
+                    // Thành phần đóng gói
+                    mnu1.md_donggoi_id = donggoi.md_donggoi_id;
+                    mnu1.sl_inner = donggoi.sl_inner;
+                    mnu1.l1 = donggoi.l1;
+                    mnu1.w1 = donggoi.w1;
+                    mnu1.h1 = donggoi.h1;
+                    mnu1.sl_outer = donggoi.sl_outer;
+                    mnu1.l2 = donggoi.l2_mix;
+                    mnu1.w2 = donggoi.w2_mix;
+                    mnu1.h2 = donggoi.h2_mix;
+                    mnu1.v2 = donggoi.v2;
+                    mnu1.vd = donggoi.vd;
+                    mnu1.vn = donggoi.vn;
+                    mnu1.vl = donggoi.vl;
+                    mnu1.ghichu_vachngan = donggoi.ghichu_vachngan;
+                    mnu1.sl_cont = donggoi.soluonggoi_ctn;
+
+                    mnu1.ngaytao = DateTime.Now;
+                    mnu1.ngaycapnhat = DateTime.Now;
+                    mnu1.nguoitao = user.manv;
+                    mnu1.nguoicapnhat = user.manv;
+                    mnu1.hoatdong = true;
+
+                    //kiem tra hang hoa doc quyen
+                    int count_dq = (from hdq in db.md_hanghoadocquyens
+                                    where !hdq.md_doitackinhdoanh_id.Equals(mnu.md_doitackinhdoanh_id) && hdq.md_sanpham_id.Equals(sp.md_sanpham_id)
+                                    select new { hdq.md_hanghoadocquyen_id }).Count();
+                    int count_dqdt = (from hdq in db.md_hanghoadocquyens
+                                      where hdq.md_doitackinhdoanh_id.Equals(mnu.md_doitackinhdoanh_id) && hdq.md_sanpham_id.Equals(sp.md_sanpham_id)
+                                      select new { hdq.md_hanghoadocquyen_id }).Count();
+
+                    if (count_dq > 0 && count_dqdt == 0 && donggoi.doigia_donggoi == true)
+                    {
+                        mnu1.trangthai = "DGDGDQ";
+                    }
+                    else if (count_dq > 0 && count_dqdt == 0)
+                    {
+                        mnu1.trangthai = "DQ";
+                    }
+                    else if (donggoi.doigia_donggoi == true)
+                    {
+                        mnu1.trangthai = "DGDG";
+                    }
+                    else
+                    {
+                        mnu1.trangthai = "BT";
+                    }
+
+                    db.c_dongdonhangs.InsertOnSubmit(mnu1);
+                }
+
+                var itemPO = new Dictionary<string, string>();
+                itemPO["c_danhsachdathang_id"] = item.c_danhsachdathang_id;
+                itemPO["soPO"] = mnu.sochungtu;
+                lstPO.Add(itemPO);
+            }
+
+            db.SubmitChanges();
+
+            msg += JsonConvert.SerializeObject(lstPO);
+        }
+        catch (Exception ex)
+        {
+            msg += string.Format(@"
+                    <div class='error' style='color:red'>Có lỗi xảy ra: {0}</div>
+                    <div style='display:none'>{1}</div>
+					<div style='display:none'>{2}</div>
+                    ", ex.Message, strdata, ex + "");
+        }
+
+        context.Response.Write(msg);
     }
 
     public void md_sanpham(HttpContext context)
