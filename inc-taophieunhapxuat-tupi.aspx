@@ -235,7 +235,7 @@
 <DIV class="ui-layout-north ui-widget-content" id="layout-north-taophieunhapxuat-pi">
     <uc1:jqGrid  ID="grid_ds_dathang_taophieunhapxuat" 
             Caption="Danh Sách Đặt Hàng"
-            SortName="c_danhsachdathang_id" 
+            SortName="dsdh.c_danhsachdathang_id" 
             UrlFileAction="Controllers/DanhSachDatHangTaoPhieuXuatController.ashx" 
                         
 			AfterRefresh = "function(){ 
