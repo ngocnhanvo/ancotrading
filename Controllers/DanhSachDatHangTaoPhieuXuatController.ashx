@@ -67,7 +67,7 @@ public class DanhSachDatHangController : IHttpHandler
         
         String sqlCount = "SELECT COUNT(*) AS count " +
             " FROM c_danhsachdathang dsdh, c_donhang dh " +
-            " WHERE dsdh.c_donhang_id = dh.c_donhang_id {0} AND dsdh.md_trangthai_id = 'HIEULUC' " + filter + " AND dsdh.c_danhsachdathang_id IN( select distinct c_danhsachdathang_id from c_dongdsdh ddsdh where ddsdh.sl_conlai > 0)";
+            " WHERE dsdh.c_donhang_id = dh.c_donhang_id {0} AND dsdh.md_trangthai_id = 'HIEULUC' " + filter + " AND dsdh.c_danhsachdathang_id IN( select distinct ddsdh.c_danhsachdathang_id from c_dongdsdh ddsdh where ddsdh.sl_conlai > 0)";
 
         sqlCount = String.Format(sqlCount, isadmin == true ? "" : "AND dsdh.nguoitao IN(" + strAccount + ") ");
         
@@ -104,7 +104,7 @@ public class DanhSachDatHangController : IHttpHandler
                 " dsdh.nguoitao, dsdh.ngaycapnhat, dsdh.nguoicapnhat, dsdh.mota, dsdh.hoatdong, " +
                 " ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
                 " FROM c_danhsachdathang dsdh, c_donhang dh " +
-                " WHERE dsdh.c_donhang_id = dh.c_donhang_id {0} AND dsdh.md_trangthai_id = 'HIEULUC' " + filter + " AND dsdh.c_danhsachdathang_id IN( select distinct c_danhsachdathang_id from c_dongdsdh ddsdh where ddsdh.sl_conlai > 0) " + 
+                " WHERE dsdh.c_donhang_id = dh.c_donhang_id {0} AND dsdh.md_trangthai_id = 'HIEULUC' " + filter + " AND dsdh.c_danhsachdathang_id IN( select distinct ddsdh.c_danhsachdathang_id from c_dongdsdh ddsdh where ddsdh.sl_conlai > 0) " + 
                 ")P WHERE RowNum > @start AND RowNum < @end";
 
         strsql = String.Format(strsql, isadmin == true ? "" : "AND dsdh.nguoitao IN(" + strAccount + ") ");
