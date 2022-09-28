@@ -138,13 +138,14 @@ public class API_Data : IHttpHandler {
                 mnu.sct_dsdh = item.sochungtu;
                 mnu.ngaylap = DateTime.Now;
                 mnu.nguoilap = user.manv;
-                mnu.shipmentdate = item.hangiaohang_po;
-                mnu.shipmenttime = mnu.shipmentdate.Value.AddDays(7);
+                mnu.shipmenttime = item.hangiaohang_po;
+                mnu.shipmentdate = mnu.shipmentdate.Value.AddDays(7);
                 mnu.cont20 = 0;
                 mnu.cont40 = 0;
                 mnu.cont40hc = 0;
                 mnu.cont45 = 0;
                 mnu.contle = 0;
+                mnu.hoahong = 0;
                 mnu.discount = item.discount;
                 mnu.md_cangbien_id = cangbien.md_cangbien_id;
                 mnu.sochungtu = jqGridHelper.Utils.taoChungTuPO(dtkd.md_doitackinhdoanh_id, 0, mnu.ngaylap.Value.Year.ToString());
