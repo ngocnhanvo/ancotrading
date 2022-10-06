@@ -57,8 +57,8 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
             if (dtkd == null | dtkd == "")
             {
                 str = String.Format(@"
-                    DECLARE @startdate datetime = convert(datetime, '{0}', 103) 
-                    DECLARE @enddate datetime = convert(datetime, '{1}', 103) 
+                    DECLARE @startdate datetime = convert(datetime, '{0} 00:00:00', 103) 
+                    DECLARE @enddate datetime = convert(datetime, '{1} 23:59:59', 103) 
                     DECLARE @table TABLE ( 
 	                    c_dongnhapxuat_id nvarchar(32),
 	                    so_inv nvarchar(50)
@@ -201,8 +201,8 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
             else
             {
                 str = String.Format(@"            
-                    DECLARE @startdate datetime = convert(datetime, '{0}', 103) 
-                    DECLARE @enddate datetime = convert(datetime, '{1}', 103) 
+                    DECLARE @startdate datetime = convert(datetime, '{0} 00:00:00', 103) 
+                    DECLARE @enddate datetime = convert(datetime, '{1} 23:59:59', 103) 
                     DECLARE @table TABLE ( 
 	                    c_dongnhapxuat_id nvarchar(32),
 	                    so_inv nvarchar(50)
@@ -351,8 +351,8 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
         else if(cdxem == "KT")
         {
             str = string.Format(@"
-                DECLARE @startdate datetime = convert(datetime, '{0}', 103) 
-                DECLARE @enddate datetime = convert(datetime, '{1}', 103)
+                DECLARE @startdate datetime = convert(datetime, '{0} 00:00:00', 103) 
+                DECLARE @enddate datetime = convert(datetime, '{1} 23:59:59', 103)
                 declare @tbl table (
 	                sophieu nvarchar(MAX),
 	                ngay_giaonhan datetime,
