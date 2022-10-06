@@ -154,6 +154,7 @@ public class API_Data : IHttpHandler {
                 mnu.nguoitao = user.manv;
                 mnu.nguoicapnhat = user.manv;
                 mnu.hoatdong = true;
+				mnu.ghichu = item.so_po;
                 db.c_donhangs.InsertOnSubmit(mnu);
 
                 int stt = 0;
