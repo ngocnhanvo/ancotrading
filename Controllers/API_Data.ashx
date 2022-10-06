@@ -139,7 +139,7 @@ public class API_Data : IHttpHandler {
                 mnu.ngaylap = DateTime.Now;
                 mnu.nguoilap = user.manv;
                 mnu.shipmenttime = item.hangiaohang_po;
-                mnu.shipmentdate = mnu.shipmentdate.Value.AddDays(7);
+                mnu.shipmentdate = mnu.shipmenttime.Value.AddDays(7);
                 mnu.cont20 = 0;
                 mnu.cont40 = 0;
                 mnu.cont40hc = 0;
