@@ -699,7 +699,7 @@ namespace OfficeToPDF
                     cellFormula = cellFormula
                     .Replace("[0]", (row.RowNum + 1).ToString())
                     .Replace("[This]", infoExcel.Alphabet[columnT.ColumnIndex - 1])
-                    .Replace(" ", "");
+                    ;
                 }
 
                 lstFormula.Add(new AvariablePrj.lstFormula()
