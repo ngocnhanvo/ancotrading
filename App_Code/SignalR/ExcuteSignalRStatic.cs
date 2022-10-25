@@ -117,61 +117,66 @@ public static class ExcuteSignalRStatic
 
     public static dynamic getImage(string ma_sanpham, int type)
     {
-        string msLink = "images/products/mausac/";
-        string cl = ma_sanpham.Substring(0, 2);
-        string dt = ma_sanpham.Substring(6, 2);
-        string ms = ma_sanpham.Substring(12, 2);
-        string kd = ma_sanpham.Substring(0, 9);
-        string image = mapPathSignalR("~/" + msLink);
-        string clDTMS = string.Format(@"{0}-{1}-{2}.jpg", cl, dt, ms);
-        //Neu co hinh anh mau sac chinh xac cua bo F
-        if (File.Exists(image + ma_sanpham + ".jpg"))
-            msLink += ma_sanpham + ".jpg";
-        //Neu co hinh anh mau sac chinh xac cua bo S
-        if (File.Exists(image + kd + ms + ".jpg"))
-            msLink += kd + ms + ".jpg";
-        //Neu khong co hinh anh mau sac chinh xac cua bo F va S
-        else
-        {
-            bool haveImg = false;
-
-            if (type == 0)
-            {
-                string kdCP = kd;
-                var rgxMauSac3 = new System.Text.RegularExpressions.Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-F[0-9]-[0-9][0-9]$");
-                if (rgxMauSac3.IsMatch(ma_sanpham))
-                {
-                    kdCP = ma_sanpham.Substring(0, 12);
-                }
-
-                string link = "";
-                for (var i = 0; i < 99; i++)
-                {
-                    var msCP = i < 10 ? "0" + i : i.ToString();
-                    if (File.Exists(image + kdCP + msCP + ".jpg"))
-                    {
-                        link = kdCP + msCP + ".jpg";
-                        haveImg = true;
-                        break;
-                    }
-                }
-
-                if (haveImg == false)
-                    msLink = Public.imgNotFound;
-                else
-                    msLink = msLink + link;
-            }
-            else if (File.Exists(image + clDTMS))
-                msLink += clDTMS;
-        }
-
         var response = new Dictionary<string, object>()
         {
-            { "cl", cl },
-            { "dt", dt },
-            { "ms", ms },
-            { "msLink", msLink }
+            { "cl", "" },
+            { "dt", "" },
+            { "ms", "" },
+            { "msLink", Public.imgNotFound }
         };
+
+        try
+        {
+            string msLink = "images/products/mausac/";
+            string cl = ma_sanpham.Substring(0, 2);
+            string dt = ma_sanpham.Substring(6, 2);
+            string ms = ma_sanpham.Substring(12, 2);
+            string kd = ma_sanpham.Substring(0, 9);
+            string image = mapPathSignalR("~/" + msLink);
+            string clDTMS = string.Format(@"{0}-{1}-{2}.jpg", cl, dt, ms);
+            //Neu co hinh anh mau sac chinh xac cua bo F
+            if (File.Exists(image + ma_sanpham + ".jpg"))
+                msLink += ma_sanpham + ".jpg";
+            //Neu co hinh anh mau sac chinh xac cua bo S
+            else if (File.Exists(image + kd + ms + ".jpg"))
+                msLink += kd + ms + ".jpg";
+            //Neu khong co hinh anh mau sac chinh xac cua bo F va S
+            else
+            {
+                bool haveImg = false;
+
+                if (type == 0)
+                {
+                    string kdCP = kd;
+                    var rgxMauSac3 = new System.Text.RegularExpressions.Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-F[0-9]-[0-9][0-9]$");
+                    if (rgxMauSac3.IsMatch(ma_sanpham)) {
+                        kdCP = ma_sanpham.Substring(0, 12);
+                    }
+                    
+                    for (var i = 0; i < 99; i++)
+                    {
+                        var msCP = i < 10 ? "0" + i : i.ToString();
+                        if (File.Exists(image + kdCP + msCP + ".jpg"))
+                        {
+                            msLink += kdCP + msCP + ".jpg";
+                            haveImg = true;
+                            break;
+                        }
+                    }
+
+                    if (haveImg == false)
+                        msLink = Public.imgNotFound;
+                }
+                else if (File.Exists(image + clDTMS))
+                    msLink += clDTMS;
+            }
+
+            response["cl"] = cl;
+            response["dt"] = dt;
+            response["ms"] = ms;
+            response["msLink"] = msLink;
+        }
+        catch { }
 
         return response;
     }

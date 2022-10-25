@@ -58,7 +58,7 @@ namespace Catalogue
                 goto end;
             }
 
-            string imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImageProduct(spR.ma_sanpham));
+            string imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImage(spR.ma_sanpham, 0)["msLink"]);
             if (File.Exists(imgPath))
             {
                 var img = System.Drawing.Image.FromFile(imgPath);
