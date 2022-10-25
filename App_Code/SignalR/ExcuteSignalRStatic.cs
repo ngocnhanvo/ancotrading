@@ -117,15 +117,6 @@ public static class ExcuteSignalRStatic
 
     public static dynamic getImage(string ma_sanpham, int type)
     {
-        var response = new Dictionary<string, object>()
-        {
-            { "cl", "" },
-            { "dt", "" },
-            { "ms", "" },
-            { "msLink", Public.imgNotFound }
-        };
-
-
         string msLink = "images/products/mausac/";
         string cl = ma_sanpham.Substring(0, 2);
         string dt = ma_sanpham.Substring(6, 2);
@@ -174,10 +165,13 @@ public static class ExcuteSignalRStatic
                 msLink += clDTMS;
         }
 
-        response["cl"] = cl;
-        response["dt"] = dt;
-        response["ms"] = ms;
-        response["msLink"] = msLink;
+        var response = new Dictionary<string, object>()
+        {
+            { "cl", cl },
+            { "dt", dt },
+            { "ms", ms },
+            { "msLink", msLink }
+        };
 
         return response;
     }
