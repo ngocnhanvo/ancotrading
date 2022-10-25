@@ -15,6 +15,9 @@ public class API_System : IHttpHandler {
         string oper = context.Request.QueryString["oper"];
         switch (oper)
         {
+            case "loadImagePresent":
+                this.loadImagePresent(context);
+                break;
             case "loadImageProductWeb":
                 this.loadImageProductWeb(context);
                 break;
