@@ -152,13 +152,14 @@ public static class ExcuteSignalRStatic
                     if (rgxMauSac3.IsMatch(ma_sanpham)) {
                         kdCP = ma_sanpham.Substring(0, 12);
                     }
-                    
+
+                    string link = "";
                     for (var i = 0; i < 99; i++)
                     {
                         var msCP = i < 10 ? "0" + i : i.ToString();
                         if (File.Exists(image + kdCP + msCP + ".jpg"))
                         {
-                            msLink += kdCP + msCP + ".jpg";
+                            link = kdCP + msCP + ".jpg";
                             haveImg = true;
                             break;
                         }
@@ -166,6 +167,8 @@ public static class ExcuteSignalRStatic
 
                     if (haveImg == false)
                         msLink = Public.imgNotFound;
+                    else
+                        msLink = msLink + link;
                 }
                 else if (File.Exists(image + clDTMS))
                     msLink += clDTMS;

@@ -101,20 +101,20 @@ public class API_System : IHttpHandler {
 
         // using (var fileStream = new FileStream(url, FileMode.Open))
         // {
-            // using (var memoryStream = new MemoryStream())
-            // {
-                // fileStream.CopyTo(memoryStream);
-                // var array = memoryStream.ToArray();
-                // fileStream.Close();
-                // fileStream.Dispose();
-                // memoryStream.Close();
-                // memoryStream.Dispose();
-                // context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
-                // context.Response.BinaryWrite(array);
-            // }
+        // using (var memoryStream = new MemoryStream())
+        // {
+        // fileStream.CopyTo(memoryStream);
+        // var array = memoryStream.ToArray();
+        // fileStream.Close();
+        // fileStream.Dispose();
+        // memoryStream.Close();
+        // memoryStream.Dispose();
+        // context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+        // context.Response.BinaryWrite(array);
         // }
-		
-		context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+        // }
+
+        context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
         context.Response.TransmitFile(url);
     }
 
@@ -130,20 +130,20 @@ public class API_System : IHttpHandler {
 
         // using (var fileStream = new FileStream(url, FileMode.Open))
         // {
-            // using (var memoryStream = new MemoryStream())
-            // {
-                // fileStream.CopyTo(memoryStream);
-                // var array = memoryStream.ToArray();
-                // fileStream.Close();
-                // fileStream.Dispose();
-                // memoryStream.Close();
-                // memoryStream.Dispose();
-                // context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
-                // context.Response.BinaryWrite(array);
-            // }
+        // using (var memoryStream = new MemoryStream())
+        // {
+        // fileStream.CopyTo(memoryStream);
+        // var array = memoryStream.ToArray();
+        // fileStream.Close();
+        // fileStream.Dispose();
+        // memoryStream.Close();
+        // memoryStream.Dispose();
+        // context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+        // context.Response.BinaryWrite(array);
         // }
-		
-		context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+        // }
+
+        context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
         context.Response.TransmitFile(url);
     }
 
@@ -160,20 +160,20 @@ public class API_System : IHttpHandler {
 
         // using (var fileStream = new FileStream(url, FileMode.Open))
         // {
-            // using (var memoryStream = new MemoryStream())
-            // {
-                // fileStream.CopyTo(memoryStream);
-                // var array = memoryStream.ToArray();
-                // fileStream.Close();
-                // fileStream.Dispose();
-                // memoryStream.Close();
-                // memoryStream.Dispose();
-                // context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
-                // context.Response.BinaryWrite(array);
-            // }
+        // using (var memoryStream = new MemoryStream())
+        // {
+        // fileStream.CopyTo(memoryStream);
+        // var array = memoryStream.ToArray();
+        // fileStream.Close();
+        // fileStream.Dispose();
+        // memoryStream.Close();
+        // memoryStream.Dispose();
+        // context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+        // context.Response.BinaryWrite(array);
         // }
-		
-		context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+        // }
+
+        context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
         context.Response.TransmitFile(url);
     }
 
@@ -182,6 +182,7 @@ public class API_System : IHttpHandler {
         try
         {
             var msp = context.Request.QueryString["msp"];
+            var showlink = context.Request.QueryString["showlink"] == "true";
             var path = ExcuteSignalRStatic.getImageProduct(msp);
             var url = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
             var lastIndex = url.LastIndexOf(".");
@@ -190,42 +191,19 @@ public class API_System : IHttpHandler {
             if (!File.Exists(url))
                 url = context.Server.MapPath("../" + Public.imgNotFound);
 
-            // using (var fileStream = new FileStream(url, FileMode.Open))
-            // {
-                // using (var memoryStream = new MemoryStream())
-                // {
-                    // fileStream.CopyTo(memoryStream);
-                    // var array = memoryStream.ToArray();
-                    // fileStream.Close();
-                    // fileStream.Dispose();
-                    // memoryStream.Close();
-                    // memoryStream.Dispose();
-
-                    // context.Response.Clear();
-                    // context.Response.ClearContent();
-                    // context.Response.ClearHeaders();
-                    // context.Response.Cache.SetCacheability(HttpCacheability.Public);
-                    // context.Response.Cache.SetExpires(DateTime.MinValue);
-
-                    // context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
-                    // context.Response.AddHeader("content-disposition", "inline; filename=" + msp);
-                    // context.Response.Buffer = true;
-                    // context.Response.Charset = "";
-
-                    // context.Response.BinaryWrite(array);
-
-                    // context.Response.Flush();
-                // }
-            // }
-			
-			context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
-			context.Response.TransmitFile(url);
+            if (showlink)
+                context.Response.Write(url);
+            else
+            {
+                context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+                context.Response.TransmitFile(url);
+            }
         }
         catch(Exception ex)
         {
-			context.Response.ContentType = "text/plain";
-			context.Response.Write(ex.Message);
-			return;
+            context.Response.ContentType = "text/plain";
+            context.Response.Write(ex.Message);
+            return;
         }
 
         context.Response.End();
