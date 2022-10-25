@@ -209,6 +209,38 @@ public class API_System : IHttpHandler {
         context.Response.End();
     }
 
+    public void loadImagePresent(HttpContext context)
+    {
+        try
+        {
+            var msp = context.Request.QueryString["msp"];
+            var showlink = context.Request.QueryString["showlink"] == "true";
+            var path = ExcuteSignalRStatic.getImage(msp, 0);
+            var url = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
+            var lastIndex = url.LastIndexOf(".");
+            var mimeType = url.Substring(lastIndex + 1).ToLower();
+
+            if (!File.Exists(url))
+                url = context.Server.MapPath("../" + Public.imgNotFound);
+
+            if (showlink)
+                context.Response.Write(url);
+            else
+            {
+                context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+                context.Response.TransmitFile(url);
+            }
+        }
+        catch(Exception ex)
+        {
+            context.Response.ContentType = "text/plain";
+            context.Response.Write(ex.Message);
+            return;
+        }
+
+        context.Response.End();
+    }
+
     public bool IsReusable {
         get {
             return false;
