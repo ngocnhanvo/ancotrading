@@ -676,6 +676,8 @@ public class API_Data : IHttpHandler {
             context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
             context.Response.TransmitFile(url);
         }
+        else
+            context.Response.Write(url);
     }
 
     public void imageMauSac(HttpContext context)
