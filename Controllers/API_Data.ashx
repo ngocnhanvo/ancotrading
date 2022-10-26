@@ -666,7 +666,7 @@ public class API_Data : IHttpHandler {
 
     public void imageDeTai(HttpContext context)
     {
-        var name = context.Request.Form["name"];
+        var name = context.Request.Params["name"];
         var url = ExcuteSignalRStatic.mapPathSignalR("~/" + Public.imgPattern + name);
         var lastIndex = url.LastIndexOf(".");
         var mimeType = url.Substring(lastIndex + 1).ToLower();
@@ -682,7 +682,7 @@ public class API_Data : IHttpHandler {
 
     public void imageMauSac(HttpContext context)
     {
-        var name = context.Request.Form["name"];
+        var name = context.Request.Params["name"];
         var url = ExcuteSignalRStatic.mapPathSignalR("~/" + Public.imgColor + name);
         var lastIndex = url.LastIndexOf(".");
         var mimeType = url.Substring(lastIndex + 1).ToLower();
@@ -692,6 +692,8 @@ public class API_Data : IHttpHandler {
             context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
             context.Response.TransmitFile(url);
         }
+        else
+            context.Response.Write(url);
     }
 
     public bool IsReusable {
