@@ -71,6 +71,18 @@ public class API_Data : IHttpHandler {
             case "md_banggia":
                 this.md_banggia(context);
                 break;
+            case "md_detai":
+                this.md_detai(context);
+                break;
+            case "md_mausac":
+                this.md_mausac(context);
+                break;
+            case "imageDeTai":
+                this.imageDeTai(context);
+                break;
+            case "imageMauSac":
+                this.imageMauSac(context);
+                break;
             case "NhanDonHang":
                 this.NhanDonHang(context);
                 break;
@@ -154,7 +166,7 @@ public class API_Data : IHttpHandler {
                 mnu.nguoitao = user.manv;
                 mnu.nguoicapnhat = user.manv;
                 mnu.hoatdong = true;
-				mnu.ghichu = item.so_po;
+                mnu.ghichu = item.so_po;
                 db.c_donhangs.InsertOnSubmit(mnu);
 
                 int stt = 0;
@@ -420,11 +432,14 @@ public class API_Data : IHttpHandler {
     {
         var msg = "";
         var sanphams = context.Request.Form["sanphams"];
+        var chuan = context.Request.Form["chuan"] == "true";
         try
         {
             var lstMSP = sanphams.Split(',');
-            var sps = db.md_donggoisanphams.Where(s => lstMSP.Contains(s.md_sanpham_id)).ToList();
-            msg = "1" + JsonConvert.SerializeObject(sps);
+            var sps = db.md_donggoisanphams.Where(s => lstMSP.Contains(s.md_sanpham_id));
+            if (chuan)
+                sps.Where(s => s.macdinh == true);
+            msg = "1" + JsonConvert.SerializeObject(sps.ToList());
         }
         catch(Exception ex)
         {
@@ -588,6 +603,93 @@ public class API_Data : IHttpHandler {
             msg = "0" + ex;
         }
         context.Response.Write(msg);
+    }
+
+    public void md_detai(HttpContext context)
+    {
+        var msg = "";
+        var detais = context.Request.Form["detais"];
+        try
+        {
+            var sps = new List<md_detai>();
+            var lstMSP = detais.Split(',');
+            foreach(var msp in lstMSP)
+            {
+                var cldt = msp.Split('-');
+                var cl = cldt[0];
+                var dt = cldt[1];
+                var sp = db.md_detais.Where(s => s.code_cl == cl & s.code_dt == dt).FirstOrDefault();
+                if (sp != null)
+                {
+                    sps.Add(sp);
+                }
+            }
+
+            msg = "1" + JsonConvert.SerializeObject(sps);
+        }
+        catch(Exception ex)
+        {
+            msg = "0" + ex;
+        }
+        context.Response.Write(msg);
+    }
+
+    public void md_mausac(HttpContext context)
+    {
+        var msg = "";
+        var mausacs = context.Request.Form["mausacs"];
+        try
+        {
+            var sps = new List<md_mausac>();
+            var lstMSP = mausacs.Split(',');
+            foreach(var msp in lstMSP)
+            {
+                var cldt = msp.Split('-');
+                var cl = cldt[0];
+                var dt = cldt[1];
+                var ms = cldt[2];
+                var sp = db.md_mausacs.Where(s => s.code_cl == cl & s.code_dt == dt & s.code_mau == ms).FirstOrDefault();
+                if (sp != null)
+                {
+                    sps.Add(sp);
+                }
+            }
+
+            msg = "1" + JsonConvert.SerializeObject(sps);
+        }
+        catch(Exception ex)
+        {
+            msg = "0" + ex;
+        }
+        context.Response.Write(msg);
+    }
+
+    public void imageDeTai(HttpContext context)
+    {
+        var name = context.Request.Form["name"];
+        var url = ExcuteSignalRStatic.mapPathSignalR("~/" + Public.imgPattern + name);
+        var lastIndex = url.LastIndexOf(".");
+        var mimeType = url.Substring(lastIndex + 1).ToLower();
+
+        if (System.IO.File.Exists(url))
+        {
+            context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+            context.Response.TransmitFile(url);
+        }
+    }
+
+    public void imageMauSac(HttpContext context)
+    {
+        var name = context.Request.Form["name"];
+        var url = ExcuteSignalRStatic.mapPathSignalR("~/" + Public.imgColor + name);
+        var lastIndex = url.LastIndexOf(".");
+        var mimeType = url.Substring(lastIndex + 1).ToLower();
+
+        if (System.IO.File.Exists(url))
+        {
+            context.Response.ContentType = mimeType == "jpg" ? "image/jpeg" : (mimeType == "png" ? "image/png" : "image/gif");
+            context.Response.TransmitFile(url);
+        }
     }
 
     public bool IsReusable {
