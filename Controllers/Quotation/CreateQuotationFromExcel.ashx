@@ -8,6 +8,12 @@ using ExcelLibrary.SpreadSheet;
 
 public class CreateQuotationFromExcel : IHttpHandler
 {
+    public class HangHoaExcel
+    {
+        public string ma_sanpham { get; set; }
+        public string docquyen { get; set; }
+    }
+
     private LinqDBDataContext db = new LinqDBDataContext();
     string id = Guid.NewGuid().ToString().Replace("-", "").ToLower();
     string filePath = "", filenameLC = "";
@@ -131,7 +137,7 @@ public class CreateQuotationFromExcel : IHttpHandler
                     }
                     else
                     {
-                        msg += string.Format(@"<div style='color:red'>Báo giá khởi tạo thất bại ""{0}"", có thể sheet đầu tiên đã bị ẩn</div>", sochungtu);
+                        msg += string.Format(@"<div style='color:red'>Báo giá khởi tạo thất bại ""{0}""</div>", sochungtu);
                         db.c_baogias.DeleteOnSubmit(mnu);
                         db.SubmitChanges();
                     }
@@ -181,34 +187,35 @@ public class CreateQuotationFromExcel : IHttpHandler
         int rowErr = 0, rowAdd = 0;
         string msg = "";
         bool choPhepImport = true;
+
+        var msps = new List<HangHoaExcel>();
         for (int i = 0; i < totalCount; i++)
         {
-            string khachhang_id = context.Request.Form["khachhang_v"];
-            string ma_sanpham = "", docquyen = "", kiemtraDQ = "0";
+            Row row = cellCollection.Rows[i];
+
+            if (row.GetCell(0) != null) {
+                var item = new HangHoaExcel();
+                item.ma_sanpham = row.GetCell(0).Value.ToString().Replace(" ", "");;
+                item.docquyen = row.GetCell(1).Value.ToString();
+
+                if(msps.Where(s=>s.ma_sanpham == item.ma_sanpham).Count() <= 0)
+                    msps.Add(item);
+            }
+        }
+
+        string khachhang_id = context.Request.Form["khachhang_v"];
+        var dem = 0;
+        foreach (var msp in msps)
+        {
+            dem++;
+            string ma_sanpham = msp.ma_sanpham, docquyen = "", kiemtraDQ = msp.docquyen;
             decimal soluong = 1, giafob = 0;
             try
             {
-                Row row = cellCollection.Rows[i];
-
-                if(row.GetCell(0) != null)
-                    ma_sanpham = row.GetCell(0).Value.ToString();
-
-                try
-                {
-                    if(row.GetCell(1) != null)
-                        kiemtraDQ = row.GetCell(1).Value.ToString();
-                } catch
-                {
-
-                }
-
-                //try { soluong = decimal.Parse(row.GetCell(1).Value.ToString()); } catch { }
-
-                ma_sanpham = ma_sanpham.Replace(" ", "");
                 md_sanpham sp = db.md_sanphams.FirstOrDefault(s => s.ma_sanpham == ma_sanpham);
                 if (sp != null)
                 {
-                    if (!new string[] { "NHD", "HHT", "SOANTHAO"}.Contains(sp.trangthai))
+                    if (!new string[] { "NHD", "HHT", "SOANTHAO" }.Contains(sp.trangthai))
                     {
                         try
                         {
@@ -220,7 +227,7 @@ public class CreateQuotationFromExcel : IHttpHandler
                         if (giafob > -1)
                         {
                             docquyen = check_hanghoadocquyen(sp.md_sanpham_id, khachhang_id);
-                            if(kiemtraDQ != "1" & docquyen != "")
+                            if (kiemtraDQ != "1" & docquyen != "")
                             {
                                 var docquyenRutGon = docquyen.Split(new string[] { "\n" }, StringSplitOptions.None)[0];
                                 docquyenRutGon = docquyenRutGon.Replace("Mã hàng độc quyền ", "");
@@ -291,7 +298,7 @@ public class CreateQuotationFromExcel : IHttpHandler
                                     mota_tienganh = sp.mota_tienganh,
                                     mota_tiengviet = sp.mota_tiengviet,
                                     ghichu_vachngan = donggoi.ghichu_vachngan,
-                                    sothutu = i * 10,
+                                    sothutu = dem * 10,
                                     giafob = giafob,
                                     soluong = soluong,
                                     md_donggoi_id = donggoi.md_donggoi_id,
