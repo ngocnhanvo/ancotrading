@@ -240,7 +240,7 @@
 <DIV class="ui-layout-north ui-widget-content" id="layout-north-taohanngach-pi">
     <uc1:jqGrid  ID="grid_ds_dathang_taohanngach" 
             Caption="Danh Sách Đặt Hàng"
-            SortName="c_danhsachdathang_id" 
+            SortName="dsdh.c_danhsachdathang_id" 
             UrlFileAction="Controllers/DanhSachDatHangTaoHanNgachController.ashx" 
                         ColNames="['c_danhsachdathang_id','Số Chứng Từ', 'Ngày Lập', 'Hạn Giao Hàng PO', 'Người Phụ Trách', 'Người Đặt Hàng', 'Đơn Hàng', 'Hướng Dẫn Làm Hàng', 'Trạng Thái', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
             RowNumbers="true"
