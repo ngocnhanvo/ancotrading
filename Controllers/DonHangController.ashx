@@ -621,6 +621,11 @@ public class DonHangController : IHttpHandler
                         }
                         else
                         {
+                            c_donhang dh = db.c_donhangs.Single(p => p.c_donhang_id == poId);
+                            dh.md_trangthai_id = "HIEULUC";
+                            db.SubmitChanges();
+                            result += "Hiệu lực đơn hàng thành công.! <br/>";
+                            /*
                             String partnerId = db.c_donhangs.Single(dh => dh.c_donhang_id.Equals(poId)).md_doitackinhdoanh_id;
                             System.Data.DataTable dt = mdbc.GetDataFromProcedure("tinhNangLucCungUng", "@donhang_id", poId);
                             int count = dt.Rows.Count;
@@ -690,6 +695,7 @@ public class DonHangController : IHttpHandler
                                     result += "<table><tr><td><input type='checkbox'/></td><td>Yêu cầu Administrator Hiệu Lực</td></tr></table>";
                                 }
                             }
+                            */
                         }
                         break;
                     default:
