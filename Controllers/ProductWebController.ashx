@@ -92,18 +92,16 @@ public class ProductWebController : IHttpHandler
 
                 foreach (var item in lstD)
                 {
-                    if (!isCode | (isCode & item["code"] == code))
-                        sps.Add(new productCatalog()
-                        {
-                            code = item["code"],
-                            detaiTA = "",
-                            titleWeb = "",
-                            titleSubWeb = ""
-                        });
+                    sps.Add(new productCatalog()
+                    {
+                        code = item["code"],
+                        detaiTA = "",
+                        titleWeb = "",
+                        titleSubWeb = ""
+                    });
                 }
-
-                if(!isCode)
-                    goto end;
+                
+                goto end;
             }
 
             var menuWeb = CustomizeObjects.getMenuProductsWeb();
