@@ -285,11 +285,13 @@ public class MauSacMainController : IHttpHandler
         
         String md_detai_id = context.Request.QueryString["DeTaiId"];
         
-        String sqlCount = "SELECT COUNT(*) AS count " +
-            " FROM md_mausac ms, md_chungloai cl, md_detai dt " +
-            " WHERE ms.md_chungloai_id = cl.md_chungloai_id " +
-            " AND ms.md_detai_id = dt.md_detai_id " +
-            " " + filter;
+        String sqlCount = string.Format(@"
+			SELECT COUNT(1) AS count
+            FROM md_mausac ms
+			LEFT JOIN md_chungloai cl on ms.md_chungloai_id = cl.md_chungloai_id
+			LEFT JOIN md_detai dt on ms.md_detai_id = dt.md_detai_id
+            WHERE 1=1 {0}
+		", filter);
 
         
         int page = int.Parse(context.Request.QueryString["page"]);
@@ -321,16 +323,24 @@ public class MauSacMainController : IHttpHandler
 			sidx = sidx + " " + sord;
 		}
 
-        string strsql = "select * from( " +
-            " select ms.md_mausac_id, ms.trangthai, cl.code_cl, (cl.code_cl + '-' + dt.code_dt) as code_dt, ms.code_mau " +
-            " , ms.tv_ngan, ms.ta_ngan, ms.tv_dai, ms.ta_dai, ms.hinhthucban, ms.hemau " +
-            " , ms.ngaytao, ms.nguoitao, ms.ngaycapnhat, ms.nguoicapnhat, ms.mota, ms.hoatdong " +
-            " , ROW_NUMBER() OVER (ORDER BY " + sidx + " ) as RowNum " +
-            " FROM md_mausac ms, md_chungloai cl, md_detai dt " +
-            " WHERE ms.md_chungloai_id = cl.md_chungloai_id " +
-            " AND ms.md_detai_id = dt.md_detai_id " +
-            " " + filter +
-            " )P where RowNum > @start AND RowNum < @end";
+        string strsql = string.Format(@"
+			select * 
+			from(
+				select 
+					ms.md_mausac_id, ms.trangthai, cl.code_cl, (cl.code_cl + '-' + dt.code_dt) as code_dt, ms.code_mau
+					, ms.tv_ngan, ms.ta_ngan, ms.tv_dai, ms.ta_dai, ms.hinhthucban, ms.hemau
+					, ms.ngaytao, ms.nguoitao, ms.ngaycapnhat, ms.nguoicapnhat, ms.mota, ms.hoatdong
+					, ROW_NUMBER() OVER (ORDER BY {0}) as RowNum
+				FROM md_mausac ms
+					LEFT JOIN md_chungloai cl on ms.md_chungloai_id = cl.md_chungloai_id
+					LEFT JOIN md_detai dt on ms.md_detai_id = dt.md_detai_id
+				WHERE 
+					1=1 {1}
+            )P 
+			where RowNum > @start AND RowNum < @end",
+			sidx,
+			filter
+		);
         
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
