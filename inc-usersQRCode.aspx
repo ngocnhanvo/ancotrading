@@ -102,7 +102,7 @@
                     , editable: true
                     , edittype: 'text'
                     , hidden: false
-                    , editrules: { edithidden:true, email: true, required: true }
+                    , editrules: { edithidden:true, required: true }
                 },
                 {
                     fixed: true
