@@ -63,7 +63,7 @@ public class QuotationController : IHttpHandler
     #region action
     public void getSelectOption_cb(HttpContext context)
     {
-        String sql = "select md_cangbien_id, ten_cangbien from md_cangbien where hoatdong = 1 and ma_cangbien != 'HPP' order by ten_cangbien asc";
+        String sql = "select md_cangbien_id, ten_cangbien from md_cangbien where hoatdong = 1 order by ten_cangbien asc";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToOptionNullFirst());
     }
