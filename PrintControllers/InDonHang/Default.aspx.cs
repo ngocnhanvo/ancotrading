@@ -29,7 +29,17 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         c_donhang_id = Request.QueryString["c_donhang_id"];
         type = Request.QueryString["type"];
         var dh = db.c_donhangs.Where(s => s.c_donhang_id == c_donhang_id).FirstOrDefault();
-        if(dh == null)
+        decimal total = 0;
+        if (tbl == "c_donhang")
+        {
+            total = db.c_dongdonhangs.Where(s => s.c_donhang_id == dh2.c_donhang_id).ToList().Sum(p => UserUtils.getGiaHopDongPO(dh, p, 2, true)).DecRound(2);
+        }
+        else
+        {
+            total = db.c_dongdonhangqrs.Where(s => s.c_donhangqr_id == c_donhang_id).ToList().Sum(p => p.soluong.GetValueOrDefault(0) * p.giafob.GetValueOrDefault(0)).DecRound(2);
+        }
+
+        if (dh == null)
         {
             tbl += "qr";
             tblChild += "qr";
@@ -82,7 +92,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         tang = pTang == null ? 0 : pTang.Value;
         giam = pGiam == null ? 0 : pGiam.Value;
 
-        decimal total = 0;
         //decimal.Parse(
         //    mdbc.ExecuteScalar(
         //        string.Format(@"
@@ -106,17 +115,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //    ) + ""
         //);
 
-        if(tbl == "c_donhang")
-        {
-            var dh2 = db.c_donhangs.Where(s => s.c_donhang_id == c_donhang_id).FirstOrDefault();
-            total = db.c_dongdonhangs.Where(s=>s.c_donhang_id == dh2.c_donhang_id).ToList().Sum(p => UserUtils.getGiaHopDongPO(dh2, p, 2, true)).DecRound(2);
-        }
-        else
-        {
-            total = db.c_dongdonhangqrs.Where(s => s.c_donhangqr_id == c_donhang_id).ToList().Sum(p => p.soluong.GetValueOrDefault(0) * p.giafob.GetValueOrDefault(0)).DecRound(2);
-        }
-
-        total = total + tang - giam;
+        //total = total + tang - giam;
 
         String totalWord = MoneyToWord.ConvertMoneyToText(total.ToString());
         totalWord = total.ToString();
