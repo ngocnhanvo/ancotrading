@@ -115,11 +115,10 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //    ) + ""
         //);
 
-        //total = total + tang - giam;
+        total = total + tang - giam;
 
         String totalWord = MoneyToWord.ConvertMoneyToText(total.ToString());
-        totalWord = total.ToString();
-
+        
         if (totalWord.Contains("Dollars"))
         {
             totalWord = "USD " + totalWord.Replace("Dollars", "");
