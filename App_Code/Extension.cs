@@ -126,7 +126,7 @@ public static class Extension
 	
 	public static decimal DecRound(this decimal dtMain, int dec)
     {
-        dtMain = Decimal.Round(dtMain, dec);
+        dtMain = Decimal.Round(dtMain, dec, MidpointRounding.AwayFromZero);
         return dtMain;
 	}
 
