@@ -89,7 +89,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         cast(A.amount - (A.amount * @discount / 100) as decimal(18, 2))
                     from (
                         select 
-                            sum(soluong * ((giafob + isnull(phi, 0)) - (giafob + isnull(phi, 0)) * isnull(discount, 0) / 100)) as amount 
+                            sum(soluong * (cast(giafob + isnull(phi, 0)) - (giafob + isnull(phi, 0)) * isnull(discount, 0) / 100) as decimal(18, 2)) as amount 
                         from 
                             {1} 
                         where 
