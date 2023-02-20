@@ -32,7 +32,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         decimal total = 0;
         if (tbl == "c_donhang")
         {
-            total = db.c_dongdonhangs.Where(s => s.c_donhang_id == dh2.c_donhang_id).ToList().Sum(p => UserUtils.getGiaHopDongPO(dh, p, 2, true)).DecRound(2);
+            total = db.c_dongdonhangs.Where(s => s.c_donhang_id == dh.c_donhang_id).ToList().Sum(p => UserUtils.getGiaHopDongPO(dh, p, 2, true)).DecRound(2);
         }
         else
         {
