@@ -82,28 +82,38 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         tang = pTang == null ? 0 : pTang.Value;
         giam = pGiam == null ? 0 : pGiam.Value;
 
-        decimal total = decimal.Parse(
-            mdbc.ExecuteScalar(
-                string.Format(@"
-                    select 
-                        cast(A.amount - (A.amount * @discount / 100) as decimal(18, 2))
-                    from (
-                        select 
-                            sum(soluong * (cast(giafob + isnull(phi, 0)) - (giafob + isnull(phi, 0)) * isnull(discount, 0) / 100) as decimal(18, 2)) as amount 
-                        from 
-                            {1} 
-                        where 
-                            {0}_id = @c_donhang_id
-                    )A"
-                    , tbl
-                    , tblChild
-                )
-                , "@c_donhang_id"
-                , c_donhang_id
-                , "@discount"
-                , discountPO
-            ) + ""
-        );
+        decimal total = 0;
+        //decimal.Parse(
+        //    mdbc.ExecuteScalar(
+        //        string.Format(@"
+        //            select 
+        //                cast(A.amount - (A.amount * @discount / 100) as decimal(18, 2))
+        //            from (
+        //                select 
+        //                    sum(soluong * (cast(giafob + isnull(phi, 0)) - (giafob + isnull(phi, 0)) * isnull(discount, 0) / 100) as decimal(18, 2)) as amount 
+        //                from 
+        //                    {1} 
+        //                where 
+        //                    {0}_id = @c_donhang_id
+        //            )A"
+        //            , tbl
+        //            , tblChild
+        //        )
+        //        , "@c_donhang_id"
+        //        , c_donhang_id
+        //        , "@discount"
+        //        , discountPO
+        //    ) + ""
+        //);
+
+        if(tbl == "c_donhang")
+        {
+            total = db.c_dongdonhangs.Where(s=>s.c_donhang_id == c_donhang_id).ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, 2, true)).DecRound(2);
+        }
+        else
+        {
+            total = db.c_dongdonhangqrs.Where(s => s.c_donhangqr_id == c_donhang_id).ToList().Sum(p => p.soluong.GetValueOrDefault(0) * p.giafob.GetValueOrDefault(0)).DecRound(2);
+        }
 
         total = total + tang - giam;
 
