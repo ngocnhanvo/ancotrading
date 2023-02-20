@@ -109,7 +109,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         if(tbl == "c_donhang")
         {
             var dh2 = db.c_donhangs.Where(s => s.c_donhang_id == c_donhang_id).FirstOrDefault();
-            total = db.c_dongdonhangs.Where(s=>s.c_donhang_id == c_donhang_id).ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh2, p, 2, true)).DecRound(2);
+            total = db.c_dongdonhangs.Where(s=>s.c_donhang_id == dh2.c_donhang_id).ToList().Sum(p => UserUtils.getGiaHopDongPO(dh2, p, 2, true)).DecRound(2);
         }
         else
         {
