@@ -1741,6 +1741,16 @@
 		        buttonicon: "ui-icon-cancel",
 		        title: "Hủy đơn hàng",
 		        onClickButton: HuyDonHang
+                });
+
+            $("#grid_ds_po").jqGrid('navButtonAdd', '#grid_ds_po-pager',
+		    {
+		        caption: "",
+		        buttonicon: "ui-icon-move",
+                title: "Chuyển đơn hàng",
+                onClickButton: function () {
+                    alert('ok');
+                }
 		    });
 	    });
     </script>
