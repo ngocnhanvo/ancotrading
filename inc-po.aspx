@@ -1749,9 +1749,11 @@
 		        buttonicon: "ui-icon-star",
                 title: "Chuyển đơn hàng",
                 onClickButton: function () {
-                    $('body').append(`<div title="Thông Báo" id="dialog-chuyendonhang">
-                        <label>Chuyển đơn hàng tới tài khoản:</label>
-                        <input id="txtChuyenDonHangUser" type="text" />
+                    $('body').append(`<div title="Chuyển đơn hàng" id="dialog-chuyendonhang">
+                        <div style="margin-top:5px;">
+                            <label>Chuyển đơn hàng tới tài khoản:</label>
+                            <input id="txtChuyenDonHangUser" type="text" style="margin-top: 5px; padding: 4px;" />
+                        </div>
                     </div>`);
 
                     // create new dialog
