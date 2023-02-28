@@ -1746,10 +1746,30 @@
             $("#grid_ds_po").jqGrid('navButtonAdd', '#grid_ds_po-pager',
 		    {
 		        caption: "",
-		        buttonicon: "ui-icon-move",
+		        buttonicon: "ui-icon-star",
                 title: "Chuyển đơn hàng",
                 onClickButton: function () {
-                    alert('ok');
+                    $('body').append(`<div title="Thông Báo" id=\"dialog-chuyendonhang-po\">
+                        <label>Chuyển đơn hàng tới tài khoản:</label>
+                        <input id="txtChuyenDonHangUser" type="text" />
+                    </div>`);
+
+                    // create new dialog
+                    $('#dialog-chuyendonhang').dialog({
+                        modal: true
+                        , open: function (event, ui) {
+                            //hide close button.
+                            $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                        }
+                        , buttons: {
+                            'Đồng ý': function () {
+                                alert('ok');
+                            },
+                            'Thoát': function () {
+                                $(this).dialog("destroy").remove();
+                            }
+                        }
+                    });
                 }
 		    });
 	    });
