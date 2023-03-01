@@ -1743,37 +1743,57 @@
 		        onClickButton: HuyDonHang
                 });
 
-            $("#grid_ds_po").jqGrid('navButtonAdd', '#grid_ds_po-pager',
-		    {
-		        caption: "",
-		        buttonicon: "ui-icon-star",
-                title: "Chuyển đơn hàng",
-                onClickButton: function () {
-                    $('body').append(`<div title="Chuyển đơn hàng" id="dialog-chuyendonhang">
+            if (vnnIsAdmin == 'True') {
+                $("#grid_ds_po").jqGrid('navButtonAdd', '#grid_ds_po-pager',
+                    {
+                        caption: "",
+                        buttonicon: "ui-icon-star",
+                        title: "Chuyển đơn hàng",
+                        onClickButton: function () {
+                            $('body').append(`<div title="Chuyển đơn hàng" id="dialog-chuyendonhang">
+                        <div style="display:none" id="waitChuyenDonHang"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>
                         <div style="margin-top:5px;">
                             <label>Chuyển đơn hàng tới tài khoản:</label>
                             <input id="txtChuyenDonHangUser" type="text" style="margin-top: 5px; padding: 4px;" />
                         </div>
                     </div>`);
 
-                    // create new dialog
-                    $('#dialog-chuyendonhang').dialog({
-                        modal: true
-                        , open: function (event, ui) {
-                            //hide close button.
-                            $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
-                        }
-                        , buttons: {
-                            'Đồng ý': function () {
-                                alert('ok');
-                            },
-                            'Thoát': function () {
-                                $(this).dialog("destroy").remove();
-                            }
+                            // create new dialog
+                            $('#dialog-chuyendonhang').dialog({
+                                modal: true
+                                , open: function (event, ui) {
+                                    //hide close button.
+                                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                                }
+                                , buttons: {
+                                    'Đồng ý': function () {
+                                        let ids = $("#grid_ds_po").jqGrid('getGridParam', 'selarrrow');
+                                        let user = $('#txtChuyenDonHangUser').val();
+                                        let wait = $('#waitChuyenDonHang');
+                                        wait.css('display', '');
+                                        let page = $('#grid_ds_po').getGridParam("page");
+                                        $.post('Controllers/DonHangController.ashx', { action: 'ChuyenDonHang', id: ids.toString(), user: user }, function (result) {
+                                            if (!result) {
+                                                $('#grid_ds_po').trigger("reloadGrid", [{ current: true, page: page }]);
+                                                $('#dialog-chuyendonhang').dialog("destroy").remove();
+                                            }
+                                            else {
+                                                alert(result);
+                                                wait.css('display', 'none');
+                                            }
+                                        }).fail(function () {
+                                            alert('Lỗi');
+                                            wait.css('display', 'none');
+                                        });
+                                    },
+                                    'Thoát': function () {
+                                        $(this).dialog("destroy").remove();
+                                    }
+                                }
+                            });
                         }
                     });
-                }
-		    });
+            }
 	    });
     </script>
 	

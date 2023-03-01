@@ -14,7 +14,7 @@ public class DonHangController : IHttpHandler
     public void ProcessRequest(HttpContext context)
     {
         String action, oper;
-        action = context.Request.QueryString["action"];
+        action = context.Request.Params["action"];
         oper = context.Request.Form["oper"];
         switch (action)
         {
@@ -51,6 +51,9 @@ public class DonHangController : IHttpHandler
             case "CopyDonHang":
                 this.CopyDonHang(context);
                 break;
+            case "ChuyenDonHang":
+                this.ChuyenDonHang(context);
+                break;
             default:
                 switch (oper)
                 {
@@ -81,6 +84,68 @@ public class DonHangController : IHttpHandler
             ms.Seek(0, System.IO.SeekOrigin.Begin);
             return (T)dcs.ReadObject(ms);
         }
+    }
+
+    public void ChuyenDonHang(HttpContext context)
+    {
+        string msg = "";
+        string user = context.Request.Form["user"];
+        try
+        {
+            user = user.Trim();
+            var nv = db.nhanviens.Where(s => s.manv == user).FirstOrDefault();
+            if(nv == null)
+            {
+                msg = string.Format("Không tìm thấy tài khoản có mã là {0}.", user);
+                goto EndEventHandler;
+            }
+
+            string[] ids = context.Request.Params["id"].Split(',');
+            foreach(var id in ids)
+            {
+                //Don hang
+                var dh = db.c_donhangs.Where(p => p.c_donhang_id.Equals(id)).FirstOrDefault();
+                if(dh != null)
+                {
+                    if (dh.nguoitao != nv.manv)
+                    {
+                        dh.nguoitao = nv.manv;
+                        dh.nguoicapnhat = nv.manv;
+                        dh.nguoilap = nv.manv;
+                        //Dong don hang
+                        var ddhs = db.c_dongdonhangs.Where(s => s.c_donhang_id == dh.c_donhang_id).ToList();
+                        foreach (var ddh in ddhs)
+                        {
+                            ddh.nguoitao = nv.manv;
+                            ddh.nguoicapnhat = nv.manv;
+                        }
+                        //Phi don hang
+                        var pdhs = db.c_phidonhangs.Where(s => s.c_donhang_id == dh.c_donhang_id).ToList();
+                        foreach (var pdh in pdhs)
+                        {
+                            pdh.nguoitao = nv.manv;
+                            pdh.nguoicapnhat = nv.manv;
+                        }
+                    }
+                    //Danh Sach Dat Hang
+                    var dsdhs = db.c_danhsachdathangs.Where(s => s.c_donhang_id == dh.c_donhang_id).ToList();
+                    foreach(var dsdh in dsdhs)
+                    {
+                        dsdh.nguoi_dathang = nv.manv;
+                        dsdh.nguoi_phutrach = nv.manv;
+                    }
+                }
+            }
+
+            db.SubmitChanges();
+        }
+        catch (Exception e)
+        {
+            context.Response.Write(e.Message);
+        }
+
+    EndEventHandler:;
+        context.Response.Write(msg);
     }
 
     public void CopyDonHang(HttpContext context)
