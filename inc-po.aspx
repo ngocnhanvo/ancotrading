@@ -22,16 +22,19 @@
 
     function updateGiaSanPhamPO_CallBack(c_donhang_id, md_sanpham_id) {
         let frm = "#FrmGrid_grid_ds_chitietpo";
+        let giafobGoc = $('#giafobGoc', frm);
         let giafob = $('#giafob', frm);
         let phifob = $('#phi', frm);
         let docquyen = $('#docquyen', frm);
         let editPhiFOB = $('#editphi', frm);
+        giafobGoc.val('Đang tải...');
         giafob.val('Đang tải...');
         $.ajax({
             url: "Controllers/DongDonHangController.ashx?action=getgiasanpham&c_donhang_id=" + c_donhang_id + "&md_sanpham_id=" + md_sanpham_id,
             type: "GET",
             success: function (data) {
                 data = JSON.parse(data);
+                giafobGoc.val(data.gia[0]);
                 giafob.val(data.gia[0]);
                 phifob.val(data.phi[0]);
                 updateMoTaGiaPO_CallBack(c_donhang_id, md_sanpham_id);
@@ -1605,6 +1608,20 @@
                 , formoptions: { colpos: 2, rowpos: 11 }
             },
             {
+                fixed: true, name: 'chuyenphiDSDH'
+                , label: 'Chuyển phí sang DSDH'
+                , hidden: true
+                , editrules:{
+                    edithidden:true
+                }
+                , editable: true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions: { value:'True:False', defaultValue: 'True' }
+                , formatter: 'checkbox'
+                , formoptions: { colpos: 2, rowpos: 12 }
+            },
+            {
                 fixed: true, name: 'discount_hehang'
                 , label: 'Discount Hệ Hàng'
                 , hidden: true
@@ -1616,7 +1633,7 @@
                 , align: 'center'
                 , editoptions: { value:'True:False', defaultValue: 'False' }
                 , formatter: 'checkbox'
-                , formoptions: { colpos: 2, rowpos: 12 }
+                , formoptions: { colpos: 2, rowpos: 13 }
             },
             {
                 fixed: true, name: 'discount_hehang_value'
@@ -1627,7 +1644,7 @@
                 }
                 , editable: true
                 , align: 'center'
-                , formoptions: { colpos: 2, rowpos: 13 }
+                , formoptions: { colpos: 2, rowpos: 14 }
             }
             ]"
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
@@ -1943,8 +1960,21 @@
                 , editable:true
             },
 			{
+				name: 'giafobGoc'
+				, label: 'Giá FOB gốc'
+				, index: 'ddh.giafobGoc'
+				, fixed:true , width: 100
+				, edittype: 'text'
+				, editable: true
+				, editrules: { required:true, number: true }
+                , editoptions:{ defaultValue: '0' }
+				, align: 'right'
+				, formatter:'currency'
+				, formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+			},
+            {
 				name: 'giafob'
-				, label: 'Giá gốc'
+				, label: 'Giá FOB'
 				, index: 'ddh.giafob'
 				, fixed:true , width: 100
 				, edittype: 'text'
@@ -2256,6 +2286,7 @@
                             $(formid).parent().parent().parent().dialog('destroy').remove();
                             alert('Hãy chọn một đơn hàng mới có thể tạo chi tiết.!');
                         }else{
+                            phiTheoPhanTramDonHang(formid);
                             $('#tr_' + forId + ' td.DataTD input#' + forId, formid).val(masterId);
 							
 							$('#ma_sanpham', formid).mask('99-*****-**-**');
@@ -2276,7 +2307,7 @@
                         return [false,'Hãy chọn một đơn hàng mới có thể tạo chi tiết.!!'];
                     }else{
                         postdata.c_donhang_id = masterId;
-						var check_thaydoi = $('#md_donggoi_id > option:selected').attr('other');
+						var check_thaydoi = $('#md_donggoi_id option:selected').attr('other');
 						var check_docquyen = $('#docquyen','#FrmGrid_grid_ds_chitietpo').val();
 						if(check_thaydoi.toUpperCase() == 'TRUE')
 						{
@@ -2321,6 +2352,7 @@
             EditFormOptions ="
                 width: 450,
                 beforeShowForm: function (formid) {
+                    phiTheoPhanTramDonHang(formid);
                     $('#ma_sanpham', formid).mask('**-*****-**-**');
                     $('#ma_sanpham', formid).prop('disabled', true);
                     $('#tr_giafob', formid).show();
@@ -2338,7 +2370,7 @@
                         return [false,'Hãy chọn một đơn hàng có thể sửa chi tiết.!!'];
                     }else{
                         postdata.c_donhang_id = masterId;
-						var check_thaydoi = $('#md_donggoi_id > option:selected').attr('other');
+						var check_thaydoi = $('#md_donggoi_id option:selected').attr('other');
 						var check_docquyen = $('#docquyen','#FrmGrid_grid_ds_chitietpo').val();
 						if(check_thaydoi.toUpperCase() == 'TRUE')
 						{
@@ -2889,7 +2921,74 @@
 	        show_congthuc_giamua();
 	        show_chuyenhetNCC();
 	        //'<tr rowpos="3" class="FormData"><td colspan=2></td>Khách hàng</tr>'.insertBefore($('#tr_phi'));
-	    };
+        };
+
+        var phiTheoPhanTramDonHang = function (frm) {
+            let phiFOB = $('#phi', frm);
+            let giafobGoc = $('#giafobGoc', frm);
+            let giafob = $('#giafob', frm);
+            giafobGoc.prop('disabled', true);
+
+            if (!phiFOB[0].changePT) {
+                phiFOB[0].changePT = 1;
+                 phiFOB.keydown(function (e) {
+                    if (!e.shiftKey) return;
+
+                    let thisSav = $(this);
+                    let giaCongTy = giafob.val();
+                    giaCongTy = giaCongTy.replace(/ /g, '');
+
+                    let code = e.which || e.keyCode;
+                    if (e.shiftKey) {
+                        switch (code) {
+                            case 53:
+                                let valVC = Number(thisSav.val());
+                                if (giaCongTy == '')
+                                    alert('giá FOB không được bỏ trống');
+                                else if (isNaN(valVC))
+                                    alert('trường đang nhập chưa có giá trị');
+                                else {
+                                    let val = Number(giaCongTy);
+                                    val = (val * valVC / 100).toFixed(2);
+                                    thisSav.val(val);
+                                }
+                                e.stopPropagation();
+                                e.preventDefault();
+                        }
+                    }
+                });
+            }
+
+            if (!giafob[0].changePT) {
+                giafob[0].changePT = 1;
+                giafob.keydown(function (e) {
+                    if (!e.shiftKey) return;
+
+                    let thisSav = $(this);
+                    let giaCongTy = giafobGoc.val();
+                    giaCongTy = giaCongTy.replace(/ /g, '');
+
+                    let code = e.which || e.keyCode;
+                    if (e.shiftKey) {
+                        switch (code) {
+                            case 53:
+                                let valVC = Number(thisSav.val());
+                                if (giaCongTy == '')
+                                    alert('giá FOB gốc không được bỏ trống');
+                                else if (isNaN(valVC))
+                                    alert('trường đang nhập chưa có giá trị');
+                                else {
+                                    let val = Number(giaCongTy);
+                                    val = (val * valVC / 100).toFixed(2);
+                                    thisSav.val(val);
+                                }
+                                e.stopPropagation();
+                                e.preventDefault();
+                        }
+                    }
+                });
+            }
+        };
 
 	    var show_selectoption_dsphi = function () {
 	        var frm = '#FrmGrid_grid_khoanphi';

@@ -144,6 +144,7 @@ public class DongDonHangController : IHttpHandler
                     m.sothutu = int.Parse(context.Request.Form["sothutu"]);
                     if (nv.isadmin.Value)
                     {
+                        m.giafobGoc = decimal.Parse(context.Request.Form["giafobGoc"]);
                         m.giafob = decimal.Parse(context.Request.Form["giafob"]);
                     }
                     m.phi = phiVal;
@@ -264,7 +265,9 @@ public class DongDonHangController : IHttpHandler
 
         var itemJS = UserUtils.get_giasanpham(context, c_donhang_id, md_sanpham_id, db);
         string barcode = "";
-        decimal gia_sp = decimal.Parse(context.Request.Form["giafob"]); ;
+        
+        decimal gia_spGoc = decimal.Parse(context.Request.Form["giafobGoc"]);
+        decimal gia_sp = decimal.Parse(context.Request.Form["giafob"]);
         try
         {
             barcode = itemJS["barcode"].ToString();
@@ -402,6 +405,7 @@ public class DongDonHangController : IHttpHandler
             mnu.md_sanpham_id = md_sanpham_id;
             mnu.ma_sanpham_khach = context.Request.Form["ma_sanpham_khach"];
             mnu.sothutu = maxLine + 10;
+            mnu.giafobGoc = gia_spGoc;
             mnu.giafob = gia_sp;
             mnu.giachuan = null;
             mnu.discount = 0;
@@ -573,6 +577,7 @@ public class DongDonHangController : IHttpHandler
                         , sp.md_sanpham_id
                         , sp.ma_sanpham
                         , ddh.ma_sanpham_khach
+                        , isnull(ddh.giafobGoc, ddh.giafob) as giafobGoc
                         , ddh.giafob
                         , isnull(ddh.phi, 0) as phi
                         , (case when isnull(dh.discount, 0) > 0 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discount
@@ -624,6 +629,7 @@ public class DongDonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["md_sanpham_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_sanpham"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_sanpham_khach"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["giafobGoc"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["giafob"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount"] + "]]></cell>";

@@ -803,6 +803,8 @@ public class DonHangController : IHttpHandler
 
             string phanbodiscountStr = (context.Request.Form["phanbodiscount"] + "").ToLower();
             var phanbodiscount = phanbodiscountStr.Equals("on") || phanbodiscountStr.Equals("true");
+            string chuyenphiDSDHStr = (context.Request.Form["chuyenphiDSDH"] + "").ToLower();
+            var chuyenphiDSDH = chuyenphiDSDHStr.Equals("on") || chuyenphiDSDHStr.Equals("true");
 
             bool isdh_mau, isdonhang_tmp, isgiadb, chkPBGCu = false;
             isdh_mau = isdonhang_tmp = isgiadb = false;
@@ -907,6 +909,7 @@ public class DonHangController : IHttpHandler
                     mnu.md_banggia_id = context.Request.Form["md_banggia_id"];
                     mnu.sochungtu = jqGridHelper.Utils.taoChungTuPO(context.Request.Form["md_doitackinhdoanh_id"], donhangmau_, mnu.ngaylap.Value.Year.ToString());
 
+                    mnu.chuyenphiDSDH = chuyenphiDSDH;
                     mnu.phanbodiscount = phanbodiscount;
                     mnu.mota = context.Request.Form["mota"];
                     mnu.hoatdong = true;
@@ -978,6 +981,8 @@ public class DonHangController : IHttpHandler
             String donhang_tmp = context.Request.Form["isdonhangtmp"].ToLower();
             string phanbodiscountStr = (context.Request.Form["phanbodiscount"] + "").ToLower();
             var phanbodiscount = phanbodiscountStr.Equals("on") || phanbodiscountStr.Equals("true");
+            string chuyenphiDSDHStr = (context.Request.Form["chuyenphiDSDH"] + "").ToLower();
+            var chuyenphiDSDH = chuyenphiDSDHStr.Equals("on") || chuyenphiDSDHStr.Equals("true");
 
             decimal mnu_cont20 = 0;
             try { mnu_cont20 = decimal.Parse(context.Request.Form["cont20"]); } catch { }
@@ -1071,6 +1076,7 @@ public class DonHangController : IHttpHandler
 
                     m.mota = context.Request.Form["mota"];
                     m.phanbodiscount = phanbodiscount;
+                    m.chuyenphiDSDH = chuyenphiDSDH;
                     m.hoatdong = true;
                     m.ngaycapnhat = DateTime.Now;
                     m.nguoicapnhat = UserUtils.getUser(context);
@@ -1312,6 +1318,7 @@ public class DonHangController : IHttpHandler
             dh.phienbangiacu,
             dh.ghichu,
             dh.phanbodiscount,
+            dh.chuyenphiDSDH,
             dh.discount_hehang,
             dh.discount_hehang_value,
             ROW_NUMBER() OVER (ORDER BY {2} {3}) as RowNum 
@@ -1383,6 +1390,7 @@ public class DonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["phienbangiacu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phanbodiscount"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["chuyenphiDSDH"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount_hehang"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount_hehang_value"] + "]]></cell>";
             xml += "</row>";

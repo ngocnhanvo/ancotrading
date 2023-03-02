@@ -403,7 +403,7 @@ public static class UserUtils
                 {
 					gianhap = gianhap2;
                     giachuan = jqGridHelper.Utils.Round5(gianhap, -2);
-                    gianhap = jqGridHelper.Utils.Round5(gianhap + (phiDiscount * tygia), -2);
+                    gianhap = phiDiscount;
                 }
                 else
                 {
@@ -414,7 +414,7 @@ public static class UserUtils
             }
             else
             {
-                gianhap = phiDiscount * tygia;
+                gianhap = jqGridHelper.Utils.Round5(gianhap + phiDiscount * tygia, -2);
             }
 
             var ddsdh = new c_dongdsdh();
