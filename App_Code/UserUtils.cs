@@ -404,7 +404,7 @@ public static class UserUtils
                 {
 					gianhap = gianhap2;
                     giachuan = jqGridHelper.Utils.Round5(gianhap, -2);
-                    gianhap = jqGridHelper.Utils.Round5(gianhap + (phiDiscount * tylePT * tygia), -2);
+                    gianhap = giachuan + jqGridHelper.Utils.Round5(phiDiscount * tylePT * tygia, -2);
                 }
                 else
                 {
