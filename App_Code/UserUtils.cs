@@ -379,6 +379,7 @@ public static class UserUtils
 			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, 0, 0, db);
             var giaNhap2BD = gianhap2;
             decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2, db);
+            decimal tylePT = get_gianhap(context, ma_dtkd_select, -1, -1, -1, db);
 
             var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
             if (!donhang.chuyenphiDSDH.GetValueOrDefault(false))
@@ -403,7 +404,7 @@ public static class UserUtils
                 {
 					gianhap = gianhap2;
                     giachuan = jqGridHelper.Utils.Round5(gianhap, -2);
-                    gianhap = tygia * phiDiscount;
+                    gianhap = jqGridHelper.Utils.Round5(gianhap + (phiDiscount * tylePT * tygia), -2);
                 }
                 else
                 {
