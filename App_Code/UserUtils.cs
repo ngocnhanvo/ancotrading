@@ -393,7 +393,8 @@ public static class UserUtils
                     phiDiscount = ddonhang.phi.GetValueOrDefault(0);
             }
 
-            gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
+            if (donhang.phanbodiscount.GetValueOrDefault(false))
+                gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
 
             if (maNCC == "ANCO1" & giachuan > -1)
                 giaNhap2BD = -1;
@@ -404,7 +405,7 @@ public static class UserUtils
                 {
 					gianhap = gianhap2;
                     giachuan = jqGridHelper.Utils.Round5(gianhap, -2);
-                    gianhap = giachuan + jqGridHelper.Utils.Round5(phiDiscount * tylePT * tygia, -2);
+                    gianhap = giachuan + jqGridHelper.Utils.Round5(phiDiscount * tygia, -2);
                 }
                 else
                 {
