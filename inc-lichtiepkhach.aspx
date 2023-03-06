@@ -2,9 +2,10 @@
 <%@ Register src="jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
     <uc1:jqGrid  ID="grid_ds_lichtiepkhach" 
             SortName="ngay" 
+            FilterToolbar="true"
             UrlFileAction="Controllers/LichTiepKhachController.ashx" 
             RowNumbers="true"
-            GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()- 45);"
+            GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()- 64);"
             OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid, {
                 beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
