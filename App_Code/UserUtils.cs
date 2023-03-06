@@ -399,7 +399,10 @@ public static class UserUtils
             if (giaNhap2BD > -1)
             {
                 if (donhang.phanbodiscount.GetValueOrDefault(false))
-                    gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, donhang.discount.GetValueOrDefault(0), 0, db);
+                {
+                    var discount = donhang.discount.GetValueOrDefault(0) > 0 ? donhang.discount.GetValueOrDefault(0) : (decimal)ddonhang.discount.GetValueOrDefault(0);
+                    gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, discount, 0, db);
+                }
                 else
                     gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
 
