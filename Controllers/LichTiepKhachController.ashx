@@ -57,10 +57,20 @@ public class LichTiepKhachController : IHttpHandler
                 ltk.soluong = context.Request.Form["soluong"];
                 ltk.thoigian = context.Request.Form["thoigian"];
                 ltk.ngay = DateTime.ParseExact(context.Request.Form["ngay"], "dd/MM/yyyy", null);
+
                 ltk.noidon = context.Request.Form["noidon"];
+                if (string.IsNullOrWhiteSpace(ltk.noidon))
+                    ltk.noidon = "Tự đến";
                 ltk.noiduave = context.Request.Form["noiduave"];
+                if (string.IsNullOrWhiteSpace(ltk.noiduave))
+                    ltk.noiduave = "Ko";
                 ltk.sosuat = context.Request.Form["sosuat"];
+                if (string.IsNullOrWhiteSpace(ltk.sosuat))
+                    ltk.sosuat = "Ko";
                 ltk.thucan = context.Request.Form["thucan"];
+                if (string.IsNullOrWhiteSpace(ltk.thucan))
+                    ltk.thucan = "Ko";
+
                 ltk.nguoilienhe = context.Request.Form["nguoilienhe"];
                 ltk.mota = context.Request.Form["mota"];
                 ltk.nguoicapnhat = UserUtils.getUser(context);
@@ -88,10 +98,20 @@ public class LichTiepKhachController : IHttpHandler
             ltk.soluong = context.Request.Form["soluong"];
             ltk.thoigian = context.Request.Form["thoigian"];
             ltk.ngay = DateTime.ParseExact(context.Request.Form["ngay"], "dd/MM/yyyy", null);
+
             ltk.noidon = context.Request.Form["noidon"];
+            if (string.IsNullOrWhiteSpace(ltk.noidon))
+                ltk.noidon = "Tự đến";
             ltk.noiduave = context.Request.Form["noiduave"];
+            if (string.IsNullOrWhiteSpace(ltk.noiduave))
+                ltk.noiduave = "Ko";
             ltk.sosuat = context.Request.Form["sosuat"];
+            if (string.IsNullOrWhiteSpace(ltk.sosuat))
+                ltk.sosuat = "Ko";
             ltk.thucan = context.Request.Form["thucan"];
+            if (string.IsNullOrWhiteSpace(ltk.thucan))
+                ltk.thucan = "Ko";
+
             ltk.nguoilienhe = context.Request.Form["nguoilienhe"];
             ltk.mota = context.Request.Form["mota"];
             ltk.nguoitao = UserUtils.getUser(context);
