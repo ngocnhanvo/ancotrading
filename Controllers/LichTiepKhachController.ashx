@@ -184,7 +184,10 @@ public class LichTiepKhachController : IHttpHandler
             msg = ex.ToString();
         }
 
-        context.Response.Write(msg);
+        if (msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Sửa thành công");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     public void add(HttpContext context)
@@ -228,7 +231,10 @@ public class LichTiepKhachController : IHttpHandler
             msg = ex.ToString();
         }
 
-        context.Response.Write(msg);
+        if (msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Thêm thành công");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
 
@@ -255,7 +261,10 @@ public class LichTiepKhachController : IHttpHandler
             msg = ex.ToString();
         }
 
-        context.Response.Write(msg);
+        if (msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Xóa thành công");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     public void load(HttpContext context)
