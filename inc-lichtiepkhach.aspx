@@ -29,12 +29,31 @@
                 , key: true
             },
             {
-                 fixed: true, name: 'khachhang'
-                 , index: 'khachhang'
-                 , label: 'Khách hàng'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
+                fixed: true, name: 'khachhang'
+                , index: 'khachhang'
+                , label: 'Khách hàng'
+                , editable: true
+                , width: 100
+                , edittype: 'text'
+                , editoptions: { 
+                    dataInit : function (elem) { 
+                        $(elem).combogrid({
+                            searchIcon: true,
+                            width: '480px',
+                            url: 'Controllers/LichTiepKhachController.ashx?action=khachhangs',
+                            colModel: [
+                                { 'columnName': 'ma_dtkd', 'width': '30', 'label': 'Mã KH', 'align':'left'}
+                                , { 'columnName': 'ten_dtkd', 'width': '35', 'label': 'Tên KH' , 'align':'left'}
+                                , { 'columnName': 'ten_quocgia', 'width': '35', 'label': 'Quốc gia' , 'align':'left'}
+                            ], 
+                            select: function(event, ui) {
+                                $(elem).val(ui.item.ma_dtkd);
+                                $('#quocgia','#FrmGrid_grid_ds_lichtiepkhach').val(ui.item.ten_quocgia);
+                                return false;
+                            }
+                        });
+                    } 
+                }
             },
             {
                 fixed: true, name: 'quocgia'

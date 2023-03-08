@@ -1,10 +1,11 @@
 ﻿<%@ WebHandler Language="C#" Class="LichTiepKhachController" %>
 
-
 using System;
 using System.Web;
 using System.Data.Linq;
 using System.Linq;
+using System.Collections.Generic;
+using System.Data;
 
 public class LichTiepKhachController : IHttpHandler
 {
@@ -17,6 +18,9 @@ public class LichTiepKhachController : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
+            case "khachhangs":
+                this.khachhangs(context);
+                break;
             default:
                 switch (oper)
                 {
@@ -37,6 +41,103 @@ public class LichTiepKhachController : IHttpHandler
         }
     }
 
+    public void khachhangs(HttpContext context)
+    {
+        context.Response.ContentType = "text/plain";
+        String searchTerm = context.Request.QueryString["searchTerm"];
+        if (searchTerm == "")
+        {
+            searchTerm = "%";
+        }
+        else
+        {
+            searchTerm = String.Format("{0}%", searchTerm);
+        }
+
+        String sqlCount = String.Format(@"
+            SELECT COUNT(1) AS count 
+            FROM md_doitackinhdoanh dtkd 
+            LEFT JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id
+            LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id
+            WHERE dtkd.ma_dtkd like '{0}' and dtkd.hoatdong = 1 and ldt.ma_loaidtkd in ('NHH','KH')
+        ", searchTerm);
+
+        int page = int.Parse(context.Request.QueryString["page"]);
+        int limit = int.Parse(context.Request.QueryString["rows"]);
+        String sidx = context.Request.QueryString["sidx"];
+        String sord = context.Request.QueryString["sord"];
+        int total_page;
+        int count = (int)mdbc.ExecuteScalar(sqlCount);
+        int start, end;
+
+        if (count > 0)
+        {
+            total_page = (int)Math.Ceiling(1.0 * count / limit);
+        }
+        else
+        {
+            total_page = 0;
+        }
+
+        if (page > total_page) page = total_page;
+        start = limit * page - limit;
+        end = (page * limit) + 1;
+
+        if (sidx.Equals("") || sidx == null)
+        {
+            sidx = "ma_dtkd";
+        }
+
+        String sql = "";
+        if (total_page != 0)
+        {
+            sql = String.Format(@"
+                select * from ( 
+                    SELECT dtkd.ma_dtkd, dtkd.ten_dtkd, qg.ten_quocgia, ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum 
+                    FROM md_doitackinhdoanh dtkd 
+                    LEFT JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id
+                    LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id
+                    WHERE dtkd.ma_dtkd like '{2}' and dtkd.hoatdong = 1 and ldt.ma_loaidtkd in ('NHH','KH')
+                )P where RowNum > @start AND RowNum < @end"
+            , sidx, sord, searchTerm);
+        }
+        else
+        {
+            sql = String.Format(@"
+                select * from ( 
+                    SELECT dtkd.ma_dtkd, dtkd.ten_dtkd, qg.ten_quocgia, ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum 
+                    FROM md_doitackinhdoanh dtkd 
+                    LEFT JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id
+                    LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id
+                    WHERE dtkd.ma_dtkd like '{2}' and dtkd.hoatdong = 1 and ldt.ma_loaidtkd in ('NHH','KH')
+                )P"
+            , sidx, sord, searchTerm);
+        }
+
+        var dt = mdbc.GetData(sql, "@start", start, "@end", end);
+        var jsonNew = new Dictionary<string, object>();
+        jsonNew["page"] = page;
+        jsonNew["total"] = total_page;
+        jsonNew["records"] = count;
+        var items = new List<Dictionary<string, object>>();
+
+        foreach (DataRow row in dt.Rows)
+        {
+            var item = new Dictionary<string, object>();
+            item["ma_dtkd"] = row["ma_dtkd"];
+            item["ten_dtkd"] = row["ten_dtkd"];
+            item["ten_quocgia"] = row["ten_quocgia"];
+            items.Add(item);
+        }
+
+        if (items.Count > 0)
+            jsonNew["rows"] = items;
+        else
+            jsonNew["rows"] = null;
+
+        context.Response.Write(Newtonsoft.Json.JsonConvert.SerializeObject(jsonNew));
+    }
+
     public void edit(HttpContext context)
     {
         string msg = "";
@@ -53,7 +154,7 @@ public class LichTiepKhachController : IHttpHandler
             else
             {
                 ltk.khachhang = context.Request.Form["khachhang"];
-                ltk.quocgia = context.Request.Form["khachhang"];
+                ltk.quocgia = context.Request.Form["quocgia"];
                 ltk.soluong = context.Request.Form["soluong"];
                 ltk.thoigian = context.Request.Form["thoigian"];
                 ltk.ngay = DateTime.ParseExact(context.Request.Form["ngay"], "dd/MM/yyyy", null);
@@ -94,7 +195,7 @@ public class LichTiepKhachController : IHttpHandler
             var ltk = new md_lichtiepkhach();
             ltk.md_lichtiepkhach_id = Helper.getNewId();
             ltk.khachhang = context.Request.Form["khachhang"];
-            ltk.quocgia = context.Request.Form["khachhang"];
+            ltk.quocgia = context.Request.Form["quocgia"];
             ltk.soluong = context.Request.Form["soluong"];
             ltk.thoigian = context.Request.Form["thoigian"];
             ltk.ngay = DateTime.ParseExact(context.Request.Form["ngay"], "dd/MM/yyyy", null);
