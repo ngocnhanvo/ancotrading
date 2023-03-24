@@ -330,6 +330,11 @@ public static class UserUtils
                     dondathang.discount = donhang.discount;
             }
         }
+        else if(new string[] { "ANCO1" }.Contains(maNCC))
+        {
+            if (donhang.discount.GetValueOrDefault(0) == 100)
+                dondathang.discount = donhang.discount;
+        }
 
         dondathang.c_danhsachdathang_id = c_dondathang_id;
         dondathang.sochungtu = sochungtu;
@@ -393,7 +398,7 @@ public static class UserUtils
                     phiDiscount = ddonhang.phi.GetValueOrDefault(0);
             }
             
-            if (maNCC == "ANCO1" & giachuan > -1)
+            if (maNCC == "ANCO1" & giachuan <= 0)
                 giaNhap2BD = -1;
 
             if (giaNhap2BD > -1)
