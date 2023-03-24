@@ -398,7 +398,7 @@ public static class UserUtils
                     phiDiscount = ddonhang.phi.GetValueOrDefault(0);
             }
             
-            if (maNCC == "ANCO1" & giachuan <= 0)
+            if (maNCC == "ANCO1" & giachuan >= -1)
                 giaNhap2BD = -1;
 
             if (giaNhap2BD > -1)
