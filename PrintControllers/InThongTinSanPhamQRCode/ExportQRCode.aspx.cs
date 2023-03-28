@@ -91,7 +91,18 @@ public partial class PrintControllers_ExportQRCode_Default : System.Web.UI.Page
             N'' as [Master], 
             N'' as [Pallet size], 
             N'' as [Q'ty/cont], 
-            N'' as [Biến tấu]
+            N'' as [Biến tấu],
+            isnull((
+                select top 1 gsp.gia 
+                from md_banggia bg, md_phienbangia pbg, md_giasanpham gsp
+                where bg.md_banggia_id = pbg.md_banggia_id
+                AND pbg.md_phienbangia_id = gsp.md_phienbangia_id
+                AND sp.md_sanpham_id = gsp.md_sanpham_id
+                AND bg.banggiaban = 1
+				AND substring(bg.ten_banggia,0,5) = 'FOB-'
+                AND pbg.md_trangthai_id = 'HIEULUC'
+                order by pbg.ngay_hieuluc desc
+            ), 0) as [Giá FOB]
 		from 
 			md_sanpham sp
 		where sp.ma_sanpham in ('{0}')
@@ -110,9 +121,10 @@ public partial class PrintControllers_ExportQRCode_Default : System.Web.UI.Page
 			ICellStyle cellHeader = ex_fm.getcell(11, true, true, "", "C", "T");
 			ICellStyle cellHeader1 = ex_fm.getcell(10, true, true, "", "C", "T");
 			ICellStyle cellcenter = ex_fm.getcell(9, false, true, "", "C", "T");
-			
+            ICellStyle cellNumber = ex_fm.getcell2(9, false, true, "", "R", "T", "#,#0.00");
+
             s1.CreateRow(0).CreateCell(0).SetCellValue("THÔNG TIN SẢN PHẨM QRCODE");
-			CellRangeAddress cellRange01 = new CellRangeAddress(0, 0, 0, 7);
+			CellRangeAddress cellRange01 = new CellRangeAddress(0, 0, 0, 9);
 			s1.AddMergedRegion(cellRange01);
 			s1.GetRow(0).HeightInPoints = 30;
 			s1.GetRow(0).GetCell(0).CellStyle = cellHeader;
@@ -144,6 +156,9 @@ public partial class PrintControllers_ExportQRCode_Default : System.Web.UI.Page
 				rowDetails.CreateCell(6).SetCellValue(" ");
 				rowDetails.CreateCell(7).SetCellValue(" ");
                 rowDetails.CreateCell(8).SetCellValue(" ");
+                rowDetails.CreateCell(9).SetCellValue(double.Parse(row["Giá FOB"].ToString()));
+                rowDetails.GetCell(9).CellStyle = cellNumber;
+
                 string bc = ma_sanpham.Substring(9, 2);
 				
 				var dgsp = (from a in db.md_sanphams
@@ -237,7 +252,7 @@ public partial class PrintControllers_ExportQRCode_Default : System.Web.UI.Page
                     }
                 }
 				
-				for (int cou = 0; cou < dt.Columns.Count; cou++)
+				for (int cou = 0; cou < dt.Columns.Count - 1; cou++)
 				{
 					rowDetails.GetCell(cou).CellStyle = cellcenter;
 				}
