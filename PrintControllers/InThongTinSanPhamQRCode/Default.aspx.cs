@@ -46,7 +46,18 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
             '' as [Master], 
             '' as [Pallet size], 
             '' as [Q'ty/cont], 
-            '' as [Biến tấu]
+            '' as [Biến tấu],
+            isnull((
+                select top 1 gsp.gia 
+                from md_banggia bg, md_phienbangia pbg, md_giasanpham gsp
+                where bg.md_banggia_id = pbg.md_banggia_id
+                AND pbg.md_phienbangia_id = gsp.md_phienbangia_id
+                AND sp.md_sanpham_id = gsp.md_sanpham_id
+                AND bg.banggiaban = 1
+				AND substring(bg.ten_banggia,0,5) = 'FOB-'
+                AND pbg.md_trangthai_id = 'HIEULUC'
+                order by pbg.ngay_hieuluc desc
+            ), 0) as [Giá FOB]
 		from 
 			md_sanpham sp
 		where sp.ma_sanpham like '{0}' {1}
@@ -64,6 +75,7 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
             ICellStyle cellHeader = ex_fm.getcell(11, true, true, "", "C", "T");
             ICellStyle cellHeader1 = ex_fm.getcell(10, true, true, "", "C", "T");
             ICellStyle cellcenter = ex_fm.getcell(9, false, true, "", "C", "T");
+            ICellStyle cellNumber = ex_fm.getcell2(9, false, true, "", "R", "T", "#,#0.00");
 
             s1.CreateRow(0).CreateCell(0).SetCellValue("THÔNG TIN SẢN PHẨM QRCODE");
             CellRangeAddress cellRange01 = new CellRangeAddress(0, 0, 0, 9);
@@ -102,6 +114,8 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
                 rowDetails.CreateCell(6).SetCellValue(" ");
                 rowDetails.CreateCell(7).SetCellValue(" ");
                 rowDetails.CreateCell(8).SetCellValue(" ");
+                rowDetails.CreateCell(9).SetCellValue(double.Parse(row["Giá FOB"].ToString()));
+                rowDetails.GetCell(9).CellStyle = cellNumber;
                 rowDetails.HeightInPoints = (float)38.4;
                 //string qrCodePath = ExcuteSignalRStatic.mapPathSignalR("~/images/qrcode/") + ma_sanpham + ".jpg";
                 //if (File.Exists(qrCodePath))
@@ -219,7 +233,7 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
                     }
                 }
 
-                for (int cou = 0; cou < dt.Columns.Count; cou++)
+                for (int cou = 0; cou < dt.Columns.Count - 1; cou++)
                 {
                     rowDetails.GetCell(cou).CellStyle = cellcenter;
                 }
