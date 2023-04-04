@@ -378,7 +378,7 @@ public static class UserUtils
             var ddonhang = db.c_dongdonhangs.FirstOrDefault(p => p.c_dongdonhang_id.Equals(item.c_dongdonhang_id));
             string nhacungung = ddonhang.nhacungungid;
             decimal gianhap = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp_ver2", "@md_sanpham_id", sp.md_sanpham_id, "@md_doitackinhdoanh_id", nhacungung, "@loai_bg", 0, "@ngaytinhgia", DateTime.Now);
-
+            var coGiaMua = gianhap > -1;
             if (gianhap == -1)
                 gianhap = 0;
 
@@ -402,7 +402,7 @@ public static class UserUtils
                     phiDiscount = ddonhang.phi.GetValueOrDefault(0);
             }
             
-            if (maNCC == "ANCO1" & giachuan >= -1)
+            if (maNCC == "ANCO1" & coGiaMua)
                 giaNhap2BD = -1;
 
             if (giaNhap2BD > -1)
