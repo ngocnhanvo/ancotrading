@@ -101,6 +101,7 @@ public class DonHangController : IHttpHandler
             }
 
             string[] ids = context.Request.Params["id"].Split(',');
+            int count = 0;
             foreach(var id in ids)
             {
                 //Don hang
@@ -126,6 +127,8 @@ public class DonHangController : IHttpHandler
                             pdh.nguoitao = nv.manv;
                             pdh.nguoicapnhat = nv.manv;
                         }
+
+                        count++;
                     }
                     //Danh Sach Dat Hang
                     var dsdhs = db.c_danhsachdathangs.Where(s => s.c_donhang_id == dh.c_donhang_id).ToList();
@@ -137,7 +140,10 @@ public class DonHangController : IHttpHandler
                 }
             }
 
-            db.SubmitChanges();
+            if (count == 0)
+                msg = "Không có đơn hàng nào được chuyển";
+            else
+                db.SubmitChanges();
         }
         catch (Exception e)
         {
