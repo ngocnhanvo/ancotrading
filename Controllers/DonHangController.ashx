@@ -108,7 +108,7 @@ public class DonHangController : IHttpHandler
                 var dh = db.c_donhangs.Where(p => p.c_donhang_id.Equals(id)).FirstOrDefault();
                 if(dh != null)
                 {
-                    if (dh.nguoitao != nv.manv)
+                    if (dh.nguoilap != nv.manv)
                     {
                         dh.nguoitao = nv.manv;
                         dh.nguoicapnhat = nv.manv;
