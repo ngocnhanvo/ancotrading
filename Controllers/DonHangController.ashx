@@ -141,7 +141,7 @@ public class DonHangController : IHttpHandler
         }
         catch (Exception e)
         {
-            context.Response.Write(e.Message);
+            msg = e.Message;
         }
 
     EndEventHandler:;
