@@ -1039,7 +1039,7 @@ public class DonHangController : IHttpHandler
                     m.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
                     m.sochungtu = context.Request.Form["sochungtu"];
                     m.ngaylap = DateTime.ParseExact(context.Request.Form["ngaylap"], "dd/MM/yyyy", null);
-                    m.nguoilap = UserUtils.getUser(context);
+                    //m.nguoilap = UserUtils.getUser(context);
                     m.md_cangbien_id = context.Request.Form["md_cangbien_id"];
                     m.discount = decimal.Parse(context.Request.Form["discount"]);
                     m.shipmentdate = DateTime.ParseExact(context.Request.Form["shipmentdate"], "dd/MM/yyyy", null);
