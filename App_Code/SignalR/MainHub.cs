@@ -16,7 +16,7 @@ public class MainHub : Hub
         public string Password { get; set; }
     }
 
-    public string emailcc = "anco@ancopottery.com,info@ancopottery.com";
+    public string emailcc = "anco@ancopottery.com";
 
     public void Login(UserLoginMobile user)
     {
