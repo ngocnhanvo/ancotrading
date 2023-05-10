@@ -86,18 +86,22 @@ public class HoaDonController : IHttpHandler
         try
         {
             String id = context.Request.Form["id"];
+            string sophieu = context.Request.Form["sophieu"].Trim();
             var hoadon = db.c_hoadons.Where(s => s.c_hoadon_id == id).FirstOrDefault();
             if (hoadon == null)
                 msg = "Không tìm thấy đối tượng cần sửa";
+            else if (db.c_hoadons.Where(s => s.c_hoadon_id != hoadon.c_hoadon_id & s.sophieu == sophieu).Count() > 0)
+                msg = "Số phiếu đã tồn tại";
             else
             {
-                //hoadon.md_trangthai_id = context.Request.Form["md_trangthai_id"];
+                hoadon.sophieu = sophieu;
                 hoadon.tiento = context.Request.Form["tiento"];
                 hoadon.thue_vat = decimal.Parse(context.Request.Form["thue_vat"]);
                 hoadon.tienthue = Math.Round(hoadon.tuongduongVND.GetValueOrDefault(0) * hoadon.thue_vat.GetValueOrDefault(0) / 100, 0, MidpointRounding.AwayFromZero);
                 hoadon.hinhthucthanhtoan = context.Request.Form["hinhthucthanhtoan"];
                 hoadon.tygia = decimal.Parse(context.Request.Form["tygia"]);
                 hoadon.tuongduongVND = hoadon.tuongduongUSD.GetValueOrDefault(0) * hoadon.tygia.GetValueOrDefault(0);
+                hoadon.ma_khachhang = context.Request.Form["ma_khachhang"];
                 hoadon.ten_khachhang = context.Request.Form["ten_khachhang"];
                 hoadon.diachi_khachhang = context.Request.Form["diachi_khachhang"];
                 hoadon.email_khachhang = context.Request.Form["email_khachhang"];
@@ -106,6 +110,7 @@ public class HoaDonController : IHttpHandler
                 hoadon.sotaikhoan_khachhang = context.Request.Form["sotaikhoan_khachhang"];
                 hoadon.masothue_khachhang = context.Request.Form["masothue_khachhang"];
                 hoadon.sotokhai_inv = context.Request.Form["sotokhai_inv"];
+                hoadon.mota = context.Request.Form["mota"];
                 db.SubmitChanges();
             }
         }
