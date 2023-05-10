@@ -212,7 +212,7 @@
                  , width: 60
                  , align: 'center'
                  , edittype: 'text'
-                 , editoptions: { readonly:'readonly' }
+                 , editoptions: { }
             },
             {
                  fixed: true, name: 'so_inv'
@@ -230,7 +230,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
-                 , editoptions: { readonly:'readonly' }
+                 , editoptions: { }
             },
             {
                  fixed: true, name: 'ten_khachhang'
