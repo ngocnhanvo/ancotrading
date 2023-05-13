@@ -136,6 +136,8 @@ public class DonHangController : IHttpHandler
                     {
                         dsdh.nguoi_dathang = nv.manv;
                         dsdh.nguoi_phutrach = nv.manv;
+                        dsdh.nguoitao = nv.manv;
+                        dsdh.nguoicapnhat = nv.manv;
                     }
                 }
             }
