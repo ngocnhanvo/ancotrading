@@ -8,16 +8,6 @@ using System.Linq;
 public class PackingController : IHttpHandler
 {
     private LinqDBDataContext db = new LinqDBDataContext();
-    public class DongGoi__ID_Ten_DoiGia_ChiPhi
-    {
-        public string donggoiId { get; set; }
-        public string maDongGoi { get; set; }
-        public string tenDongGoi { get; set; }
-        public string slinner { get; set; }
-        public string dvtinner { get; set; }
-        public bool? doiGiaDG { get; set; }
-        public decimal? cpdg_VuotChuan{ get; set; }
-    }
 
     public void ProcessRequest(HttpContext context)
     {
@@ -158,39 +148,14 @@ public class PackingController : IHttpHandler
 			docquyen = check_hanghoadocquyen(md_sanpham_id, dtkd_id);
 		}
 		
-        var dgmds = (
-                    from a in db.md_donggois
-                    join b in db.md_donggoisanphams on a.md_donggoi_id equals b.md_donggoi_id
-                    where a.hoatdong == true & (b.md_sanpham_id == md_sanpham_id)
-                    orderby b.macdinh descending
-                    select new DongGoi__ID_Ten_DoiGia_ChiPhi()
-                    {
-                        donggoiId = a.md_donggoi_id,
-                        maDongGoi = a.ma_donggoi,
-                        tenDongGoi = a.ten_donggoi,
-                        doiGiaDG = a.doigia_donggoi,
-                        slinner = a.sl_inner.ToString(),
-                        dvtinner = db.md_donvitinhs.Where(t => t.md_donvitinh_id == a.dvt_inner).Select(t => t.ten_dvt).FirstOrDefault()
-                    }
-                    ).ToList();
+        String sql = String.Format("select dg.md_donggoi_id, dg.ten_donggoi, dg.doigia_donggoi " +
+                " FROM md_donggoi dg, md_donggoisanpham dgsp " +
+                " WHERE dg.hoatdong = 1 " +
+                " AND dg.md_donggoi_id = dgsp.md_donggoi_id " +
+                " AND dgsp.md_sanpham_id = '{0}' order by dgsp.macdinh desc ", md_sanpham_id);
         
-        string selectDG = "";
-        if (dgmds.Count > 0)
-        {
-            selectDG += "<select>";
-            foreach (var item in dgmds)
-            {
-                selectDG += string.Format(@"<option value=""{0}"" other=""{2}"" cpdgvc=""{3}"">{1}</option>",
-                    item.donggoiId,
-                    item.maDongGoi + " (" + item.slinner + " " + item.dvtinner + ")",
-                    item.doiGiaDG.GetValueOrDefault(false),
-                    item.cpdg_VuotChuan.GetValueOrDefault(0)
-                    );
-            }
-            selectDG += "</select>";
-        }
-
-        context.Response.Write(selectDG + "(##)" + docquyen);
+        SelectHtmlControl s = new SelectHtmlControl(sql);
+        context.Response.Write(s.ToSelected(md_donggoi_id) + "(##)" + docquyen);
     }
 
     public void getSelectOption(HttpContext context)
