@@ -280,8 +280,8 @@ public class API_Data : IHttpHandler {
             var sps = db.md_sanphams.Where(s => lstMSP.Contains(s.ma_sanpham)).ToList();
             foreach(var sp in sps)
             {
-                sp.hinhanh = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
-                sp.hinhanhWeb = ExcuteSignalRStatic.getImageProductWeb(sp.ma_sanpham);
+                sp.hinhanh = string.Format("Controllers/API_System.ashx?oper=loadImageProduct&msp={0}&ver={1}", sp.ma_sanpham, Helper.getNewId());
+                sp.hinhanhWeb = string.Format("Controllers/API_System.ashx?oper=loadImageProductWeb&msp={0}&ver={1}", sp.ma_sanpham, Helper.getNewId());
             }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }

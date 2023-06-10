@@ -37,6 +37,7 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
      public void viewReport(XtraReport report, String SqlQuery)
     {
         SqlDataAdapter da = new SqlDataAdapter(SqlQuery, mdbc.GetConnection);
+        da.SelectCommand.CommandTimeout = 60;
         DataSet ds = new DataSet();
         da.Fill(ds);
         report.DataSource = ds;
