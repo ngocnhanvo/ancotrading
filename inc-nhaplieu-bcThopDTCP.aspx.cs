@@ -29,7 +29,7 @@ public partial class inc_nhaplieu_bcThopDTCP : System.Web.UI.Page
         }
         jsonMonth = string.Join(";", list);
         
-        var arr = new string[] { "ANCO1", "ANCO2" };
+        var arr = new string[] { "ANCO1", "ANHIEPLUC" };
         list = new List<string>();
         list.Add(":");
         foreach (var xuong in db.md_doitackinhdoanhs.Where(s=> arr.Contains(s.ma_dtkd)).OrderBy(s=>s.ma_dtkd))

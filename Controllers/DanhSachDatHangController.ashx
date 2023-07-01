@@ -18,7 +18,7 @@ public class DanhSachDatHangController : IHttpHandler
     public String logoPath = HttpContext.Current.Server.MapPath("~/images/anco_logo_print.png");
     public String productImagePath = HttpContext.Current.Server.MapPath("~/images/products/fullsize/");
 
-    public string[] arrNCC = new string[] { "VINHGIA", "ANCO2" };
+    public string[] arrNCC = new string[] { "VINHGIA", "ANHIEPLUC" };
     public void ProcessRequest(HttpContext context)
     {
         String action, oper;
@@ -116,7 +116,7 @@ public class DanhSachDatHangController : IHttpHandler
             mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
         }
 
-        mdtkdId = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == "ANCO2").Select(s => s.md_doitackinhdoanh_id).FirstOrDefault();
+        mdtkdId = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == "ANHIEPLUC").Select(s => s.md_doitackinhdoanh_id).FirstOrDefault();
         dsdhs = db.c_danhsachdathangs.Where(s => lst.Contains(s.trangthai) & s.md_doitackinhdoanh_id == mdtkdId & s.md_trangthai_id != "HIEULUC");
         item = new Dictionary<string, object>();
         item["result"] = dsdhs.Select(s => new { s.c_danhsachdathang_id }).ToList();
@@ -421,7 +421,7 @@ public class DanhSachDatHangController : IHttpHandler
             catch (Exception ex)
             {
 				msg += string.Format("<div style='display:none'>{0}</div>", ex + "");
-                msg += "errAnco2: " + ex.Message;
+                msg += "errANHIEPLUC: " + ex.Message;
             }
 
             if (msg.Length <= 0)
@@ -430,7 +430,7 @@ public class DanhSachDatHangController : IHttpHandler
                 db.SubmitChanges();
                 try
                 {
-                    guidonhangSendMail(context, lstMail, nv, mail, "ANCO2");
+                    guidonhangSendMail(context, lstMail, nv, mail, "ANHIEPLUC");
                 }
                 catch (Exception ex)
                 {

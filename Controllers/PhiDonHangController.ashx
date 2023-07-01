@@ -464,8 +464,8 @@ public class PhiDonHangController : IHttpHandler
         {
             gianhap = gianhap * 82 / 100;
         }
-        //Neu doi tac la AN BINH, ANCO1, ANCO2, ANCOHUNG
-        else if(ma_dtkd_select == "AN BINH" | ma_dtkd_select == "ANCO1" | ma_dtkd_select == "ANCO2" | ma_dtkd_select == "ANCOHUNG")
+        //Neu doi tac la AN BINH, ANCO1, ANHIEPLUC, ANCOHUNG
+        else if(ma_dtkd_select == "AN BINH" | ma_dtkd_select == "ANCO1" | ma_dtkd_select == "ANHIEPLUC" | ma_dtkd_select == "ANCOHUNG")
         {
             gianhap = gianhap * 80 / 100;
         }
