@@ -80,76 +80,92 @@ public class DanhSachDatHangController : IHttpHandler
         lst.Add("TUCHOI");
         lst.Add("DAGUI");
         lst.Add("DANHAN");
+
         string mdtkdId = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == "VINHGIA").Select(s => s.md_doitackinhdoanh_id).FirstOrDefault();
         var dsdhs = db.c_danhsachdathangs.Where(s => lst.Contains(s.trangthai) & s.md_doitackinhdoanh_id == mdtkdId & s.md_trangthai_id != "HIEULUC");
         var item = new Dictionary<string, object>();
-        item["result"] = dsdhs.Select(s => new { s.c_danhsachdathang_id }).ToList();
-        string msgVINHGIA = Extension.GetModule(
-            Extension.API_VINHGIA + "?oper=getListDSDH",
-            item
-        );
-        if (!msgVINHGIA.Contains("false##"))
+        string msgVINHGIA = "", msgANCO2 = "";
+        try
         {
-            var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(msgVINHGIA);
-            foreach (var a in dsdhs)
+            item["result"] = dsdhs.Select(s => new { s.c_danhsachdathang_id }).ToList();
+            msgVINHGIA = Extension.GetModule(
+                Extension.API_VINHGIA + "?oper=getListDSDH",
+                item
+            );
+            if (!msgVINHGIA.Contains("false##"))
             {
-                string trangthai = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).Select(s => s["trangthai"] + "").FirstOrDefault();
-                if (!string.IsNullOrEmpty(trangthai))
+                var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(msgVINHGIA);
+                foreach (var a in dsdhs)
                 {
-                    a.trangthai = trangthai;
-                }
-                else
-                {
-                    if (a.trangthai != "CHUAGUI" & !string.IsNullOrEmpty(a.trangthai))
-                        a.trangthai = "TUCHOI";
+                    string trangthai = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).Select(s => s["trangthai"] + "").FirstOrDefault();
+                    if (!string.IsNullOrEmpty(trangthai))
+                    {
+                        a.trangthai = trangthai;
+                    }
                     else
-                        a.trangthai = "CHUAGUI";
+                    {
+                        if (a.trangthai != "CHUAGUI" & !string.IsNullOrEmpty(a.trangthai))
+                            a.trangthai = "TUCHOI";
+                        else
+                            a.trangthai = "CHUAGUI";
+                    }
                 }
-            }
 
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateSLDaDatTrenPO");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER TrigUpdateSoPI");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateGoiHDLH");
-            db.SubmitChanges();
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateSLDaDatTrenPO");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER TrigUpdateSoPI");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateSLDaDatTrenPO");
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER TrigUpdateSoPI");
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateGoiHDLH");
+                db.SubmitChanges();
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateSLDaDatTrenPO");
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER TrigUpdateSoPI");
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
+            }
+        }
+        catch (Exception ex)
+        {
+            msgVINHGIA = ex.Message;
         }
 
-        mdtkdId = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == "ANHIEPLUC").Select(s => s.md_doitackinhdoanh_id).FirstOrDefault();
-        dsdhs = db.c_danhsachdathangs.Where(s => lst.Contains(s.trangthai) & s.md_doitackinhdoanh_id == mdtkdId & s.md_trangthai_id != "HIEULUC");
-        item = new Dictionary<string, object>();
-        item["result"] = dsdhs.Select(s => new { s.c_danhsachdathang_id }).ToList();
-        string msgANCO2 = Extension.GetModule(
-            Extension.API_ANCO2 + "?oper=getListDSDH",
-            item
-        );
-        if (!msgANCO2.Contains("false##"))
+        try
         {
-            var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(msgANCO2);
-            foreach (var a in dsdhs)
+            mdtkdId = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == "ANHIEPLUC").Select(s => s.md_doitackinhdoanh_id).FirstOrDefault();
+            dsdhs = db.c_danhsachdathangs.Where(s => lst.Contains(s.trangthai) & s.md_doitackinhdoanh_id == mdtkdId & s.md_trangthai_id != "HIEULUC");
+            item = new Dictionary<string, object>();
+            item["result"] = dsdhs.Select(s => new { s.c_danhsachdathang_id }).ToList();
+            msgANCO2 = Extension.GetModule(
+                Extension.API_ANCO2 + "?oper=getListDSDH",
+                item
+            );
+            if (!msgANCO2.Contains("false##"))
             {
-                string trangthai = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).Select(s => s["trangthai"] + "").FirstOrDefault();
-                if (!string.IsNullOrEmpty(trangthai))
+                var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(msgANCO2);
+                foreach (var a in dsdhs)
                 {
-                    a.trangthai = trangthai;
-                }
-                else
-                {
-                    if (a.trangthai != "CHUAGUI" & !string.IsNullOrEmpty(a.trangthai))
-                        a.trangthai = "TUCHOI";
+                    string trangthai = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).Select(s => s["trangthai"] + "").FirstOrDefault();
+                    if (!string.IsNullOrEmpty(trangthai))
+                    {
+                        a.trangthai = trangthai;
+                    }
                     else
-                        a.trangthai = "CHUAGUI";
+                    {
+                        if (a.trangthai != "CHUAGUI" & !string.IsNullOrEmpty(a.trangthai))
+                            a.trangthai = "TUCHOI";
+                        else
+                            a.trangthai = "CHUAGUI";
+                    }
                 }
-            }
 
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateSLDaDatTrenPO");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER TrigUpdateSoPI");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateGoiHDLH");
-            db.SubmitChanges();
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateSLDaDatTrenPO");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER TrigUpdateSoPI");
-            mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateSLDaDatTrenPO");
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER TrigUpdateSoPI");
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateGoiHDLH");
+                db.SubmitChanges();
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateSLDaDatTrenPO");
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER TrigUpdateSoPI");
+                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
+            }
+        }
+        catch(Exception ex)
+        {
+            msgANCO2 = ex.Message;
         }
 
         context.Response.Write(msgVINHGIA + msgANCO2);
@@ -287,7 +303,7 @@ public class DanhSachDatHangController : IHttpHandler
                                 x.h2,
                                 x.h1,
                                 x.gianhap,
-								x.giachuan,
+                                x.giachuan,
                                 ghichu_vachngan = EncodeHTML_DSDH(x.ghichu_vachngan),
                                 x.c_dongdsdh_id,
                                 x.c_dongdonhang_id,
@@ -388,7 +404,7 @@ public class DanhSachDatHangController : IHttpHandler
             }
             catch (Exception ex)
             {
-				msg += string.Format("<div style='display:none'>{0}</div>", ex + "");
+                msg += string.Format("<div style='display:none'>{0}</div>", ex + "");
                 msg += "errVinhGia:" + ex.Message;
             }
 
@@ -420,7 +436,7 @@ public class DanhSachDatHangController : IHttpHandler
             }
             catch (Exception ex)
             {
-				msg += string.Format("<div style='display:none'>{0}</div>", ex + "");
+                msg += string.Format("<div style='display:none'>{0}</div>", ex + "");
                 msg += "errANHIEPLUC: " + ex.Message;
             }
 
