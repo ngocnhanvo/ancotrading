@@ -143,7 +143,7 @@
                 namDisplay.show();
                 tungayDisplay.hide();
                 denngayDisplay.hide();
-                ncuDisplayFilter(['ANCO1', 'ANCO2']);
+                ncuDisplayFilter(['ANCO1', 'ANCO2', 'ANHIEPLUC']);
                 $('#lblReportNameNCU').html("Báo cáo tổng hợp doanh thu - chi phí của xưởng");
                 break;
             case 1003:
