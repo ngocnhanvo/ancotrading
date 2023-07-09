@@ -89,12 +89,26 @@
             </tr>
             <tr style="height:10px">
                 <td colspan=2>
-
                 </td>
             </tr>
             <tr>
                 <td colspan=2 style="vertical-align: middle;text-align: center;">
                     <input class="thaotac2" type="button" style="padding:3px 6px 3px 6px; user-select: none;" onclick="submitRptTool(1)" value="Thực hiện"/>
+                </td>
+            </tr>
+            <tr style="height:10px">
+                <td colspan=2>
+                </td>
+            </tr>
+            <tr>
+                <td colspan=2 style="text-align:center">
+                    <a 
+                        href="Mẫu import/Ủy Nhiệm Chi.xls" 
+                        target="_blank"
+                        style="color: blue; text-decoration: underline; font-size: 110%;"
+                    >
+                        Mẫu excel dùng để nhập liệu
+                    </a>
                 </td>
             </tr>
         </table>
