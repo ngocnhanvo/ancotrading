@@ -189,4 +189,234 @@ public static class Helper
 
         return boMain;
     }
+
+    public static string themChiTietUyNhiemChi(
+        HttpContext context, LinqDBDataContext db, 
+        string loai, string istiencocStr, string tiencong, string c_thuchi_id, string ids,
+        string values, string md_doitackinhdoanh_id, string ctd_ngaychi, string thueStr,
+        string ltt, string loaiphieu2, string tkno, string tkco, string diengiai,
+        string c_donhang_id, string c_packinginvoice_id, string mota,
+        string sotien, string c_nhapxuat_id, string sotaikhoan, string nganhang)
+    {
+        string msg = "";
+
+        try
+        {
+            string sphieu_id = "b1b236e7fd8250eca850782b295d528e", sphieu = "", tiento = "UNC";
+
+            if (loai == "TM")
+            {
+                sphieu_id = "91fb9d0f2fcbc85bdefa91cfa289f0d4"; //TM C
+                tiento = "C";
+            }
+
+            hotro ht = db.hotros.Where(s => s.c_chitietthuchi_id == sphieu_id).FirstOrDefault();
+            md_sochungtu sochungtu = db.md_sochungtus.Single(s => s.tiento == tiento);
+            if (ht != null)
+            {
+                if (ht.ngaymoinhat.Value.Year == DateTime.Now.Year)
+                {
+                    if (ht.ngaymoinhat.Value.Month != DateTime.Now.Month)
+                    {
+                        sochungtu.so_duocgan = 1;
+                    }
+                    if (loai == "TM")
+                        sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
+                    else if (loai == "CK")
+                        sphieu = sochungtu.tiento + sochungtu.so_duocgan + "/" + sochungtu.hauto;
+                    sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
+                }
+                else
+                {
+                    if (loai == "TM")
+                        sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
+                    else if (loai == "CK")
+                        sphieu = sochungtu.tiento + sochungtu.so_duocgan + "/" + sochungtu.hauto;
+                    sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
+                }
+            }
+            else
+            {
+                if (loai == "TM")
+                    sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
+                else if (loai == "CK")
+                    sphieu = sochungtu.tiento + sochungtu.so_duocgan + "/" + sochungtu.hauto;
+                sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
+            }
+
+            if (tiencong == null || tiencong == "")
+                tiencong = "0";
+
+            bool istiencoc = false;
+            if (istiencocStr != null)
+            {
+                if (istiencocStr.ToLower().Equals("on")) { istiencoc = true; }
+            }
+
+            var thuchi = db.c_thuchis.Single(c => c.c_thuchi_id.Equals(c_thuchi_id));
+
+            ids = ids.Replace("[", "").Replace("]", "").Replace("\"", "").Trim();
+            values = values.Replace("[", "").Replace("]", "").Replace("\"", "").Trim();
+
+            DateTime ngaychi = DateTime.ParseExact(ctd_ngaychi, "dd/MM/yyyy", null);
+            int thue = int.Parse(thueStr);
+            string[] idsArr = ids.Split(',');
+            string[] valuesArr = values.Split(',');
+            decimal sum_ = 0;
+            for (int i = 0; i < valuesArr.Length; i++)
+            {
+                if (valuesArr[i].Length > 1)
+                {
+                    sum_ += decimal.Parse(valuesArr[i]);
+                }
+            }
+
+            if (thuchi.md_trangthai_id.Equals("SOANTHAO"))
+            {
+                var idVal = new string[] { thuchi.md_doitackinhdoanh_id, thuchi.doitacValue };
+
+                if (thuchi.sotien.Value > sum_)
+                {
+                    string lp2 = ltt == "KH" ? loaiphieu2 : "";
+                    if (idsArr.Length > 0 && values.Length > 0)
+                    {
+                        for (int i = 0; i < idsArr.Length; i++)
+                        {
+                            var mnu = new c_chitietthuchi();
+                            mnu.c_chitietthuchi_id = Helper.getNewId();
+                            mnu.c_thuchi_id = c_thuchi_id;
+                            mnu.loaiphieu2 = lp2;
+                            mnu.loai = loai;
+                            mnu.so_c = sphieu;
+                            mnu.tk_no = int.Parse(tkno);
+                            mnu.tk_co = int.Parse(tkco);
+                            mnu.md_doitackinhdoanh_id = md_doitackinhdoanh_id;
+                            mnu.dtkd_id_ThuChi = idVal[0];
+                            mnu.dtkd_val_ThuChi = idVal[1];
+                            mnu.sotien = decimal.Parse(valuesArr[i]);
+                            mnu.sotiencong = decimal.Parse(tiencong);
+                            mnu.quydoi = (thuchi.tygia.Value * decimal.Parse(valuesArr[i]));
+                            mnu.diengiai = diengiai;
+                            mnu.c_donhang_id = c_donhang_id;
+                            mnu.ngaychi = ngaychi;
+                            mnu.c_packinginvoice_id = c_packinginvoice_id;
+                            mnu.obj_code = idsArr[i];
+                            mnu.isdatcoc = istiencoc;
+                            mnu.thue = thue;
+                            mnu.mota = mota;
+                            mnu.sotaikhoan = sotaikhoan;
+                            mnu.nganhang = nganhang;
+                            mnu.hoatdong = true;
+                            mnu.ngaytao = DateTime.Now;
+                            mnu.ngaycapnhat = DateTime.Now;
+                            mnu.nguoitao = UserUtils.getUser(context);
+                            mnu.nguoicapnhat = UserUtils.getUser(context);
+
+                            db.c_chitietthuchis.InsertOnSubmit(mnu);
+                        }
+                    }
+                    else
+                    {
+                        var mnu = new c_chitietthuchi();
+                        mnu.c_chitietthuchi_id = Helper.getNewId();
+                        mnu.c_thuchi_id = c_thuchi_id;
+                        mnu.so_c = sphieu;
+                        mnu.loai = loai;
+                        mnu.tk_no = int.Parse(tkno);
+                        mnu.tk_co = int.Parse(tkco);
+                        mnu.md_doitackinhdoanh_id = md_doitackinhdoanh_id;
+                        mnu.dtkd_id_ThuChi = idVal[0];
+                        mnu.dtkd_val_ThuChi = idVal[1];
+                        mnu.sotien = decimal.Parse(sotien);
+                        mnu.sotiencong = decimal.Parse(tiencong);
+                        mnu.quydoi = (thuchi.tygia.Value * decimal.Parse(sotien));
+                        mnu.diengiai = diengiai;
+                        mnu.c_donhang_id = c_donhang_id;
+                        mnu.ngaychi = ngaychi;
+                        mnu.c_packinginvoice_id = c_packinginvoice_id;
+                        mnu.obj_code = c_nhapxuat_id;
+                        mnu.loaiphieu = ltt;
+                        mnu.loaiphieu2 = lp2;
+                        mnu.isdatcoc = istiencoc;
+                        mnu.thue = thue;
+                        mnu.mota = mota;
+                        mnu.sotaikhoan = sotaikhoan;
+                        mnu.nganhang = nganhang;
+                        mnu.hoatdong = true;
+                        mnu.ngaytao = DateTime.Now;
+                        mnu.ngaycapnhat = DateTime.Now;
+                        mnu.nguoitao = UserUtils.getUser(context);
+                        mnu.nguoicapnhat = UserUtils.getUser(context);
+
+                        db.c_chitietthuchis.InsertOnSubmit(mnu);
+                    }
+
+                    ht = db.hotros.Where(s => s.c_chitietthuchi_id == sphieu_id).FirstOrDefault();
+                    if (ht == null)
+                    {
+                        ht = new hotro();
+                        ht.hotro_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss"));
+                        ht.c_chitietthuchi_id = sphieu_id;
+                        ht.ngaymoinhat = DateTime.Now;
+                        ht.hoatdong = true;
+                        ht.ngaytao = DateTime.Now;
+                        ht.ngaycapnhat = DateTime.Now;
+                        ht.nguoitao = UserUtils.getUser(context);
+                        ht.nguoicapnhat = UserUtils.getUser(context);
+                        db.hotros.InsertOnSubmit(ht);
+                    }
+                    else
+                    {
+                        ht.ngaymoinhat = DateTime.Now;
+                        ht.hoatdong = true;
+                        ht.nguoicapnhat = UserUtils.getUser(context);
+                        ht.ngaycapnhat = DateTime.Now;
+                    }
+                }
+                else
+                {
+                    msg = "Số tiền phân bổ không hợp lệ!";
+                }
+            }
+            else
+            {
+                msg = "Không thể thêm mới khi phiếu chi đã hiệu lực.";
+            }
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        return msg;
+    }
+
+    public static string bienDichLoaiChiTraKhac(string lct)
+    {
+        string kq = "";
+        switch(lct)
+        {
+            case "0": kq = "chenhLechTyGiaDSBH"; break;
+            case "1": kq = "dsoVTXuatChoBPCtyKhac"; break;
+            case "2": kq = "tienBHXHBHLDNghiViec"; break;
+            case "3": kq = "dienNuocRacCtyHaca"; break;
+            case "4": kq = "nopTamUng"; break;
+            case "5": kq = "tienPheLieu"; break;
+            case "6": kq = "VTBBPLTNK"; break;
+            case "7": kq = "chiPhiXuatKhau"; break;
+            case "8": kq = "chiPhiHCNS"; break;
+            case "9": kq = "luongNV"; break;
+            case "10": kq = "luongCN"; break;
+            case "11": kq = "phiCDBHXHNV"; break;
+            case "12": kq = "phiCDBHXHCN"; break;
+            case "13": kq = "thuongLeTetNV"; break;
+            case "14": kq = "thuongLeTetCN"; break;
+            case "15": kq = "chiTienMatKhac"; break;
+            case "16": kq = "trich20PheLieu"; break;
+            case "17": kq = "KhieuNai"; break;
+            case "18": kq = "cuocGuiMauKiemDinh"; break;
+        }
+
+        return kq;
+    }
 }

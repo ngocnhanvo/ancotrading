@@ -322,4 +322,12 @@ public static class Extension
         else
             return list[indexOf + 1];
     }
+
+    public static string removeAllSpaceOrTrimText(this string a, bool onlyTrim)
+    {
+        if (a == null)
+            a = "";
+
+        return onlyTrim ? a.Trim() : a.Replace(" ", "");
+    }
 }

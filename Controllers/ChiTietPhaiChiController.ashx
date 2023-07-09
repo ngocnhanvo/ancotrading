@@ -160,186 +160,48 @@ public class ChiTietPhaiChiController : IHttpHandler
 
     public void add(HttpContext context)
     {
-        string sphieu_id = "b1b236e7fd8250eca850782b295d528e", sphieu = "", tiento = "UNC";     //CK UNC // table hotro
         string loai = context.Request.Form["loai"];
-        if(loai == "TM")
-        {
-            sphieu_id = "91fb9d0f2fcbc85bdefa91cfa289f0d4"; //TM C
-            tiento = "C";
-        }
-
-        hotro ht = db.hotros.Where(s => s.c_chitietthuchi_id == sphieu_id).FirstOrDefault();
-        md_sochungtu sochungtu = db.md_sochungtus.Single(s => s.tiento == tiento);
-        if(ht != null)
-        {
-            if(ht.ngaymoinhat.Value.Year == DateTime.Now.Year)
-            {
-                if(ht.ngaymoinhat.Value.Month != DateTime.Now.Month)
-                {
-                    sochungtu.so_duocgan = 1;
-                }
-                if(loai == "TM")
-                    sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
-                else if(loai == "CK")
-                    sphieu = sochungtu.tiento + sochungtu.so_duocgan + "/" + sochungtu.hauto;
-                sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
-            }
-            else
-            {
-                if(loai == "TM")
-                    sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
-                else if(loai == "CK")
-                    sphieu = sochungtu.tiento + sochungtu.so_duocgan + "/" + sochungtu.hauto;
-                sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
-            }
-        }
-        else
-        {
-            if(loai == "TM")
-                sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
-            else if(loai == "CK")
-                sphieu = sochungtu.tiento + sochungtu.so_duocgan + "/" + sochungtu.hauto;
-            sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
-        }
-
         string tc = context.Request.Form["istiencoc"];
         string tiencong = context.Request.Form["sotiencong"];
-        if(tiencong == null || tiencong == "")
-            tiencong = "0";
-        bool istiencoc = false;
-        if (tc != null)
-        {
-            if (tc.ToLower().Equals("on")) { istiencoc = true; }
-        }
         string c_thuchi_id = context.Request.Form["c_thuchi_id"];
-        var thuchi = db.c_thuchis.Single(c => c.c_thuchi_id.Equals(c_thuchi_id));
-
-        string ids = context.Request.Form["ids"].Replace("[", "").Replace("]", "").Replace("\"", "").Trim();
-        string values = context.Request.Form["values"].Replace("[", "").Replace("]", "").Replace("\"", "").Trim();
+        string ids = context.Request.Form["ids"];
+        string values = context.Request.Form["values"];
         string md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id2"];
-        DateTime ngaychi = DateTime.ParseExact(context.Request.Form["ctd_ngaychi"], "dd/MM/yyyy", null);
-        int thue = int.Parse(context.Request.Form["thue"]);
-        string[] idsArr = ids.Split(',');
-        string[] valuesArr = values.Split(',');
-        decimal sum_ = 0;
-        for (int i = 0; i < valuesArr.Length; i++)
+        string ctd_ngaychi = context.Request.Form["ctd_ngaychi"];
+        string thueStr = context.Request.Form["thue"];
+        string ltt = context.Request.Form["loaithanhtoan"];
+        string loaiphieu2 = context.Request.Form["loaiphieu2"];
+        string tkno = context.Request.Form["tkno"];
+        string tkco = context.Request.Form["tkco"];
+        string diengiai = context.Request.Form["diengiai"];
+        string c_donhang_id = context.Request.Form["c_donhang_id"];
+        string c_packinginvoice_id = context.Request.Form["c_packinginvoice_id"];
+        string mota = context.Request.Form["mota"];
+        string sotien = context.Request.Form["sotien"];
+        string c_nhapxuat_id = context.Request.Form["c_nhapxuat_id"];
+        string sotaikhoan = "";
+        string nganhang = "";
+        string msg = Helper.themChiTietUyNhiemChi(context, db,
+            loai, tc, tiencong, c_thuchi_id, ids, values, md_doitackinhdoanh_id,
+            ctd_ngaychi, thueStr, ltt, loaiphieu2, tkno, tkco, diengiai, c_donhang_id,
+            c_packinginvoice_id, mota, sotien, c_nhapxuat_id, sotaikhoan, nganhang
+            );
+
+        if (msg.Length <= 0)
         {
-            if (valuesArr[i].Length >1)
+            try
             {
-                sum_ += decimal.Parse(valuesArr[i]);
-            }
-        }
-
-        if (thuchi.md_trangthai_id.Equals("SOANTHAO"))
-        {
-            var idVal = new string[] { thuchi.md_doitackinhdoanh_id, thuchi.doitacValue };
-
-            if (thuchi.sotien.Value > sum_)
-            {
-                string ltt = context.Request.Form["loaithanhtoan"];
-                string lp2 = ltt == "KH" ? context.Request.Form["loaiphieu2"] : "";
-                if (idsArr.Length > 0 && values.Length > 0)
-                {
-                    for (int i = 0; i < idsArr.Length; i++)
-                    {
-                        var mnu = new c_chitietthuchi();
-                        mnu.c_chitietthuchi_id = Helper.getNewId();
-                        mnu.c_thuchi_id = c_thuchi_id;
-                        mnu.loaiphieu2 = lp2;
-                        mnu.loai = loai;
-                        mnu.so_c = sphieu;
-                        mnu.tk_no = int.Parse(context.Request.Form["tkno"]);
-                        mnu.tk_co = int.Parse(context.Request.Form["tkco"]);
-                        mnu.md_doitackinhdoanh_id = md_doitackinhdoanh_id;
-                        mnu.dtkd_id_ThuChi = idVal[0];
-                        mnu.dtkd_val_ThuChi = idVal[1];
-                        mnu.sotien = decimal.Parse(valuesArr[i]);
-                        mnu.sotiencong = decimal.Parse(tiencong);
-                        mnu.quydoi = (thuchi.tygia.Value * decimal.Parse(valuesArr[i]));
-                        mnu.diengiai = context.Request.Form["diengiai"];
-                        mnu.c_donhang_id = context.Request.Form["c_donhang_id"];
-                        mnu.ngaychi = ngaychi;
-                        mnu.c_packinginvoice_id = context.Request.Form["c_packinginvoice_id"];
-                        mnu.obj_code = idsArr[i];
-                        mnu.isdatcoc = istiencoc;
-                        mnu.thue = thue;
-                        mnu.mota = context.Request.Form["mota"];
-                        mnu.hoatdong = true;
-                        mnu.ngaytao = DateTime.Now;
-                        mnu.ngaycapnhat = DateTime.Now;
-                        mnu.nguoitao = UserUtils.getUser(context);
-                        mnu.nguoicapnhat = UserUtils.getUser(context);
-
-                        db.c_chitietthuchis.InsertOnSubmit(mnu);
-                    }
-                }
-                else
-                {
-                    var mnu = new c_chitietthuchi();
-                    mnu.c_chitietthuchi_id = Helper.getNewId();
-                    mnu.c_thuchi_id = c_thuchi_id;
-                    mnu.so_c = sphieu;
-                    mnu.loai = loai;
-                    mnu.tk_no = int.Parse(context.Request.Form["tkno"]);
-                    mnu.tk_co = int.Parse(context.Request.Form["tkco"]);
-                    mnu.md_doitackinhdoanh_id = md_doitackinhdoanh_id;
-                    mnu.dtkd_id_ThuChi = idVal[0];
-                    mnu.dtkd_val_ThuChi = idVal[1];
-                    mnu.sotien = decimal.Parse(context.Request.Form["sotien"]);
-                    mnu.sotiencong = decimal.Parse(tiencong);
-                    mnu.quydoi = (thuchi.tygia.Value * decimal.Parse(context.Request.Form["sotien"]));
-                    mnu.diengiai = context.Request.Form["diengiai"];
-                    mnu.c_donhang_id = context.Request.Form["c_donhang_id"];
-                    mnu.ngaychi = ngaychi;
-                    mnu.c_packinginvoice_id = context.Request.Form["c_packinginvoice_id"];
-                    mnu.obj_code = context.Request.Form["c_nhapxuat_id"];
-                    mnu.loaiphieu = ltt;
-                    mnu.loaiphieu2 = lp2;
-                    mnu.isdatcoc = istiencoc;
-                    mnu.thue = thue;
-                    mnu.mota = context.Request.Form["mota"];
-                    mnu.hoatdong = true;
-                    mnu.ngaytao = DateTime.Now;
-                    mnu.ngaycapnhat = DateTime.Now;
-                    mnu.nguoitao = UserUtils.getUser(context);
-                    mnu.nguoicapnhat = UserUtils.getUser(context);
-
-                    db.c_chitietthuchis.InsertOnSubmit(mnu);
-                }
-
-                ht = db.hotros.Where(s => s.c_chitietthuchi_id == sphieu_id).FirstOrDefault();
-                if(ht == null)
-                {
-                    ht = new hotro();
-                    ht.hotro_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss"));
-                    ht.c_chitietthuchi_id = sphieu_id;
-                    ht.ngaymoinhat = DateTime.Now;
-                    ht.hoatdong = true;
-                    ht.ngaytao = DateTime.Now;
-                    ht.ngaycapnhat = DateTime.Now;
-                    ht.nguoitao = UserUtils.getUser(context);
-                    ht.nguoicapnhat = UserUtils.getUser(context);
-                    db.hotros.InsertOnSubmit(ht);
-                }
-                else
-                {
-                    ht.ngaymoinhat = DateTime.Now;
-                    ht.hoatdong = true;
-                    ht.nguoicapnhat = UserUtils.getUser(context);
-                    ht.ngaycapnhat = DateTime.Now;
-                }
-
                 db.SubmitChanges();
-
-                jqGridHelper.Utils.writeResult(1, "Xử lý thành công!");
+                jqGridHelper.Utils.writeResult(1, "Thêm thành công.");
             }
-            else {
-                jqGridHelper.Utils.writeResult(0, "Số tiền phân bổ không hợp lệ!");
+            catch(Exception ex)
+            {
+                jqGridHelper.Utils.writeResult(0, ex.Message);
             }
         }
         else
         {
-            jqGridHelper.Utils.writeResult(0, "Không thể thêm mới khi phiếu chi đã hiệu lực.");
+            jqGridHelper.Utils.writeResult(0, msg);
         }
     }
 
