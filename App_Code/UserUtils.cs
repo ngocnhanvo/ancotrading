@@ -31,8 +31,8 @@ public static class UserUtils
             getptr = 2;
 
         decimal gianhap = -1;
-        //Neu doi tac la ANBINH, ANCO2, NAMAN
-        if (new string[] { "ANBINH", "ANCO2", "NAMAN" }.Contains(ma_dtkd_select))
+        //Neu doi tac la ANBINH, ANHIEPLUC, NAMAN
+        if (new string[] { "ANBINH", "ANHIEPLUC", "NAMAN" }.Contains(ma_dtkd_select))
         {
             decimal tygia = 23000;
             decimal discountVNN = decimal.Parse("0.80");
@@ -322,7 +322,7 @@ public static class UserUtils
             //discount_vinhgia = donhang.discount.Value;
             dondathang.discount = donhang.discount.GetValueOrDefault(0);
         }
-        else if (new string[] { "ANCO2", "ANBINH" }.Contains(maNCC))
+        else if (new string[] { "ANHIEPLUC", "ANBINH" }.Contains(maNCC))
         {
             if (donhang.donhang_mau.GetValueOrDefault(false) == true)
             {
