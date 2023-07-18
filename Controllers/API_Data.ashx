@@ -173,24 +173,31 @@ public class API_Data : IHttpHandler {
                 foreach (var b in lstItem)
                 {
                     stt++;
-
+					//Kiem tra SP
                     var sp = db.md_sanphams.Where(s => s.ma_sanpham == b.md_sanpham_id).FirstOrDefault();
                     if(sp == null)
 					{
 						throw new Exception(string.Format(@"Ancotrading: {0} không tồn tại", sp.ma_sanpham));
 					}
-					
+					//Kiem tra ĐGSP mặc định
 					var qcdg = db.md_donggoisanphams.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).FirstOrDefault();
+					if(qcdg == null)
+					{
+						throw new Exception(string.Format(@"Ancotrading: {0} không có đóng gói mặc định", sp.ma_sanpham));
+					}
+					//Kiem tra ĐG
                     var donggoi = db.md_donggois.Where(s => s.md_donggoi_id == qcdg.md_donggoi_id).FirstOrDefault();
 					if(donggoi == null)
 					{
 						throw new Exception(string.Format(@"Ancotrading: {0} không có đóng gói mặc định", sp.ma_sanpham));
 					}
+					//Kiem tra NCU mặc định
                     var ncumd = db.md_nhacungungmacdinhs.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).FirstOrDefault();
 					if(ncumd == null) 
 					{
 						throw new Exception(string.Format(@"Ancotrading: {0} không có nhà cung ứng mặc định", sp.ma_sanpham));
 					}
+					
                     var mnu1 = new c_dongdonhang();
                     mnu1.c_dongdonhang_id = Helper.getNewId();
                     mnu1.c_donhang_id = mnu.c_donhang_id;
