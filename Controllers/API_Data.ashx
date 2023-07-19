@@ -137,7 +137,13 @@ public class API_Data : IHttpHandler {
 
             foreach (var a in result)
             {
-                var user = db.nhanviens.Where(s => s.email == a["email"] + "").FirstOrDefault();
+				string emailUser = a["email"] + "";
+                var user = db.nhanviens.Where(s => s.email == emailUser).FirstOrDefault();
+				if(user == null)
+				{
+					throw new Exception(string.Format(@"Ancotrading: nhân viên có email {0} không tồn tại", emailUser));
+				}
+				
                 var item = JsonConvert.DeserializeObject<c_danhsachdathang>(a["c_danhsachdathang"] + "");
                 var lstItem = JsonConvert.DeserializeObject<List<c_dongdsdh>>(a["c_dongdsdh"] + "");
                 //var lstItem2 = JsonConvert.DeserializeObject<List<c_phidathang>>(a["c_phidathang"] + "");
