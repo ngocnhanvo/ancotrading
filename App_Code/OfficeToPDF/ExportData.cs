@@ -668,7 +668,9 @@ namespace OfficeToPDF
             if (isDate)
             {
                 var fmt = columnT.CellStyle.GetDataFormatString().Replace("\\{", "").Replace("\\}", "").Replace("m", "M").Replace("p", "m");
-                columnT.SetCellValue(((DateTime)dt.Rows[iRow][nameColumnData]).ToString(fmt));
+                var data = dt.Rows[iRow][nameColumnData];
+                if(data != null)
+                    columnT.SetCellValue(((DateTime)data).ToString(fmt));
             }
             else if (isNumber)
             {
