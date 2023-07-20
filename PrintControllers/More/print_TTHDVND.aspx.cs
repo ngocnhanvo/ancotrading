@@ -36,19 +36,23 @@ public partial class PrintControllers_More_print_TTHDVND : System.Web.UI.Page
         var sophieu = "";
         foreach (DataRow row in tbl.Rows)
         {
+            var giamgia = tbl.AsEnumerable().Select(s=> new { sophieu = s.Field<string>("sophieu"), gghd = s.Field<decimal>("gghd") }).Distinct().Sum(s => s.gghd);
+            row["giamgia"] = giamgia;
+
+            var philamhang = tbl.AsEnumerable().Select(s => new { sophieu = s.Field<string>("sophieu"), plhhd = s.Field<decimal>("plhhd") }).Distinct().Sum(s => s.plhhd);
+            row["philamhang"] = philamhang;
+
             if (sophieu == row["sophieu"].ToString())
             {
                 row["tuongduongVND"] = DBNull.Value;
                 row["tuongduongUSD"] = DBNull.Value;
             }
             else
+            {
                 sophieu = row["sophieu"].ToString();
-
-            var giamgia = tbl.AsEnumerable().Select(s=> new { sophieu = s.Field<string>("sophieu"), gghd = s.Field<decimal>("gghd") }).Distinct().Sum(s => s.gghd);
-            row["giamgia"] = giamgia;
-
-            var philamhang = tbl.AsEnumerable().Select(s => new { sophieu = s.Field<string>("sophieu"), plhhd = s.Field<decimal>("plhhd") }).Distinct().Sum(s => s.plhhd);
-            row["philamhang"] = philamhang;
+                var tuongduongVND = tbl.AsEnumerable().Select(s => new { sophieu = s.Field<string>("sophieu"), thanhtien = s.Field<decimal>("thanhtien") }).Distinct().Sum(s => s.thanhtien);
+                row["tuongduongVND"] = tuongduongVND - giamgia + philamhang;
+            }
         }
     }
 
