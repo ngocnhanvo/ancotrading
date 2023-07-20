@@ -51,7 +51,7 @@ public partial class PrintControllers_More_print_TTHDVND : System.Web.UI.Page
             {
                 sophieu = row["sophieu"].ToString();
                 var tuongduongVND = tbl.AsEnumerable().Select(s => new { sophieu = s.Field<string>("sophieu"), thanhtien = s.Field<decimal>("thanhtien") }).Distinct().Sum(s => s.thanhtien);
-                row["tuongduongVND"] = tuongduongVND - giamgia + philamhang;
+                //row["tuongduongVND"] = tuongduongVND - giamgia + philamhang;
             }
         }
     }
