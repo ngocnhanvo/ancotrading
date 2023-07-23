@@ -97,7 +97,7 @@ public partial class PrintControllers_More_print_TTHDVND : System.Web.UI.Page
             from c_hoadon hd
             left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
             where hd.c_hoadon_id in ('{0}')
-            order by hd.sophieu 
+            order by hd.sophieu, ct.ma_sanpham
 		"
         , string.Join("','", ids)
         );
