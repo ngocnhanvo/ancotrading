@@ -52,7 +52,7 @@ public partial class PrintControllers_More_print_TTHDVND : System.Web.UI.Page
                 sophieu = row["sophieu"].ToString();
                 var giamgiaSP = tbl.AsEnumerable().Where(s=>s.Field<string>("sophieu") == sophieu).Select(s => new { gghd = s.Field<decimal>("gghd") }).Distinct().Sum(s => s.gghd);
                 var philamhangSP = tbl.AsEnumerable().Where(s => s.Field<string>("sophieu") == sophieu).Select(s => new { plhhd = s.Field<decimal>("plhhd") }).Distinct().Sum(s => s.plhhd);
-                var tuongduongVND = tbl.AsEnumerable().Where(s => s.Field<string>("sophieu") == sophieu).Select(s => new { msp = s.Field<string>("ma_sanpham"), thanhtien = s.Field<decimal>("thanhtien") }).Distinct().Sum(s => s.thanhtien);
+                var tuongduongVND = tbl.AsEnumerable().Where(s => s.Field<string>("sophieu") == sophieu).Select(s => new { msp = s.Field<string>("ma_sanpham"), thanhtien = s.Field<decimal>("thanhtien") }).Sum(s => s.thanhtien);
                 row["tuongduongVND"] = tuongduongVND - giamgiaSP + philamhangSP;
             }
         }
