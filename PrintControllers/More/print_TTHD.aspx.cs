@@ -87,11 +87,21 @@ public partial class PrintControllers_More_print_TTHD : System.Web.UI.Page
                 hd.giamgia as gghd,
                 hd.philamhang as plhhd,
                 hd.giamgia,
-                hd.philamhang
-            from c_hoadon hd
-            left join c_hoadon_ct ct on hd.c_hoadon_id = ct.c_hoadon_id
-            where hd.c_hoadon_id in ('{0}')
-            order by hd.sophieu 
+                hd.philamhang,
+                nx.container, 
+	            dh.sochungtu
+            from c_hoadon_ct ct
+                left join c_hoadon hd on hd.c_hoadon_id = ct.c_hoadon_id
+                left join c_packinginvoice inv on inv.so_inv = hd.so_inv
+                left join c_dongpklinv div on div.c_packinginvoice_id = inv.c_packinginvoice_id
+                left join c_nhapxuat nx on div.c_nhapxuat_id = nx.c_nhapxuat_id
+                left join c_donhang dh on div.c_donhang_id = dh.c_donhang_id
+            where 
+                hd.c_hoadon_id in ('{0}')
+                and ct.md_sanpham_id = div.md_sanpham_id
+                and ct.sothutu = div.line
+            order by 
+                hd.sophieu, nx.container, dh.sochungtu, ct.ma_sanpham
 		"
         , string.Join("','", ids)
         );
