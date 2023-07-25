@@ -671,7 +671,7 @@ namespace OfficeToPDF
                 var data = dt.Rows[iRow][nameColumnData];
                 try
                 {
-                    if (object.Equals(data, null))
+                    if (!object.Equals(data, null))
                         columnT.SetCellValue(((DateTime)data).ToString(fmt));
                 }
                 catch (Exception ex)
