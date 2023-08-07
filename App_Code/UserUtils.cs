@@ -726,7 +726,7 @@ public static class UserUtils
         var discount = dh.discount.GetValueOrDefault(0) > 0 ? dh.discount.GetValueOrDefault(0) : (decimal)ddh.discount.GetValueOrDefault(0);
         var phanBoDiscountVaoGia = dh.phanbodiscount.GetValueOrDefault(false) ? giaFOBvaPhi * discount / 100 : 0;
         var giaHopDong = giaFOBvaPhi - phanBoDiscountVaoGia;
-        return Math.Round(giaHopDong, 2);
+        return Math.Round(giaHopDong, 2, MidpointRounding.AwayFromZero);
     }
 
     public static decimal getGiaHopDongPO(c_donhang dh, c_dongdonhang ddh, int? round, bool? pbds)
