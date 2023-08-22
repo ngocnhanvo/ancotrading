@@ -86,13 +86,13 @@ public class API_Data : IHttpHandler {
             case "NhanDonHang":
                 this.NhanDonHang(context);
                 break;
-            case "getList":
-                this.getList(context);
+            case "getListDSDH":
+                this.getListDSDH(context);
                 break;
         }
     }
 
-    public void getList(HttpContext context)
+    public void getListDSDH(HttpContext context)
     {
         string msg = "";
         try
