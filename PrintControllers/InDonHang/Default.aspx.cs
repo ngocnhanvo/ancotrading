@@ -27,12 +27,15 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         //try
         //{
         c_donhang_id = Request.QueryString["c_donhang_id"];
+		if (c_donhang_id == null)
+            c_donhang_id = "";
+		
         type = Request.QueryString["type"];
         var dh = db.c_donhangs.Where(s => s.c_donhang_id == c_donhang_id).FirstOrDefault();
         decimal total = 0;
         if (tbl == "c_donhang")
         {
-            total = db.c_dongdonhangs.Where(s => s.c_donhang_id == dh.c_donhang_id).ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, 2, true)).DecRound(2);
+            total = db.c_dongdonhangs.Where(s => s.c_donhang_id == c_donhang_id).ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, 2, true)).DecRound(2);
         }
         else
         {

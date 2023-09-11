@@ -65,6 +65,7 @@ public partial class PrintControllers_InThongTinSanPhamMore_Default : System.Web
                         AND pbg.md_phienbangia_id = gsp.md_phienbangia_id
                         AND sp.md_sanpham_id = gsp.md_sanpham_id
                         AND bg.banggiaban = 0
+                        AND bg.ten_banggia like N'' + dtkd.ma_dtkd + '-%'
                         AND pbg.md_trangthai_id = 'HIEULUC'
                         order by pbg.ngay_hieuluc desc
                     ), 0) as [gia mua]
