@@ -277,7 +277,7 @@
                  , width: 100
             },
             {
-                 fixed: true, name: 'email_khachhang', hidden: true, hidedlg: true
+                 fixed: true, name: 'email_khachhang', hidden: true
                  , label: 'Email'
                  , index: 'email_khachhang'
                  , editable: false
@@ -285,7 +285,7 @@
                  , edittype: 'text'
             },
             {
-                 fixed: true, name: 'daidien_khachhang', hidden: true, hidedlg: true
+                 fixed: true, name: 'daidien_khachhang', hidden: true
                  , label: 'Người mua hàng'
                  , index: 'daidien_khachhang'
                  , editable: false
@@ -293,7 +293,7 @@
                  , edittype: 'text'
             },
             {
-                 fixed: true, name: 'sotaikhoan_khachhang', hidden: true, hidedlg: true
+                 fixed: true, name: 'sotaikhoan_khachhang', hidden: true
                  , label: 'Số tài khoản'
                  , index: 'sotaikhoan_khachhang'
                  , editable: false
@@ -301,7 +301,7 @@
                  , edittype: 'text'
             },
             {
-                 fixed: true, name: 'masothue_khachhang', hidden: true, hidedlg: true
+                 fixed: true, name: 'masothue_khachhang', hidden: true
                  , label: 'MST'
                  , index: 'masothue_khachhang'
                  , editable: false
@@ -309,7 +309,7 @@
                  , edittype: 'text'
             },
             {
-                 fixed: true, name: 'nganhang', hidden: true, hidedlg: true
+                 fixed: true, name: 'nganhang', hidden: true
                  , label: 'Ngân hàng'
                  , index: 'nganhang'
                  , editable: false
