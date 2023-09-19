@@ -227,7 +227,7 @@
                  fixed: true, name: 'sodh'
                  , label: 'Đơn Hàng'
                  , index: 'dbo.LayChungTuDonHang(inv.c_packinginvoice_id)'
-                 , editable: true
+                 , editable: false
                  , width: 100
                  , edittype: 'text'
                  , editoptions: { readonly:'readonly' }
