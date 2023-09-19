@@ -103,6 +103,7 @@ public class HoaDonController : IHttpHandler
                 hoadon.tuongduongVND = hoadon.tuongduongUSD.GetValueOrDefault(0) * hoadon.tygia.GetValueOrDefault(0);
                 hoadon.ma_khachhang = context.Request.Form["ma_khachhang"];
                 hoadon.ten_khachhang = context.Request.Form["ten_khachhang"];
+                hoadon.nhacungung = context.Request.Form["nhacungung"];
                 hoadon.diachi_khachhang = context.Request.Form["diachi_khachhang"];
                 hoadon.email_khachhang = context.Request.Form["email_khachhang"];
                 hoadon.nganhang = context.Request.Form["nganhang"];
@@ -231,7 +232,7 @@ public class HoaDonController : IHttpHandler
 
         if (sidx.Equals("") || sidx == null)
         {
-            sidx = "nx.c_nhapxuat_id";
+            sidx = "hd.sophieu";
         }
 
         string strsql = string.Format(@"
@@ -244,9 +245,12 @@ public class HoaDonController : IHttpHandler
                     hd.tiento,
                     hd.sophieu,
                     hd.so_inv,
+                    dbo.LayChungTuDonHang(inv.c_packinginvoice_id) as sodh,
                     hd.ma_khachhang,
                     hd.ten_khachhang,
                     hd.diachi_khachhang,
+                    hd.nhacungung,
+                    dtkd.ten_dtkd as ten_nhacungung,
                     hd.email_khachhang,
                     hd.daidien_khachhang,
                     hd.sotaikhoan_khachhang,
@@ -276,6 +280,8 @@ public class HoaDonController : IHttpHandler
                 FROM 
                     c_hoadon hd
                     left join md_nganhang nh on nh.md_nganhang_id = hd.nganhang
+                    left join c_packinginvoice inv on inv.so_inv = hd.so_inv
+                    left join md_doitackinhdoanh dtkd on dtkd.md_doitackinhdoanh_id = hd.nhacungung
                 WHERE 
                     1=1
                     {2}
