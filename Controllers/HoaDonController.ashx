@@ -105,11 +105,11 @@ public class HoaDonController : IHttpHandler
                 hoadon.ten_khachhang = context.Request.Form["ten_khachhang"];
                 hoadon.nhacungung = context.Request.Form["nhacungung"];
                 hoadon.diachi_khachhang = context.Request.Form["diachi_khachhang"];
-                hoadon.email_khachhang = context.Request.Form["email_khachhang"];
-                hoadon.nganhang = context.Request.Form["nganhang"];
-                hoadon.daidien_khachhang = context.Request.Form["daidien"];
-                hoadon.sotaikhoan_khachhang = context.Request.Form["sotaikhoan_khachhang"];
-                hoadon.masothue_khachhang = context.Request.Form["masothue_khachhang"];
+                //hoadon.email_khachhang = context.Request.Form["email_khachhang"];
+                //hoadon.nganhang = context.Request.Form["nganhang"];
+                //hoadon.daidien_khachhang = context.Request.Form["daidien"];
+                //hoadon.sotaikhoan_khachhang = context.Request.Form["sotaikhoan_khachhang"];
+                //hoadon.masothue_khachhang = context.Request.Form["masothue_khachhang"];
                 hoadon.sotokhai_inv = context.Request.Form["sotokhai_inv"];
                 hoadon.mota = context.Request.Form["mota"];
                 db.SubmitChanges();
