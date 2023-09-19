@@ -107,7 +107,7 @@ public class HoaDonController : IHttpHandler
                 hoadon.diachi_khachhang = context.Request.Form["diachi_khachhang"];
                 hoadon.email_khachhang = context.Request.Form["email_khachhang"];
                 hoadon.nganhang = context.Request.Form["nganhang"];
-                hoadon.daidien_khachhang = context.Request.Form["daidien"];
+                hoadon.daidien_khachhang = context.Request.Form["daidien_khachhang"];
                 hoadon.sotaikhoan_khachhang = context.Request.Form["sotaikhoan_khachhang"];
                 hoadon.masothue_khachhang = context.Request.Form["masothue_khachhang"];
                 hoadon.sotokhai_inv = context.Request.Form["sotokhai_inv"];
@@ -246,11 +246,11 @@ public class HoaDonController : IHttpHandler
                     hd.sophieu,
                     hd.so_inv,
                     dbo.LayChungTuDonHang(inv.c_packinginvoice_id) as sodh,
+                    hd.nhacungung,
+                    dtkd.ten_dtkd as ten_nhacungung,
                     hd.ma_khachhang,
                     hd.ten_khachhang,
                     hd.diachi_khachhang,
-                    hd.nhacungung,
-                    dtkd.ten_dtkd as ten_nhacungung,
                     hd.email_khachhang,
                     hd.daidien_khachhang,
                     hd.sotaikhoan_khachhang,

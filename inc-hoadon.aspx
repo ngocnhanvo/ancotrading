@@ -233,6 +233,25 @@
                  , editoptions: { readonly:'readonly' }
             },
             {
+                 fixed: true, name: 'nhacungung', hidden: true, hidedlg: true
+                 , label: 'Nhà cung ứng'
+                 , index: 'dtkd.ten_dtkd'
+                 , editable: true
+                 , width: 100
+                 , editrules: {
+                    edithidden: true
+                 }
+                 , edittype: 'select'
+                 , editoptions: { dataUrl: 'Controllers/PartnerController.ashx?action=getoption' }
+            },
+            {
+                 fixed: true, name: 'ten_nhacungung'
+                 , label: 'Nhà cung ứng'
+                 , index: 'dtkd.ten_dtkd'
+                 , editable: false
+                 , width: 100
+            },
+            {
                  fixed: true, name: 'ma_khachhang'
                  , label: 'Mã KH'
                  , index: 'ma_khachhang'
@@ -258,65 +277,61 @@
                  , edittype: 'text'
             },
             {
-                 fixed: true, name: 'nhacungung', hidden: true, hidedlg: true
-                 , label: 'Nhà cung ứng'
-                 , index: 'dtkd.ten_dtkd'
-                 , editable: true
-                 , width: 100
-                 , editrules: {
-                    edithidden: true
-                 }
-                 , edittype: 'select'
-                 , editoptions: { dataUrl: 'Controllers/PartnerController.ashx?action=getoption' }
-            },
-            {
-                 fixed: true, name: 'ten_nhacungung'
-                 , label: 'Nhà cung ứng'
-                 , index: 'dtkd.ten_dtkd'
-                 , editable: false
-                 , width: 100
-            },
-            {
                  fixed: true, name: 'email_khachhang', hidden: true
                  , label: 'Email'
                  , index: 'email_khachhang'
-                 , editable: false
+                 , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , editrules: {
+                    edithidden: true
+                 }
             },
             {
                  fixed: true, name: 'daidien_khachhang', hidden: true
                  , label: 'Người mua hàng'
                  , index: 'daidien_khachhang'
-                 , editable: false
+                 , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , editrules: {
+                    edithidden: true
+                 }
             },
             {
                  fixed: true, name: 'sotaikhoan_khachhang', hidden: true
                  , label: 'Số tài khoản'
                  , index: 'sotaikhoan_khachhang'
-                 , editable: false
+                 , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , editrules: {
+                    edithidden: true
+                 }
             },
             {
                  fixed: true, name: 'masothue_khachhang', hidden: true
                  , label: 'MST'
                  , index: 'masothue_khachhang'
-                 , editable: false
+                 , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , editrules: {
+                    edithidden: true
+                 }
             },
             {
                  fixed: true, name: 'nganhang', hidden: true
                  , label: 'Ngân hàng'
                  , index: 'nganhang'
-                 , editable: false
+                 , editable: true
                  , width: 100
                  , align: 'center'
                  , edittype: 'select'
                  , editoptions: { dataUrl: 'Controllers/NganHangController.ashx?action=getoption&fn=true' }
+                 , editrules: {
+                    edithidden: true
+                 }
             },
             {
                  fixed: true, name: 'hinhthucthanhtoan'
