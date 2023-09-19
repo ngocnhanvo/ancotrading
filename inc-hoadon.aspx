@@ -523,6 +523,7 @@
             ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
             ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
             EditFormOptions="
+                                width: 400,
                                 beforeShowForm: function (formid) {
                                     formid.css({'max-height': (0.85*window.innerHeight) + 'px'});
                                     formid.closest('div.ui-jqdialog').dialogCenter(); 
