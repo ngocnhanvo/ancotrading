@@ -93,7 +93,7 @@ public partial class PrintControllers_InBaoCaoChiTietDoanhThu_Default : System.W
 			left join c_nhapxuat k on k.c_donhang_id = g.c_donhang_id and k.md_loaichungtu_id = 'NK'
 			left join c_dongnhapxuat l on l.c_nhapxuat_id = k.c_nhapxuat_id and l.md_sanpham_id = d.md_sanpham_id
 			/* lay phieu xuat */
-			left join c_nhapxuat z on z.c_donhang_id = g.c_donhang_id and z.md_loaichungtu_id = 'XK'
+			left join c_nhapxuat z on z.sophieunx like N'%' + g.sochungtu + '%' and z.md_loaichungtu_id = 'XK'
 			left join c_dongnhapxuat x on x.c_nhapxuat_id = z.c_nhapxuat_id and x.c_dongdonhang_id = h.c_dongdonhang_id and x.md_sanpham_id = d.md_sanpham_id
 			where a.md_trangthai_id = 'HIEULUC' {0}
 				and a.ngay_motokhai >= convert(date,'{1}',103) and a.ngay_motokhai <= convert(date,'{2}',103)
