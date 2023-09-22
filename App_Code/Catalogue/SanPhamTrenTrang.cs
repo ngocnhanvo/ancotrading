@@ -296,6 +296,11 @@ namespace Catalogue
                     }
 
                     boMain = db.md_bos.Where(s => s.ma_bo == strSize & s.ma_bo_cha == maBoCha).FirstOrDefault();
+
+                    if(boMain == null)
+                    {
+                        throw new Exception(string.Format(@"Mã {0} không có bộ S", spR.ma_sanpham));
+                    }
                 }
 
                 int countR = 0;
