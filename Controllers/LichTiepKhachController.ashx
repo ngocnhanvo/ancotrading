@@ -236,7 +236,7 @@ public class LichTiepKhachController : IHttpHandler
             ltk.thucan = context.Request.Form["thucan"];
             if (string.IsNullOrWhiteSpace(ltk.thucan))
                 ltk.thucan = "Ko";
-
+            ltk.baocao = "";
             ltk.nguoilienhe = context.Request.Form["nguoilienhe"];
             ltk.mota = context.Request.Form["mota"];
             ltk.nguoitao = UserUtils.getUser(context);
