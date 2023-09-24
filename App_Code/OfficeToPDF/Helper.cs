@@ -9,6 +9,13 @@ using System.Collections.Generic;
 /// </summary>
 public static class Helper
 {
+    #region bien toan cuc
+    public static string SOANTHAO = "SOANTHAO";
+    public static string HIEULUC = "HIEULUC";
+    public static string KETTHUC = "KETTHUC";
+    public static string HUY = "HUY";
+    #endregion bien toan cuc
+
     public static void removeFileWithPath(string path)
     {
         if (System.IO.File.Exists(path))

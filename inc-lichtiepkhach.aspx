@@ -6,17 +6,9 @@
             UrlFileAction="Controllers/LichTiepKhachController.ashx" 
             RowNumbers="true"
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()- 64);"
-            OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid, {
-                beforeShowForm: function (formid) {
-                    formid.closest('div.ui-jqdialog').dialogCenter(); 
-                }
-                , afterSubmit: function(rs, postdata) {
-                  return showMsgDialog(rs);
-                }
-                , errorTextFormat:function(data) { 
-                    return 'Lỗi: ' + data.responseText 
-                }
-            }); }"
+            OndblClickRow = "function(rowid) {
+                $('#edit_grid_ds_lichtiepkhach').click();
+            }"
             ColModel = "[
             {
                 fixed: true, name: 'md_lichtiepkhach_id'
@@ -27,6 +19,21 @@
                 , editable:true
                 , edittype: 'text'
                 , key: true
+            },
+            {
+                 name: 'trangthai'
+                 , label: 'TT'
+                 , index: 'trangthai'
+                 , editable: true
+                 , fixed:true 
+                 , width: 100
+                 , edittype: 'select'
+                 , editoptions:{value:'SOANTHAO:SOẠN THẢO;HIEULUC:HIỆU LỰC;HUY:HỦY' } 
+                 , align:'center'
+                 , formatter:'imagestatusLTK'
+                 , search : true
+                 , stype : 'select'
+                 , searchoptions:{sopt:['eq'], value:':[ALL];SOANTHAO:SOẠN THẢO;HIEULUC:HIỆU LỰC;HUY:HỦY' }
             },
             {
                 fixed: true, name: 'khachhang'
@@ -129,6 +136,14 @@
                 , editable: true
             },
             {
+                fixed: true, name: 'baocao'
+                , index: 'baocao'
+                , label: 'Báo cáo'
+                , width: 100
+                , edittype: 'textarea'
+                , editable: true
+            },
+            {
                 fixed: true, name: 'ngaytao', hidden: true
                 , index: 'ngaytao'
                 , label: 'Ngày tạo'
@@ -186,6 +201,8 @@
             ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
             AddFormOptions=" 
                 beforeShowForm: function (formid) {
+                    $('#trangthai', formid).prop('disabled', true);
+                    $('#baocao', formid).prop('disabled', true);
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 }
                 , afterSubmit: function(rs, postdata) {
@@ -197,6 +214,8 @@
                 "
             EditFormOptions ="
                 beforeShowForm: function (formid) {
+                    $('#trangthai', formid).prop('disabled', false);
+                    $('#baocao', formid).prop('disabled', false);
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 }
                 , afterSubmit: function(rs, postdata) {
@@ -251,10 +270,25 @@
                         <td>Đến ngày:</td>
                         <td><input id="txtDenNgayLTK" autocomplete="off" type="text" style="margin-left: 5px; padding: 3px;" /></td>
                     </tr>
+                    <tr>
+                        <td colspan="2"><div style="width:100%; height:5px;"></div></td>
+                    </tr>
+                    <tr>
+                        <td>Trạng thái:</td>
+                        <td>
+                            <select id="selTrangThaiLTK" style="margin-left: 5px; padding: 3px;">
+                                <option value="">[ALL]</option>
+                                <option value="SOANTHAO">SOẠN THẢO</option>
+                                <option value="HIEULUC">HIỆU LỰC</option>
+                                <option value="HUY">HỦY</option>
+                            </select>
+                        </td>
+                    </tr>
                     </table>
                 </div>`);
                 let tungayDT = $('#txtTuNgayLTK');
                 let denngayDT = $('#txtDenNgayLTK');
+                let trangthaiDT = $('#selTrangThaiLTK');
                 // create new dialog
                 $('#dialog_inLichTiepKhach').dialog({
                     modal: true
@@ -268,7 +302,7 @@
                         'In': function () {
                             let printURL = "PrintControllers/More/print_LichTiepKhach.aspx";
                             let windowSize = "width=700,height=700,scrollbars=yes";
-                            window.open(`${printURL}?tungay=${tungayDT.val()}&denngay=${denngayDT.val()}`, "Chiết xuất lịch tiếp khách", windowSize);
+                            window.open(`${printURL}?tungay=${tungayDT.val()}&denngay=${denngayDT.val()}&tt=${trangthaiDT.val()}`, "Chiết xuất lịch tiếp khách", windowSize);
                         },
                         'Thoát': function () {
                             $(this).dialog("destroy").remove();

@@ -40,6 +40,9 @@ public partial class PrintControllers_More_print_LichTiepKhach : System.Web.UI.P
     {
         string tungay = context.Request.QueryString["tungay"];
         string denngay = context.Request.QueryString["denngay"];
+        string trangthai = context.Request.QueryString["tt"];
+        if (!string.IsNullOrWhiteSpace(trangthai))
+            trangthai = string.Format("and ltk.trangthai='{0}'", trangthai);
 
         string sql = string.Format(@"	 
             declare @tungay datetime = convert(datetime, N'{0}', 103)
@@ -52,11 +55,12 @@ public partial class PrintControllers_More_print_LichTiepKhach : System.Web.UI.P
 	            ltk.*
             from md_lichtiepkhach ltk
             left join nhanvien nv on ltk.nguoitao = nv.manv
-            where ltk.ngay between @tungay and @denngay
+            where ltk.ngay between @tungay and @denngay {2}
             order by ltk.ngay
 		"
         , tungay
         , denngay
+        , trangthai
         );
 
         return sql;

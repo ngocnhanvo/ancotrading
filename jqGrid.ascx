@@ -4,6 +4,18 @@
     function lightboxFormat( cellvalue, options, rowObject ){
         return '<a rel="prettyPhoto" href="images/products/'+cellvalue+'"><img src="images/products/'+cellvalue+'"/></span></a>'
     }
+
+    jQuery.extend($.fn.fmatter, {
+        imagestatusLTK: function (cellvalue, options, rowObject) {
+            return `<img title="${cellvalue}" src="iconcollection/${cellvalue}.png"/>`;
+        }
+    });
+
+    jQuery.extend($.fn.fmatter.imagestatusLTK, {
+        unformat: function(cellvalue, options, rowObject) {
+            return $('img', rowObject).attr('title');
+        }
+    });
     
     function lightboxUnFormat( cellvalue, options, cell){
 	    return $('img', cell).attr('src');

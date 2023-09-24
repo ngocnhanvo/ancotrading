@@ -143,7 +143,8 @@ public class LichTiepKhachController : IHttpHandler
         string msg = "";
         var user = UserUtils.getUser(context);
         String id = context.Request.Form["id"];
-
+        var trangthai = context.Request.Form["trangthai"];
+        var baocao = context.Request.Form["baocao"];
         try
         {
             var ltk = db.md_lichtiepkhaches.Where(s => s.md_lichtiepkhach_id == id).FirstOrDefault();
@@ -151,8 +152,28 @@ public class LichTiepKhachController : IHttpHandler
                 msg = @"Không tìm thấy đối tượng cần sửa";
             else if (ltk.nguoitao != user)
                 msg = string.Format(@"Chỉ người tạo ""{0}"" mới có thể sửa.", ltk.nguoitao);
+            else if (baocao != ltk.baocao & ltk.trangthai != Helper.HIEULUC)
+                msg = "Không thể báo cáo khi chưa Hiệu Lực";
+            else if (baocao != ltk.baocao & !string.IsNullOrWhiteSpace(ltk.baocao))
+                msg = "Đã báo cáo trước đó";
+            else if (new string[] { Helper.HIEULUC, Helper.HUY }.Contains(ltk.trangthai))
+            {
+                if (trangthai == Helper.SOANTHAO)
+                {
+                    msg = "Không thể chuyển trạng thái về Soạn Thảo";
+                }
+                else
+                {
+                    ltk.trangthai = trangthai;
+                    if (baocao != ltk.baocao & string.IsNullOrWhiteSpace(ltk.baocao))
+                        ltk.baocao = baocao;
+                    db.SubmitChanges();
+                    jqGridHelper.Utils.writeResult(1, "Cập nhật trạng thái thành công");
+                }
+            }
             else
             {
+                ltk.trangthai = trangthai;
                 ltk.khachhang = context.Request.Form["khachhang"];
                 ltk.quocgia = context.Request.Form["quocgia"];
                 ltk.soluong = context.Request.Form["soluong"];
@@ -177,6 +198,7 @@ public class LichTiepKhachController : IHttpHandler
                 ltk.nguoicapnhat = UserUtils.getUser(context);
                 ltk.ngaycapnhat = DateTime.Now;
                 db.SubmitChanges();
+                jqGridHelper.Utils.writeResult(1, "Sửa thành công");
             }
         }
         catch (Exception ex)
@@ -184,9 +206,7 @@ public class LichTiepKhachController : IHttpHandler
             msg = ex.ToString();
         }
 
-        if (msg.Length <= 0)
-            jqGridHelper.Utils.writeResult(1, "Sửa thành công");
-        else
+        if (msg.Length > 0)
             jqGridHelper.Utils.writeResult(0, msg);
     }
 
@@ -197,6 +217,7 @@ public class LichTiepKhachController : IHttpHandler
         {
             var ltk = new md_lichtiepkhach();
             ltk.md_lichtiepkhach_id = Helper.getNewId();
+            ltk.trangthai = Helper.SOANTHAO;
             ltk.khachhang = context.Request.Form["khachhang"];
             ltk.quocgia = context.Request.Form["quocgia"];
             ltk.soluong = context.Request.Form["soluong"];
@@ -250,6 +271,10 @@ public class LichTiepKhachController : IHttpHandler
                 msg = @"Không tìm thấy đối tượng cần xóa";
             else if (ltk.nguoitao != user)
                 msg = string.Format(@"Chỉ người tạo ""{0}"" mới có thể xóa.", ltk.nguoitao);
+            else if (ltk.trangthai == Helper.HIEULUC)
+                msg = string.Format(@"Đã Hiệu Lực.");
+            else if (ltk.trangthai == Helper.HUY)
+                msg = string.Format(@"Đã Hủy.");
             else
             {
                 db.md_lichtiepkhaches.DeleteOnSubmit(ltk);

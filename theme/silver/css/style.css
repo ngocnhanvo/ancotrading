@@ -260,5 +260,11 @@ td[id^="grid_"][id$="-pager_left"] {
     width: auto !important;
 }
 
+td.DataTD textarea:disabled {
+    cursor: not-allowed;
+    background-color: #CCC;
+    opacity: 0.5;
+}
+
 
 
