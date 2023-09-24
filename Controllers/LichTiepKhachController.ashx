@@ -152,15 +152,19 @@ public class LichTiepKhachController : IHttpHandler
                 msg = @"Không tìm thấy đối tượng cần sửa";
             else if (ltk.nguoitao != user)
                 msg = string.Format(@"Chỉ người tạo ""{0}"" mới có thể sửa.", ltk.nguoitao);
-            else if (baocao != ltk.baocao & ltk.trangthai != Helper.HIEULUC)
-                msg = "Không thể báo cáo khi chưa Hiệu Lực";
             else if (baocao != ltk.baocao & !string.IsNullOrWhiteSpace(ltk.baocao))
                 msg = "Đã báo cáo trước đó";
+            else if (baocao != ltk.baocao & ltk.trangthai != Helper.HIEULUC)
+                msg = "Không thể báo cáo khi chưa Hiệu Lực";
             else if (new string[] { Helper.HIEULUC, Helper.HUY }.Contains(ltk.trangthai))
             {
                 if (trangthai == Helper.SOANTHAO)
                 {
                     msg = "Không thể chuyển trạng thái về Soạn Thảo";
+                }
+                else if(trangthai == ltk.trangthai & baocao == ltk.baocao)
+                {
+                    msg = "Không thể sửa khi đã Hiệu Lực hoặc Hủy";
                 }
                 else
                 {
