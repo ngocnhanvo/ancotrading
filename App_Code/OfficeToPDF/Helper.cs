@@ -398,6 +398,87 @@ public static class Helper
         return msg;
     }
 
+    public static string themPhieuThu(
+        HttpContext context, LinqDBDataContext db,
+        string tiento, decimal? soduocgan, string hauto, string dinhDanh,
+        string md_doitackinhdoanh_id, string loai, string ngaylapphieu, string nguoi_giaonop,
+        string ngay_giaonop, string sotien, string md_dongtien_id, string tygia,
+        string lydo, string loaiphieu, string md_loaichungtu_id, 
+        string sochungtuPT, string quydoi_vnd,
+        string tk_quy, string mota
+        )
+    {
+        string msg = "";
+
+        try
+        {
+            var mnu = db.c_thuchis.Where(s => s.sophieu == dinhDanh).FirstOrDefault();
+            var add = mnu == null;
+            if (add)
+            {
+                mnu = new c_thuchi();
+                mnu.c_thuchi_id = Helper.getNewId();
+                string sphieu = tiento + "/" + soduocgan + "/" + hauto;
+                mnu.sophieu = sphieu;
+            }
+            
+            bool check = (bool)mdbc.ExecuteScalarProcedure("p_kiemtragiaodich", "@date", (DateTime.ParseExact(ngaylapphieu, "dd/MM/yyyy", null)).ToString("MM/dd/yyyy"), "@md_doitackinhdoanh_id", md_doitackinhdoanh_id);
+            if (check.Equals(true))
+            {
+                mnu.loai = loai;
+                mnu.md_doitackinhdoanh_id = md_doitackinhdoanh_id;
+                mnu.ngaylapphieu = DateTime.ParseExact(ngaylapphieu, "dd/MM/yyyy", null);
+                mnu.nguoi_giaonop = nguoi_giaonop;
+                mnu.ngay_giaonop = DateTime.ParseExact(ngay_giaonop, "dd/MM/yyyy", null);
+                mnu.sotien = decimal.Parse(sotien);
+                mnu.md_dongtien_id = md_dongtien_id;
+                mnu.tygia = decimal.Parse(tygia);
+                mnu.lydo = lydo;
+                mnu.loaiphieu = loaiphieu;
+                mnu.sochungtu = sochungtuPT;
+                if (string.IsNullOrWhiteSpace(quydoi_vnd))
+                {
+                    mnu.quydoi_vnd = (mnu.sotien.GetValueOrDefault(0) * mnu.tygia.GetValueOrDefault(0)).DecRound(-2);
+                }
+                else
+                {
+                    mnu.quydoi_vnd = decimal.Parse(quydoi_vnd);
+                }
+
+                if(!string.IsNullOrWhiteSpace(tk_quy))
+                    mnu.tk_quy = int.Parse(tk_quy);
+
+                mnu.tongcackhoan = 0;
+                mnu.tongkhoanphi = 0;
+                mnu.tienconlai = mnu.tongcackhoan - mnu.sotien + mnu.tongkhoanphi;
+                mnu.md_trangthai_id = Helper.SOANTHAO;
+                
+                mnu.md_loaichungtu_id = md_loaichungtu_id;
+                mnu.ispaymentin = true;
+
+                mnu.mota = mota;
+                mnu.hoatdong = true;
+                mnu.nguoitao = UserUtils.getUser(context);
+                mnu.nguoicapnhat = UserUtils.getUser(context);
+                mnu.ngaytao = DateTime.Now;
+                mnu.ngaycapnhat = DateTime.Now;
+
+                if (add)
+                    db.c_thuchis.InsertOnSubmit(mnu);
+            }
+            else
+            {
+                msg = "Không thể thêm giao dịch vào kỳ kế toán đã đóng!";
+            }
+        }
+        catch (Exception e)
+        {
+            msg = e.Message;
+        }
+
+        return msg;
+    }
+
     public static string bienDichLoaiChiTraKhac(string lct)
     {
         string kq = "";

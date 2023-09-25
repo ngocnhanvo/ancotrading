@@ -25,6 +25,7 @@
         var divRptEl = $("#reportviewer");
         var chuThich = frmEl.find('.chuthich');
         var thaotac2 = frmEl.find('.thaotac2');
+        let $mauIPKT = $('#mauIPKT');
         frmEl.attr('stt', stt);
         $('#lblReportNameketoan_tool').html($(a).text());
         frmEl.show();
@@ -34,6 +35,12 @@
             case 1:
                 chuThich.html('Nhập liệu ủy nhiệm chi');
                 thaotac2.attr('onclick', 'submitRptTool(1)');
+                $mauIPKT.attr('href', 'Mẫu import/Ủy Nhiệm Chi.xls');
+                break;
+            case 2:
+                chuThich.html('Nhập liệu phiếu thu');
+                thaotac2.attr('onclick', 'submitRptTool(1)');
+                $mauIPKT.attr('href', 'Mẫu import/Phiếu Thu.xls');
                 break;
         }
     }
@@ -46,6 +53,10 @@
             case '1':
                 title = "Nhập liệu ủy nhiệm chi";
                 url = "ToolKeToan/NhapLieuUNC.aspx";
+                break;
+            case '2':
+                title = "Nhập liệu phiếu thu";
+                url = "ToolKeToan/NhapLieuPT.aspx";
                 break;
         }
 		
@@ -71,7 +82,7 @@
         target="exportEXKT_popup"
         method="post" 
         id="frmketoan_tool"
-        onsubmit="window.open('about:blank','exportEX_popup','width=700,height=700,scrollbars=yes');"
+        onsubmit="window.open('','exportEXKT_popup','width=700,height=700,scrollbars=yes');"
         style="display:none; user-select: none">
         <table>
             <tr>
@@ -102,7 +113,7 @@
             </tr>
             <tr>
                 <td colspan=2 style="text-align:center">
-                    <a 
+                    <a id="mauIPKT"
                         href="Mẫu import/Ủy Nhiệm Chi.xls" 
                         target="_blank"
                         style="color: blue; text-decoration: underline; font-size: 110%;"
@@ -122,6 +133,7 @@
 <div style="background:#F4F0EC;" class="ui-layout-west" id="lay-west-ketoan_tool">
     <div class="ui-widget-content" style="height:100%; overflow:auto; text-align:center">
         <button style="text-align:left;" onclick="createKeToanTool(this, 1)">Nhập liệu ủy nhiệm chi</button>
+        <button style="text-align:left;" onclick="createKeToanTool(this, 2)">Nhập liệu phiếu thu</button>
     </div>
 </div>
 

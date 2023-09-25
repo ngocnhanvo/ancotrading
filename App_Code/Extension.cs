@@ -123,12 +123,20 @@ public static class Extension
         string textToFind = matchWholeWord ? string.Format(@"\b{0}\b", find) : find;
         return Regex.Replace(input, textToFind, replace);
     }
-	
-	public static decimal DecRound(this decimal dtMain, int dec)
+
+    public static decimal DecRound(this decimal value, int digits)
     {
-        dtMain = Decimal.Round(dtMain, dec, MidpointRounding.AwayFromZero);
-        return dtMain;
-	}
+        if (digits >= 0)
+            value = Decimal.Round(value, digits, MidpointRounding.AwayFromZero);
+        else
+        {
+            digits = Math.Abs(digits);
+            decimal temp = value / (decimal)Math.Pow(10, digits);
+            temp = Math.Round(temp, 0, MidpointRounding.AwayFromZero);
+            value = temp * (decimal)Math.Pow(10, digits);
+        }
+        return value;
+    }
 
     public static T Cast<T>(this Object myobj)
     {

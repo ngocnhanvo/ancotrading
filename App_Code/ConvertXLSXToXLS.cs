@@ -11,21 +11,21 @@ using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.HSSF.Util;
 using NPOI.XSSF.Util;
-using System.IO; 
+using System.IO;
 using System.Collections.Generic;
 public static class ConvertXLSXToXLS
 {
     public static string ConvertWorkbookXSSFToHSSF(string path)
     {
         //Install-Package NPOI -Version 2.0.6
-		string xls_file = "";
-		XSSFWorkbook source = null;
-		using (var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
-		{
-			xls_file = path.Replace(".xlsx",".xls");
-			source = new XSSFWorkbook(fs);
-		}
-		
+        string xls_file = "";
+        XSSFWorkbook source = null;
+        using (var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
+        {
+            xls_file = path.Replace(".xlsx", ".xls");
+            source = new XSSFWorkbook(fs);
+        }
+
         HSSFWorkbook retVal = new HSSFWorkbook();
         for (int i = 0; i < source.NumberOfSheets; i++)
         {
@@ -34,13 +34,13 @@ public static class ConvertXLSXToXLS
             XSSFSheet xssfsheet = (XSSFSheet)source.GetSheetAt(i);
             CopySheets(xssfsheet, hssfSheet, retVal);
         }
-		
-		using (var fs = new FileStream(xls_file, FileMode.Create, FileAccess.Write))
-		{
-			retVal.Write(fs);
-		}
-		
-		File.Delete(path);
+
+        using (var fs = new FileStream(xls_file, FileMode.Create, FileAccess.Write))
+        {
+            retVal.Write(fs);
+        }
+
+        File.Delete(path);
         return xls_file;
     }
 
@@ -77,50 +77,51 @@ public static class ConvertXLSXToXLS
         // pour chaque row
         for (int j = srcRow.FirstCellNum; j <= srcRow.LastCellNum; j++)
         {
-            XSSFCell oldCell = (XSSFCell)srcRow.GetCell(j); // ancienne cell
-            HSSFCell newCell = (HSSFCell)destRow.GetCell(j); // new cell
-            if (oldCell != null)
+            try
             {
-                if (newCell == null)
+                XSSFCell oldCell = (XSSFCell)srcRow.GetCell(j); // ancienne cell
+                HSSFCell newCell = (HSSFCell)destRow.GetCell(j); // new cell
+                if (oldCell != null)
                 {
-                    newCell = (HSSFCell)destRow.CreateCell(j);
-                }
-                // copy chaque cell
-                CopyCell(oldCell, newCell, styleMap, retVal);
-                // copy les informations de fusion entre les cellules
-                CellRangeAddress mergedRegion = GetMergedRegion(srcSheet, srcRow.RowNum,
-                        (short)oldCell.ColumnIndex);
-
-                if (mergedRegion != null)
-                {
-                    CellRangeAddress newMergedRegion = new CellRangeAddress(mergedRegion.FirstRow,
-                            mergedRegion.LastRow, mergedRegion.FirstColumn, mergedRegion.LastColumn);
-                    if (IsNewMergedRegion(newMergedRegion, mergedRegions))
+                    if (newCell == null)
                     {
-                        mergedRegions.Add(newMergedRegion);
-                        destSheet.AddMergedRegion(newMergedRegion);
+                        newCell = (HSSFCell)destRow.CreateCell(j);
                     }
+                    // copy chaque cell
+                    CopyCell(oldCell, newCell, styleMap, retVal);
+                    // copy les informations de fusion entre les cellules
+                    CellRangeAddress mergedRegion = GetMergedRegion(srcSheet, srcRow.RowNum,
+                            (short)oldCell.ColumnIndex);
 
-                    if (newMergedRegion.FirstColumn == 0 && newMergedRegion.LastColumn == 6 && newMergedRegion.FirstRow == newMergedRegion.LastRow)
+                    if (mergedRegion != null)
                     {
-                        HSSFCellStyle style2 = (HSSFCellStyle)retVal.CreateCellStyle();
-                        style2.VerticalAlignment = VerticalAlignment.Top;
-                        style2.Alignment = HorizontalAlignment.Left;
-                        style2.FillForegroundColor = HSSFColor.Teal.Index;
-                        style2.FillPattern = FillPattern.SolidForeground;
-
-                        for (int i = destRow.FirstCellNum; i <= destRow.LastCellNum; i++)
+                        CellRangeAddress newMergedRegion = new CellRangeAddress(mergedRegion.FirstRow,
+                                mergedRegion.LastRow, mergedRegion.FirstColumn, mergedRegion.LastColumn);
+                        if (IsNewMergedRegion(newMergedRegion, mergedRegions))
                         {
-                            if (destRow.GetCell(i) != null)
-                                destRow.GetCell(i).CellStyle = style2;
+                            mergedRegions.Add(newMergedRegion);
+                            destSheet.AddMergedRegion(newMergedRegion);
+                        }
+
+                        if (newMergedRegion.FirstColumn == 0 && newMergedRegion.LastColumn == 6 && newMergedRegion.FirstRow == newMergedRegion.LastRow)
+                        {
+                            HSSFCellStyle style2 = (HSSFCellStyle)retVal.CreateCellStyle();
+                            style2.VerticalAlignment = VerticalAlignment.Top;
+                            style2.Alignment = HorizontalAlignment.Left;
+                            style2.FillForegroundColor = HSSFColor.Teal.Index;
+                            style2.FillPattern = FillPattern.SolidForeground;
+
+                            for (int i = destRow.FirstCellNum; i <= destRow.LastCellNum; i++)
+                            {
+                                if (destRow.GetCell(i) != null)
+                                    destRow.GetCell(i).CellStyle = style2;
+                            }
                         }
                     }
                 }
             }
+            catch { }
         }
-
-
-
     }
 
     private static void CopyCell(XSSFCell oldCell, HSSFCell newCell, Dictionary<int, XSSFCellStyle> styleMap, HSSFWorkbook retVal)
