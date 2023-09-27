@@ -226,10 +226,12 @@ public class NhapXuatController : IHttpHandler
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
 
+        var dagui = context.Request.Form["dagui"].removeAllSpaceOrTrimText(false).ToLower() == "true";
         c_nhapxuat m = db.c_nhapxuats.Single(p => p.c_nhapxuat_id == context.Request.Form["id"]);
         if (m.md_trangthai_id.Equals("SOANTHAO"))
         {
             // m.c_donhang_id = context.Request.Form["c_donhang_id"];
+            m.dagui = dagui;
             m.sophieu = context.Request.Form["sophieu"];
             m.sophieunx = context.Request.Form["sophieunx"];
             m.ngay_giaonhan = DateTime.ParseExact(context.Request.Form["ngay_giaonhan"], "dd/MM/yyyy", null);
@@ -254,7 +256,13 @@ public class NhapXuatController : IHttpHandler
         }
         else
         {
-            jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi trạng thái là hiệu lực!");
+            if (m.dagui.GetValueOrDefault(false) != dagui)
+            {
+                m.dagui = dagui;
+                db.SubmitChanges();
+            }
+            else
+                jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi trạng thái là hiệu lực!");
         }
     }
 
@@ -388,8 +396,8 @@ public class NhapXuatController : IHttpHandler
         }
 
         string strsql = "select * from( " +
-            " select nx.c_nhapxuat_id, nx.md_trangthai_id, dh.sochungtu, nx.sophieu, nx.sophieunx " +
-            "   , nx.ngay_giaonhan, dtkd.ten_dtkd, nx.nguoigiao, nx.nguoinhan " +
+            " select nx.c_nhapxuat_id, nx.md_trangthai_id, nx.dagui, dh.sochungtu, nx.sophieu, nx.sophieunx " +
+            "   , nx.ngay_giaonhan, dtkd.ma_dtkd, dtkd.ten_dtkd, nx.nguoigiao, nx.nguoinhan " +
             "   , nx.sophieukhach, nx.ngay_phieu, kho.ten_kho " +
             "   , nx.soseal, nx.container, nx.loaicont " +
             "   , nx.md_loaichungtu_id, nx.ngaytao, nx.nguoitao, nx.ngaycapnhat, nx.nguoicapnhat " +
@@ -417,10 +425,12 @@ public class NhapXuatController : IHttpHandler
             xml += "<row>";
             xml += "<cell><![CDATA[" + row["c_nhapxuat_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["md_trangthai_id"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["dagui"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sochungtu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sophieu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sophieunx"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngay_giaonhan"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_dtkd"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoigiao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoinhan"] + "]]></cell>";

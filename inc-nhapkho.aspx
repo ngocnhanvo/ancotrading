@@ -306,26 +306,16 @@
             FuncTaoPhieuNhapXuat="function(){ add_tab('Tạo phiếu nhập kho', 'inc-taophieunhapxuat-tupi.aspx')}"
             UrlFileAction="Controllers/NhapKhoController.ashx" 
             FilterToolbar="true"
-            ColNames="['c_nhapxuat_id', 'TT', 'Đơn Hàng', 'Số Phiếu', 'Số Phiếu NX'
-            , 'Ngày Giao Nhận', 'Đối Tác', 'Người Giao', 'Người Nhập', 'Số Phiếu Khách'
+            ColNames="['c_nhapxuat_id', 'TT', 'Đã gửi', 'Đơn Hàng', 'Số Phiếu', 'Số Phiếu NX'
+            , 'Ngày Giao Nhận', 'Mã Đối Tác', 'Đối Tác', 'Người Giao', 'Người Nhập', 'Số Phiếu Khách'
             , 'Ngày Phiếu', 'Kho', 'Số Seal', 'Số Container', 'Loại Cont', 'Phí cộng', 'Phí trừ'
             , 'Discount(%)', 'Tổng tiền'
             , 'Loại Chứng Từ', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật'
             , 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
             RowNumbers="true"
-            OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid, {
-            
-                errorTextFormat:function(data) { 
-                    return 'Lỗi: ' + data.responseText 
-                }
-                , afterSubmit: function(rs, postdata){
-                    return showMsgDialog(rs);
-                }
-                , beforeShowForm: function (formid) {
-                    formid.closest('div.ui-jqdialog').dialogCenter();
-                }
-            
-            }); }"
+            OndblClickRow = "function(rowid) { 
+                $('#edit_grid_ds_nhapkho').click();
+            }"
             ColModel = "[
             {
                 fixed: true, name: 'c_nhapxuat_id'
@@ -340,10 +330,22 @@
                  fixed: true, name: 'md_trangthai_id'
                  , index: 'nx.md_trangthai_id'
                  , editable: false
-                 , width: 100
+                 , width: 60
                  , edittype: 'text'
                  , align: 'center'
                  , formatter:'imagestatus'
+            },
+            {
+                fixed: true, name: 'dagui'
+                , index: 'dagui'
+                , width: 50
+                , editable:true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions:{ value:'True:False', defaultValue: 'True' }
+                , formatter: 'checkbox'
+                , stype: 'select'
+                , searchoptions:{ value:':;0:Chưa gửi;1:Đã gửi' }
             },
             {
                  fixed: true, name: 'c_donhang_id'
@@ -358,7 +360,8 @@
                  fixed: true, name: 'sophieu'
                  , index: 'sophieu'
                  , editable: true
-                 , width: 100
+                 , width: 80
+                 , align: 'center'
                  , edittype: 'text'
             },
             {
@@ -374,16 +377,23 @@
                  , index: 'ngay_giaonhan'
                  , editable: true
                  , width: 100
+                 , align: 'center'
                  , edittype: 'text'
                  , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
             },
             {
                  fixed: true, name: 'md_doitackinhdoanh_id'
-                 , index: 'dtkd.ten_dtkd'
+                 , index: 'dtkd.ma_dtkd'
                  , editable: true
                  , width: 100
                  , edittype: 'select'
                  , editoptions: { dataUrl: 'Controllers/PartnerController.ashx?action=getoption', readonly:'readonly' }
+            },
+            {
+                 fixed: true, name: 'ten_dtkd'
+                 , index: 'dtkd.ten_dtkd'
+                 , editable: false
+                 , width: 200
             },
             {
                  fixed: true, name: 'nguoigiao'
@@ -412,6 +422,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , align: 'center'
                  , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
             },
             {
@@ -542,6 +553,7 @@
             ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
             ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
             EditFormOptions ="
+                width: 350,
                 errorTextFormat:function(data) { 
                     return 'Lỗi: ' + data.responseText 
                 }
