@@ -20,6 +20,13 @@ public partial class PrintControllers_InPhieuNhapHang_SendMail : System.Web.UI.P
         string cc = Request.Params["ccNK"];
         string bcc = Request.Params["bccNK"];
         string pkId = Request.Params["nhapkhoIdNK"];
+        var nk = db.c_nhapxuats.Where(s => s.c_nhapxuat_id == pkId).FirstOrDefault();
+        if(nk == null)
+        {
+            Response.Write("Lỗi: phiếu nhập kho không tồn tại");
+            goto EndEventHandler;
+        }
+
         string manv = UserUtils.getUser(Context);
         var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
         md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
@@ -28,7 +35,10 @@ public partial class PrintControllers_InPhieuNhapHang_SendMail : System.Web.UI.P
         var temName = "NK_KT";
         var template = db.md_mailtemplates.Where(s => s.ten_template == temName).FirstOrDefault();
         if (template == null)
-            throw new Exception(string.Format(@"Không tìm thấy mẫu gửi mail có tên ""{0}""", temName));
+        {
+            Response.Write(string.Format(@"Không tìm thấy mẫu gửi mail có tên ""{0}""", temName));
+            goto EndEventHandler;
+        }
 
         string fd = "PrintControllers/InPhieuNhapHang/";
         string linkConnect = string.Format(@"{0}?c_nhapxuat_id={1}&type=excel", fd, pkId);
@@ -39,14 +49,23 @@ public partial class PrintControllers_InPhieuNhapHang_SendMail : System.Web.UI.P
             var dicFile = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(msgDT);
             var xls = dicFile["xls"];
             var pdf = dicFile["pdf"];
+            var dh = db.c_donhangs.Where(s => s.c_donhang_id == nk.c_donhang_id).FirstOrDefault();
+
+            var subject = template.subject_mail;
+            subject = subject.Replace("PHIEUNHAP", nk.sophieu);
+            subject = subject.Replace("SOPO", dh.sochungtu);
+
+            var content = template.content_mail;
+            content = content.Replace("PHIEUNHAP", nk.sophieu);
+            content = content.Replace("SOPO", dh.sochungtu);
 
             mail.Send(
                 nv.email
                 , nguoinhan
                 , cc
                 , bcc
-                , template.subject_mail
-                , template.content_mail
+                , subject
+                , content
                 , xls + ";" + pdf
             );
 
@@ -56,5 +75,7 @@ public partial class PrintControllers_InPhieuNhapHang_SendMail : System.Web.UI.P
         {
             Response.Write(ex.Message);
         }
+
+        EndEventHandler:;
     }
 }
