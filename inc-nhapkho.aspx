@@ -302,7 +302,8 @@
                         $ccNK.prop('disabled', true);
                         $bccNK.prop('disabled', true);
 					}
-				});
+                });
+                $('#printRequired').click();
                 //hide close button.
                 $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
             }
