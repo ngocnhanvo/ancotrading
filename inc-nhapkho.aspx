@@ -235,25 +235,74 @@
     }
 
     function funcPrintNK() {
-        var xkId = $('#grid_ds_nhapkho').jqGrid('getGridParam', 'selrow');
-        var name = 'dialog-print-nk';
-        var title = 'Trích xuất dữ liệu';
-        var content = '<table style="width:100%">' +
-                            '<tr>' +
-                                '<td>' +
-                                '</td>' +
+        let xkId = $('#grid_ds_nhapkho').jqGrid('getGridParam', 'selrow');
+        let name = 'dialog-print-nk';
+        let title = 'Trích xuất dữ liệu';
+        let windowSize = "width=700,height=700,scrollbars=yes";
+        let style = "width:90%;padding:4px;margin-left:4px;margin-bottom:4px;";
 
-                                '<td>' +
-                                    '<input id="printRequired" type="radio" name="rdoPrintType" value="printRequired" checked="checked" />' +
-                                    '<label for="printRequired">In phiếu nhập kho</label>' +
-                                '</td>' +
-                            '</tr>' +
-                      '</table>';
+        $('body').append(`
+            <div title="${title}" id="${name}">
+                <table style="width:100%">
+                    <tr>
+                        <td>
+                        </td>
 
-        $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
+                        <td>
+                            <input id="printRequired" type="radio" name="rdoPrintType" value="printRequired" checked="checked" />
+                            <label for="printRequired">In phiếu nhập kho</label>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                        </td>
+
+                        <td>
+                            <fieldset style="padding:10px 0px">
+                                <legend>
+                                    <input id="printEmailNK" type="radio" name="rdoPrintType" value="printEmailNK" />
+								    <label for="printEmailNK">Gửi email</label>
+                                </legend>
+								
+                                <form
+                                    enctype="multipart/form-data" 
+                                    id="frm_printEmailNK"
+                                    action='PrintControllers/InPhieuNhapHang/SendMail.aspx'
+                                    target="exportEX_popup"
+									method="post" onsubmit="window.open('about:blank','exportEX_popup','${windowSize}');"
+								>
+                                    <input id="nhapkhoIdNK" name="nhapkhoIdNK" value="${xkId}" type="hidden"/>
+									<input id="nguoinhanNK" name="nguoinhanNK" type="text" class="FormElement ui-widget-content ui-corner-all" style="${style}" placeholder="Người nhận" />
+                                    <input id="ccNK" name="ccNK" type="text" class="FormElement ui-widget-content ui-corner-all" style="${style}" placeholder="Cc" />
+                                    <input id="bccNK" name="bccNK" type="text" class="FormElement ui-widget-content ui-corner-all" style="${style}" placeholder="Bcc" />
+								</form>
+							</fieldset>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        `);
+
+        let $nguoinhanNK = $('#nguoinhanNK');
+        let $ccNK = $('#ccNK');
+        let $bccNK = $('#bccNK');
         $('#' + name).dialog({
             modal: true
-            , open: function(event, ui) {
+            , open: function (event, ui) {
+                $('input[name="rdoPrintType"]', `#${name}`).click(function() {
+					let val = $(this).val();
+					if(val == 'printEmailNK') {
+                        $nguoinhanNK.prop('disabled', false);
+                        $ccNK.prop('disabled', false);
+                        $bccNK.prop('disabled', false);
+					}
+					else {
+						$nguoinhanNK.prop('disabled', true);
+                        $ccNK.prop('disabled', true);
+                        $bccNK.prop('disabled', true);
+					}
+				});
                 //hide close button.
                 $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
             }
@@ -261,7 +310,7 @@
             {
                 id: "btn-print-ok",
                 text: "In",
-                click: function() {
+                click: function () {
                     var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-nk').val();
                     var printURL = "PrintControllers/";
                     var windowSize = "width=700,height=700,scrollbars=yes";
@@ -273,8 +322,22 @@
                             } else {
                                 alert('Bạn chưa chọn phiếu nhập kho');
                             }
-                        } else {
-                        printURL += "InDSPhieuNhapHang/";
+                        }
+                        else if (printType == "printEmailNK") {
+                            if (!xkId) {
+                                alert('Bạn chưa chọn phiếu nhập kho');
+                                return;
+                            }
+
+                            if (!$nguoinhanNK.val().replace(/ /g,'')) {
+                                alert('Chưa điền người nhận');
+                                return;
+                            }
+
+                            $('#frm_printEmailNK').submit();
+                        }
+                        else {
+                            printURL += "InDSPhieuNhapHang/";
                             window.open(printURL, "In Danh Sách Phiếu Nhập Kho", windowSize);
                         }
                     } else {

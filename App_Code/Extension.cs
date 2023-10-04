@@ -204,14 +204,29 @@ public static class Extension
         catch { }
         return text;
     }
-	
-	public static string GetModule(string link, Dictionary<string, object> jsonData)
+
+    public static string GetModule(string link, Dictionary<string, object> jsonData)
     {
+        var context = System.Web.HttpContext.Current;
+        var url = context.Request.Url;
+        if (!link.Contains("http"))
+        {
+            var vtp = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
+            if (string.IsNullOrWhiteSpace(vtp))
+                link = url.GetLeftPart(UriPartial.Authority) + "/" + link;
+            else
+                link = url.GetLeftPart(UriPartial.Authority) + vtp + "/" + link;
+        }
         var myUri = new Uri(link);
         string jsonString = JsonConvert.SerializeObject(jsonData);
-        var request = WebRequest.Create(myUri);
+        var request = (HttpWebRequest)WebRequest.Create(myUri);
         request.ContentType = "application/x-www-form-urlencoded";
         request.Method = "POST";
+
+        request.CookieContainer = new CookieContainer();
+        var authCookie = context.Request.Cookies[System.Web.Security.FormsAuthentication.FormsCookieName];
+        request.CookieContainer.Add(new System.Net.Cookie(authCookie.Name, authCookie.Value, authCookie.Path, url.Host));
+
         string postData = string.Format(@"data={0}", jsonString);
         Stream reqStream = request.GetRequestStream();
         byte[] postArray = Encoding.UTF8.GetBytes(postData);

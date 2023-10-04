@@ -13,6 +13,7 @@ using System.ComponentModel;
 
 public partial class PrintControllers_InPhieuNhapHang_Default : System.Web.UI.Page
 {
+    public String path = HttpContext.Current.Server.MapPath("~/FileSendMail/");
     protected void Page_Load(object sender, EventArgs e)
     {
         String c_nhapxuat_id = Context.Request.QueryString["c_nhapxuat_id"];
@@ -64,7 +65,23 @@ public partial class PrintControllers_InPhieuNhapHang_Default : System.Web.UI.Pa
 			
             report.DataSource = ds;
             report.DataAdapter = da;
-            ReportViewer1.Report = report;
+            if (Request.Params["type"] == "excel")
+            {
+                string nameXls = string.Format("PhieuNhapHang-{0}.xls", DateTime.Now.ToString("ddMMyyyyhhmmss"));
+                string namePdf = string.Format("PhieuNhapHang-{0}.pdf", DateTime.Now.ToString("ddMMyyyyhhmmss"));
+                string linkXls = string.Format("{0}{1}", path, nameXls);
+                string linkPdf = string.Format("{0}{1}", path, namePdf);
+                report.ExportToXls(linkXls);
+                report.ExportToPdf(linkPdf);
+                var dic = new Dictionary<string, string>();
+                dic["xls"] = linkXls;
+                dic["pdf"] = linkPdf;
+                Response.Clear();
+                Response.Write(Newtonsoft.Json.JsonConvert.SerializeObject(dic));
+                Response.End();
+            }
+            else
+                ReportViewer1.Report = report;
         }
         else
         {
