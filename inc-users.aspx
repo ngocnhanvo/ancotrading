@@ -4,6 +4,7 @@
     /*$(window).bind('resize', function () {
         $("#grid_ds_nhanvien").setGridHeight($(window).height() - 220);
     }).trigger('resize');*/
+    var jsonUserSMTP = <%=result%>;
 </script>
 
     <uc1:jqGrid ID="grid_ds_nhanvien" 
@@ -75,6 +76,15 @@
                 , edittype: 'password'
                 , hidden: true
                 , editrules:{ edithidden:true }
+            },
+            {
+                fixed: true, name: 'smtp'
+                , label: 'SMTP'
+                , index: 'smtp'
+                , width: 100 
+                , editable:true
+                , edittype: 'select'
+                , editoptions:{ value: jsonUserSMTP }
             },
             {
                 fixed: true, name: 'email_cc'

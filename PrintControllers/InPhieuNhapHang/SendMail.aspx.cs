@@ -29,7 +29,11 @@ public partial class PrintControllers_InPhieuNhapHang_SendMail : System.Web.UI.P
 
         string manv = UserUtils.getUser(Context);
         var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
-        md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
+        md_smtp smtp = null;
+        if (string.IsNullOrWhiteSpace(nv.smtp))
+            smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
+        else
+            smtp = db.md_smtps.FirstOrDefault(p => p.md_smtp_id == nv.smtp);
 
         var mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
         var temName = "NK_KT";

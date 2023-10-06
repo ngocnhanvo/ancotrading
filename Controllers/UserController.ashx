@@ -78,6 +78,7 @@ public class UserController : IHttpHandler {
         u.hoten = context.Request.Form["hoten"];
         u.email = context.Request.Form["email"];
         u.email_pass = context.Request.Form["email_pass"] == "" ? u.email_pass : context.Request.Form["email_pass"];
+        u.smtp = context.Request.Form["smtp"];
         u.email_cc = context.Request.Form["email_cc"];
         u.dienthoai = context.Request.Form["dienthoai"];
         u.diachi = context.Request.Form["diachi"];
@@ -135,6 +136,7 @@ public class UserController : IHttpHandler {
                 hoten = context.Request.Form["hoten"],
                 email = context.Request.Form["email"],
                 email_pass = context.Request.Form["email_pass"],
+                smtp = context.Request.Form["smtp"],
                 email_cc = context.Request.Form["email_cc"],
                 dienthoai = context.Request.Form["dienthoai"],
                 diachi = context.Request.Form["diachi"],
@@ -232,10 +234,11 @@ public class UserController : IHttpHandler {
                 P.* 
             from ( 
                 select 
-                    nv.*, vt.tenvt as tenvt, ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum 
+                    nv.*, vt.tenvt as tenvt, smtp.smtpserver, ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum 
                 from 
                     nhanvien nv 
                     left join vaitro vt on nv.mavt = vt.mavt 
+                    left join md_smtp smtp on nv.smtp = smtp.md_smtp_id 
                 where 
                     1=1 {2}  
             )P 
@@ -261,6 +264,7 @@ public class UserController : IHttpHandler {
             xml += "<cell><![CDATA[" + row["hoten"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["email"] + "]]></cell>";
             xml += "<cell><![CDATA[" + "" + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["smtpserver"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["email_cc"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["dienthoai"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["otp"] + "]]></cell>";
