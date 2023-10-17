@@ -147,6 +147,10 @@ public class DongDonHangController : IHttpHandler
                         m.giafobGoc = decimal.Parse(context.Request.Form["giafobGoc"]);
                         m.giafob = decimal.Parse(context.Request.Form["giafob"]);
                     }
+                    else if(nv.suaGia.GetValueOrDefault(false))
+                    {
+                        m.giafob = decimal.Parse(context.Request.Form["giafob"]);
+                    }
                     m.phi = phiVal;
                     m.soluong = decimal.Parse(context.Request.Form["soluong"]);
                     m.soluong_conlai = decimal.Parse(context.Request.Form["soluong"]);

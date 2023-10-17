@@ -7,8 +7,8 @@
     string manv = Context.User.Identity.Name;
     String selAdmin = "select isadmin from nhanvien where manv = @manv";
     bool isadmin = (bool)mdbc.ExecuteScalar(selAdmin, "@manv", manv);
-    bool? xemgiaHH, xemgiaHHST, xemgiaHHNHD, xemgiaHHDQ, xemgiaDSDH, xemgiaNoiHH;
-    xemgiaHH = xemgiaHHST = xemgiaHHNHD = xemgiaHHDQ =  xemgiaDSDH = xemgiaNoiHH = false;
+    bool? xemgiaHH, xemgiaHHST, xemgiaHHNHD, xemgiaHHDQ, xemgiaDSDH, xemgiaNoiHH, suaGiaPO;
+    xemgiaHH = xemgiaHHST = xemgiaHHNHD = xemgiaHHDQ =  xemgiaDSDH = xemgiaNoiHH = suaGiaPO = false;
 
     bool? chietxuatHH, chietxuatHHST, chietxuatHHNHD, chietxuatHHDQ, chietxuatLHH, chietxuatDGSP, chietxuatDGST, chietxuatHSCode, chietxuatNNL, chietxuatKDSP, chietxuatCNSP, chietxuatDeTai, chietxuatMauSac;
     chietxuatHH = chietxuatHHST = chietxuatHHNHD = chietxuatHHDQ = chietxuatLHH = chietxuatDGSP = chietxuatDGST = chietxuatHSCode = chietxuatNNL = chietxuatKDSP = chietxuatCNSP = chietxuatDeTai = chietxuatMauSac = false;
@@ -71,6 +71,8 @@
         xemgiaDSDH = (from myRow in dt.AsEnumerable()
                       where myRow.Field<string>("url") == "inc-ds-dathang.aspx"
                       select myRow.Field<bool>("gia")).FirstOrDefault();
+
+        suaGiaPO = dt.AsEnumerable().FirstOrDefault().Field<bool>("suaGia");
         #endregion XemGia
 
         #region ChietXuat
@@ -1046,13 +1048,14 @@
         }
 		
 		var showPBGCforEveryOne = false;
-		var xemgiaHH, xemgiaHHST, xemgiaHHNHD, xemgiaHHDQ, xemgiaDSDH, xemgiaNoiHH;
+		var xemgiaHH, xemgiaHHST, xemgiaHHNHD, xemgiaHHDQ, xemgiaDSDH, xemgiaNoiHH, suaGiaPO;
 		xemgiaHH = '<%=xemgiaHH%>';
 		xemgiaHHST = '<%=xemgiaHHST%>';
 		xemgiaHHNHD = '<%=xemgiaHHNHD%>';
 		xemgiaHHDQ = '<%=xemgiaHHDQ%>';
 		xemgiaDSDH = '<%=xemgiaDSDH%>';
-	    xemgiaNoiHH = '<%=xemgiaNoiHH%>';
+        xemgiaNoiHH = '<%=xemgiaNoiHH%>';
+        suaGiaPO = '<%=suaGiaPO%>';
 		
 		var chietxuatHH, chietxuatHHST, chietxuatHHNHD, chietxuatHHDQ, chietxuatLHH, chietxuatDGSP, chietxuatDGST, chietxuatHSCode, chietxuatNNL, chietxuatKDSP, chietxuatCNSP, chietxuatDeTai, chietxuatMauSac, chietxuatBoCai, selectHinhThucBan;
 		chietxuatHH = '<%=chietxuatHH%>';

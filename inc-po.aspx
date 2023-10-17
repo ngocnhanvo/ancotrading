@@ -120,7 +120,7 @@
                 phifob.prop('disabled', false);
             }
             else {
-                giafob.prop('disabled', true);
+                giafob.prop('disabled', suaGiaPO != 'True');
                 phifob.prop('disabled', false);
             }
         }
