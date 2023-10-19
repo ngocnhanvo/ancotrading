@@ -255,6 +255,7 @@ public class DanhSachDatHangController : IHttpHandler
                     var dsdh2 = new c_danhsachdathang();
                     dsdh.CopyPropertiesTo(dsdh2);
                     dsdh2.sochungtu = EncodeHTML_DSDH(dsdh2.sochungtu);
+                    dsdh2.md_doitackinhdoanh_id = "ANCOTRADING";
                     dsdh2.so_po = EncodeHTML_DSDH(dsdh2.so_po);
                     dsdh2.mota = string.IsNullOrEmpty(dsdh2.mota) ? "" : EncodeHTML_DSDH(dsdh2.mota);
                     if (string.IsNullOrEmpty(dsdh2.huongdanlamhang))
