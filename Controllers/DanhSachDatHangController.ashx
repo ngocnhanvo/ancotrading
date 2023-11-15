@@ -1312,7 +1312,7 @@ public class DanhSachDatHangController : IHttpHandler
 
     public string taoFileThongTinSanPham(HttpContext context, string manv, c_danhsachdathang dsdh)
     {
-        String fileNameExcel = manv + "Thong-Tin-San-Pham-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + ".xls";
+        String fileNameExcel = manv + "Thong-Tin-San-Pham-" + DateTime.Now.ToString("fffssmmhh-dd-MM-yyyy") + ".xls";
         //-- Tao Excel
         try
         {
@@ -1320,6 +1320,7 @@ public class DanhSachDatHangController : IHttpHandler
             report.Parameters["so_dsdh"].Value = dsdh.sochungtu;
             report.Parameters["so_donhang"].Value = dsdh.so_po;
             SqlDataAdapter da = new SqlDataAdapter(getSqlThongTinSP(dsdh.c_danhsachdathang_id), mdbc.GetConnection);
+            da.SelectCommand.CommandTimeout = 60;
             DataSet ds = new DataSet();
             da.Fill(ds);
             report.DataSource = ds;
@@ -1330,7 +1331,7 @@ public class DanhSachDatHangController : IHttpHandler
         catch (Exception ex)
         {
             fileNameExcel = "";
-            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Thông tin sản phẩm</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
+            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Thông tin sản phẩm</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.ToString()));
         }
 
         return fileNameExcel;
@@ -1496,7 +1497,7 @@ public class DanhSachDatHangController : IHttpHandler
 
     public string taoFileXacNhanBaoBi(HttpContext context, string manv, c_danhsachdathang dsdh)
     {
-        string pathInBaoBi = path + "AnCoInBaoBi" + DateTime.Now.ToString("ddMMyyyyhhmmss") + ".xls";
+        string pathInBaoBi = path + "AnCoInBaoBi" + DateTime.Now.ToString("ddMMyyyyhhmmssfff") + ".xls";
         try
         {
             string sql = String.Format(@"select 
@@ -1510,6 +1511,7 @@ public class DanhSachDatHangController : IHttpHandler
             // tạo file excel
             rptXacNhanBaoBi report = new rptXacNhanBaoBi();
             SqlDataAdapter da = new SqlDataAdapter(sql, mdbc.GetConnection);
+            da.SelectCommand.CommandTimeout = 60;
             DataSet ds = new DataSet();
             da.Fill(ds);
             report.DataSource = ds;
@@ -1519,7 +1521,7 @@ public class DanhSachDatHangController : IHttpHandler
         catch (Exception ex)
         {
             pathInBaoBi = "";
-            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Xác Nhận Bao Bì</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
+            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Xác Nhận Bao Bì</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.ToString()));
         }
 
         return pathInBaoBi;
