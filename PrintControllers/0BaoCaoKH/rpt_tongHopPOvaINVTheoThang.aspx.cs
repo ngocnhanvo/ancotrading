@@ -57,7 +57,7 @@ public partial class PrintControllers_0BaoCaoKH_rpt_tongHopPOvaINVTheoThang : Sy
 	            dh.shipmenttime as ngaydh,
 	            dh.amount as trigiadh,
 	            0 as daxuat,
-	            0 as conlai,
+	            dh.amount as conlai,
 	            inv.so_inv as inv,
 	            inv.ngay_motokhai as ngayinv,
 	            inv.totalgross as trigiainv,
