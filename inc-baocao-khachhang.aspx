@@ -60,6 +60,8 @@
         var rptId = eval($("#rptKhachHangId", frmID).val());
         var startdate = $("#txtTuNgayKH", frmID).val();
         var enddate = $("#txtDenNgayKH", frmID).val();
+        let nam = $("#namBCKH", frmID).val();
+        let thang = $("#thangBCKH", frmID).val();
         var doitackinhdoanh_id = $("#txtDoiTacKH", frmID).val();
         var hehang_id = $("#txtHeHang", frmID).val();
         var loaiphieu = $("#loaiphieu", frmID).val();
@@ -93,7 +95,11 @@
                     , "PrintControllers/0BaoCaoKH/rpt_DoanhSoTungKHTheoNCCtrenHH.aspx"
                     , startdate, enddate, doitackinhdoanh_id, null, thongketheo);
                 break;
-
+            case 1005:
+                actionKhachHang("Tổng hợp PO, INV theo tháng"
+                    , "PrintControllers/0BaoCaoKH/rpt_tongHopPOvaINVTheoThang.aspx"
+                    , nam, thang, doitackinhdoanh_id, null, thongketheo);
+                break;
             case 100:
                 actionKhachHang("Tổng hợp khiếu nại"
                     , "PrintControllers/InTongHopKhieuNai/"
@@ -257,6 +263,8 @@
         $("#tr_nguoibanhang", frmID).css({ "display": "none" });
         $("#tungay", frmID).css({ "display": "" });
         $("#denngay", frmID).css({ "display": "" });
+        $("#namBCKH", frmID).parent().parent().css({ "display": "none" });
+        $("#thangBCKH", frmID).parent().parent().css({ "display": "none" });
         $("#tr_kydangmo", frmID).css({ "display": "none" });
         $("#tr_loaikh", frmID).css({ "display": "none" });
         $("#tr_thongketheo", frmID).css({ "display": "none" });
@@ -283,6 +291,15 @@
                 $('#lblReportNameKH').html("Báo cáo doanh số từng khách hàng theo nhà cung ứng / hệ hàng");
                 $("#tr_dtkd", frmID).css({ "display": "" });
                 $("#tr_thongketheo").css({ "display": "" });
+                break;
+            case 1005:
+                $('#lblReportNameKH').html("Tổng hợp PO, INV theo tháng");
+                $("#tr_dtkd", frmID).css({ "display": "" });
+                $("#tr_thongketheo").css({ "display": "" });
+                $("#namBCKH", frmID).parent().parent().css({ "display": "" });
+                $("#thangBCKH", frmID).parent().parent().css({ "display": "" });
+                $("#tungay", frmID).css({ "display": "none" });
+                $("#denngay", frmID).css({ "display": "none" });
                 break;
 
             case 100:
@@ -481,6 +498,28 @@
                         <div class="date">
                             <input type="text" name="txtDenNgayKH" id="txtDenNgayKH"/>
                         </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td100">Chọn năm</td>
+                    <td>
+                        <select name="nam" id="namBCKH">
+                            <% for (int i = DateTime.Now.Year + 10; i >= DateTime.Now.Year - 10; i--)
+                               {%>
+                                  <option value="<%=i %>" <%= DateTime.Now.Year == i ? " selected=\"selected\"" :""%> ><%=i %> </option> 
+                               <%} %>
+                       </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td100">Chọn tháng</td>
+                    <td>
+                        <select name="thang" id="thangBCKH">
+                            <% for (int i = 12; i >= 1; i--)
+                               {%>
+                                  <option value="<%=i %>" <%= DateTime.Now.Month == i ? " selected=\"selected\"" :""%> ><%=i %> </option> 
+                               <%} %>
+                       </select>
                     </td>
                 </tr>
                 <tr id="tr_kydangmo">
