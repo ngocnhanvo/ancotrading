@@ -227,13 +227,14 @@ public class NhapXuatController : IHttpHandler
         { hd = true; }
 
         var dagui = context.Request.Form["dagui"].removeAllSpaceOrTrimText(false).ToLower() == "true";
+        var sophieunx = context.Request.Form["sophieunx"];
         c_nhapxuat m = db.c_nhapxuats.Single(p => p.c_nhapxuat_id == context.Request.Form["id"]);
         if (m.md_trangthai_id.Equals("SOANTHAO"))
         {
             // m.c_donhang_id = context.Request.Form["c_donhang_id"];
             m.dagui = dagui;
             m.sophieu = context.Request.Form["sophieu"];
-            m.sophieunx = context.Request.Form["sophieunx"];
+            m.sophieunx = sophieunx;
             m.ngay_giaonhan = DateTime.ParseExact(context.Request.Form["ngay_giaonhan"], "dd/MM/yyyy", null);
             //m.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
             m.nguoigiao = context.Request.Form["nguoigiao"];
@@ -256,13 +257,23 @@ public class NhapXuatController : IHttpHandler
         }
         else
         {
+            var edit = false;
             if (m.dagui.GetValueOrDefault(false) != dagui)
             {
                 m.dagui = dagui;
                 db.SubmitChanges();
+                edit = true;
             }
-            else
-                jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi trạng thái là hiệu lực!");
+
+            if (m.sophieunx != sophieunx)
+            {
+                m.sophieunx = sophieunx;
+                db.SubmitChanges();
+                edit = true;
+            }
+
+            if(!edit)
+                jqGridHelper.Utils.writeResult(0, @"Không thể chỉnh sửa khi trạng thái là hiệu lực! (Ngoại trừ ""Đã gửi"" và ""Số Phiếu NX"")");
         }
     }
 

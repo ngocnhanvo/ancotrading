@@ -434,7 +434,6 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
-                 , editoptions: { readonly:'readonly' }
             },
             {
                  fixed: true, name: 'ngay_giaonhan'
