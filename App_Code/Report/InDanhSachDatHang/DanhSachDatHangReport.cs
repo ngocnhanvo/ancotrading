@@ -387,7 +387,7 @@ public class DanhSachDatHangReport
             columnAt = 2,
             text = "Hình ảnh",
             value = "",
-            width = 2500
+            width = 3000
         });
 
         columnHeaders.Add(new columnHeader()
@@ -569,7 +569,6 @@ public class DanhSachDatHangReport
                     rowLast = row,
                     column = 3,
                     columnLast = 3,
-                    zoom = 0.25,
                     link = imgPath,
                     heightCell = 70,
                     widthCell = 5000

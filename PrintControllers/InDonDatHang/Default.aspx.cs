@@ -37,7 +37,15 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
     {
         if (type != "pdf")
         {
-
+            foreach(var img in lstimage)
+            {
+                img.column = img.column - 1;
+                img.columnLast = img.columnLast - 1;
+                img.dx1 = 10;
+                img.dx2 = 1000;
+                img.dy1 = 10;
+                img.dy2 = 100;
+            }
             hsswb = config.setImageForExcel(hsswb, lstimage);
             MemoryStream exportData = new MemoryStream();
             hsswb.Write(exportData);
