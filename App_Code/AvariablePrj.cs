@@ -4,17 +4,22 @@ public class AvariablePrj
     public partial class lstImage
     {
         public string id { get; set; }
+        public int dx1 { get; set; }
+        public int dx2 { get; set; }
+        public int dy1 { get; set; }
+        public int dy2 { get; set; }
         public int row { get; set; }
         public int rowLast { get; set; }
         public int column { get; set; }
         public int columnLast { get; set; }
         public string link { get; set; }
-        public float heightCell { get; set; }
-        public float widthCell { get; set; }
+        public float? heightCell { get; set; }
+        public float? widthCell { get; set; }
         public float? topIMG { get; set; }
         public float? leftIMG { get; set; }
         public float? widthIMG { get; set; }
         public float? heightIMG { get; set; }
+        public double? zoom { get; set; } 
     }
 
     public partial class lstText

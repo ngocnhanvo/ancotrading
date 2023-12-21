@@ -568,7 +568,7 @@ public class DanhSachDatHangReport
                     row = row,
                     column = 3,
                     link = imgPath,
-                    heightCell = 60,
+                    heightCell = 70,
                     widthCell = 5000
                 });
             }

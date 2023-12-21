@@ -929,8 +929,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     row = row,
                     column = 3,
                     link = imgPath,
-                    heightCell = 60,
-                    widthCell = 5000
+                    heightCell = 60
                 });
             }
             catch { }

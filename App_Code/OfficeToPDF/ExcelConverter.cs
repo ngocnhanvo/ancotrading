@@ -432,6 +432,12 @@ namespace OfficeToPDF
                             height += (float)((double)oRangeBS.RowHeight);
                         }
 
+                        if (image.heightCell != null)
+                        {
+                            if (height > image.heightCell.GetValueOrDefault(0))
+                                height = image.heightCell.GetValueOrDefault(0);
+                        }
+
                         float widthR = pictureR.Width;
                         float heightR = pictureR.Height;
                         float percent = height / heightR;
@@ -1212,6 +1218,12 @@ namespace OfficeToPDF
                         var pictureR = System.Drawing.Image.FromFile(image.link);
                         float width = (float)((double)oRange.Width);
                         float height = (float)((double)oRange.Height);
+                        if(image.heightCell != null)
+                        {
+                            if (height > image.heightCell.GetValueOrDefault(0))
+                                height = image.heightCell.GetValueOrDefault(0);
+                        }
+
                         float widthR = pictureR.Width;
                         float heightR = pictureR.Height;
                         float percent = height / heightR;
