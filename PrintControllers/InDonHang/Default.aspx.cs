@@ -1322,83 +1322,43 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
     public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName)
     {
-        //xuất Excel không áp dụng Spire.Xls
-        //if (type != "pdf")
-        //{
-        //    foreach (var item in lstimage)
-        //    {
-        //        var image = System.Drawing.Image.FromFile(item.link);
-        //        MemoryStream ms = new MemoryStream();
-        //        //pull the memory stream from the image (I need this for the byte array later)
-        //        image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-        //        image.Dispose();
-        //        //the drawing patriarch will hold the anchor and the master information
-        //        IDrawing patriarch = hsswb.GetSheetAt(0).CreateDrawingPatriarch();
-        //        //store the coordinates of which cell and where in the cell the image goes
-        //        int intx1 = item.column - 1;
-        //        int inty1 = item.row;
-        //        int intx2 = item.column;
-        //        int inty2 = 1 + item.row;
+        var fileName = "PO_" + c_donhang_id + "_" + Guid.NewGuid().ToString();
+        string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
+        url = url.Replace("PrintControllers\\InDonHang\\", "");
 
-        //        HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
-        //        //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
-        //        anchor.AnchorType = 0;
-        //        //add the byte array and encode it for the excel file
-        //        int index = hsswb.AddPicture(ms.ToArray(), PictureType.JPEG);
-        //        IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
-        //    }
+        var xfile = new FileStream(url, FileMode.Create, System.IO.FileAccess.ReadWrite);
+        hsswb.Write(xfile);
+        xfile.Close();
+        xfile.Dispose();
 
-        //    MemoryStream exportData = new MemoryStream();
-        //    hsswb.Write(exportData);
-        //    hsswb.Clear();
-
-        //    Response.ContentType = "application/vnd.ms-excel";
-        //    Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", saveAsFileName));
-        //    Response.Clear();
-        //    Response.BinaryWrite(exportData.GetBuffer());
-        //    Response.End();
-        //}
-        ////xuất Excel có áp dụng Spire.Xls
-        //else
+        if (type == "pdf")
         {
-            var fileName = "PO_" + c_donhang_id + "_" + Guid.NewGuid().ToString();
-            string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
-            url = url.Replace("PrintControllers\\InDonHang\\", "");
-
-            var xfile = new FileStream(url, FileMode.Create, System.IO.FileAccess.ReadWrite);
-            hsswb.Write(xfile);
-            xfile.Close();
-            xfile.Dispose();
-            
-            if (type == "pdf")
+            var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
+            var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstimage, lstText);
+            File.Delete(url);
+            Response.Write(result);
+            if (result.Length <= 0)
+                Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width&remove=true", fileName));
+        }
+        else
+        {
+            var urlXls = url.Replace(fileName + ".xls", fileName + "1.xls");
+            var excel = new OfficeToPDF.ExcelConverter();
+            foreach (var img in lstimage)
+                img.column -= 1;
+            excel.lstImage = lstimage;
+            //excel.lstText = lstText;
+            var result = excel.ConvertInterop(url, urlXls, null);
+            File.Delete(url);
+            Response.Write(result);
+            if (result.Length <= 0)
             {
-                var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
-                var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstimage, lstText);
-                File.Delete(url);
-                Response.Write(result);
-                if (result.Length <= 0)
-                    Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width&remove=true", fileName));
-            }
-            else
-            {
-                var urlXls = url.Replace(fileName + ".xls", fileName + "1.xls");
-                var excel = new OfficeToPDF.ExcelConverter();
-                foreach (var img in lstimage)
-                    img.column -= 1;
-                excel.lstImage = lstimage;
-                //excel.lstText = lstText;
-                var result = excel.ConvertInterop(url, urlXls, null);
-                File.Delete(url);
-                Response.Write(result);
-                if (result.Length <= 0)
-                {
-                    var data = "";
-                    data += "oper=downloadFile";
-                    data += string.Format("&name={0}", saveAsFileName);
-                    data += string.Format("&path=ReportPdf/{0}1.xls", fileName);
-                    data += string.Format("&remove=true");
-                    Response.Redirect(string.Format("../../Controllers/API_System.ashx?{0}", data));
-                }
+                var data = "";
+                data += "oper=downloadFile";
+                data += string.Format("&name={0}", saveAsFileName);
+                data += string.Format("&path=ReportPdf/{0}1.xls", fileName);
+                data += string.Format("&remove=true");
+                Response.Redirect(string.Format("../../Controllers/API_System.ashx?{0}", data));
             }
         }
     }

@@ -369,7 +369,7 @@ public class ExportExcel
 
             HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, intx1, inty1, intx2, inty2);
             //types are 0, 2, and 3. 0 resizes within the cell, 2 doesn’t
-            anchor.AnchorType = 0;
+            anchor.AnchorType = 2;
             //add the byte array and encode it for the excel file
             int index = hsswb.AddPicture(ms.ToArray(), PictureType.JPEG);
             IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
