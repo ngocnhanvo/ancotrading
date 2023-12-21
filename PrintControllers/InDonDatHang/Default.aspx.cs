@@ -43,8 +43,8 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
                 img.columnLast = img.columnLast - 1;
                 img.dx1 = 10;
                 img.dx2 = 1000;
-                img.dy1 = 100;
-                img.dy2 = 300;
+                img.dy1 = 40;
+                img.dy2 = 215;
                 //img.zoom = 0.25;
             }
             hsswb = config.setImageForExcel(hsswb, lstimage);
