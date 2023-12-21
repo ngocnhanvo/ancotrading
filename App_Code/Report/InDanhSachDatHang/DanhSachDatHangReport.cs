@@ -568,7 +568,7 @@ public class DanhSachDatHangReport
                     row = row,
                     column = 3,
                     link = imgPath,
-                    heightCell = row_t.HeightInPoints,
+                    heightCell = 60,
                     widthCell = 5000
                 });
             }
