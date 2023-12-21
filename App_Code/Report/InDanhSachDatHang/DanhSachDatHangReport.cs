@@ -387,7 +387,7 @@ public class DanhSachDatHangReport
             columnAt = 2,
             text = "Hình ảnh",
             value = "",
-            width = width
+            width = 2500
         });
 
         columnHeaders.Add(new columnHeader()
@@ -566,7 +566,10 @@ public class DanhSachDatHangReport
                 var imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImageProduct(dt.Rows[i]["maSo"].ToString()));
                 lstimage.Add(new AvariablePrj.lstImage() {
                     row = row,
+                    rowLast = row,
                     column = 3,
+                    columnLast = 3,
+                    zoom = 0.25,
                     link = imgPath,
                     heightCell = 70,
                     widthCell = 5000
