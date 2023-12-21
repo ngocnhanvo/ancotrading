@@ -44,7 +44,7 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
                 img.dx1 = 10;
                 img.dx2 = 1000;
                 img.dy1 = 10;
-                img.dy2 = 100;
+                img.dy2 = 200;
             }
             hsswb = config.setImageForExcel(hsswb, lstimage);
             MemoryStream exportData = new MemoryStream();
