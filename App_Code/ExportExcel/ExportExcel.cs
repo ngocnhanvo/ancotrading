@@ -375,7 +375,7 @@ public class ExportExcel
             anchor.AnchorType = 2;
             //add the byte array and encode it for the excel file
             int index = hsswb.AddPicture(ms.ToArray(), PictureType.JPEG);
-            var signaturePicture = patriarch.CreatePicture(anchor, index);
+            var signaturePicture = (HSSFPicture)patriarch.CreatePicture(anchor, index);
             if(item.zoom != null)
             {
                 signaturePicture.Resize(item.zoom.Value);
