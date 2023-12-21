@@ -1351,6 +1351,15 @@ public class DanhSachDatHangController : IHttpHandler
             var rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
             rptPI.guiNCC = guiNCC;
             wb = rptPI.CreateWBPI();
+            foreach(var img in rptPI.Lstimage)
+            {
+                img.column = img.column - 1;
+                img.columnLast = img.columnLast - 1;
+                img.dx1 = 10;
+                img.dx2 = 1000;
+                img.dy1 = 40;
+                img.dy2 = 215;
+            }
             wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
             fileNameXls = path + fileNameXls;
             var xfile = new FileStream(fileNameXls, FileMode.Create, FileAccess.ReadWrite);
