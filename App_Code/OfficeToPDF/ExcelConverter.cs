@@ -419,7 +419,7 @@ namespace OfficeToPDF
                         var pictureR = System.Drawing.Image.FromFile(image.link);
                         float width = (float)((double)oRange.Width);
                         float height = (float)((double)oRange.RowHeight);
-
+                        float height2 = height;
                         for (var iRan = image.column + 1; iRan <= image.columnLast; iRan++)
                         {
                             var oRangeBS = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[image.row + 1, iRan + 1];
@@ -448,7 +448,7 @@ namespace OfficeToPDF
                         var rateColumnAndPicture = (width - widthImg) / 2;
                         rateColumnAndPicture = rateColumnAndPicture <= 0 ? 0 : rateColumnAndPicture;
 
-                        var rateRowAndPicture = (height - heightImg) / 2;
+                        var rateRowAndPicture = (height2 - heightImg) / 2;
                         rateRowAndPicture = rateRowAndPicture <= 0 ? 2 : rateRowAndPicture;
 
                         var Left = (float)((double)oRange.Left + rateColumnAndPicture);
@@ -1218,7 +1218,8 @@ namespace OfficeToPDF
                         var pictureR = System.Drawing.Image.FromFile(image.link);
                         float width = (float)((double)oRange.Width);
                         float height = (float)((double)oRange.Height);
-                        if(image.heightCell != null)
+                        float height2 = height;
+                        if (image.heightCell != null)
                         {
                             if (height > image.heightCell.GetValueOrDefault(0))
                                 height = image.heightCell.GetValueOrDefault(0);
@@ -1234,7 +1235,7 @@ namespace OfficeToPDF
                         var rateColumnAndPicture = (width - widthImg) / 2;
                         rateColumnAndPicture = rateColumnAndPicture <= 0 ? 0 : rateColumnAndPicture;
 
-                        var rateRowAndPicture = (height - heightImg) / 2;
+                        var rateRowAndPicture = (height2 - heightImg) / 2;
                         rateRowAndPicture = rateRowAndPicture <= 0 ? 2 : rateRowAndPicture;
 
                         var Left = (float)((double)oRange.Left + rateColumnAndPicture);
