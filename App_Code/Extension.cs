@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Xml.XPath;
 using System.IO;
 using System.Data;
-using System.Xml.Serialization;
 using System.Xml;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
@@ -22,6 +18,10 @@ public static class Extension
 	public static string API_VINHGIA = System.Web.Configuration.WebConfigurationManager.AppSettings["API_VINHGIA"];
 	public static string API_ANCO2 = System.Web.Configuration.WebConfigurationManager.AppSettings["API_ANCO2"];
     public static string API_IPWanApp = System.Web.Configuration.WebConfigurationManager.AppSettings["API_IPWanApp"];
+    public static string API_ALL(string madtkd)
+    {
+        return System.Web.Configuration.WebConfigurationManager.AppSettings[$"API_{madtkd}"];
+    }
 
     public static string ConvertXML(this DataTable dtMain, int page, int total, Int64 records)
     {

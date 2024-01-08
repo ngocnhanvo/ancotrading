@@ -18,7 +18,17 @@ public class DanhSachDatHangController : IHttpHandler
     public String logoPath = HttpContext.Current.Server.MapPath("~/images/anco_logo_print.png");
     public String productImagePath = HttpContext.Current.Server.MapPath("~/images/products/fullsize/");
 
-    public string[] arrNCC = new string[] { "VINHGIA", "ANHIEPLUC" };
+    public List<Dictionary<string, string>> msgPublics = new List<Dictionary<string, string>> {
+        new Dictionary<string, string>()
+        {
+            { "ANCO1", "" },
+        },
+        new Dictionary<string, string>()
+        {
+            { "ANHIEPLUC", "" },
+        }
+    };
+
     public void ProcessRequest(HttpContext context)
     {
         String action, oper;
@@ -80,102 +90,69 @@ public class DanhSachDatHangController : IHttpHandler
         lst.Add("TUCHOI");
         lst.Add("DAGUI");
         lst.Add("DANHAN");
-
-        string mdtkdId = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == "VINHGIA").Select(s => s.md_doitackinhdoanh_id).FirstOrDefault();
-        var dsdhs = db.c_danhsachdathangs.Where(s => lst.Contains(s.trangthai) & s.md_doitackinhdoanh_id == mdtkdId & s.md_trangthai_id != "HIEULUC");
-        var item = new Dictionary<string, object>();
-        string msgVINHGIA = "", msgANCO2 = "";
-        try
+        var msgs = new List<Dictionary<string, string>>(msgPublics);
+        foreach (var msg in msgs)
         {
-            item["result"] = dsdhs.Select(s => new { s.c_danhsachdathang_id }).ToList();
-            msgVINHGIA = Extension.GetModule(
-                Extension.API_VINHGIA + "?oper=getListDSDH",
-                item
-            );
-            if (!msgVINHGIA.Contains("false##"))
-            {
-                var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(msgVINHGIA);
-                foreach (var a in dsdhs)
-                {
-                    string trangthai = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).Select(s => s["trangthai"] + "").FirstOrDefault();
-                    if (!string.IsNullOrEmpty(trangthai))
-                    {
-                        a.trangthai = trangthai;
-                    }
-                    else
-                    {
-                        if (a.trangthai != "CHUAGUI" & !string.IsNullOrEmpty(a.trangthai))
-                            a.trangthai = "TUCHOI";
-                        else
-                            a.trangthai = "CHUAGUI";
-                    }
-                }
+            var madtkd = msg.Keys.FirstOrDefault();
+            string mdtkdId = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == madtkd).Select(s => s.md_doitackinhdoanh_id).FirstOrDefault();
+            var dsdhs = db.c_danhsachdathangs.Where(s => lst.Contains(s.trangthai) & s.md_doitackinhdoanh_id == mdtkdId & s.md_trangthai_id != "HIEULUC");
+            var item = new Dictionary<string, object>();
 
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateSLDaDatTrenPO");
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER TrigUpdateSoPI");
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateGoiHDLH");
-                db.SubmitChanges();
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateSLDaDatTrenPO");
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER TrigUpdateSoPI");
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
+            try
+            {
+                item["result"] = dsdhs.Select(s => new { s.c_danhsachdathang_id }).ToList();
+
+                msg[madtkd] = Extension.GetModule(
+                    Extension.API_ALL(madtkd) + "?oper=getListDSDH",
+                                    item
+                                );
+                if (!msg[madtkd].Contains("false##"))
+                {
+                    var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(msg[madtkd]);
+                    foreach (var a in dsdhs)
+                    {
+                        string trangthai = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).Select(s => s["trangthai"] + "").FirstOrDefault();
+                        if (!string.IsNullOrEmpty(trangthai))
+                        {
+                            if (trangthai == "DANHAN")
+                                a.trangthai = "DANHAN";
+                            else if (trangthai == "DAGUI")
+                                a.trangthai = "DAGUI";
+                            else
+                                a.trangthai = "DAHIEULUC";
+                        }
+                        else
+                        {
+                            if (a.trangthai != "CHUAGUI" & !string.IsNullOrEmpty(a.trangthai))
+                                a.trangthai = "TUCHOI";
+                            else
+                                a.trangthai = "CHUAGUI";
+                        }
+                    }
+
+                    mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateSLDaDatTrenPO");
+                    mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER TrigUpdateSoPI");
+                    mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateGoiHDLH");
+                    db.SubmitChanges();
+                    mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateSLDaDatTrenPO");
+                    mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER TrigUpdateSoPI");
+                    mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
+                }
+            }
+            catch (Exception ex)
+            {
+                msg[madtkd] = ex.Message;
             }
         }
-        catch (Exception ex)
-        {
-            msgVINHGIA = ex.Message;
-        }
 
-        try
-        {
-            mdtkdId = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == "ANHIEPLUC").Select(s => s.md_doitackinhdoanh_id).FirstOrDefault();
-            dsdhs = db.c_danhsachdathangs.Where(s => lst.Contains(s.trangthai) & s.md_doitackinhdoanh_id == mdtkdId & s.md_trangthai_id != "HIEULUC");
-            item = new Dictionary<string, object>();
-            item["result"] = dsdhs.Select(s => new { s.c_danhsachdathang_id }).ToList();
-            msgANCO2 = Extension.GetModule(
-                Extension.API_ANCO2 + "?oper=getListDSDH",
-                item
-            );
-            if (!msgANCO2.Contains("false##"))
-            {
-                var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(msgANCO2);
-                foreach (var a in dsdhs)
-                {
-                    string trangthai = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).Select(s => s["trangthai"] + "").FirstOrDefault();
-                    if (!string.IsNullOrEmpty(trangthai))
-                    {
-                        a.trangthai = trangthai;
-                    }
-                    else
-                    {
-                        if (a.trangthai != "CHUAGUI" & !string.IsNullOrEmpty(a.trangthai))
-                            a.trangthai = "TUCHOI";
-                        else
-                            a.trangthai = "CHUAGUI";
-                    }
-                }
-
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateSLDaDatTrenPO");
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER TrigUpdateSoPI");
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang DISABLE TRIGGER updateGoiHDLH");
-                db.SubmitChanges();
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateSLDaDatTrenPO");
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER TrigUpdateSoPI");
-                mdbc.ExcuteNonQuery("ALTER TABLE c_danhsachdathang ENABLE  TRIGGER updateGoiHDLH");
-            }
-        }
-        catch(Exception ex)
-        {
-            msgANCO2 = ex.Message;
-        }
-
-        context.Response.Write(msgVINHGIA + msgANCO2);
+        context.Response.Write(Newtonsoft.Json.JsonConvert.SerializeObject(msgs));
     }
 
-    private void guidonhangSendMail(HttpContext context, List<Dictionary<string, object>> lstMail, nhanvien nv, GoogleMail mail, string madtkd)
+    private void guidonhangSendMail(HttpContext context, List<Dictionary<string, object>> lstMail, nhanvien nv, GoogleMail mail, string madtkd, string mailNN)
     {
         foreach (var mailObj in lstMail.Where(s => s["ma_dtkd"].ToString() == madtkd))
         {
-            string emailCC = nv.email_cc + "," + UserUtils.mailKCS;
+            string emailCC = "";
 
             if (string.IsNullOrEmpty(nv.email_cc) & string.IsNullOrEmpty(UserUtils.mailKCS))
             {
@@ -189,12 +166,23 @@ public class DanhSachDatHangController : IHttpHandler
             {
                 emailCC = nv.email_cc;
             }
+            else
+            {
+                emailCC = nv.email_cc + "," + UserUtils.mailKCS;
+            }
+
+            if (string.IsNullOrWhiteSpace(emailCC))
+                emailCC = nv.email;
+            else
+                emailCC = emailCC + "," + nv.email;
 
             var dsdh = mailObj["dsdh"] as c_danhsachdathang;
             string fileTTSP = taoFileThongTinSanPham(context, nv.manv, dsdh);
             var fileDDHsKhongGia = taoFileDonDatHang(context, nv.manv, mailObj["ma_dtkd"].ToString(), dsdh, false);
             string fileXNBB = taoFileXacNhanBaoBi(context, nv.manv, dsdh);
             string emailkt = mailObj["email"] + "";
+            if (!string.IsNullOrWhiteSpace(mailNN))
+                emailkt = emailkt + "," + mailNN;
 
             if (!string.IsNullOrEmpty(emailkt))
             {
@@ -224,7 +212,6 @@ public class DanhSachDatHangController : IHttpHandler
 
     public void guidonhang(HttpContext context)
     {
-        var db = new LinqDBDataContext();
         String manv = UserUtils.getUser(context);
         var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
         var smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
@@ -232,11 +219,15 @@ public class DanhSachDatHangController : IHttpHandler
         var tmp = db.md_mailtemplates.FirstOrDefault(p => p.use_for.Equals("PI") && p.ten_template == "PI_VG");
         string msg = "", vnn_msg = "";
         string id = context.Request.Form["id"];
+        var type = context.Request.Form["type"];
+        var mailNN = context.Request.Form["mailNN"];
         string[] vnn = id.Split(',');
-        string id_all = "";
-        var lstVINHGIA = new List<Dictionary<string, object>>();
-        var lstANCO2 = new List<Dictionary<string, object>>();
         var lstMail = new List<Dictionary<string, object>>();
+
+        var lstDTKD = new List<Dictionary<string, Dictionary<string, object>>>();
+
+        var lstPO = new List<Dictionary<string, string>>();
+
         var lstDSDH = db.c_danhsachdathangs.Where(s => vnn.Contains(s.c_danhsachdathang_id));
         //
         foreach (var dsdh in lstDSDH)
@@ -247,219 +238,232 @@ public class DanhSachDatHangController : IHttpHandler
                 msg += "Lỗi:Dòng \"" + dsdh.sochungtu + "\" đã hiệu lực.<br>";
             else if (dsdh.trangthai == "DAGUI")
                 msg += "Lỗi:Dòng \"" + dsdh.sochungtu + "\" đã được gửi trước đó.<br>";
-            else if (dtkd.ma_dtkd != "ANCO1" & dtkd.ma_dtkd != "ANCO1_HACA-HK")
+            else
             {
-                if (arrNCC.Contains(dtkd.ma_dtkd))
-                {
-                    dsdh.trangthai = "DAGUI";
-                    var dsdh2 = new c_danhsachdathang();
-                    dsdh.CopyPropertiesTo(dsdh2);
-                    dsdh2.sochungtu = EncodeHTML_DSDH(dsdh2.sochungtu);
-                    dsdh2.md_doitackinhdoanh_id = "ANCOTRADING";
-                    dsdh2.so_po = EncodeHTML_DSDH(dsdh2.so_po);
-                    dsdh2.mota = string.IsNullOrEmpty(dsdh2.mota) ? "" : EncodeHTML_DSDH(dsdh2.mota);
-                    if (string.IsNullOrEmpty(dsdh2.huongdanlamhang))
-                        dsdh2.huongdanlamhang = "";
-                    dsdh2.huongdanlamhang = EncodeHTML_DSDH(dsdh2.huongdanlamhang);
-                    if (string.IsNullOrEmpty(dsdh2.huongdanlamhangchung))
-                        dsdh2.huongdanlamhangchung = "";
-                    dsdh2.huongdanlamhangchung = EncodeHTML_DSDH(dsdh2.huongdanlamhangchung);
+                var dsdh2 = new c_danhsachdathang();
+                dsdh.CopyPropertiesTo(dsdh2);
+                dsdh2.trangthai = "DAGUI";
+                dsdh2.md_doitackinhdoanh_id = "NEXX";
+                dsdh2.sochungtu = EncodeHTML_DSDH(dsdh2.sochungtu);
+                dsdh2.so_po = EncodeHTML_DSDH(dsdh2.so_po);
+                dsdh2.mota = string.IsNullOrEmpty(dsdh2.mota) ? "" : EncodeHTML_DSDH(dsdh2.mota);
+                if (string.IsNullOrEmpty(dsdh2.huongdanlamhang))
+                    dsdh2.huongdanlamhang = "";
+                dsdh2.huongdanlamhang = EncodeHTML_DSDH(dsdh2.huongdanlamhang);
+                if (string.IsNullOrEmpty(dsdh2.huongdanlamhangchung))
+                    dsdh2.huongdanlamhangchung = "";
+                dsdh2.huongdanlamhangchung = EncodeHTML_DSDH(dsdh2.huongdanlamhangchung);
 
-                    if (string.IsNullOrEmpty(dsdh2.diachigiaohang))
-                        dsdh2.diachigiaohang = "";
-                    dsdh2.diachigiaohang = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh2.diachigiaohang).Select(s => s.ma_dtkd).FirstOrDefault();
-                    vnn_msg += string.Format(@"<div style='color:blue'>Gửi đơn hàng ""{0}"" thành công.</div>", dsdh.sochungtu);
-                    var item = new Dictionary<string, object>();
-                    item["c_danhsachdathang"] = dsdh2;
+                if (string.IsNullOrEmpty(dsdh2.diachigiaohang))
+                    dsdh2.diachigiaohang = "";
+                dsdh2.diachigiaohang = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh2.diachigiaohang).Select(s => s.ma_dtkd).FirstOrDefault();
+                vnn_msg += string.Format(@"<div style='color:blue'>Gửi đơn hàng ""{0}"" thành công.</div>", dsdh.sochungtu);
+                var item = new Dictionary<string, object>();
+                item["c_danhsachdathang"] = dsdh2;
 
-                    var dongdsdh = db.c_dongdsdhs.
-                            Where(s => s.c_danhsachdathang_id == dsdh2.c_danhsachdathang_id).
-                            Select(x => new
-                            {
-                                x.w2,
-                                x.w1,
-                                x.vn,
-                                x.vl,
-                                x.vd,
-                                x.v2,
-                                tem_dan = EncodeHTML_DSDH(x.tem_dan),
-                                x.sothutu,
-                                x.sl_inner,
-                                dvt_inner = db.md_donvitinhs.FirstOrDefault(t => t.md_donvitinh_id == db.md_donggois.FirstOrDefault(tt => tt.md_donggoi_id == x.md_donggoi_id).dvt_inner).ten_dvt,
-                                x.sl_outer,
-                                dvt_outer = db.md_donvitinhs.FirstOrDefault(t => t.md_donvitinh_id == db.md_donggois.FirstOrDefault(tt => tt.md_donggoi_id == x.md_donggoi_id).dvt_outer).ten_dvt,
-                                x.sl_huy,
-                                x.sl_dathang,
-                                x.sl_dagiao,
-                                x.sl_cont,
-                                x.sl_conlai,
-                                mota = EncodeHTML_DSDH(x.mota),
-                                md_sanpham_id = db.md_sanphams.Where(t => t.md_sanpham_id == x.md_sanpham_id).Select(t => t.ma_sanpham).FirstOrDefault(),
-                                x.md_donggoi_id,
-                                x.md_doitackinhdoanh_id,
-                                ma_sanpham_khach = EncodeHTML_DSDH(x.ma_sanpham_khach),
-                                x.l2,
-                                x.l1,
-                                huongdan_dathang = EncodeHTML_DSDH(x.huongdan_dathang),
-                                x.h2,
-                                x.h1,
-                                x.gianhap,
-                                x.giachuan,
-                                ghichu_vachngan = EncodeHTML_DSDH(x.ghichu_vachngan),
-                                x.c_dongdsdh_id,
-                                x.c_dongdonhang_id,
-                                x.c_danhsachdathang_id
-                            })
-                            .ToList();
-
-                    var phidsdh = db.c_phidathangs.
+                var dongdsdh = db.c_dongdsdhs.
                         Where(s => s.c_danhsachdathang_id == dsdh2.c_danhsachdathang_id).
                         Select(x => new
                         {
-                            x.sotien,
-                            x.isphicong,
+                            x.w2,
+                            x.w1,
+                            x.vn,
+                            x.vl,
+                            x.vd,
+                            x.v2,
+                            tem_dan = EncodeHTML_DSDH(x.tem_dan),
+                            x.sothutu,
+                            x.sl_inner,
+                            dvt_inner = db.md_donvitinhs.FirstOrDefault(t => t.md_donvitinh_id == db.md_donggois.FirstOrDefault(tt => tt.md_donggoi_id == x.md_donggoi_id).dvt_inner).ten_dvt,
+                            x.sl_outer,
+                            dvt_outer = db.md_donvitinhs.FirstOrDefault(t => t.md_donvitinh_id == db.md_donggois.FirstOrDefault(tt => tt.md_donggoi_id == x.md_donggoi_id).dvt_outer).ten_dvt,
+                            x.sl_huy,
+                            x.sl_dathang,
+                            x.sl_dagiao,
+                            x.sl_cont,
+                            x.sl_conlai,
                             mota = EncodeHTML_DSDH(x.mota),
-                            x.c_phidathang_id,
+                            md_sanpham_id = db.md_sanphams.Where(t => t.md_sanpham_id == x.md_sanpham_id).Select(t => t.ma_sanpham).FirstOrDefault(),
+                            x.md_donggoi_id,
+                            x.md_doitackinhdoanh_id,
+                            ma_sanpham_khach = EncodeHTML_DSDH(x.ma_sanpham_khach),
+                            x.l2,
+                            x.l1,
+                            huongdan_dathang = EncodeHTML_DSDH(x.huongdan_dathang),
+                            x.h2,
+                            x.h1,
+                            x.gianhap,
+                            x.giachuan,
+                            ghichu_vachngan = EncodeHTML_DSDH(x.ghichu_vachngan),
+                            x.c_dongdsdh_id,
+                            x.c_dongdonhang_id,
                             x.c_danhsachdathang_id
                         })
                         .ToList();
 
-                    item["c_dongdsdh"] = dongdsdh;
-                    item["c_phidathang"] = phidsdh;
-
-                    if (dtkd.ma_dtkd == "VINHGIA")
+                var phidsdh = db.c_phidathangs.
+                    Where(s => s.c_danhsachdathang_id == dsdh2.c_danhsachdathang_id).
+                    Select(x => new
                     {
-                        lstVINHGIA.Add(item);
-                    }
-                    else
-                    {
-                        lstANCO2.Add(item);
-                    }
-                    if (tmp != null)
-                    {
-                        decimal? phicong = 0, phitru = 0, discount = 0;
-                        decimal cong = 0, tru = 0;
-                        phicong = phidsdh.Where(p => p.isphicong.Equals(true)).Select(p => p.sotien).Sum();
-                        phitru = phidsdh.Where(p => p.isphicong.Equals(false)).Select(p => p.sotien).Sum();
+                        x.sotien,
+                        x.isphicong,
+                        mota = EncodeHTML_DSDH(x.mota),
+                        x.c_phidathang_id,
+                        x.c_danhsachdathang_id
+                    })
+                    .ToList();
 
-                        cong = phicong == null ? 0 : phicong.Value;
-                        tru = phitru == null ? 0 : phitru.Value;
+                item["c_dongdsdh"] = dongdsdh;
+                item["c_phidathang"] = phidsdh;
+                item["email"] = mailNN;
 
-                        decimal? giatridonhang = 0;
-                        if (dsdh.total != null & dsdh.discount != 100)
+                var itemDTKD = new Dictionary<string, Dictionary<string, object>>();
+                itemDTKD[dtkd.ma_dtkd] = item;
+                lstDTKD.Add(itemDTKD);
+
+                var itemPO = new Dictionary<string, string>();
+                itemPO["c_danhsachdathang_id"] = dsdh2.c_danhsachdathang_id;
+                itemPO["soPO"] = "";
+                lstPO.Add(itemPO);
+
+                if (tmp != null)
+                {
+                    decimal? phicong = 0, phitru = 0, discount = 0;
+                    decimal cong = 0, tru = 0;
+                    phicong = phidsdh.Where(p => p.isphicong.Equals(true)).Select(p => p.sotien).Sum();
+                    phitru = phidsdh.Where(p => p.isphicong.Equals(false)).Select(p => p.sotien).Sum();
+
+                    cong = phicong == null ? 0 : phicong.Value;
+                    tru = phitru == null ? 0 : phitru.Value;
+
+                    decimal? giatridonhang = 0;
+                    if (dsdh.total != null & dsdh.discount != 100)
+                    {
+                        if (dsdh.discount > 0)
                         {
-                            if (dsdh.discount > 0)
+                            discount = (dsdh.total.Value * dsdh.discount / 100);
+                        }
+                        giatridonhang = dsdh.total.Value - discount + cong - tru;
+                    }
+
+                    string noidung = tmp.content_mail
+                        .Replace("%0D", "<br/>")
+                        .Replace("[NGAYLAP]", dsdh.ngaylap.Value.ToString("dd/MM/yyyy"));
+
+                    noidung = noidung.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
+                    noidung = noidung.Replace("[SOPO]", dsdh.so_po);
+                    noidung = noidung.Replace("[NHACUNGUNG]", dtkd.ten_dtkd);
+                    noidung = noidung.Replace("[NGAYGIAOHANG]", dsdh.hangiaohang_po.Value.ToString("dd/MM/yyyy"));
+                    noidung = noidung.Replace("[SOLUONGMAHANG]", dongdsdh.Count().ToString());
+                    noidung = noidung.Replace("[GIATRIDONHANG]", "đã ẩn");
+                    noidung = Public.DecodeHTML(noidung);
+                    string tieude = tmp.subject_mail;
+                    tieude = tieude.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
+                    tieude = tieude.Replace("[SOPO]", dsdh.so_po);
+                    tieude = tieude.Replace("[NGAYLAP]", dsdh.ngaylap == null ? "" : dsdh.ngaylap.Value.ToString("dd/MM/yyyy"));
+
+                    var mailObj = new Dictionary<string, object>();
+                    mailObj["tieude"] = tieude;
+                    mailObj["noidung"] = noidung;
+                    mailObj["ma_dtkd"] = dtkd.ma_dtkd;
+                    mailObj["email"] = dtkd.email;
+                    mailObj["emailkt"] = dtkd.emailkt;
+                    mailObj["dsdh"] = dsdh;
+                    lstMail.Add(mailObj);
+                }
+            }
+        }
+
+        if (lstDTKD.Count > 0)
+        {
+            foreach (var msgPL in msgPublics)
+            {
+                string msgDT = "", msgDTSuccess = "", msgDTFail = "";
+                var madtkd = msgPL.Keys.FirstOrDefault();
+                var sends = lstDTKD.Where(s => s.Keys.Contains(madtkd)).ToList();
+                if (sends.Count > 0)
+                {
+                    var lstSend = new List<Dictionary<string, object>>();
+                    foreach (var send in sends)
+                    {
+                        lstSend.Add(send[madtkd]);
+                    }
+
+                    if (type == "1")
+                    {
+                        var item = new Dictionary<string, object>();
+                        item["result"] = lstSend;
+                        try
+                        {
+                            string link = Extension.API_ALL(madtkd) + "?oper=NhanDonHang";
+                            msgDT += Extension.GetModule(link, item);
+                        }
+                        catch (Exception ex)
+                        {
+                            msgDTFail += $"<div style='display:none'>{ex}</div>";
+                            msgDTFail += $"err{madtkd}: {ex.Message}";
+                        }
+                    }
+
+                    if (!msgDT.Contains("error") & !msgDT.Contains("Có lỗi xảy ra") & msgDTFail.Length <= 0)
+                    {
+                        try
+                        {
+                            if (type == "0" | msgDT.Length <= 0)
                             {
-                                discount = (dsdh.total.Value * dsdh.discount / 100);
+                                msgDT = JsonConvert.SerializeObject(lstPO);
                             }
-                            giatridonhang = dsdh.total.Value - discount + cong - tru;
+
+                            var sctDonHangs = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(msgDT);
+                            foreach (var sctDH in sctDonHangs)
+                            {
+                                var c_danhsachdathang_id = "";
+                                if(sctDH.ContainsKey("c_danhsachdathang_id"))
+                                    c_danhsachdathang_id = sctDH["c_danhsachdathang_id"];
+
+                                var soPO = "";
+                                if (sctDH.ContainsKey("soPO"))
+                                    soPO = sctDH["soPO"];
+
+                                var dsdh = db.c_danhsachdathangs.Where(s => s.c_danhsachdathang_id == c_danhsachdathang_id).FirstOrDefault();
+                                if (dsdh != null)
+                                {
+                                    if (type == "1")
+                                        dsdh.trangthai = "DAGUI";
+
+                                    msgDTSuccess += $@"<div style='color:blue'>Gửi đơn hàng ""{dsdh.sochungtu}"" thành công.</div>";
+                                }
+                            }
+
+                            if (msgDTSuccess.Length > 0)
+                                db.SubmitChanges();
+                        }
+                        catch (Exception ex)
+                        {
+                            msgDT += $"<div style='color:red'>Lỗi: {ex.Message}.</div>";
                         }
 
-                        string noidung = tmp.content_mail
-                            .Replace("%0D", "<br/>")
-                            .Replace("[NGAYLAP]", dsdh.ngaylap.Value.ToString("dd/MM/yyyy"));
-
-                        noidung = noidung.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
-                        noidung = noidung.Replace("[SOPO]", dsdh.so_po);
-                        noidung = noidung.Replace("[NHACUNGUNG]", dtkd.ten_dtkd);
-                        noidung = noidung.Replace("[NGAYGIAOHANG]", dsdh.hangiaohang_po.Value.ToString("dd/MM/yyyy"));
-                        noidung = noidung.Replace("[SOLUONGMAHANG]", dongdsdh.Count().ToString());
-                        noidung = noidung.Replace("[GIATRIDONHANG]", "đã ẩn");
-                        noidung = Public.DecodeHTML(noidung);
-                        string tieude = tmp.subject_mail;
-                        tieude = tieude.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
-                        tieude = tieude.Replace("[SOPO]", dsdh.so_po);
-                        tieude = tieude.Replace("[NGAYLAP]", dsdh.ngaylap == null ? "" : dsdh.ngaylap.Value.ToString("dd/MM/yyyy"));
-
-                        var mailObj = new Dictionary<string, object>();
-                        mailObj["tieude"] = tieude;
-                        mailObj["noidung"] = noidung;
-                        mailObj["ma_dtkd"] = dtkd.ma_dtkd;
-                        mailObj["email"] = dtkd.email;
-                        mailObj["emailkt"] = dtkd.emailkt;
-                        mailObj["dsdh"] = dsdh;
-                        lstMail.Add(mailObj);
+                        if (msgDTSuccess.Length > 0)
+                        {
+                            msgDT = msgDTSuccess;
+                            try
+                            {
+                                guidonhangSendMail(context, lstMail, nv, mail, madtkd, mailNN);
+                            }
+                            catch (Exception ex)
+                            {
+                                msgDT += $"<div style='color:red'>Gửi mail thất bại: {ex.Message}.</div>";
+                            }
+                        }
+                    }
+                    else if(msgDTFail.Length > 0)
+                    {
+                        msgDT = msgDTFail;
                     }
                 }
-                else
-                {
-                    dsdh.trangthai = "DAHIEULUC";
-                }
-            }
-            else if (msg.Length <= 0)
-            {
-                id_all += "'" + dsdh.c_danhsachdathang_id + "',";
-            }
-        }
 
-        if (lstVINHGIA.Count > 0)
-        {
-            var item = new Dictionary<string, object>();
-            item["result"] = lstVINHGIA;
-            try
-            {
-                msg += Extension.GetModule(
-                    Extension.API_VINHGIA + "?oper=NhanDonHang",
-                    item
-                );
+                msg += msgDT;
             }
-            catch (Exception ex)
-            {
-                msg += string.Format("<div style='display:none'>{0}</div>", ex + "");
-                msg += "errVinhGia:" + ex.Message;
-            }
-
-            if (msg.Length <= 0)
-            {
-                msg += vnn_msg;
-                db.SubmitChanges();
-                try
-                {
-                    guidonhangSendMail(context, lstMail, nv, mail, "VINHGIA");
-                }
-                catch (Exception ex)
-                {
-                    msg += string.Format(@"<div style='color:red'>Gửi mail thất bại: {0}.</div>", ex.Message);
-                }
-            }
-        }
-
-        if (lstANCO2.Count > 0)
-        {
-            var item = new Dictionary<string, object>();
-            item["result"] = lstANCO2;
-            try
-            {
-                msg += Extension.GetModule(
-                    Extension.API_ANCO2 + "?oper=NhanDonHang",
-                    item
-                );
-            }
-            catch (Exception ex)
-            {
-                msg += string.Format("<div style='display:none'>{0}</div>", ex + "");
-                msg += "errANHIEPLUC: " + ex.Message;
-            }
-
-            if (msg.Length <= 0)
-            {
-                msg += vnn_msg;
-                db.SubmitChanges();
-                try
-                {
-                    guidonhangSendMail(context, lstMail, nv, mail, "ANHIEPLUC");
-                }
-                catch (Exception ex)
-                {
-                    msg += string.Format(@"<div style='color:red'>Gửi mail thất bại: {0}.</div>", ex.Message);
-                }
-            }
-        }
-
-        if (lstVINHGIA.Count <= 0 & lstANCO2.Count <= 0)
-        {
-            msg += vnn_msg;
-            db.SubmitChanges();
         }
 
         context.Response.Write(msg);
@@ -786,8 +790,15 @@ public class DanhSachDatHangController : IHttpHandler
             SqlDataAdapter da = new SqlDataAdapter(getSqlThongTinSP(piId), mdbc.GetConnection);
             DataSet ds = new DataSet();
             da.Fill(ds);
+            var tbl = ds.Tables[0];
+            foreach(DataRow row in tbl.Rows)
+            {
+                string msp = row["sanpham"].ToString();
+                row["hinhanh"] = ExcuteSignalRStatic.getImageProduct(msp);
+            }
             report.DataSource = ds;
             report.DataAdapter = da;
+
             report.ExportToXls(path + fileNameExcel);
         }
         catch (Exception ex)
@@ -946,8 +957,8 @@ public class DanhSachDatHangController : IHttpHandler
                     string dk_trangthai = "";
                     c_danhsachdathang dsdh_nht = db.c_danhsachdathangs.Where(s => s.c_danhsachdathang_id == piId).FirstOrDefault();
                     md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh_nht.md_doitackinhdoanh_id).FirstOrDefault();
-                    if (!arrNCC.Contains(dtkd.ma_dtkd))
-                        dk_trangthai = ", trangthai = N'DAGUI'";
+
+                    dk_trangthai = ", trangthai = N'DAGUI'";
                     String update = "update c_danhsachdathang set isgui_hdlh = 1" + dk_trangthai + " where c_danhsachdathang_id = @c_danhsachdathang_id";
                     mdbc.ExcuteNonQuery(update, "@c_danhsachdathang_id", piId);
                 }
@@ -972,17 +983,14 @@ public class DanhSachDatHangController : IHttpHandler
 
             if (dsdh.md_trangthai_id.Equals("SOANTHAO"))
             {
+                var msgs = new List<Dictionary<string, string>>(msgPublics);
+                var madtkds = msgs.Select(s=>s.Keys.FirstOrDefault()).ToList();
+
                 string ma_dtkd = db.md_doitackinhdoanhs.
                         Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).
                         Select(s => s.ma_dtkd).FirstOrDefault();
-                // Dem cac dong don hang co sl_conlai < 1 trong cac dong danh sach dat hang co sl_conlai > sl_conlai trong dong don hang
-                String getCountSLConLai = String.Format("select COUNT(*) as count from c_dongdonhang ddh where c_dongdonhang_id in (select c_dongdonhang_id from c_dongdsdh ddsdh where ddsdh.c_danhsachdathang_id = '{0}' and ddsdh.sl_conlai > ddh.soluong_conlai) and soluong_conlai < 1 ", piId);
-                int CountSLConLai = (int)mdbc.ExecuteScalar(getCountSLConLai);
-                if (CountSLConLai > 0)
-                {
-                    msg = String.Format("Hiệu lực thất bại! Trong danh sách đặt hàng {0}, có một hoặc một vài sản phẩm đã hết số lượng còn lại .!", dsdh.sochungtu);
-                }
-                else if (dsdh.trangthai != "DAHIEULUC" & arrNCC.Contains(ma_dtkd))
+
+                if (dsdh.trangthai != "DAHIEULUC" & madtkds.Contains(ma_dtkd))
                 {
                     msg = String.Format(@"Hiệu lực thất bại! {0} phải trong trạng thái ""Đã nhận""", dsdh.sochungtu);
                 }
@@ -1260,7 +1268,7 @@ public class DanhSachDatHangController : IHttpHandler
                 " (select dtkd_a.ma_dtkd from md_doitackinhdoanh dtkd_a where dtkd_a.md_doitackinhdoanh_id = dsdh.diachigiaohang) as dcgh_1, " +
                 " dsdh.diachigiaohang as dcgh_2, " +
                 " dsdh.huongdanlamhang,dsdh.huongdanlamhangchung, dsdh.discount, dsdh.isgui_hdlh, dsdh.ngaytao, " +
-                " dsdh.nguoitao, dsdh.ngaycapnhat, dsdh.nguoicapnhat, dsdh.mota, dsdh.hoatdong, " +
+                " dsdh.nguoitao, dsdh.ngaycapnhat, dsdh.nguoicapnhat, dsdh.mota, dsdh.hoatdong, dsdh.mail_nguoinhan, dsdh.po_lienket, " +
                 " ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
                 " FROM c_danhsachdathang dsdh, c_donhang dh, md_doitackinhdoanh dtkd " +
                 " WHERE dsdh.c_donhang_id = dh.c_donhang_id " +
@@ -1304,6 +1312,8 @@ public class DanhSachDatHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["nguoicapnhat"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["mail_nguoinhan"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["po_lienket"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";
@@ -1312,7 +1322,7 @@ public class DanhSachDatHangController : IHttpHandler
 
     public string taoFileThongTinSanPham(HttpContext context, string manv, c_danhsachdathang dsdh)
     {
-        String fileNameExcel = manv + "Thong-Tin-San-Pham-" + DateTime.Now.ToString("fffssmmhh-dd-MM-yyyy") + ".xls";
+        String fileNameExcel = manv + "Thong-Tin-San-Pham-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + ".xls";
         //-- Tao Excel
         try
         {
@@ -1320,9 +1330,14 @@ public class DanhSachDatHangController : IHttpHandler
             report.Parameters["so_dsdh"].Value = dsdh.sochungtu;
             report.Parameters["so_donhang"].Value = dsdh.so_po;
             SqlDataAdapter da = new SqlDataAdapter(getSqlThongTinSP(dsdh.c_danhsachdathang_id), mdbc.GetConnection);
-            da.SelectCommand.CommandTimeout = 60;
             DataSet ds = new DataSet();
             da.Fill(ds);
+            var tbl = ds.Tables[0];
+            foreach(DataRow row in tbl.Rows)
+            {
+                string msp = row["sanpham"].ToString();
+                row["hinhanh"] = ExcuteSignalRStatic.getImageProduct(msp);
+            }
             report.DataSource = ds;
             report.DataAdapter = da;
             fileNameExcel = path + fileNameExcel;
@@ -1331,7 +1346,7 @@ public class DanhSachDatHangController : IHttpHandler
         catch (Exception ex)
         {
             fileNameExcel = "";
-            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Thông tin sản phẩm</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.ToString()));
+            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Thông tin sản phẩm</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
         }
 
         return fileNameExcel;
@@ -1350,16 +1365,8 @@ public class DanhSachDatHangController : IHttpHandler
         {
             var rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
             rptPI.guiNCC = guiNCC;
+            //rptPI.TypePrint = "pdf";
             wb = rptPI.CreateWBPI();
-            foreach(var img in rptPI.Lstimage)
-            {
-                img.column = img.column - 1;
-                img.columnLast = img.columnLast - 1;
-                img.dx1 = 10;
-                img.dx2 = 1000;
-                img.dy1 = 40;
-                img.dy2 = 215;
-            }
             wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
             fileNameXls = path + fileNameXls;
             var xfile = new FileStream(fileNameXls, FileMode.Create, FileAccess.ReadWrite);
@@ -1506,7 +1513,7 @@ public class DanhSachDatHangController : IHttpHandler
 
     public string taoFileXacNhanBaoBi(HttpContext context, string manv, c_danhsachdathang dsdh)
     {
-        string pathInBaoBi = path + "AnCoInBaoBi" + DateTime.Now.ToString("ddMMyyyyhhmmssfff") + ".xls";
+        string pathInBaoBi = path + "AnCoInBaoBi" + DateTime.Now.ToString("ddMMyyyyhhmmss") + ".xls";
         try
         {
             string sql = String.Format(@"select 
@@ -1520,7 +1527,6 @@ public class DanhSachDatHangController : IHttpHandler
             // tạo file excel
             rptXacNhanBaoBi report = new rptXacNhanBaoBi();
             SqlDataAdapter da = new SqlDataAdapter(sql, mdbc.GetConnection);
-            da.SelectCommand.CommandTimeout = 60;
             DataSet ds = new DataSet();
             da.Fill(ds);
             report.DataSource = ds;
@@ -1530,7 +1536,7 @@ public class DanhSachDatHangController : IHttpHandler
         catch (Exception ex)
         {
             pathInBaoBi = "";
-            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Xác Nhận Bao Bì</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.ToString()));
+            context.Response.Write(string.Format(@"<div>Không tạo được file Excel Xác Nhận Bao Bì</div><div style='margin-left:5px;'>Chi tiết: {0}</div>", ex.Message));
         }
 
         return pathInBaoBi;
