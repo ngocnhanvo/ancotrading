@@ -1268,7 +1268,7 @@ public class DanhSachDatHangController : IHttpHandler
                 " (select dtkd_a.ma_dtkd from md_doitackinhdoanh dtkd_a where dtkd_a.md_doitackinhdoanh_id = dsdh.diachigiaohang) as dcgh_1, " +
                 " dsdh.diachigiaohang as dcgh_2, " +
                 " dsdh.huongdanlamhang,dsdh.huongdanlamhangchung, dsdh.discount, dsdh.isgui_hdlh, dsdh.ngaytao, " +
-                " dsdh.nguoitao, dsdh.ngaycapnhat, dsdh.nguoicapnhat, dsdh.mota, dsdh.hoatdong, dsdh.mail_nguoinhan, dsdh.po_lienket, " +
+                " dsdh.nguoitao, dsdh.ngaycapnhat, dsdh.nguoicapnhat, dsdh.mota, dsdh.hoatdong, " +
                 " ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
                 " FROM c_danhsachdathang dsdh, c_donhang dh, md_doitackinhdoanh dtkd " +
                 " WHERE dsdh.c_donhang_id = dh.c_donhang_id " +
@@ -1312,8 +1312,6 @@ public class DanhSachDatHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["nguoicapnhat"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["mail_nguoinhan"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["po_lienket"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";
