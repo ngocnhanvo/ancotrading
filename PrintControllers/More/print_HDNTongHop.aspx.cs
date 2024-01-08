@@ -69,6 +69,7 @@ public partial class PrintControllers_More_print_HDNTongHop : System.Web.UI.Page
 	            hd.ma_khachhang,
 	            hd.ten_khachhang,
 	            hd.diachi_khachhang,
+                qg.ten_quocgia as quocgia_khachhang,
 	            hd.email_khachhang,
 	            ct.ma_sanpham,
 	            ct.ten_sanpham,
@@ -104,6 +105,8 @@ public partial class PrintControllers_More_print_HDNTongHop : System.Web.UI.Page
                 left join c_dongpklinv div on div.c_packinginvoice_id = inv.c_packinginvoice_id
                 left join c_nhapxuat nx on div.c_nhapxuat_id = nx.c_nhapxuat_id
                 left join c_donhang dh on div.c_donhang_id = dh.c_donhang_id
+                left join md_doitackinhdoanh dtkd2 on dtkd2.ma_dtkd = hd.ma_khachhang
+                left join md_quocgia qg on qg.md_quocgia_id = dtkd2.md_quocgia_id
             where 
                 year(hd.ngayhoadon) = {0}
                 and month(hd.ngayhoadon) = {1}
