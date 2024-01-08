@@ -89,7 +89,7 @@
             <table style="width:100%">
                 <tr>
                     <td>
-                        <input id="print_TTHD" type="radio" name="rdoPrintType" value="print_TTHD" checked="checked" />
+                        <input id="print_TTHD" type="radio" name="rdoPrintType" value="print_TTHD" />
                         <label for="print_TTHD">In thông tin hóa đơn</label> 
                     </td>
                 </tr>
@@ -111,25 +111,71 @@
                         <label for="print_HDNFOBVND">In hóa đơn nhập FOB VNĐ</label> 
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <fieldset style="padding:10px 0px 40px 0px;">
+							<legend>
+								<input id="print_HDNTongHop" type="radio" name="rdoPrintType" value="print_HDNTongHop" />
+								<label for="print_HDNTongHop">Tổng hợp hóa đơn theo tháng</label> 
+                                <table style="width: 150px; position: absolute; margin-left: 15px; margin-top: 5px;">
+                                    <tr>
+                                        <th>Năm</th>
+                                        <th>Tháng</th>
+                                    </tr>
+                                    <tr>
+                                        <td><select id="namHDNTongHop" style="width:100%;"></select></td>
+                                        <td><select id="thangHDNTongHop" style="width:100%;"></select></td>
+                                    </tr>
+							</legend>
+						</fieldset>
+                    </td>
+                </tr>
             </table>
         `;
 
         $('body').append(`<div title="${title}" id="${name}">${content}</div>`);
         $('#' + name).dialog({
 			width: 300,
-            modal: true
-                , open: function(event, ui) {
-                    //hide close button.
-                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+            modal: true,
+            open: function (event, ui) {
+                let strNamTH = '', cry = new Date().getFullYear();
+                for (let i = cry; i >= cry - 10; i--) {
+                    strNamTH += `<option value="${i}">${i}</option>`;
                 }
-                , buttons: [
+                $('#namHDNTongHop').html(strNamTH);
+                
+                let strThangTH = '', crm = new Date().getMonth() + 1;
+                for (let i = 12; i >= 1; i--) {
+                    strThangTH += `<option value="${i}">${i}</option>`;
+                }
+                $('#thangHDNTongHop').html(strThangTH);
+                $('#thangHDNTongHop').val(crm);
+
+                $('input[name=rdoPrintType]', '#dialog-print-hoadon').click(function () {
+                    let printType = $('input[name=rdoPrintType]:checked', '#dialog-print-hoadon').val();
+                    if (printType == 'print_HDNTongHop') {
+                        $('#namHDNTongHop').prop('disabled', false);
+                        $('#thangHDNTongHop').prop('disabled', false);
+                    }
+                    else {
+                        $('#namHDNTongHop').prop('disabled', true);
+                        $('#thangHDNTongHop').prop('disabled', true);
+                    }
+                });
+
+                $('#print_TTHD').click();
+                $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+            },
+            buttons: [
                 {
                     id: "btn-print-ok",
                     text: "In",
-                    click: function() {
-                        var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-hoadon').val();
-                        var printURL = "PrintControllers/";
-                        var windowSize = "width=700,height=700,scrollbars=yes";
+                    click: function () {
+                        let printType = $('input[name=rdoPrintType]:checked', '#dialog-print-hoadon').val();
+                        let printURL = "PrintControllers/";
+                        let params_ = '';
+                        let windowSize = "width=700,height=700,scrollbars=yes";
+
                         if (typeof printType == 'undefined') {
                             alert('Chưa chọn cách in');
                             return;
@@ -139,24 +185,29 @@
                             return;
                         }
 
-                        if (['print_TTHD','print_TTHDVND'].lastIndexOf(printType) <= -1 & piId.length > 1) {
+                        if (['print_TTHD', 'print_TTHDVND'].lastIndexOf(printType) <= -1 & piId.length > 1) {
                             alert('Chỉ được chọn 1 hóa đơn');
                             return;
                         }
-   
+
+                        if (['print_HDNTongHop'].lastIndexOf(printType) > -1) {
+                            let nam = $('#namHDNTongHop').val(), thang = $('#thangHDNTongHop').val();
+                            params_ += `&nam=${nam}&thang=${thang}`;
+                        }
+
                         printURL += `More/${printType}.aspx`;
-                        let params_ = '';
+                        
                         window.open(printURL + "?id=" + piId + params_, "Chiết xuất hóa đơn", windowSize);
                     }
                 }
                 , {
                     id: "btn-print-close",
                     text: "Thoát",
-                    click: function() {
+                    click: function () {
                         $(this).dialog("destroy").remove();
                     }
                 }
-                ]
+            ]
         });
     }
 
@@ -275,6 +326,15 @@
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'ten_quocgia'
+                 , label: 'Quốc gia'
+                 , index: 'qg.ten_quocgia'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+                 , editoptions: { disabled:true }
             },
             {
                  fixed: true, name: 'email_khachhang', hidden: true
