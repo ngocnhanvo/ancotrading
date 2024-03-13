@@ -219,7 +219,7 @@ public class DanhSachDatHangController : IHttpHandler
         var tmp = db.md_mailtemplates.FirstOrDefault(p => p.use_for.Equals("PI") && p.ten_template == "PI_VG");
         string msg = "", vnn_msg = "";
         string id = context.Request.Form["id"];
-        var type = context.Request.Form["type"];
+        var type = "1";
         var mailNN = context.Request.Form["mailNN"];
         string[] vnn = id.Split(',');
         var lstMail = new List<Dictionary<string, object>>();

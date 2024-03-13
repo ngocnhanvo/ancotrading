@@ -393,14 +393,8 @@ public static class UserUtils
             var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
             if (!donhang.chuyenphiDSDH.GetValueOrDefault(false))
                 phiDiscount = 0;
-
-            if (donhang.discount.GetValueOrDefault(0) > 0)
+            else if (donhang.discount.GetValueOrDefault(0) > 0)
             {
-                //if (dondathang.discount.GetValueOrDefault(0) <= 0)
-                //{
-                //    phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + donhang.discount.GetValueOrDefault(0));
-                //}
-                //else
                 phiDiscount = ddonhang.phi.GetValueOrDefault(0);
             }
             
