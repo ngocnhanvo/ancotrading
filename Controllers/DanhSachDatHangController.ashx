@@ -19,10 +19,10 @@ public class DanhSachDatHangController : IHttpHandler
     public String productImagePath = HttpContext.Current.Server.MapPath("~/images/products/fullsize/");
 
     public List<Dictionary<string, string>> msgPublics = new List<Dictionary<string, string>> {
-        new Dictionary<string, string>()
-        {
-            { "ANCO1", "" },
-        },
+        //new Dictionary<string, string>()
+        //{
+        //    { "ANCO1", "" },
+        //},
         new Dictionary<string, string>()
         {
             { "ANHIEPLUC", "" },
@@ -230,14 +230,23 @@ public class DanhSachDatHangController : IHttpHandler
 
         var lstDSDH = db.c_danhsachdathangs.Where(s => vnn.Contains(s.c_danhsachdathang_id));
         //
+        var arrGuiDonHangHeThong = new List<string>();
+        foreach (var msgPL in msgPublics)
+        {
+            var madtkd = msgPL.Keys.FirstOrDefault();
+            arrGuiDonHangHeThong.Add(madtkd);
+        }
+
         foreach (var dsdh in lstDSDH)
         {
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).FirstOrDefault();
 
             if (dsdh.md_trangthai_id != "SOANTHAO")
-                msg += "Lỗi:Dòng \"" + dsdh.sochungtu + "\" đã hiệu lực.<br>";
+                msg += $@"Lỗi:Dòng ""{dsdh.sochungtu}"" đã hiệu lực.<br>";
             else if (dsdh.trangthai == "DAGUI")
-                msg += "Lỗi:Dòng \"" + dsdh.sochungtu + "\" đã được gửi trước đó.<br>";
+                msg += $@"Lỗi:Dòng ""{dsdh.sochungtu}"" đã được gửi trước đó.<br>";
+            else if(!arrGuiDonHangHeThong.Contains(dtkd.ma_dtkd))
+                msg += $@"Lỗi:""{dtkd.ma_dtkd}"" chưa triển khai chức năng này.<br>";
             else
             {
                 var dsdh2 = new c_danhsachdathang();
