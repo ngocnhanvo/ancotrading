@@ -1366,15 +1366,24 @@ public class DanhSachDatHangController : IHttpHandler
         String fileNameXls = fileName + ".xls";
         String fileNamePdf = fileName + ".pdf";
         //-- Tao excel
-        NPOI.HSSF.UserModel.HSSFWorkbook wb = null;
-
         try
         {
             var rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
             rptPI.guiNCC = guiNCC;
             //rptPI.TypePrint = "pdf";
-            wb = rptPI.CreateWBPI();
-            wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
+            var wb = rptPI.CreateWBPI();
+            var imgs = new List<AvariablePrj.lstImage>();
+            foreach (var img in rptPI.Lstimage)
+            {
+                img.column = img.column - 1;
+                img.columnLast = img.columnLast - 1;
+                img.dx1 = 10;
+                img.dx2 = 1000;
+                img.dy1 = 40;
+                img.dy2 = 215;
+                imgs.Add(img);
+            }
+            wb = rptPI.ConfigExcel.setImageForExcel(wb, imgs);
             fileNameXls = path + fileNameXls;
             var xfile = new FileStream(fileNameXls, FileMode.Create, FileAccess.ReadWrite);
             wb.Write(xfile);
@@ -1393,7 +1402,7 @@ public class DanhSachDatHangController : IHttpHandler
             var rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
             rptPI.guiNCC = guiNCC;
             rptPI.TypePrint = "pdf";
-            wb = rptPI.CreateWBPI();
+            var wb = rptPI.CreateWBPI();
             //wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
 
             var url = path + Guid.NewGuid().ToString() + ".xls";
