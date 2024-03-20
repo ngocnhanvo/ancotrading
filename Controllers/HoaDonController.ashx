@@ -202,9 +202,17 @@ public class HoaDonController : IHttpHandler
 
 
         String sqlCount = string.Format(@"
-            SELECT COUNT(1) AS count
-			FROM c_hoadon hd
-            WHERE 1 = 1 {0}
+            SELECT 
+                COUNT(1) AS count
+			FROM 
+                c_hoadon hd
+                left join md_nganhang nh on nh.md_nganhang_id = hd.nganhang
+                left join c_packinginvoice inv on inv.so_inv = hd.so_inv
+                left join md_doitackinhdoanh dtkd on dtkd.md_doitackinhdoanh_id = hd.nhacungung
+                left join md_doitackinhdoanh dtkd2 on dtkd2.ma_dtkd = hd.ma_khachhang
+                left join md_quocgia qg on qg.md_quocgia_id = dtkd2.md_quocgia_id
+            WHERE 
+                1 = 1 {0}
             ", filter);
 
         sqlCount = String.Format(sqlCount, isadmin == true ? "" : " AND nx.nguoitao IN(" + strAccount + ") ");
