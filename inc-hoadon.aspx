@@ -248,7 +248,7 @@
             {
                  fixed: true, name: 'tiento'
                  , label: 'Tiền tố'
-                 , index: 'tiento'
+                 , index: 'hd.tiento'
                  , editable: true
                  , width: 40
                  , align: 'center'
@@ -258,7 +258,7 @@
             {
                  fixed: true, name: 'sophieu'
                  , label: 'Số phiếu'
-                 , index: 'sophieu'
+                 , index: 'hd.sophieu'
                  , editable: true
                  , width: 60
                  , align: 'center'
@@ -268,7 +268,7 @@
             {
                  fixed: true, name: 'so_inv'
                  , label: 'Số INV'
-                 , index: 'so_inv'
+                 , index: 'hd.so_inv'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -305,7 +305,7 @@
             {
                  fixed: true, name: 'ma_khachhang'
                  , label: 'Mã KH'
-                 , index: 'ma_khachhang'
+                 , index: 'hd.ma_khachhang'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -314,7 +314,7 @@
             {
                  fixed: true, name: 'ten_khachhang'
                  , label: 'Tên KH'
-                 , index: 'ma_khachhang'
+                 , index: 'hd.ma_khachhang'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -322,7 +322,7 @@
             {
                  fixed: true, name: 'diachi_khachhang'
                  , label: 'Địa chỉ'
-                 , index: 'ma_khachhang'
+                 , index: 'hd.diachi_khachhang'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -339,7 +339,7 @@
             {
                  fixed: true, name: 'email_khachhang', hidden: true
                  , label: 'Email'
-                 , index: 'email_khachhang'
+                 , index: 'hd.email_khachhang'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -350,7 +350,7 @@
             {
                  fixed: true, name: 'daidien_khachhang', hidden: true
                  , label: 'Người mua hàng'
-                 , index: 'daidien_khachhang'
+                 , index: 'hd.daidien_khachhang'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -361,7 +361,7 @@
             {
                  fixed: true, name: 'sotaikhoan_khachhang', hidden: true
                  , label: 'Số tài khoản'
-                 , index: 'sotaikhoan_khachhang'
+                 , index: 'hd.sotaikhoan_khachhang'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -372,7 +372,7 @@
             {
                  fixed: true, name: 'masothue_khachhang', hidden: true
                  , label: 'MST'
-                 , index: 'masothue_khachhang'
+                 , index: 'hd.masothue_khachhang'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -383,7 +383,7 @@
             {
                  fixed: true, name: 'nganhang', hidden: true
                  , label: 'Ngân hàng'
-                 , index: 'nganhang'
+                 , index: 'nh.ten_nganhang'
                  , editable: true
                  , width: 100
                  , align: 'center'
@@ -396,7 +396,7 @@
             {
                  fixed: true, name: 'hinhthucthanhtoan'
                  , label: 'Hình thức TT'
-                 , index: 'hinhthucthanhtoan'
+                 , index: 'hd.hinhthucthanhtoan'
                  , editable: true
                  , width: 90
                  , align: 'center'
@@ -406,7 +406,7 @@
             {
                  fixed: true, name: 'thue_vat'
                  , label: 'VAT'
-                 , index: 'thue_vat'
+                 , index: 'hd.thue_vat'
                  , editable: true
                  , width: 90
                  , edittype: 'text'
