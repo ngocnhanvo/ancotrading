@@ -68,6 +68,7 @@ public partial class PrintControllers_0BaoCaoKH_rpt_baoCaoTriGiaCacDonHang : Sys
 	            left join md_paymentterm pay on pay.md_paymentterm_id = dh.md_paymentterm_id 
             where
 	            dh.shipmenttime between @tungay and @denngay
+                and dh.md_trangthai_id != 'SOANTHAO'
             order by
 	            dh.shipmenttime, dh.sochungtu
 		"
