@@ -1,30 +1,33 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="inc-ds-dathang.aspx.cs" Inherits="inc_ds_dathang" %>
-<%@ Register src="jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
+
+<%@ Register Src="jqGrid.ascx" TagName="jqGrid" TagPrefix="uc1" %>
 
 <script>
-    $(function() {
-		$('#lay-center-dathang').parent().layout({
+    $(function () {
+        $('#lay-center-dathang').parent().layout({
             south: {
                 size: "50%"
             }
             , center: {
-                onresize: function() {
+                onresize: function () {
                     let h = $("#lay-center-dathang").height();
                     $("#grid_ds_dathang").setGridHeight(h - 90);
                 }
             }
         });
-		
-		// Layout nho duoi
+
+        // Layout nho duoi
         $('#lay-south-dathang').layout({
             center: {
-                onresize: function() {
+                onresize: function () {
                     let o = $("#tabs-dathang-details");
                     $("#grid_ds_chitietdathang").setGridWidth(o.width());
                     $("#grid_phidathang").setGridWidth(o.width());
+                    $("#grid_huongdanlamhang").setGridWidth(o.width());
 
                     $("#grid_ds_chitietdathang").setGridHeight(o.height() - 97);
                     $("#grid_phidathang").setGridHeight(o.height() - 97);
+                    $("#grid_huongdanlamhang").setGridHeight(o.height() - 97);
                 }
             }
         });
@@ -45,12 +48,12 @@
             // create new dialog
             $('#dialog-active-pi').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
                 , buttons: {
-                    'Thoát': function() {
+                    'Thoát': function () {
                         $(this).dialog("destroy").remove();
                     }
                 }
@@ -67,43 +70,43 @@
             // create new dialog
             $('#dialog-active-pi').dialog({
                 modal: true
-                , open: function(event, ui) {
+                , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                 }
                 , buttons:
-                [
-                    {
-                        id: "btn-active",
-                        text: "Có",
-                        click: function() {
-                            $("#dialog-caution").ajaxStart(function() {
-                                $("#wait").css("display", "block");
-                                $("#btn-active").button("disable");
-                                $("#btn-close").button("disable");
-                            });
+                    [
+                        {
+                            id: "btn-active",
+                            text: "Có",
+                            click: function () {
+                                $("#dialog-caution").ajaxStart(function () {
+                                    $("#wait").css("display", "block");
+                                    $("#btn-active").button("disable");
+                                    $("#btn-close").button("disable");
+                                });
 
-                            $("#dialog-caution").ajaxComplete(function() {
-                                $("#wait").css("display", "none");
-                                $("#btn-close span").text("Thoát");
-                                $("#btn-close").button("enable");
-                            });
+                                $("#dialog-caution").ajaxComplete(function () {
+                                    $("#wait").css("display", "none");
+                                    $("#btn-close span").text("Thoát");
+                                    $("#btn-close").button("enable");
+                                });
 
-                            $.get("Controllers/DanhSachDatHangController.ashx?action=activepi&piId=" + id, function(result) {
-                                //$('#dialog-caution').css({ 'color': 'green' });
-                                $('#dialog-active-pi').find('#dialog-caution').html(result);
-                                $('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
-                            });
+                                $.get("Controllers/DanhSachDatHangController.ashx?action=activepi&piId=" + id, function (result) {
+                                    //$('#dialog-caution').css({ 'color': 'green' });
+                                    $('#dialog-active-pi').find('#dialog-caution').html(result);
+                                    $('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
+                                });
+                            }
+                        },
+                        {
+                            id: "btn-close",
+                            text: "Không",
+                            click: function () {
+                                $(this).dialog("destroy").remove();
+                            }
                         }
-                    },
-                    {
-                        id: "btn-close",
-                        text: "Không",
-                        click: function() {
-                            $(this).dialog("destroy").remove();
-                        }
-                    }
-                ]
+                    ]
             });
         }
     }
@@ -113,59 +116,59 @@
         var name = 'dialog-print-pi';
         var title = 'Trích xuất dữ liệu';
         var content = '<table style="width:100%">' +
-                                '<tr>' +
-                                    '<td>' +
-                                        '<input id="printRequired" type="radio" name="rdoPrintType" value="printRequired" checked="checked" />' +
-                                        '<label for="printRequired">Chiết xuất đơn đặt hàng</label>' +
-                                    '</td>' +
-									
-									'<td>' +
-                                        '<input id="printPoTem" type="radio" name="rdoPrintType" value="printPoTem" />' +
-                                        '<label for="printPoTem">In chi tiết tem bao bì</label>' +
-                                    '</td>' +
-                                '</tr>' +
+            '<tr>' +
+            '<td>' +
+            '<input id="printRequired" type="radio" name="rdoPrintType" value="printRequired" checked="checked" />' +
+            '<label for="printRequired">Chiết xuất đơn đặt hàng</label>' +
+            '</td>' +
 
-                                '<tr>' +
-									'<td>' +
-										'<input id="printST_DS" type="radio" name="rdoPrintType" value="printST_DS" />' +
-										'<label for="printST_DS">Chiết xuất tất cả ds đặt hàng</label>' +
-									'</td>' +
-									
-									
-                                    '<td>' +
-                                        '<input id="printPoBaoBi" type="radio" name="rdoPrintType" value="printPoBaoBi" />' +
-                                        '<label for="printPoBaoBi">In bao bì</label>' +
-                                    '</td>' +
-                                '</tr>' +
-								
-								'<tr>' +
-									'<td>' +
-                                        '<input id="printDSDH" type="radio" name="rdoPrintType" value="printDSDH" />' +
-                                        '<label for="printDSDH">In đơn đặt hàng</label>' +
-                                    '</td>' +
-									
-                                    '<td>' +
-                                        '<input id="printPoXml" type="radio" name="rdoPrintType" value="printPoXml" />' +
-                                        '<label for="printPoXml">In đơn hàng xml</label>' +
-                                    '</td>' +
+            '<td>' +
+            '<input id="printPoTem" type="radio" name="rdoPrintType" value="printPoTem" />' +
+            '<label for="printPoTem">In chi tiết tem bao bì</label>' +
+            '</td>' +
+            '</tr>' +
 
-                                   
-                                '</tr>' +
-                          '</table>';
+            '<tr>' +
+            '<td>' +
+            '<input id="printST_DS" type="radio" name="rdoPrintType" value="printST_DS" />' +
+            '<label for="printST_DS">Chiết xuất tất cả ds đặt hàng</label>' +
+            '</td>' +
+
+
+            '<td>' +
+            '<input id="printPoBaoBi" type="radio" name="rdoPrintType" value="printPoBaoBi" />' +
+            '<label for="printPoBaoBi">In bao bì</label>' +
+            '</td>' +
+            '</tr>' +
+
+            '<tr>' +
+            '<td>' +
+            '<input id="printDSDH" type="radio" name="rdoPrintType" value="printDSDH" />' +
+            '<label for="printDSDH">In đơn đặt hàng</label>' +
+            '</td>' +
+
+            '<td>' +
+            '<input id="printPoXml" type="radio" name="rdoPrintType" value="printPoXml" />' +
+            '<label for="printPoXml">In đơn hàng xml</label>' +
+            '</td>' +
+
+
+            '</tr>' +
+            '</table>';
 
         $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
         $('#' + name).dialog({
-			width: 500,
+            width: 500,
             modal: true
-                , open: function(event, ui) {
-                    //hide close button.
-                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
-                }
-                , buttons: [
+            , open: function (event, ui) {
+                //hide close button.
+                $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+            }
+            , buttons: [
                 {
                     id: "btn-print-ok",
                     text: "In",
-                    click: function() {
+                    click: function () {
                         var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-pi').val();
                         var printURL = "PrintControllers/";
                         var windowSize = "width=700,height=700,scrollbars=yes";
@@ -178,7 +181,7 @@
                                     params_ += "&type=excel";
                                     window.open(printURL + "?c_danhsachdathang_id=" + piId + params_, "Chiết xuất Đơn Đặt Hàng", windowSize);
                                 } else {
-                                alert('Bạn chưa chọn đơn đặt hàng cần in!');
+                                    alert('Bạn chưa chọn đơn đặt hàng cần in!');
                                 }
                             } else if (printType == 'printPoTem') {
                                 if (piId != null) {
@@ -214,8 +217,8 @@
                                     alert('Bạn chưa chọn đơn đặt hàng cần chiết xuất xml!');
                                 }
                             } else if (printType == "printST_DS") {
-                                    printURL += "InDSDH_Soanthao/";
-                                    window.open(printURL, "Chiết xuất tất cả các DSDH đang \"Soạn Thảo\"", windowSize);
+                                printURL += "InDSDH_Soanthao/";
+                                window.open(printURL, "Chiết xuất tất cả các DSDH đang \"Soạn Thảo\"", windowSize);
                             }
                         } else {
                             alert('Hãy chọn cách in.!');
@@ -225,22 +228,22 @@
                 , {
                     id: "btn-print-close",
                     text: "Thoát",
-                    click: function() {
+                    click: function () {
                         $(this).dialog("destroy").remove();
                     }
                 }
-                ]
+            ]
         });
     }
 
-	$(function() {
-		$('#newKcs, #newNcu').change(function () {
-			if ($(this).is(':checked')) {
-				$( '#Kcs' ).prop( 'checked', false );
-				$( '#Ncu' ).prop( 'checked', false );
-			}
-		});
-	});
+    $(function () {
+        $('#newKcs, #newNcu').change(function () {
+            if ($(this).is(':checked')) {
+                $('#Kcs').prop('checked', false);
+                $('#Ncu').prop('checked', false);
+            }
+        });
+    });
 
     function sendMailPI() {
         var piId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selarrrow');
@@ -248,106 +251,97 @@
             alert('Hãy chọn một báo giá mà bạn muốn gửi email!');
         } else {
 
-        $('body').append("<div title='Gửi Email' id='sendpi'>" + "<div id='content'>Đang kiểm tra...</div>" + "</div>");
-        $('#sendpi').dialog({
+            $('body').append("<div title='Gửi Email' id='sendpi'>" + "<div id='content'>Đang kiểm tra...</div>" + "</div>");
+            $('#sendpi').dialog({
                 modal: true
-			 , width:500 
-             , open: function(event, ui) {
-                 //hide close button.
-                 $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
-             }
-             , buttons: [
-                {
-                    id: "btn-send",
-                    text: "Gửi đi",
-                    click: function () {
-                        var sendType = $('input[name=rdType]:checked', '#sendpi').val();
-                        var sendnewKcs = $('input[name=newKcs]:checked', '#sendpi').val();
-                        var sendKcs = $('input[name=Kcs]:checked', '#sendpi').val();
-                        var sendnewNcu = $('input[name=newNcu]:checked', '#sendpi').val();
-                        var sendNcu = $('input[name=Ncu]:checked', '#sendpi').val();
-                        var sendnewKTNCU = $('input[name=newKTNCU]:checked', '#sendpi').val();
-                        var sendKTNCU = $('input[name=KTNCU]:checked', '#sendpi').val();
-						var sendMailType = "";
-                        if (typeof sendType != 'undefined') 
-						{
-                            if (sendnewKcs == null & sendKcs == null
-                                & sendnewNcu == null & sendNcu == null
-                                & sendnewKTNCU == null & sendKTNCU == null)
-							{
-								alert("Hãy chọn Người Gửi!");
-								
-							}
-							else 
-							{
-								$('#sendpi #content').html("Đang gửi email...");
-								$("#btn-send").button("disable");
-								$("#btn-close").button("disable");
-								
-								if(sendType == "toAll")
-								{
-									if (sendnewKcs == "newKcs") {
-										sendMailType += sendnewKcs + ",";
-									}
-									
-									if(sendnewNcu == "newNcu")
-									{
-										sendMailType += sendnewNcu + ",";
+                , width: 500
+                , open: function (event, ui) {
+                    //hide close button.
+                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                }
+                , buttons: [
+                    {
+                        id: "btn-send",
+                        text: "Gửi đi",
+                        click: function () {
+                            var sendType = $('input[name=rdType]:checked', '#sendpi').val();
+                            var sendnewKcs = $('input[name=newKcs]:checked', '#sendpi').val();
+                            var sendKcs = $('input[name=Kcs]:checked', '#sendpi').val();
+                            var sendnewNcu = $('input[name=newNcu]:checked', '#sendpi').val();
+                            var sendNcu = $('input[name=Ncu]:checked', '#sendpi').val();
+                            var sendnewKTNCU = $('input[name=newKTNCU]:checked', '#sendpi').val();
+                            var sendKTNCU = $('input[name=KTNCU]:checked', '#sendpi').val();
+                            var sendMailType = "";
+                            if (typeof sendType != 'undefined') {
+                                if (sendnewKcs == null & sendKcs == null
+                                    & sendnewNcu == null & sendNcu == null
+                                    & sendnewKTNCU == null & sendKTNCU == null) {
+                                    alert("Hãy chọn Người Gửi!");
+
+                                }
+                                else {
+                                    $('#sendpi #content').html("Đang gửi email...");
+                                    $("#btn-send").button("disable");
+                                    $("#btn-close").button("disable");
+
+                                    if (sendType == "toAll") {
+                                        if (sendnewKcs == "newKcs") {
+                                            sendMailType += sendnewKcs + ",";
+                                        }
+
+                                        if (sendnewNcu == "newNcu") {
+                                            sendMailType += sendnewNcu + ",";
+                                        }
+
+                                        if (sendnewKTNCU == "newKTNCU") {
+                                            sendMailType += sendnewKTNCU + ",";
+                                        }
+                                    }
+                                    else {
+                                        if (sendKcs == "Kcs") {
+                                            sendMailType += sendKcs + ",";
+                                        }
+
+                                        if (sendNcu == "Ncu") {
+                                            sendMailType += sendNcu + ",";
+                                        }
+
+                                        if (sendKTNCU == "KTNCU") {
+                                            sendMailType += sendKTNCU + ",";
+                                        }
                                     }
 
-                                    if(sendnewKTNCU == "newKTNCU")
-									{
-										sendMailType += sendnewKTNCU + ",";
-									}
-								}
-								else
-								{								
-									if (sendKcs == "Kcs") {
-										sendMailType += sendKcs + ",";
-									}
-									
-									if(sendNcu == "Ncu")
-									{
-										sendMailType += sendNcu + ",";
-                                    }
+                                    $.get("Controllers/DanhSachDatHangController.ashx?action=sendmail&piId=" + piId + "&sendType=" + sendType + "&sendMailType=" + sendMailType, function (result) {
+                                        $('#sendpi #content').html(result);
+                                        $("#btn-close span").text("Thoát");
+                                        $("#btn-close").button("enable");
+                                        $('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
+                                    });
+                                }
 
-                                    if(sendKTNCU == "KTNCU")
-									{
-										sendMailType += sendKTNCU + ",";
-									}
-								}
-								
-								$.get("Controllers/DanhSachDatHangController.ashx?action=sendmail&piId=" + piId + "&sendType=" + sendType + "&sendMailType=" + sendMailType, function (result) {
-                                    $('#sendpi #content').html(result);
-                                    $("#btn-close span").text("Thoát");
-                                    $("#btn-close").button("enable");
-									$('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
-                                });
-							}
-							
-                        } else {
-                            alert("Hãy chọn kiểu DSDH!");
+                            } else {
+                                alert("Hãy chọn kiểu DSDH!");
+                            }
                         }
                     }
-                }
-                , {
-                    id: "btn-close",
-                    text: "Thoát",
-                    click: function() {
-                        $(this).dialog("destroy").remove();
+                    , {
+                        id: "btn-close",
+                        text: "Thoát",
+                        click: function () {
+                            $(this).dialog("destroy").remove();
+                        }
                     }
-                }
-             ]
+                ]
             });
 
-            $.get("Controllers/DanhSachDatHangController.ashx?action=startsendmail&piId=" + piId, function(result) {
+            $.get("Controllers/DanhSachDatHangController.ashx?action=startsendmail&piId=" + piId, function (result) {
                 $('#sendpi').find('#content').html('<h2>Xác nhận trước khi gửi email!</h2><div>' + result + '</div>');
-				hide_sendmail();
+                hide_sendmail();
             });
         }
     }
-    
-	function LamMoiTrangThaiDDH() {
+
+    function LamMoiTrangThaiDDH() {
         $('body').append(`
 			<div title='Làm mới trạng thái đơn mua hàng' id='lammoitrangthai'>
 				<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>
@@ -355,50 +349,50 @@
 			</div>
 		`);
         $('#lammoitrangthai').dialog({
-                modal: true
-			 , width:500 
-             , open: function(event, ui) {
-                 //hide close button.
-                 $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
-             }
-             , buttons: [
+            modal: true
+            , width: 500
+            , open: function (event, ui) {
+                //hide close button.
+                $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+            }
+            , buttons: [
                 {
                     id: "btn-dongy",
                     text: "Đồng ý",
                     click: function () {
-						$('#wait').show();
-                        $.get('Controllers/DanhSachDatHangController.ashx?action=danhsachdathang', function(){
-							$('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
-							$('#wait').hide();
-							$('#lammoitrangthai').dialog("destroy").remove();
-						});
+                        $('#wait').show();
+                        $.get('Controllers/DanhSachDatHangController.ashx?action=danhsachdathang', function () {
+                            $('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
+                            $('#wait').hide();
+                            $('#lammoitrangthai').dialog("destroy").remove();
+                        });
                     }
                 }
                 , {
                     id: "btn-close",
                     text: "Thoát",
-                    click: function() {
+                    click: function () {
                         $(this).dialog("destroy").remove();
                     }
                 }
-             ]
-		});
+            ]
+        });
     }
 </script>
 
 <script>
     function dupEditDanhSachDatHang(rowid) {
         <% if (DaoRules.GetRuleEdit(Context))
-           { %>
-            $(this).jqGrid('editGridRow', rowid, {
-                beforeShowForm: function (formid) {
-                    formid.closest('div.ui-jqdialog').dialogCenter();
-                }
-                    , afterSubmit: function (rs, postdata) {
-                        return showMsgDialog(rs);
-                    }
-                }
-            );
+    { %>
+        $(this).jqGrid('editGridRow', rowid, {
+            beforeShowForm: function (formid) {
+                formid.closest('div.ui-jqdialog').dialogCenter();
+            }
+            , afterSubmit: function (rs, postdata) {
+                return showMsgDialog(rs);
+            }
+        }
+        );
         <%} %>
     };
 </script>
@@ -430,12 +424,12 @@
                             $('#btn-ok').button('option', 'disabled', true);
                             $('#wait').show();
                             $.post('Controllers/DanhSachDatHangController.ashx?action=guidonhang&piId=' + piId,
-                            { id: piId.toString() }, function (result) {
-								$('.dlg_content').html(result);
-                                $('#btn-ok').button('option', 'disabled', false);
-                                $('#wait').hide();
-                                $('#grid_ds_dathang')[0].triggerToolbar();
-                            });
+                                { id: piId.toString() }, function (result) {
+                                    $('.dlg_content').html(result);
+                                    $('#btn-ok').button('option', 'disabled', false);
+                                    $('#wait').hide();
+                                    $('#grid_ds_dathang')[0].triggerToolbar();
+                                });
                         }
                     }
                     , {
@@ -456,21 +450,20 @@
                 , 'Đã Gửi Hướng Dẫn Làm Hàng', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Ghi chú', 'Hoạt động']"*/
 </script>
 
-<DIV class="ui-layout-center ui-widget-content" id="lay-center-dathang">
-<uc1:jqGrid  ID="grid_ds_dathang" 
-            Caption="Danh Sách Đặt Hàng"
-            SortName="dsdh.ngaylap" 
-            FuncActivePI="funcActivePI"
-            FuncSendMail="sendMailPI"
-            BtnPrint="printPI"
-            UrlFileAction="Controllers/DanhSachDatHangController.ashx" 
-
-            RowNumbers="true"
-            OndblClickRow = "dupEditDanhSachDatHang"
-            FuncChiaTachPOTaoPI="function(){ add_tab('Tạo đơn đặt hàng', 'inc-chiatachpo-taopi.aspx')}"
-            GuiDonHang="guidonhang"
-			MultiSelect="true"
-			ColModel = "[
+<div class="ui-layout-center ui-widget-content" id="lay-center-dathang">
+    <uc1:jqGrid ID="grid_ds_dathang"
+        Caption="Danh Sách Đặt Hàng"
+        SortName="dsdh.ngaylap"
+        FuncActivePI="funcActivePI"
+        FuncSendMail="sendMailPI"
+        BtnPrint="printPI"
+        UrlFileAction="Controllers/DanhSachDatHangController.ashx"
+        RowNumbers="true"
+        OndblClickRow="dupEditDanhSachDatHang"
+        FuncChiaTachPOTaoPI="function(){ add_tab('Tạo đơn đặt hàng', 'inc-chiatachpo-taopi.aspx')}"
+        GuiDonHang="guidonhang"
+        MultiSelect="true"
+        ColModel="[
             {
                 fixed: true, name: 'c_danhsachdathang_id'
                 , label: 'c_danhsachdathang_id'
@@ -709,12 +702,12 @@
                 , formoptions: { colpos: 1, rowpos: 17 }
             }
             ]"
-            GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 90);"
-            FilterToolbar = "true"
-            Height = "420"
-            ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
-            ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
-            EditFormOptions ="
+        GridComplete="var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 90);"
+        FilterToolbar="true"
+        Height="420"
+        ShowEdit="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
+        ShowDel="<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
+        EditFormOptions="
                 width:350 ,
                 beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
@@ -726,7 +719,7 @@
                   return showMsgDialog(rs);
                 }
             "
-            ViewFormOptions="
+        ViewFormOptions="
                 width:350 ,
                 beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
@@ -738,7 +731,7 @@
                   return showMsgDialog(rs);
                 }
             "
-            DelFormOptions="
+        DelFormOptions="
                 beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 },
@@ -749,7 +742,7 @@
                   return showMsgDialog(rs);
                 }
             "
-            OnSelectRow = "function(ids) {
+        OnSelectRow="function(ids) {
 				var chk_box = $('#jqg_grid_ds_dathang_' + ids);
 				setTimeout(function() {
 					if(!chk_box.prop('checked')) { ids = null; }
@@ -772,26 +765,28 @@
 					}
                     $('#grid_ds_chitietdathang').jqGrid('getGridParam', 'postData').poId = ids;
                     $('#grid_phidathang').jqGrid('getGridParam', 'postData').poId = ids;
+                    $('#grid_huongdanlamhang').jqGrid('getGridParam', 'postData').poId = ids;
                     $('#grid_ds_chitietdathang')[0].triggerToolbar();
                     $('#grid_phidathang')[0].triggerToolbar();
+                    $('#grid_huongdanlamhang')[0].triggerToolbar();
 				},10);
 			}"
-            runat="server" />
-</DIV>
-<DIV class="ui-layout-south ui-widget-content" id="lay-south-dathang" style="padding:0;"> 
-         <div class="ui-layout-center" id="tabs-dathang-details">
-         <ul>
+        runat="server" />
+</div>
+<div class="ui-layout-south ui-widget-content" id="lay-south-dathang" style="padding: 0;">
+    <div class="ui-layout-center" id="tabs-dathang-details">
+        <ul>
             <li><a href="#dathang-details">Các dòng đặt hàng</a></li>
             <li><a href="#phidathang-details">Các khoản phí</a></li>
+            <li><a href="#huongdanlamhang-details">Hướng dẫn làm hàng</a></li>
         </ul>
         <div id="dathang-details">
-			<uc1:jqGrid  ID="grid_ds_chitietdathang" 
-            SortName="sp.ma_sanpham" 
-			SortOrder="ASC"
-            UrlFileAction="Controllers/DongDanhSachDatHangController.ashx" 
-
-            RowNumbers="true"
-            OndblClickRow = "function(rowid) { $(this).jqGrid(
+            <uc1:jqGrid ID="grid_ds_chitietdathang"
+                SortName="sp.ma_sanpham"
+                SortOrder="ASC"
+                UrlFileAction="Controllers/DongDanhSachDatHangController.ashx"
+                RowNumbers="true"
+                OndblClickRow="function(rowid) { $(this).jqGrid(
                                     'editGridRow', rowid, { 
                                             errorTextFormat:function(data) { 
                                                 return 'Lỗi: ' + data.responseText 
@@ -804,7 +799,7 @@
                                             }
                                     }) 
                             }"
-            ColModel = "[
+                ColModel="[
             {
                 fixed: true, name: 'c_dongdsdh_id'
                 , label: 'c_dongdsdh_id'
@@ -1066,12 +1061,12 @@
                 , formatter: 'checkbox'
             }
             ]"
-            GridComplete = "let o = $(this).parent().parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 97);$(this).setGridWidth($(o).width())"
-            FilterToolbar = "true"
-            Height = "150"
-            MultiSelect = "false" 
-            ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
-            EditFormOptions ="
+                GridComplete="let o = $(this).parent().parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 97);$(this).setGridWidth($(o).width())"
+                FilterToolbar="true"
+                Height="150"
+                MultiSelect="false"
+                ShowEdit="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
+                EditFormOptions="
                 errorTextFormat:function(data) { 
                         return 'Lỗi: ' + data.responseText 
                 }
@@ -1082,19 +1077,19 @@
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 }
                 "
-            ViewFormOptions=" width:500
+                ViewFormOptions=" width:500
                 , beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 }"
-            runat="server" />
-	</DIV>
- <div id="phidathang-details">
-            <uc1:jqGrid  ID="grid_phidathang" 
-            SortName="ngaytao" 
-            SortOrder="ASC"
-            UrlFileAction="Controllers/PhiDathangController.ashx" 
-            RowNumbers="true"
-            OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid,
+                runat="server" />
+        </div>
+        <div id="phidathang-details">
+            <uc1:jqGrid ID="grid_phidathang"
+                SortName="ngaytao"
+                SortOrder="ASC"
+                UrlFileAction="Controllers/PhiDathangController.ashx"
+                RowNumbers="true"
+                OndblClickRow="function(rowid) { $(this).jqGrid('editGridRow', rowid,
                                                     {
                                                         afterSubmit: function(rs, postdata){
                                                             return showMsgDialog(rs);
@@ -1108,7 +1103,7 @@
                                                         
                                                     }
                                                 ); }"
-            ColModel = "[
+                ColModel="[
             {
                 name: 'c_phidathang_id'
                 , label: 'c_phidathang_id'
@@ -1210,14 +1205,14 @@
                 , formatter: 'checkbox'
             }
             ]"
-            GridComplete = "let o = $(this).parent().parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 97);$(this).setGridWidth($(o).width())"
-            FilterToolbar="true"
-            Height = "150"
-            MultiSelect = "false" 
-            ShowAdd ="<%$ Code: DaoRules.GetRuleAdd(Context).ToString().ToLower() %>"
-            ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
-            ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
-            AddFormOptions=" 
+                GridComplete="let o = $(this).parent().parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 97);$(this).setGridWidth($(o).width())"
+                FilterToolbar="true"
+                Height="150"
+                MultiSelect="false"
+                ShowAdd="<%$ Code: DaoRules.GetRuleAdd(Context).ToString().ToLower() %>"
+                ShowEdit="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
+                ShowDel="<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
+                AddFormOptions=" 
                 
                 beforeShowForm: function (formid) {
                         var masterId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
@@ -1246,61 +1241,465 @@
                    return showMsgDialog(rs);
                 }
                 "
-            EditFormOptions ="
+                EditFormOptions="
                 beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 },
                 errorTextFormat:function(data) { 
                     return 'Lỗi: ' + data.responseText 
                 }"
-            ViewFormOptions="
+                ViewFormOptions="
                 beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 },
                 errorTextFormat:function(data) { 
                     return 'Lỗi: ' + data.responseText 
             }"
-            DelFormOptions="
+                DelFormOptions="
                 beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 },
                 afterSubmit: function(rs, postdata) { 
                     return showMsgDialog(rs); 
             }"
-            runat="server" />
+                runat="server" />
         </div>
-        </DIV>
-</DIV>
+        <div id="huongdanlamhang-details">
+            <uc1:jqGrid ID="grid_huongdanlamhang"
+                SortName="ngaytao"
+                SortOrder="ASC"
+                UrlFileAction="Controllers/DSDH_HuongDanLamHang_Controller.ashx"
+                RowNumbers="true"
+                OndblClickRow="
+                function(rowid) {
+                    $('#edit_grid_huongdanlamhang').click();
+                }
+            "
+                ColModel="
+            [
+                {
+                    name: 'md_taptin_id'
+                    , label: 'md_taptin_id'
+                    , index: 'md_taptin_id'
+                    , fixed:true 
+                    , width: 100
+                    , hidden: true 
+                    , editable:true
+                    , edittype: 'text'
+                    , key: true
+                },
+                {
+                    name: 'tentaptin'
+                    , label: 'Tên tập tin'
+                    , index: 'tt.tentaptin'
+                    , fixed:true 
+                    , width: 140
+                    , edittype: 'text'
+                    , editable: true
+                    , hidden: false
+                },
+                {
+                     name: 'mimetype'
+                     , label: 'Loại'
+                     , index: 'tt.mimetype'
+                     , editable: false
+                     , fixed:true 
+                     , width: 60
+                     , edittype: 'text'
+                     , align: 'center'
+                },
+                {
+                     name: 'size'
+                     , label: 'Kích thước'
+                     , index: 'tt.size'
+                     , editable: false
+                     , fixed:true 
+                     , width: 80
+                     , edittype: 'text'
+                     , editoptions:{ defaultValue: '0' }
+                     , editrules: { required:true, number:true, minValue: 0 }
+                     , align: 'right'
+                     , formatter: formatBytes
+                     , unformat: disable_formatter
+                },
+                {
+                     name: 'path'
+                     , label: 'Tải về'
+                     , index: 'tt.path'
+                     , editable: false
+                     , fixed:true 
+                     , width: 50
+                     , edittype: 'text'
+                     , align: 'center'
+                     , formatter: download
+                     , unformat: disable_formatter
+                },
+                {
+                    name: 'ngaytao'
+                    , label: 'Ngày tạo'
+                    , index: 'tt.ngaytao'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: false 
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
+                    name: 'nguoitao'
+                    , label: 'Người tạo'
+                    , index: 'tt.nguoitao'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: false 
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
+                    name: 'ngaycapnhat'
+                    , label: 'Ngày gửi'
+                    , index: 'tt.ngaycapnhat'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: false
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
+                    name: 'nguoicapnhat'
+                    , label: 'Người gửi'
+                    , index: 'tt.nguoicapnhat'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: true 
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
+                    name: 'mota'
+                    , label: 'Mô tả'
+                    , index: 'tt.mota'
+                    , fixed:true 
+                    , width: 100
+                    , editable:true
+                    , edittype: 'textarea'
+                },
+                {
+                    name: 'trangthai'
+                    , label: 'Trạng thái'
+                    , index: 'tt.trangthai'
+                    , fixed:true 
+                    , width: 100
+                    , editable: false
+                    , align: 'center'
+                }
+            ]"
+                GridComplete="let o = $(this).parent().parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 97);$(this).setGridWidth($(o).width())"
+                FilterToolbar="true"
+                Height="150"
+                MultiSelect="true"
+                ShowAdd="false"
+                ShowEdit="false"
+                ShowDel="<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
+                AddFormOptions="
+                beforeShowForm: function (formid) {
+                    let masterId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
+                    let forId = 'c_danhsachdathang_id';
+                    if(masterId == null)
+                    {
+                        $(formid).parent().parent().parent().dialog('destroy').remove();
+                        alert('Hãy chọn một đơn hàng mới có thể tạo chi tiết.!');
+                    }
+                    else{
+                        formid.closest('div.ui-jqdialog').dialogCenter();
+                    }
+                }, 
+                beforeSubmit:function(postdata, formid) {
+                    let masterId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
+                    let forId = 'c_danhsachdathang_id';
+                    if(masterId == null)
+                    {
+                        $(formid).parent().parent().parent().dialog('destroy').remove();
+                        return [false,'Hãy chọn một đơn hàng mới có thể tạo chi tiết.!!'];
+                    }
+                    else {
+                        postdata.c_danhsachdathang_id = masterId;
+                        return [true,'']; 
+                    }
+                }, 
+                afterSubmit: function(rs, postdata){
+                   return showMsgDialog(rs);
+                }
+            "
+                EditFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+                }"
+                ViewFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+            }"
+                DelFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                afterSubmit: function(rs, postdata) { 
+                    return showMsgDialog(rs); 
+            }"
+                runat="server" />
+        </div>
+    </div>
+</div>
 
 <script>
-	var hide_sendmail = function() {								  
-			$('.t_plus', '#sendpi').hide();
-			$( '#new', '#sendpi' ).on( "click", function() {
-				$('.t_plus', '#sendpi').hide();
-                $('.t_new', '#sendpi').show();
-                $('.new_toAll', '#sendpi').prop('checked', false);
-			});
-			
-			$( '#plus', '#sendpi' ).on( "click", function() {
-				$('.t_plus', '#sendpi').show();
-				$('.t_new', '#sendpi').hide();
-				$('.new_toAllPlus', '#sendpi').prop('checked', false);
-			});
-		}
- 
-	$("#grid_ds_dathang").jqGrid('navGrid', "#grid_ds_dathang-pager").jqGrid('navButtonAdd', "#grid_ds_dathang-pager", 
-	{
-		caption: "",
-		buttonicon: "ui-icon-refresh",
-		onClickButton: function(){
-			LamMoiTrangThaiDDH();
-		}, 
-		title: "Làm mới trạng thái ĐĐH", 
-		cursor: "pointer"
-	});
+    var hide_sendmail = function () {
+        $('.t_plus', '#sendpi').hide();
+        $('#new', '#sendpi').on("click", function () {
+            $('.t_plus', '#sendpi').hide();
+            $('.t_new', '#sendpi').show();
+            $('.new_toAll', '#sendpi').prop('checked', false);
+        });
 
-	$('#grid_phidathang-pager_left').removeAttr('style');
-	createRightPanel('grid_ds_dathang');
-	createRightPanel('grid_ds_chitietdathang');
-	createRightPanel('grid_phidathang');
+        $('#plus', '#sendpi').on("click", function () {
+            $('.t_plus', '#sendpi').show();
+            $('.t_new', '#sendpi').hide();
+            $('.new_toAllPlus', '#sendpi').prop('checked', false);
+        });
+    }
+
+    $("#grid_ds_dathang").jqGrid('navGrid', "#grid_ds_dathang-pager").jqGrid('navButtonAdd', "#grid_ds_dathang-pager",
+        {
+            caption: "",
+            buttonicon: "ui-icon-refresh",
+            onClickButton: function () {
+                LamMoiTrangThaiDDH();
+            },
+            title: "Làm mới trạng thái ĐĐH",
+            cursor: "pointer"
+        });
+
+    $('#grid_phidathang-pager_left').removeAttr('style');
+    createRightPanel('grid_ds_dathang');
+    createRightPanel('grid_ds_chitietdathang');
+    createRightPanel('grid_phidathang');
+</script>
+
+<script type="text/javascript" id="script_grid_huongdanlamhang">
+    function UploadTapTingrid_huongdanlamhang() {
+        let data_js = new FormData();
+        let $div, $frmGHDLH;
+        $div = $(`
+            <form  enctype="multipart/form-data" id="frm_File_grid_huongdanlamhang">
+                <div class="mess"></div>
+                <input type="button" onclick="$(this).next().click();" value="Chọn tập tin" />
+                <input type="file" style="display:none" multiple accept=".jpg,.png,.xls,.xlsx,.doc,.docx,.pdf,.ppt" />
+            </form>
+        `);
+        
+        $div.dialog({
+            title: `Tải lên "hướng dẫn làm hàng"`,
+            resizeable: false,
+            modal: true,
+            width: 400,
+            height: 300,
+            open: function (event, ui) {
+                $frmGHDLH = $('#frm_File_grid_huongdanlamhang');
+                let $fileInput = $frmGHDLH.find('input[type="file"]');
+                let $mess = $frmGHDLH.find('.mess');
+                let $table;
+
+                $fileInput.change(function () {
+                    let files = $(this)[0].files;
+                    let messFile = '';
+                    for (let i = 0; i < files.length; i++) {
+                        let file = files[i];
+                        let spanRemove = $(`span.btnVNN[fileN="${file.name}"]`);
+                        if (spanRemove.attr('fileN') != null) {
+                            spanRemove.click();
+                        }
+
+                        messFile += `
+                            <tr class="rowFile" style="height: 25px;">
+                                <td>${file.name} (${file.size} Byte)</td>
+                                <td style="text-align:center"><span class="btnVNN" fileI="${i}" fileN="${file.name}">X</span></td>
+                            </tr>`;
+
+                        data_js.append('hinhanh' + i, file);
+                    }
+
+                    $table = $frmGHDLH.find('table');
+                    if ($table.prop('tagName') == null) {
+                        messFile = `
+                            <table style="width:100%">
+                                <tr style="height: 25px;">
+                                    <td style="font-weight:bold">Tên</td>
+                                    <td style="font-weight:bold; text-align:center;"><a class="btnVNN">Xóa</a></td>
+                                </tr>
+                                ${messFile}
+                            </table>
+                        `;
+                        $mess.html(messFile);
+                        $table = $frmGHDLH.find('table');
+                    }
+                    else {
+                        $table.append(messFile);
+                    }
+
+                    $('span.btnVNN').off('click');
+                    $('span.btnVNN').click(function () {
+                        let index = $(this).attr('fileI');
+                        $(this).parent().parent().remove();
+                        data_js.delete('hinhanh' + index);
+                        if ($('tr.rowFile').length <= 0) {
+                            $table.remove();
+                        }
+                    });
+
+                    $('a.btnVNN').off('click');
+                    $('a.btnVNN').click(function () {
+                        let index = $(this).attr('fileI');
+                        $(this).parent().parent().remove();
+                        $('span.btnVNN').click();
+                    });
+
+                    $(this).val('');
+                });
+            },
+            close: function (event, ui) {
+                $(this).dialog('destroy').remove();
+            },
+            buttons: [
+                {
+                    text: "Tải lên",
+                    id: "upload_File_grid_huongdanlamhang",
+                    click: function () {
+                        let $mess = $div.find('.mess');
+                        let $btnUpload = $('#upload_File_grid_huongdanlamhang');
+                        let id_parent = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
+                        data_js.append("id_parent", id_parent);
+                        $mess.html('<img style="width:30px; height:30px" src="iconcollection/loading.gif"/>');
+                        $btnUpload.prop('disabled', true);
+                        $.ajax({
+                            url: 'Controllers/DSDH_HuongDanLamHang_Controller.ashx?action=Upload',
+                            type: 'POST',
+                            data: data_js,
+                            processData: false,
+                            contentType: false,
+                            success: function (data) {
+                                $mess.html(data);
+                                data_js = new FormData();
+                                $btnUpload.prop('disabled', false);
+
+                                if (data.lastIndexOf('error') <= -1) {
+                                    $('#grid_huongdanlamhang')[0].triggerToolbar();
+                                    $div.dialog("destroy").remove();
+                                }
+                            }
+                        });
+                    }
+                },
+                {
+                    text: "Đóng",
+                    click: function () {
+                        $(this).dialog("destroy").remove();
+                    }
+                }
+            ]
+        });
+    }
+
+    $("#grid_huongdanlamhang").jqGrid('navButtonAdd', '#grid_huongdanlamhang-pager',
+        {
+            caption: "Tải lên HDLH",
+            title: `Tải lên "hướng dẫn làm hàng"`,
+            onClickButton: function () {
+                UploadTapTingrid_huongdanlamhang();
+            }
+        }
+    );
+
+    $("#grid_huongdanlamhang").jqGrid('navButtonAdd', '#grid_huongdanlamhang-pager',
+        {
+            caption: "Gửi HDLH",
+            title: `Gửi "hướng dẫn làm hàng"`,
+            onClickButton: function () {
+                let data_js = new FormData();
+                let $div, $frmGHDLH;
+                let id_parent = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
+                let ids = $('#grid_huongdanlamhang').jqGrid('getGridParam', 'selarrrow');
+                let txt = ids.length > 1 ? 'những ' : '';
+                $div = $(`
+                    <form enctype="multipart/form-data" id="frm_Send_grid_huongdanlamhang">
+                        <div class="mess">Bạn muốn gửi ${txt}tập tin này đến NCC?</div>
+                    </form>
+                `);
+
+                $div.dialog({
+                    title: `Gửi "hướng dẫn làm hàng"`,
+                    resizeable: false,
+                    modal: true,
+                    width: 400,
+                    height: 300,
+                    open: function (event, ui) {
+                        $frmGHDLH = $('#frm_Send_grid_huongdanlamhang');
+                    },
+                    close: function (event, ui) {
+                        $(this).dialog('destroy').remove();
+                    },
+                    buttons: [
+                        {
+                            text: "Gửi NCC",
+                            id: "send_HDLH_grid_huongdanlamhang",
+                            click: function () {
+                                let $mess = $div.find('.mess');
+                                let $btnSend = $('#send_HDLH_grid_huongdanlamhang');
+                                data_js.append("id_parent", id_parent);
+                                data_js.append("id", ids.toString());
+                                $mess.html('<img style="width:30px; height:30px" src="iconcollection/loading.gif"/>');
+                                $btnSend.prop('disabled', true);
+                                $.ajax({
+                                    url: 'Controllers/DSDH_HuongDanLamHang_Controller.ashx?action=Send',
+                                    type: 'POST',
+                                    data: data_js,
+                                    processData: false,
+                                    contentType: false,
+                                    success: function (data) {
+                                        $mess.html(data);
+                                        data_js = new FormData();
+                                        $btnSend.prop('disabled', false);
+
+                                        if (data.lastIndexOf('error') <= -1) {
+                                            $('#grid_huongdanlamhang')[0].triggerToolbar();
+                                            $div.dialog("destroy").remove();
+                                        }
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            text: "Đóng",
+                            click: function () {
+                                $(this).dialog("destroy").remove();
+                            }
+                        }
+                    ]
+                });
+            }
+        }
+    );
+
+    createRightPanel('grid_huongdanlamhang');
 </script>

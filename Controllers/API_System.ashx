@@ -3,9 +3,11 @@
 using System;
 using System.IO;
 using System.Web;
+using System.Linq;
 using System.Web.Script.Serialization;
 
-public class API_System : IHttpHandler {
+public class API_System : IHttpHandler
+{
     public JavaScriptSerializer js = new JavaScriptSerializer();
     private LinqDBDataContext db = new LinqDBDataContext();
     public string emailcc = "anco@ancopottery.com,info@ancopottery.com";
@@ -41,11 +43,27 @@ public class API_System : IHttpHandler {
 
     public void downloadFile(HttpContext context)
     {
+        var ttid = context.Request.QueryString["id"];
         string name = context.Request.QueryString["name"];
-        string type = context.Request.QueryString["type"];
         string path = context.Request.QueryString["path"];
-        var remove = context.Request.QueryString["remove"] == "true";
-        path = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
+        string type = context.Request.QueryString["type"];
+        var remove = false;
+
+        if (string.IsNullOrWhiteSpace(ttid))
+        {
+            remove = context.Request.QueryString["remove"] == "true";
+            path = ExcuteSignalRStatic.mapPathSignalR($@"~/{path}");
+        }
+        else
+        {
+            var tt = db.md_taptins.Where(s => s.md_taptin_id == ttid).FirstOrDefault();
+            if (tt != null)
+            {
+                name = tt.tentaptin;
+                path = ExcuteSignalRStatic.mapPathSignalR($@"~/{tt.path}");
+            }
+        }
+
         if (File.Exists(path))
         {
             context.Response.Clear();
@@ -55,7 +73,7 @@ public class API_System : IHttpHandler {
             context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
             context.Response.WriteFile(path);
             context.Response.Flush();
-            if(remove)
+            if (remove)
                 File.Delete(path);
             context.Response.End();
         }
@@ -202,7 +220,7 @@ public class API_System : IHttpHandler {
                 context.Response.TransmitFile(url);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             context.Response.ContentType = "text/plain";
             context.Response.Write(ex.Message);
@@ -234,7 +252,7 @@ public class API_System : IHttpHandler {
                 context.Response.TransmitFile(url);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             context.Response.ContentType = "text/plain";
             context.Response.Write(ex.Message);
@@ -244,8 +262,10 @@ public class API_System : IHttpHandler {
         context.Response.End();
     }
 
-    public bool IsReusable {
-        get {
+    public bool IsReusable
+    {
+        get
+        {
             return false;
         }
     }

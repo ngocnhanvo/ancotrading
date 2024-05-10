@@ -266,5 +266,10 @@ td.DataTD textarea:disabled {
     opacity: 0.5;
 }
 
+.btnVNN {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
 
 

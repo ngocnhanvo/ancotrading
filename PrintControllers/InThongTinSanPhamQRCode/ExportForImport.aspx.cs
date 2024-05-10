@@ -48,24 +48,21 @@ public partial class PrintControllers_ExportForImport_Default : System.Web.UI.Pa
 		
 		String sql = string.Format(@"
 		select
-            sp.ma_sanpham as [Mã Số Anco1],
-	        sp.ma_sanpham as [Mã Số Anco], 
+            sp.ma_sanpham as [Mã hàng],
+	        sp.ma_sanpham as [Mã ANCO/NEXX], 
             sp.mota_tiengviet as [Mô Tả Tiếng Việt], 
             sp.mota_tienganh as [Mô Tả Tiếng Anh], 
             155 as [Định Khoản],
-	        dvt.ten_dvt as [Đơn Vị Tính],
+	        replace(replace(dvt.ten_dvt,'pc','Cái'), 'set', 'Bộ') as [Đơn Vị Tính],
 	        kd.ten_tv as [Hình dáng],
 	        '' as [Nhóm năng lực],
-	        sp.trongluong as [Trọng lượng],
+	        sp.trongluong as [Khối lượng(kg)],
 	        sp.dientich as [Diện tích],
-	        null as [Độ khó],
-	        null as [HSTT riêng],
 	        null as [CBM mặc định],
 	        null as [NCC mặc định],
-	        N'Kho hàng sau hoàn thiện' as [Kho mặc định],
-	        N'Kho tồn thành phẩm ANCO1' as [Kho tồn],
-	        null as [Quy trình (Xoay, Rót, Cán)],
-	        null as [Mua ngoài],
+	        N'Kho hàng sau hoàn thiện' as [Kho SX],
+	        N'Kho tồn thành phẩm' as [Kho tồn],
+	        N'Xưởng Hoàn Thiện' as [Xưởng SX],
             N'VAT10' as [Thuế],
 	        0 as [Bán thành phẩm],
 	        null as [Nơi giao hàng],
@@ -102,15 +99,11 @@ public partial class PrintControllers_ExportForImport_Default : System.Web.UI.Pa
             {
                 rowHeader.CreateCell(i).SetCellValue(col.ColumnName);
                 s1.SetColumnWidth(i, 4000);
-                if (new int[] { 0, 1, 6, 7, 16, 20, 21 }.Contains(i))
-                {
-                    s1.SetColumnWidth(i, 4000);
-                }
-                else if (new int[] { 2, 3, 14, 15 }.Contains(i))
+                if (new int[] { 2, 3, 12, 13 }.Contains(i))
                 {
                     s1.SetColumnWidth(i, 7000);
                 }
-                else if (new int[] { 4, 5, 8, 9, 10, 11, 12, 13, 17, 18, 19, 22, 23, 24 }.Contains(i))
+                else if (new int[] { 4, 5, 8, 9, 10, 11, 16, 17, 19, 20, 21 }.Contains(i))
                 {
                     s1.SetColumnWidth(i, 2500);
                 }
@@ -137,17 +130,23 @@ public partial class PrintControllers_ExportForImport_Default : System.Web.UI.Pa
                 rowDetails.GetCell(8).CellStyle = cellNumber2;
                 rowDetails.CreateCell(9).SetCellValue(double.Parse(row[9].ToString()));
                 rowDetails.GetCell(9).CellStyle = cellNumber3;
-                rowDetails.CreateCell(14).SetCellValue(row[14].ToString());
+				//rowDetails.CreateCell(10).SetCellValue(double.Parse(row[10].ToString()));
+                //rowDetails.GetCell(10).CellStyle = cellNumber3;
+				//rowDetails.CreateCell(11).SetCellValue(row[11].ToString());
+				rowDetails.CreateCell(12).SetCellValue(row[12].ToString());
+				rowDetails.CreateCell(13).SetCellValue(row[13].ToString());
+                //rowDetails.CreateCell(14).SetCellValue(row[14].ToString());
                 rowDetails.CreateCell(15).SetCellValue(row[15].ToString());
-                rowDetails.CreateCell(18).SetCellValue(row[18].ToString());
+                rowDetails.CreateCell(16).SetCellValue(double.Parse(row[16].ToString()));
+                rowDetails.GetCell(16).CellStyle = cellNumber0;
+                //rowDetails.CreateCell(17).SetCellValue(row[17].ToString());
+                //rowDetails.CreateCell(18).SetCellValue(row[18].ToString());
                 rowDetails.CreateCell(19).SetCellValue(double.Parse(row[19].ToString()));
-                rowDetails.GetCell(19).CellStyle = cellNumber0;
-                rowDetails.CreateCell(22).SetCellValue(double.Parse(row[22].ToString()));
-                rowDetails.GetCell(22).CellStyle = cellNumber1;
-                rowDetails.CreateCell(23).SetCellValue(double.Parse(row[23].ToString()));
-                rowDetails.GetCell(23).CellStyle = cellNumber1;
-                rowDetails.CreateCell(24).SetCellValue(double.Parse(row[24].ToString()));
-                rowDetails.GetCell(24).CellStyle = cellNumber1;
+                rowDetails.GetCell(19).CellStyle = cellNumber1;
+                rowDetails.CreateCell(20).SetCellValue(double.Parse(row[20].ToString()));
+                rowDetails.GetCell(20).CellStyle = cellNumber1;
+                rowDetails.CreateCell(21).SetCellValue(double.Parse(row[21].ToString()));
+                rowDetails.GetCell(21).CellStyle = cellNumber1;
                 iRow++;
             }
             Button1.Visible = true;

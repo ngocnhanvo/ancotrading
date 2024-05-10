@@ -100,6 +100,11 @@
                     , "PrintControllers/0BaoCaoKH/rpt_tongHopPOvaINVTheoThang.aspx"
                     , nam, thang, doitackinhdoanh_id, null, thongketheo);
                 break;
+            case 1006:
+                actionKhachHang("Báo cáo trị giá các đơn hàng"
+                    , "PrintControllers/0BaoCaoKH/rpt_baoCaoTriGiaCacDonHang.aspx"
+                    , startdate, enddate, doitackinhdoanh_id, null, thongketheo);
+                break;
             case 100:
                 actionKhachHang("Tổng hợp khiếu nại"
                     , "PrintControllers/InTongHopKhieuNai/"
@@ -300,6 +305,11 @@
                 $("#thangBCKH", frmID).parent().parent().css({ "display": "" });
                 $("#tungay", frmID).css({ "display": "none" });
                 $("#denngay", frmID).css({ "display": "none" });
+                break;
+            case 1006:
+                $('#lblReportNameKH').html("Báo cáo trị giá các đơn hàng");
+                $("#tungay", frmID).css({ "display": "" });
+                $("#denngay", frmID).css({ "display": "" });
                 break;
 
             case 100:

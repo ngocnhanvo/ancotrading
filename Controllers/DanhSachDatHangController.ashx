@@ -124,9 +124,18 @@ public class DanhSachDatHangController : IHttpHandler
                         else
                         {
                             if (a.trangthai != "CHUAGUI" & !string.IsNullOrEmpty(a.trangthai))
+                            {
                                 a.trangthai = "TUCHOI";
+                                var taptins = db.md_taptins.Where(s => s.lienket == a.c_danhsachdathang_id & s.trangthai != "CHUAGUI").ToList();
+                                foreach (var taptin in taptins)
+                                {
+                                    taptin.trangthai = "CHUAGUI";
+                                }
+                            }
                             else
+                            {
                                 a.trangthai = "CHUAGUI";
+                            }
                         }
                     }
 
@@ -1181,18 +1190,42 @@ public class DanhSachDatHangController : IHttpHandler
 
     public void del(HttpContext context)
     {
+        var msg = "";
         String id = context.Request.Form["id"];
         var ds = db.c_danhsachdathangs.Single(p => p.c_danhsachdathang_id.Equals(id));
         bool duocXoa = Public.LaNguoiTao(context, ds.nguoitao, db);
+
         if (ds.md_trangthai_id.Equals("HIEULUC"))
         {
-            jqGridHelper.Utils.writeResult(0, "Không thể xóa khi đặt hàng đã hiệu lực.!");
+            msg = $@"Không thể xóa khi đặt hàng đã hiệu lực.!";
+            goto EndEventHandler;
         }
-        else if (duocXoa == false)
+
+        if (ds.trangthai.Equals("DAGUI"))
         {
-            jqGridHelper.Utils.writeResult(0, string.Format(@"Chỉ tài khoản {0} hoặc admin mới có thể xóa.!", ds.nguoitao));
+            msg = $@"Đã gửi NCC.!";
+            goto EndEventHandler;
         }
-        else
+
+        if (ds.trangthai.Equals("DANHAN"))
+        {
+            msg = $@"Đã gửi NCC và NCC đã xem.!";
+            goto EndEventHandler;
+        }
+
+        if (ds.trangthai.Equals("DAHIEULUC"))
+        {
+            msg = $@"Đã gửi NCC và NCC đã nhận.!";
+            goto EndEventHandler;
+        }
+
+        if (!duocXoa)
+        {
+            msg = $@"Chỉ tài khoản {ds.nguoitao} hoặc admin mới có thể xóa.!";
+            goto EndEventHandler;
+        }
+
+        try
         {
             var ct = from p in db.c_dongdsdhs
                      where p.c_danhsachdathang_id == ds.c_danhsachdathang_id
@@ -1201,10 +1234,42 @@ public class DanhSachDatHangController : IHttpHandler
             var pds = from p in db.c_phidathangs
                       where p.c_danhsachdathang_id == ds.c_danhsachdathang_id
                       select p;
+            //Xoa Dong Hang
             db.c_dongdsdhs.DeleteAllOnSubmit(ct);
+            //Xoa Phi dat hang
             db.c_phidathangs.DeleteAllOnSubmit(pds);
+            //Xoa Huong dan lam hang
+            var links = new List<string>();
+            var taptins = db.md_taptins.Where(s => s.lienket == ds.c_danhsachdathang_id).ToList();
+            foreach (var taptin in taptins)
+            {
+                db.md_taptins.DeleteOnSubmit(taptin);
+                links.Add(ExcuteSignalRStatic.mapPathSignalR($@"~/{taptin.path}"));
+            }
+            //Xoa Don dat hang
             db.c_danhsachdathangs.DeleteOnSubmit(ds);
+            //Cap nhat
             db.SubmitChanges();
+            foreach (var link in links)
+            {
+                if (File.Exists(link))
+                    File.Delete(link);
+            }
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+    EndEventHandler:;
+
+        if(msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa thành công.!");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
         }
     }
 
