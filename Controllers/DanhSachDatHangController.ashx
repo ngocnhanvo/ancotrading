@@ -1201,23 +1201,26 @@ public class DanhSachDatHangController : IHttpHandler
             goto EndEventHandler;
         }
 
-        if (ds.trangthai.Equals("DAGUI"))
+		if (!string.IsNullOrEmpty(ds.trangthai))
         {
-            msg = $@"Đã gửi NCC.!";
-            goto EndEventHandler;
-        }
+			if (ds.trangthai.Equals("DAGUI"))
+			{
+				msg = $@"Đã gửi NCC.!";
+				goto EndEventHandler;
+			}
 
-        if (ds.trangthai.Equals("DANHAN"))
-        {
-            msg = $@"Đã gửi NCC và NCC đã xem.!";
-            goto EndEventHandler;
-        }
+			if (ds.trangthai.Equals("DANHAN"))
+			{
+				msg = $@"Đã gửi NCC và NCC đã xem.!";
+				goto EndEventHandler;
+			}
 
-        if (ds.trangthai.Equals("DAHIEULUC"))
-        {
-            msg = $@"Đã gửi NCC và NCC đã nhận.!";
-            goto EndEventHandler;
-        }
+			if (ds.trangthai.Equals("DAHIEULUC"))
+			{
+				msg = $@"Đã gửi NCC và NCC đã nhận.!";
+				goto EndEventHandler;
+			}
+		}
 
         if (!duocXoa)
         {
