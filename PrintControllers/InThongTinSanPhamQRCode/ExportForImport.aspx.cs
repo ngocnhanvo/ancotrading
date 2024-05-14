@@ -53,7 +53,7 @@ public partial class PrintControllers_ExportForImport_Default : System.Web.UI.Pa
             sp.mota_tiengviet as [Mô Tả Tiếng Việt], 
             sp.mota_tienganh as [Mô Tả Tiếng Anh], 
             155 as [Định Khoản],
-	        replace(replace(dvt.ten_dvt,'pc','Cái'), 'set', 'Bộ') as [Đơn Vị Tính],
+	        replace(replace(dvt.ten_dvt,'pc',N'Cái'), 'set', N'Bộ') as [Đơn Vị Tính],
 	        kd.ten_tv as [Hình dáng],
 	        '' as [Nhóm năng lực],
 	        sp.trongluong as [Khối lượng(kg)],
