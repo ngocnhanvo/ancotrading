@@ -481,7 +481,7 @@ public class PhaiChiController : IHttpHandler
 
         string manv = context.User.Identity.Name;
         if (manv == "quangtrung")
-            filter = " and dtkd.ma_dtkd = N'ANCO1'";
+            filter += " and dtkd.ma_dtkd = N'ANCO1' ";
 
         String sqlCount = string.Format(@"
 			SELECT COUNT(1) AS count 
