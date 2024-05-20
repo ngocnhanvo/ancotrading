@@ -329,17 +329,17 @@ public class PhaiChiController : IHttpHandler
             c_thuchi mnu = db.c_thuchis.Single(p => p.c_thuchi_id == context.Request.Form["id"]);
             if (mnu.md_trangthai_id.Equals("SOANTHAO"))
             {
-				var dtkdId = context.Request.Form["md_doitackinhdoanh_id"];
-				var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dtkdId).FirstOrDefault();
+                var dtkdId = context.Request.Form["md_doitackinhdoanh_id"];
+                var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dtkdId).FirstOrDefault();
                 var idVal = new string[] { "", "" };
                 if(dtkd != null)
                 {
                     idVal[0] = dtkd.md_doitackinhdoanh_id;
                     idVal[1] = dtkd.ma_dtkd;
                 }
-				
+
                 mnu.md_doitackinhdoanh_id = idVal[0];
-				mnu.doitacValue = idVal[1];
+                mnu.doitacValue = idVal[1];
                 mnu.ngaylapphieu = DateTime.ParseExact(context.Request.Form["ngaylapphieu"], "dd/MM/yyyy", null);
                 mnu.nguoi_giaonop = context.Request.Form["nguoi_giaonop"];
                 mnu.ngay_giaonop = DateTime.ParseExact(context.Request.Form["ngay_giaonop"], "dd/MM/yyyy", null);
@@ -479,16 +479,20 @@ public class PhaiChiController : IHttpHandler
             filter = f.ToScript();
         }
 
+        string manv = context.User.Identity.Name;
+        if (manv == "quangtrung")
+            filter = " and dtkd.ma_dtkd = N'ANCO1'";
+
         String sqlCount = string.Format(@"
 			SELECT COUNT(1) AS count 
 			FROM c_thuchi tc
 			left join md_doitackinhdoanh dtkd on tc.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
 			left join md_dongtien dt on tc.md_dongtien_id = dt.md_dongtien_id
 			left join md_loaichungtu lct on tc.md_loaichungtu_id = lct.md_loaichungtu_id
-            WHERE 1=1 AND tc.ispaymentin = 0 {0}", 
-			filter
-		);
-		
+            WHERE 1=1 AND tc.ispaymentin = 0 {0}",
+            filter
+        );
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -538,8 +542,8 @@ public class PhaiChiController : IHttpHandler
 				1=1
 				AND tc.ispaymentin = 0 {2}
             )P 
-			WHERE RowNum > @start AND RowNum < @end", 
-			sidx, sord, filter);
+			WHERE RowNum > @start AND RowNum < @end",
+            sidx, sord, filter);
 
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
