@@ -100,7 +100,7 @@ public class ProductWebController : IHttpHandler
                         titleSubWeb = ""
                     });
                 }
-                
+
                 goto end;
             }
 
@@ -117,22 +117,20 @@ public class ProductWebController : IHttpHandler
 
                         foreach (var dklsp in arrDieuKienLocSP2)
                         {
-                            string sql = string.Format(@"
-                                select 
+                            var emp1 = employer == "" ? "top 1" : "";
+                            var emp2 = employer == "true" ? "" : "AND sp.website = 1";
+                            string sql = $@"
+                                select {emp1}
                                     sp.ma_sanpham, sp.md_kieudang_id, sp.inoutdoorWeb
                                 from 
                                     md_sanpham sp
                                 where 1=1
                                     AND sp.hoatdong = 1
                                     AND sp.trangthai in ('DHD')
-                                    AND sp.ma_sanpham like N'{0}'
-                                    AND sp.ma_sanpham = N'{1}'
-                                    {2}
-                                ",
-                                dklsp,
-                                code,
-                                employer == "true" ? "" : "AND sp.website = 1"
-                            );
+                                    AND sp.ma_sanpham like N'{dklsp}'
+                                    AND sp.ma_sanpham = N'{code}'
+                                    {emp2}
+                            ";
 
                             var dt = mdbc.GetData(sql);
                             foreach (DataRow row in dt.Rows)
