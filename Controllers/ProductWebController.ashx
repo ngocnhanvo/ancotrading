@@ -105,7 +105,7 @@ public class ProductWebController : IHttpHandler
             }
 
             var menuWeb = CustomizeObjects.getMenuProductsWeb();
-
+            var emp1 = employer == "" ? "top 1" : "";
             if (isCode)
             {
                 var spsDTs = new List<productCatalog>();
@@ -117,7 +117,6 @@ public class ProductWebController : IHttpHandler
 
                         foreach (var dklsp in arrDieuKienLocSP2)
                         {
-                            var emp1 = employer == "" ? "top 1" : "";
                             var emp2 = employer == "true" ? "" : "AND sp.website = 1";
                             string sql = $@"
                                 select {emp1}
@@ -193,19 +192,17 @@ public class ProductWebController : IHttpHandler
 
                 foreach (var dklsp in arrDieuKienLocSP)
                 {
-                    string sql = string.Format(@"
-                    select 
-                        sp.ma_sanpham, sp.md_kieudang_id, sp.inoutdoorWeb
-                    from 
-                        md_sanpham sp
-                    where 1=1
-                        AND sp.hoatdong = 1 
-                        AND sp.website = 1 
-                        AND sp.trangthai in ('DHD')
-                        AND sp.ma_sanpham like N'{0}'
-                    ",
-                        dklsp
-                    );
+                    string sql = $@"
+                        select {emp1}
+                            sp.ma_sanpham, sp.md_kieudang_id, sp.inoutdoorWeb
+                        from 
+                            md_sanpham sp
+                        where 1=1
+                            AND sp.hoatdong = 1 
+                            AND sp.website = 1 
+                            AND sp.trangthai in ('DHD')
+                            AND sp.ma_sanpham like N'{dklsp}'
+                    ";
 
                     var dt = mdbc.GetData(sql);
                     foreach (DataRow row in dt.Rows)
@@ -223,18 +220,16 @@ public class ProductWebController : IHttpHandler
             }
             else if(isKey)
             {
-                string sql = string.Format(@"
-                    select 
+                string sql = $@"
+                    select {emp1}
                         sp.ma_sanpham, sp.md_kieudang_id, sp.inoutdoorWeb
                     from 
                         md_sanpham sp
                     where 1=1
                         AND sp.hoatdong = 1
                         AND sp.trangthai in ('DHD')
-                        AND sp.ma_sanpham like N'{0}'
-                    ",
-                    key
-                );
+                        AND sp.ma_sanpham like N'{key}'
+                ";
 
                 var dt = mdbc.GetData(sql);
                 foreach (DataRow row in dt.Rows)
