@@ -203,8 +203,9 @@ public class API_System : IHttpHandler
         try
         {
             var msp = context.Request.QueryString["msp"];
+			var notimg = context.Request.QueryString["notimg"] == "true";
             var showlink = context.Request.QueryString["showlink"] == "true";
-            var path = ExcuteSignalRStatic.getImageProduct(msp);
+            var path = ExcuteSignalRStatic.getImageProduct(msp, notimg);
             var url = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
             var lastIndex = url.LastIndexOf(".");
             var mimeType = url.Substring(lastIndex + 1).ToLower();
