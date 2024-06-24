@@ -217,7 +217,7 @@ public static class ExcuteSignalRStatic
         return image;
     }
 
-    public static string getImageProduct(string msp)
+    public static string getImageProduct(string msp, bool notimg = false)
     {
         string image = "";
         try
@@ -250,13 +250,21 @@ public static class ExcuteSignalRStatic
                     image = Public.imgProduct + image;
                 }
 
-                if (!File.Exists(mapPathSignalR("~/" + image)))
-                    image = Public.imgNotFound;
+                if (!File.Exists(mapPathSignalR("~/" + image))) 
+				{
+					if(notimg)
+						image = Public.imgNotFound_notimg;
+					else
+						image = Public.imgNotFound;
+				}
             }
         }
         catch
         {
-            image = Public.imgNotFound;
+			if(notimg)
+				image = Public.imgNotFound_notimg;
+			else
+				image = Public.imgNotFound;
         }
 
         return image;
