@@ -402,11 +402,15 @@ public static class UserUtils
                 giaNhap2BD = -1;
 
             decimal discount = 0;
+            if (donhang.phanbodiscount.GetValueOrDefault(false))
+            {
+                discount = donhang.discount.GetValueOrDefault(0) > 0 ? donhang.discount.GetValueOrDefault(0) : (decimal)ddonhang.discount.GetValueOrDefault(0);
+            }
+
             if (giaNhap2BD > -1)
             {
                 if (donhang.phanbodiscount.GetValueOrDefault(false))
                 {
-                    discount = donhang.discount.GetValueOrDefault(0) > 0 ? donhang.discount.GetValueOrDefault(0) : (decimal)ddonhang.discount.GetValueOrDefault(0);
                     gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, discount, 0, db);
                 }
                 else
@@ -433,7 +437,6 @@ public static class UserUtils
             if(ma_dtkd_select == "ANBINH" & sp.ma_sanpham.StartsWith("88-"))
             {
                 giachuan = (ddonhang.giafob.Value - ddonhang.giafob.Value * discount / 100) * (decimal)0.8 * 23000;
-                throw new Exception(ddonhang.giafob.Value.ToString() + "," + discount);
                 giachuan = jqGridHelper.Utils.Round5(giachuan, -2);
                 gianhap = giachuan + jqGridHelper.Utils.Round5(phiDiscount * 23000, -2);
                 gianhap = jqGridHelper.Utils.Round5(gianhap, -2);
