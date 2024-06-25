@@ -430,9 +430,9 @@ public static class UserUtils
                 gianhap = jqGridHelper.Utils.Round5(gianhap + phiDiscount * tygia, -2);
             }
 
-            if(maNCC == "ANBINH" & sp.ma_sanpham.StartsWith("88-"))
+            if(ma_dtkd_select == "ANBINH" & sp.ma_sanpham.StartsWith("88-"))
             {
-                giachuan = (ddonhang.giafob.Value - ddonhang.giafob.Value * discount / 100) * 80/100 * 23000;
+                giachuan = (ddonhang.giafob.Value - ddonhang.giafob.Value * discount / 100) * (decimal)0.8 * 23000;
                 giachuan = jqGridHelper.Utils.Round5(giachuan, -2);
                 gianhap = giachuan + jqGridHelper.Utils.Round5(phiDiscount * 23000, -2);
                 gianhap = jqGridHelper.Utils.Round5(gianhap, -2);
