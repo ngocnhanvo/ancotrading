@@ -433,7 +433,7 @@ public static class UserUtils
             if(ma_dtkd_select == "ANBINH" & sp.ma_sanpham.StartsWith("88-"))
             {
                 giachuan = (ddonhang.giafob.Value - ddonhang.giafob.Value * discount / 100) * (decimal)0.8 * 23000;
-                throw new Exception(giachuan.ToString());
+                throw new Exception(ddonhang.giafob.Value.ToString() + "," + discount);
                 giachuan = jqGridHelper.Utils.Round5(giachuan, -2);
                 gianhap = giachuan + jqGridHelper.Utils.Round5(phiDiscount * 23000, -2);
                 gianhap = jqGridHelper.Utils.Round5(gianhap, -2);
