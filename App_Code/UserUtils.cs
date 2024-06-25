@@ -401,7 +401,7 @@ public static class UserUtils
             if (maNCC == "ANCO1" & coGiaMua)
                 giaNhap2BD = -1;
 
-            decimal discount = 0;
+            decimal discount = donhang.discount.GetValueOrDefault(0);
             if (donhang.phanbodiscount.GetValueOrDefault(false))
             {
                 discount = donhang.discount.GetValueOrDefault(0) > 0 ? donhang.discount.GetValueOrDefault(0) : (decimal)ddonhang.discount.GetValueOrDefault(0);
