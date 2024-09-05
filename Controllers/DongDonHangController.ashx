@@ -529,7 +529,7 @@ public class DongDonHangController : IHttpHandler
                 left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
                 left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id
                 left join md_doitackinhdoanh dtkd on ddh.nhacungungid = dtkd.md_doitackinhdoanh_id
-            AND dh.c_donhang_id = N'{0}' {1}",
+            WHERE dh.c_donhang_id = N'{0}' {1}",
             poId != null ? poId : "0",
             filter
         );

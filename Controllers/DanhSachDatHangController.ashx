@@ -19,10 +19,10 @@ public class DanhSachDatHangController : IHttpHandler
     public String productImagePath = HttpContext.Current.Server.MapPath("~/images/products/fullsize/");
 
     public List<Dictionary<string, string>> msgPublics = new List<Dictionary<string, string>> {
-        //new Dictionary<string, string>()
-        //{
-        //    { "ANCO1", "" },
-        //},
+        new Dictionary<string, string>()
+        {
+            { "ANCO1", "" },
+        },
         new Dictionary<string, string>()
         {
             { "ANHIEPLUC", "" },
@@ -1201,26 +1201,26 @@ public class DanhSachDatHangController : IHttpHandler
             goto EndEventHandler;
         }
 
-		if (!string.IsNullOrEmpty(ds.trangthai))
+        if (!string.IsNullOrEmpty(ds.trangthai))
         {
-			if (ds.trangthai.Equals("DAGUI"))
-			{
-				msg = $@"Đã gửi NCC.!";
-				goto EndEventHandler;
-			}
+            if (ds.trangthai.Equals("DAGUI"))
+            {
+                msg = $@"Đã gửi NCC.!";
+                goto EndEventHandler;
+            }
 
-			if (ds.trangthai.Equals("DANHAN"))
-			{
-				msg = $@"Đã gửi NCC và NCC đã xem.!";
-				goto EndEventHandler;
-			}
+            if (ds.trangthai.Equals("DANHAN"))
+            {
+                msg = $@"Đã gửi NCC và NCC đã xem.!";
+                goto EndEventHandler;
+            }
 
-			if (ds.trangthai.Equals("DAHIEULUC"))
-			{
-				msg = $@"Đã gửi NCC và NCC đã nhận.!";
-				goto EndEventHandler;
-			}
-		}
+            if (ds.trangthai.Equals("DAHIEULUC"))
+            {
+                msg = $@"Đã gửi NCC và NCC đã nhận.!";
+                goto EndEventHandler;
+            }
+        }
 
         if (!duocXoa)
         {

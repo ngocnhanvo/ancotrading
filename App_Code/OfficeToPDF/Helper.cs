@@ -61,6 +61,19 @@ public static class Helper
         return a;
     }
 
+    public static string load_number(string number, int number_length)
+    {
+        int dodai = number_length - number.Length;
+        string kq = "";
+        for (int i = 0; i < dodai; i++)
+        {
+            kq += "0";
+        }
+        kq += number;
+
+        return kq;
+    }
+
     public static System.Collections.Generic.Dictionary<string, string> pathReport(string name)
     {
         name = name.Replace("/", "-");

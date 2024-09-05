@@ -694,9 +694,12 @@ public class Objects
             for (int i = 0; i < detailsCount; i++)
             {
                 var rowTTDT = rowTT + 5 + i;
+                var maspM = dtDetails.Rows[i]["ma_sanpham"].ToString();
                 try
                 {
-                    String imgPath = Path.Combine(productImagePath, dtDetails.Rows[i]["pic"].ToString() + ".jpg");
+                    //String imgPath = Path.Combine(productImagePath, dtDetails.Rows[i]["pic"].ToString() + ".jpg");
+                    var path = ExcuteSignalRStatic.getImageProduct(maspM);
+                    var imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
                     System.Drawing.Image image = System.Drawing.Image.FromFile(imgPath);
                     MemoryStream ms = new MemoryStream();
                     image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
@@ -712,7 +715,7 @@ public class Objects
                 { }
 
                 
-                s1.CreateRow(rowTTDT).CreateCell(0).SetCellValue(dtDetails.Rows[i]["ma_sanpham"].ToString());
+                s1.CreateRow(rowTTDT).CreateCell(0).SetCellValue(maspM);
                 s1.GetRow(rowTTDT).HeightInPoints = 50;
                 s1.GetRow(rowTTDT).CreateCell(1).SetCellValue("");
                 s1.GetRow(rowTTDT).CreateCell(2).SetCellValue(dtDetails.Rows[i]["mota_tienganh"].ToString());

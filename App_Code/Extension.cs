@@ -354,4 +354,12 @@ public static class Extension
 
         return onlyTrim ? a.Trim() : a.Replace(" ", "");
     }
+
+    public static int? ToNullableInt(this string s)
+    {
+        if (!string.IsNullOrWhiteSpace(s))
+            return int.Parse(s);
+        else
+            return null;
+    }
 }

@@ -766,9 +766,11 @@
                     $('#grid_ds_chitietdathang').jqGrid('getGridParam', 'postData').poId = ids;
                     $('#grid_phidathang').jqGrid('getGridParam', 'postData').poId = ids;
                     $('#grid_huongdanlamhang').jqGrid('getGridParam', 'postData').poId = ids;
+                    $('#grid_huongdanlamhang2').jqGrid('getGridParam', 'postData').poId = ids;
                     $('#grid_ds_chitietdathang')[0].triggerToolbar();
                     $('#grid_phidathang')[0].triggerToolbar();
                     $('#grid_huongdanlamhang')[0].triggerToolbar();
+                    $('#grid_huongdanlamhang2')[0].triggerToolbar();
 				},10);
 			}"
         runat="server" />
@@ -779,6 +781,7 @@
             <li><a href="#dathang-details">Các dòng đặt hàng</a></li>
             <li><a href="#phidathang-details">Các khoản phí</a></li>
             <li><a href="#huongdanlamhang-details">Hướng dẫn làm hàng</a></li>
+            <li><a href="#huongdanlamhang2-details">Hướng dẫn làm hàng (Ghi chú)</a></li>
         </ul>
         <div id="dathang-details">
             <uc1:jqGrid ID="grid_ds_chitietdathang"
@@ -1461,6 +1464,173 @@
             }"
                 runat="server" />
         </div>
+
+        <div id="huongdanlamhang2-details">
+            <uc1:jqGrid ID="grid_huongdanlamhang2"
+                SortName="ngaytao"
+                SortOrder="ASC"
+                UrlFileAction="Controllers/DSDH_HuongDanLamHang2_Controller.ashx"
+                RowNumbers="true"
+                OndblClickRow="
+                function(rowid) {
+                    $('#edit_grid_huongdanlamhang2').click();
+                }
+            "
+                ColModel="
+            [
+                {
+                    name: 'md_ghichuhdlh_id'
+                    , label: 'md_ghichuhdlh_id'
+                    , index: 'md_ghichuhdlh_id'
+                    , fixed:true 
+                    , width: 100
+                    , hidden: true 
+                    , editable:true
+                    , edittype: 'text'
+                    , key: true
+                },
+                {
+                    name: 'ghichu'
+                    , label: 'Ghi chú thêm'
+                    , index: 'tt.ghichu'
+                    , fixed:true 
+                    , width: 140
+                    , edittype: 'textarea'
+                    , editable: true
+                    , hidden: false
+                },
+                {
+                    name: 'ngaytao'
+                    , label: 'Ngày tạo'
+                    , index: 'tt.ngaytao'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: false 
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
+                    name: 'nguoitao'
+                    , label: 'Người tạo'
+                    , index: 'tt.nguoitao'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: false 
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
+                    name: 'ngaycapnhat'
+                    , label: 'Ngày gửi'
+                    , index: 'tt.ngaycapnhat'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: false
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
+                    name: 'nguoicapnhat'
+                    , label: 'Người gửi'
+                    , index: 'tt.nguoicapnhat'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: true 
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
+                    name: 'mota'
+                    , label: 'Mô tả'
+                    , index: 'tt.mota'
+                    , fixed:true 
+                    , width: 100
+                    , editable:true
+                    , editstyle: 'height:100px'
+                    , edittype: 'textarea'
+                    , hidden: true
+                },
+                {
+                    name: 'trangthai'
+                    , label: 'Trạng thái'
+                    , index: 'tt.trangthai'
+                    , fixed:true 
+                    , width: 100
+                    , editable: false
+                    , align: 'center'
+                }
+            ]"
+                GridComplete="let o = $(this).parent().parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 97);$(this).setGridWidth($(o).width())"
+                FilterToolbar="true"
+                Height="150"
+                MultiSelect="false"
+                ShowAdd="true"
+                ShowEdit="true"
+                ShowDel="<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
+                AddFormOptions="
+                beforeShowForm: function (formid) {
+                    let masterId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
+                    let forId = 'c_danhsachdathang_id';
+                    if(masterId == null)
+                    {
+                        $(formid).parent().parent().parent().dialog('destroy').remove();
+                        alert('Hãy chọn một đơn hàng mới có thể tạo chi tiết.!');
+                    }
+                    else{
+                        formid.closest('div.ui-jqdialog').dialogCenter();
+                    }
+                }, 
+                beforeSubmit:function(postdata, formid) {
+                    let masterId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
+                    let forId = 'c_danhsachdathang_id';
+                    if(masterId == null)
+                    {
+                        $(formid).parent().parent().parent().dialog('destroy').remove();
+                        return [false,'Hãy chọn một đơn hàng mới có thể tạo chi tiết.!!'];
+                    }
+                    else {
+                        postdata.c_danhsachdathang_id = masterId;
+                        return [true,'']; 
+                    }
+                }, 
+                afterSubmit: function(rs, postdata){
+                   return showMsgDialog(rs);
+                }
+            "
+                EditFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                afterSubmit: function(rs, postdata) {
+                   return showMsgDialog(rs);
+                },
+                errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+                }"
+                ViewFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+            }"
+                DelFormOptions="
+                beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                },
+                afterSubmit: function(rs, postdata) { 
+                    return showMsgDialog(rs); 
+            }"
+                runat="server" />
+        </div>
     </div>
 </div>
 
@@ -1498,208 +1668,6 @@
 </script>
 
 <script type="text/javascript" id="script_grid_huongdanlamhang">
-    function UploadTapTingrid_huongdanlamhang() {
-        let data_js = new FormData();
-        let $div, $frmGHDLH;
-        $div = $(`
-            <form  enctype="multipart/form-data" id="frm_File_grid_huongdanlamhang">
-                <div class="mess"></div>
-                <input type="button" onclick="$(this).next().click();" value="Chọn tập tin" />
-                <input type="file" style="display:none" multiple accept=".jpg,.png,.xls,.xlsx,.doc,.docx,.pdf,.ppt" />
-            </form>
-        `);
-        
-        $div.dialog({
-            title: `Tải lên "hướng dẫn làm hàng"`,
-            resizeable: false,
-            modal: true,
-            width: 400,
-            height: 300,
-            open: function (event, ui) {
-                $frmGHDLH = $('#frm_File_grid_huongdanlamhang');
-                let $fileInput = $frmGHDLH.find('input[type="file"]');
-                let $mess = $frmGHDLH.find('.mess');
-                let $table;
-
-                $fileInput.change(function () {
-                    let files = $(this)[0].files;
-                    let messFile = '';
-                    for (let i = 0; i < files.length; i++) {
-                        let file = files[i];
-                        let spanRemove = $(`span.btnVNN[fileN="${file.name}"]`);
-                        if (spanRemove.attr('fileN') != null) {
-                            spanRemove.click();
-                        }
-
-                        messFile += `
-                            <tr class="rowFile" style="height: 25px;">
-                                <td>${file.name} (${file.size} Byte)</td>
-                                <td style="text-align:center"><span class="btnVNN" fileI="${i}" fileN="${file.name}">X</span></td>
-                            </tr>`;
-
-                        data_js.append('hinhanh' + i, file);
-                    }
-
-                    $table = $frmGHDLH.find('table');
-                    if ($table.prop('tagName') == null) {
-                        messFile = `
-                            <table style="width:100%">
-                                <tr style="height: 25px;">
-                                    <td style="font-weight:bold">Tên</td>
-                                    <td style="font-weight:bold; text-align:center;"><a class="btnVNN">Xóa</a></td>
-                                </tr>
-                                ${messFile}
-                            </table>
-                        `;
-                        $mess.html(messFile);
-                        $table = $frmGHDLH.find('table');
-                    }
-                    else {
-                        $table.append(messFile);
-                    }
-
-                    $('span.btnVNN').off('click');
-                    $('span.btnVNN').click(function () {
-                        let index = $(this).attr('fileI');
-                        $(this).parent().parent().remove();
-                        data_js.delete('hinhanh' + index);
-                        if ($('tr.rowFile').length <= 0) {
-                            $table.remove();
-                        }
-                    });
-
-                    $('a.btnVNN').off('click');
-                    $('a.btnVNN').click(function () {
-                        let index = $(this).attr('fileI');
-                        $(this).parent().parent().remove();
-                        $('span.btnVNN').click();
-                    });
-
-                    $(this).val('');
-                });
-            },
-            close: function (event, ui) {
-                $(this).dialog('destroy').remove();
-            },
-            buttons: [
-                {
-                    text: "Tải lên",
-                    id: "upload_File_grid_huongdanlamhang",
-                    click: function () {
-                        let $mess = $div.find('.mess');
-                        let $btnUpload = $('#upload_File_grid_huongdanlamhang');
-                        let id_parent = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
-                        data_js.append("id_parent", id_parent);
-                        $mess.html('<img style="width:30px; height:30px" src="iconcollection/loading.gif"/>');
-                        $btnUpload.prop('disabled', true);
-                        $.ajax({
-                            url: 'Controllers/DSDH_HuongDanLamHang_Controller.ashx?action=Upload',
-                            type: 'POST',
-                            data: data_js,
-                            processData: false,
-                            contentType: false,
-                            success: function (data) {
-                                $mess.html(data);
-                                data_js = new FormData();
-                                $btnUpload.prop('disabled', false);
-
-                                if (data.lastIndexOf('error') <= -1) {
-                                    $('#grid_huongdanlamhang')[0].triggerToolbar();
-                                    $div.dialog("destroy").remove();
-                                }
-                            }
-                        });
-                    }
-                },
-                {
-                    text: "Đóng",
-                    click: function () {
-                        $(this).dialog("destroy").remove();
-                    }
-                }
-            ]
-        });
-    }
-
-    $("#grid_huongdanlamhang").jqGrid('navButtonAdd', '#grid_huongdanlamhang-pager',
-        {
-            caption: "Tải lên HDLH",
-            title: `Tải lên "hướng dẫn làm hàng"`,
-            onClickButton: function () {
-                UploadTapTingrid_huongdanlamhang();
-            }
-        }
-    );
-
-    $("#grid_huongdanlamhang").jqGrid('navButtonAdd', '#grid_huongdanlamhang-pager',
-        {
-            caption: "Gửi HDLH",
-            title: `Gửi "hướng dẫn làm hàng"`,
-            onClickButton: function () {
-                let data_js = new FormData();
-                let $div, $frmGHDLH;
-                let id_parent = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
-                let ids = $('#grid_huongdanlamhang').jqGrid('getGridParam', 'selarrrow');
-                let txt = ids.length > 1 ? 'những ' : '';
-                $div = $(`
-                    <form enctype="multipart/form-data" id="frm_Send_grid_huongdanlamhang">
-                        <div class="mess">Bạn muốn gửi ${txt}tập tin này đến NCC?</div>
-                    </form>
-                `);
-
-                $div.dialog({
-                    title: `Gửi "hướng dẫn làm hàng"`,
-                    resizeable: false,
-                    modal: true,
-                    width: 400,
-                    height: 300,
-                    open: function (event, ui) {
-                        $frmGHDLH = $('#frm_Send_grid_huongdanlamhang');
-                    },
-                    close: function (event, ui) {
-                        $(this).dialog('destroy').remove();
-                    },
-                    buttons: [
-                        {
-                            text: "Gửi NCC",
-                            id: "send_HDLH_grid_huongdanlamhang",
-                            click: function () {
-                                let $mess = $div.find('.mess');
-                                let $btnSend = $('#send_HDLH_grid_huongdanlamhang');
-                                data_js.append("id_parent", id_parent);
-                                data_js.append("id", ids.toString());
-                                $mess.html('<img style="width:30px; height:30px" src="iconcollection/loading.gif"/>');
-                                $btnSend.prop('disabled', true);
-                                $.ajax({
-                                    url: 'Controllers/DSDH_HuongDanLamHang_Controller.ashx?action=Send',
-                                    type: 'POST',
-                                    data: data_js,
-                                    processData: false,
-                                    contentType: false,
-                                    success: function (data) {
-                                        $mess.html(data);
-                                        data_js = new FormData();
-                                        $btnSend.prop('disabled', false);
-
-                                        if (data.lastIndexOf('error') <= -1) {
-                                            $('#grid_huongdanlamhang')[0].triggerToolbar();
-                                            $div.dialog("destroy").remove();
-                                        }
-                                    }
-                                });
-                            }
-                        },
-                        {
-                            text: "Đóng",
-                            click: function () {
-                                $(this).dialog("destroy").remove();
-                            }
-                        }
-                    ]
-                });
-            }
-        }
-    );
-
+    <%=js%>
     createRightPanel('grid_huongdanlamhang');
 </script>

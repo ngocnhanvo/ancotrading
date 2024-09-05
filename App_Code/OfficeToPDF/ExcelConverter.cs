@@ -92,7 +92,35 @@ namespace OfficeToPDF
 
                                 if (phStart > -1 & phEnd > -1)
                                 {
-                                    oRange.Characters[phStart + 1, phEnd].Insert(textReplace.newT);
+                                    if (textReplace.wrap_Mer.GetValueOrDefault(false))
+                                    {
+                                        oRange.Value = textReplace.newT;
+                                        var oRangeWrap = (Range)worksheet.Cells[oRange.Row, oRange.Column + 50];
+                                        double columnWidth = 0;
+                                        for (var i = oRange.Column; i < textReplace.column_Mer + oRange.Column; i++)
+                                        {
+                                            var oRangeWrap2 = (Range)worksheet.Cells[oRange.Row, i];
+                                            columnWidth += double.Parse(oRangeWrap2.ColumnWidth.ToString());
+                                        }
+
+                                        oRangeWrap.ColumnWidth = columnWidth;
+                                        oRange.Copy(oRangeWrap);
+                                        oRange.Rows.AutoFit();
+                                        var heightATF = double.Parse(oRange.Rows.Height.ToString());
+                                        oRange.RowHeight = heightATF + (heightATF * 5 / 100);
+                                        oRangeWrap.Delete(XlDeleteShiftDirection.xlShiftUp);
+                                    }
+                                    else
+                                    {
+                                        try
+                                        {
+                                            oRange.Characters[phStart + 1, phEnd].Insert(textReplace.newT);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            oRange.Characters[phStart + 1, phEnd].Insert(ex.Message);
+                                        }
+                                    }
                                 }
                             }
                             catch
@@ -551,32 +579,6 @@ namespace OfficeToPDF
                         stringTextBox.Font.Bold = hasBold;
                         stringTextBox.Font.Size = fontSize;
                     }
-
-                    
-
-                    //foreach (var textReplace in lstTextReplace)
-                    //{
-                    //    try
-                    //    {
-                    //        var oRange = worksheet.Cells.Find(What: textReplace.oldT, LookIn: XlFindLookIn.xlValues, SearchDirection: XlSearchDirection.xlNext, LookAt: XlLookAt.xlPart);
-
-                    //        if (textReplace.oldT.Substring(0, 2) == "{#")
-                    //        {
-                    //            oRange.Value2 = textReplace.newT;
-                    //        }
-                    //        else
-                    //        {
-                    //            int phStart = oRange.Value.ToString().LastIndexOf(textReplace.oldT);
-                    //            int phEnd = textReplace.oldT.Length;
-
-                    //            if (phStart > -1 & phEnd > -1)
-                    //            {
-                    //                oRange.Characters[phStart + 1, phEnd].Insert(textReplace.newT);
-                    //            }
-                    //        }
-                    //    }
-                    //    catch { }
-                    //}
 
                     foreach (var col in lstAutoSizeColumn)
                     {

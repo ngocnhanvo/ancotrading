@@ -489,11 +489,11 @@
 	        let val = $(this).val();
 	        if(val == 1) {
 	            noDauNamTR.show();
-	            tyGiaMuaTR.show();
+	            //tyGiaMuaTR.show();
 	        }
 	        else {
 	            noDauNamTR.hide();
-	            tyGiaMuaTR.hide();
+	            //tyGiaMuaTR.hide();
 	        }
 	    });
 

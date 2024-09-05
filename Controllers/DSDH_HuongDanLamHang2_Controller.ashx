@@ -1,0 +1,432 @@
+﻿<%@ WebHandler Language="C#" Class="DSDH_HuongDanLamHang2_Controller" %>
+
+using System;
+using System.Web;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+
+public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
+{
+    private LinqDBDataContext db = new LinqDBDataContext();
+    string fmtDate = "dd/MM/yyyy HH:mm";
+    string CHUAGUI = "CHUAGUI", DAGUI = "DAGUI";
+    public void ProcessRequest(HttpContext context)
+    {
+        String action, oper;
+        action = context.Request.QueryString["action"];
+        oper = context.Request.Form["oper"];
+        switch (action)
+        {
+            case "Send":
+                this.Send(context);
+                break;
+            case "loadGhiChu":
+                this.loadGhiChu(context);
+                break;
+            default:
+                switch (oper)
+                {
+                    case "del":
+                        this.del(context);
+                        break;
+                    case "edit":
+                        this.edit(context);
+                        break;
+                    case "add":
+                        this.add(context);
+                        break;
+                    default:
+                        this.load(context);
+                        break;
+                }
+                break;
+        }
+    }
+
+    public void Send(HttpContext context)
+    {
+        var msg = "";
+        var hdlh = context.Request.Form["hdlh"];
+        var id = context.Request.Form["id_parent"].removeAllSpaceOrTrimText(false);
+        if(string.IsNullOrWhiteSpace(id))
+        {
+            msg = $@"Chưa chọn đơn đặt hàng";
+            goto EndEventHandler;
+        }
+
+        var dsdh = db.c_danhsachdathangs.Where(c => c.c_danhsachdathang_id == id).FirstOrDefault();
+        if (dsdh == null)
+        {
+            msg = $@"Không tìm thấy ""danh sách đăth hàng""";
+            goto EndEventHandler;
+        }
+
+        if (dsdh.trangthai == CHUAGUI)
+        {
+            msg = $@"Chưa gửi ""danh sách đăth hàng""";
+            goto EndEventHandler;
+        }
+
+        if (dsdh.trangthai == "TUCHOI")
+        {
+            msg = $@"""Danh sách đăth hàng"" đã bị trả lại";
+            goto EndEventHandler;
+        }
+
+        var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).FirstOrDefault();
+        if (dtkd == null)
+        {
+            msg = $@"Không tìm thấy ""Nhà cung cấp""";
+            goto EndEventHandler;
+        }
+
+        var nccs = new string[] { "ANCO1" };
+        if (!nccs.Contains(dtkd.ma_dtkd))
+        {
+            msg = $@"Nhà cung cấp ""{dtkd.ma_dtkd}"" chưa được kích hoạt tính năng này";
+            goto EndEventHandler;
+        }
+
+        var ghichus = db.md_ghichuhdlhs.Where(p => p.lienket == dsdh.c_danhsachdathang_id & p.trangthai == CHUAGUI).OrderBy(s=>s.ngaytao).ToList();
+        var msgErrs = new List<string>();
+        var taptin2s = new List<md_ghichuhdlh>();
+        foreach (var ghichu in ghichus)
+        {
+            if (ghichu.trangthai != CHUAGUI)
+            {
+                msgErrs.Add($@"""{ghichu.ghichu}"" đã được gửi NCC");
+            }
+            else
+            {
+                var ghichu2 = new md_ghichuhdlh();
+                ghichu.CopyPropertiesTo(ghichu2);
+                taptin2s.Add(ghichu2);
+
+                ghichu.ngaycapnhat = DateTime.Now;
+                ghichu.trangthai = DAGUI;
+            }
+        }
+
+        dsdh.huongdanlamhang = hdlh;
+
+        if (msgErrs.Count <= 0)
+        {
+            string msgDT = "";
+            try
+            {
+                string link = Extension.API_ALL(dtkd.ma_dtkd) + "?oper=guiHDLH2";
+                var item = new Dictionary<string, object>();
+                item["result"] = taptin2s;
+                item["hdlh"] = hdlh;
+                msgDT += Extension.GetModule(link, item);
+
+                if (!msgDT.Contains("error") & !msgDT.Contains("Có lỗi xảy ra"))
+                {
+                    db.SubmitChanges();
+                }
+                else
+                {
+                    msg = msgDT;
+                }
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
+        }
+        else
+            msg = string.Join("<br>", msgErrs);
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            msg = $@"<div style='color:blue'>Đã gửi HDLH</div>";
+        }
+        else
+        {
+            msg = $@"<div error style='color:red'>{msg}</div>";
+        }
+
+        context.Response.Write(msg);
+    }
+
+    public void loadGhiChu(HttpContext context)
+    {
+        var msg = "";
+        var id = context.Request.Form["id"].removeAllSpaceOrTrimText(false);
+        if(string.IsNullOrWhiteSpace(id))
+        {
+            msg = $@"Chưa chọn đơn đặt hàng";
+            goto EndEventHandler;
+        }
+        var dsdh = db.c_danhsachdathangs.Where(c => c.c_danhsachdathang_id == id).FirstOrDefault();
+        if (dsdh == null)
+        {
+            msg = $@"Không tìm thấy ""danh sách đăth hàng""";
+            goto EndEventHandler;
+        }
+
+        var ghichus = db.md_ghichuhdlhs.Where(p => p.lienket == dsdh.c_danhsachdathang_id & p.trangthai == CHUAGUI).OrderBy(s=>s.ngaytao).ToList();
+
+        msg = dsdh.huongdanlamhang;
+
+        foreach(var ghichu in ghichus)
+        {
+            var ngaytaoStr = ghichu.ngaytao.Value.ToString(fmtDate);
+            msg += $"\n------{ngaytaoStr}-----";
+            msg += $"\n{ghichu.ghichu}";
+            msg += $"\n";
+        }
+
+    EndEventHandler:;
+
+        context.Response.Write(msg);
+    }
+
+    public void edit(HttpContext context)
+    {
+        string msg = "";
+        var gchdlhId = context.Request.Form["id"];
+        var gcstr = context.Request.Form["ghichu"];
+        var ghichu = db.md_ghichuhdlhs.Where(c => c.md_ghichuhdlh_id == gchdlhId).FirstOrDefault();
+        if (ghichu == null)
+        {
+            msg = $@"Không tìm thấy ""Ghi chú""";
+            goto EndEventHandler;
+        }
+
+        if (ghichu.trangthai != CHUAGUI)
+        {
+            msg = $@"Đã gửi NCC";
+            goto EndEventHandler;
+        }
+
+        try
+        {
+            ghichu.ghichu = gcstr;
+            ghichu.hoatdong = true;
+            ghichu.ngaycapnhat = DateTime.Now;
+            ghichu.nguoicapnhat = UserUtils.getUser(context);
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+    EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Sửa ghi chú thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
+    }
+
+    public void add(HttpContext context)
+    {
+        string msg = "";
+        var dsdhId = context.Request.Form["c_danhsachdathang_id"];
+        var gcstr = context.Request.Form["ghichu"];
+        var dsdh = db.c_danhsachdathangs.Where(c => c.c_danhsachdathang_id == dsdhId).FirstOrDefault();
+        if (dsdh == null)
+        {
+            msg = $@"Không tìm thấy ""danh sách đăth hàng""";
+            goto EndEventHandler;
+        }
+
+        try
+        {
+            var dateNow = DateTime.Now;
+            var exist = db.md_ghichuhdlhs.Where(s => s.lienket == dsdh.c_danhsachdathang_id & (dateNow - s.ngaytao.Value).TotalMinutes < 1 & s.trangthai == CHUAGUI).FirstOrDefault();
+            if (exist == null)
+            {
+                var ghichu = new md_ghichuhdlh();
+                ghichu.md_ghichuhdlh_id = Helper.getNewId();
+                ghichu.lienket = dsdh.c_danhsachdathang_id;
+                ghichu.ghichu = gcstr;
+                ghichu.trangthai = CHUAGUI;
+                ghichu.hoatdong = true;
+                ghichu.ngaytao = dateNow;
+                ghichu.nguoitao = UserUtils.getUser(context);
+                db.md_ghichuhdlhs.InsertOnSubmit(ghichu);
+            }
+            else
+            {
+                exist.ghichu += $"\n{gcstr}";
+            }
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+    EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Thêm ghi chú thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
+    }
+
+    public void del(HttpContext context)
+    {
+        var ids = context.Request.Form["id"].removeAllSpaceOrTrimText(false).Split(',').ToList();
+        var ghichus = db.md_ghichuhdlhs.Where(p => ids.Contains(p.md_ghichuhdlh_id)).ToList();
+        var dsdhId = ghichus.Select(s => s.lienket).FirstOrDefault();
+        var dsdh = db.c_danhsachdathangs.Where(c => c.c_danhsachdathang_id == dsdhId).FirstOrDefault();
+        var msg = "";
+        if (dsdh == null)
+        {
+            msg = $@"Không tìm thấy ""danh sách đăth hàng""";
+            goto EndEventHandler;
+        }
+
+        var msgErrs = new List<string>();
+        var links = new List<string>();
+        foreach (var ghichu in ghichus)
+        {
+            if (ghichu.trangthai != CHUAGUI)
+            {
+                msgErrs.Add($@"""{ghichu.ghichu}"" đã được gửi NCC");
+            }
+            else
+            {
+                db.md_ghichuhdlhs.DeleteOnSubmit(ghichu);
+            }
+        }
+
+        if (msgErrs.Count <= 0)
+        {
+            db.SubmitChanges();
+        }
+        else
+            msg = string.Join(", ", msgErrs);
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa ghi chú thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
+    }
+
+    public void load(HttpContext context)
+    {
+        context.Response.ContentType = "text/xml";
+        context.Response.Charset = "UTF-8";
+        String poId = context.Request.QueryString["poId"];
+        //// filter
+        String filter = "";
+        bool _search = bool.Parse(context.Request.QueryString["_search"]);
+        if (_search)
+        {
+            String _filters = context.Request.QueryString["filters"];
+            jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
+            filter = f.ToScript();
+        }
+
+        var sqlCount = $@"
+            SELECT COUNT(1) AS count 
+            FROM md_ghichuhdlh WHERE 1=1 {filter} 
+            and lienket ='{poId}'
+        ";
+
+        int page = int.Parse(context.Request.QueryString["page"]);
+        int limit = int.Parse(context.Request.QueryString["rows"]);
+        String sidx = context.Request.QueryString["sidx"];
+        String sord = context.Request.QueryString["sord"];
+        int total_page;
+        int count = (int)mdbc.ExecuteScalar(sqlCount);
+        int start, end;
+
+        if (count > 0)
+        {
+            total_page = (int)Math.Ceiling(1.0 * count / limit);
+        }
+        else
+        {
+            total_page = 0;
+        }
+
+        if (page > total_page) page = total_page;
+        start = limit * page - limit;
+        end = (page * limit) + 1;
+
+        if (sidx.Equals("") || sidx == null)
+        {
+            sidx = "tt.md_ghichuhdlh_id";
+        }
+
+        string strsql = $@"
+            select P.* 
+                from (
+                    select 
+                        tt.md_ghichuhdlh_id 
+                        , tt.ghichu
+                        , tt.ngaytao
+                        , tt.nguoitao
+                        , tt.ngaycapnhat
+                        , tt.nguoicapnhat
+                        , tt.mota
+                        , tt.trangthai
+                        , ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
+                    FROM 
+                        md_ghichuhdlh tt 
+                    WHERE 
+                        1=1 {filter} 
+                        and tt.lienket = '{poId}'
+                )P 
+            where RowNum > @start AND RowNum < @end
+        ";
+
+        var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
+        string xml = $@"<?xml version=""1.0"" encoding=""UTF-8"" ?>";
+        xml += $@"<rows>";
+        xml += $@"<page>{page}</page>";
+        xml += $@"<total>{total_page}</total>";
+        xml += $@"<records>{count}</records>";
+        foreach (System.Data.DataRow row in dt.Rows)
+        {
+            xml += "<row>";
+            foreach (System.Data.DataColumn column in dt.Columns)
+            {
+                if (column.DataType == System.Type.GetType("System.DateTime"))
+                {
+                    try
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)row[column.ColumnName]).ToString("dd/MM/yyyy HH:mm"));
+                    }
+                    catch
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
+                    }
+                }
+                else
+                    xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
+            }
+            xml += "</row>";
+        }
+        xml += "</rows>";
+        context.Response.Write(xml);
+    }
+
+    public bool IsReusable
+    {
+        get { return false; }
+    }
+}

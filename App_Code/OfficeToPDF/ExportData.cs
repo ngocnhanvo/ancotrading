@@ -94,11 +94,20 @@ namespace OfficeToPDF
                         newT = dt.Rows[0][column.ColumnName].ToString()
                     });
 
-                    lstTextReplace.Add(new AvariablePrj.lstTextReplace()
+                    if (
+                        column.DataType == Type.GetType("System.Double") |
+                        column.DataType == Type.GetType("System.Decimal") |
+                        column.DataType == Type.GetType("System.Int16") |
+                        column.DataType == Type.GetType("System.Int32") |
+                        column.DataType == Type.GetType("System.Int64")
+                        )
                     {
-                        oldT = "{#" + column.ColumnName + "}",
-                        newT = dt.Rows[0][column.ColumnName].ToString()
-                    });
+                        lstTextReplace.Add(new AvariablePrj.lstTextReplace()
+                        {
+                            oldT = "{#" + column.ColumnName + "}",
+                            newT = dt.Rows[0][column.ColumnName].ToString()
+                        });
+                    }
                 }
 
                 var s1 = hssfwb.GetSheetAt(0);
@@ -114,6 +123,12 @@ namespace OfficeToPDF
                 var area = hssfwb.GetPrintArea(0);
                 var columnText = area.Split(':')[1];
                 var maxColumn = Array.IndexOf(infoExcel.Alphabet, columnText);
+
+                lstTextReplace.Add(new AvariablePrj.lstTextReplace()
+                {
+                    oldT = "{totalPage}",
+                    newT = "{totalPage}"
+                });
 
                 lstTextReplace.Add(new AvariablePrj.lstTextReplace()
                 {
@@ -133,7 +148,7 @@ namespace OfficeToPDF
                     newT = config.yyyy
                 });
 
-                CellRangeAddress logoCell = null;
+                var findlogo = false;
                 foreach (var item in cellRangeAddressAll)
                 {
                     var cell = s1.GetRow(item.FirstRow).GetCell(item.FirstColumn);
@@ -141,64 +156,99 @@ namespace OfficeToPDF
                     {
                         if (cell.StringCellValue.StartsWith("{logo}"))
                         {
-                            logoCell = item;
-                            break;
+                            lstImage.Add(new AvariablePrj.lstImage()
+                            {
+                                column = item.FirstColumn,
+                                columnLast = item.LastColumn,
+                                row = item.FirstRow,
+                                rowLast = item.LastRow,
+                                link = context.Server.MapPath(config.logo.Substring(0, config.logo.LastIndexOf("?")))
+                            });
+                            findlogo = true;
+                        }
+
+                        if (cell.StringCellValue.StartsWith("{picture_"))
+                        {
+                            var a = cell.StringCellValue.Substring(1, cell.StringCellValue.Length - 2);
+                            var link = ExcuteSignalRStatic.mapPathSignalR("~/" + dt.Rows[0][a].ToString());
+                            if (lstImage.Where(s => s.link == link).Count() <= 0)
+                            {
+                                lstImage.Add(new AvariablePrj.lstImage()
+                                {
+                                    column = item.FirstColumn,
+                                    columnLast = item.LastColumn,
+                                    row = item.FirstRow,
+                                    rowLast = item.LastRow,
+                                    keepSize = true,
+                                    link = link
+                                });
+                            }
                         }
                     }
-                }
-
-                var findlogo = false;
-                if (logoCell != null)
-                {
-                    lstImage.Add(new AvariablePrj.lstImage()
-                    {
-                        column = logoCell.FirstColumn,
-                        columnLast = logoCell.LastColumn,
-                        row = logoCell.FirstRow,
-                        rowLast = logoCell.LastRow,
-                        link = context.Server.MapPath(config.logo.Substring(0, config.logo.LastIndexOf("?")))
-                    });
-                    findlogo = true;
                 }
 
                 for (var i = 0; i <= s1.LastRowNum; i++)
                 {
                     string comment = "";
-                    try
-                    {
-                        comment = s1.GetRow(i).GetCell(0).CellComment.String.String;
-                    }
-                    catch { }
-
                     var rowI = s1.GetRow(i);
+
                     if (rowI != null)
                     {
+                        var cellI0 = rowI.GetCell(0);
+                        if (cellI0 != null)
+                        {
+                            if (cellI0.CellComment != null)
+                            {
+                                comment = cellI0.CellComment.String.String;
+                            }
+                        }
+
                         for (var col = 0; col <= maxColumn; col++)
                         {
                             var cell = rowI.GetCell(col);
-                            if (i == 0)
-                            {
-                                string commentCol = "";
-                                try
-                                {
-                                    commentCol = cell.CellComment.String.String;
-                                }
-                                catch { }
-
-                                if (commentCol.StartsWith("autoFit"))
-                                {
-                                    lstAutoSizeColumn.Add(col);
-                                    cell.RemoveCellComment();
-                                }
-
-                                if (commentCol.StartsWith("copyColumn"))
-                                {
-                                    lstCopyColumn.Add(col);
-                                }
-                            }
 
                             if (cell != null)
                             {
+                                if (i == 0)
+                                {
+                                    string commentCol = "";
+                                    try
+                                    {
+                                        commentCol = cell.CellComment.String.String;
+                                    }
+                                    catch { }
+
+                                    if (commentCol.StartsWith("autoFit"))
+                                    {
+                                        lstAutoSizeColumn.Add(col);
+                                        cell.RemoveCellComment();
+                                    }
+
+                                    if (commentCol.StartsWith("copyColumn"))
+                                    {
+                                        lstCopyColumn.Add(col);
+                                    }
+                                }
+                                else
+                                {
+                                    string commentCol = "";
+                                    if (cell.CellComment != null)
+                                    {
+                                        commentCol = cell.CellComment.String.String;
+                                    }
+
+                                    if (commentCol.StartsWith("wrap"))
+                                    {
+                                        var itemRP = lstTextReplace.Where(s => s.oldT == cell.StringCellValue).FirstOrDefault();
+                                        if (itemRP != null)
+                                        {
+                                            itemRP.wrap_Mer = true;
+                                            itemRP.column_Mer = commentCol.Substring(4).ToNullableInt();
+                                        }
+                                        cell.RemoveCellComment();
+                                    }
+                                }
+
                                 if (cell.CellType == CellType.String)
                                 {
                                     if (!findlogo)

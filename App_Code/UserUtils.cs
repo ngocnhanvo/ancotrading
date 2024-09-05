@@ -56,11 +56,11 @@ public static class UserUtils
         else if (new string[] { "ANCO1" }.Contains(ma_dtkd_select))
         {
             decimal tygia = 23000;
-            var tyGiaMua = db.rpt_tonghopdoanhthuchiphis.Where(s => s.xuongValue == ma_dtkd_select & s.nam == DateTime.Now.Year).FirstOrDefault();
-            if(tyGiaMua != null)
-            {
-                tygia = tyGiaMua.tyGiaMua.GetValueOrDefault(0) > 0 ? tyGiaMua.tyGiaMua.GetValueOrDefault(0) : tygia;
-            }
+            //var tyGiaMua = db.rpt_tonghopdoanhthuchiphis.Where(s => s.xuongValue == ma_dtkd_select & s.nam == DateTime.Now.Year).FirstOrDefault();
+            //if(tyGiaMua != null)
+            //{
+            //    tygia = tyGiaMua.tyGiaMua.GetValueOrDefault(0) > 0 ? tyGiaMua.tyGiaMua.GetValueOrDefault(0) : tygia;
+            //}
 
             decimal discountVNN = decimal.Parse("0.80");
             //Lay discount dac biet
