@@ -35,7 +35,34 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         decimal total = 0;
         if (tbl == "c_donhang")
         {
-            total = db.c_dongdonhangs.Where(s => s.c_donhang_id == c_donhang_id).ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, 2, true)).DecRound(2);
+            var ddh = from c in db.c_dongdonhangs where c.c_donhang_id.Equals(dh.c_donhang_id) select c;
+            if (dh.phanbodiscount.GetValueOrDefault(false))
+            {
+                total = ddh.ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, 2, true)).DecRound(2);
+            }
+            else
+            {
+                if (dh.discount > 0)
+                {
+                    total = ddh.ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, 2, false)).DecRound(2);
+                    decimal discountVal = (total * dh.discount.Value / 100).DecRound(2);
+                    total = total - discountVal;
+                }
+                else
+                {
+                    var ddh2s = ddh.ToList()
+                            .Select(s => new { cl = s.code_cl, dc = s.discount.GetValueOrDefault(0), st = s.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, s, 2, dh.phanbodiscount.GetValueOrDefault(false)) })
+                            .GroupBy(s => new { s.cl, s.dc })
+                            .Select(s => new { s.Key.cl, s.Key.dc, st = s.Sum(t => t.st) })
+                            .ToList();
+
+                    total = 0;
+                    foreach (var ddh2 in ddh2s)
+                    {
+                        total += ddh2.st - Math.Round(ddh2.st * (decimal)ddh2.dc / 100, 2, MidpointRounding.AwayFromZero);
+                    }
+                }
+            }
         }
         else
         {

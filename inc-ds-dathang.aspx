@@ -780,8 +780,8 @@
         <ul>
             <li><a href="#dathang-details">Các dòng đặt hàng</a></li>
             <li><a href="#phidathang-details">Các khoản phí</a></li>
-            <li><a href="#huongdanlamhang-details">Hướng dẫn làm hàng</a></li>
-            <li><a href="#huongdanlamhang2-details">Hướng dẫn làm hàng (Ghi chú)</a></li>
+            <li><a href="#huongdanlamhang-details">Tập tin đính kèm</a></li>
+            <li><a href="#huongdanlamhang2-details">Hướng dẫn làm hàng</a></li>
         </ul>
         <div id="dathang-details">
             <uc1:jqGrid ID="grid_ds_chitietdathang"

@@ -10,7 +10,7 @@
         `);
 
     $div.dialog({
-        title: `Tải lên "hướng dẫn làm hàng"`,
+        title: `Tải lên "tập tin đính kèm"`,
         resizeable: false,
         modal: true,
         width: 400,
@@ -123,8 +123,8 @@
 
 $("#grid_huongdanlamhang").jqGrid('navButtonAdd', '#grid_huongdanlamhang-pager',
     {
-        caption: "Tải lên HDLH",
-        title: `Tải lên "hướng dẫn làm hàng"`,
+        caption: "Tải lên tập tin",
+        title: `Tải lên "tập tin"`,
         onClickButton: function () {
             UploadTapTingrid_huongdanlamhang();
         }
@@ -133,8 +133,8 @@ $("#grid_huongdanlamhang").jqGrid('navButtonAdd', '#grid_huongdanlamhang-pager',
 
 $("#grid_huongdanlamhang").jqGrid('navButtonAdd', '#grid_huongdanlamhang-pager',
     {
-        caption: "Gửi HDLH",
-        title: `Gửi "hướng dẫn làm hàng"`,
+        caption: "Gửi tập tin đính kèm",
+        title: `Gửi "tập tin đính kèm"`,
         onClickButton: function () {
             let data_js = new FormData();
             let $div, $frmGHDLH;
@@ -148,7 +148,7 @@ $("#grid_huongdanlamhang").jqGrid('navButtonAdd', '#grid_huongdanlamhang-pager',
                 `);
 
             $div.dialog({
-                title: `Gửi "hướng dẫn làm hàng"`,
+                title: `Gửi "tập tin đính kèm"`,
                 resizeable: false,
                 modal: true,
                 width: 400,
@@ -203,8 +203,8 @@ $("#grid_huongdanlamhang").jqGrid('navButtonAdd', '#grid_huongdanlamhang-pager',
 
 $("#grid_huongdanlamhang2").jqGrid('navButtonAdd', '#grid_huongdanlamhang2-pager',
     {
-        caption: "Gửi ghi chú",
-        title: `Gửi ghi chú "hướng dẫn làm hàng"`,
+        caption: "Gửi HDLH",
+        title: `Gửi "hướng dẫn làm hàng"`,
         onClickButton: function () {
             let data_js = new FormData();
             let $div, $frmGHDLH;
@@ -213,22 +213,29 @@ $("#grid_huongdanlamhang2").jqGrid('navButtonAdd', '#grid_huongdanlamhang2-pager
             let txt = ids.length > 1 ? 'những ' : '';
             $div = $(`
                     <form enctype="multipart/form-data" id="frm_Send_grid_huongdanlamhang2">
-                        <div class="mess">Bạn muốn gửi ${txt}ghi chú này đến NCC?</div>
+                        <div class="mess">Bạn muốn gửi "hướng dẫn làm hàng" này đến NCC?</div>
                         <div>
+                            <label>Đặc điểm hàng hóa</label><br/>
                             <textarea id="huongdanlamhang2" style="width: 97%;height: 180px;margin-top: 5px;padding: 5px;" multiline="true" readonly>Đang tải...</textarea>
+                        </div>
+
+                        <div>
+                            <label>Các hướng dẫn khác</label><br/>
+                            <textarea id="huongdanlamhangchung2" style="width: 97%;height: 180px;margin-top: 5px;padding: 5px;" multiline="true" readonly>Đang tải...</textarea>
                         </div>
                     </form>
                 `);
 
             $div.dialog({
-                title: `Gửi ghi chú "hướng dẫn làm hàng"`,
+                title: `Gửi "hướng dẫn làm hàng"`,
                 resizeable: false,
                 modal: true,
                 width: 400,
                 height: 300,
                 open: function (event, ui) {
                     $.post('Controllers/DSDH_HuongDanLamHang2_Controller.ashx?action=loadGhiChu', { id: id_parent }, function (rs) {
-                        $('#huongdanlamhang2').val(rs);
+                        $('#huongdanlamhang2').val(rs.ddhh);
+                        $('#huongdanlamhang2').val(rs.ddhh);
                     });
                     $frmGHDLH = $('#frm_Send_grid_huongdanlamhang2');
                 },

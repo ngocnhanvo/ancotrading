@@ -351,7 +351,7 @@ public class DonHangController : IHttpHandler
         try
         {
             decimal totalQuantity = 0, totalSalary = 0, totalCbm = 0;
-            decimal? phicong = 0, phitru = 0;
+            decimal phicong = 0, phitru = 0;
             c_donhang dh = db.c_donhangs.FirstOrDefault(d => d.c_donhang_id.Equals(c_donhang_id));
             if (dh != null)
             {
@@ -359,12 +359,39 @@ public class DonHangController : IHttpHandler
                 var phiDH = from phi in db.c_phidonhangs where phi.c_donhang_id.Equals(dh.c_donhang_id) select phi;
 
                 totalQuantity = ddh.Sum(p => p.soluong).Value;
-                phicong = phiDH.Where(p => p.phitang.Equals(true)).Select(p => p.phi).Sum();
-                phitru = phiDH.Where(p => p.phitang.Equals(false)).Select(p => p.phi).Sum();
-                totalSalary = ddh.ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, 2, true)).DecRound(2);
-                decimal discountVal = (totalSalary * dh.discount.Value / 100).DecRound(2);
-                discountVal = 0;
-                totalSalary = (totalSalary - discountVal) + (phicong == null ? 0 : phicong.Value) - (phitru == null ? 0 : phitru.Value);
+                phicong = phiDH.Where(p => p.phitang.Equals(true)).ToList().Sum(s=>s.phi.GetValueOrDefault(0));
+                phitru = phiDH.Where(p => p.phitang.Equals(false)).ToList().Sum(s=>s.phi.GetValueOrDefault(0));
+
+                if (dh.phanbodiscount.GetValueOrDefault(false))
+                {
+                    totalSalary = ddh.ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, 2, true)).DecRound(2);
+                }
+                else
+                {
+                    if (dh.discount > 0)
+                    {
+                        totalSalary = ddh.ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, 2, false)).DecRound(2);
+                        decimal discountVal = (totalSalary * dh.discount.Value / 100).DecRound(2);
+                        totalSalary = totalSalary - discountVal;
+                    }
+                    else
+                    {
+                        var ddh2s = ddh.ToList()
+                                .Select(s=> new { cl = s.code_cl, dc = s.discount.GetValueOrDefault(0), st = s.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, s, 2, dh.phanbodiscount.GetValueOrDefault(false)) })
+                                .GroupBy(s=> new { s.cl, s.dc })
+                                .Select(s=> new { s.Key.cl, s.Key.dc, st = s.Sum(t=>t.st) })
+                                .ToList();
+
+                        totalSalary = 0;
+                        foreach(var ddh2 in ddh2s)
+                        {
+                            totalSalary += ddh2.st - Math.Round(ddh2.st * (decimal)ddh2.dc / 100, 2, MidpointRounding.AwayFromZero);
+                        }
+                    }
+                }
+
+                totalSalary = totalSalary + phicong - phitru;
+
                 totalCbm = ddh.ToList().Sum(s=>s.v2.GetValueOrDefault(0));
 
                 msg = string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dh.sochungtu, totalCbm, totalSalary, totalQuantity);
