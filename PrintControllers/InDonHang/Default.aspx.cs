@@ -312,7 +312,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                                     (ddh.giafob + isnull(ddh.phi, 0)) * 
                                     (
                                         case when dh.discount > 0 then dh.discount else ddh.discount end
-                                    ) / 100 + 0.000000000000000001
+                                    ) / 100 + 0.00000000000001
                             end
                         ) as decimal(18,2)) as giafob
                         
