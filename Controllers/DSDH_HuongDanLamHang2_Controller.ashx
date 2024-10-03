@@ -173,15 +173,16 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
             goto EndEventHandler;
         }
 
+        ddhh = dsdh.huongdanlamhang;
+        chdk = dsdh.huongdanlamhangchung;
+
         var ghichus = db.md_ghichuhdlhs.Where(p => p.lienket == dsdh.c_danhsachdathang_id & p.trangthai == CHUAGUI).OrderBy(s=>s.ngaytao).ToList();
         if (ghichus.Count <= 0)
         {
             msg = $@"Không có ""Hướng dẫn làm hàng"" nào cần gửi";
             goto EndEventHandler;
         }
-
-        ddhh = dsdh.huongdanlamhang;
-        chdk = chdk = dsdh.huongdanlamhangchung;
+        
         foreach(var ghichu in ghichus)
         {
             var ngaytaoStr = ghichu.ngaytao.Value.ToString(fmtDate);

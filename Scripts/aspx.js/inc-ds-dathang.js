@@ -243,6 +243,7 @@ $("#grid_huongdanlamhang2").jqGrid('navButtonAdd', '#grid_huongdanlamhang2-pager
                             $('#huongdanlamhangchung2').val(rs.chdk);
                             if (rs.msg.length > 0) {
                                 alert(rs.msg);
+                                $('#send_HDLH_grid_huongdanlamhang2').hide();
                             }
                         }
                         catch (r) {
