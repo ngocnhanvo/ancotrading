@@ -17,7 +17,7 @@ public class DanhSachDatHangController : IHttpHandler
     public String path = HttpContext.Current.Server.MapPath("~/FileSendMail/");
     public String logoPath = HttpContext.Current.Server.MapPath("~/images/anco_logo_print.png");
     public String productImagePath = HttpContext.Current.Server.MapPath("~/images/products/fullsize/");
-
+    public string CHUAGUI = "CHUAGUI", TUCHOI = "TUCHOI";
     public List<Dictionary<string, string>> msgPublics = new List<Dictionary<string, string>> {
         new Dictionary<string, string>()
         {
@@ -86,8 +86,8 @@ public class DanhSachDatHangController : IHttpHandler
         var lst = new List<string>();
         lst.Add("");
         lst.Add(null);
-        lst.Add("CHUAGUI");
-        lst.Add("TUCHOI");
+        lst.Add(CHUAGUI);
+        lst.Add(TUCHOI);
         lst.Add("DAGUI");
         lst.Add("DANHAN");
         var msgs = new List<Dictionary<string, string>>(msgPublics);
@@ -123,18 +123,24 @@ public class DanhSachDatHangController : IHttpHandler
                         }
                         else
                         {
-                            if (a.trangthai != "CHUAGUI" & !string.IsNullOrEmpty(a.trangthai))
+                            if (a.trangthai != CHUAGUI & !string.IsNullOrEmpty(a.trangthai))
                             {
-                                a.trangthai = "TUCHOI";
-                                var taptins = db.md_taptins.Where(s => s.lienket == a.c_danhsachdathang_id & s.trangthai != "CHUAGUI").ToList();
+                                a.trangthai = TUCHOI;
+                                var taptins = db.md_taptins.Where(s => s.lienket == a.c_danhsachdathang_id & s.trangthai != CHUAGUI).ToList();
                                 foreach (var taptin in taptins)
                                 {
-                                    taptin.trangthai = "CHUAGUI";
+                                    taptin.trangthai = CHUAGUI;
+                                }
+
+                                var hdlhs = db.md_ghichuhdlhs.Where(s => s.lienket == a.c_danhsachdathang_id & s.trangthai != CHUAGUI).ToList();
+                                foreach (var hdlh in hdlhs)
+                                {
+                                    hdlh.trangthai = CHUAGUI;
                                 }
                             }
                             else
                             {
-                                a.trangthai = "CHUAGUI";
+                                a.trangthai = CHUAGUI;
                             }
                         }
                     }
@@ -1108,6 +1114,12 @@ public class DanhSachDatHangController : IHttpHandler
         String h = context.Request.Form["hoatdong"].ToLower();
         string huongdanlamhang = context.Request.Form["huongdanlamhang"];
         string huongdanlamhangchung = context.Request.Form["huongdanlamhangchung"];
+        var arrGuiDonHangHeThong = new List<string>();
+        foreach (var msgPL in msgPublics)
+        {
+            var madtkd = msgPL.Keys.FirstOrDefault();
+            arrGuiDonHangHeThong.Add(madtkd);
+        }
         string msg = "";
         bool hd = false;
         if (h.Equals("on") || h.Equals("true"))
@@ -1124,20 +1136,16 @@ public class DanhSachDatHangController : IHttpHandler
         }
 
         c_danhsachdathang m = db.c_danhsachdathangs.Single(p => p.c_danhsachdathang_id == context.Request.Form["id"]);
+        var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == m.md_doitackinhdoanh_id).FirstOrDefault();
         if (m.md_trangthai_id.Equals("SOANTHAO"))
         {
             m.ngaylap = DateTime.ParseExact(context.Request.Form["ngaylap"], "dd/MM/yyyy", null);
             m.hangiaohang_po = DateTime.ParseExact(context.Request.Form["hangiaohang_po"], "dd/MM/yyyy", null);
             m.nguoi_phutrach = UserUtils.getUser(context);
             m.nguoi_dathang = UserUtils.getUser(context);
-
-            m.huongdanlamhang = context.Request.Form["huongdanlamhang"];
-            m.huongdanlamhangchung = context.Request.Form["huongdanlamhangchung"];
-
             m.diachigiaohang = context.Request.Form["diachigiaohang"];
             m.isgui_hdlh = bool.Parse(isgui_hdlh);
             m.discount = decimal.Parse(context.Request.Form["discount"]);
-
             m.mota = context.Request.Form["mota"];
             m.hoatdong = hd;
             m.nguoicapnhat = UserUtils.getUser(context);
@@ -1147,11 +1155,32 @@ public class DanhSachDatHangController : IHttpHandler
         else
         {
             m.isgui_hdlh = bool.Parse(isgui_hdlh);
-            m.huongdanlamhang = context.Request.Form["huongdanlamhang"];
-            m.huongdanlamhangchung = context.Request.Form["huongdanlamhangchung"];
-            db.SubmitChanges();
             //jqGridHelper.Utils.writeResult(0,"Không thể chỉnh sửa khi đặt hàng đã hiệu lực.!");
         }
+
+        //Tạm thời chỉ áp dụng Anco1
+        if(arrGuiDonHangHeThong[0].Contains(dtkd.ma_dtkd))
+        {
+            if(m.trangthai == CHUAGUI)
+            {
+                m.huongdanlamhang = huongdanlamhang;
+                m.huongdanlamhangchung = huongdanlamhangchung;
+            }
+            else if(m.huongdanlamhang != huongdanlamhang | m.huongdanlamhangchung != huongdanlamhangchung)
+            {
+                jqGridHelper.Utils.writeResult(0, "Không thể sửa HDLH khi đã gửi DSDH");
+                goto EndEventHandler;
+            }
+        }
+        else
+        {
+            m.huongdanlamhang = huongdanlamhang;
+            m.huongdanlamhangchung = huongdanlamhangchung;
+        }
+
+        db.SubmitChanges();
+
+    EndEventHandler:;
     }
 
     public void add(HttpContext context)
@@ -1248,6 +1277,12 @@ public class DanhSachDatHangController : IHttpHandler
             {
                 db.md_taptins.DeleteOnSubmit(taptin);
                 links.Add(ExcuteSignalRStatic.mapPathSignalR($@"~/{taptin.path}"));
+            }
+
+            var hdlhs = db.md_ghichuhdlhs.Where(s => s.lienket == ds.c_danhsachdathang_id).ToList();
+            foreach (var hdlh in hdlhs)
+            {
+                db.md_ghichuhdlhs.DeleteOnSubmit(hdlh);
             }
             //Xoa Don dat hang
             db.c_danhsachdathangs.DeleteOnSubmit(ds);
