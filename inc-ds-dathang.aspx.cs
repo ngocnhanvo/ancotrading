@@ -10,6 +10,6 @@ public partial class inc_ds_dathang : System.Web.UI.Page
     public string js = "";
     protected void Page_Load(object sender, EventArgs e)
     {
-        js = System.IO.File.ReadAllText(ExcuteSignalRStatic.mapPathSignalR("~/Scripts/Custom_Grid_script/inc-ds-dathang.js"));
+        js = System.IO.File.ReadAllText(ExcuteSignalRStatic.mapPathSignalR("~/Scripts/aspx.js/inc-ds-dathang.js"));
     }
 }

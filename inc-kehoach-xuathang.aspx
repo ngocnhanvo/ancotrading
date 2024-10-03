@@ -446,7 +446,7 @@
 									alert('Chưa chọn kế hoạch cần in.!');
 								}
 							}else if (printType == "printYC"){
-								printURL += "InYeuCauXuatHang/";
+								printURL += "InYeuCauXuatHang/ycxh220524.aspx";
 								if (id != null) {
 									window.open(printURL + "?c_kehoachxuathang_id=" + id, "In Phiếu Yêu Cầu Xuất", windowSize);
 								} else {

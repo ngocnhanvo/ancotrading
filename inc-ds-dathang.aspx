@@ -1490,6 +1490,17 @@
                     , key: true
                 },
                 {
+                    name: 'loai'
+                    , label: 'Loại'
+                    , index: 'tt.loai'
+                    , fixed:true 
+                    , width: 140
+                    , edittype: 'select'
+                    , editoptions: {value: 'Đặc điểm hàng hóa:Đặc điểm hàng hóa;Các hướng dẫn khác:Các hướng dẫn khác'}
+                    , editable: true
+                    , hidden: false
+                },
+                {
                     name: 'ghichu'
                     , label: 'Ghi chú thêm'
                     , index: 'tt.ghichu'

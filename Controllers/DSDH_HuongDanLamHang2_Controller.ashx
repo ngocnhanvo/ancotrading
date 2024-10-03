@@ -11,6 +11,8 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
     private LinqDBDataContext db = new LinqDBDataContext();
     string fmtDate = "dd/MM/yyyy HH:mm";
     string CHUAGUI = "CHUAGUI", DAGUI = "DAGUI";
+    string DDHH = "Đặc điểm hàng hóa";
+    string CHDK = "Các hướng dẫn khác";
     public void ProcessRequest(HttpContext context)
     {
         String action, oper;
@@ -48,6 +50,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
     {
         var msg = "";
         var hdlh = context.Request.Form["hdlh"];
+        var chdk = context.Request.Form["chdk"];
         var id = context.Request.Form["id_parent"].removeAllSpaceOrTrimText(false);
         if(string.IsNullOrWhiteSpace(id))
         {
@@ -109,6 +112,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
         }
 
         dsdh.huongdanlamhang = hdlh;
+        dsdh.huongdanlamhangchung = chdk;
 
         if (msgErrs.Count <= 0)
         {
@@ -119,6 +123,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
                 var item = new Dictionary<string, object>();
                 item["result"] = taptin2s;
                 item["hdlh"] = hdlh;
+                item["chdk"] = chdk;
                 msgDT += Extension.GetModule(link, item);
 
                 if (!msgDT.Contains("error") & !msgDT.Contains("Có lỗi xảy ra"))
@@ -154,7 +159,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
 
     public void loadGhiChu(HttpContext context)
     {
-        var msg = "";
+        string msg = "", ddhh = "", chdk = "";
         var id = context.Request.Form["id"].removeAllSpaceOrTrimText(false);
         if(string.IsNullOrWhiteSpace(id))
         {
@@ -169,20 +174,35 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
         }
 
         var ghichus = db.md_ghichuhdlhs.Where(p => p.lienket == dsdh.c_danhsachdathang_id & p.trangthai == CHUAGUI).OrderBy(s=>s.ngaytao).ToList();
+        if (ghichus.Count <= 0)
+        {
+            msg = $@"Không có ""Hướng dẫn làm hàng"" nào cần gửi";
+            goto EndEventHandler;
+        }
 
-        msg = dsdh.huongdanlamhang;
-
+        ddhh = dsdh.huongdanlamhang;
+        chdk = chdk = dsdh.huongdanlamhangchung;
         foreach(var ghichu in ghichus)
         {
             var ngaytaoStr = ghichu.ngaytao.Value.ToString(fmtDate);
-            msg += $"\n------{ngaytaoStr}-----";
-            msg += $"\n{ghichu.ghichu}";
-            msg += $"\n";
+            if (ghichu.loai == DDHH)
+            {
+                ddhh += $"\n------{ngaytaoStr}-----";
+                ddhh += $"\n{ghichu.ghichu}";
+                ddhh += $"\n";
+            }
+            else
+            {
+                chdk += $"\n------{ngaytaoStr}-----";
+                chdk += $"\n{ghichu.ghichu}";
+                chdk += $"\n";
+            }
         }
 
     EndEventHandler:;
 
-        context.Response.Write(msg);
+        dynamic dicMSG = new { ddhh, chdk, msg };
+        context.Response.Write(Newtonsoft.Json.JsonConvert.SerializeObject(dicMSG));
     }
 
     public void edit(HttpContext context)
@@ -233,6 +253,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
         string msg = "";
         var dsdhId = context.Request.Form["c_danhsachdathang_id"];
         var gcstr = context.Request.Form["ghichu"];
+        var loai = context.Request.Form["loai"];
         var dsdh = db.c_danhsachdathangs.Where(c => c.c_danhsachdathang_id == dsdhId).FirstOrDefault();
         if (dsdh == null)
         {
@@ -243,23 +264,23 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
         try
         {
             var dateNow = DateTime.Now;
-            var exist = db.md_ghichuhdlhs.Where(s => s.lienket == dsdh.c_danhsachdathang_id & (dateNow - s.ngaytao.Value).TotalMinutes < 1 & s.trangthai == CHUAGUI).FirstOrDefault();
-            if (exist == null)
+            var exist = db.md_ghichuhdlhs.Where(s => s.lienket == dsdh.c_danhsachdathang_id & s.loai == loai & s.trangthai == CHUAGUI).FirstOrDefault();
+            if (exist != null)
             {
-                var ghichu = new md_ghichuhdlh();
-                ghichu.md_ghichuhdlh_id = Helper.getNewId();
-                ghichu.lienket = dsdh.c_danhsachdathang_id;
-                ghichu.ghichu = gcstr;
-                ghichu.trangthai = CHUAGUI;
-                ghichu.hoatdong = true;
-                ghichu.ngaytao = dateNow;
-                ghichu.nguoitao = UserUtils.getUser(context);
-                db.md_ghichuhdlhs.InsertOnSubmit(ghichu);
+                msg = $@"Hãy gửi các HDLH đang có trước khi tạo HDLH mới ({loai})";
+                goto EndEventHandler;
             }
-            else
-            {
-                exist.ghichu += $"\n{gcstr}";
-            }
+
+            var ghichu = new md_ghichuhdlh();
+            ghichu.md_ghichuhdlh_id = Helper.getNewId();
+            ghichu.lienket = dsdh.c_danhsachdathang_id;
+            ghichu.loai = loai;
+            ghichu.ghichu = gcstr;
+            ghichu.trangthai = CHUAGUI;
+            ghichu.hoatdong = true;
+            ghichu.ngaytao = dateNow;
+            ghichu.nguoitao = UserUtils.getUser(context);
+            db.md_ghichuhdlhs.InsertOnSubmit(ghichu);
             db.SubmitChanges();
         }
         catch (Exception ex)
@@ -377,6 +398,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
                 from (
                     select 
                         tt.md_ghichuhdlh_id 
+                        , tt.loai
                         , tt.ghichu
                         , tt.ngaytao
                         , tt.nguoitao
