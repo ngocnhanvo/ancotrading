@@ -15,7 +15,7 @@ public class TaoPackingListController : IHttpHandler {
         {
             String txtSoPackingList = context.Request.Form["p[txtSoPackingList]"];
             String arrayPhieuXuat = context.Request.Form["p[arrayPhieuXuat]"].ToString();
-            String txtSoInvoice = context.Request.Form["p[txtSoPackingList]"];
+            String txtSoInvoice = context.Request.Form["p[txtSoPackingList]"].removeAllSpaceOrTrimText(true);
             String txtNgayLap = context.Request.Form["p[txtNgayLap]"];
             //String selNoiDi = context.Request.Form["p[selNoiDi]"];
             String selNoiDen = context.Request.Form["p[txtNoiDen]"];
