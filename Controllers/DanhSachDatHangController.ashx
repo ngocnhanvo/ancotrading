@@ -96,7 +96,7 @@ public class DanhSachDatHangController : IHttpHandler
         {
             var madtkd = msg.Keys.FirstOrDefault();
             string mdtkdId = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == madtkd).Select(s => s.md_doitackinhdoanh_id).FirstOrDefault();
-            var dsdhs = db.c_danhsachdathangs.Where(s => lst.Contains(s.trangthai) & s.md_doitackinhdoanh_id == mdtkdId & s.md_trangthai_id != "HIEULUC");
+            var dsdhs = db.c_danhsachdathangs.Where(s => lst.Contains(s.trangthai) & s.md_doitackinhdoanh_id == mdtkdId & s.md_trangthai_id != "KETTHUC");
             var item = new Dictionary<string, object>();
 
             try
