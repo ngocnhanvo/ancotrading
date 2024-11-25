@@ -17,7 +17,7 @@ public class DanhSachDatHangController : IHttpHandler
     public String path = HttpContext.Current.Server.MapPath("~/FileSendMail/");
     public String logoPath = HttpContext.Current.Server.MapPath("~/images/anco_logo_print.png");
     public String productImagePath = HttpContext.Current.Server.MapPath("~/images/products/fullsize/");
-    public string CHUAGUI = "CHUAGUI", TUCHOI = "TUCHOI", DANHAN = "DANHAN";
+    public string CHUAGUI = "CHUAGUI", TUCHOI = "TUCHOI", DANHAN = "DANHAN", DAHIEULUC = "DAHIEULUC";
     public List<Dictionary<string, string>> msgPublics = new List<Dictionary<string, string>> {
         new Dictionary<string, string>()
         {
@@ -90,6 +90,7 @@ public class DanhSachDatHangController : IHttpHandler
         lst.Add(TUCHOI);
         lst.Add("DAGUI");
         lst.Add(DANHAN);
+        lst.Add(DAHIEULUC);
         var msgs = new List<Dictionary<string, string>>(msgPublics);
         foreach (var msg in msgs)
         {
@@ -122,12 +123,15 @@ public class DanhSachDatHangController : IHttpHandler
 
                         if (!string.IsNullOrEmpty(trangthai))
                         {
-                            if (trangthai == DANHAN)
-                                a.trangthai = DANHAN;
-                            else if (trangthai == "DAGUI")
-                                a.trangthai = "DAGUI";
-                            else
-                                a.trangthai = "DAHIEULUC";
+                            if (a.trangthai != DAHIEULUC)
+                            {
+                                if (trangthai == DANHAN)
+                                    a.trangthai = DANHAN;
+                                else if (trangthai == "DAGUI")
+                                    a.trangthai = "DAGUI";
+                                else
+                                    a.trangthai = DAHIEULUC;
+                            }
 
                             if (!string.IsNullOrWhiteSpace(hdlhsStr))
                             {
@@ -144,7 +148,7 @@ public class DanhSachDatHangController : IHttpHandler
                                 }
                             }
                         }
-                        else
+                        else if(a.trangthai != DAHIEULUC)
                         {
                             if (a.trangthai != CHUAGUI & !string.IsNullOrEmpty(a.trangthai))
                             {
