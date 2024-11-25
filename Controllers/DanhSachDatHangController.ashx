@@ -181,7 +181,7 @@ public class DanhSachDatHangController : IHttpHandler
             }
             catch (Exception ex)
             {
-                msg[madtkd] = ex.Message;
+                msg[madtkd] = ex.ToString();
             }
         }
 
