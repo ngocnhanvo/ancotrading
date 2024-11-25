@@ -1190,7 +1190,7 @@ public class DanhSachDatHangController : IHttpHandler
         //Tạm thời chỉ áp dụng Anco1
         if(arrGuiDonHangHeThong[0].Contains(dtkd.ma_dtkd))
         {
-            if(m.trangthai == CHUAGUI)
+            if(m.trangthai == CHUAGUI | string.IsNullOrEmpty(m.trangthai))
             {
                 m.huongdanlamhang = huongdanlamhang;
                 m.huongdanlamhangchung = huongdanlamhangchung;
