@@ -17,7 +17,7 @@ public class DanhSachDatHangController : IHttpHandler
     public String path = HttpContext.Current.Server.MapPath("~/FileSendMail/");
     public String logoPath = HttpContext.Current.Server.MapPath("~/images/anco_logo_print.png");
     public String productImagePath = HttpContext.Current.Server.MapPath("~/images/products/fullsize/");
-    public string CHUAGUI = "CHUAGUI", TUCHOI = "TUCHOI";
+    public string CHUAGUI = "CHUAGUI", TUCHOI = "TUCHOI", DANHAN = "DANHAN";
     public List<Dictionary<string, string>> msgPublics = new List<Dictionary<string, string>> {
         new Dictionary<string, string>()
         {
@@ -89,7 +89,7 @@ public class DanhSachDatHangController : IHttpHandler
         lst.Add(CHUAGUI);
         lst.Add(TUCHOI);
         lst.Add("DAGUI");
-        lst.Add("DANHAN");
+        lst.Add(DANHAN);
         var msgs = new List<Dictionary<string, string>>(msgPublics);
         foreach (var msg in msgs)
         {
@@ -111,15 +111,38 @@ public class DanhSachDatHangController : IHttpHandler
                     var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(msg[madtkd]);
                     foreach (var a in dsdhs)
                     {
-                        string trangthai = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).Select(s => s["trangthai"] + "").FirstOrDefault();
+                        var dsdhDic = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).FirstOrDefault();
+                        string trangthai = "";
+                        string hdlhsStr = "";
+                        if (dsdhDic == null)
+                        {
+                            trangthai = dsdhDic["trangthai"].ToString();
+                            hdlhsStr = dsdhDic["hdlhs"].ToString();
+                        }
+
                         if (!string.IsNullOrEmpty(trangthai))
                         {
-                            if (trangthai == "DANHAN")
-                                a.trangthai = "DANHAN";
+                            if (trangthai == DANHAN)
+                                a.trangthai = DANHAN;
                             else if (trangthai == "DAGUI")
                                 a.trangthai = "DAGUI";
                             else
                                 a.trangthai = "DAHIEULUC";
+
+                            if (!string.IsNullOrWhiteSpace(hdlhsStr))
+                            {
+                                var hdlhs = JsonConvert.DeserializeObject<List<md_ghichuhdlh>>(hdlhsStr);
+                                foreach (var hdlh in hdlhs)
+                                {
+                                    var hdlhMain = db.md_ghichuhdlhs.Where(s => s.md_ghichuhdlh_id == hdlh.md_ghichuhdlh_id).FirstOrDefault();
+                                    if (hdlhMain != null)
+                                    {
+                                        hdlhMain.trangthai = hdlh.trangthai;
+                                        hdlhMain.ngayxacnhan = hdlh.ngayxacnhan;
+                                        //hdlhMain.mota = hdlh.mota;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -130,12 +153,14 @@ public class DanhSachDatHangController : IHttpHandler
                                 foreach (var taptin in taptins)
                                 {
                                     taptin.trangthai = CHUAGUI;
+                                    taptin.ngayxacnhan = null;
                                 }
 
                                 var hdlhs = db.md_ghichuhdlhs.Where(s => s.lienket == a.c_danhsachdathang_id & s.trangthai != CHUAGUI).ToList();
                                 foreach (var hdlh in hdlhs)
                                 {
                                     hdlh.trangthai = CHUAGUI;
+                                    hdlh.ngayxacnhan = null;
                                 }
                             }
                             else

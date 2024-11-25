@@ -47,8 +47,8 @@
     }
 
     function updateNhaCungUngPO_CallBack(md_sanpham_id) {
-        var frm = "#FrmGrid_grid_ds_chitietpo";
-        var c_dongdonhang_id = $("#c_dongdonhang_id", frm).val();
+        let frm = "#FrmGrid_grid_ds_chitietpo";
+        let c_dongdonhang_id = $("#c_dongdonhang_id", frm).val();
 
         $("#nhacungungid", frm)
                     .html("<option value=''>Đang tải nhà cung ứng...</option>")
@@ -59,7 +59,7 @@
             type: "GET",
             success: function (packingHtml) {
                 if (packingHtml != 'null') {
-                    $("#nhacungungid", frm).removeAttr("disabled").html(packingHtml);
+                    $("#nhacungungid", frm).removeAttr("disabled").html($(packingHtml).html());
                 } else {
                     $("#nhacungungid", frm).html("<option value=''>Không tìm thấy nhà cung ứng!</option>");
                 }
@@ -68,9 +68,9 @@
     }
 
     function updatePackingPO_CallBack(md_sanpham_id) {
-        var frm = "#FrmGrid_grid_ds_chitietpo";
-        var c_dongdonhang_id = $("#c_dongdonhang_id", frm).val();
-        var c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
+        let frm = "#FrmGrid_grid_ds_chitietpo";
+        let c_dongdonhang_id = $("#c_dongdonhang_id", frm).val();
+        let c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
         $("#md_donggoi_id", frm).html("<option value=''>Đang tải đóng gói...</option>").attr("disabled", "disabled");
         $.ajax({
             url: "Controllers/PackingController.ashx?action=getoptionselected&c_dongdonhang_id=" + c_dongdonhang_id + "&md_sanpham_id=" + md_sanpham_id +
@@ -80,7 +80,7 @@
                 var arr_pkl = packingHtml.split('(##)');
 
                 if (packingHtml != 'null') {
-                    $("#md_donggoi_id", frm).removeAttr("disabled").html(arr_pkl[0]);
+                    $("#md_donggoi_id", frm).removeAttr("disabled").html($(arr_pkl[0]).html());
                     $("#docquyen", frm).val(arr_pkl[1]);
                 } else {
                     $("#md_donggoi_id", frm).html("<option value=''>Không tìm thấy đóng gói!</option>");

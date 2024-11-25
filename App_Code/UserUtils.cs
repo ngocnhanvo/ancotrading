@@ -162,7 +162,7 @@ public static class UserUtils
                 else if (baogia.gia_db == true)
                 {
                     string md_doitackinhdoanh_id = baogia.md_doitackinhdoanh_id;
-                    var items = mdbc.GetDataFromProcedure("getGiaMuaSp_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", md_doitackinhdoanh_id, "@ngaytinhgia", baogia.ngaybaogia);
+                    var items = mdbc.GetDataFromProcedure("getGiaMuaSp_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", md_doitackinhdoanh_id, "@ngaytinhgia", baogia.ngaybaogia.Value.ToString("yyyy-MM-dd HH:mm"));
                     itemJS["gia"] = items.Rows[0]["gia"].ToString();
                     itemJS["barcode"] = items.Rows[0]["barcode"].ToString();
                     itemJS["phi"] = items.Rows[0]["phi"].ToString();
@@ -170,7 +170,7 @@ public static class UserUtils
                 //Lấy theo giá chuẩn
                 else
                 {
-                    decimal gia_sp = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", baogia.md_doitackinhdoanh_id, "@loai_bg", true, "@ngaytinhgia", baogia.ngaybaogia);
+                    decimal gia_sp = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", baogia.md_doitackinhdoanh_id, "@loai_bg", true, "@ngaytinhgia", baogia.ngaybaogia.Value.ToString("yyyy-MM-dd HH:mm"));
                     itemJS["gia"] = gia_sp + "";
                     itemJS["barcode"] = "";
                     itemJS["phi"] = 0 + "";

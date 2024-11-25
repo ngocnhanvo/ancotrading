@@ -1386,6 +1386,18 @@
                     , align: 'center'
                 },
                 {
+                    name: 'ngayxacnhan'
+                    , label: 'Ngày nhận'
+                    , index: 'tt.ngayxacnhan'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: false
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
                     name: 'mota'
                     , label: 'Mô tả'
                     , index: 'tt.mota'
@@ -1555,6 +1567,18 @@
                     , editable:false
                     , edittype: 'text'
                     , hidden: true 
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
+                    name: 'ngayxacnhan'
+                    , label: 'Ngày nhận'
+                    , index: 'tt.ngayxacnhan'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: false
                     , editrules:{ edithidden : true }
                     , align: 'center'
                 },
