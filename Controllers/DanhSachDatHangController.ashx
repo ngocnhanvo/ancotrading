@@ -114,7 +114,7 @@ public class DanhSachDatHangController : IHttpHandler
                         var dsdhDic = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).FirstOrDefault();
                         string trangthai = "";
                         string hdlhsStr = "";
-                        if (dsdhDic == null)
+                        if (dsdhDic != null)
                         {
                             trangthai = dsdhDic["trangthai"].ToString();
                             hdlhsStr = dsdhDic["hdlhs"].ToString();
