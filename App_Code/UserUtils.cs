@@ -377,7 +377,7 @@ public static class UserUtils
             var sp = db.md_sanphams.FirstOrDefault(p => p.md_sanpham_id.Equals(item.sanpham_id));
             var ddonhang = db.c_dongdonhangs.FirstOrDefault(p => p.c_dongdonhang_id.Equals(item.c_dongdonhang_id));
             string nhacungung = ddonhang.nhacungungid;
-            decimal gianhap = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp_ver2", "@md_sanpham_id", sp.md_sanpham_id, "@md_doitackinhdoanh_id", nhacungung, "@loai_bg", 0, "@ngaytinhgia", DateTime.Now);
+            decimal gianhap = (decimal)mdbc.ExecuteScalarProcedure("getGiaMuaSp_ver2", "@md_sanpham_id", sp.md_sanpham_id, "@md_doitackinhdoanh_id", nhacungung, "@loai_bg", 0, "@ngaytinhgia", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             var coGiaMua = gianhap > -1;
             if (gianhap == -1)
                 gianhap = 0;
