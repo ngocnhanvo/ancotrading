@@ -113,8 +113,7 @@ public class DanhSachDatHangController : IHttpHandler
                     foreach (var a in dsdhs)
                     {
                         var dsdhDic = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).FirstOrDefault();
-                        string trangthai = "";
-                        string hdlhsStr = "";
+                        string trangthai = "", hdlhsStr = "", ttsStr = "";
                         if (dsdhDic != null)
                         {
                             trangthai = dsdhDic["trangthai"].ToString();
@@ -143,6 +142,23 @@ public class DanhSachDatHangController : IHttpHandler
                                     {
                                         hdlhMain.trangthai = hdlh.trangthai;
                                         hdlhMain.ngayxacnhan = hdlh.ngayxacnhan;
+                                        hdlhMain.nguoixacnhan = hdlh.value_nguoicapnhat;
+                                        //hdlhMain.mota = hdlh.mota;
+                                    }
+                                }
+                            }
+
+                            if (!string.IsNullOrWhiteSpace(ttsStr))
+                            {
+                                var tts = JsonConvert.DeserializeObject<List<md_taptin>>(ttsStr);
+                                foreach (var tt in tts)
+                                {
+                                    var hdlhMain = db.md_taptins.Where(s => s.md_taptin_id == tt.md_taptin_id).FirstOrDefault();
+                                    if (hdlhMain != null)
+                                    {
+                                        hdlhMain.trangthai = tt.trangthai;
+                                        hdlhMain.ngayxacnhan = tt.ngayxacnhan;
+                                        hdlhMain.nguoixacnhan = tt.value_nguoicapnhat;
                                         //hdlhMain.mota = hdlh.mota;
                                     }
                                 }

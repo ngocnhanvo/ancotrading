@@ -648,7 +648,7 @@ public class DonHangController : IHttpHandler
                 }
                 else
                 {
-                    String getTongSoLuongConLai = "select count(*) from c_dongdonhang where soluong_conlai < 1 AND c_donhang_id = @c_donhang_id";
+                    String getTongSoLuongConLai = "select count(1) from c_dongdonhang where soluong_conlai < 1 AND c_donhang_id = @c_donhang_id";
                     int sum = (int)mdbc.ExecuteScalar(getTongSoLuongConLai, "@c_donhang_id", donhang.c_donhang_id);
                     if (sum == 0)
                     {

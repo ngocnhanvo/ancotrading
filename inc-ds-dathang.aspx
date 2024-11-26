@@ -1398,6 +1398,18 @@
                     , align: 'center'
                 },
                 {
+                    name: 'nguoixacnhan'
+                    , label: 'Người nhận'
+                    , index: 'tt.nguoixacnhan'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: true 
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
                     name: 'mota'
                     , label: 'Mô tả'
                     , index: 'tt.mota'
@@ -1579,6 +1591,18 @@
                     , editable:false
                     , edittype: 'text'
                     , hidden: false
+                    , editrules:{ edithidden : true }
+                    , align: 'center'
+                },
+                {
+                    name: 'nguoixacnhan'
+                    , label: 'Người nhận'
+                    , index: 'tt.nguoixacnhan'
+                    , fixed:true 
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: true 
                     , editrules:{ edithidden : true }
                     , align: 'center'
                 },

@@ -406,6 +406,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
                         , tt.ngaycapnhat
                         , tt.nguoicapnhat
                         , tt.ngayxacnhan
+                        , tt.nguoixacnhan
                         , tt.mota
                         , tt.trangthai
                         , ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
