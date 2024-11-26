@@ -1405,7 +1405,7 @@
                     , width: 100
                     , editable:false
                     , edittype: 'text'
-                    , hidden: true 
+                    , hidden: false 
                     , editrules:{ edithidden : true }
                     , align: 'center'
                 },
@@ -1602,7 +1602,7 @@
                     , width: 100
                     , editable:false
                     , edittype: 'text'
-                    , hidden: true 
+                    , hidden: false 
                     , editrules:{ edithidden : true }
                     , align: 'center'
                 },
