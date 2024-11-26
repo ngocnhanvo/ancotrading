@@ -118,6 +118,7 @@ public class DanhSachDatHangController : IHttpHandler
                         {
                             trangthai = dsdhDic["trangthai"].ToString();
                             hdlhsStr = dsdhDic["hdlhs"].ToString();
+                            ttsStr = dsdhDic["tts"].ToString();
                         }
 
                         if (!string.IsNullOrEmpty(trangthai))
