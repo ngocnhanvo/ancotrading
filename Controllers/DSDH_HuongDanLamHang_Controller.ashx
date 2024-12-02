@@ -173,34 +173,41 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             var pathRoot = "taptin/hdlhAnco";
             for (int i = 1; i <= lengthF; i++)
             {
-                string fileName = files[i - 1].FileName;
+                string fileName = files[i - 1].FileName.removeAllSpaceOrTrimText(true);
                 int mimeI = fileName.LastIndexOf(".");
                 string mime = fileName.Substring(mimeI);
                 string name = fileName.Substring(0, mimeI);
-                var taptin = db.md_taptins.Where(p => p.tentaptin == fileName & p.doituong_dinhkem == "HDLH" & p.lienket == dsdh.c_danhsachdathang_id).FirstOrDefault();
-                if (taptin == null)
+                if (!name.StartsWith(Helper.HDBS) & !name.StartsWith(Helper.HDDG) & !name.StartsWith(Helper.HDCT))
                 {
-                    var id = Helper.getNewId();
-                    var path = $"{pathRoot}/{id}{mime}";
-                    taptin = new md_taptin();
-                    taptin.md_taptin_id = id;
-                    taptin.lienket = id_parent;
-                    taptin.trangthai = "CHUAGUI";
-                    taptin.doituong_dinhkem = "HDLH";
-                    taptin.tentaptin = fileName;
-                    taptin.path = path;
-                    taptin.size = files[i - 1].ContentLength;
-                    taptin.mimetype = mime;
-                    taptin.hoatdong = true;
-                    taptin.ngaytao = DateTime.Now;
-                    taptin.nguoitao = UserUtils.getUser(context);
-                    db.md_taptins.InsertOnSubmit(taptin);
-                    updated = true;
-                    msg += $@"<div style='color:blue'>{fileName}: đã tải lên thành công.</div>";
+                    msg += $@"<div error style='color:red'>{fileName}: tên phải bắt đầu bằng {Helper.HDBS}, {Helper.HDDG} hoặc {Helper.HDCT}</div>";
                 }
                 else
                 {
-                    msg += $@"<div error style='color:red'>{fileName}: đã tồn tại tập tin có tên này.</div>";
+                    var taptin = db.md_taptins.Where(p => p.tentaptin == fileName & p.doituong_dinhkem == "HDLH" & p.lienket == dsdh.c_danhsachdathang_id).FirstOrDefault();
+                    if (taptin == null)
+                    {
+                        var id = Helper.getNewId();
+                        var path = $"{pathRoot}/{id}{mime}";
+                        taptin = new md_taptin();
+                        taptin.md_taptin_id = id;
+                        taptin.lienket = id_parent;
+                        taptin.trangthai = "CHUAGUI";
+                        taptin.doituong_dinhkem = "HDLH";
+                        taptin.tentaptin = fileName;
+                        taptin.path = path;
+                        taptin.size = files[i - 1].ContentLength;
+                        taptin.mimetype = mime;
+                        taptin.hoatdong = true;
+                        taptin.ngaytao = DateTime.Now;
+                        taptin.nguoitao = UserUtils.getUser(context);
+                        db.md_taptins.InsertOnSubmit(taptin);
+                        updated = true;
+                        msg += $@"<div style='color:blue'>{fileName}: đã tải lên thành công.</div>";
+                    }
+                    else
+                    {
+                        msg += $@"<div error style='color:red'>{fileName}: đã tồn tại tập tin có tên này.</div>";
+                    }
                 }
             }
 
@@ -210,7 +217,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
 
                 for (int i = 1; i <= lengthF; i++)
                 {
-                    string fileName = files[i - 1].FileName;
+                    string fileName = files[i - 1].FileName.removeAllSpaceOrTrimText(true);
                     var taptin = db.md_taptins.Where(p => p.tentaptin == fileName & p.doituong_dinhkem == "HDLH" & p.lienket == dsdh.c_danhsachdathang_id).FirstOrDefault();
                     if (taptin != null)
                     {

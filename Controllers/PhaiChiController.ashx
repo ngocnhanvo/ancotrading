@@ -479,8 +479,8 @@ public class PhaiChiController : IHttpHandler
             filter = f.ToScript();
         }
 
-        string manv = context.User.Identity.Name;
-        if (manv == "quangtrung")
+        string manv = context.User.Identity.Name.removeAllSpaceOrTrimText(true);
+        if (new string[] { "quangtrung", "thuyhan"}.Contains(manv))
             filter += " and dtkd.ma_dtkd = N'ANCO1' ";
 
         String sqlCount = string.Format(@"

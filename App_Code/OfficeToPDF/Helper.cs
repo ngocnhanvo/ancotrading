@@ -14,6 +14,7 @@ public static class Helper
     public static string HIEULUC = "HIEULUC";
     public static string KETTHUC = "KETTHUC";
     public static string HUY = "HUY";
+    public static string HDBS = "HDBS", HDDG = "HDDG", HDCT = "HDCT";
     #endregion bien toan cuc
 
     public static void removeFileWithPath(string path)
