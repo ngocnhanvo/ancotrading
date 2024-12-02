@@ -38,6 +38,15 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
     {
         string nam = context.Request.QueryString["nam"];
         string xuong = context.Request.QueryString["xuong"];
+        var maXuong = context.Request.QueryString["maXuong"];
+        string manv = context.User.Identity.Name.removeAllSpaceOrTrimText(true);
+        if (new string[] { "quangtrung", "thuyhan" }.Contains(manv))
+        {
+            if (maXuong != "ANCO1")
+            {
+                throw new Exception("Chỉ có thể xem Anco1");
+            }
+        }
 
         string sql = string.Format(@"	 
             declare @tungay datetime = convert(datetime, N'01/01/{0} 00:00:00', 103)

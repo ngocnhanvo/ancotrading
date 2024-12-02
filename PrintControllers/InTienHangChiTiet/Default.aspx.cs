@@ -53,6 +53,12 @@ public partial class PrintControllers_InTienHangChiTiet_Default : System.Web.UI.
             "" : 
                 string.Format("AND cnx.md_doitackinhdoanh_id = N'{0}'", dtkd);
 
+        string manv = Context.User.Identity.Name.removeAllSpaceOrTrimText(true);
+        if (new string[] { "quangtrung", "thuyhan" }.Contains(manv))
+        {
+            dtkdWhere += " AND cnx.md_doitackinhdoanh_id in (select md_doitackinhdoanh_id from md_doitackinhdoanh where ma_dtkd = N'ANCO1') ";
+        }
+
         if (string.IsNullOrEmpty(cdxem))
         {
             if (dtkd == null | dtkd == "")

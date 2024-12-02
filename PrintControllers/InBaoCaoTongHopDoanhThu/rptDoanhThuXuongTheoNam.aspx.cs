@@ -40,6 +40,14 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuXuongTh
         string xuong = context.Request.QueryString["xuong"];
         var maXuong = context.Request.QueryString["maXuong"];
         var tenXuong = maXuong == "ANCO1" ? "AN CƠ 1" : (maXuong == "ANCO2" ? "AN CƠ 2" : maXuong);
+        string manv = context.User.Identity.Name.removeAllSpaceOrTrimText(true);
+        if (new string[] { "quangtrung", "thuyhan" }.Contains(manv))
+        {
+            if(maXuong != "ANCO1")
+            {
+                throw new Exception("Chỉ có thể xem Anco1");
+            }
+        }
 
         string sql = string.Format(@"	 
             declare @tungay datetime = convert(datetime, N'01/01/{0} 00:00:00', 103)
