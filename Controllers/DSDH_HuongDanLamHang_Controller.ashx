@@ -56,13 +56,13 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             goto EndEventHandler;
         }
 
-        if(dsdh.trangthai == "CHUAGUI")
+        if (dsdh.trangthai == "CHUAGUI")
         {
             msg = $@"Chưa gửi ""danh sách đăth hàng""";
             goto EndEventHandler;
         }
 
-        if(dsdh.trangthai == "TUCHOI")
+        if (dsdh.trangthai == "TUCHOI")
         {
             msg = $@"""Danh sách đăth hàng"" đã bị trả lại";
             goto EndEventHandler;
@@ -84,9 +84,9 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
 
         var msgErrs = new List<string>();
         var taptin2s = new List<md_taptin>();
-        foreach(var taptin in taptins)
+        foreach (var taptin in taptins)
         {
-            if(taptin.trangthai != "CHUAGUI")
+            if (taptin.trangthai != "CHUAGUI")
             {
                 msgErrs.Add($@"""{taptin.tentaptin}"" đã được gửi NCC");
             }
@@ -97,7 +97,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
                 var link = ExcuteSignalRStatic.mapPathSignalR($@"~/{taptin2.path}");
                 if (File.Exists(link))
                 {
-                    var bytes =  File.ReadAllBytes(link);
+                    var bytes = File.ReadAllBytes(link);
                     taptin2.mota = Helper.EncodeHTML_VNN(Convert.ToBase64String(bytes));
                     taptin2s.Add(taptin2);
 
@@ -136,7 +136,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
 
         EndEventHandler:;
 
-        if(msg.Length <= 0)
+        if (msg.Length <= 0)
         {
             msg = $@"<div style='color:blue'>Đã gửi HDLH</div>";
         }
@@ -162,7 +162,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         }
 
         var dsdh = db.c_danhsachdathangs.Where(s => s.c_danhsachdathang_id == id_parent).FirstOrDefault();
-        if(dsdh == null)
+        if (dsdh == null)
         {
             msg = $@"<div error style='color:red'>Không tìm thấy ""danh sách đăth hàng""</div>";
             goto EndEventHandler;
@@ -170,16 +170,21 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
 
         try
         {
+            var fileTypes = new string[] { ".doc", ".docx", ".xls", ".xlsx" };
             var pathRoot = "taptin/hdlhAnco";
             for (int i = 1; i <= lengthF; i++)
             {
                 string fileName = files[i - 1].FileName.removeAllSpaceOrTrimText(true);
                 int mimeI = fileName.LastIndexOf(".");
-                string mime = fileName.Substring(mimeI);
+                string mime = fileName.Substring(mimeI).ToLower();
                 string name = fileName.Substring(0, mimeI);
-                if (!name.StartsWith(Helper.HDBS) & !name.StartsWith(Helper.HDDG) & !name.StartsWith(Helper.HDCT))
+                if (!fileTypes.Contains(mime))
                 {
-                    msg += $@"<div error style='color:red'>{fileName}: tên phải bắt đầu bằng {Helper.HDBS}, {Helper.HDDG} hoặc {Helper.HDCT}</div>";
+                    msg += $@"<div error style='color:red'>{fileName}: phải là word hoặc excel</div>";
+                }
+                else if (!name.StartsWith(Helper.HDBS) & !name.StartsWith(Helper.HDTEM_BAOBI))
+                {
+                    msg += $@"<div error style='color:red'>{fileName}: tên phải bắt đầu bằng {Helper.HDBS} hoặc {Helper.HDTEM_BAOBI}</div>";
                 }
                 else
                 {
@@ -191,7 +196,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
                         taptin = new md_taptin();
                         taptin.md_taptin_id = id;
                         taptin.lienket = id_parent;
-                        taptin.trangthai = "CHUAGUI";
+                        taptin.trangthai = Helper.CHUAGUI;
                         taptin.doituong_dinhkem = "HDLH";
                         taptin.tentaptin = fileName;
                         taptin.path = path;
@@ -241,7 +246,29 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
 
     public void edit(HttpContext context)
     {
+        string msg = "";
+        var id = context.Request.Form["id"];
+        var mota = context.Request.Form["mota"].removeAllSpaceOrTrimText(true);
+        var object_ = db.md_taptins.Where(s => s.md_taptin_id == id).FirstOrDefault();
+        if (object_ == null)
+        {
+            msg = "Không tìm thấy tập tin cần sửa";
+            goto EndEventHandler;
+        }
 
+        object_.mota = mota;
+        db.SubmitChanges();
+
+    EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Sửa tập tin thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void add(HttpContext context)
@@ -265,9 +292,9 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
 
         var msgErrs = new List<string>();
         var links = new List<string>();
-        foreach(var taptin in taptins)
+        foreach (var taptin in taptins)
         {
-            if(taptin.trangthai != "CHUAGUI")
+            if (taptin.trangthai != "CHUAGUI")
             {
                 msgErrs.Add($@"""{taptin.tentaptin}"" đã được gửi NCC");
             }
@@ -281,7 +308,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         if (msgErrs.Count <= 0)
         {
             db.SubmitChanges();
-            foreach(var link in links)
+            foreach (var link in links)
             {
                 if (File.Exists(link))
                     File.Delete(link);
@@ -292,7 +319,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
 
         EndEventHandler:;
 
-        if(msg.Length <= 0)
+        if (msg.Length <= 0)
         {
             jqGridHelper.Utils.writeResult(1, "Xóa tập tin thành công");
         }
@@ -319,8 +346,8 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
 
         var sqlCount = $@"
             SELECT COUNT(1) AS count 
-            FROM md_taptin WHERE 1=1 {filter} 
-            and lienket ='{poId}'
+            FROM md_taptin tt WHERE 1=1 {filter} 
+            and tt.lienket ='{poId}'
         ";
 
         int page = int.Parse(context.Request.QueryString["page"]);
@@ -354,6 +381,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
                 select 
                     tt.md_taptin_id 
                     , tt.tentaptin
+                    , tt.mota
                     , tt.mimetype
                     , tt.size
                     , tt.md_taptin_id as path
@@ -363,7 +391,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
                     , tt.nguoicapnhat
                     , tt.ngayxacnhan
                     , tt.nguoixacnhan
-                    , tt.mota
+                    , tt.lydotuchoi
                     , tt.trangthai
                     , ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
                 FROM 

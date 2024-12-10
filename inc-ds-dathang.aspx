@@ -1277,215 +1277,228 @@
                 function(rowid) {
                     $('#edit_grid_huongdanlamhang').click();
                 }
-            "
+                "
                 ColModel="
-            [
-                {
-                    name: 'md_taptin_id'
-                    , label: 'md_taptin_id'
-                    , index: 'md_taptin_id'
-                    , fixed:true 
-                    , width: 100
-                    , hidden: true 
-                    , editable:true
-                    , edittype: 'text'
-                    , key: true
-                },
-                {
-                    name: 'tentaptin'
-                    , label: 'Tên tập tin'
-                    , index: 'tt.tentaptin'
-                    , fixed:true 
-                    , width: 140
-                    , edittype: 'text'
-                    , editable: true
-                    , hidden: false
-                },
-                {
-                     name: 'mimetype'
-                     , label: 'Loại'
-                     , index: 'tt.mimetype'
-                     , editable: false
-                     , fixed:true 
-                     , width: 60
-                     , edittype: 'text'
-                     , align: 'center'
-                },
-                {
-                     name: 'size'
-                     , label: 'Kích thước'
-                     , index: 'tt.size'
-                     , editable: false
-                     , fixed:true 
-                     , width: 80
-                     , edittype: 'text'
-                     , editoptions:{ defaultValue: '0' }
-                     , editrules: { required:true, number:true, minValue: 0 }
-                     , align: 'right'
-                     , formatter: formatBytes
-                     , unformat: disable_formatter
-                },
-                {
-                     name: 'path'
-                     , label: 'Tải về'
-                     , index: 'tt.path'
-                     , editable: false
-                     , fixed:true 
-                     , width: 50
-                     , edittype: 'text'
-                     , align: 'center'
-                     , formatter: download
-                     , unformat: disable_formatter
-                },
-                {
-                    name: 'ngaytao'
-                    , label: 'Ngày tạo'
-                    , index: 'tt.ngaytao'
-                    , fixed:true 
-                    , width: 100
-                    , editable:false
-                    , edittype: 'text'
-                    , hidden: false 
-                    , editrules:{ edithidden : true }
-                    , align: 'center'
-                },
-                {
-                    name: 'nguoitao'
-                    , label: 'Người tạo'
-                    , index: 'tt.nguoitao'
-                    , fixed:true 
-                    , width: 100
-                    , editable:false
-                    , edittype: 'text'
-                    , hidden: false 
-                    , editrules:{ edithidden : true }
-                    , align: 'center'
-                },
-                {
-                    name: 'ngaycapnhat'
-                    , label: 'Ngày gửi'
-                    , index: 'tt.ngaycapnhat'
-                    , fixed:true 
-                    , width: 100
-                    , editable:false
-                    , edittype: 'text'
-                    , hidden: false
-                    , editrules:{ edithidden : true }
-                    , align: 'center'
-                },
-                {
-                    name: 'nguoicapnhat'
-                    , label: 'Người gửi'
-                    , index: 'tt.nguoicapnhat'
-                    , fixed:true 
-                    , width: 100
-                    , editable:false
-                    , edittype: 'text'
-                    , hidden: true 
-                    , editrules:{ edithidden : true }
-                    , align: 'center'
-                },
-                {
-                    name: 'ngayxacnhan'
-                    , label: 'Ngày nhận'
-                    , index: 'tt.ngayxacnhan'
-                    , fixed:true 
-                    , width: 100
-                    , editable:false
-                    , edittype: 'text'
-                    , hidden: false
-                    , editrules:{ edithidden : true }
-                    , align: 'center'
-                },
-                {
-                    name: 'nguoixacnhan'
-                    , label: 'Người nhận'
-                    , index: 'tt.nguoixacnhan'
-                    , fixed:true 
-                    , width: 100
-                    , editable:false
-                    , edittype: 'text'
-                    , hidden: false 
-                    , editrules:{ edithidden : true }
-                    , align: 'center'
-                },
-                {
-                    name: 'mota'
-                    , label: 'Mô tả'
-                    , index: 'tt.mota'
-                    , fixed:true 
-                    , width: 100
-                    , editable:true
-                    , edittype: 'textarea'
-                },
-                {
-                    name: 'trangthai'
-                    , label: 'Trạng thái'
-                    , index: 'tt.trangthai'
-                    , fixed:true 
-                    , width: 100
-                    , editable: false
-                    , align: 'center'
-                }
-            ]"
+                [
+                    {
+                        name: 'md_taptin_id'
+                        , label: 'md_taptin_id'
+                        , index: 'md_taptin_id'
+                        , fixed:true 
+                        , width: 100
+                        , hidden: true 
+                        , editable:true
+                        , edittype: 'text'
+                        , key: true
+                    },
+                    {
+                        name: 'tentaptin'
+                        , label: 'Tên tập tin'
+                        , index: 'tt.tentaptin'
+                        , fixed:true 
+                        , width: 140
+                        , edittype: 'text'
+                        , editable: false
+                        , hidden: false
+                    },
+                    {
+                        name: 'mota'
+                        , label: 'ghi chú Ancotrading'
+                        , index: 'tt.mota'
+                        , fixed: true 
+                        , width: 140
+                        , edittype: 'text'
+                        , editable: true
+                        , hidden: false
+                        , edittype: 'textarea'
+                    },
+                    {
+                         name: 'mimetype'
+                         , label: 'Loại'
+                         , index: 'tt.mimetype'
+                         , editable: false
+                         , fixed:true 
+                         , width: 60
+                         , edittype: 'text'
+                         , align: 'center'
+                    },
+                    {
+                         name: 'size'
+                         , label: 'Kích thước'
+                         , index: 'tt.size'
+                         , editable: false
+                         , fixed:true 
+                         , width: 80
+                         , edittype: 'text'
+                         , editoptions:{ defaultValue: '0' }
+                         , editrules: { required:true, number:true, minValue: 0 }
+                         , align: 'right'
+                         , formatter: formatBytes
+                         , unformat: disable_formatter
+                    },
+                    {
+                         name: 'path'
+                         , label: 'Tải về'
+                         , index: 'tt.path'
+                         , editable: false
+                         , fixed:true 
+                         , width: 50
+                         , edittype: 'text'
+                         , align: 'center'
+                         , formatter: download
+                         , unformat: disable_formatter
+                    },
+                    {
+                        name: 'ngaytao'
+                        , label: 'Ngày tạo'
+                        , index: 'tt.ngaytao'
+                        , fixed:true 
+                        , width: 100
+                        , editable:false
+                        , edittype: 'text'
+                        , hidden: false 
+                        , editrules:{ edithidden : true }
+                        , align: 'center'
+                    },
+                    {
+                        name: 'nguoitao'
+                        , label: 'Người tạo'
+                        , index: 'tt.nguoitao'
+                        , fixed:true 
+                        , width: 100
+                        , editable:false
+                        , edittype: 'text'
+                        , hidden: false 
+                        , editrules:{ edithidden : true }
+                        , align: 'center'
+                    },
+                    {
+                        name: 'ngaycapnhat'
+                        , label: 'Ngày gửi'
+                        , index: 'tt.ngaycapnhat'
+                        , fixed:true 
+                        , width: 100
+                        , editable:false
+                        , edittype: 'text'
+                        , hidden: false
+                        , editrules:{ edithidden : true }
+                        , align: 'center'
+                    },
+                    {
+                        name: 'nguoicapnhat'
+                        , label: 'Người gửi'
+                        , index: 'tt.nguoicapnhat'
+                        , fixed:true 
+                        , width: 100
+                        , editable:false
+                        , edittype: 'text'
+                        , hidden: true 
+                        , editrules:{ edithidden : true }
+                        , align: 'center'
+                    },
+                    {
+                        name: 'ngayxacnhan'
+                        , label: 'Ngày nhận'
+                        , index: 'tt.ngayxacnhan'
+                        , fixed:true 
+                        , width: 100
+                        , editable:false
+                        , edittype: 'text'
+                        , hidden: false
+                        , editrules:{ edithidden : true }
+                        , align: 'center'
+                    },
+                    {
+                        name: 'nguoixacnhan'
+                        , label: 'Người nhận'
+                        , index: 'tt.nguoixacnhan'
+                        , fixed:true 
+                        , width: 100
+                        , editable:false
+                        , edittype: 'text'
+                        , hidden: false 
+                        , editrules:{ edithidden : true }
+                        , align: 'center'
+                    },
+                    {
+                        name: 'lydotuchoi'
+                        , label: 'Lý do không nhận'
+                        , index: 'tt.lydotuchoi'
+                        , fixed:true 
+                        , width: 100
+                        , editable:false
+                        , edittype: 'textarea'
+                    },
+                    {
+                        name: 'trangthai'
+                        , label: 'Trạng thái'
+                        , index: 'tt.trangthai'
+                        , stype: 'select'
+                        , searchoptions:{sopt:['eq'], value:':[ALL];CHUAGUI:Chưi gửi;DAGUI:Đã gửi;DANHAN:Đã nhận;TUCHOI:Từ chối' }
+                        , fixed:true 
+                        , width: 100
+                        , editable: false
+                        , align: 'center'
+                    }
+                ]"
                 GridComplete="let o = $(this).parent().parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 97);$(this).setGridWidth($(o).width())"
                 FilterToolbar="true"
                 Height="150"
                 MultiSelect="true"
                 ShowAdd="false"
-                ShowEdit="false"
+                ShowEdit="true"
                 ShowDel="<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
                 AddFormOptions="
-                beforeShowForm: function (formid) {
-                    let masterId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
-                    let forId = 'c_danhsachdathang_id';
-                    if(masterId == null)
-                    {
-                        $(formid).parent().parent().parent().dialog('destroy').remove();
-                        alert('Hãy chọn một đơn hàng mới có thể tạo chi tiết.!');
+                    beforeShowForm: function (formid) {
+                        let masterId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
+                        let forId = 'c_danhsachdathang_id';
+                        if(masterId == null)
+                        {
+                            $(formid).parent().parent().parent().dialog('destroy').remove();
+                            alert('Hãy chọn một đơn hàng mới có thể tạo chi tiết.!');
+                        }
+                        else{
+                            formid.closest('div.ui-jqdialog').dialogCenter();
+                        }
+                    }, 
+                    beforeSubmit:function(postdata, formid) {
+                        let masterId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
+                        let forId = 'c_danhsachdathang_id';
+                        if(masterId == null)
+                        {
+                            $(formid).parent().parent().parent().dialog('destroy').remove();
+                            return [false,'Hãy chọn một đơn hàng mới có thể tạo chi tiết.!!'];
+                        }
+                        else {
+                            postdata.c_danhsachdathang_id = masterId;
+                            return [true,'']; 
+                        }
+                    }, 
+                    afterSubmit: function(rs, postdata){
+                       return showMsgDialog(rs);
                     }
-                    else{
-                        formid.closest('div.ui-jqdialog').dialogCenter();
-                    }
-                }, 
-                beforeSubmit:function(postdata, formid) {
-                    let masterId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
-                    let forId = 'c_danhsachdathang_id';
-                    if(masterId == null)
-                    {
-                        $(formid).parent().parent().parent().dialog('destroy').remove();
-                        return [false,'Hãy chọn một đơn hàng mới có thể tạo chi tiết.!!'];
-                    }
-                    else {
-                        postdata.c_danhsachdathang_id = masterId;
-                        return [true,'']; 
-                    }
-                }, 
-                afterSubmit: function(rs, postdata){
-                   return showMsgDialog(rs);
-                }
-            "
+                "
                 EditFormOptions="
-                beforeShowForm: function (formid) {
-                    formid.closest('div.ui-jqdialog').dialogCenter(); 
-                },
-                errorTextFormat:function(data) { 
-                    return 'Lỗi: ' + data.responseText 
+                    beforeShowForm: function (formid) {
+                        formid.closest('div.ui-jqdialog').dialogCenter(); 
+                    },
+                    errorTextFormat:function(data) { 
+                        return 'Lỗi: ' + data.responseText 
+                    }"
+                    ViewFormOptions="
+                    beforeShowForm: function (formid) {
+                        formid.closest('div.ui-jqdialog').dialogCenter(); 
+                    },
+                    errorTextFormat:function(data) { 
+                        return 'Lỗi: ' + data.responseText 
                 }"
-                ViewFormOptions="
-                beforeShowForm: function (formid) {
-                    formid.closest('div.ui-jqdialog').dialogCenter(); 
-                },
-                errorTextFormat:function(data) { 
-                    return 'Lỗi: ' + data.responseText 
-            }"
                 DelFormOptions="
                 beforeShowForm: function (formid) {
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 },
                 afterSubmit: function(rs, postdata) { 
                     return showMsgDialog(rs); 
-            }"
+                }"
                 runat="server" />
         </div>
 
@@ -1624,6 +1637,8 @@
                     , fixed:true 
                     , width: 100
                     , editable: false
+                    , stype: 'select'
+                    , searchoptions:{sopt:['eq'], value:':[ALL];CHUAGUI:Chưi gửi;DAGUI:Đã gửi;DANHAN:Đã nhận;TUCHOI:Từ chối' }
                     , align: 'center'
                 }
             ]"

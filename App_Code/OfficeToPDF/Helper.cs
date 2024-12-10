@@ -10,11 +10,14 @@ using System.Collections.Generic;
 public static class Helper
 {
     #region bien toan cuc
+    public static string CHUAGUI = "CHUAGUI";
+    public static string DAGUI = "DAGUI";
+    public static string DANHAN = "DANHAN";
     public static string SOANTHAO = "SOANTHAO";
     public static string HIEULUC = "HIEULUC";
     public static string KETTHUC = "KETTHUC";
     public static string HUY = "HUY";
-    public static string HDBS = "HDBS", HDDG = "HDDG", HDCT = "HDCT";
+    public static string HDBS = "HDBS", HDDG = "HDDG", HDCT = "HDCT", HDTEM_BAOBI = "HDTEM-BAOBI";
     #endregion bien toan cuc
 
     public static void removeFileWithPath(string path)

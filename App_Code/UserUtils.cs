@@ -429,14 +429,14 @@ public static class UserUtils
                 gianhap = jqGridHelper.Utils.Round5(gianhap + phiDiscount * tygia, -2);
             }
 
-            if(ma_dtkd_select == "ANBINH" & sp.ma_sanpham.StartsWith("88-"))
-            {
-                var discount = donhang.discount.GetValueOrDefault(0) > 0 ? donhang.discount.GetValueOrDefault(0) : (decimal)ddonhang.discount.GetValueOrDefault(0);
-                giachuan = (ddonhang.giafob.Value - ddonhang.giafob.Value * discount / 100) * (decimal)0.8 * 23000;
-                giachuan = jqGridHelper.Utils.Round5(giachuan, -2);
-                gianhap = giachuan + jqGridHelper.Utils.Round5(phiDiscount * 23000, -2);
-                gianhap = jqGridHelper.Utils.Round5(gianhap, -2);
-            }
+            //if(ma_dtkd_select == "ANBINH" & sp.ma_sanpham.StartsWith("88-"))
+            //{
+            //    var discount = donhang.discount.GetValueOrDefault(0) > 0 ? donhang.discount.GetValueOrDefault(0) : (decimal)ddonhang.discount.GetValueOrDefault(0);
+            //    giachuan = (ddonhang.giafob.Value - ddonhang.giafob.Value * discount / 100) * (decimal)0.8 * 23000;
+            //    giachuan = jqGridHelper.Utils.Round5(giachuan, -2);
+            //    gianhap = giachuan + jqGridHelper.Utils.Round5(phiDiscount * 23000, -2);
+            //    gianhap = jqGridHelper.Utils.Round5(gianhap, -2);
+            //}
 
             var ddsdh = new c_dongdsdh();
 

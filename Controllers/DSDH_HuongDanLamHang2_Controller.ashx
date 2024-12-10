@@ -364,7 +364,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
 
         var sqlCount = $@"
             SELECT COUNT(1) AS count 
-            FROM md_ghichuhdlh WHERE 1=1 {filter} 
+            FROM md_ghichuhdlh tt WHERE 1=1 {filter} 
             and lienket ='{poId}'
         ";
 

@@ -113,12 +113,14 @@ public class DanhSachDatHangController : IHttpHandler
                     foreach (var a in dsdhs)
                     {
                         var dsdhDic = data.Where(s => s["c_danhsachdathang_id"] + "" == a.c_danhsachdathang_id).FirstOrDefault();
-                        string trangthai = "", hdlhsStr = "", ttsStr = "";
+                        string trangthai = "", hdlhsStr = "", ttsStr = "", huongdanlamhang = "", huongdanlamhangchung = "";
                         if (dsdhDic != null)
                         {
                             trangthai = dsdhDic["trangthai"].ToString();
                             hdlhsStr = dsdhDic["hdlhs"].ToString();
                             ttsStr = dsdhDic["tts"].ToString();
+                            huongdanlamhang = dsdhDic["huongdanlamhang"].ToString();
+                            huongdanlamhangchung = dsdhDic["huongdanlamhangchung"].ToString();
                         }
 
                         if (!string.IsNullOrEmpty(trangthai))
@@ -131,6 +133,9 @@ public class DanhSachDatHangController : IHttpHandler
                                     a.trangthai = "DAGUI";
                                 else
                                     a.trangthai = DAHIEULUC;
+
+                                a.huongdanlamhang = huongdanlamhang;
+                                a.huongdanlamhangchung = huongdanlamhangchung;
                             }
 
                             if (!string.IsNullOrWhiteSpace(hdlhsStr))
@@ -160,7 +165,8 @@ public class DanhSachDatHangController : IHttpHandler
                                         hdlhMain.trangthai = tt.trangthai;
                                         hdlhMain.ngayxacnhan = tt.ngayxacnhan;
                                         hdlhMain.nguoixacnhan = tt.value_nguoicapnhat;
-                                        //hdlhMain.mota = hdlh.mota;
+                                        if(tt.trangthai == TUCHOI)
+                                            hdlhMain.lydotuchoi = tt.mota;
                                     }
                                 }
                             }
