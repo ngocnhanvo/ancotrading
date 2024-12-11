@@ -86,7 +86,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         var taptin2s = new List<md_taptin>();
         foreach (var taptin in taptins)
         {
-            if (taptin.trangthai != "CHUAGUI")
+            if (taptin.trangthai != Helper.CHUAGUI)
             {
                 msgErrs.Add($@"""{taptin.tentaptin}"" đã được gửi NCC");
             }
@@ -102,7 +102,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
                     taptin2s.Add(taptin2);
 
                     taptin.ngaycapnhat = DateTime.Now;
-                    taptin.trangthai = "DAGUI";
+                    taptin.trangthai = Helper.DAGUI;
                 }
             }
         }
@@ -119,6 +119,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
 
                 if (!msgDT.Contains("error") & !msgDT.Contains("Có lỗi xảy ra"))
                 {
+                    dsdh.trangthaiHDLH = Helper.DAGUI;
                     db.SubmitChanges();
                 }
                 else

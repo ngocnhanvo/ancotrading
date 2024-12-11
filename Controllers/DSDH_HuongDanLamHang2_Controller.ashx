@@ -128,6 +128,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
 
                 if (!msgDT.Contains("error") & !msgDT.Contains("Có lỗi xảy ra"))
                 {
+                    dsdh.trangthaiHDLH = Helper.DAGUI;
                     db.SubmitChanges();
                 }
                 else
@@ -182,7 +183,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
             msg = $@"Không có ""Hướng dẫn làm hàng"" nào cần gửi";
             goto EndEventHandler;
         }
-        
+
         foreach(var ghichu in ghichus)
         {
             var ngaytaoStr = ghichu.ngaytao.Value.ToString(fmtDate);
