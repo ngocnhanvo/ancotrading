@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Web;
@@ -136,5 +136,53 @@ public class GoogleMail
         client.UseDefaultCredentials = false;
         client.Credentials = new NetworkCredential(_email, _password);
         client.Send(mail);
+    }
+
+    public void Send(String from, String to, String cc, String bcc, String subject, String body, List<Attachment> attachments, params object[] args)
+    {
+        if (Regex.IsMatch(body, "^([cCdDeEfFgGhHiIjI]:).+"))
+        {
+            body = File.ReadAllText(body);
+        }
+        body = String.Format(body, args);
+
+        MailMessage mail = new MailMessage();
+        mail.From = new MailAddress(from);
+        mail.ReplyTo = new MailAddress(from);
+
+        to = to.Replace(" ", "");
+        string[] tos = to.Split(";,".ToArray());
+        foreach (string item in tos)
+        {
+            mail.To.Add(new MailAddress(item));
+        }
+        mail.Subject = subject;
+        mail.Body = body;
+        mail.IsBodyHtml = true;
+
+        if (!String.IsNullOrEmpty(cc))
+        {
+            mail.CC.Add(cc);
+        }
+        if (!String.IsNullOrEmpty(bcc))
+        {
+            mail.Bcc.Add(bcc);
+        }
+
+        if (attachments.Count > 0)
+        {
+            foreach (var attachment in attachments)
+            {
+                mail.Attachments.Add(attachment);
+            }
+        }
+
+        ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
+        SmtpClient client = new SmtpClient(_smtp, _port);
+        client.EnableSsl = _ssl;
+        client.UseDefaultCredentials = false;
+        client.Credentials = new NetworkCredential(_email, _password);
+        client.Send(mail);
+        mail.Dispose();
     }
 }

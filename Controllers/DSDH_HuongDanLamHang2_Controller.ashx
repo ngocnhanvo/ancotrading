@@ -46,32 +46,64 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
         }
     }
 
+    public string guiMail(HttpContext context, List<md_ghichuhdlh> gcs, c_danhsachdathang dsdh)
+    {
+        string msg = "";
+        try
+        {
+            string manv = UserUtils.getUser(context);
+            var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
+            var smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
+            var mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
+            var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).FirstOrDefault();
+
+            string title = $@"Hướng dẩn bổ sung cho đơn hàng {dsdh.so_po}";
+            string body = $@"Là phần hướng dẩn bổ sung cho dơn hàng số {dsdh.so_po} của DSDH số {dsdh.sochungtu} chi tiết theo số lần như chương trinh";
+            mail.Send(
+                nv.email
+                , dtkd.email
+                , nv.email
+                , ""
+                , title
+                , body
+            );
+        }
+        catch (Exception ex)
+        {
+            msg = $"Gửi mail thất bại: {ex.Message}";
+        }
+
+        return msg;
+    }
+
     public void Send(HttpContext context)
     {
+        var nccs = new string[] { "ANCO1" };
         var msg = "";
         var hdlh = context.Request.Form["hdlh"];
         var chdk = context.Request.Form["chdk"];
         var id = context.Request.Form["id_parent"].removeAllSpaceOrTrimText(false);
-        if(string.IsNullOrWhiteSpace(id))
+        var dsdh = db.c_danhsachdathangs.Where(c => c.c_danhsachdathang_id == id).FirstOrDefault();
+        var ghichus = db.md_ghichuhdlhs.Where(p => p.lienket == id & p.trangthai == CHUAGUI).OrderBy(s => s.ngaytao).ToList();
+        if (string.IsNullOrWhiteSpace(id))
         {
             msg = $@"Chưa chọn đơn đặt hàng";
             goto EndEventHandler;
         }
 
-        var dsdh = db.c_danhsachdathangs.Where(c => c.c_danhsachdathang_id == id).FirstOrDefault();
         if (dsdh == null)
         {
             msg = $@"Không tìm thấy ""danh sách đăth hàng""";
             goto EndEventHandler;
         }
 
-        if (dsdh.trangthai == CHUAGUI)
+        if (dsdh.trangthai == Helper.CHUAGUI)
         {
             msg = $@"Chưa gửi ""danh sách đăth hàng""";
             goto EndEventHandler;
         }
 
-        if (dsdh.trangthai == "TUCHOI")
+        if (dsdh.trangthai == Helper.TUCHOI)
         {
             msg = $@"""Danh sách đăth hàng"" đã bị trả lại";
             goto EndEventHandler;
@@ -84,14 +116,6 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
             goto EndEventHandler;
         }
 
-        var nccs = new string[] { "ANCO1" };
-        if (!nccs.Contains(dtkd.ma_dtkd))
-        {
-            msg = $@"Nhà cung cấp ""{dtkd.ma_dtkd}"" chưa được kích hoạt tính năng này";
-            goto EndEventHandler;
-        }
-
-        var ghichus = db.md_ghichuhdlhs.Where(p => p.lienket == dsdh.c_danhsachdathang_id & p.trangthai == CHUAGUI).OrderBy(s=>s.ngaytao).ToList();
         var msgErrs = new List<string>();
         var taptin2s = new List<md_ghichuhdlh>();
         foreach (var ghichu in ghichus)
@@ -119,12 +143,15 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
             string msgDT = "";
             try
             {
-                string link = Extension.API_ALL(dtkd.ma_dtkd) + "?oper=guiHDLH2";
-                var item = new Dictionary<string, object>();
-                item["result"] = taptin2s;
-                item["hdlh"] = hdlh;
-                item["chdk"] = chdk;
-                msgDT += Extension.GetModule(link, item);
+                if (nccs.Contains(dtkd.ma_dtkd))
+                {
+                    string link = Extension.API_ALL(dtkd.ma_dtkd) + "?oper=guiHDLH2";
+                    var item = new Dictionary<string, object>();
+                    item["result"] = taptin2s;
+                    item["hdlh"] = hdlh;
+                    item["chdk"] = chdk;
+                    msgDT += Extension.GetModule(link, item);
+                }
 
                 if (!msgDT.Contains("error") & !msgDT.Contains("Có lỗi xảy ra"))
                 {
@@ -149,6 +176,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
         if (msg.Length <= 0)
         {
             msg = $@"<div style='color:blue'>Đã gửi HDLH</div>";
+            msg += $@"<div style='color:red'>{guiMail(context, ghichus, dsdh)}</div>";
         }
         else
         {
@@ -162,7 +190,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
     {
         string msg = "", ddhh = "", chdk = "";
         var id = context.Request.Form["id"].removeAllSpaceOrTrimText(false);
-        if(string.IsNullOrWhiteSpace(id))
+        if (string.IsNullOrWhiteSpace(id))
         {
             msg = $@"Chưa chọn đơn đặt hàng";
             goto EndEventHandler;
@@ -177,14 +205,14 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
         ddhh = dsdh.huongdanlamhang;
         chdk = dsdh.huongdanlamhangchung;
 
-        var ghichus = db.md_ghichuhdlhs.Where(p => p.lienket == dsdh.c_danhsachdathang_id & p.trangthai == CHUAGUI).OrderBy(s=>s.ngaytao).ToList();
+        var ghichus = db.md_ghichuhdlhs.Where(p => p.lienket == dsdh.c_danhsachdathang_id & p.trangthai == CHUAGUI).OrderBy(s => s.ngaytao).ToList();
         if (ghichus.Count <= 0)
         {
             msg = $@"Không có ""Hướng dẫn làm hàng"" nào cần gửi";
             goto EndEventHandler;
         }
 
-        foreach(var ghichu in ghichus)
+        foreach (var ghichu in ghichus)
         {
             var ngaytaoStr = ghichu.ngaytao.Value.ToString(fmtDate);
             if (ghichu.loai == DDHH)

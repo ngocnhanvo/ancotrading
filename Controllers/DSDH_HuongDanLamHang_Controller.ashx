@@ -43,10 +43,69 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         }
     }
 
+    public string guiMail(HttpContext context, List<md_taptin> tts, c_danhsachdathang dsdh)
+    {
+        string msg = "";
+        try
+        {
+            string manv = UserUtils.getUser(context);
+            var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
+            var smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
+            var mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
+            var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).FirstOrDefault();
+
+            string title = $@"", body = $@"";
+            var coDGbaBB = tts.Where(s => s.tentaptin.StartsWith(Helper.HDDG) & s.tentaptin.StartsWith(Helper.HDTEM_BAOBI)).Count() > 0;
+            var coDG = tts.Where(s => s.tentaptin.StartsWith(Helper.HDDG) & !s.tentaptin.StartsWith(Helper.HDTEM_BAOBI)).Count() > 0;
+            var coBB = tts.Where(s => !s.tentaptin.StartsWith(Helper.HDDG) & s.tentaptin.StartsWith(Helper.HDTEM_BAOBI)).Count() > 0;
+            if (coDGbaBB)
+            {
+                title = $@"Hướng dẩn đóng gói/tem/bao bì cho đơn hàng {dsdh.so_po}";
+                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói/tem/bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            }
+            else if (coDG)
+            {
+                title = $@"Hướng dẫn đóng gói cho đơn hàng {dsdh.so_po}";
+                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            }
+            else if (coBB)
+            {
+                title = $@"Hướng dẫn tem/bao bì cho đơn hàng {dsdh.so_po}";
+                body = $@"<div>Tập tin đính kèm là phần hướng dẫn tem/bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            }
+
+            var attachments = new List<System.Net.Mail.Attachment>();
+            foreach (var tt in tts)
+            {
+                var attachment = new System.Net.Mail.Attachment(ExcuteSignalRStatic.mapPathSignalR($"~/{tt.path}"));
+                attachment.Name = tt.tentaptin;
+                attachments.Add(attachment);
+                body += $"<div style='color:red; font-size:large'>{tt.mota}</div>";
+            }
+
+            mail.Send(
+                nv.email
+                , dtkd.email
+                , nv.email
+                , ""
+                , title
+                , body
+                , attachments
+            );
+        }
+        catch (Exception ex)
+        {
+            msg = $"Gửi mail thất bại: {ex.Message}";
+        }
+
+        return msg;
+    }
+
     public void Send(HttpContext context)
     {
+        var nccs = new string[] { "ANCO1" };
         var ids = context.Request.Form["id"].removeAllSpaceOrTrimText(false).Split(',').ToList();
-        var taptins = db.md_taptins.Where(p => ids.Contains(p.md_taptin_id)).ToList();
+        var taptins = db.md_taptins.Where(p => ids.Contains(p.md_taptin_id)).OrderBy(s => s.ngaytao).ToList();
         var dsdhId = taptins.Select(s => s.lienket).FirstOrDefault();
         var dsdh = db.c_danhsachdathangs.Where(c => c.c_danhsachdathang_id == dsdhId).FirstOrDefault();
         var msg = "";
@@ -56,13 +115,13 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             goto EndEventHandler;
         }
 
-        if (dsdh.trangthai == "CHUAGUI")
+        if (dsdh.trangthai == Helper.CHUAGUI)
         {
             msg = $@"Chưa gửi ""danh sách đăth hàng""";
             goto EndEventHandler;
         }
 
-        if (dsdh.trangthai == "TUCHOI")
+        if (dsdh.trangthai == Helper.TUCHOI)
         {
             msg = $@"""Danh sách đăth hàng"" đã bị trả lại";
             goto EndEventHandler;
@@ -72,13 +131,6 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         if (dtkd == null)
         {
             msg = $@"Không tìm thấy ""Nhà cung cấp""";
-            goto EndEventHandler;
-        }
-
-        var nccs = new string[] { "ANCO1" };
-        if (!nccs.Contains(dtkd.ma_dtkd))
-        {
-            msg = $@"Nhà cung cấp ""{dtkd.ma_dtkd}"" chưa được kích hoạt tính năng này";
             goto EndEventHandler;
         }
 
@@ -112,10 +164,13 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             string msgDT = "";
             try
             {
-                string link = Extension.API_ALL(dtkd.ma_dtkd) + "?oper=guiHDLH";
-                var item = new Dictionary<string, object>();
-                item["result"] = taptin2s;
-                msgDT += Extension.GetModule(link, item);
+                if (nccs.Contains(dtkd.ma_dtkd))
+                {
+                    string link = Extension.API_ALL(dtkd.ma_dtkd) + "?oper=guiHDLH";
+                    var item = new Dictionary<string, object>();
+                    item["result"] = taptin2s;
+                    msgDT += Extension.GetModule(link, item);
+                }
 
                 if (!msgDT.Contains("error") & !msgDT.Contains("Có lỗi xảy ra"))
                 {
@@ -140,6 +195,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         if (msg.Length <= 0)
         {
             msg = $@"<div style='color:blue'>Đã gửi HDLH</div>";
+            msg += $@"<div style='color:red'>{guiMail(context, taptins, dsdh)}</div>";
         }
         else
         {

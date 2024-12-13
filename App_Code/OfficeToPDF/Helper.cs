@@ -13,6 +13,7 @@ public static class Helper
     public static string CHUAGUI = "CHUAGUI";
     public static string DAGUI = "DAGUI";
     public static string DANHAN = "DANHAN";
+    public static string TUCHOI = "TUCHOI";
     public static string SOANTHAO = "SOANTHAO";
     public static string HIEULUC = "HIEULUC";
     public static string KETTHUC = "KETTHUC";
