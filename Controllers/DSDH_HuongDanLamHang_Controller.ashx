@@ -170,6 +170,11 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
                     var item = new Dictionary<string, object>();
                     item["result"] = taptin2s;
                     msgDT += Extension.GetModule(link, item);
+                    msg += $@"<div style='color:red'>{guiMail(context, taptins, dsdh)}</div>";
+                }
+                else
+                {
+                    msgDT += $@"<div error style='color:red'>{guiMail(context, taptins, dsdh)}</div>";
                 }
 
                 if (!msgDT.Contains("error") & !msgDT.Contains("Có lỗi xảy ra"))
@@ -195,7 +200,6 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         if (msg.Length <= 0)
         {
             msg = $@"<div style='color:blue'>Đã gửi HDLH</div>";
-            msg += $@"<div style='color:red'>{guiMail(context, taptins, dsdh)}</div>";
         }
         else
         {
