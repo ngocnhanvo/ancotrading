@@ -102,7 +102,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             msg = ex.ToString();
         }
 
-        if (msg.Length >= 0)
+        if (msg.Length > 0)
             msg = $@"<div error style='color:red'>Gửi mail thất bại: {msg}</div>";
         else
             msg = $@"<div style='color:blue'>Gửi mail thành công</div>";;
@@ -113,6 +113,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
     public void Send(HttpContext context)
     {
         var nccs = new string[] { "ANCO1" };
+        var guiChuongTrinh = false;
         var ids = context.Request.Form["id"].removeAllSpaceOrTrimText(false).Split(',').ToList();
         var taptins = db.md_taptins.Where(p => ids.Contains(p.md_taptin_id)).OrderBy(s => s.ngaytao).ToList();
         var dsdhId = taptins.Select(s => s.lienket).FirstOrDefault();
@@ -142,6 +143,8 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             msg = $@"Không tìm thấy ""Nhà cung cấp""";
             goto EndEventHandler;
         }
+
+        guiChuongTrinh = nccs.Contains(dtkd.ma_dtkd);
 
         var msgErrs = new List<string>();
         var taptin2s = new List<md_taptin>();
@@ -173,13 +176,12 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             string msgDT = "";
             try
             {
-                if (nccs.Contains(dtkd.ma_dtkd))
+                if (guiChuongTrinh)
                 {
                     string link = Extension.API_ALL(dtkd.ma_dtkd) + "?oper=guiHDLH";
                     var item = new Dictionary<string, object>();
                     item["result"] = taptin2s;
                     msgDT += Extension.GetModule(link, item);
-                    msg += guiMail(context, taptins, dsdh);
                 }
                 else
                 {
@@ -209,6 +211,8 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         if (msg.Length <= 0)
         {
             msg = $@"<div style='color:blue'>Đã gửi HDLH</div>";
+            if (guiChuongTrinh)
+                msg += guiMail(context, taptins, dsdh);
         }
         else
         {
