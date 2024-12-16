@@ -64,7 +64,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             if (coDG & coBB)
             {
                 title = $@"Hướng dẩn bổ sung đóng gói và bao bì cho đơn hàng {dsdh.so_po}";
-                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói,tem,bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói và bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
             }
             else if (coDG)
             {
