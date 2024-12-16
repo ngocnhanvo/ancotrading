@@ -64,8 +64,8 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             var coBB = tts.Where(s => !s.tentaptin.StartsWith(Helper.HDDG) & s.tentaptin.StartsWith(Helper.HDTEM_BAOBI)).Count() > 0;
             if (coDGbaBB)
             {
-                title = $@"Hướng dẩn đóng gói/tem/bao bì cho đơn hàng {dsdh.so_po}";
-                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói/tem/bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+                title = $@"Hướng dẩn đóng gói,tem,bao bì cho đơn hàng {dsdh.so_po}";
+                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói,tem,bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
             }
             else if (coDG)
             {
@@ -74,8 +74,8 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             }
             else if (coBB)
             {
-                title = $@"Hướng dẫn tem/bao bì cho đơn hàng {dsdh.so_po}";
-                body = $@"<div>Tập tin đính kèm là phần hướng dẫn tem/bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+                title = $@"Hướng dẫn tem,bao bì cho đơn hàng {dsdh.so_po}";
+                body = $@"<div>Tập tin đính kèm là phần hướng dẫn tem,bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
             }
 
             var attachments = new List<System.Net.Mail.Attachment>();
@@ -90,7 +90,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             mail.Send(
                 nv.email
                 , dtkd.email
-                , nv.email
+                , nv.email_cc
                 , ""
                 , title
                 , body
@@ -99,8 +99,13 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         }
         catch (Exception ex)
         {
-            msg = $"Gửi mail thất bại: {ex.Message}";
+            msg = ex.Message;
         }
+
+        if (msg.Length >= 0)
+            msg = $@"<div error style='color:red'>Gửi mail thất bại: {msg}</div>";
+        else
+            msg = $@"<div style='color:blue'>Gửi mail thành công</div>";;
 
         return msg;
     }
@@ -174,11 +179,11 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
                     var item = new Dictionary<string, object>();
                     item["result"] = taptin2s;
                     msgDT += Extension.GetModule(link, item);
-                    msg += $@"<div style='color:red'>{guiMail(context, taptins, dsdh)}</div>";
+                    msg += guiMail(context, taptins, dsdh);
                 }
                 else
                 {
-                    msgDT += $@"<div error style='color:red'>{guiMail(context, taptins, dsdh)}</div>";
+                    msgDT = guiMail(context, taptins, dsdh);
                 }
 
                 if (!msgDT.Contains("error") & !msgDT.Contains("Có lỗi xảy ra"))
@@ -247,9 +252,9 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
                 {
                     msg += $@"<div error style='color:red'>{fileName}: phải là word hoặc excel</div>";
                 }
-                else if (!name.StartsWith(Helper.HDBS) & !name.StartsWith(Helper.HDTEM_BAOBI))
+                else if (!name.StartsWith(Helper.HDDG) & !name.StartsWith(Helper.HDTEM_BAOBI))
                 {
-                    msg += $@"<div error style='color:red'>{fileName}: tên phải bắt đầu bằng {Helper.HDBS} hoặc {Helper.HDTEM_BAOBI}</div>";
+                    msg += $@"<div error style='color:red'>{fileName}: tên phải bắt đầu bằng {Helper.HDDG} hoặc {Helper.HDTEM_BAOBI}</div>";
                 }
                 else
                 {
