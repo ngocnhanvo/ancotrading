@@ -66,10 +66,11 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
             mail.Send(
                 nv.email
                 , dtkd.email
-                , nv.email
+                , nv.email_cc
                 , ""
                 , title
                 , body
+                , ""
             );
         }
         catch (Exception ex)
