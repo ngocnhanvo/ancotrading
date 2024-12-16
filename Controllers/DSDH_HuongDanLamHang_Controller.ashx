@@ -51,7 +51,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             string manv = UserUtils.getUser(context);
             var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
             var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
-            if(string.IsNullOrWhiteSpace(nv.smtp))
+            if(!string.IsNullOrWhiteSpace(nv.smtp))
             {
                 smtp = db.md_smtps.Where(s => s.smtpserver == nv.smtp).FirstOrDefault();
             }
@@ -99,7 +99,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         }
         catch (Exception ex)
         {
-            msg = ex.Message;
+            msg = ex.ToString();
         }
 
         if (msg.Length >= 0)
