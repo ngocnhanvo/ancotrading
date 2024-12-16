@@ -59,10 +59,9 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).FirstOrDefault();
 
             string title = $@"", body = $@"";
-            var coDGbaBB = tts.Where(s => s.tentaptin.StartsWith(Helper.HDDG) & s.tentaptin.StartsWith(Helper.HDTEM_BAOBI)).Count() > 0;
             var coDG = tts.Where(s => s.tentaptin.StartsWith(Helper.HDDG) & !s.tentaptin.StartsWith(Helper.HDTEM_BAOBI)).Count() > 0;
             var coBB = tts.Where(s => !s.tentaptin.StartsWith(Helper.HDDG) & s.tentaptin.StartsWith(Helper.HDTEM_BAOBI)).Count() > 0;
-            if (coDGbaBB)
+            if (coDG & coBB)
             {
                 title = $@"Hướng dẩn bổ sung đóng gói và bao bì cho đơn hàng {dsdh.so_po}";
                 body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói,tem,bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
