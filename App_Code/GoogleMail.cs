@@ -182,7 +182,16 @@ public class GoogleMail
         client.EnableSsl = _ssl;
         client.UseDefaultCredentials = false;
         client.Credentials = new NetworkCredential(_email, _password);
+        client.SendCompleted += new SendCompletedEventHandler((object sender, System.ComponentModel.AsyncCompletedEventArgs e) => {
+
+        });
         client.Send(mail);
+        foreach (var ata in mail.Attachments)
+        {
+            ata.Dispose();
+        }
+
         mail.Dispose();
+        client.Dispose();
     }
 }
