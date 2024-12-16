@@ -104,7 +104,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         if (msg.Length > 0)
             msg = $@"<div error style='color:red'>Gửi mail thất bại: {msg}</div>";
         else
-            msg = $@"<div style='color:blue'>Gửi mail thành công</div>";;
+            msg = $@"<div style='color:blue'>Gửi mail thành công</div>";
 
         return msg;
     }

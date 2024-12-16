@@ -53,7 +53,11 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
         {
             string manv = UserUtils.getUser(context);
             var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
-            var smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
+            var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
+            if(!string.IsNullOrWhiteSpace(nv.smtp))
+            {
+                smtp = db.md_smtps.Where(s => s.smtpserver == nv.smtp).FirstOrDefault();
+            }
             var mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).FirstOrDefault();
 
@@ -70,8 +74,13 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
         }
         catch (Exception ex)
         {
-            msg = $"Gửi mail thất bại: {ex.Message}";
+            msg = ex.ToString();
         }
+
+        if (msg.Length > 0)
+            msg = $@"<div error style='color:red'>Gửi mail thất bại: {msg}</div>";
+        else
+            msg = $@"<div style='color:blue'>Gửi mail thành công</div>";
 
         return msg;
     }
@@ -79,6 +88,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
     public void Send(HttpContext context)
     {
         var nccs = new string[] { "ANCO1" };
+        var guiChuongTrinh = false;
         var msg = "";
         var hdlh = context.Request.Form["hdlh"];
         var chdk = context.Request.Form["chdk"];
@@ -143,7 +153,7 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
             string msgDT = "";
             try
             {
-                if (nccs.Contains(dtkd.ma_dtkd))
+                if (guiChuongTrinh)
                 {
                     string link = Extension.API_ALL(dtkd.ma_dtkd) + "?oper=guiHDLH2";
                     var item = new Dictionary<string, object>();
@@ -151,6 +161,10 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
                     item["hdlh"] = hdlh;
                     item["chdk"] = chdk;
                     msgDT += Extension.GetModule(link, item);
+                }
+                else
+                {
+                    msgDT = guiMail(context, ghichus, dsdh);
                 }
 
                 if (!msgDT.Contains("error") & !msgDT.Contains("Có lỗi xảy ra"))
@@ -176,7 +190,8 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
         if (msg.Length <= 0)
         {
             msg = $@"<div style='color:blue'>Đã gửi HDLH</div>";
-            msg += $@"<div style='color:red'>{guiMail(context, ghichus, dsdh)}</div>";
+            if (guiChuongTrinh)
+                msg += guiMail(context, ghichus, dsdh);
         }
         else
         {

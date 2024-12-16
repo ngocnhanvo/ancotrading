@@ -161,7 +161,7 @@ $("#grid_huongdanlamhang").jqGrid('navButtonAdd', '#grid_huongdanlamhang-pager',
                 },
                 buttons: [
                     {
-                        text: "Gửi NCC",
+                        text: "Gửi tập tin đến NCC",
                         id: "send_HDLH_grid_huongdanlamhang",
                         click: function () {
                             let $mess = $div.find('.mess');
@@ -257,7 +257,7 @@ $("#grid_huongdanlamhang2").jqGrid('navButtonAdd', '#grid_huongdanlamhang2-pager
                 },
                 buttons: [
                     {
-                        text: "Gửi NCC",
+                        text: "Gửi văn bản đến NCC",
                         id: "send_HDLH_grid_huongdanlamhang2",
                         click: function () {
                             let $btnSend = $('#send_HDLH_grid_huongdanlamhang2');
