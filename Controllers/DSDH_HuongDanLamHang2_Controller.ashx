@@ -62,16 +62,30 @@ public class DSDH_HuongDanLamHang2_Controller : IHttpHandler
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).FirstOrDefault();
 
             string title = $@"Hướng dẩn bổ sung cho đơn hàng {dsdh.so_po}";
-            string body = $@"Là phần hướng dẩn bổ sung cho dơn hàng số {dsdh.so_po} của DSDH số {dsdh.sochungtu} chi tiết theo số lần như chương trinh";
+            string body = $@"Là phần hướng dẩn bổ sung cho dơn hàng số {dsdh.so_po} của DSDH số {dsdh.sochungtu} chi tiết theo số lần như chương trinh<br><br>";
+
+            var ddhhs = gcs.Where(s => s.loai == DDHH).OrderBy(s => s.ngaytao).Select(s=>s.ghichu).ToList();
+            var chdks = gcs.Where(s => s.loai == CHDK).OrderBy(s => s.ngaytao).Select(s=>s.ghichu).ToList();
+            if (ddhhs.Count > 0)
+            {
+                body += "<b>Đặc điểm hàng hóa:</b><br>";
+                body += string.Join("<br>", ddhhs);
+            }
+            if (chdks.Count > 0)
+            {
+                body += "<b>Các hướng dẫn khác:</b><br>";
+                body += string.Join("<br>", chdks);
+            }
+            string cachuongdankhac = string.Join("<br>", chdks);
             mail.Send(
-                nv.email
-                , dtkd.email
-                , nv.email_cc
-                , ""
-                , title
-                , body
-                , ""
-            );
+            nv.email
+            , dtkd.email
+            , nv.email_cc
+            , ""
+            , title
+            , body
+            , ""
+        );
         }
         catch (Exception ex)
         {
