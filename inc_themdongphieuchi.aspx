@@ -298,26 +298,26 @@
             <td>
                 <select id="loaiphieu2" name="loaiphieu2" style="max-width: 200px;">
                     <option value=""></option>
-                    <option ncc="ANCO1,ANCO2" value="chenhLechTyGiaDSBH">Chênh lệch tỷ giá (doanh số bán hàng)</option>
-                    <option ncc="ANCO1,ANCO2" value="dsoVTXuatChoBPCtyKhac">D/số vật tư xuất cho các BP, các cty khác</option>
-                    <option ncc="ANCO1,ANCO2" value="tienBHXHBHLDNghiViec">Tiền BHXH,BHLĐ, nghỉ việc</option>
-                    <option ncc="ANCO2" value="dienNuocRacCtyHaca">Điện, nước, rác cty Haca</option>
-                    <option ncc="ANCO2" value="nopTamUng">Nộp tạm ứng</option>
-                    <option ncc="ANCO1,ANCO2" value="tienPheLieu">Tiền phế liệu</option>
-                    <option ncc="ANCO1,ANCO2" value="VTBBPLTNK">Vật tư, bao bì, Pallet, Tem nhập kho</option>
-                    <option ncc="ANCO1,ANCO2" value="chiPhiXuatKhau">Chi phí xuất khẩu</option>
-                    <option ncc="ANCO1,ANCO2" value="chiPhiHCNS">Chi phí HCNS (điện, nước, rác, photo, bảo vệ, cước điện thoại, cơm trưa, xăng xe, VPP, tạp phẩm…)</option>
-                    <option ncc="ANCO1,ANCO2" value="luongNV">Lương nhân viên</option>
-                    <option ncc="ANCO1,ANCO2" value="luongCN">Lương công nhân</option>
-                    <option ncc="ANCO1,ANCO2" value="phiCDBHXHNV">Phí CĐ và BHXH (34%) nhân viên</option>
-                    <option ncc="ANCO1,ANCO2" value="phiCDBHXHCN">Phí CĐ và BHXH (34%) công nhân</option>
-                    <option ncc="ANCO1,ANCO2" value="thuongLeTetNV">Thưởng lễ, tết nhân viên</option>
-                    <option ncc="ANCO1,ANCO2" value="thuongLeTetCN">Thưởng tết công nhân</option>
-                    <option ncc="ANCO2" value="tamUngLuongCN">Tạm ứng lương công nhân</option>
-                    <option ncc="ANCO1,ANCO2" value="chiTienMatKhac">Các khoản chi phí khác (phí kiểm hàng, thiết bị máy vi tính, khử trùng kho,...) </option>
-                    <option ncc="ANCO2" value="trich20PheLieu">Trích 20% phế liệu</option>
-                    <option ncc="ANCO1,ANCO2" value="KhieuNai">Khiếu nại</option>
-                    <option ncc="ANCO1,ANCO2" value="cuocGuiMauKiemDinh">Cước gửi mẫu, kiểm định</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="chenhLechTyGiaDSBH">Chênh lệch tỷ giá (doanh số bán hàng)</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="dsoVTXuatChoBPCtyKhac">D/số vật tư xuất cho các BP, các cty khác</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="tienBHXHBHLDNghiViec">Tiền BHXH,BHLĐ, nghỉ việc</option>
+                    <option ncc="ANCO2,ANHIEPLUC" value="dienNuocRacCtyHaca">Điện, nước, rác cty Haca</option>
+                    <option ncc="ANCO2,ANHIEPLUC" value="nopTamUng">Nộp tạm ứng</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="tienPheLieu">Tiền phế liệu</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="VTBBPLTNK">Vật tư, bao bì, Pallet, Tem nhập kho</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="chiPhiXuatKhau">Chi phí xuất khẩu</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="chiPhiHCNS">Chi phí HCNS (điện, nước, rác, photo, bảo vệ, cước điện thoại, cơm trưa, xăng xe, VPP, tạp phẩm…)</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="luongNV">Lương nhân viên</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="luongCN">Lương công nhân</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="phiCDBHXHNV">Phí CĐ và BHXH (34%) nhân viên</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="phiCDBHXHCN">Phí CĐ và BHXH (34%) công nhân</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="thuongLeTetNV">Thưởng lễ, tết nhân viên</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="thuongLeTetCN">Thưởng tết công nhân</option>
+                    <option ncc="ANCO2,ANHIEPLUC" value="tamUngLuongCN">Tạm ứng lương công nhân</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="chiTienMatKhac">Các khoản chi phí khác (phí kiểm hàng, thiết bị máy vi tính, khử trùng kho,...) </option>
+                    <option ncc="ANCO2,ANHIEPLUC" value="trich20PheLieu">Trích 20% phế liệu</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="KhieuNai">Khiếu nại</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="cuocGuiMauKiemDinh">Cước gửi mẫu, kiểm định</option>
                 </select>
             </td>
         </tr>
