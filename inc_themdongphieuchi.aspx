@@ -562,20 +562,21 @@
             }
         });
 
-        let sel = '<%=xuongVal%>';    
-        $('#loaiphieu2 option', '#f_thanhtoan').each(function () {
-            let attr = $(this).attr('ncc');
-            if (typeof attr !== typeof undefined && attr !== false) {
-                let arrAttr = attr.split(',');
-                if (arrAttr.lastIndexOf(sel) > -1)
-                    $(this).show();
-                else
-                    $(this).hide();
-            }
-            else {
-                $(this).show();
-            }
-        });
+        let sel = '<%=xuongVal%>';
+       
+        //$('#loaiphieu2 option', '#f_thanhtoan').each(function () {
+        //    let attr = $(this).attr('ncc');
+        //    if (typeof attr !== typeof undefined && attr !== false) {
+        //        let arrAttr = attr.split(',');
+        //        if (arrAttr.lastIndexOf(sel) > -1)
+        //            $(this).show();
+        //        else
+        //            $(this).hide();
+        //    }
+        //    else {
+        //        $(this).show();
+        //    }
+        //});
 
         $('#md_doitackinhdoanh_id2', '#f_thanhtoan').val('<%=xuongId%>').change();
         $('#loaiphieu2', '#f_thanhtoan').val('<%=loaiphieu2%>');
