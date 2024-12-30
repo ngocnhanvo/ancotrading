@@ -70,67 +70,72 @@ namespace OfficeToPDF
                 if (lstTextReplace.Count > 0)
                 {
                     var textReplace = lstTextReplace.FirstOrDefault();
-                    var oRange = worksheet.Cells.Find(What: textReplace.oldT, LookIn: XlFindLookIn.xlValues, SearchDirection: XlSearchDirection.xlNext, LookAt: XlLookAt.xlPart);
-                    
-                    if (oRange == null)
+                    if (textReplace != null)
                     {
-                        lstTextReplace.Remove(textReplace);
-                    }
-                    else
-                    {
-                        var text = oRange.Value2;
-                        if (new string[] { "{#", "{!" }.Contains(textReplace.oldT.Substring(0, 2)))
+                        if (!string.IsNullOrWhiteSpace(textReplace.oldT))
                         {
-                            oRange.Value2 = textReplace.newT;
-                        }
-                        else
-                        {
-                            try
+                            var oRange = worksheet.Cells.Find(What: textReplace.oldT, LookIn: XlFindLookIn.xlValues, SearchDirection: XlSearchDirection.xlNext, LookAt: XlLookAt.xlPart);
+
+                            if (oRange == null)
                             {
-                                int phStart = oRange.Value.ToString().LastIndexOf(textReplace.oldT);
-                                int phEnd = textReplace.oldT.Length;
-
-                                if (phStart > -1 & phEnd > -1)
+                                lstTextReplace.Remove(textReplace);
+                            }
+                            else
+                            {
+                                var text = oRange.Value2;
+                                if (new string[] { "{#", "{!" }.Contains(textReplace.oldT.Substring(0, 2)))
                                 {
-                                    if (textReplace.wrap_Mer.GetValueOrDefault(false))
+                                    oRange.Value2 = textReplace.newT;
+                                }
+                                else
+                                {
+                                    try
                                     {
-                                        oRange.Value = textReplace.newT;
-                                        var oRangeWrap = (Range)worksheet.Cells[oRange.Row, oRange.Column + 50];
-                                        double columnWidth = 0;
-                                        for (var i = oRange.Column; i < textReplace.column_Mer + oRange.Column; i++)
-                                        {
-                                            var oRangeWrap2 = (Range)worksheet.Cells[oRange.Row, i];
-                                            columnWidth += double.Parse(oRangeWrap2.ColumnWidth.ToString());
-                                        }
+                                        int phStart = oRange.Value.ToString().LastIndexOf(textReplace.oldT);
+                                        int phEnd = textReplace.oldT.Length;
 
-                                        oRangeWrap.ColumnWidth = columnWidth;
-                                        oRange.Copy(oRangeWrap);
-                                        oRange.Rows.AutoFit();
-                                        var heightATF = double.Parse(oRange.Rows.Height.ToString());
-                                        oRange.RowHeight = heightATF + (heightATF * 5 / 100);
-                                        oRangeWrap.Delete(XlDeleteShiftDirection.xlShiftUp);
+                                        if (phStart > -1 & phEnd > -1)
+                                        {
+                                            if (textReplace.wrap_Mer.GetValueOrDefault(false))
+                                            {
+                                                oRange.Value = textReplace.newT;
+                                                var oRangeWrap = (Range)worksheet.Cells[oRange.Row, oRange.Column + 50];
+                                                double columnWidth = 0;
+                                                for (var i = oRange.Column; i < textReplace.column_Mer + oRange.Column; i++)
+                                                {
+                                                    var oRangeWrap2 = (Range)worksheet.Cells[oRange.Row, i];
+                                                    columnWidth += double.Parse(oRangeWrap2.ColumnWidth.ToString());
+                                                }
+
+                                                oRangeWrap.ColumnWidth = columnWidth;
+                                                oRange.Copy(oRangeWrap);
+                                                oRange.Rows.AutoFit();
+                                                var heightATF = double.Parse(oRange.Rows.Height.ToString());
+                                                oRange.RowHeight = heightATF + (heightATF * 5 / 100);
+                                                oRangeWrap.Delete(XlDeleteShiftDirection.xlShiftUp);
+                                            }
+                                            else
+                                            {
+                                                try
+                                                {
+                                                    oRange.Characters[phStart + 1, phEnd].Insert(textReplace.newT);
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    oRange.Characters[phStart + 1, phEnd].Insert(ex.Message);
+                                                }
+                                            }
+                                        }
                                     }
-                                    else
+                                    catch
                                     {
-                                        try
-                                        {
-                                            oRange.Characters[phStart + 1, phEnd].Insert(textReplace.newT);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            oRange.Characters[phStart + 1, phEnd].Insert(ex.Message);
-                                        }
+                                        oRange.Value2 = textReplace.newT;
                                     }
                                 }
                             }
-                            catch
-                            {
-                                oRange.Value2 = textReplace.newT;
-                            }
                         }
+                        replaceTextRecursive(worksheet);
                     }
-
-                    replaceTextRecursive(worksheet);
                 }
             }
             catch {
