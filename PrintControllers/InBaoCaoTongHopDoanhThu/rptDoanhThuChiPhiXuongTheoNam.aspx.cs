@@ -966,6 +966,8 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
                 @b_10_10 AS b_10_10,
                 @b_10BS1_10 AS b_10BS1_10,
                 (SELECT SUM(tien) FROM @tblHoaHong WHERE thang = 10) AS b_11_10,
+                @b_12_10 AS b_12_10,
+	            @b_13_10 AS b_13_10,
 	            @a_1BS1_11 AS a_1BS1_11,
 	            @a_2_11 AS a_2_11,
 	            @a_2BS1_11 AS a_2BS1_11,
