@@ -492,98 +492,98 @@ namespace OfficeToPDF
                         pictureR.Dispose();
                     }
 
-                    //float widthBackUp = -1;
-                    //foreach (var textInLine in lstText)
-                    //{
-                    //    float leftTextPrev = -1, topTextPrev = 0, widthTextPrev = -1, heightTextPrev = 0;
-                    //    if (textInLine.columnFPrev != null & textInLine.columnTPrev != null)
-                    //    {
-                    //        string textRangePrev = "";
-                    //        var hasBoldPrev = false;
-                    //        double fontSizePrev = 12;
-                    //        string fontNamePrev = "Arial";
-                    //        for (var iCl = textInLine.columnFPrev; iCl <= textInLine.columnTPrev; iCl++)
-                    //        {
-                    //            var oRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[textInLine.row + 1, iCl + 1];
-                    //            widthTextPrev += (float)((double)oRange.Width);
+                    float widthBackUp = -1;
+                    foreach (var textInLine in lstText)
+                    {
+                        float leftTextPrev = -1, topTextPrev = 0, widthTextPrev = -1, heightTextPrev = 0;
+                        if (textInLine.columnFPrev != null & textInLine.columnTPrev != null)
+                        {
+                            string textRangePrev = "";
+                            var hasBoldPrev = false;
+                            double fontSizePrev = 12;
+                            string fontNamePrev = "Arial";
+                            for (var iCl = textInLine.columnFPrev; iCl <= textInLine.columnTPrev; iCl++)
+                            {
+                                var oRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[textInLine.row + 1, iCl + 1];
+                                widthTextPrev += (float)((double)oRange.Width);
 
-                    //            if (iCl == textInLine.columnFPrev)
-                    //            {
-                    //                leftTextPrev = (float)((double)oRange.Left);
-                    //                topTextPrev = (float)((double)oRange.Top - textInLine.top);
-                    //                heightTextPrev = (float)((double)oRange.Height);
-                    //                textRangePrev = (string)oRange.Value2;
-                    //                oRange.Value2 = "";
-                    //                hasBoldPrev = (bool)oRange.Font.Bold;
-                    //                fontSizePrev = (double)oRange.Font.Size;
-                    //                fontNamePrev = (string)oRange.Font.Name;
-                    //            }
-                    //        }
+                                if (iCl == textInLine.columnFPrev)
+                                {
+                                    leftTextPrev = (float)((double)oRange.Left);
+                                    topTextPrev = (float)((double)oRange.Top - textInLine.top);
+                                    heightTextPrev = (float)((double)oRange.Height);
+                                    textRangePrev = (string)oRange.Value2;
+                                    oRange.Value2 = "";
+                                    hasBoldPrev = (bool)oRange.Font.Bold;
+                                    fontSizePrev = (double)oRange.Font.Size;
+                                    fontNamePrev = (string)oRange.Font.Name;
+                                }
+                            }
 
-                    //        var textBoxPrev = worksheet.Shapes.AddTextbox(Microsoft.Office.Core.MsoTextOrientation.msoTextOrientationHorizontal, leftTextPrev, topTextPrev, widthTextPrev, heightTextPrev);
-                    //        textBoxPrev.TextFrame.VerticalAlignment = XlVAlign.xlVAlignCenter;
-                    //        textBoxPrev.TextFrame.MarginLeft = 3;
-                    //        textBoxPrev.TextFrame.MarginRight = 2;
-                    //        if (string.IsNullOrEmpty(textRangePrev))
-                    //            textBoxPrev.Width = widthBackUp;
-                    //        else
-                    //            textBoxPrev.TextFrame.AutoSize = true;
-                    //        textBoxPrev.Line.Visible = Microsoft.Office.Core.MsoTriState.msoFalse;
-                    //        textBoxPrev.Fill.Visible = Microsoft.Office.Core.MsoTriState.msoFalse;
-                    //        var stringTextBoxPrev = textBoxPrev.TextFrame.Characters(Type.Missing, Type.Missing);
-                    //        stringTextBoxPrev.Text = textRangePrev;
-                    //        stringTextBoxPrev.Font.Name = fontNamePrev;
-                    //        stringTextBoxPrev.Font.Bold = hasBoldPrev;
-                    //        stringTextBoxPrev.Font.Size = fontSizePrev;
+                            var textBoxPrev = worksheet.Shapes.AddTextbox(Microsoft.Office.Core.MsoTextOrientation.msoTextOrientationHorizontal, leftTextPrev, topTextPrev, widthTextPrev, heightTextPrev);
+                            textBoxPrev.TextFrame.VerticalAlignment = XlVAlign.xlVAlignCenter;
+                            textBoxPrev.TextFrame.MarginLeft = 3;
+                            textBoxPrev.TextFrame.MarginRight = 2;
+                            if (string.IsNullOrEmpty(textRangePrev))
+                                textBoxPrev.Width = widthBackUp;
+                            else
+                                textBoxPrev.TextFrame.AutoSize = true;
+                            textBoxPrev.Line.Visible = Microsoft.Office.Core.MsoTriState.msoFalse;
+                            textBoxPrev.Fill.Visible = Microsoft.Office.Core.MsoTriState.msoFalse;
+                            var stringTextBoxPrev = textBoxPrev.TextFrame.Characters(Type.Missing, Type.Missing);
+                            stringTextBoxPrev.Text = textRangePrev;
+                            stringTextBoxPrev.Font.Name = fontNamePrev;
+                            stringTextBoxPrev.Font.Bold = hasBoldPrev;
+                            stringTextBoxPrev.Font.Size = fontSizePrev;
 
-                    //        if (textBoxPrev.Width < textInLine.minWidth)
-                    //            textBoxPrev.Width = (float)textInLine.minWidth;
+                            if (textBoxPrev.Width < textInLine.minWidth)
+                                textBoxPrev.Width = (float)textInLine.minWidth;
 
-                    //        leftTextPrev = textBoxPrev.Left;
-                    //        widthTextPrev = textBoxPrev.Width;
-                    //        widthBackUp = widthTextPrev;
-                    //    }
+                            leftTextPrev = textBoxPrev.Left;
+                            widthTextPrev = textBoxPrev.Width;
+                            widthBackUp = widthTextPrev;
+                        }
 
-                    //    float leftText = 0, topText = 0, widthText = 0, heightText = 0;
-                    //    string textRange = "";
-                    //    var hasBold = false;
-                    //    double fontSize = 12;
-                    //    string fontName = "Arial";
-                    //    for (var iCl = textInLine.columnF; iCl <= textInLine.columnT; iCl++)
-                    //    {
-                    //        var oRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[textInLine.row + 1, iCl + 1];
-                    //        widthText += (float)((double)oRange.Width);
+                        float leftText = 0, topText = 0, widthText = 0, heightText = 0;
+                        string textRange = "";
+                        var hasBold = false;
+                        double fontSize = 12;
+                        string fontName = "Arial";
+                        for (var iCl = textInLine.columnF; iCl <= textInLine.columnT; iCl++)
+                        {
+                            var oRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[textInLine.row + 1, iCl + 1];
+                            widthText += (float)((double)oRange.Width);
 
-                    //        if (iCl == textInLine.columnF)
-                    //        {
-                    //            leftText = (float)((double)oRange.Left - textInLine.left);
-                    //            topText = (float)((double)oRange.Top - textInLine.top);
-                    //            heightText = (float)((double)oRange.RowHeight);
-                    //            textRange = (string)oRange.Text;
-                    //            oRange.Value2 = "";
-                    //            hasBold = (bool)oRange.Font.Bold;
-                    //            fontSize = (double)oRange.Font.Size;
-                    //            fontName = (string)oRange.Font.Name;
-                    //        }
-                    //    }
+                            if (iCl == textInLine.columnF)
+                            {
+                                leftText = (float)((double)oRange.Left - textInLine.left);
+                                topText = (float)((double)oRange.Top - textInLine.top);
+                                heightText = (float)((double)oRange.RowHeight);
+                                textRange = (string)oRange.Text;
+                                oRange.Value2 = "";
+                                hasBold = (bool)oRange.Font.Bold;
+                                fontSize = (double)oRange.Font.Size;
+                                fontName = (string)oRange.Font.Name;
+                            }
+                        }
 
-                    //    leftText = leftTextPrev <= -1 ? leftText : leftTextPrev + widthTextPrev;
-                    //    var textBox = worksheet.Shapes.AddTextbox(Microsoft.Office.Core.MsoTextOrientation.msoTextOrientationHorizontal, leftText, topText, widthText, heightText);
-                    //    textBox.TextFrame.MarginLeft = 2;
-                    //    textBox.TextFrame.MarginRight = 2;
-                    //    textBox.TextFrame.MarginTop = 0;
-                    //    textBox.TextFrame.MarginBottom = 0;
-                    //    textBox.Height = heightText;
-                    //    textBox.TextFrame.VerticalAlignment = XlVAlign.xlVAlignCenter;
-                    //    textBox.TextFrame2.WordWrap = Microsoft.Office.Core.MsoTriState.msoCTrue;
-                    //    textBox.Line.Visible = Microsoft.Office.Core.MsoTriState.msoFalse;
-                    //    textBox.Fill.Visible = Microsoft.Office.Core.MsoTriState.msoFalse;
-                    //    var stringTextBox = textBox.TextFrame.Characters(Type.Missing, Type.Missing);
-                    //    stringTextBox.Text = textRange;
-                    //    stringTextBox.Font.Name = fontName;
-                    //    stringTextBox.Font.Bold = hasBold;
-                    //    stringTextBox.Font.Size = fontSize;
-                    //}
+                        leftText = leftTextPrev <= -1 ? leftText : leftTextPrev + widthTextPrev;
+                        var textBox = worksheet.Shapes.AddTextbox(Microsoft.Office.Core.MsoTextOrientation.msoTextOrientationHorizontal, leftText, topText, widthText, heightText);
+                        textBox.TextFrame.MarginLeft = 2;
+                        textBox.TextFrame.MarginRight = 2;
+                        textBox.TextFrame.MarginTop = 0;
+                        textBox.TextFrame.MarginBottom = 0;
+                        textBox.Height = heightText;
+                        textBox.TextFrame.VerticalAlignment = XlVAlign.xlVAlignCenter;
+                        textBox.TextFrame2.WordWrap = Microsoft.Office.Core.MsoTriState.msoCTrue;
+                        textBox.Line.Visible = Microsoft.Office.Core.MsoTriState.msoFalse;
+                        textBox.Fill.Visible = Microsoft.Office.Core.MsoTriState.msoFalse;
+                        var stringTextBox = textBox.TextFrame.Characters(Type.Missing, Type.Missing);
+                        stringTextBox.Text = textRange;
+                        stringTextBox.Font.Name = fontName;
+                        stringTextBox.Font.Bold = hasBold;
+                        stringTextBox.Font.Size = fontSize;
+                    }
 
                     //foreach (var col in lstAutoSizeColumn)
                     //{
