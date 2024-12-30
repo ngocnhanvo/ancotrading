@@ -430,7 +430,7 @@ namespace OfficeToPDF
                         //excelCellrange.Font.Size = 13.5;
                     }
 
-                    //replaceTextRecursive(worksheet);
+                    replaceTextRecursive(worksheet);
 
                     //foreach (var formula in lstFormula)
                     //{
