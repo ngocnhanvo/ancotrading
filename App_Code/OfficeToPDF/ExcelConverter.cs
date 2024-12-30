@@ -69,7 +69,7 @@ namespace OfficeToPDF
             {
                 if (lstTextReplace.Count > 0)
                 {
-                    var textReplace = lstTextReplace.FirstOrDefault();
+                    var textReplace = lstTextReplace.Where(s=>s.check != true).FirstOrDefault();
                     if (textReplace != null)
                     {
                         if (!string.IsNullOrWhiteSpace(textReplace.oldT))
@@ -78,7 +78,7 @@ namespace OfficeToPDF
 
                             if (oRange == null)
                             {
-                                lstTextReplace.Remove(textReplace);
+                                textReplace.check = true;
                             }
                             else
                             {
@@ -430,6 +430,7 @@ namespace OfficeToPDF
                         //excelCellrange.Font.Size = 13.5;
                     }
 
+                    replaceTextRecursive(worksheet);
                     replaceTextRecursive(worksheet);
 
                     foreach (var formula in lstFormula)

@@ -45,6 +45,7 @@ public class AvariablePrj
         public int column { get; set; }
         public bool? wrap_Mer { get; set; }
         public int? column_Mer { get; set; }
+        public bool check { get; set; }
     }
 
     public partial class lstFormula
