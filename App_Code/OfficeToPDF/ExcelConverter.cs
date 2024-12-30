@@ -585,18 +585,18 @@ namespace OfficeToPDF
                         stringTextBox.Font.Size = fontSize;
                     }
 
-                    //foreach (var col in lstAutoSizeColumn)
-                    //{
-                    //    try
-                    //    {
-                    //        var RangeFm = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, col + 1];
-                    //        RangeFm.EntireColumn.AutoFit();
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
-                    //        string msg1 = ex.Message;
-                    //    }
-                    //}
+                    foreach (var col in lstAutoSizeColumn)
+                    {
+                        try
+                        {
+                            var RangeFm = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, col + 1];
+                            RangeFm.EntireColumn.AutoFit();
+                        }
+                        catch (Exception ex)
+                        {
+                            string msg1 = ex.Message;
+                        }
+                    }
 
                     // Try and avoid xls files raising a dialog
                     var temporaryStorageDir = Path.GetTempFileName();
