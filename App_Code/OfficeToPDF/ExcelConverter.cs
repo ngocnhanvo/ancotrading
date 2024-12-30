@@ -63,13 +63,12 @@ namespace OfficeToPDF
             "ScaleWithDocHeaderFooter", "TopMargin", "Zoom"
         };
 
-        public void replaceTextRecursive(Microsoft.Office.Interop.Excel._Worksheet worksheet)
+        public void replaceTextRecursive(Microsoft.Office.Interop.Excel._Worksheet worksheet, AvariablePrj.lstTextReplace textReplace)
         {
             try
             {
                 if (lstTextReplace.Count > 0)
                 {
-                    var textReplace = lstTextReplace.Where(s=>s.check != true).FirstOrDefault();
                     if (textReplace != null)
                     {
                         if (!string.IsNullOrWhiteSpace(textReplace.oldT))
@@ -430,8 +429,10 @@ namespace OfficeToPDF
                         //excelCellrange.Font.Size = 13.5;
                     }
 
-                    for (var i = 0; i < 500; i++)
-                        replaceTextRecursive(worksheet);
+                    foreach (var textReplace in lstTextReplace)
+                    {
+                        replaceTextRecursive(worksheet, textReplace);
+                    }
 
                     foreach (var formula in lstFormula)
                     {
