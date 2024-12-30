@@ -87,7 +87,13 @@ namespace OfficeToPDF
                 foreach (DataColumn column in dt.Columns)
                 {
                     DisplayName = DisplayName.Replace("{" + column.ColumnName + "}", dt.Rows[0][column.ColumnName].ToString());
-                    
+
+                    lstTextReplace.Add(new AvariablePrj.lstTextReplace()
+                    {
+                        oldT = "{" + column.ColumnName + "}",
+                        newT = dt.Rows[0][column.ColumnName].ToString()
+                    });
+
                     if (
                         column.DataType == Type.GetType("System.Double") |
                         column.DataType == Type.GetType("System.Decimal") |
@@ -99,24 +105,6 @@ namespace OfficeToPDF
                         lstTextReplace.Add(new AvariablePrj.lstTextReplace()
                         {
                             oldT = "{#" + column.ColumnName + "}",
-                            newT = dt.Rows[0][column.ColumnName].ToString()
-                        });
-                        if(column.DataType == Type.GetType("System.Int16") |
-                        column.DataType == Type.GetType("System.Int32") |
-                        column.DataType == Type.GetType("System.Int64"))
-                        {
-                            lstTextReplace.Add(new AvariablePrj.lstTextReplace()
-                            {
-                                oldT = "{" + column.ColumnName + "}",
-                                newT = dt.Rows[0][column.ColumnName].ToString()
-                            });
-                        }
-                    }
-                    else
-                    {
-                        lstTextReplace.Add(new AvariablePrj.lstTextReplace()
-                        {
-                            oldT = "{" + column.ColumnName + "}",
                             newT = dt.Rows[0][column.ColumnName].ToString()
                         });
                     }
