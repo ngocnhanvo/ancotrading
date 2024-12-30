@@ -743,7 +743,8 @@ public partial class PrintControllers_InBaoCaoTongHopDoanhThu_rptDoanhThuChiPhiX
             end
 
             select 
-                @nam as nam,
+                @nam as nam1,
+                @nam as nam2,
                 (select top 1 noDauNam from @tblNhapLieu where thang = 1) as noDauNam,
                 (select sum(tien) from @tblTienDSBH where thang = 1) as a_1_1,
                 (select sum(tien) from @tblTienDSBH where thang = 2) as a_1_2,
