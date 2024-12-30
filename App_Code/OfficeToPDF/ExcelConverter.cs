@@ -446,51 +446,51 @@ namespace OfficeToPDF
                         }
                     }
 
-                    //foreach (var image in lstImage)
-                    //{
-                    //    var oRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[image.row + 1, image.column + 1];
-                    //    var pictureR = System.Drawing.Image.FromFile(image.link);
-                    //    float width = (float)((double)oRange.Width);
-                    //    float height = (float)((double)oRange.RowHeight);
-                    //    float height2 = height;
-                    //    for (var iRan = image.column + 1; iRan <= image.columnLast; iRan++)
-                    //    {
-                    //        var oRangeBS = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[image.row + 1, iRan + 1];
-                    //        width += (float)((double)oRangeBS.Width);
-                    //    }
+                    foreach (var image in lstImage)
+                    {
+                        var oRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[image.row + 1, image.column + 1];
+                        var pictureR = System.Drawing.Image.FromFile(image.link);
+                        float width = (float)((double)oRange.Width);
+                        float height = (float)((double)oRange.RowHeight);
+                        float height2 = height;
+                        for (var iRan = image.column + 1; iRan <= image.columnLast; iRan++)
+                        {
+                            var oRangeBS = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[image.row + 1, iRan + 1];
+                            width += (float)((double)oRangeBS.Width);
+                        }
 
-                    //    for (var iRan = image.row + 1; iRan <= image.rowLast; iRan++)
-                    //    {
-                    //        var oRangeBS = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[iRan + 1, image.column + 1];
-                    //        height += (float)((double)oRangeBS.RowHeight);
-                    //    }
+                        for (var iRan = image.row + 1; iRan <= image.rowLast; iRan++)
+                        {
+                            var oRangeBS = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[iRan + 1, image.column + 1];
+                            height += (float)((double)oRangeBS.RowHeight);
+                        }
 
-                    //    if (image.heightCell != null)
-                    //    {
-                    //        if (height > image.heightCell.GetValueOrDefault(0))
-                    //            height = image.heightCell.GetValueOrDefault(0);
-                    //    }
+                        if (image.heightCell != null)
+                        {
+                            if (height > image.heightCell.GetValueOrDefault(0))
+                                height = image.heightCell.GetValueOrDefault(0);
+                        }
 
-                    //    float widthR = pictureR.Width;
-                    //    float heightR = pictureR.Height;
-                    //    float percent = height / heightR;
+                        float widthR = pictureR.Width;
+                        float heightR = pictureR.Height;
+                        float percent = height / heightR;
 
-                    //    var widthImg = (int)(widthR * percent);
-                    //    var heightImg = (int)(heightR * percent - 3.5);
-                    //    widthImg = widthImg > width ? (int)(width - 1) : widthImg;
-                    //    var rateColumnAndPicture = (width - widthImg) / 2;
-                    //    rateColumnAndPicture = rateColumnAndPicture <= 0 ? 0 : rateColumnAndPicture;
+                        var widthImg = (int)(widthR * percent);
+                        var heightImg = (int)(heightR * percent - 3.5);
+                        widthImg = widthImg > width ? (int)(width - 1) : widthImg;
+                        var rateColumnAndPicture = (width - widthImg) / 2;
+                        rateColumnAndPicture = rateColumnAndPicture <= 0 ? 0 : rateColumnAndPicture;
 
-                    //    var rateRowAndPicture = (height2 - heightImg) / 2;
-                    //    rateRowAndPicture = rateRowAndPicture <= 0 ? 2 : rateRowAndPicture;
+                        var rateRowAndPicture = (height2 - heightImg) / 2;
+                        rateRowAndPicture = rateRowAndPicture <= 0 ? 2 : rateRowAndPicture;
 
-                    //    var Left = (float)((double)oRange.Left + rateColumnAndPicture);
-                    //    var Top = (float)((double)oRange.Top + rateRowAndPicture);
+                        var Left = (float)((double)oRange.Left + rateColumnAndPicture);
+                        var Top = (float)((double)oRange.Top + rateRowAndPicture);
 
-                    //    var pic = worksheet.Shapes.AddPicture(image.link, Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoCTrue, Left, Top, widthImg, heightImg);
+                        var pic = worksheet.Shapes.AddPicture(image.link, Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoCTrue, Left, Top, widthImg, heightImg);
 
-                    //    pictureR.Dispose();
-                    //}
+                        pictureR.Dispose();
+                    }
 
                     //float widthBackUp = -1;
                     //foreach (var textInLine in lstText)
