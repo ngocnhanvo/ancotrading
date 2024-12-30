@@ -430,21 +430,21 @@ namespace OfficeToPDF
                         //excelCellrange.Font.Size = 13.5;
                     }
 
-                    replaceTextRecursive(worksheet);
+                    //replaceTextRecursive(worksheet);
 
-                    //foreach (var formula in lstFormula)
-                    //{
-                    //    try
-                    //    {
-                    //        var RangeFm = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[formula.row, formula.col];
-                    //        if (!string.IsNullOrEmpty(formula.formula))
-                    //            RangeFm.Formula = string.Format("=" + formula.formula);
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
-                    //        string msg1 = ex.Message;
-                    //    }
-                    //}
+                    foreach (var formula in lstFormula)
+                    {
+                        try
+                        {
+                            var RangeFm = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[formula.row, formula.col];
+                            if (!string.IsNullOrEmpty(formula.formula))
+                                RangeFm.Formula = string.Format("=" + formula.formula);
+                        }
+                        catch (Exception ex)
+                        {
+                            string msg1 = ex.Message;
+                        }
+                    }
 
                     //foreach (var image in lstImage)
                     //{
