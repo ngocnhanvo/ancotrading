@@ -324,6 +324,7 @@
                     <%--<option ncc="ANCO2,ANHIEPLUC" value="trich20PheLieu">Trích 20% phế liệu</option>--%>
                     <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="KhieuNai">Khiếu nại</option>
                     <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="cuocGuiMauKiemDinh">Cước gửi mẫu, kiểm định</option>
+                    <option ncc="ANCO1,ANCO2,ANHIEPLUC,ANCOTRADING" value="hangHoa">Hàng hóa</option>
                 </select>
             </td>
         </tr>
