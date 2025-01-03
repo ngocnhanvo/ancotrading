@@ -223,6 +223,12 @@
 						<option value="5">VAT 05</option>
 					<%}%>
 					
+                    <% if(obj.thue == 8) {%>
+						<option value="8" selected>VAT 08</option>
+					<%} else {%>
+						<option value="8">VAT 08</option>
+					<%}%>  
+
 					<% if(obj.thue == 10) {%>
 						<option value="10" selected>VAT 10</option>
 					<%} else {%>
