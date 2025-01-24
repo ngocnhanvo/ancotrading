@@ -137,9 +137,17 @@ public class API_Data : IHttpHandler
         var result = new ThongTin();
         try
         {
+            int skip = context.Request.Form["skip"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
+            int take = context.Request.Form["take"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
             var rsps = new List<ThongTinSP>();
-            var sps = db.md_sanphams.Where(s => s.trangthai == "DHD" & (s.laMacon ?? false) == false).OrderBy(s => s.ma_sanpham).ToList();
-            foreach (var sp in sps)
+            var sps = context.Session["sps"] as List<md_sanpham>;
+            if (sps == null)
+            {
+                sps = db.md_sanphams.Where(s => s.trangthai == "DHD" & (s.laMacon ?? false) == false).OrderBy(s => s.ma_sanpham).ToList();
+                context.Session["sps"] = sps;
+            }
+
+            foreach (var sp in sps.Skip(skip).Take(take))
             {
                 var item = dequyTTSP(sp, sps, true, db);
                 var mabo = sp.ma_sanpham.Substring(9, 2).ToString();
@@ -169,24 +177,31 @@ public class API_Data : IHttpHandler
 
                 rsps.Add(item);
             }
-
-            var rkhs = (from a in db.md_doitackinhdoanhs
-                        join b in db.md_loaidtkds on a.md_loaidtkd_id equals b.md_loaidtkd_id
-                        where b.ma_loaidtkd == "KH"
-                        select new ThongTinKhachHang
-                        {
-                            customerCode = a.ma_dtkd,
-                            companyName = a.ten_dtkd,
-                            contactPerson = a.daidien,
-                            eMail = a.email,
-                            Phone = a.tel,
-                            address = a.diachi
-                        })
-                       .OrderBy(s => s.customerCode)
-                       .ToList();
-
             result.sps = rsps;
-            result.khs = rkhs;
+
+            if (skip == 0)
+            {
+                var rkhs = (from a in db.md_doitackinhdoanhs
+                            join b in db.md_loaidtkds on a.md_loaidtkd_id equals b.md_loaidtkd_id
+                            where b.ma_loaidtkd == "KH"
+                            select new ThongTinKhachHang
+                            {
+                                customerCode = a.ma_dtkd,
+                                companyName = a.ten_dtkd,
+                                contactPerson = a.daidien,
+                                eMail = a.email,
+                                Phone = a.tel,
+                                address = a.diachi
+                            })
+                           .OrderBy(s => s.customerCode)
+                           .ToList();
+                result.khs = rkhs;
+            }
+            else
+            {
+                result.khs = new List<ThongTinKhachHang>();
+            }
+
             result.date = DateTime.Now;
             result.dateStr = result.date.ToString("dd/MM/yyyy");
             result.slSP = result.sps.Count;
