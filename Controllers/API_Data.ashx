@@ -7,7 +7,7 @@ using System.Web.Script.Serialization;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-public class API_Data : IHttpHandler
+public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionState
 {
     private LinqDBDataContext db = new LinqDBDataContext();
     public class ThongTinSP
