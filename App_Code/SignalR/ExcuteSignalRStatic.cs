@@ -28,6 +28,46 @@ public static class ExcuteSignalRStatic
         return mdbc.GetData(strsql);
     }
 
+    public class getDongGoiResult
+    {
+        public decimal? sl_inner { get; set; }
+        public string dvtinner { get; set; }
+        public decimal? sl_outer { get; set; }
+        public string dvtouter { get; set; }
+        public decimal? l2_mix { get; set; }
+        public decimal? w2_mix { get; set; }
+        public decimal? h2_mix { get; set; }
+        public decimal? sl_cont_mix { get; set; }
+        public decimal? soluonggoi_ctn_20 { get; set; }
+        public decimal? soluonggoi_ctn { get; set; }
+        public decimal? soluonggoi_ctn_40hc { get; set; }
+        public decimal? cbm { get; set; }
+    }
+
+    public static getDongGoiResult getDongGoi(string md_sanpham_id, LinqDBDataContext db)
+    {
+        var ttdg = (from a in db.md_donggois
+                    join b in db.md_donggoisanphams on a.md_donggoi_id equals b.md_donggoi_id
+                    where b.md_sanpham_id == md_sanpham_id & b.macdinh == true
+                    select new getDongGoiResult
+                    {
+                        sl_inner = a.sl_inner,
+                        dvtinner = db.md_donvitinhs.Where(s => s.md_donvitinh_id == a.dvt_inner).Select(s => s.ten_dvt).FirstOrDefault(),
+                        sl_outer = a.sl_outer,
+                        dvtouter = db.md_donvitinhs.Where(s => s.md_donvitinh_id == a.dvt_outer).Select(s => s.ten_dvt).FirstOrDefault(),
+                        l2_mix = a.l2_mix,
+                        w2_mix = a.w2_mix,
+                        h2_mix = a.h2_mix,
+                        sl_cont_mix = a.sl_cont_mix,
+                        soluonggoi_ctn_20 = a.soluonggoi_ctn_20,
+                        soluonggoi_ctn = a.soluonggoi_ctn,
+                        soluonggoi_ctn_40hc = a.soluonggoi_ctn_40hc,
+                        cbm = a.v2
+                    }).FirstOrDefault();
+
+        return ttdg;
+    }
+
     public static DataTable getFOB(string md_sanpham_id)
     {
         string strsql =
@@ -113,6 +153,26 @@ public static class ExcuteSignalRStatic
 
         strsql = string.Format(strsql, arrMSP);
         return mdbc.GetData(strsql);
+    }
+
+    public static decimal? getPrice(string spid, LinqDBDataContext db)
+    {
+        var gia = (from a in db.md_banggias
+                   join b in db.md_phienbangias on a.md_banggia_id equals b.md_banggia_id
+                   join c in db.md_giasanphams on b.md_phienbangia_id equals c.md_phienbangia_id
+                   where
+                    a.banggiaban == true
+                    & a.ten_banggia.StartsWith("FOB-")
+                    & c.md_sanpham_id == spid
+                    & b.hoatdong == true
+                    & b.ngay_hieuluc <= DateTime.Now
+                   orderby
+                       b.ngay_hieuluc descending
+                   select
+                       c.gia
+                        ).FirstOrDefault();
+
+        return gia;
     }
 
     public static dynamic getImage(string ma_sanpham, int type)

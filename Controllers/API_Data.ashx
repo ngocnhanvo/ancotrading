@@ -7,13 +7,52 @@ using System.Web.Script.Serialization;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-public class API_Data : IHttpHandler {
+public class API_Data : IHttpHandler
+{
     private LinqDBDataContext db = new LinqDBDataContext();
+    public class ThongTinSP
+    {
+        public string itemNo { get; set; }
+        public string packing { get; set; }
+        public string palletSize { get; set; }
+        public string qtyCont { get; set; }
+        public string price { get; set; }
+        public string amount { get; set; }
+        public string cbm { get; set; }
+        public string image { get; set; }
+        public List<ThongTinSP> sizes { get; set; }
+        public List<ThongTinSP> colors { get; set; }
+    }
+
+    public class ThongTinKhachHang
+    {
+        public string customerCode { get; set; }
+        public string companyName { get; set; }
+        public string contactPerson { get; set; }
+        public string eMail { get; set; }
+        public string Phone { get; set; }
+        public string address { get; set; }
+    }
+
+    public class ThongTin
+    {
+        public DateTime date { get; set; }
+        public string dateStr { get; set; }
+        public int slSP { get; set; }
+        public int slKH { get; set; }
+        public int slGet { get; set; }
+        public List<ThongTinSP> sps { get; set; }
+        public List<ThongTinKhachHang> khs { get; set; }
+    }
+
     public void ProcessRequest(HttpContext context)
     {
         string oper = context.Request.Params["oper"];
         switch (oper)
         {
+            case "sanphams":
+                this.sanphams(context);
+                break;
             case "md_sanpham":
                 this.md_sanpham(context);
                 break;
@@ -92,6 +131,130 @@ public class API_Data : IHttpHandler {
         }
     }
 
+    public void sanphams(HttpContext context)
+    {
+        var msg = "";
+        var result = new ThongTin();
+        try
+        {
+            var rsps = new List<ThongTinSP>();
+            var sps = db.md_sanphams.Where(s => s.trangthai == "DHD" & (s.laMacon ?? false) == false).OrderBy(s => s.ma_sanpham).ToList();
+            foreach (var sp in sps)
+            {
+                var item = dequyTTSP(sp, sps, true, db);
+                var mabo = sp.ma_sanpham.Substring(9, 2).ToString();
+                var mabo_0 = mabo.Substring(0, 1).ToString();
+                if (
+                    mabo != "S1"
+                    & new string[] { "B", "L", "S", "X" }.Contains(mabo_0))
+                {
+                    var ma09 = sp.ma_sanpham.Substring(0, 9) + "0";
+                    var ma12 = sp.ma_sanpham.Substring(12, 2);
+                    var mas = new List<string>();
+                    for (var i = 0; i < 10; i++)
+                    {
+                        mas.Add(ma09 + i + ma12);
+                    }
+
+                    var spsCai = sps.Where(s =>
+                        s.ma_sanpham != sp.ma_sanpham
+                        & mas.Contains(s.ma_sanpham)
+                        ).ToList();
+                    foreach (var spCai in spsCai)
+                    {
+                        var itemCai = dequyTTSP(spCai, sps, true, db);
+                        item.sizes.Add(itemCai);
+                    }
+                }
+
+                rsps.Add(item);
+            }
+
+            var rkhs = (from a in db.md_doitackinhdoanhs
+                        join b in db.md_loaidtkds on a.md_loaidtkd_id equals b.md_loaidtkd_id
+                        where b.ma_loaidtkd == "KH"
+                        select new ThongTinKhachHang
+                        {
+                            customerCode = a.ma_dtkd,
+                            companyName = a.ten_dtkd,
+                            contactPerson = a.daidien,
+                            eMail = a.email,
+                            Phone = a.tel,
+                            address = a.diachi
+                        })
+                       .OrderBy(s => s.customerCode)
+                       .ToList();
+
+            result.sps = rsps;
+            result.khs = rkhs;
+            result.date = DateTime.Now;
+            result.dateStr = result.date.ToString("dd/MM/yyyy");
+            result.slSP = result.sps.Count;
+            result.slKH = result.khs.Count;
+            msg = "1" + JsonConvert.SerializeObject(result);
+        }
+        catch (Exception ex)
+        {
+            msg = "0" + ex;
+        }
+        context.Response.Write(msg);
+    }
+
+    public ThongTinSP dequyTTSP(md_sanpham sp, List<md_sanpham> sps, bool themMau, LinqDBDataContext db)
+    {
+        var ttdg = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id, db);
+        string packing = "-", palletSize = "-", qtyCont = "-", cbm = "";
+        if (ttdg != null)
+        {
+            var dDVT = ExcuteSignalRStatic.getTextFromInner(ttdg.dvtinner, ttdg.dvtouter, ttdg.sl_inner.ToString(), ttdg.sl_outer.ToString());
+            var inner = dDVT.inner;
+            var outer = dDVT.outer;
+            if (!string.IsNullOrWhiteSpace(inner.Replace(" ", "")))
+            {
+                packing = $@"{inner}, {outer}";
+            }
+
+            palletSize = $@"L{ttdg.l2_mix}xW{ttdg.w2_mix}xH{ttdg.h2_mix} cm";
+
+            if (ttdg.soluonggoi_ctn_40hc.GetValueOrDefault(0) != 0)
+            {
+                qtyCont = $@"{ttdg.soluonggoi_ctn_40hc} {dDVT.quantity}/40HC'";
+            }
+
+            cbm = ttdg.cbm.GetValueOrDefault(0).ToString();
+        }
+
+        string price = "";
+        var ttgsp = ExcuteSignalRStatic.getPrice(sp.md_sanpham_id, db);
+        if (ttgsp != null)
+            price = ttgsp.GetValueOrDefault(0).ToString("#,#0.00");
+        var item = new ThongTinSP();
+        item.itemNo = sp.ma_sanpham;
+        item.packing = packing;
+        item.palletSize = palletSize;
+        item.qtyCont = qtyCont;
+        item.price = price;
+        item.amount = "1";
+        item.cbm = cbm;
+        var imagePath = ExcuteSignalRStatic.mapPathSignalR($"~/{ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham)}");
+        byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
+        string base64String = Convert.ToBase64String(imageBytes);
+        item.image = base64String;
+        item.sizes = new List<ThongTinSP>();
+        item.colors = new List<ThongTinSP>();
+        if (themMau)
+        {
+            var maTho = sp.ma_sanpham.Substring(0, 12);
+            var spsMau = sps.Where(s => s.ma_sanpham.StartsWith(maTho)).OrderBy(s => s.ma_sanpham).ToList();
+            foreach (var spMau in spsMau)
+            {
+                var itemMau = dequyTTSP(spMau, sps, false, db);
+                item.colors.Add(itemMau);
+            }
+        }
+        return item;
+    }
+
     public void getListDSDH(HttpContext context)
     {
         string msg = "";
@@ -137,13 +300,13 @@ public class API_Data : IHttpHandler {
 
             foreach (var a in result)
             {
-				string emailUser = a["email"] + "";
+                string emailUser = a["email"] + "";
                 var user = db.nhanviens.Where(s => s.email == emailUser).FirstOrDefault();
-				if(user == null)
-				{
-					throw new Exception(string.Format(@"Ancotrading: nhân viên có email {0} không tồn tại", emailUser));
-				}
-				
+                if (user == null)
+                {
+                    throw new Exception(string.Format(@"Ancotrading: nhân viên có email {0} không tồn tại", emailUser));
+                }
+
                 var item = JsonConvert.DeserializeObject<c_danhsachdathang>(a["c_danhsachdathang"] + "");
                 var lstItem = JsonConvert.DeserializeObject<List<c_dongdsdh>>(a["c_dongdsdh"] + "");
                 //var lstItem2 = JsonConvert.DeserializeObject<List<c_phidathang>>(a["c_phidathang"] + "");
@@ -179,31 +342,31 @@ public class API_Data : IHttpHandler {
                 foreach (var b in lstItem)
                 {
                     stt++;
-					//Kiem tra SP
+                    //Kiem tra SP
                     var sp = db.md_sanphams.Where(s => s.ma_sanpham == b.md_sanpham_id).FirstOrDefault();
-                    if(sp == null)
-					{
-						throw new Exception(string.Format(@"Ancotrading: {0} không tồn tại", sp.ma_sanpham));
-					}
-					//Kiem tra ĐGSP mặc định
-					var qcdg = db.md_donggoisanphams.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).FirstOrDefault();
-					if(qcdg == null)
-					{
-						throw new Exception(string.Format(@"Ancotrading: {0} không có đóng gói mặc định", sp.ma_sanpham));
-					}
-					//Kiem tra ĐG
+                    if (sp == null)
+                    {
+                        throw new Exception(string.Format(@"Ancotrading: {0} không tồn tại", sp.ma_sanpham));
+                    }
+                    //Kiem tra ĐGSP mặc định
+                    var qcdg = db.md_donggoisanphams.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).FirstOrDefault();
+                    if (qcdg == null)
+                    {
+                        throw new Exception(string.Format(@"Ancotrading: {0} không có đóng gói mặc định", sp.ma_sanpham));
+                    }
+                    //Kiem tra ĐG
                     var donggoi = db.md_donggois.Where(s => s.md_donggoi_id == qcdg.md_donggoi_id).FirstOrDefault();
-					if(donggoi == null)
-					{
-						throw new Exception(string.Format(@"Ancotrading: {0} không có đóng gói mặc định", sp.ma_sanpham));
-					}
-					//Kiem tra NCU mặc định
+                    if (donggoi == null)
+                    {
+                        throw new Exception(string.Format(@"Ancotrading: {0} không có đóng gói mặc định", sp.ma_sanpham));
+                    }
+                    //Kiem tra NCU mặc định
                     var ncumd = db.md_nhacungungmacdinhs.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).FirstOrDefault();
-					if(ncumd == null) 
-					{
-						throw new Exception(string.Format(@"Ancotrading: {0} không có nhà cung ứng mặc định", sp.ma_sanpham));
-					}
-					
+                    if (ncumd == null)
+                    {
+                        throw new Exception(string.Format(@"Ancotrading: {0} không có nhà cung ứng mặc định", sp.ma_sanpham));
+                    }
+
                     var mnu1 = new c_dongdonhang();
                     mnu1.c_dongdonhang_id = Helper.getNewId();
                     mnu1.c_donhang_id = mnu.c_donhang_id;
@@ -304,7 +467,7 @@ public class API_Data : IHttpHandler {
         {
             var lstMSP = ma_sanphams.Split(',');
             var sps = db.md_sanphams.Where(s => lstMSP.Contains(s.ma_sanpham)).ToList();
-            foreach(var sp in sps)
+            foreach (var sp in sps)
             {
                 var hinhanh = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
                 if (!hinhanh.EndsWith(Public.imgNotFound))
@@ -321,7 +484,7 @@ public class API_Data : IHttpHandler {
             }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -338,7 +501,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_chungloais.Where(s => lstMSP.Contains(s.md_chungloai_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -355,7 +518,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_chucnangs.Where(s => lstMSP.Contains(s.md_chucnang_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -372,7 +535,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_cangbiens.Where(s => lstMSP.Contains(s.md_cangbien_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -389,7 +552,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_donvitinhsanphams.Where(s => lstMSP.Contains(s.md_donvitinhsanpham_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -406,7 +569,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_hscodes.Where(s => lstMSP.Contains(s.md_hscode_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -423,7 +586,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_kieudangs.Where(s => lstMSP.Contains(s.md_kieudang_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -440,7 +603,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_nhomnanglucs.Where(s => lstMSP.Contains(s.md_nhomnangluc_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -457,7 +620,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_phanloaihhs.Where(s => lstMSP.Contains(s.md_phanloaihh_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -477,7 +640,7 @@ public class API_Data : IHttpHandler {
                 sps.Where(s => s.macdinh == true);
             msg = "1" + JsonConvert.SerializeObject(sps.ToList());
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -494,7 +657,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_donggois.Where(s => lstMSP.Contains(s.md_donggoi_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -511,7 +674,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_hanghoadocquyens.Where(s => lstMSP.Contains(s.md_sanpham_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -528,7 +691,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_doitackinhdoanhs.Where(s => lstMSP.Contains(s.md_doitackinhdoanh_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -545,7 +708,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_cangxuathangs.Where(s => lstMSP.Contains(s.md_sanpham_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -562,7 +725,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_bientaus.Where(s => lstMSP.Contains(s.md_sanpham_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -579,7 +742,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_nhacungungmacdinhs.Where(s => lstMSP.Contains(s.md_sanpham_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -595,12 +758,12 @@ public class API_Data : IHttpHandler {
             var lstMSP = sanphams.Split(',');
             var bgBans = db.md_banggias.Where(s => s.banggiaban == true & s.ten_banggia.StartsWith("FOB") & s.hoatdong == true).ToList();
             var bgIds = bgBans.Select(s => s.md_banggia_id).ToList();
-            var pbgBan = db.md_phienbangias.Where(s => bgIds.Contains(s.md_banggia_id) & s.md_trangthai_id == "HIEULUC" & s.hoatdong == true).OrderByDescending(s=>s.ngay_hieuluc).FirstOrDefault();
+            var pbgBan = db.md_phienbangias.Where(s => bgIds.Contains(s.md_banggia_id) & s.md_trangthai_id == "HIEULUC" & s.hoatdong == true).OrderByDescending(s => s.ngay_hieuluc).FirstOrDefault();
             var pbgId = pbgBan == null ? "" : pbgBan.md_phienbangia_id;
             var sps = db.md_giasanphams.Where(s => lstMSP.Contains(s.md_sanpham_id) & s.md_phienbangia_id == pbgId).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -617,7 +780,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_phienbangias.Where(s => lstMSP.Contains(s.md_phienbangia_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -634,7 +797,7 @@ public class API_Data : IHttpHandler {
             var sps = db.md_banggias.Where(s => lstMSP.Contains(s.md_banggia_id)).ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -649,7 +812,7 @@ public class API_Data : IHttpHandler {
         {
             var sps = new List<md_detai>();
             var lstMSP = detais.Split(',');
-            foreach(var msp in lstMSP)
+            foreach (var msp in lstMSP)
             {
                 var cldt = msp.Split('-');
                 var cl = cldt[0];
@@ -663,7 +826,7 @@ public class API_Data : IHttpHandler {
 
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -678,7 +841,7 @@ public class API_Data : IHttpHandler {
         {
             var sps = new List<md_mausac>();
             var lstMSP = mausacs.Split(',');
-            foreach(var msp in lstMSP)
+            foreach (var msp in lstMSP)
             {
                 var cldt = msp.Split('-');
                 var cl = cldt[0];
@@ -693,7 +856,7 @@ public class API_Data : IHttpHandler {
 
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = "0" + ex;
         }
@@ -732,8 +895,10 @@ public class API_Data : IHttpHandler {
             context.Response.Write(url);
     }
 
-    public bool IsReusable {
-        get {
+    public bool IsReusable
+    {
+        get
+        {
             return false;
         }
     }

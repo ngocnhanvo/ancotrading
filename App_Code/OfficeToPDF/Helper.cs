@@ -27,6 +27,16 @@ public static class Helper
             System.IO.File.Delete(path);
     }
 
+    public static string getClientIP(HttpContext context)
+    {
+        string clientIp = (
+            context.Request.ServerVariables["HTTP_X_CLUSTER_CLIENT_IP"] ??
+                context.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] ??
+                   context.Request.ServerVariables["REMOTE_ADDR"]).Split(',')[0].Trim();
+
+        return clientIp;
+    }
+
     public static int getPage(HttpContext context)
     {
         int kq = 1;
