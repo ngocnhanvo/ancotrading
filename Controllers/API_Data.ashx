@@ -137,10 +137,18 @@ public class API_Data : IHttpHandler
         var result = new ThongTin();
         try
         {
-            int skip = context.Request.Form["skip"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
-            int take = context.Request.Form["take"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
+            int skip = context.Request.Params["skip"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
+            int take = context.Request.Params["take"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
             var rsps = new List<ThongTinSP>();
-            var sps = context.Session["sps"] as List<md_sanpham>;
+            List<md_sanpham> sps = null;
+            foreach(var key in context.Session.Keys)
+            {
+                if(key.ToString() == "sps")
+                {
+                    sps = context.Session["sps"] as List<md_sanpham>;
+                }
+            }
+
             if (sps == null)
             {
                 sps = db.md_sanphams.Where(s => s.trangthai == "DHD" & (s.laMacon ?? false) == false).OrderBy(s => s.ma_sanpham).ToList();
