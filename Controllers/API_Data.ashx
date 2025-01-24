@@ -149,7 +149,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 }
             }
 
-            if (sps == null)
+            if (sps == null | skip == 0)
             {
                 sps = db.md_sanphams.Where(s => s.trangthai == "DHD" & (s.laMacon ?? false) == false).OrderBy(s => s.ma_sanpham).ToList();
                 context.Session["sps"] = sps;
