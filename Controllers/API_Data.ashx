@@ -263,10 +263,11 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         item.price = price;
         item.amount = "1";
         item.cbm = cbm;
-        var imagePath = ExcuteSignalRStatic.mapPathSignalR($"~/{ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham)}");
-        byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
-        string base64String = Convert.ToBase64String(imageBytes);
-        item.image = base64String;
+        item.image = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
+        //var imagePath = ExcuteSignalRStatic.mapPathSignalR($"~/{ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham)}");
+        //byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
+        //string base64String = Convert.ToBase64String(imageBytes);
+        //item.image = base64String;
         item.sizes = new List<ThongTinSP>();
         item.colors = new List<ThongTinSP>();
         if (themMau)
