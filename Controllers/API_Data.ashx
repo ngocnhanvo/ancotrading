@@ -143,6 +143,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
             int skip = context.Request.Params["skip"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
             int take = context.Request.Params["take"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
             string dateStr = context.Request.Params["dateStr"].removeAllSpaceOrTrimText(true);
+            result.date = DateTime.Now;
             result.dateStr = string.IsNullOrWhiteSpace(dateStr) ? result.date.ToString("dd/MM/yyyy") : dateStr;
 
             var rsps = new List<ThongTinSP>();
@@ -220,8 +221,6 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
             }
 
             result.@continue = continueStep;
-            result.date = DateTime.Now;
-            
             result.slSP = result.sps.Count;
             result.slKH = result.khs.Count;
             msg = "1" + JsonConvert.SerializeObject(result);
