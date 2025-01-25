@@ -41,6 +41,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         public int slSP { get; set; }
         public int slKH { get; set; }
         public int slGet { get; set; }
+        public bool @continue { get; set; }
         public List<ThongTinSP> sps { get; set; }
         public List<ThongTinKhachHang> khs { get; set; }
     }
@@ -155,6 +156,8 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 context.Session["sps"] = sps;
             }
 
+            var continueStep = sps.Count > skip + take;
+
             foreach (var sp in sps.Skip(skip).Take(take))
             {
                 var item = dequyTTSP(sp, sps, true, db);
@@ -210,6 +213,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 result.khs = new List<ThongTinKhachHang>();
             }
 
+            result.@continue = continueStep;
             result.date = DateTime.Now;
             result.dateStr = result.date.ToString("dd/MM/yyyy");
             result.slSP = result.sps.Count;
