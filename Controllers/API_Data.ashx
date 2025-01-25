@@ -12,6 +12,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     private LinqDBDataContext db = new LinqDBDataContext();
     public class ThongTinSP
     {
+        public string dateStr { get; set; }
         public string itemNo { get; set; }
         public string packing { get; set; }
         public string palletSize { get; set; }
@@ -26,6 +27,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
     public class ThongTinKhachHang
     {
+        public string dateStr { get; set; }
         public string customerCode { get; set; }
         public string companyName { get; set; }
         public string contactPerson { get; set; }
@@ -140,6 +142,9 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         {
             int skip = context.Request.Params["skip"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
             int take = context.Request.Params["take"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
+            string dateStr = context.Request.Params["dateStr"].removeAllSpaceOrTrimText(true);
+            result.dateStr = string.IsNullOrWhiteSpace(dateStr) ? result.date.ToString("dd/MM/yyyy") : dateStr;
+
             var rsps = new List<ThongTinSP>();
             List<md_sanpham> sps = null;
             foreach(var key in context.Session.Keys)
@@ -160,7 +165,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
             foreach (var sp in sps.Skip(skip).Take(take))
             {
-                var item = dequyTTSP(sp, sps, true, db);
+                var item = dequyTTSP(sp, sps, true, result.dateStr, db);
                 var mabo = sp.ma_sanpham.Substring(9, 2).ToString();
                 var mabo_0 = mabo.Substring(0, 1).ToString();
                 if (
@@ -181,7 +186,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                         ).ToList();
                     foreach (var spCai in spsCai)
                     {
-                        var itemCai = dequyTTSP(spCai, sps, true, db);
+                        var itemCai = dequyTTSP(spCai, sps, true, result.dateStr, db);
                         item.sizes.Add(itemCai);
                     }
                 }
@@ -197,6 +202,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                             where b.ma_loaidtkd == "KH"
                             select new ThongTinKhachHang
                             {
+                                dateStr = result.dateStr,
                                 customerCode = a.ma_dtkd,
                                 companyName = a.ten_dtkd,
                                 contactPerson = a.daidien,
@@ -215,7 +221,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
             result.@continue = continueStep;
             result.date = DateTime.Now;
-            result.dateStr = result.date.ToString("dd/MM/yyyy");
+            
             result.slSP = result.sps.Count;
             result.slKH = result.khs.Count;
             msg = "1" + JsonConvert.SerializeObject(result);
@@ -227,7 +233,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         context.Response.Write(msg);
     }
 
-    public ThongTinSP dequyTTSP(md_sanpham sp, List<md_sanpham> sps, bool themMau, LinqDBDataContext db)
+    public ThongTinSP dequyTTSP(md_sanpham sp, List<md_sanpham> sps, bool themMau, string dateStr, LinqDBDataContext db)
     {
         var ttdg = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id, db);
         string packing = "-", palletSize = "-", qtyCont = "-", cbm = "";
@@ -256,6 +262,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         if (ttgsp != null)
             price = ttgsp.GetValueOrDefault(0).ToString("#,#0.00");
         var item = new ThongTinSP();
+        item.dateStr = dateStr;
         item.itemNo = sp.ma_sanpham;
         item.packing = packing;
         item.palletSize = palletSize;
@@ -276,7 +283,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
             var spsMau = sps.Where(s => s.ma_sanpham.StartsWith(maTho)).OrderBy(s => s.ma_sanpham).ToList();
             foreach (var spMau in spsMau)
             {
-                var itemMau = dequyTTSP(spMau, sps, false, db);
+                var itemMau = dequyTTSP(spMau, sps, false, dateStr, db);
                 item.colors.Add(itemMau);
             }
         }
