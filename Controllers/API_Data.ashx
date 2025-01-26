@@ -42,6 +42,8 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         public string dateStr { get; set; }
         public int slSP { get; set; }
         public int slKH { get; set; }
+        public int tongSLSP { get; set; }
+        public int tongSLKH { get; set; }
         public int slGet { get; set; }
         public bool @continue { get; set; }
         public List<ThongTinSP> sps { get; set; }
@@ -221,6 +223,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
             }
 
             result.@continue = continueStep;
+            result.tongSLSP = sps.Count;
             result.slSP = result.sps.Count;
             result.slKH = result.khs.Count;
             msg = "1" + JsonConvert.SerializeObject(result);
@@ -269,11 +272,11 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         item.price = price;
         item.amount = "1";
         item.cbm = cbm;
-        item.image = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
-        //var imagePath = ExcuteSignalRStatic.mapPathSignalR($"~/{ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham)}");
-        //byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
-        //string base64String = Convert.ToBase64String(imageBytes);
-        //item.image = base64String;
+        //item.image = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
+        var imagePath = ExcuteSignalRStatic.mapPathSignalR($"~/{ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham)}");
+        byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
+        string base64String = Convert.ToBase64String(imageBytes);
+        item.image = base64String;
         item.sizes = new List<ThongTinSP>();
         item.colors = new List<ThongTinSP>();
         if (themMau)
