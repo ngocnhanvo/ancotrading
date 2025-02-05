@@ -53,7 +53,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
             if(!string.IsNullOrWhiteSpace(nv.smtp))
             {
-                smtp = db.md_smtps.Where(s => s.smtpserver == nv.smtp).FirstOrDefault();
+                smtp = db.md_smtps.Where(s => s.md_smtp_id == nv.smtp).FirstOrDefault();
             }
             var mail = new GoogleMail();
             mail.Email = nv.email;
