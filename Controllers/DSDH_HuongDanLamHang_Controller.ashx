@@ -55,7 +55,12 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             {
                 smtp = db.md_smtps.Where(s => s.smtpserver == nv.smtp).FirstOrDefault();
             }
-            var mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
+            var mail = new GoogleMail();
+            mail.Email = nv.email;
+            mail.Password = nv.email_pass;
+            mail.Smtp = smtp.smtpserver;
+            mail.Port = smtp.port.Value;
+            mail.Ssl = smtp.use_ssl.GetValueOrDefault(false);
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).FirstOrDefault();
 
             string title = $@"", body = $@"";
