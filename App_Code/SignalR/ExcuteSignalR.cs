@@ -14,7 +14,7 @@ public class ExcuteSignalR
 
     }
 
-    public md_doitackinhdoanh createDTKD(LinqDBDataContext db, string ma_dtkd, string ten_dtkd, string email, string phone, string address, string nguoilienhe)
+    public md_doitackinhdoanh createDTKD(LinqDBDataContext db, string ma_dtkd, string ten_dtkd, string email, string phone, string address, string nguoilienhe, string note = "")
     {
         md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(s => s.ma_dtkd == ma_dtkd);
         string md_loaidtkd_id = "";
@@ -35,7 +35,8 @@ public class ExcuteSignalR
                 isncc = false,
                 hoatdong = true,
                 ngaytao = DateTime.Now,
-                ngaycapnhat = DateTime.Now
+                ngaycapnhat = DateTime.Now,
+                mota = note
             };
             db.md_doitackinhdoanhs.InsertOnSubmit(dtkd);
             db.SubmitChanges();

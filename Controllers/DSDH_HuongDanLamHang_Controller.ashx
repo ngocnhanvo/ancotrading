@@ -125,7 +125,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
         var msg = "";
         if (dsdh == null)
         {
-            msg = $@"Không tìm thấy ""danh sách đăth hàng""";
+            msg = $@"Không tìm thấy ""danh sách đặt hàng""";
             goto EndEventHandler;
         }
 

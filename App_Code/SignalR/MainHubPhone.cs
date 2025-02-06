@@ -57,6 +57,7 @@ public class MainHubPhone : Hub
         };
 
         string msg = "";
+        string BaoGiaID = parrams.BaoGiaID + "";
         try
         {
             var db = new LinqDBDataContext();
@@ -68,23 +69,25 @@ public class MainHubPhone : Hub
             string phone = parrams.phone + "";
             string address = parrams.address + "";
             string nguoilienhe = parrams.nguoilienhe + "";
+            string note = parrams.note + "";
+            string note2 = parrams.note2 + "";
             string json_data = parrams.json_data + "";
             var d = JsonConvert.DeserializeObject<List<Objects.Json_product>>(json_data);
 
             var nv = db.nhanviens.FirstOrDefault(p => p.manv == username);
             if (nv == null)
             {
-                msg = "Not found user \"" + username + "\" in system.";
+                msg = $@"Not found user ""${username}"" in system.";
             }
             else
             {
-                var dtkd = exec.createDTKD(db, ma_dtkd, ten_dtkd, email, phone, address, nguoilienhe);
+                var dtkd = exec.createDTKD(db, ma_dtkd, ten_dtkd, email, phone, address, nguoilienhe, note);
 
                 bool hd = false, gia_db = false;
                 int check = 0; // validate form on server
                 int qo_mau = 1;
 
-                String sochungtu = jqGridHelper.Utils.taoChungTuQO(dtkd.md_doitackinhdoanh_id, qo_mau, DateTime.Now.Year.ToString());
+                string sochungtu = jqGridHelper.Utils.taoChungTuQO(dtkd.md_doitackinhdoanh_id, qo_mau, DateTime.Now.Year.ToString());
 
 
                 string md_trongluong_id = "", md_cangbien_id = "", md_dongtien_id = "", md_kichthuoc_id = "";
@@ -102,9 +105,8 @@ public class MainHubPhone : Hub
 
                 c_baogia mnu = new c_baogia
                 {
-                    c_baogia_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                    c_baogia_id = Helper.getNewId(),
                     sobaogia = sochungtu,
-
                     md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id,
                     shipmenttime = 75,
                     ngaybaogia = DateTime.Now,
@@ -118,11 +120,10 @@ public class MainHubPhone : Hub
                     totalquo = 0,
                     isform = true,
                     moq_item_color = "",
-                    md_trangthai_id = "SOANTHAO",
-
+                    md_trangthai_id = Helper.SOANTHAO,
                     nguoitao = username,
                     nguoicapnhat = username,
-                    mota = "",
+                    mota = note2,
                     hoatdong = hd,
                     gia_db = gia_db,
                     ngaytao = DateTime.Now,
@@ -175,7 +176,7 @@ public class MainHubPhone : Hub
             msg = ex + "";
         }
         response["Message"] = msg;
-        response["data_bk"] = parrams.data_bk;
+        response["BaoGiaID"] = BaoGiaID;
         Clients.Caller.QOPOexcute(response);
     }
 }
