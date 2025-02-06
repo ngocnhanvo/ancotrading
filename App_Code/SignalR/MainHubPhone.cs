@@ -58,8 +58,10 @@ public class MainHubPhone : Hub
 
         string msg = "";
         string BaoGiaID = parrams.BaoGiaID + "";
+        string countStr = parrams.count + "";
         try
         {
+            int count = countStr.ToNullableInt().GetValueOrDefault(0);
             var db = new LinqDBDataContext();
             var exec = new ExcuteSignalR();
             string username = parrams.username + "";
@@ -168,6 +170,8 @@ public class MainHubPhone : Hub
 
                     msg = parrams.success;
                     response["Success"] = true;
+                    count++;
+                    response["Count"] = count;
                 }
             }
         }
