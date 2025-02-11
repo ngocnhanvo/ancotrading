@@ -932,7 +932,7 @@
                             return [false,'Hãy chọn một quotation mới có thể tạo chi tiết.!'];
                         }else{
                             postdata.c_baogia_id = masterId;
-                            var check_thaydoi = $('#md_donggoi_id > option:selected').attr('other');
+                            var check_thaydoi = $('#md_donggoi_id &gt; option:selected').attr('other');
 							var check_docquyen = $('#docquyen','#FrmGrid_grid_ds_chitietquotationqr').val();
 							if(check_thaydoi.toUpperCase() == 'TRUE')
 							{
@@ -1004,7 +1004,7 @@
                             return [false,'Hãy chọn một quotation mới có thể tạo chi tiết.!'];
                         }else{
                             postdata.c_baogia_id = masterId;
-							var check_thaydoi = $('#md_donggoi_id > option:selected').attr('other');
+							var check_thaydoi = $('#md_donggoi_id &gt; option:selected').attr('other');
 							var check_docquyen = $('#docquyen','#FrmGrid_grid_ds_chitietquotationqr').val();
 							if(check_thaydoi.toUpperCase() == 'TRUE')
 							{
@@ -1160,6 +1160,56 @@
             buttonicon: "ui-icon-battery-3",
             onClickButton: funcChuyenQRThanhQO,
             title: "Chuyển thành QO",
+            cursor: "pointer"
+        });
+
+        $("#grid_ds_quotationqr").jqGrid('navGrid', "#grid_ds_quotationqr-pager").jqGrid('navButtonAdd', "#grid_ds_quotationqr-pager",
+        {
+            caption: "Gửi email",
+            buttonicon: "ui-icon-mail-closed",
+            onClickButton: function () {
+                const qoId = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
+                let dlgId = 'dlgSendMailQR';
+                if ($(`#${dlgId}`).attr('id'))
+                    $(`#${dlgId}`).dialog("destroy").remove();
+                $('body').append(`
+                    <div title="Gửi mail" id="${dlgId}">
+                        <iframe id="formQOQRMail" style="width:99%;height:99%; zoom: 90%; background-color:#1b4cb912;"></iframe>
+                    </div>`
+                );
+
+				$(`#${dlgId}`).dialog({
+					modal: true, 
+                    width: 600,
+                    height: window.innerHeight - 30,
+                    open: function (event, ui) {
+                        let $formQOQRMail = $(`#formQOQRMail`);
+                        let myIFrame = $formQOQRMail[0].contentWindow || $formQOQRMail[0].contentDocument.document || $formQOQRMail[0].contentDocument;
+                        let loaded = false;
+                        $formQOQRMail.attr('src', `Outlook.aspx?v=${uuidv4()}`);
+                        $formQOQRMail.on('load', function() {
+                            if (!loaded) {
+                                $.get(`Controllers/QuotationQRController.ashx?action=createEmail`, { id: qoId }, function (rs) {
+                                    rs = JSON.parse(rs);
+                                    if (rs.status) {
+                                        rs = JSON.parse(rs.msg);
+                                        myIFrame.postMessage(rs, '*');
+                                    }
+                                    else {
+                                        alert(rs.msg);
+                                        $(`#${dlgId}`).dialog("destroy").remove();
+                                    }
+                                });
+                            }
+                            loaded = true;
+                        });
+                    },
+                    close: function () {
+                        $(`#${dlgId}`).dialog("destroy").remove();
+                    }
+				});
+            },
+            title: "Gửi email",
             cursor: "pointer"
         });
 

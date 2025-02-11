@@ -2,7 +2,7 @@
 
 using System;
 using System.Web;
-using System.Data.Linq;
+using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Data;
@@ -19,6 +19,9 @@ public class QuotationQRController : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
+            case "createEmail":
+                this.createEmail(context);
+                break;
             case "chuyenThanhQO":
                 this.chuyenThanhQO(context);
                 break;
@@ -34,6 +37,89 @@ public class QuotationQRController : IHttpHandler
                 }
                 break;
         }
+    }
+
+    public void createEmail(HttpContext context)
+    {
+        var id = context.Request.QueryString["id"];
+        string msg = "", user = UserUtils.getUser(context);
+        bool status = false;
+        string from = "", to = "", cc = "", subject = "", body = "";
+
+        try
+        {
+            var bg = db.c_baogiaqrs.Where(s => s.c_baogiaqr_id == id).FirstOrDefault();
+            if(bg == null)
+            {
+                msg = "Không tìm thấy báo giá đã chọn";
+                goto EndEventHandler;
+            }
+
+            var nv = db.nhanviens.Where(s => s.manv == user).FirstOrDefault();
+            if(nv == null)
+            {
+                msg = "Không tìm thấy tài khoản, kiểm tra phiên đăng nhập";
+                goto EndEventHandler;
+            }
+
+            if(string.IsNullOrWhiteSpace(nv.email))
+            {
+                msg = "Không tìm thấy email được gán trong tài khoản, kiểm tra tài khoản của bạn";
+                goto EndEventHandler;
+            }
+
+            var kh = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == bg.md_doitackinhdoanh_id).FirstOrDefault();
+            if(kh == null)
+            {
+                msg = "Không tìm thấy khách hàng trong báo giá, kiểm tra danh mục đối tác kinh doanh";
+                goto EndEventHandler;
+            }
+
+            var tmp = db.md_mailtemplates.FirstOrDefault(p => p.use_for.Equals("QRCode") && p.default_mail.Equals(true));
+            if(tmp == null)
+            {
+                msg = "Không tìm thấy mẫu gửi mail, kiểm tra danh mục Mail Template";
+                goto EndEventHandler;
+            }
+
+            from = nv.email;
+            to = string.IsNullOrWhiteSpace(bg.emailKH) ? kh.email : bg.emailKH;
+            cc = nv.email_cc;
+            subject = tmp.subject_mail;
+            body = tmp.content_mail.Replace("%0D", "<br/>").Replace("[ten_dtkd]", kh.ten_dtkd);
+
+            var ms = new MemoryStream();
+            string path = ExcuteSignalRStatic.mapPathSignalR("~/SendMail/quotation/");
+            String name = nv.manv + "-Quotation-" + DateTime.Now.ToString("mmhh-dd-MM-yyyy") + ".xls";
+            String logoPath = ExcuteSignalRStatic.mapPathSignalR("~/images/anco_logo_print.png");
+            String productImagePath = ExcuteSignalRStatic.mapPathSignalR("~/images/products/fullsize/");
+            var rptQO = new Objects.BaoGiaMauReport_QRCode(db, bg.c_baogiaqr_id, logoPath, productImagePath, "qr");
+            NPOI.HSSF.UserModel.HSSFWorkbook wb = rptQO.CreateWBQuotation();
+            wb.Write(ms);
+            File.WriteAllBytes(path + name, ms.ToArray());
+            long len = ms.Length;
+            ms.Close();
+
+            status = true;
+            string link = $"SendMail/quotation/{name}";
+            
+            var rs = new { from, to, cc, subject, body, file = new {link, name, len } };
+            msg = JsonConvert.SerializeObject(rs);
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+    EndEventHandler:;
+
+        dynamic result = new
+        {
+            msg,
+            status
+        };
+
+        context.Response.Write(JsonConvert.SerializeObject(result));
     }
 
     #region oper
@@ -63,64 +149,64 @@ public class QuotationQRController : IHttpHandler
     {
         string c_baogia_id = context.Request.Form["id"];
         c_baogiaqr bgqr = db.c_baogiaqrs.FirstOrDefault(s => s.c_baogiaqr_id == c_baogia_id);
-        Dictionary<string, object> lstMsg = new Dictionary<string, object>();   
+        Dictionary<string, object> lstMsg = new Dictionary<string, object>();
         int status = 0;
         string mess = "";
         if (bgqr != null)
         {
-			md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.Where(s=>s.md_doitackinhdoanh_id == bgqr.md_doitackinhdoanh_id).FirstOrDefault();
-			
-			if(string.IsNullOrEmpty(dtkd.ma_dtkd)) {
-				mess += "<br>Thiếu mã đối tác.";
-			}
-			if(string.IsNullOrEmpty(dtkd.ten_dtkd)) {
-				mess += "<br>Thiếu tên đối tác.";
-			}
-			if(string.IsNullOrEmpty(dtkd.tel)) {
-				mess += "<br>Thiếu số điện thoại của đối tác.";
-			}
-			if(string.IsNullOrEmpty(dtkd.fax)) {
-				mess += "<br>Thiếu số Fax.";
-			}
-			if(string.IsNullOrEmpty(dtkd.md_quocgia_id)){
-				mess += "<br>Thiếu quốc gia.";
-			}
-			if(string.IsNullOrEmpty(dtkd.md_khuvuc_id)){
-				mess += "<br>Thiếu khu vực.";
-			}
-			
-			if(mess.Length > 0) {
-				mess = mess.Substring(4);
-			}
-			else {
-				try
-				{
-					string bgid = Guid.NewGuid().ToString().Replace("-", "");
-					String sochungtu = jqGridHelper.Utils.taoChungTuQO(bgqr.md_doitackinhdoanh_id, 1, DateTime.Now.Year.ToString());
-					c_baogia bg = bgqr.Cast<c_baogia>();
-					bg.c_baogia_id = bgid;
-					bg.sobaogia = sochungtu;
-					db.c_baogias.InsertOnSubmit(bg);
+            md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.Where(s=>s.md_doitackinhdoanh_id == bgqr.md_doitackinhdoanh_id).FirstOrDefault();
 
-					foreach (c_chitietbaogiaqr ctbgqr in db.c_chitietbaogiaqrs.Where(s => s.c_baogiaqr_id == c_baogia_id))
-					{
-						c_chitietbaogia ctbg = ctbgqr.Cast<c_chitietbaogia>();
-						ctbg.c_chitietbaogia_id = Guid.NewGuid().ToString().Replace("-", "");
-						ctbg.c_baogia_id = bgid;
-						db.c_chitietbaogias.InsertOnSubmit(ctbg);
-						db.c_chitietbaogiaqrs.DeleteOnSubmit(ctbgqr);
-					}
+            if(string.IsNullOrEmpty(dtkd.ma_dtkd)) {
+                mess += "<br>Thiếu mã đối tác.";
+            }
+            if(string.IsNullOrEmpty(dtkd.ten_dtkd)) {
+                mess += "<br>Thiếu tên đối tác.";
+            }
+            if(string.IsNullOrEmpty(dtkd.tel)) {
+                mess += "<br>Thiếu số điện thoại của đối tác.";
+            }
+            if(string.IsNullOrEmpty(dtkd.fax)) {
+                mess += "<br>Thiếu số Fax.";
+            }
+            if(string.IsNullOrEmpty(dtkd.md_quocgia_id)){
+                mess += "<br>Thiếu quốc gia.";
+            }
+            if(string.IsNullOrEmpty(dtkd.md_khuvuc_id)){
+                mess += "<br>Thiếu khu vực.";
+            }
 
-					db.c_baogiaqrs.DeleteOnSubmit(bgqr);
-					db.SubmitChanges();
-					status = 1;
-					mess = sochungtu;
-				}
-				catch (Exception ex)
-				{
-					mess = ex.Message;
-				}
-			}
+            if(mess.Length > 0) {
+                mess = mess.Substring(4);
+            }
+            else {
+                try
+                {
+                    string bgid = Guid.NewGuid().ToString().Replace("-", "");
+                    String sochungtu = jqGridHelper.Utils.taoChungTuQO(bgqr.md_doitackinhdoanh_id, 1, DateTime.Now.Year.ToString());
+                    c_baogia bg = bgqr.Cast<c_baogia>();
+                    bg.c_baogia_id = bgid;
+                    bg.sobaogia = sochungtu;
+                    db.c_baogias.InsertOnSubmit(bg);
+
+                    foreach (c_chitietbaogiaqr ctbgqr in db.c_chitietbaogiaqrs.Where(s => s.c_baogiaqr_id == c_baogia_id))
+                    {
+                        c_chitietbaogia ctbg = ctbgqr.Cast<c_chitietbaogia>();
+                        ctbg.c_chitietbaogia_id = Guid.NewGuid().ToString().Replace("-", "");
+                        ctbg.c_baogia_id = bgid;
+                        db.c_chitietbaogias.InsertOnSubmit(ctbg);
+                        db.c_chitietbaogiaqrs.DeleteOnSubmit(ctbgqr);
+                    }
+
+                    db.c_baogiaqrs.DeleteOnSubmit(bgqr);
+                    db.SubmitChanges();
+                    status = 1;
+                    mess = sochungtu;
+                }
+                catch (Exception ex)
+                {
+                    mess = ex.Message;
+                }
+            }
         }
         else
         {

@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<!--
+Copyright (c) 2003-2020, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+-->
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CKEditor Sample</title>
+	<script src="../ckeditor.js"></script>
+	<script src="js/sample.js"></script>
+	<link rel="stylesheet" href="css/samples.css">
+	<link rel="stylesheet" href="toolbarconfigurator/lib/codemirror/neo.css">
+    <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<body id="main">
+    <div class="overlay-dark"></div>
+    <div class="overlay-content">
+        <div>
+            <input 
+                type="file" 
+                id="fileOrImg" 
+                accept="*" 
+                onchange="fileOrImgChange(this);" 
+            />
+        </div>
+        
+        <div>
+            <label>Display name</label>
+            <input type="text" id="txtfileOrImg" />
+            <input type="text" id="txtfileOrImgData" style="display:none" />
+        </div>
+        
+        <div><input id="chkDisplayImage" type="checkbox" disabled /><label for="chkDisplayImage">Display direct image</label></div>
+        
+        <div style="text-align:center">
+            <input onclick="fileOrImgInsert(this);" type="button" value="Accept" />
+        </div>
+    </div>
+    <div class="ckeditorPublic">
+        <i onclick="window.parent.postMessage({ closeIframe: true }, '*')" id="closeEditor" class="fa fa-times"></i>
+        <i onclick="postDataFromIframeToServer(this)" id="saveEditor" class="fa fa-floppy-o"></i>
+    </div>
+    <div id="titleEditor">Loading...</div>
+	<div id="editor">
+
+	</div>
+<script>
+	initSample();
+</script>
+</body>
+</html>

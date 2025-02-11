@@ -128,6 +128,7 @@ public class MainHubPhone : Hub
                     mota = note2,
                     hoatdong = hd,
                     gia_db = gia_db,
+                    emailKH = email,
                     ngaytao = DateTime.Now,
                     ngaycapnhat = DateTime.Now
                 };
