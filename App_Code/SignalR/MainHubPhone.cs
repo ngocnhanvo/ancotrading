@@ -16,13 +16,21 @@ public class MainHubPhone : Hub
         public string Password { get; set; }
     }
 
+    public partial class UserApp
+    {
+        public string user { get; set; }
+        public string name { get; set; }
+        public string key { get; set; }
+        public string status { get; set; }
+    }
+
     public string emailcc = "anco@ancopottery.com";
 
     public void Login(UserLoginMobile user)
     {
         string manv = user.Username;
         string password = user.Password;
-        dynamic data = new Dictionary<string, string>();
+        dynamic data = new UserApp();
         data.user = manv;
         data.name = "";
         data.key = "";
