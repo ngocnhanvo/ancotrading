@@ -30,19 +30,8 @@ public class MainHubPhone : Hub
     {
         string manv = user.Username;
         string password = user.Password;
-        dynamic data = new UserApp();
-        data.user = manv;
-        data.name = "";
-        data.key = "";
-        data.status = "false";
-
-        string json = JsonConvert.SerializeObject(new List<UserApp>() { data });
-        var response = new Dictionary<string, object>()
-        {
-            { "Success", false },
-            { "Message", json }
-        };
-
+        var data = new UserApp { user = manv, name = "", key = "", status = "false" };
+        bool Success = false;
         if (manv != "" & manv != null)
         {
             string matkhau = Security.EncodeMd5Hash(password);
@@ -52,15 +41,18 @@ public class MainHubPhone : Hub
 
             if (dt.Rows.Count > 0)
             {
-                data.name = dt.Rows[0]["hoten"];
+                data.name = dt.Rows[0]["hoten"].ToString();
                 data.key = manvmd5;
                 data.status = "true";
-                json = JsonConvert.SerializeObject(new List<UserApp>() { data });
+                Success = true;
             }
-
-            response["Success"] = true;
-            response["Message"] = json;
         }
+
+        var response = new 
+        {
+            Success,
+            Message = JsonConvert.SerializeObject(new List<UserApp>() { data })
+        };
 
         Clients.Caller.Login(response);
     }
