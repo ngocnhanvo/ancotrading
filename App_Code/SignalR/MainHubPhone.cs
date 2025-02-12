@@ -51,7 +51,7 @@ public class MainHubPhone : Hub
         var response = new 
         {
             Success,
-            Message = JsonConvert.SerializeObject(new List<UserApp>() { data })
+            Message = Success ? JsonConvert.SerializeObject(new List<UserApp>() { data }) : "Username or password is incorrect"
         };
 
         Clients.Caller.Login(response);
