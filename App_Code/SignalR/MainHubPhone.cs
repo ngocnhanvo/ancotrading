@@ -22,13 +22,12 @@ public class MainHubPhone : Hub
     {
         string manv = user.Username;
         string password = user.Password;
-        dynamic data = new 
-        {
-            user = manv,
-            name = "",
-            key = "",
-            status = "false"
-        };
+        dynamic data = new Dictionary<string, string>();
+        data.user = manv;
+        data.name = "";
+        data.key = "";
+        data.status = "false";
+
         string json = $@"[{JsonConvert.SerializeObject(data)}]";
         var response = new Dictionary<string, object>()
         {
