@@ -36,7 +36,7 @@ public class MainHubPhone : Hub
         data.key = "";
         data.status = "false";
 
-        string json = $@"[{JsonConvert.SerializeObject(data)}]";
+        string json = JsonConvert.SerializeObject(new List<UserApp>() { data });
         var response = new Dictionary<string, object>()
         {
             { "Success", false },
@@ -55,7 +55,7 @@ public class MainHubPhone : Hub
                 data.name = dt.Rows[0]["hoten"];
                 data.key = manvmd5;
                 data.status = "true";
-                json = $@"[{JsonConvert.SerializeObject(data)}]";
+                json = JsonConvert.SerializeObject(new List<UserApp>() { data });
             }
 
             response["Success"] = true;
