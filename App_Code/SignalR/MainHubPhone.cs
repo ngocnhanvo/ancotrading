@@ -22,7 +22,14 @@ public class MainHubPhone : Hub
     {
         string manv = user.Username;
         string password = user.Password;
-        string json = string.Format(@"[{{ ""user"":""{0}"", ""key"":""{1}"", ""status"":""{2}""}}]", manv, "", "false");
+        dynamic data = new 
+        {
+            user = manv,
+            name = "",
+            key = "",
+            status = "false"
+        };
+        string json = $@"[{JsonConvert.SerializeObject(data)}]";
         var response = new Dictionary<string, object>()
         {
             { "Success", false },
@@ -36,9 +43,12 @@ public class MainHubPhone : Hub
             string sql = "select * from nhanvien where manv = @manv and matkhau = @matkhau and hoatdong = 1";
             var dt = mdbc.GetData(sql, "@manv", manv, "@matkhau", matkhau);
 
-            if (dt.Rows.Count != 0)
+            if (dt.Rows.Count > 0)
             {
-                json = string.Format(@"[{{ ""user"":""{0}"", ""key"":""{1}"", ""status"":""{2}""}}]", manv, manvmd5, "true");
+                data.name = dt.Rows[0]["hoten"];
+                data.key = manvmd5;
+                data.status = "true";
+                json = $@"[{JsonConvert.SerializeObject(data)}]";
             }
 
             response["Success"] = true;
