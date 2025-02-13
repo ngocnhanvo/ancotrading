@@ -26,6 +26,7 @@ public class Objects
         public string price;
         public string image;
         public string soluong;
+        public string ghichu;
         public string detai_mausac;
     }
 

@@ -174,7 +174,7 @@ public class MainHubPhone : Hub
                     {
                         decimal gia_fob = 0;
                         try { gia_fob = decimal.Parse(row.price.Replace("$", "").Replace(" ", "")); } catch { }
-                        exec.add_ctbg(row.ma_sanpham, maxOrder, gia_fob, mnuqr.c_baogiaqr_id, username, dtkd.md_doitackinhdoanh_id, db, "qr", row.soluong);
+                        exec.add_ctbg(row.ma_sanpham, maxOrder, gia_fob, mnuqr.c_baogiaqr_id, username, dtkd.md_doitackinhdoanh_id, db, "qr", row.soluong, row.ghichu);
                     }
                     db.SubmitChanges();
 

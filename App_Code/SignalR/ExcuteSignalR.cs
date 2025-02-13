@@ -210,6 +210,9 @@ public class ExcuteSignalR
             string object1 = "1";
             try { object1 = args[1].ToString(); } catch { }
 
+            string object2 = "";
+            try { object2 = args[2].ToString(); } catch { }
+
             c_chitietbaogia ctbg = new c_chitietbaogia
             {
                 c_chitietbaogia_id = ImportUtils.getNEWID(),
@@ -240,7 +243,7 @@ public class ExcuteSignalR
                 sl_cont = soluonggoi_ctn,
                 ghichu = "",
                 docquyen = "",
-                mota = "",
+                mota = object2,
                 hoatdong = true,
                 ngaytao = DateTime.Now,
                 ngaycapnhat = DateTime.Now,
