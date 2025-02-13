@@ -710,7 +710,7 @@
                     , align:'right'
                     , formatter:'number'
                     , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
-					, hidden: true
+					, hidden: false
 					, editrulea:{ edithidden:true }
                 },
                 {
