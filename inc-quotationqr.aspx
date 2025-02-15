@@ -527,6 +527,8 @@
 
                     $('#grid_ds_chitietquotationqr').jqGrid('getGridParam', 'postData').quotationId = ids;
 					$('#grid_ds_chitietquotationqr')[0].triggerToolbar();
+                    $('#grid_ds_color_referencesqr').jqGrid('getGridParam', 'postData').quotationId = ids;
+					$('#grid_ds_color_referencesqr')[0].triggerToolbar();
                 }
             "
             runat="server" />
@@ -535,10 +537,11 @@
 <DIV class="ui-layout-south ui-widget-content" id="layout-south-quotationqr">
     <div class="ui-layout-center" id="tabs-quotationqr-details">
         <ul>
-            <li><a href="#qo-details-1">Danh Sách Sản Phẩm</a></li>
+            <li><a href="#qo-detailsqr-1">Danh Sách Sản Phẩm</a></li>
+            <li><a href="#qo-detailsqr-2">Color References</a></li>
         </ul>
         
-        <div id="qo-details-1">
+        <div id="qo-detailsqr-1">
                 <uc1:jqGrid  ID="grid_ds_chitietquotationqr" 
                 SortName="sp.ma_sanpham" 
                 SortOrder="asc"
@@ -550,34 +553,6 @@
                 RowNumbers="true"
                 OndblClickRow = "
 				function(rowid) { 
-					// $(this).jqGrid('editGridRow', rowid,
-					// {
-						// afterShowForm:populatePackingQO
-						// , afterclickPgButtons:populatePackingQO
-						// , errorTextFormat:function(data) { 
-							// return 'Lỗi: ' + data.responseText 
-						// }
-						// , afterSubmit: function(rs, postdata){
-							// return showMsgDialog(rs);
-						// }
-						// , beforeShowForm: function (formid) {
-							// $('#ma_sanpham', formid).mask('**-*****-**-**');
-							// $('#tr_sothutu', formid).show();
-							// $('#tr_md_donggoi_id', formid).show();
-							
-							// formid.closest('div.ui-jqdialog').dialogCenter();
-						// }
-						// , afterComplete: function()
-						// {
-							// var selMasterGrid = $('#grid_ds_quotationqr');
-							// var id = $(selMasterGrid).jqGrid('getGridParam', 'selrow');
-							// selMasterGrid.trigger('reloadGrid');
-							// setTimeout(function(){
-									// $(selMasterGrid).jqGrid('setSelection', id);
-							// }, 500);
-						// }
-																		 
-					// }); 
 					$('#edit_grid_ds_chitietquotationqr').click();
 				}"
                 ColModel = "[
@@ -1077,6 +1052,180 @@
                 runat="server" />
         </div>
         
+        <div id="qo-detailsqr-2">
+                <uc1:jqGrid  ID="grid_ds_color_referencesqr" 
+                SortName="md_color_reference_id" 
+                UrlFileAction="Controllers/ColorReferencesController.ashx" 
+                ColNames="['md_color_reference_id', 'Số Báo Giá', 'Màu', 'Url', 'Filter', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô Tả', 'Mặc Định']"
+                FilterToolbar="true"
+                RowNumbers="true"
+                OndblClickRow = "
+                    function(rowid) { 
+                        $(this).jqGrid('editGridRow', rowid,
+                        {
+                            errorTextFormat:function(data) { 
+                                return 'Lỗi: ' + data.responseText 
+                            }
+                            , afterSubmit: function(rs, postdata){
+                                return showMsgDialog(rs);
+                            }
+                            , beforeShowForm: function (formid) {
+                                formid.closest('div.ui-jqdialog').dialogCenter();
+                            }
+                        }); 
+                    }
+                "
+                ColModel = "[
+                {
+                    fixed: true, name: 'md_color_reference_id'
+                    , index: 'color.md_color_reference_id'
+                    , width: 100
+                    , hidden: true 
+                    , editable:true
+                    , edittype: 'text'
+                    , key: true
+                },
+                {
+                    fixed: true, name: 'c_baogia_id'
+                    , index: 'bg.sobaogia'
+                    , width: 100
+                    , edittype: 'text'
+                    , editable: true
+                    , hidden: true
+                },
+                {
+                    fixed: true, name: 'mau'
+                    , index: 'color.mau'
+                    , width: 100
+                    , edittype: 'text'
+                    , editable:true
+                },
+                {
+                    fixed: true, name: 'url'
+                    , index: 'color.url'
+                    , width: 100
+                    , edittype: 'text'
+                    , editable:true
+                },
+                {
+                    fixed: true, name: 'filter'
+                    , index: 'color.filter'
+                    , width: 100
+                    , edittype: 'text'
+                    , editable:true
+                },
+                {
+                    fixed: true, name: 'ngaytao'
+                    , index: 'color.ngaytao'
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: true 
+                    , editrules:{ edithidden : true }
+                },
+                {
+                    fixed: true, name: 'nguoitao'
+                    , index: 'color.nguoitao'
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: true 
+                    , editrules:{ edithidden : true }
+                },
+                {
+                    fixed: true, name: 'ngaycapnhat'
+                    , index: 'color.ngaycapnhat'
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: true 
+                    , editrules:{ edithidden : true }
+                },
+                {
+                    fixed: true, name: 'nguoicapnhat'
+                    , index: 'color.nguoicapnhat'
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: true 
+                    , editrules:{ edithidden : true }
+                },
+                {
+                    fixed: true, name: 'mota'
+                    , index: 'color.mota'
+                    , width: 100
+                    , editable:true
+                    , edittype: 'textarea'
+                },
+                {
+                    fixed: true, name: 'hoatdong'
+                    , index: 'color.hoatdong'
+                    , width: 100
+                    , editable:true
+                    , edittype: 'checkbox'
+                    , align: 'center'
+                    , editoptions:{ value:'True:False', defaultValue: 'True' }
+                    , formatter: 'checkbox'
+                }
+                ]"
+                GridComplete = "let o = $('#tabs-quotationqr-details'); $(this).setGridHeight($(o).height() - 97); $(this).setGridWidth($(o).width())"
+                Height = "150"
+                ShowAdd ="<%$ Code: DaoRules.GetRuleAdd(Context).ToString().ToLower() %>"
+                ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
+                ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
+                OnSelectRow = "
+                    function(ids) {
+		                if(ids == null) {
+			                ids=0;
+				        }
+                         let ma_sanpham = $(this).jqGrid('getCell', ids, 'ma_sanpham');
+                        $('#img-product').attr('src', '');
+                        $('#img-product').attr('src', 'Controllers/API_System.ashx?oper=loadImageProduct&msp=' + ma_sanpham + '&ver=' + uuidv4());
+                     }
+                "
+                AddFormOptions="
+                afterSubmit: function(rs, postdata){
+                    return showMsgDialog(rs);
+                }
+                , beforeShowForm: function (formid) {
+                     var masterId = $('#grid_ds_quotation').jqGrid('getGridParam', 'selrow');
+                        var forId = 'c_baogia_id';
+                        if(masterId == null)
+                        {
+                            $(formid).parent().parent().parent().dialog('destroy').remove();
+                            alert('Hãy chọn một quotation mới có thể tạo chi tiết.!');
+                        }else{
+                            formid.closest('div.ui-jqdialog').dialogCenter(); 
+                        }
+                }
+                , beforeSubmit:function(postdata, formid){
+                    var masterId = $('#grid_ds_quotation').jqGrid('getGridParam', 'selrow');
+                    var forId = 'c_baogia_id';
+                    if(masterId == null)
+                    {
+                        $(formid).parent().parent().parent().dialog('destroy').remove();
+                        return [false,'Hãy chọn một quotation mới có thể tạo chi tiết.!'];
+                    }else{
+                        postdata.c_baogia_id = masterId;
+                        return [true,'']; 
+                    }
+                }
+                , errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+                }"
+	            EditFormOptions ="
+	            afterSubmit: function(rs, postdata){
+                    return showMsgDialog(rs);
+                }
+                , beforeShowForm: function (formid) {
+                    formid.closest('div.ui-jqdialog').dialogCenter(); 
+                }
+                , errorTextFormat:function(data) { 
+                    return 'Lỗi: ' + data.responseText 
+                }"
+                MultiSelect = "false"
+                runat="server" />
+        </div>
     </div>
     <div class="ui-layout-east" style="text-align:center; background:#f4f0ec">
         <table style="width:100%; height:100%">
@@ -1185,23 +1334,22 @@
                     open: function (event, ui) {
                         let $formQOQRMail = $(`#formQOQRMail`);
                         let myIFrame = $formQOQRMail[0].contentWindow || $formQOQRMail[0].contentDocument.document || $formQOQRMail[0].contentDocument;
-                        let loaded = false;
                         $formQOQRMail.attr('src', `Outlook.aspx?v=${uuidv4()}`);
                         $formQOQRMail.on('load', function() {
-                            if (!loaded) {
-                                $.get(`Controllers/QuotationQRController.ashx?action=createEmail`, { id: qoId }, function (rs) {
-                                    rs = JSON.parse(rs);
-                                    if (rs.status) {
-                                        rs = JSON.parse(rs.msg);
-                                        myIFrame.postMessage(rs, '*');
-                                    }
-                                    else {
-                                        alert(rs.msg);
-                                        $(`#${dlgId}`).dialog("destroy").remove();
-                                    }
-                                });
-                            }
-                            loaded = true;
+                            $formQOQRMail.off('load');
+                            $.get(`Controllers/QuotationQRController.ashx?action=createEmail`, { id: qoId }, function (rs) {
+                                rs = JSON.parse(rs);
+                                if (rs.status) {
+                                    rs = JSON.parse(rs.msg);
+                                    let origin = window.location.origin;
+                                    rs.origin = origin;
+                                    myIFrame.postMessage(rs, origin);
+                                }
+                                else {
+                                    alert(rs.msg);
+                                    $(`#${dlgId}`).dialog("destroy").remove();
+                                }
+                            });
                         });
                     },
                     close: function () {

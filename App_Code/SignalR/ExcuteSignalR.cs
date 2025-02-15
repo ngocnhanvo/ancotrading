@@ -14,6 +14,52 @@ public class ExcuteSignalR
 
     }
 
+    public string createColorRefer(LinqDBDataContext db, List<md_sanpham> sps, string baogiaId, string manv = "")
+    {
+        string msg = "";
+        var maThos = sps.Select(s => s.ma_sanpham.Substring(0, 12)).Distinct().ToList();
+        var filters = sps.Select(s => s.ma_sanpham.Substring(0, 8) + s.ma_sanpham.Substring(12, 2)).Distinct().ToList();
+        var colorRefs = new List<md_color_reference>();
+
+        db.md_color_references.DeleteAllOnSubmit(db.md_color_references.Where(s => s.c_baogia_id == baogiaId));
+        var spsMau = db.md_sanphams.Where(s => s.trangthai == "DHD" & (s.laMacon ?? false) == false & maThos.Contains(s.ma_sanpham.Substring(0, 12))).OrderBy(s => s.ma_sanpham).ToList();
+        foreach (var spMau in spsMau)
+        {
+            string cl = spMau.ma_sanpham.Substring(0, 2), dt = spMau.ma_sanpham.Substring(6, 2), ms = spMau.ma_sanpham.Substring(12, 2);
+            var filter = spMau.ma_sanpham.Substring(0, 8) + ms;
+            if (!filters.Contains(filter))
+            {
+                var colorRef = colorRefs.Where(s => s.c_baogia_id == baogiaId & s.filter == filter).FirstOrDefault();
+                if (colorRef == null)
+                {
+                    var mausac = db.md_mausacs.Where(s => s.code_cl == cl & s.code_dt == dt & s.code_mau == ms).FirstOrDefault();
+                    string mau = mausac == null ? "" : mausac.ta_ngan;
+                    colorRef = new md_color_reference();
+                    colorRef.md_color_reference_id = Helper.getNewId();
+                    colorRef.c_baogia_id = baogiaId;
+                    colorRef.filter = filter;
+                    colorRef.url = $"{filter}.jpg";
+                    colorRef.mau = mau;
+                    colorRef.nguoitao = manv;
+                    colorRef.nguoicapnhat = manv;
+                    colorRef.ngaytao = DateTime.Now;
+                    colorRef.ngaycapnhat = DateTime.Now;
+                    colorRef.mota = "";
+                    colorRef.hoatdong = false;
+                    colorRefs.Add(colorRef);
+                }
+            }
+        }
+
+        if (colorRefs.Count > 0)
+        {
+            db.md_color_references.InsertAllOnSubmit(colorRefs);
+            db.SubmitChanges();
+        }
+
+        return msg;
+    }
+
     public md_doitackinhdoanh createDTKD(LinqDBDataContext db, string ma_dtkd, string ten_dtkd, string email, string phone, string address, string nguoilienhe, string note = "")
     {
         md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(s => s.ma_dtkd == ma_dtkd);
@@ -162,7 +208,7 @@ public class ExcuteSignalR
         }
     }
 
-    public void add_ctbg(string ma_sanpham, int maxOrder, decimal gia_fob, string c_baogia_id,
+    public md_sanpham add_ctbg(string ma_sanpham, int maxOrder, decimal gia_fob, string c_baogia_id,
     string tk, string md_doitackinhdoanh_id, LinqDBDataContext db, params object[] args)
     {
         md_sanpham pro = db.md_sanphams.FirstOrDefault(s => s.ma_sanpham == ma_sanpham);
@@ -264,5 +310,7 @@ public class ExcuteSignalR
                 db.c_chitietbaogias.InsertOnSubmit(ctbg);
             }
         }
+
+        return pro;
     }
 }

@@ -4,15 +4,15 @@
 
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="" charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Outlook-style Email Compose</title>
-    <script src="Scripts/NgocNhan/ckeditor/ckeditor.js?v=12345766"></script>
-	<script src="Scripts/NgocNhan/ckeditor/samples/js/sample.js?v=12345766"></script>
-	<link rel="stylesheet" href="Scripts/NgocNhan/ckeditor/samples/css/samples.css">
-	<link rel="stylesheet" href="Scripts/NgocNhan/ckeditor/samples/toolbarconfigurator/lib/codemirror/neo.css">
-    <link rel="stylesheet" href="Scripts/NgocNhan/ckeditor/samples/font-awesome-4.7.0/css/font-awesome.min.css">
-    <style>
+    <script type="text/javascript" src="Scripts/NgocNhan/ckeditor/ckeditor.js?v=12345766"></script>
+	<script type="text/javascript" src="Scripts/NgocNhan/ckeditor/samples/js/sample.js?v=12345766"></script>
+	<link type="text/css" rel="stylesheet" href="Scripts/NgocNhan/ckeditor/samples/css/samples.css" />
+	<link type="text/css" rel="stylesheet" href="Scripts/NgocNhan/ckeditor/samples/toolbarconfigurator/lib/codemirror/neo.css" />
+    <link type="text/css" rel="stylesheet" href="Scripts/NgocNhan/ckeditor/samples/font-awesome-4.7.0/css/font-awesome.min.css" />
+    <style type="text/css">
         * {
             margin: 0;
             padding: 0;
@@ -166,6 +166,15 @@
             color: #ff4444;
         }
 
+        #from {
+            font-weight: bold;
+            font-size: 82%;
+        }
+
+        #btnSendMail > button > i {
+            margin-right: 8px;
+        }
+
         /* Container màn hình chờ */
         .loading-screen {
             position: fixed;
@@ -213,14 +222,14 @@
     <div class="overlay-dark"></div>
     <div class="compose-container">
         <div class="compose-header">
-            <span id="from">From: Loading...</span>
-            <div class="compose-options">
-                <button onclick="sendEmail()"><i class="fa fa-paper-plane"></i> Send</button>
+            <span id="from">Đang tải...</span>
+            <div id="btnSendMail" class="compose-options">
+                <button onclick="sendEmail()"><i class="fa fa-paper-plane"></i>Gửi Mail</button>
             </div>
         </div>
         <div class="compose-body">
             <div class="input-group">
-                <label>To</label>
+                <label>Đến</label>
                 <input type="email" id="toInput" required>
             </div>
             <div class="input-group">
@@ -239,7 +248,6 @@
             <div id="editor">
 
 	        </div>
-            <%--<div class="email-editor" contenteditable="true"></div>--%>
             
             <div class="attachment-area">
                 <input type="file" class="attachment-input" id="attachment" multiple accept=".xls,.xlsx,.doc,.docx,.pdf,.png,.jpg">
@@ -252,23 +260,9 @@
         </div>
     </div>
 
-    <script>
+    <script type="text/javascript">
 
         initSample();
-
-        function toggleCc() {
-            const ccInput = document.getElementById('ccInput');
-            ccInput.style.display = ccInput.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function toggleBcc() {
-            const bccInput = document.getElementById('bccInput');
-            bccInput.style.display = bccInput.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function formatText(command) {
-            document.execCommand(command, false, null);
-        }
 
         function sendEmail() {
             alert('Email sent!');
@@ -365,20 +359,24 @@
 
         let funcMess = function (event) {
             let json = event.data;
-            document.getElementById('from').innerHTML = `From: ${json.from}`;
-            document.getElementById('toInput').value = json.to;
-            document.getElementById('ccInput').value = json.cc;
-            document.getElementById('subjectInput').value = json.subject;
-            CKEDITOR.instances.editor.setData(json.body);
-            if(json.file) {
-                attachedFiles.push({
-                    name: json.file.name,
-                    link: json.file.link,
-                    length: json.file.length
-                });
-                renderFileList();
+            let orgin = window.location.origin;
+            if (orgin == json.origin) {
+                document.getElementById('from').innerHTML = `Người gửi: ${json.from}`;
+                document.getElementById('toInput').value = json.to;
+                document.getElementById('ccInput').value = json.cc;
+                document.getElementById('bccInput').value = json.bcc;
+                document.getElementById('subjectInput').value = json.subject;
+                CKEDITOR.instances.editor.setData(json.body);
+                if (json.file) {
+                    attachedFiles.push({
+                        name: json.file.name,
+                        link: json.file.link,
+                        length: json.file.length
+                    });
+                    renderFileList();
+                }
+                document.getElementById('loadingMain').style.display = 'none';
             }
-            document.getElementById('loadingMain').style.display = 'none';
         };
 
         window.removeEventListener('message', funcMess);

@@ -44,7 +44,7 @@ public class QuotationQRController : IHttpHandler
         var id = context.Request.QueryString["id"];
         string msg = "", user = UserUtils.getUser(context);
         bool status = false;
-        string from = "", to = "", cc = "", subject = "", body = "";
+        string from = "", to = "", cc = "", bcc = "", subject = "", body = "";
 
         try
         {
@@ -85,6 +85,7 @@ public class QuotationQRController : IHttpHandler
             from = nv.email;
             to = string.IsNullOrWhiteSpace(bg.emailKH) ? kh.email : bg.emailKH;
             cc = nv.email_cc;
+            bcc = from;
             subject = tmp.subject_mail;
             body = tmp.content_mail.Replace("%0D", "<br/>").Replace("[ten_dtkd]", kh.ten_dtkd);
 
@@ -103,7 +104,7 @@ public class QuotationQRController : IHttpHandler
             status = true;
             string link = $"SendMail/quotation/{name}";
             
-            var rs = new { from, to, cc, subject, body, file = new {link, name, len } };
+            var rs = new { from, to, cc, bcc, subject, body, file = new {link, name, len } };
             msg = JsonConvert.SerializeObject(rs);
         }
         catch (Exception ex)

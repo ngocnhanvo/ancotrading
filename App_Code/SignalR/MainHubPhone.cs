@@ -165,17 +165,16 @@ public class MainHubPhone : Hub
                     mnuqr.c_baogiaqr_id = mnu.c_baogia_id;
                     mnuqr.sobaogia = "***/" + sochungtu.Substring(4);
                     db.c_baogiaqrs.InsertOnSubmit(mnuqr);
-                    db.SubmitChanges();
 
-                    String getOrder = "select max(sothutu) as count from c_chitietbaogiaqr where c_baogiaqr_id = @c_baogia_id";
-                    object omax = mdbc.ExecuteScalar(getOrder, "@c_baogia_id", mnuqr.c_baogiaqr_id);
-                    int maxOrder = omax.ToString().Equals("") ? 0 : (int)omax;
+                    var sps = new List<md_sanpham>();
                     foreach (var row in d)
                     {
                         decimal gia_fob = 0;
                         try { gia_fob = decimal.Parse(row.price.Replace("$", "").Replace(" ", "")); } catch { }
-                        exec.add_ctbg(row.ma_sanpham, maxOrder, gia_fob, mnuqr.c_baogiaqr_id, username, dtkd.md_doitackinhdoanh_id, db, "qr", row.soluong, row.ghichu);
+                        var sp = exec.add_ctbg(row.ma_sanpham, 0, gia_fob, mnuqr.c_baogiaqr_id, username, dtkd.md_doitackinhdoanh_id, db, "qr", row.soluong, row.ghichu);
+                        sps.Add(sp);
                     }
+                    exec.createColorRefer(db, sps, mnuqr.c_baogiaqr_id, username);
                     db.SubmitChanges();
 
                     msg = parrams.success;
