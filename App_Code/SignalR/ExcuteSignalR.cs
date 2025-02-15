@@ -18,7 +18,7 @@ public class ExcuteSignalR
     {
         string msg = "";
         var maThos = sps.Select(s => s.ma_sanpham.Substring(0, 12)).Distinct().ToList();
-        var filters = sps.Select(s => s.ma_sanpham.Substring(0, 8) + s.ma_sanpham.Substring(12, 2)).Distinct().ToList();
+        var filters = sps.Select(s => s.ma_sanpham.Substring(0, 9) + s.ma_sanpham.Substring(12, 2)).Distinct().ToList();
         var colorRefs = new List<md_color_reference>();
 
         db.md_color_references.DeleteAllOnSubmit(db.md_color_references.Where(s => s.c_baogia_id == baogiaId));
@@ -26,7 +26,7 @@ public class ExcuteSignalR
         foreach (var spMau in spsMau)
         {
             string cl = spMau.ma_sanpham.Substring(0, 2), dt = spMau.ma_sanpham.Substring(6, 2), ms = spMau.ma_sanpham.Substring(12, 2);
-            var filter = spMau.ma_sanpham.Substring(0, 8) + ms;
+            var filter = spMau.ma_sanpham.Substring(0, 9) + ms;
             if (!filters.Contains(filter))
             {
                 var colorRef = colorRefs.Where(s => s.c_baogia_id == baogiaId & s.filter == filter).FirstOrDefault();

@@ -130,9 +130,14 @@ public class QuotationQRController : IHttpHandler
         var qo = db.c_baogiaqrs.Single(q=>q.c_baogiaqr_id.Equals(id));
         if (qo.md_trangthai_id.Equals("SOANTHAO"))
         {
-            foreach(c_chitietbaogiaqr ctbg in db.c_chitietbaogiaqrs.Where(s=>s.c_baogiaqr_id == id))
+            foreach(var ctbg in db.c_chitietbaogiaqrs.Where(s=>s.c_baogiaqr_id == id))
             {
                 db.c_chitietbaogiaqrs.DeleteOnSubmit(ctbg);
+            }
+
+            foreach(var colorRef in db.md_color_references.Where(s=>s.c_baogia_id == id))
+            {
+                db.md_color_references.DeleteOnSubmit(colorRef);
             }
             db.SubmitChanges();
 
