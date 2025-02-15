@@ -59,6 +59,7 @@ public class BaoGiaReport
     {
         //try
         //{
+        c_baogia_id = c_baogia_id == null ? "" : c_baogia_id;
         string tbl = LaBaoGiaMauQR.GetValueOrDefault(false) ? "c_baogiaqr" : "c_baogia";
         string tblChild1 = LaBaoGiaMauQR.GetValueOrDefault(false) ? "c_chitietbaogiaqr" : "c_chitietbaogia"; 
         string orderby = UserUtils.get_sapxep_qodetail(null, c_baogia_id, "B.ma_sanpham", "order by B.ma_sanpham asc", db);
@@ -147,7 +148,7 @@ public class BaoGiaReport
         );
 
 
-        String selectRefereces = String.Format(@"
+        String selectRefereces = $@"
             SELECT 
 	            (select SUBSTRING(filter, 1, 2) + '-' + ta_ngan as ta_ngan from md_chungloai cl where cl.code_cl = SUBSTRING(filter, 1, 2)) as ta_ngan, 
                 SUBSTRING(filter, 1, 2) as chungloai, 
@@ -155,27 +156,27 @@ public class BaoGiaReport
                 mau, 
                 url
             FROM 
-	            c_baogia bg
+	            {tbl} bg
 				inner join md_color_reference color on bg.c_baogia_id = color.c_baogia_id
             WHERE
                 color.hoatdong = 1
-                AND bg.c_baogia_id = N'{0}'
+                AND bg.{tbl}_id = N'{c_baogia_id}'
             order by url
-        ", c_baogia_id == null ? "" : c_baogia_id);
+        ";
 
-        String selectDistinct = String.Format(@"
+        String selectDistinct = $@"
             SELECT distinct 
                 chungloai, ta_ngan
             FROM (
                 SELECT 
 	                (select ta_ngan from md_chungloai cl where cl.code_cl = SUBSTRING(filter, 1, 2)) as ta_ngan, SUBSTRING(filter, 1, 2) as chungloai, SUBSTRING(filter, 4, 2) as codemau, mau , url
                 FROM 
-	                c_baogia bg
+	                {tbl} bg
 					inner join md_color_reference color on bg.c_baogia_id = color.c_baogia_id
                 WHERE
 					color.hoatdong = 1
-                    AND bg.c_baogia_id = N'{0}'
-            ) as tmp", c_baogia_id == null ? "" : c_baogia_id);
+                    AND bg.{tbl}_id = N'{c_baogia_id}'
+            ) as tmp";
 
         DataTable dtDetails = mdbc.GetData(selectDetails);
         DataTable dtDistinct = mdbc.GetData(selectDistinct);
