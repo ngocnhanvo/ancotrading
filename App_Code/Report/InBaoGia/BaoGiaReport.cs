@@ -157,7 +157,7 @@ public class BaoGiaReport
                 url
             FROM 
 	            {tbl} bg
-				inner join md_color_reference color on bg.c_baogia_id = color.c_baogia_id
+				inner join md_color_reference color on bg.{tbl}_id = color.c_baogia_id
             WHERE
                 color.hoatdong = 1
                 AND bg.{tbl}_id = N'{c_baogia_id}'
@@ -172,7 +172,7 @@ public class BaoGiaReport
 	                (select ta_ngan from md_chungloai cl where cl.code_cl = SUBSTRING(filter, 1, 2)) as ta_ngan, SUBSTRING(filter, 1, 2) as chungloai, SUBSTRING(filter, 4, 2) as codemau, mau , url
                 FROM 
 	                {tbl} bg
-					inner join md_color_reference color on bg.c_baogia_id = color.c_baogia_id
+					inner join md_color_reference color on bg.{tbl}_id = color.c_baogia_id
                 WHERE
 					color.hoatdong = 1
                     AND bg.{tbl}_id = N'{c_baogia_id}'
