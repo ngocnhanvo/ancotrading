@@ -338,17 +338,28 @@ public static class ExcuteSignalRStatic
             var indexMimeImg = color.LastIndexOf(".");
             var colorFull = indexMimeImg <= -1 ? color + ".jpg" : color;
             //var mimeImg = colorFull.Substring(colorFull.LastIndexOf("."));
+            //Lay màu mới theo chuẩn 300x300
             string msLink1 = Public.imgColor;
-            string msLink2 = Public.imgProduct;
             image1 = mapPathSignalR($@"~/{msLink1}{colorFull}");
             if (File.Exists(image1))
                 image2 = msLink1 + colorFull;
-
+            //Neu không có màu chuẩn thì lấy màu cũ 150x150
             if (string.IsNullOrWhiteSpace(image2))
             {
+                //Nếu colorFull là mã thô
+                string msLink2 = Public.imgProduct;
                 image1 = mapPathSignalR($@"~/{msLink2}{colorFull}");
                 if (File.Exists(image1))
                     image2 = msLink2 + colorFull;
+                //Nếu colorFull là mã thô + mã màu
+                if (string.IsNullOrWhiteSpace(image2))
+                {
+                    indexMimeImg = colorFull.LastIndexOf(".");
+                    colorFull = colorFull.Substring(0, 8) + colorFull.Substring(indexMimeImg);
+                    image1 = mapPathSignalR($@"~/{msLink2}{colorFull}");
+                    if (File.Exists(image1))
+                        image2 = msLink2 + colorFull;
+                }
             }
             
             if(string.IsNullOrWhiteSpace(image2))
