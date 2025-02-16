@@ -145,22 +145,7 @@
                     , 'Ghi chú', 'Hoạt động', 'Giá đặc biệt'
                     , 'Giá FOB phiên bản cũ', 'Phiên bản giá cũ', 'Đã gửi mail']"
             RowNumbers="true"
-            OndblClickRow = "function(rowid) { 
-								/*$(this).jqGrid('editGridRow', rowid, { 
-									errorTextFormat:function(data) { 
-										return 'Lỗi: ' + data.responseText 
-									}
-									, afterSubmit: function(rs, postdata){
-										return showMsgDialog(rs); 
-									}
-									, beforeShowForm: function (formid) {
-                                        var frmID = '#' + formid.attr('id');
-										$('#gia_db', frmID).prop('disabled', true);
-										$('#isform', frmID).prop('disabled', true);
-										disable_cangbien(frmID);
-										formid.closest('div.ui-jqdialog').dialogCenter(); 
-									}
-                                })*/
+            OndblClickRow = "function(rowid) {
 								$('#edit_grid_ds_quotationqr').click();
                             }"
 
@@ -480,7 +465,13 @@
                 , formatter: 'checkbox'
             }
             ]"
-            GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 90);"
+            GridComplete = "
+                var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 90);
+                if($(this)[0].lastRS) {
+                    $(this).jqGrid('setSelection', $(this)[0].lastRS, true);
+                    $(this)[0].lastRS = null;
+                }
+            "
             FilterToolbar="true"
             Height = "170"
             MultiSelect = "false" 
@@ -1335,7 +1326,7 @@
                 {
                     fixed: true, name: 'ngaytao'
                     , index: 'ls.ngaytao'
-                    , label: 'Ngày tạo'
+                    , label: 'Ngày gửi'
                     , width: 100
                     , editable:false
                     , edittype: 'text'
@@ -1345,7 +1336,7 @@
                 {
                     fixed: true, name: 'nguoitao'
                     , index: 'ls.nguoitao'
-                    , label: 'Người tạo'
+                    , label: 'T.Khoản gửi'
                     , width: 100
                     , editable:false
                     , edittype: 'text'

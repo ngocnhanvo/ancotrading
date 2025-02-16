@@ -1144,6 +1144,12 @@
                 if (json.closeOutLook) {
                     $(`#ui-dialog-title-dlgSendMailQR`).next().click();
                 }
+
+                if (json.refreshQR) {
+                    let $grid = $(`#grid_ds_quotationqr`);
+                    $grid[0].lastRS = json.id;
+                    $grid[0].triggerToolbar();
+                }
             }
         };
         window.removeEventListener('message', funcMess);

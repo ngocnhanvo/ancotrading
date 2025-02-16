@@ -345,6 +345,8 @@
                             let origin = window.location.origin;
                             window.parent.postMessage({
                                 closeOutLook: true,
+                                refreshQR: true,
+                                id: c_baogia_id,
                                 origin
                             }, origin);
                         }
@@ -363,8 +365,10 @@
                 xhr.send(formData);
             };
 
-            if (attachedFiles.length > 0) {
-
+            if (ataFLen <= 0) {
+                afterAction();
+            }
+            else {
                 for (let i = 0; i < ataFLen; i++) {
                     let file = attachedFiles[i];
                     if (file.data) {

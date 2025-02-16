@@ -120,7 +120,7 @@ public class QuotationQRHistoryController : IHttpHandler
                 {
                     try
                     {
-                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)row[column.ColumnName]).ToString("dd/MM/yyyy"));
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)row[column.ColumnName]).ToString("dd/MM/yyyy (HH:mm)"));
                     }
                     catch
                     {
