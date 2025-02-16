@@ -254,7 +254,7 @@ public class QuotationQRController : IHttpHandler
 
             from = nv.email;
             to = string.IsNullOrWhiteSpace(bg.emailKH) ? kh.email : bg.emailKH;
-            cc = nv.email_cc;
+            //cc = nv.email_cc;
             bcc = from;
             subject = tmp.subject_mail;
             body = tmp.content_mail.Replace("%0D", "<br/>").Replace("[ten_dtkd]", kh.ten_dtkd);
