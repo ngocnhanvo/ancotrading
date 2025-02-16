@@ -10,6 +10,30 @@ using Newtonsoft.Json;
 
 public class QuotationQRController : IHttpHandler
 {
+    private class FileSave
+    {
+        public byte[] fileBytes { get; set; }
+        public string filePath { get; set; }
+    }
+
+    private class FileMail
+    {
+        public string data { get; set; }
+        public string name { get; set; }
+        public int size { get; set; }
+    }
+
+    private class eMail
+    {
+        public string c_baogia_id { get; set; }
+        public string from { get; set; }
+        public string to { get; set; }
+        public string cc { get; set; }
+        public string bcc { get; set; }
+        public string title { get; set; }
+        public string body { get; set; }
+        public List<FileMail> files { get; set; }
+    }
     private LinqDBDataContext db = new LinqDBDataContext();
 
     public void ProcessRequest(HttpContext context)
@@ -19,6 +43,9 @@ public class QuotationQRController : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
+            case "sendEmail":
+                this.sendEmail(context);
+                break;
             case "createEmail":
                 this.createEmail(context);
                 break;
@@ -39,6 +66,149 @@ public class QuotationQRController : IHttpHandler
         }
     }
 
+    public void sendEmail(HttpContext context)
+    {
+        var id = context.Request.QueryString["id"];
+        string msg = "", user = UserUtils.getUser(context);
+        var data = context.Request.Params["data"];
+        bool status = false;
+        try
+        {
+            var json = JsonConvert.DeserializeObject<eMail>(data);
+            var bg = db.c_baogiaqrs.Where(s => s.c_baogiaqr_id == json.c_baogia_id).FirstOrDefault();
+            if (bg == null)
+            {
+                msg = "Không tìm thấy báo giá đã chọn";
+                goto EndEventHandler;
+            }
+
+            if (string.IsNullOrWhiteSpace(json.from))
+            {
+                msg = "Không tìm thấy email của người gửi";
+                goto EndEventHandler;
+            }
+
+            if (string.IsNullOrWhiteSpace(json.to))
+            {
+                msg = "Không tìm thấy email của người nhận";
+                goto EndEventHandler;
+            }
+
+            if (string.IsNullOrWhiteSpace(json.title))
+            {
+                msg = "Không tìm thấy tiêu đề";
+                goto EndEventHandler;
+            }
+
+            if (string.IsNullOrWhiteSpace(json.body))
+            {
+                msg = "Không tìm thấy nội dung";
+                goto EndEventHandler;
+            }
+
+            string manv = UserUtils.getUser(context);
+            var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
+            if (nv.email.Trim() != json.from)
+            {
+                msg = $"Email của người dùng ({nv.email}) không khớp với email của người gửi ({json.from})";
+                goto EndEventHandler;
+            }
+
+            var pathMain = ExcuteSignalRStatic.mapPathSignalR($"~/SendMail/quotation/{bg.c_baogiaqr_id}");
+            var directoryMain = new DirectoryInfo(pathMain);
+            if (!directoryMain.Exists)
+            {
+                msg = $"Thư mục gốc của báo giá đã bị xóa, vui lòng mở lại chức năng gửi mail";
+                goto EndEventHandler;
+            }
+
+            var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(nv.smtp))
+            {
+                smtp = db.md_smtps.Where(s => s.md_smtp_id == nv.smtp).FirstOrDefault();
+            }
+            var mail = new GoogleMail();
+            mail.Email = nv.email;
+            mail.Password = nv.email_pass;
+            mail.Smtp = smtp.smtpserver;
+            mail.Port = smtp.port.Value;
+            mail.Ssl = smtp.use_ssl.GetValueOrDefault(false);
+            mail.Attachments = new List<System.Net.Mail.Attachment>();
+
+            var fileBytes = new List<FileSave>();
+            foreach(var file in json.files)
+            {
+                var fileB = Convert.FromBase64String(file.data);
+                fileBytes.Add(new FileSave() { fileBytes = fileB, filePath = file.name });
+                var stream = new MemoryStream(fileB);
+                var attachment = new System.Net.Mail.Attachment(stream, file.name);
+                attachment.ContentDisposition.FileName = file.name;
+                mail.Attachments.Add(attachment);
+            }
+
+            mail.Send2(
+               mail.Email
+               , json.to
+               , json.cc
+               , json.bcc
+               , json.title
+               , Security.DecodeHTML(json.body)
+               , ""
+            );
+
+            msg = "Gửi mail thành công";
+            status = true;
+            bg.daguiMail = status;
+
+            var ls = new c_baogiaqr_lichsu();
+            ls.c_baogiaqr_lichsu_id = Helper.getNewId();
+            ls.c_baogiaqr_id = bg.c_baogiaqr_id;
+            ls.from = json.from;
+            ls.to = json.to;
+            ls.cc = json.cc;
+            ls.bcc = json.bcc;
+            ls.title = json.title;
+            ls.body = json.body;
+            ls.nguoitao = nv.manv;
+            ls.ngaytao = DateTime.Now;
+            ls.nguoicapnhat = nv.manv;
+            ls.ngaycapnhat = DateTime.Now;
+            ls.mota = "";
+            db.c_baogiaqr_lichsus.InsertOnSubmit(ls);
+
+
+            foreach(var fileByte in fileBytes)
+            {
+                var path = $"{pathMain}/{ls.c_baogiaqr_lichsu_id}";
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+                path = $"{path}/{fileByte.filePath}";
+                File.WriteAllBytes(path, fileByte.fileBytes);
+            }
+
+            var files = directoryMain.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                try { file.Delete(); } catch { }
+            }
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.ToString();
+        }
+
+    EndEventHandler:;
+
+        dynamic result = new
+        {
+            msg,
+            status
+        };
+
+        context.Response.Write(JsonConvert.SerializeObject(result));
+    }
+
     public void createEmail(HttpContext context)
     {
         var id = context.Request.QueryString["id"];
@@ -49,34 +219,34 @@ public class QuotationQRController : IHttpHandler
         try
         {
             var bg = db.c_baogiaqrs.Where(s => s.c_baogiaqr_id == id).FirstOrDefault();
-            if(bg == null)
+            if (bg == null)
             {
                 msg = "Không tìm thấy báo giá đã chọn";
                 goto EndEventHandler;
             }
 
             var nv = db.nhanviens.Where(s => s.manv == user).FirstOrDefault();
-            if(nv == null)
+            if (nv == null)
             {
                 msg = "Không tìm thấy tài khoản, kiểm tra phiên đăng nhập";
                 goto EndEventHandler;
             }
 
-            if(string.IsNullOrWhiteSpace(nv.email))
+            if (string.IsNullOrWhiteSpace(nv.email))
             {
                 msg = "Không tìm thấy email được gán trong tài khoản, kiểm tra tài khoản của bạn";
                 goto EndEventHandler;
             }
 
             var kh = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == bg.md_doitackinhdoanh_id).FirstOrDefault();
-            if(kh == null)
+            if (kh == null)
             {
                 msg = "Không tìm thấy khách hàng trong báo giá, kiểm tra danh mục đối tác kinh doanh";
                 goto EndEventHandler;
             }
 
             var tmp = db.md_mailtemplates.FirstOrDefault(p => p.use_for.Equals("QRCode") && p.default_mail.Equals(true));
-            if(tmp == null)
+            if (tmp == null)
             {
                 msg = "Không tìm thấy mẫu gửi mail, kiểm tra danh mục Mail Template";
                 goto EndEventHandler;
@@ -89,22 +259,25 @@ public class QuotationQRController : IHttpHandler
             subject = tmp.subject_mail;
             body = tmp.content_mail.Replace("%0D", "<br/>").Replace("[ten_dtkd]", kh.ten_dtkd);
 
-            var ms = new MemoryStream();
-            string path = ExcuteSignalRStatic.mapPathSignalR("~/SendMail/quotation/");
-            String name = nv.manv + "-Quotation-" + DateTime.Now.ToString("mmhh-dd-MM-yyyy") + ".xls";
-            String logoPath = ExcuteSignalRStatic.mapPathSignalR("~/images/anco_logo_print.png");
-            String productImagePath = ExcuteSignalRStatic.mapPathSignalR("~/images/products/fullsize/");
-            var rptQO = new Objects.BaoGiaMauReport_QRCode(db, bg.c_baogiaqr_id, logoPath, productImagePath, "qr");
-            NPOI.HSSF.UserModel.HSSFWorkbook wb = rptQO.CreateWBQuotation();
-            wb.Write(ms);
-            File.WriteAllBytes(path + name, ms.ToArray());
-            long len = ms.Length;
-            ms.Close();
+            string name = $"{nv.manv}-Quotation-.xls", mime = "";
+            long size = 0;
+            string linkDic = ExcuteSignalRStatic.mapPathSignalR($"~/SendMail/quotation/{bg.c_baogiaqr_id}");
+            if(!Directory.Exists(linkDic))
+                Directory.CreateDirectory(linkDic);
+            string link = $"{linkDic}/{name}", data = "";
 
-            status = true;
-            string link = $"SendMail/quotation/{name}";
-            
-            var rs = new { from, to, cc, bcc, subject, body, file = new {link, name, len } };
+            var rptBaoGia = new BaoGiaReport(bg.c_baogiaqr_id);
+            msg = rptBaoGia.inBaoGia(db, context, name, "excel", true, link, name);
+            if (msg.Length <= 0)
+            {
+                var fileBytes = File.ReadAllBytes(link);
+                size = fileBytes.Length;
+                data = Convert.ToBase64String(fileBytes);
+                mime = "application/vnd.ms-excel";
+                status = true;
+            }
+
+            var rs = new { c_baogia_id = bg.c_baogiaqr_id, from, to, cc, bcc, subject, body, file = new { link, name, size, data, mime } };
             msg = JsonConvert.SerializeObject(rs);
         }
         catch (Exception ex)
@@ -127,15 +300,15 @@ public class QuotationQRController : IHttpHandler
     public void del(HttpContext context)
     {
         String id = context.Request.Form["id"];
-        var qo = db.c_baogiaqrs.Single(q=>q.c_baogiaqr_id.Equals(id));
+        var qo = db.c_baogiaqrs.Single(q => q.c_baogiaqr_id.Equals(id));
         if (qo.md_trangthai_id.Equals("SOANTHAO"))
         {
-            foreach(var ctbg in db.c_chitietbaogiaqrs.Where(s=>s.c_baogiaqr_id == id))
+            foreach (var ctbg in db.c_chitietbaogiaqrs.Where(s => s.c_baogiaqr_id == id))
             {
                 db.c_chitietbaogiaqrs.DeleteOnSubmit(ctbg);
             }
 
-            foreach(var colorRef in db.md_color_references.Where(s=>s.c_baogia_id == id))
+            foreach (var colorRef in db.md_color_references.Where(s => s.c_baogia_id == id))
             {
                 db.md_color_references.DeleteOnSubmit(colorRef);
             }
@@ -160,31 +333,39 @@ public class QuotationQRController : IHttpHandler
         string mess = "";
         if (bgqr != null)
         {
-            md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.Where(s=>s.md_doitackinhdoanh_id == bgqr.md_doitackinhdoanh_id).FirstOrDefault();
+            md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == bgqr.md_doitackinhdoanh_id).FirstOrDefault();
 
-            if(string.IsNullOrEmpty(dtkd.ma_dtkd)) {
+            if (string.IsNullOrEmpty(dtkd.ma_dtkd))
+            {
                 mess += "<br>Thiếu mã đối tác.";
             }
-            if(string.IsNullOrEmpty(dtkd.ten_dtkd)) {
+            if (string.IsNullOrEmpty(dtkd.ten_dtkd))
+            {
                 mess += "<br>Thiếu tên đối tác.";
             }
-            if(string.IsNullOrEmpty(dtkd.tel)) {
+            if (string.IsNullOrEmpty(dtkd.tel))
+            {
                 mess += "<br>Thiếu số điện thoại của đối tác.";
             }
-            if(string.IsNullOrEmpty(dtkd.fax)) {
+            if (string.IsNullOrEmpty(dtkd.fax))
+            {
                 mess += "<br>Thiếu số Fax.";
             }
-            if(string.IsNullOrEmpty(dtkd.md_quocgia_id)){
+            if (string.IsNullOrEmpty(dtkd.md_quocgia_id))
+            {
                 mess += "<br>Thiếu quốc gia.";
             }
-            if(string.IsNullOrEmpty(dtkd.md_khuvuc_id)){
+            if (string.IsNullOrEmpty(dtkd.md_khuvuc_id))
+            {
                 mess += "<br>Thiếu khu vực.";
             }
 
-            if(mess.Length > 0) {
+            if (mess.Length > 0)
+            {
                 mess = mess.Substring(4);
             }
-            else {
+            else
+            {
                 try
                 {
                     string bgid = Guid.NewGuid().ToString().Replace("-", "");
@@ -297,7 +478,7 @@ public class QuotationQRController : IHttpHandler
             ngaybaogia, ngayhethan, cb.ten_cangbien, baogia.shipmenttime, baogia.moq_item_color,  tl.ten_trongluong, 
             baogia.totalcbm, baogia.totalcbf, baogia.totalquo, dt.ma_iso, kt.ten_kichthuoc, baogia.isform,  
             baogia.ngaytao, baogia.nguoitao, baogia.ngaycapnhat, baogia.nguoicapnhat, baogia.mota, baogia.hoatdong, 
-            baogia.gia_db, baogia.ghepbo, baogia.chkPBGCu, baogia.phienbangiacu,
+            baogia.gia_db, baogia.daguiMail, baogia.chkPBGCu, baogia.phienbangiacu,
             ROW_NUMBER() OVER (ORDER BY {2} {3}) as RowNum 
             FROM c_baogiaqr baogia with (nolock) 
 			LEFT JOIN md_doitackinhdoanh dtkd with (nolock) on baogia.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id 
@@ -345,7 +526,7 @@ public class QuotationQRController : IHttpHandler
             xml += "<cell><![CDATA[" + row["gia_db"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["chkPBGCu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phienbangiacu"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["ghepbo"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["daguiMail"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

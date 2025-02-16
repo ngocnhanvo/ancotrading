@@ -1135,7 +1135,19 @@
 	        if (!$(e.target).parents(".custom-menu-vnn").length > 0) {
 	            $(".custom-menu-vnn").fadeOut(300);
 	        }
-	    });
+        });
+
+        let funcMess = function (event) {
+            let json = event.data;
+            let orgin = window.location.origin;
+            if (orgin == json.origin) {
+                if (json.closeOutLook) {
+                    $(`#ui-dialog-title-dlgSendMailQR`).next().click();
+                }
+            }
+        };
+        window.removeEventListener('message', funcMess);
+        window.addEventListener('message', funcMess, false);
 	</script>
 </body>
 </html>

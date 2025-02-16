@@ -16,15 +16,15 @@ public class PackingController : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
-			case "updatestatus":
-					this.UpdateStatus(context);
-					break;
+            case "updatestatus":
+                this.UpdateStatus(context);
+                break;
             case "getoptionselected":
                 this.getOptionSelected(context);
-                break;    
+                break;
             case "getbyproduct":
                 this.getSelectOptionByProduct(context);
-                break;    
+                break;
             case "getoption":
                 this.getSelectOption(context);
                 break;
@@ -47,54 +47,54 @@ public class PackingController : IHttpHandler
                 break;
         }
     }
-	
-	public void UpdateStatus(HttpContext context)
+
+    public void UpdateStatus(HttpContext context)
     {
         String msg = "";
         try
-        {   
+        {
             String id = context.Request.QueryString["md_donggoi_id"];
             String trangthai = context.Request.QueryString["trangthai"];
             md_donggoi sp = db.md_donggois.FirstOrDefault(p => p.md_donggoi_id.Equals(id));
 
             if (sp != null | trangthai == "TOACTIVE")
-			{
-				bool next = true;
-				switch (trangthai)
-				{
-					case "HIEULUC":
-						msg = "Đã chuyển trạng thái đóng gói thành \"Hiệu lực\"!";
-						break;
-					case "SOANTHAO":
-						msg = "Đã chuyển trạng thái đóng gói thành Soạn thảo!";
-						break;
-					case "TOACTIVE":
-						msg = "Đã chuyển tất cả đóng gói \"soạn thảo\" sang \"Hiệu lực\"!";
-						break;
-					default:
-						msg = "Không xác định được trạng thái của đóng gói!";
-						next = false;
-						break;
-				}
+            {
+                bool next = true;
+                switch (trangthai)
+                {
+                    case "HIEULUC":
+                        msg = "Đã chuyển trạng thái đóng gói thành \"Hiệu lực\"!";
+                        break;
+                    case "SOANTHAO":
+                        msg = "Đã chuyển trạng thái đóng gói thành Soạn thảo!";
+                        break;
+                    case "TOACTIVE":
+                        msg = "Đã chuyển tất cả đóng gói \"soạn thảo\" sang \"Hiệu lực\"!";
+                        break;
+                    default:
+                        msg = "Không xác định được trạng thái của đóng gói!";
+                        next = false;
+                        break;
+                }
 
-				if (next)
-				{
-					if (trangthai.Equals("TOACTIVE"))
-					{
-						String update = "update md_donggoi set trangthai = 'HIEULUC' where trangthai='SOANTHAO'";
-						mdbc.ExcuteNonQuery(update);
-					}
-					else
-					{	
-						sp.trangthai = trangthai;
-						db.SubmitChanges();
-					}
-				}
-			}
-			else
-			{
-				msg = "Chưa chọn đóng gói hoặc đóng gói không tồn tại!";
-			}
+                if (next)
+                {
+                    if (trangthai.Equals("TOACTIVE"))
+                    {
+                        String update = "update md_donggoi set trangthai = 'HIEULUC' where trangthai='SOANTHAO'";
+                        mdbc.ExcuteNonQuery(update);
+                    }
+                    else
+                    {
+                        sp.trangthai = trangthai;
+                        db.SubmitChanges();
+                    }
+                }
+            }
+            else
+            {
+                msg = "Chưa chọn đóng gói hoặc đóng gói không tồn tại!";
+            }
         }
         catch (Exception ex)
         {
@@ -108,8 +108,8 @@ public class PackingController : IHttpHandler
         String md_sanpham_id = context.Request.QueryString["md_sanpham_id"];
         String c_dongdonhang_id = context.Request.QueryString["c_dongdonhang_id"];
         String c_chitietbaogia_id = context.Request.QueryString["c_chitietbaogia_id"];
-		String c_baogia_id = context.Request.QueryString["c_baogia_id"];
-		String c_donhang_id = context.Request.QueryString["c_donhang_id"];
+        String c_baogia_id = context.Request.QueryString["c_baogia_id"];
+        String c_donhang_id = context.Request.QueryString["c_donhang_id"];
         String md_donggoi_id = ""; // selected
 
         if (c_dongdonhang_id != null)
@@ -117,43 +117,64 @@ public class PackingController : IHttpHandler
             if (!c_dongdonhang_id.Equals(""))
             {
                 c_dongdonhang ddh = db.c_dongdonhangs.FirstOrDefault(p => p.c_dongdonhang_id.Equals(c_dongdonhang_id));
-                md_donggoi_id = ddh.md_donggoi_id;    
+                md_donggoi_id = ddh.md_donggoi_id;
             }
-			else
-			{
-				md_donggoi_id = "";
-			}
+            else
+            {
+                md_donggoi_id = "";
+            }
         }
 
         if (c_chitietbaogia_id != null)
         {
-            c_chitietbaogia ctbg = db.c_chitietbaogias.FirstOrDefault(p => p.c_chitietbaogia_id.Equals(c_chitietbaogia_id));
+            var ctbg = db.c_chitietbaogias.FirstOrDefault(p => p.c_chitietbaogia_id.Equals(c_chitietbaogia_id));
             try
-			{
-				md_donggoi_id = ctbg.md_donggoi_id;
-			}
-			catch
-			{
-				
-			}
+            {
+                if (ctbg == null)
+                {
+                    var ctbg2 = db.c_chitietbaogiaqrs.FirstOrDefault(p => p.c_chitietbaogiaqr_id.Equals(c_chitietbaogia_id));
+                    if (ctbg2 != null)
+                        md_donggoi_id = ctbg2.md_donggoi_id;
+                }
+                else
+                {
+                    md_donggoi_id = ctbg.md_donggoi_id;
+                }
+            }
+            catch
+            {
+
+            }
         }
-		
-		string docquyen = "", dtkd_id = "";
-		if(c_baogia_id != null) {
-			dtkd_id = db.c_baogias.FirstOrDefault(p => p.c_baogia_id.Equals(c_baogia_id)).md_doitackinhdoanh_id;
-			docquyen = check_hanghoadocquyen(md_sanpham_id, dtkd_id);
-		}
-		else if(c_donhang_id != null) {
-			dtkd_id = db.c_donhangs.FirstOrDefault(p => p.c_donhang_id.Equals(c_donhang_id)).md_doitackinhdoanh_id;
-			docquyen = check_hanghoadocquyen(md_sanpham_id, dtkd_id);
-		}
-		
+
+        string docquyen = "", dtkd_id = "";
+        if(c_baogia_id != null) {
+            var bg = db.c_baogias.FirstOrDefault(p => p.c_baogia_id.Equals(c_baogia_id));
+            if (bg == null)
+            {
+                var bgqr = db.c_baogiaqrs.FirstOrDefault(p => p.c_baogiaqr_id.Equals(c_baogia_id));
+                if (bgqr != null)
+                {
+                    dtkd_id = bgqr.md_doitackinhdoanh_id;
+                }
+            }
+            else
+            {
+                dtkd_id = bg.md_doitackinhdoanh_id;
+            }
+            docquyen = check_hanghoadocquyen(md_sanpham_id, dtkd_id);
+        }
+        else if(c_donhang_id != null) {
+            dtkd_id = db.c_donhangs.FirstOrDefault(p => p.c_donhang_id.Equals(c_donhang_id)).md_doitackinhdoanh_id;
+            docquyen = check_hanghoadocquyen(md_sanpham_id, dtkd_id);
+        }
+
         String sql = String.Format("select dg.md_donggoi_id, dg.ten_donggoi, dg.doigia_donggoi " +
                 " FROM md_donggoi dg, md_donggoisanpham dgsp " +
                 " WHERE dg.hoatdong = 1 " +
                 " AND dg.md_donggoi_id = dgsp.md_donggoi_id " +
                 " AND dgsp.md_sanpham_id = '{0}' order by dgsp.macdinh desc ", md_sanpham_id);
-        
+
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToSelected(md_donggoi_id) + "(##)" + docquyen);
     }
@@ -176,12 +197,12 @@ public class PackingController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToOptionList());
     }
-    
+
     public void edit(HttpContext context)
     {
         String ma_donggoi = context.Request.Form["ma_donggoi"];
         String md_donggoi_id = context.Request.Form["md_donggoi_id"];
-        
+
         String selPacking = "select COUNT(*) as count from md_donggoi where ma_donggoi = @ma_donggoi AND md_donggoi_id != @md_donggoi_id";
         int colCount = (int)mdbc.ExecuteScalar(selPacking, "@ma_donggoi", ma_donggoi, "@md_donggoi_id", md_donggoi_id);
         if (colCount != 0)
@@ -193,7 +214,7 @@ public class PackingController : IHttpHandler
             String h, mi, dgdg;
             h = context.Request.Form["hoatdong"].ToLower();
             mi = context.Request.Form["mix_chophepsudung"].ToLower();
-			dgdg = context.Request.Form["doigia_donggoi"].ToLower();
+            dgdg = context.Request.Form["doigia_donggoi"].ToLower();
             bool hd, mix, dgdg_chk;
             hd = mix = dgdg_chk = false;
 
@@ -202,10 +223,10 @@ public class PackingController : IHttpHandler
 
             if (mi.Equals("on") || mi.Equals("true"))
             { mix = true; }
-			
-			if (dgdg.Equals("on") || dgdg.Equals("true"))
+
+            if (dgdg.Equals("on") || dgdg.Equals("true"))
             { dgdg_chk = true; }
-		
+
             String sl_outer = context.Request.Form["sl_outer"];
             String getDvt = "Select ten_dvt from md_donvitinh where md_donvitinh_id = @md_donvitinh_id";
             String dvtouter = (String)mdbc.ExecuteScalar(getDvt, "@md_donvitinh_id", context.Request.Form["dvtouter"]);
@@ -233,14 +254,14 @@ public class PackingController : IHttpHandler
             m.vl = decimal.Parse(context.Request.Form["vl"]);
             m.ghichu_vachngan = context.Request.Form["ghichu_vachngan"];
             m.mix_chophepsudung = mix;
-			
-			if(context.Request.Form["ngayxacnhan"] != "")
-			{
-				m.ngayxacnhan = DateTime.ParseExact(context.Request.Form["ngayxacnhan"], "dd/MM/yyyy", null);
-			}else{
-				m.ngayxacnhan = null;
-			}
-			m.doigia_donggoi = dgdg_chk;
+
+            if(context.Request.Form["ngayxacnhan"] != "")
+            {
+                m.ngayxacnhan = DateTime.ParseExact(context.Request.Form["ngayxacnhan"], "dd/MM/yyyy", null);
+            }else{
+                m.ngayxacnhan = null;
+            }
+            m.doigia_donggoi = dgdg_chk;
             m.mota = context.Request.Form["mota"];
             m.hoatdong = hd;
             m.nguoicapnhat = UserUtils.getUser(context);
@@ -264,10 +285,10 @@ public class PackingController : IHttpHandler
 
         if (mi.Equals("on") || mi.Equals("true"))
         { mix = true; }
-		
-		if (dgdg.Equals("on") || dgdg.Equals("true"))
+
+        if (dgdg.Equals("on") || dgdg.Equals("true"))
         { dgdg_chk = true; }
-	
+
         String ma_donggoi = context.Request.Form["ma_donggoi"];
         String selPacking = "select COUNT(*) as count from md_donggoi where ma_donggoi = @ma_donggoi";
         int colCount = (int)mdbc.ExecuteScalar(selPacking, "@ma_donggoi", ma_donggoi);
@@ -280,17 +301,17 @@ public class PackingController : IHttpHandler
             String sl_outer = context.Request.Form["sl_outer"];
             String getDvt = "Select ten_dvt from md_donvitinh where md_donvitinh_id = @md_donvitinh_id";
             String dvtouter = (String)mdbc.ExecuteScalar(getDvt, "@md_donvitinh_id", context.Request.Form["dvtouter"]);
-			
-			DateTime? nxn = new DateTime();
-			try
-			{
-				nxn = DateTime.ParseExact( context.Request.Form["ngayxacnhan"], "dd/MM/yyyy", null);
-			}catch
-			{
-				nxn = null;
-			}
-			
-			
+
+            DateTime? nxn = new DateTime();
+            try
+            {
+                nxn = DateTime.ParseExact( context.Request.Form["ngayxacnhan"], "dd/MM/yyyy", null);
+            }catch
+            {
+                nxn = null;
+            }
+
+
             md_donggoi mnu = new md_donggoi
             {
                 md_donggoi_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
@@ -314,11 +335,11 @@ public class PackingController : IHttpHandler
                 vn = decimal.Parse(context.Request.Form["vn"]),
                 vl = decimal.Parse(context.Request.Form["vl"]),
                 ghichu_vachngan = context.Request.Form["ghichu_vachngan"],
-				trangthai = "SOANTHAO",
+                trangthai = "SOANTHAO",
                 mix_chophepsudung = mix,
-                
+
                 ngayxacnhan = nxn,
-				doigia_donggoi = dgdg_chk,
+                doigia_donggoi = dgdg_chk,
                 mota = context.Request.Form["mota"],
                 hoatdong = hd,
                 nguoitao = UserUtils.getUser(context),
@@ -360,7 +381,7 @@ public class PackingController : IHttpHandler
 
         String sqlCount = "SELECT COUNT(*) AS count " +
             " FROM md_donggoi dg where dg.trangthai = 'HIEULUC' and 1=1 " + filter;
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -395,10 +416,10 @@ public class PackingController : IHttpHandler
             " , l2_mix, w2_mix, h2_mix, v2, sl_cont_mix, soluonggoi_ctn_20,soluonggoi_ctn,soluonggoi_ctn_40hc, vd, vn, vl, ghichu_vachngan " +
             ", mix_chophepsudung, dg.ngayxacnhan, dg.doigia_donggoi, dg.ngaytao, dg.nguoitao, dg.ngaycapnhat, dg.nguoicapnhat, dg.mota, dg.hoatdong , dg.trangthai, " +
             " ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            " FROM md_donggoi dg where dg.trangthai = 'HIEULUC' and 1=1 " + filter + 
+            " FROM md_donggoi dg where dg.trangthai = 'HIEULUC' and 1=1 " + filter +
             " )P where RowNum > @start AND RowNum < @end";
-        
-        
+
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
@@ -433,9 +454,9 @@ public class PackingController : IHttpHandler
             xml += "<cell><![CDATA[" + row[21] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[22] + "]]></cell>";
             xml += "<cell><![CDATA[" + (!row[23].ToString().Equals("") ? DateTime.Parse(row[23].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-			xml += "<cell><![CDATA[" + row[29] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[29] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[24] + "]]></cell>";
-			xml += "<cell><![CDATA[" + DateTime.Parse(row[25].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[25].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row[26] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row[27].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row[28] + "]]></cell>";
@@ -445,26 +466,26 @@ public class PackingController : IHttpHandler
         xml += "</rows>";
         context.Response.Write(xml);
     }
-	
-	public string check_hanghoadocquyen(string md_sanpham_id, string md_doitackinhdoanh_id) {
-		string msg = "";
-		md_hanghoadocquyen hhdq = db.md_hanghoadocquyens.FirstOrDefault(s=>s.md_sanpham_id == md_sanpham_id);
-		if(hhdq != null) {
-			md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(s=>s.md_doitackinhdoanh_id == hhdq.md_doitackinhdoanh_id);
-			if(dtkd != null) {
-				if(dtkd.md_doitackinhdoanh_id != md_doitackinhdoanh_id) {
-					md_quocgia quocgia = db.md_quocgias.FirstOrDefault(s=>s.md_quocgia_id == dtkd.md_quocgia_id);
-					string ten_qg = "";
-					if(quocgia != null) {
-						ten_qg = quocgia.ten_quocgia;
-					}
-					//msg = "Mã hàng độc quyền cho khách "+ dtkd.ma_dtkd +" ở thị trường "+ ten_qg +". Bạn có muốn mở bán cho khách hàng của bạn không ? YES/NO";
-					msg = "Mã hàng độc quyền cho khách "+ dtkd.ma_dtkd +" ở thị trường "+ hhdq.mota +".\n Bạn có muốn mở bán cho khách hàng của bạn không ? YES/NO";
-				}
-			}
-		}
-		return msg;
-	}
+
+    public string check_hanghoadocquyen(string md_sanpham_id, string md_doitackinhdoanh_id) {
+        string msg = "";
+        md_hanghoadocquyen hhdq = db.md_hanghoadocquyens.FirstOrDefault(s=>s.md_sanpham_id == md_sanpham_id);
+        if(hhdq != null) {
+            md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(s=>s.md_doitackinhdoanh_id == hhdq.md_doitackinhdoanh_id);
+            if(dtkd != null) {
+                if(dtkd.md_doitackinhdoanh_id != md_doitackinhdoanh_id) {
+                    md_quocgia quocgia = db.md_quocgias.FirstOrDefault(s=>s.md_quocgia_id == dtkd.md_quocgia_id);
+                    string ten_qg = "";
+                    if(quocgia != null) {
+                        ten_qg = quocgia.ten_quocgia;
+                    }
+                    //msg = "Mã hàng độc quyền cho khách "+ dtkd.ma_dtkd +" ở thị trường "+ ten_qg +". Bạn có muốn mở bán cho khách hàng của bạn không ? YES/NO";
+                    msg = "Mã hàng độc quyền cho khách "+ dtkd.ma_dtkd +" ở thị trường "+ hhdq.mota +".\n Bạn có muốn mở bán cho khách hàng của bạn không ? YES/NO";
+                }
+            }
+        }
+        return msg;
+    }
 
     public bool IsReusable
     {

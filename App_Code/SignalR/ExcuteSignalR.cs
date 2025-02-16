@@ -211,6 +211,19 @@ public class ExcuteSignalR
     public md_sanpham add_ctbg(string ma_sanpham, int maxOrder, decimal gia_fob, string c_baogia_id,
     string tk, string md_doitackinhdoanh_id, LinqDBDataContext db, params object[] args)
     {
+        //Qr
+        string object0 = "";
+        try { object0 = args[0].ToString(); } catch { }
+        //So luong
+        string object1 = "1";
+        try { object1 = args[1].ToString(); } catch { }
+        //Ghi chu
+        string object2 = "";
+        try { object2 = args[2].ToString(); } catch { }
+        //Dong goi
+        string object3 = "";
+        try { object3 = args[3].ToString(); } catch { }
+
         md_sanpham pro = db.md_sanphams.FirstOrDefault(s => s.ma_sanpham == ma_sanpham);
         if (pro != null)
         {
@@ -222,7 +235,12 @@ public class ExcuteSignalR
             String dvt_inner = "", dvt_outer = "", ghichu_vachngan = "", trangthai = "BT", md_donggoi_id = "";
 
             System.Nullable<decimal> sl_inner = 0, soluonggoi_ctn = 0, sl_outer = 0, l1 = 0, w1 = 0, h1 = 0, l2_mix = 0, w2_mix = 0, h2_mix = 0, v2 = 0, vd = 0, vn = 0, vl = 0;
-            md_donggoisanpham dgsp = db.md_donggoisanphams.FirstOrDefault(s => s.md_sanpham_id == pro.md_sanpham_id & s.macdinh == true);
+            md_donggoisanpham dgsp = null;
+            if (!string.IsNullOrWhiteSpace(object3))
+                dgsp = db.md_donggoisanphams.Where(s => s.md_donggoi_id == object3 & s.md_sanpham_id == pro.md_sanpham_id).FirstOrDefault();
+            if(dgsp == null)
+                dgsp = db.md_donggoisanphams.Where(s => s.md_sanpham_id == pro.md_sanpham_id & s.macdinh == true).FirstOrDefault();
+
             if (dgsp != null)
             {
                 md_donggoi dg_sel = db.md_donggois.FirstOrDefault(s => s.md_donggoi_id == dgsp.md_donggoi_id);
@@ -250,14 +268,7 @@ public class ExcuteSignalR
             }
 
             trangthai = UserUtils.get_DQ_DG_ALL(null, dgsp.md_donggoi_id, md_doitackinhdoanh_id, pro.md_sanpham_id, db)[0];
-            string object0 = "";
-            try { object0 = args[0].ToString(); } catch { }
-
-            string object1 = "1";
-            try { object1 = args[1].ToString(); } catch { }
-
-            string object2 = "";
-            try { object2 = args[2].ToString(); } catch { }
+            
 
             c_chitietbaogia ctbg = new c_chitietbaogia
             {

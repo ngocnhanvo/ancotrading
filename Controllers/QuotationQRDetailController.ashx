@@ -19,12 +19,176 @@ public class QuotationQRDetailController : IHttpHandler
             default:
                 switch (oper)
                 {
+                    case "del":
+                        this.del(context);
+                        break;
+                    case "edit":
+                        this.edit(context);
+                        break;
+                    case "add":
+                        this.add(context);
+                        break;
                     default:
                         this.load(context);
                         break;
                 }
                 break;
         }
+    }
+
+    public void edit(HttpContext context)
+    {
+        string msg = "";
+        var exec = new ExcuteSignalR();
+        string username = UserUtils.getUser(context);
+        string id = context.Request.Form["id"];
+        string ma_sanpham = context.Request.Form["ma_sanpham"];
+        var soluong = context.Request.Form["soluong"].ToNullableInt().GetValueOrDefault(0);
+        string ghichu = context.Request.Form["ghichu"].removeAllSpaceOrTrimText(true);
+        string donggoiId = context.Request.Form["md_donggoi_id"].removeAllSpaceOrTrimText(true);
+        try
+        {
+            var dbg = db.c_chitietbaogiaqrs.Where(s => s.c_chitietbaogiaqr_id == id).FirstOrDefault();
+            if (dbg == null)
+            {
+                msg = "Không tìm thấy dòng hàng đã chọn";
+                goto EndEventHandler;
+            }
+
+            var bg = db.c_baogiaqrs.Where(s => s.c_baogiaqr_id == dbg.c_baogiaqr_id).FirstOrDefault();
+            if (bg == null)
+            {
+                msg = "Không tìm thấy báo giá";
+                goto EndEventHandler;
+            }
+
+            if (soluong < 1)
+            {
+                msg = "Số lượng phải lớn hơn hoặc bằng 1";
+                goto EndEventHandler;
+            }
+
+            dbg.soluong = soluong;
+            dbg.ghichu = ghichu;
+            dbg.md_donggoi_id = donggoiId;
+            dbg.ngaycapnhat = DateTime.Now;
+            dbg.nguoicapnhat = username;
+            db.SubmitChanges();
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+    EndEventHandler:;
+
+        if(msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Đã sửa một dòng hàng.!");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
+    }
+
+    public void add(HttpContext context)
+    {
+        string msg = "";
+        var exec = new ExcuteSignalR();
+        string username = UserUtils.getUser(context);
+        string baogia_id = context.Request.Form["c_baogia_id"];
+        string ma_sanpham = context.Request.Form["ma_sanpham"];
+        var soluong = context.Request.Form["soluong"].ToNullableInt().GetValueOrDefault(0);
+        string ghichu = context.Request.Form["ghichu"].removeAllSpaceOrTrimText(true);
+        string donggoiId = context.Request.Form["md_donggoi_id"].removeAllSpaceOrTrimText(true);
+        try
+        {
+            var bg = db.c_baogiaqrs.Where(s => s.c_baogiaqr_id == baogia_id).FirstOrDefault();
+            if (bg == null)
+            {
+                msg = "Không tìm thấy báo giá";
+                goto EndEventHandler;
+            }
+
+            if (soluong < 1)
+            {
+                msg = "Số lượng phải lớn hơn hoặc bằng 1";
+                goto EndEventHandler;
+            }
+
+            var sp = db.md_sanphams.Where(s => s.ma_sanpham == ma_sanpham).FirstOrDefault();
+            if (sp == null)
+            {
+                msg = $"Không tìm thấy dòng hàng có mã {ma_sanpham}";
+                goto EndEventHandler;
+            }
+            var spids = db.c_chitietbaogiaqrs.Where(s => s.c_baogiaqr_id == bg.c_baogiaqr_id).Select(s => s.md_sanpham_id).ToList();
+            if (spids.Contains(sp.md_sanpham_id))
+            {
+                msg = $"Mã {ma_sanpham} đã được thêm vào báo giá trước đó";
+                goto EndEventHandler;
+            }
+
+            int order = (spids.Count + 1) * 10;
+            exec.add_ctbg(ma_sanpham, order, -1, bg.c_baogiaqr_id, username, bg.md_doitackinhdoanh_id, db, "qr", soluong, ghichu, donggoiId);
+            var sps = db.md_sanphams.Where(s => spids.Contains(s.md_sanpham_id)).ToList();
+            sps.Add(sp);
+            exec.createColorRefer(db, sps, bg.c_baogiaqr_id, username);
+            db.SubmitChanges();
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+    EndEventHandler:;
+
+        if(msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Đã thêm một dòng hàng.!");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
+    }
+
+
+    public void del(HttpContext context)
+    {
+        string msg = "";
+        String id = context.Request.Form["id"];
+        var dbg = db.c_chitietbaogiaqrs.Where(s => s.c_chitietbaogiaqr_id == id).FirstOrDefault();
+        if (dbg == null)
+        {
+            msg = "Không tìm thấy dòng hàng";
+            goto EndEventHandler;
+        }
+
+        var bg = db.c_baogiaqrs.Where(s => s.c_baogiaqr_id == dbg.c_baogiaqr_id).FirstOrDefault();
+        if(bg == null)
+        {
+            msg = "Không tìm thấy báo giá";
+            goto EndEventHandler;
+        }
+
+        var sp = db.md_sanphams.Where(s => s.md_sanpham_id == dbg.md_sanpham_id).FirstOrDefault();
+        if(sp != null)
+        {
+            string maTho = sp.ma_sanpham.Substring(0, 9);
+            var spsCLs = from a in db.c_chitietbaogiaqrs
+                         join b in db.md_sanphams on a.md_sanpham_id equals b.md_sanpham_id
+                         where a.c_baogiaqr_id == bg.c_baogiaqr_id & b.ma_sanpham.StartsWith(maTho) & a.c_chitietbaogiaqr_id != dbg.c_chitietbaogiaqr_id
+                         select a;
+            if (spsCLs.ToList().Count <= 0)
+            {
+                var colors = db.md_color_references.Where(s => s.c_baogia_id == bg.c_baogiaqr_id & s.filter.StartsWith(maTho)).ToList();
+                db.md_color_references.DeleteAllOnSubmit(colors);
+            }
+        }
+
+        db.c_chitietbaogiaqrs.DeleteOnSubmit(dbg);
+        db.SubmitChanges();
+
+    EndEventHandler:;
+
+        if(msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Đã xóa một dòng hàng.!");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     public void load(HttpContext context)

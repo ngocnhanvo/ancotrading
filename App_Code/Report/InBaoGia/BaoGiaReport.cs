@@ -61,7 +61,7 @@ public class BaoGiaReport
         //{
         c_baogia_id = c_baogia_id == null ? "" : c_baogia_id;
         string tbl = LaBaoGiaMauQR.GetValueOrDefault(false) ? "c_baogiaqr" : "c_baogia";
-        string tblChild1 = LaBaoGiaMauQR.GetValueOrDefault(false) ? "c_chitietbaogiaqr" : "c_chitietbaogia"; 
+        string tblChild1 = LaBaoGiaMauQR.GetValueOrDefault(false) ? "c_chitietbaogiaqr" : "c_chitietbaogia";
         string orderby = UserUtils.get_sapxep_qodetail(null, c_baogia_id, "B.ma_sanpham", "order by B.ma_sanpham asc", db);
 
         String selectDetails = String.Format(@"
@@ -200,7 +200,7 @@ public class BaoGiaReport
 
     private HSSFWorkbook CreateHSSFWorkbook(DataTable dtDetails, DataTable dtDistinct, DataTable dtReferences)
     {
-        
+
         String tenkt = dtDetails.Rows[0]["ten_kichthuoc"].ToString().ToLower();
         String tentl = dtDetails.Rows[0]["ten_trongluong"].ToString().ToLower();
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
@@ -236,7 +236,8 @@ public class BaoGiaReport
 
         int row = 0;
         config.endHeader = 20;
-        config.LogoRpt = new ExportExcel.Logoreport() {
+        config.LogoRpt = new ExportExcel.Logoreport()
+        {
             cell1 = 5,
             cell2 = 5,
             dx1 = 450,
@@ -434,7 +435,7 @@ public class BaoGiaReport
         cellNumBorderKT.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
         cellNumBorderKT.BorderBottom = cellNumBorderKT.BorderRight = cellNumBorderKT.BorderLeft = cellNumBorderKT.BorderTop = BorderStyle.Thin;
         //SO
-        
+
         int detailsCount = dtDetails.Rows.Count;
         var rowDt = row;
         for (int i = 0; i < detailsCount; i++)
@@ -465,7 +466,7 @@ public class BaoGiaReport
             //}
             //catch
             //{ }
-            
+
             s1.CreateRow(rowDt).CreateCell(0).SetCellValue(dtDetails.Rows[i]["msp"].ToString());
             s1.GetRow(rowDt).HeightInPoints = 50;
             s1.GetRow(rowDt).CreateCell(1).SetCellValue("");
@@ -544,9 +545,9 @@ public class BaoGiaReport
             rowDt++;
             for (int j = 0; j <= 30; j++)
             {
-                if(j == 0)
+                if (j == 0)
                     s1.GetRow(rowDt).GetCell(j).CellStyle = cellTextCenterBoderAll;
-                else if (new int[] { 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 27}.Contains(j))
+                else if (new int[] { 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 27 }.Contains(j))
                 {
                     s1.GetRow(rowDt).GetCell(j).CellStyle = cellStyleRight;
                 }
@@ -599,7 +600,7 @@ public class BaoGiaReport
                     }
                 }
 
-                s1.GetRow(rowMS-1).CreateCell(5 + j * 3).SetCellValue("Color " + items[j]["codemau"].ToString());
+                s1.GetRow(rowMS - 1).CreateCell(5 + j * 3).SetCellValue("Color " + items[j]["codemau"].ToString());
                 s1.GetRow(rowMS).CreateCell(5 + j * 3).SetCellValue(items[j]["mau"].ToString());
                 try
                 {
@@ -790,10 +791,83 @@ public class BaoGiaReport
         set { c_baogia_id = value; }
     }
 
-    public BaoGiaReport(String c_baogia_id, String logoPath, String productImagePath)
+    public BaoGiaReport(String c_baogia_id, String logoPath = "", String productImagePath = "")
     {
         this.c_baogia_id = c_baogia_id;
         this.logoPath = logoPath;
         this.productImagePath = productImagePath;
+    }
+
+    public string inBaoGia(LinqDBDataContext dblc, HttpContext context, string saveAsFileName = "", string type = "", bool mail = false, string url = "", string fileName = "")
+    {
+        var bg = dblc.c_baogias.Where(p => p.c_baogia_id.Equals(this.c_baogia_id)).FirstOrDefault();
+        LogoPath = ExcuteSignalRStatic.mapPathSignalR("~/images/anco_logo_print.png");
+        ProductImagePath = Public.imgProducts;
+        TypeReport = type;
+        LaBaoGiaMau = bg == null ? false : bg.isform.GetValueOrDefault(false);
+        LaBaoGiaMauQR = bg == null ? true : false;
+        var wb = CreateWBQuotation();
+
+        if (string.IsNullOrWhiteSpace(saveAsFileName))
+            saveAsFileName = bg == null ? "AncoQuotationQR_R.xls" : bg.isform.GetValueOrDefault(false) ? "AncoQuotation_R.xls" : "AncoQuotation.xls";
+
+        return this.luuBaoGia(dblc, context, wb, saveAsFileName, type, mail, url, fileName);
+    }
+
+    public string luuBaoGia(LinqDBDataContext dblc, HttpContext context, HSSFWorkbook hsswb, string saveAsFileName, string type, bool mail, string url, string fileName)
+    {
+        if (!mail)
+        {
+            fileName = "DSDH_" + c_baogia_id + "_" + Guid.NewGuid().ToString();
+            url = ExcuteSignalRStatic.mapPathSignalR($"~ReportPdf/{fileName}.xls");
+        }
+
+        var xfile = new FileStream(url, FileMode.Create, System.IO.FileAccess.ReadWrite);
+        hsswb.Write(xfile);
+        xfile.Close();
+        xfile.Dispose();
+
+        if (type == "pdf")
+        {
+            var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
+
+            var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, Lstimage, new List<AvariablePrj.lstText>());
+
+            if (!mail)
+            {
+                File.Delete(url);
+                context.Response.Write(result);
+                if (result.Length <= 0)
+                    context.Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width&remove=true", fileName));
+            }
+
+            return result;
+        }
+        else
+        {
+            var urlXls = url.Replace(fileName + ".xls", fileName + "1.xls");
+            var excel = new OfficeToPDF.ExcelConverter();
+            foreach (var img in Lstimage)
+                img.column -= 1;
+            excel.lstImage = Lstimage;
+            excel.lstText = null;
+            var result = excel.ConvertInterop(url, urlXls, null);
+
+            if (!mail)
+            {
+                File.Delete(url);
+                context.Response.Write(result);
+                if (result.Length <= 0)
+                {
+                    var data = "";
+                    data += "oper=downloadFile";
+                    data += string.Format("&name={0}", saveAsFileName);
+                    data += string.Format("&path=ReportPdf/{0}1.xls", fileName);
+                    data += string.Format("&remove=true");
+                    context.Response.Redirect(string.Format("../../Controllers/API_System.ashx?{0}", data));
+                }
+            }
+            return result;
+        }
     }
 }

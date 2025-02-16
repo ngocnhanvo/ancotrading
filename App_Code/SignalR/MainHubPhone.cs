@@ -171,7 +171,8 @@ public class MainHubPhone : Hub
                     {
                         decimal gia_fob = 0;
                         try { gia_fob = decimal.Parse(row.price.Replace("$", "").Replace(" ", "")); } catch { }
-                        var sp = exec.add_ctbg(row.ma_sanpham, 0, gia_fob, mnuqr.c_baogiaqr_id, username, dtkd.md_doitackinhdoanh_id, db, "qr", row.soluong, row.ghichu);
+                        int order = (sps.Count + 1) * 10;
+                        var sp = exec.add_ctbg(row.ma_sanpham, order, gia_fob, mnuqr.c_baogiaqr_id, username, dtkd.md_doitackinhdoanh_id, db, "qr", row.soluong, row.ghichu);
                         sps.Add(sp);
                     }
                     exec.createColorRefer(db, sps, mnuqr.c_baogiaqr_id, username);

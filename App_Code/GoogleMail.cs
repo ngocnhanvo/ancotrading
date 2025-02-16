@@ -49,6 +49,8 @@ public class GoogleMail
         set { _ssl = value; }
     }
 
+    public List<Attachment> Attachments { get; set; }
+
     public GoogleMail()
     { 
     
@@ -189,6 +191,75 @@ public class GoogleMail
         foreach (var ata in mail.Attachments)
         {
             ata.Dispose();
+        }
+
+        mail.Dispose();
+        client.Dispose();
+    }
+
+    public void Send2(String from, String to, String cc, String bcc, String subject, String body, String attachments, params object[] args)
+    {
+
+        if (Regex.IsMatch(body, "^([cCdDeEfFgGhHiIjI]:).+"))
+        {
+            body = File.ReadAllText(body);
+        }
+        body = String.Format(body, args);
+
+        MailMessage mail = new MailMessage();
+        mail.From = new MailAddress(from);
+        //mail.ReplyTo = new MailAddress(from);
+
+
+        int dem = 0;
+        if (attachments != "" & attachments != null)
+        {
+            dem = attachments.Split('#').Count();
+        }
+        for (int i = 0; i < dem - 1; i++)
+        {
+            System.Net.Mail.Attachment attachment;
+            attachment = new System.Net.Mail.Attachment(attachments.Split('#')[i]);
+            mail.Attachments.Add(attachment);
+        }
+
+        foreach (var attachment in Attachments)
+        {
+            mail.Attachments.Add(attachment);
+        }
+
+        to = to.Replace(" ", "");
+        string[] tos = to.Split(";,".ToArray());
+        foreach (string item in tos)
+        {
+            mail.To.Add(new MailAddress(item));
+        }
+
+        mail.Subject = subject;
+        mail.Body = body;
+        mail.IsBodyHtml = true;
+
+        if (!String.IsNullOrEmpty(cc))
+        {
+            mail.CC.Add(cc);
+        }
+
+        if (!String.IsNullOrEmpty(bcc))
+        {
+            mail.Bcc.Add(bcc);
+        }
+
+        //ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
+        SmtpClient client = new SmtpClient(_smtp, _port);
+        //client.Timeout = 1000;
+        client.EnableSsl = Ssl;
+        client.UseDefaultCredentials = true;
+        client.Credentials = new NetworkCredential(_email, _password);
+        client.Send(mail);
+
+        foreach (var attachment in Attachments)
+        {
+            attachment.Dispose();
         }
 
         mail.Dispose();

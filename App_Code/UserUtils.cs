@@ -134,12 +134,20 @@ public static class UserUtils
         itemJS["phi"] = "";
 
         var baogia = db.c_baogias.Where(d => d.c_baogia_id.Equals(c_baogia_id)).
-            Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, ngaybaogia = s.ngaybaogia }).FirstOrDefault();
+            Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, s.ngaybaogia }).FirstOrDefault();
+
+        if (baogia == null)
+        {
+            baogia = db.c_baogiaqrs.Where(d => d.c_baogiaqr_id.Equals(c_baogia_id)).
+            Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, s.ngaybaogia }).FirstOrDefault(); ;
+        }
+
         if (baogia == null)
         {
             baogia = db.c_donhangs.Where(d => d.c_donhang_id.Equals(c_baogia_id)).
             Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, ngaybaogia = s.ngaylap }).FirstOrDefault(); ;
         }
+
         var sp = db.md_sanphams.FirstOrDefault(s => s.md_sanpham_id.Equals(md_sanpham_id));
         if (baogia != null)
         {

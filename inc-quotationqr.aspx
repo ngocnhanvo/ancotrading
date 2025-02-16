@@ -23,9 +23,11 @@
                     var o = $("#tabs-quotationqr-details")
                     $("#grid_ds_chitietquotationqr").setGridWidth(o.width());
                     $("#grid_ds_color_referencesqr").setGridWidth(o.width());
+                    $("#grid_ds_lichsuquotationqr").setGridWidth(o.width());
 
                     $("#grid_ds_chitietquotationqr").setGridHeight(o.height() - 97);
                     $("#grid_ds_color_referencesqr").setGridHeight(o.height() - 97);
+                    $("#grid_ds_lichsuquotationqr").setGridHeight(o.height() - 97);
                 }
             }
         });
@@ -112,6 +114,22 @@
                 ]
             });
     }
+
+    function populatePackingQOQR() {
+        // first of all update the city based on the country
+        updatePackingQOQR_CallBack($("#sanpham_id","#FrmGrid_grid_ds_chitietquotationqr").val());
+	    var id_sel = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
+	    celValue = $('#grid_ds_quotationqr').jqGrid ('getCell', id_sel, 'gia_db');
+	    var giafob = $('#giafob','#FrmGrid_grid_ds_chitietquotationqr');
+	    var docquyen = $('#tr_docquyen','#FrmGrid_grid_ds_chitietquotationqr');
+	    if(celValue == 'True') {
+		    giafob.prop('disabled', true);
+	    }
+	    else {
+		    giafob.prop('disabled', false);
+	    }
+	    docquyen.hide();
+    }
 </script>
 <DIV class="ui-layout-center ui-widget-content" id="lay-center-quotationqr" style="padding:0;">
     <uc1:jqGrid  ID="grid_ds_quotationqr"
@@ -125,7 +143,7 @@
                     , 'Đồng Tiền', 'Kích Thước', 'QO mẫu', 'Ngày Tạo'
                     , 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật'
                     , 'Ghi chú', 'Hoạt động', 'Giá đặc biệt'
-                    , 'Giá FOB phiên bản cũ', 'Phiên bản giá cũ', 'Đã ghép bộ']"
+                    , 'Giá FOB phiên bản cũ', 'Phiên bản giá cũ', 'Đã gửi mail']"
             RowNumbers="true"
             OndblClickRow = "function(rowid) { 
 								/*$(this).jqGrid('editGridRow', rowid, { 
@@ -452,8 +470,8 @@
                 , formoptions:{label:'Phiên bản giá cũ ' + ip_fd()}
             },
 			{
-                fixed: true, name: 'ghepbo', hidden: true
-                , index: 'baogia.ghepbo'
+                fixed: true, name: 'daguiMail', hidden: false
+                , index: 'baogia.daguiMail'
                 , width: 100
                 , editable:false
                 , edittype: 'checkbox'
@@ -529,6 +547,8 @@
 					$('#grid_ds_chitietquotationqr')[0].triggerToolbar();
                     $('#grid_ds_color_referencesqr').jqGrid('getGridParam', 'postData').quotationId = ids;
 					$('#grid_ds_color_referencesqr')[0].triggerToolbar();
+                    $('#grid_ds_lichsuquotationqr').jqGrid('getGridParam', 'postData').quotationId = ids;
+					$('#grid_ds_lichsuquotationqr')[0].triggerToolbar();
                 }
             "
             runat="server" />
@@ -539,6 +559,7 @@
         <ul>
             <li><a href="#qo-detailsqr-1">Danh Sách Sản Phẩm</a></li>
             <li><a href="#qo-detailsqr-2">Color References</a></li>
+            <li><a href="#qo-detailsqr-3">Lịch sử gửi mail</a></li>
         </ul>
         
         <div id="qo-detailsqr-1">
@@ -634,10 +655,10 @@
                                   , { 'columnName': 'mota_tiengviet', 'width': '50', 'label': 'Mô Tả TV' , 'align':'left'}],
                                   select: function(event, ui) {
                                         $(elem).val(ui.item.ma_sanpham);
-                                        $('#sanpham_id').val(ui.item.md_sanpham_id);
-										var c_baogia_id = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
-                                        updatePackingQO_CallBack(ui.item.md_sanpham_id);
-                                        updateGiaSanPham_CallBack(c_baogia_id, ui.item.md_sanpham_id) 
+                                        $('#sanpham_id','#FrmGrid_grid_ds_chitietquotationqr').val(ui.item.md_sanpham_id);
+										let c_baogia_id = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
+                                        updatePackingQOQR_CallBack(ui.item.md_sanpham_id);
+                                        updateGiaSanPhamQR_CallBack(c_baogia_id, ui.item.md_sanpham_id) 
                                         return false;
                                   }
                             });
@@ -667,7 +688,7 @@
                     , index: 'ctbg.giafob'
                     , width: 100
                     , edittype: 'text'
-                    , editable: true
+                    , editable: false
                     , editrules: { required:true, number:true }
                     , editoptions: { defaultValue: '0' }
                     , align:'right'
@@ -694,7 +715,7 @@
                     , width: 100
                     , edittype: 'select'
                     , editable: true
-                    , editoptions: { 'value':'Chọn một đóng gói'}
+                    , editoptions: { 'value':':Chọn một đóng gói'}
 					, hidden:true
 					, editrules:{ edithidden:true }
                 },
@@ -946,6 +967,8 @@
                     , afterSubmit: function(rs, postdata){
                        return showMsgDialog(rs);
                     }
+                    , afterShowForm:populatePackingQOQR
+                    , afterclickPgButtons: populatePackingQOQR
                     , afterComplete: function()
                     {
                         var selMasterGrid = $('#grid_ds_quotationqr');
@@ -955,6 +978,7 @@
                                 $(selMasterGrid).jqGrid('setSelection', id);
                         }, 500);
                     }
+
                 "
 	            EditFormOptions ="
 	                errorTextFormat:function(data) { 
@@ -1015,6 +1039,8 @@
 							}
                         }
                     }
+                    , afterShowForm:populatePackingQOQR
+                    , afterclickPgButtons: populatePackingQOQR
                     , afterComplete: function()
                     {
                         var selMasterGrid = $('#grid_ds_quotationqr');
@@ -1046,9 +1072,9 @@
                     }
 	            "
                 MultiSelect = "false" 
-                ShowAdd ="false"
-                ShowEdit ="false"
-                ShowDel = "false"
+                ShowAdd ="true"
+                ShowEdit ="true"
+                ShowDel = "true"
                 runat="server" />
         </div>
         
@@ -1188,7 +1214,7 @@
                     return showMsgDialog(rs);
                 }
                 , beforeShowForm: function (formid) {
-                     var masterId = $('#grid_ds_quotation').jqGrid('getGridParam', 'selrow');
+                     var masterId = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
                         var forId = 'c_baogia_id';
                         if(masterId == null)
                         {
@@ -1199,7 +1225,7 @@
                         }
                 }
                 , beforeSubmit:function(postdata, formid){
-                    var masterId = $('#grid_ds_quotation').jqGrid('getGridParam', 'selrow');
+                    var masterId = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
                     var forId = 'c_baogia_id';
                     if(masterId == null)
                     {
@@ -1226,6 +1252,152 @@
                 MultiSelect = "false"
                 runat="server" />
         </div>
+
+        <div id="qo-detailsqr-3">
+                <uc1:jqGrid  ID="grid_ds_lichsuquotationqr" 
+                SortName="ngaytao"
+                SortOrder="desc"
+                UrlFileAction="Controllers/QuotationQRHistoryController.ashx" 
+                FilterToolbar="true"
+                RowNumbers="true"
+                OndblClickRow="function() {
+                    $('#view_grid_ds_lichsuquotationqr').click();    
+                }"
+                ColModel = "[
+                {
+                    fixed: true, name: 'c_baogiaqr_lichsu_id'
+                    , index: 'ls.c_baogiaqr_lichsu_id'
+                    , label: 'c_baogiaqr_lichsu_id'
+                    , width: 100
+                    , hidden: true 
+                    , editable:true
+                    , edittype: 'text'
+                    , key: true
+                },
+                {
+                    fixed: true, name: 'c_baogia_id'
+                    , index: 'ls.c_baogia_id'
+                    , label: 'c_baogia_id'
+                    , width: 100
+                    , edittype: 'text'
+                    , editable: true
+                    , hidden: true
+                },
+                {
+                    fixed: true, name: 'from'
+                    , index: 'ls.from'
+                    , label: 'Mail gửi'
+                    , width: 150
+                    , edittype: 'text'
+                    , editable:true
+                },
+                {
+                    fixed: true, name: 'to'
+                    , index: 'ls.to'
+                    , label: 'Mail nhận'
+                    , width: 150
+                    , edittype: 'text'
+                    , editable:true
+                },
+                {
+                    fixed: true, name: 'cc'
+                    , index: 'ls.cc'
+                    , label: 'Cc'
+                    , width: 150
+                    , edittype: 'text'
+                    , editable:true
+                },
+                {
+                    fixed: true, name: 'bcc'
+                    , index: 'ls.bcc'
+                    , label: 'Bcc'
+                    , width: 150
+                    , edittype: 'text'
+                    , editable:true
+                },
+                {
+                    fixed: true, name: 'title'
+                    , index: 'ls.title'
+                    , label: 'Tiêu đề'
+                    , width: 150
+                    , edittype: 'text'
+                    , editable:true
+                },
+                {
+                    fixed: true, name: 'body', hidden: true
+                    , index: 'ls.body'
+                    , label: 'Nội dung'
+                    , width: 100
+                    , edittype: 'textarea'
+                    , editable:true
+                    , editrules:{ edithidden : true }
+                },
+                {
+                    fixed: true, name: 'ngaytao'
+                    , index: 'ls.ngaytao'
+                    , label: 'Ngày tạo'
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: false 
+                    , editrules:{ edithidden : true }
+                },
+                {
+                    fixed: true, name: 'nguoitao'
+                    , index: 'ls.nguoitao'
+                    , label: 'Người tạo'
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: false 
+                    , editrules:{ edithidden : true }
+                },
+                {
+                    fixed: true, name: 'ngaycapnhat'
+                    , index: 'ls.ngaycapnhat'
+                    , label: 'Ngày cập nhật'
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: true
+                },
+                {
+                    fixed: true, name: 'nguoicapnhat'
+                    , index: 'ls.nguoicapnhat'
+                    , label: 'Người cập nhật'
+                    , width: 100
+                    , editable:false
+                    , edittype: 'text'
+                    , hidden: true 
+                },
+                {
+                    fixed: true, name: 'mota', hidden: true
+                    , index: 'ls.mota'
+                    , label: 'Mô tả'
+                    , width: 100
+                    , editable:true
+                    , edittype: 'textarea'
+                }
+                ]"
+                GridComplete = "let o = $('#tabs-quotationqr-details'); $(this).setGridHeight($(o).height() - 97); $(this).setGridWidth($(o).width())"
+                Height = "150"
+                ShowAdd ="false"
+                ShowEdit ="false"
+                ShowDel = "false"
+                MultiSelect = "false"
+                ViewFormOptions="
+                    width: 600,
+                    recreateForm: true,
+                    beforeShowForm: function(formid) {
+                       formid.closest('.ui-jqdialog').css({
+                           top: '50%',
+                           left: '50%',
+                           transform: 'translate(-50%, -50%)'
+                       });
+                   }
+                "
+                runat="server" />
+        </div>
     </div>
     <div class="ui-layout-east" style="text-align:center; background:#f4f0ec">
         <table style="width:100%; height:100%">
@@ -1238,6 +1410,38 @@
     </div> 
 
     <script type="text/javascript">
+        function updateGiaSanPhamQR_CallBack(c_baogia_id, md_sanpham_id) {
+		    let frm = "#FrmGrid_grid_ds_chitietquotationqr";
+		    let $giafob =  $('#giafob', frm);
+		    $giafob.val('Đang tải...');
+            $.ajax({
+                url: "Controllers/QuotationDetailController.ashx?action=getgiasanpham&c_baogia_id=" + c_baogia_id + "&md_sanpham_id=" + md_sanpham_id,
+                type: "GET",
+                success: function (data) {
+                    $giafob.val(data);
+                }
+            });
+        }
+        function updatePackingQOQR_CallBack(md_sanpham_id) {
+            let c_chitietbaogia_id = $("#c_chitietbaogiaqr_id").val();
+            let c_baogia_id = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
+            let $dgoi = $("#md_donggoi_id", '#FrmGrid_grid_ds_chitietquotationqr');
+            $dgoi.html("<option value=''>Đang tải đóng gói...</option>").attr("disabled", "disabled");
+            $.ajax({
+            url: "Controllers/PackingController.ashx?action=getoptionselected&c_chitietbaogia_id=" + c_chitietbaogia_id + "&md_sanpham_id=" + md_sanpham_id +
+	        "&c_baogia_id=" + c_baogia_id,
+                type: "GET",
+                success: function(packingHtml) {
+			        var arr_pkl = packingHtml.split('(##)'); 
+			        if (packingHtml != 'null') {
+                        $dgoi.removeAttr("disabled").html(arr_pkl[0]);
+				        $("#docquyen").val(arr_pkl[1]);
+                    } else {
+                        $dgoi.html("<option value=''>Không tìm thấy đóng gói!</option>");
+                    }
+                }
+            });
+        }
         var funcChuyenQRThanhQO = function () {
             var qoId = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
 					if (qoId === null) {
@@ -1363,6 +1567,7 @@
 
         createRightPanel('grid_ds_quotationqr');
         createRightPanel('grid_ds_chitietquotationqr');
+        createRightPanel('grid_ds_lichsuquotationqr');
     </script>
 </DIV>
 

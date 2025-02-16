@@ -105,4 +105,11 @@ public static class Security
             return false;
         }
     }
+
+    public static string DecodeHTML(string text)
+    {
+        try { text = text.Replace("0ψ0", "<").Replace("1Ψ1", ">"); }
+        catch { }
+        return text;
+    }
 }

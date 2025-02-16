@@ -8,9 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Outlook-style Email Compose</title>
     <script type="text/javascript" src="Scripts/NgocNhan/ckeditor/ckeditor.js?v=12345766"></script>
-	<script type="text/javascript" src="Scripts/NgocNhan/ckeditor/samples/js/sample.js?v=12345766"></script>
-	<link type="text/css" rel="stylesheet" href="Scripts/NgocNhan/ckeditor/samples/css/samples.css" />
-	<link type="text/css" rel="stylesheet" href="Scripts/NgocNhan/ckeditor/samples/toolbarconfigurator/lib/codemirror/neo.css" />
+    <script type="text/javascript" src="Scripts/NgocNhan/ckeditor/samples/js/sample.js?v=12345766"></script>
+    <link type="text/css" rel="stylesheet" href="Scripts/NgocNhan/ckeditor/samples/css/samples.css" />
+    <link type="text/css" rel="stylesheet" href="Scripts/NgocNhan/ckeditor/samples/toolbarconfigurator/lib/codemirror/neo.css" />
     <link type="text/css" rel="stylesheet" href="Scripts/NgocNhan/ckeditor/samples/font-awesome-4.7.0/css/font-awesome.min.css" />
     <style type="text/css">
         * {
@@ -38,18 +38,18 @@
             border-radius: 4px 4px 0 0;
         }
 
-        .compose-header button {
-            background: none;
-            border: none;
-            color: white;
-            padding: 8px 15px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
+            .compose-header button {
+                background: none;
+                border: none;
+                color: white;
+                padding: 8px 15px;
+                cursor: pointer;
+                border-radius: 4px;
+            }
 
-        .compose-header button:hover {
-            background: rgba(255,255,255,0.2);
-        }
+                .compose-header button:hover {
+                    background: rgba(255,255,255,0.2);
+                }
 
         .compose-options {
             display: flex;
@@ -67,19 +67,19 @@
             align-items: center;
         }
 
-        .input-group label {
-            font-size: 80%;
-            width: 74px;
-            color: #666;
-            text-align: center;
-            right: 10px;
-            position: relative;
-            background-color: #f3f7f7;
-            padding: 2px;
-            margin-left: 10px;
-            border: 1px solid #CCC;
-            border-radius: 7px;
-        }
+            .input-group label {
+                font-size: 80%;
+                width: 74px;
+                color: #666;
+                text-align: center;
+                right: 10px;
+                position: relative;
+                background-color: #f3f7f7;
+                padding: 2px;
+                margin-left: 10px;
+                border: 1px solid #CCC;
+                border-radius: 7px;
+            }
 
         input, .subject-input {
             width: 100%;
@@ -104,17 +104,17 @@
             border-bottom: 1px solid #eee;
         }
 
-        .formatting-toolbar button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #666;
-            padding: 5px;
-        }
+            .formatting-toolbar button {
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #666;
+                padding: 5px;
+            }
 
-        .formatting-toolbar button:hover {
-            background: #eee;
-        }
+                .formatting-toolbar button:hover {
+                    background: #eee;
+                }
 
         .attachment-area {
             margin-top: 10px;
@@ -149,9 +149,9 @@
             cursor: pointer;
         }
 
-        .file-name:hover {
-            text-decoration: underline;
-        }
+            .file-name:hover {
+                text-decoration: underline;
+            }
 
         .delete-btn {
             background: none;
@@ -162,14 +162,18 @@
             margin-left: auto;
         }
 
-        .delete-btn:hover {
-            color: #ff4444;
-        }
+            .delete-btn:hover {
+                color: #ff4444;
+            }
 
-        #from {
+        span#from {
             font-weight: bold;
             font-size: 82%;
         }
+
+            span#from::before {
+                content: 'Người gửi: ';
+            }
 
         #btnSendMail > button > i {
             margin-right: 8px;
@@ -201,8 +205,13 @@
 
         /* Hiệu ứng quay */
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Text loading */
@@ -215,7 +224,7 @@
     </style>
 </head>
 <body>
-     <div class="loading-screen" id="loadingMain">
+    <div class="loading-screen" id="loadingMain">
         <div class="loader"></div>
         <div class="loading-text">Loading...</div>
     </div>
@@ -246,9 +255,8 @@
             </div>
 
             <div id="editor">
+            </div>
 
-	        </div>
-            
             <div class="attachment-area">
                 <input type="file" class="attachment-input" id="attachment" multiple accept=".xls,.xlsx,.doc,.docx,.pdf,.png,.jpg">
                 <label for="attachment" class="attachment-label">
@@ -261,21 +269,140 @@
     </div>
 
     <script type="text/javascript">
-
+        let c_baogia_id = "";
         initSample();
 
+        var encodeHTML = function (a) {
+            if (a) {
+                a = a.replace(/</g, '0ψ0');
+                a = a.replace(/>/g, '1Ψ1');
+            }
+            return a;
+        };
+
+        function distinctJsonArrayByProperties(jsonArray, properties) {
+            const keyMap = new Map(); // Sử dụng Map để theo dõi các khóa đã gặp (khóa bây giờ có thể dựa trên nhiều thuộc tính)
+            const distinctArray = jsonArray.filter(obj => {
+                // Tạo một khóa tổng hợp từ các giá trị của các thuộc tính được chỉ định
+                const compositeKey = properties.map(prop => obj[prop]).join(','); // Nối các giá trị bằng dấu phẩy
+
+                if (!keyMap.has(compositeKey)) {
+                    keyMap.set(compositeKey, true); // Đánh dấu khóa này đã gặp
+                    return true; // Giữ lại object này trong mảng kết quả
+                }
+                return false; // Loại bỏ object trùng lặp (cùng khóa)
+            });
+            return distinctArray;
+        }
+
         function sendEmail() {
-            alert('Email sent!');
-            // Add actual email sending logic here
+            showLockScreen(true);
+            let files = [], errors = [];
+            let count = 0, ataFLen = attachedFiles.length;
+            const distinctFilesArr = distinctJsonArrayByProperties(attachedFiles, ['name']);
+            if (ataFLen > distinctFilesArr.length) {
+                showLockScreen(false);
+                alert(`Có tập tin đang bị trùng tên với nhau`);
+                return;
+            }
+
+            const afterAction = function () {
+                count++;
+                if (count < ataFLen)
+                    return;
+
+                if (errors.length > 0) {
+                    alert(errors.join('\n'));
+                    showLockScreen(false);
+                    return;
+                }
+
+                let data = {
+                    c_baogia_id: c_baogia_id,
+                    from: document.getElementById('from').innerHTML,
+                    to: document.getElementById('toInput').value,
+                    cc: document.getElementById('ccInput').value,
+                    bcc: document.getElementById('bccInput').value,
+                    title: document.getElementById('subjectInput').value,
+                    body: encodeHTML(CKEDITOR.instances.editor.getData()),
+                    files
+                };
+                const formData = new FormData();
+                formData.append('data', JSON.stringify(data));
+
+                const xhr = new XMLHttpRequest();
+                const url = `Controllers/QuotationQRController.ashx?action=sendEmail`;
+
+                xhr.open('POST', url);
+                //xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        let rs = xhr.responseText;
+                        showLockScreen(false);
+                        rs = JSON.parse(rs);
+                        alert(rs.msg);
+                        if (rs.status) {
+                            let origin = window.location.origin;
+                            window.parent.postMessage({
+                                closeOutLook: true,
+                                origin
+                            }, origin);
+                        }
+                    }
+                    else {
+                        showLockScreen(false);
+                        alert(`Lỗi HTTP (XHR): ${xhr.status} ${xhr.statusText}`);
+                    }
+                };
+
+                xhr.onerror = function () {
+                    alert('Lỗi mạng (XHR)');
+                    showLockScreen(false);
+                };
+
+                xhr.send(formData);
+            };
+
+            if (attachedFiles.length > 0) {
+
+                for (let i = 0; i < ataFLen; i++) {
+                    let file = attachedFiles[i];
+                    if (file.data) {
+                        files.push(file);
+                        afterAction();
+                    }
+                    else {
+                        const reader = new FileReader();
+
+                        reader.onload = function (event) {
+                            const base64String = event.target.result.split(',')[1];
+                            files.push({
+                                name: file.name,
+                                size: file.size,
+                                data: base64String
+                            });
+
+                            afterAction();
+                        };
+
+                        reader.onerror = function (error) {
+                            errors.push(`Không đọc được tập tin ${file.name}`);
+                            afterAction();
+                        };
+
+                        reader.readAsDataURL(file);
+                    }
+                }
+            }
         }
 
         // Handle file attachments
-        document.getElementById('attachment').addEventListener('change', function(e) {
+        document.getElementById('attachment').addEventListener('change', function (e) {
             const files = e.target.files;
             const fileList = document.getElementById('file-list');
             fileList.innerHTML = '';
-            
-            for(let file of files) {
+
+            for (let file of files) {
                 const div = document.createElement('div');
                 div.innerHTML = `<i class="fa fa-paperclip"></i> ${file.name}`;
                 fileList.appendChild(div);
@@ -287,7 +414,7 @@
         // ... Các hàm cũ giữ nguyên ...
 
         // Cập nhật hàm xử lý file đính kèm
-        document.getElementById('attachment').addEventListener('change', function(e) {
+        document.getElementById('attachment').addEventListener('change', function (e) {
             const newFiles = Array.from(e.target.files);
             attachedFiles = [...attachedFiles, ...newFiles];
             updateAttachmentInput();
@@ -298,14 +425,14 @@
         function renderFileList() {
             const fileList = document.getElementById('file-list');
             fileList.innerHTML = '';
-            
+
             attachedFiles.forEach((file, index) => {
                 let indexOf = file.name ? file.name.lastIndexOf('.') : 0;
                 let mime = file.name.substr(indexOf).toLowerCase();
                 let isXls = [".xls", ".xlsx"].lastIndexOf(mime) > -1;
                 let isDoc = [".doc", ".docx"].lastIndexOf(mime) > -1;
                 let isPDF = [".pdf"].lastIndexOf(mime) > -1;
-                let isIMG = [".png",".jpg"].lastIndexOf(mime) > -1;
+                let isIMG = [".png", ".jpg"].lastIndexOf(mime) > -1;
                 let icon =
                     isXls ? "fa-file-excel-o" :
                         isDoc ? "fa-file-word-o" :
@@ -315,7 +442,7 @@
                 div.className = 'file-item';
                 div.innerHTML = `
                     <i class="fa ${icon}"></i>
-                    <a class="file-name" onclick="openFile(${index}, '${file.link}')">${file.name}</a>
+                    <a class="file-name" onclick="openFile(${index})">${file.name}</a>
                     <button class="delete-btn" onclick="deleteFile(${index})">&times;</button>
                 `;
                 fileList.appendChild(div);
@@ -330,28 +457,54 @@
         }
 
         // Hàm mở file
-        function openFile(index, link) {
+        function downloadBase64File(base64String, fileName, mimeType) {
+            // 1. Giải mã Base64 string thành chuỗi binary
+            const binaryString = atob(base64String);
+
+            // 2. Tạo mảng byte từ chuỗi binary
+            const byteArray = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                byteArray[i] = binaryString.charCodeAt(i);
+            }
+
+            // 3. Tạo Blob object từ mảng byte, có MIME type
+            const blob = new Blob([byteArray], { type: mimeType });
+
+            // 4. Tạo URL tạm thời cho Blob
+            const blobUrl = URL.createObjectURL(blob);
+
+            // 5. Tạo thẻ <a> một cách lập trình
+            const downloadLink = document.createElement('a');
+            downloadLink.href = blobUrl;
+            downloadLink.download = fileName; // Tên tập tin khi tải xuống
+            // 7. Kích hoạt tải xuống bằng cách click vào liên kết
+            downloadLink.click();
+            downloadLink.remove();
+            URL.revokeObjectURL(blobUrl);
+        }
+        function openFile(index) {
             const file = attachedFiles[index];
-            let url;
-            if (link.lastIndexOf('/') > -1)
-                url = link;
-            else
-                url = URL.createObjectURL(file);
-            // Tạo link tải xuống
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = file.name;
-            a.click();
-            a.remove();
-            // Dọn dẹp bộ nhớ
-            URL.revokeObjectURL(url);
+            if (file.data) {
+                downloadBase64File(file.data, file.name, file.mime);
+            }
+            else {
+                let url = URL.createObjectURL(file);
+                // Tạo link tải xuống
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                a.click();
+                a.remove();
+                // Dọn dẹp bộ nhớ
+                URL.revokeObjectURL(url);
+            }
         }
 
         // Cập nhật input file
         function updateAttachmentInput() {
             const dataTransfer = new DataTransfer();
             attachedFiles.forEach(file => {
-                if (!file.link)
+                if (!file.data)
                     dataTransfer.items.add(file)
             });
             document.getElementById('attachment').files = dataTransfer.files;
@@ -361,7 +514,8 @@
             let json = event.data;
             let orgin = window.location.origin;
             if (orgin == json.origin) {
-                document.getElementById('from').innerHTML = `Người gửi: ${json.from}`;
+                c_baogia_id = json.c_baogia_id;
+                document.getElementById('from').innerHTML = json.from;
                 document.getElementById('toInput').value = json.to;
                 document.getElementById('ccInput').value = json.cc;
                 document.getElementById('bccInput').value = json.bcc;
@@ -370,15 +524,18 @@
                 if (json.file) {
                     attachedFiles.push({
                         name: json.file.name,
-                        link: json.file.link,
-                        length: json.file.length
+                        size: json.file.size,
+                        data: json.file.data
                     });
                     renderFileList();
                 }
-                document.getElementById('loadingMain').style.display = 'none';
+                showLockScreen(false);
             }
         };
 
+        function showLockScreen(type) {
+            document.getElementById('loadingMain').style.display = type ? '' : 'none';
+        }
         window.removeEventListener('message', funcMess);
         window.addEventListener('message', funcMess, false);
     </script>

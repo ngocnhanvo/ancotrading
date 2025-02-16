@@ -29,6 +29,12 @@ public partial class MSSQL : System.Web.UI.Page
     public static string urlRoot = "", urlMid = "App_Data";
     protected void Page_Load(object sender, EventArgs e)
     {
+        var user = UserUtils.getUser(Context);
+        if (user != "superadmin")
+        {
+            Response.Redirect("Default-Security.aspx");
+        }
+
         tenDB = mdbc.GetConnection.Database;
         urlRoot = $"{AppDomain.CurrentDomain.BaseDirectory}{urlMid}\\";
         if (!IsPostBack)
