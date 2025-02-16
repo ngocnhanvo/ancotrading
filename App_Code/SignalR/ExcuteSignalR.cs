@@ -19,9 +19,10 @@ public class ExcuteSignalR
         string msg = "";
         var maThos = sps.Select(s => s.ma_sanpham.Substring(0, 12)).Distinct().ToList();
         var filters = sps.Select(s => s.ma_sanpham.Substring(0, 9) + s.ma_sanpham.Substring(12, 2)).Distinct().ToList();
-        var colorRefs = new List<md_color_reference>();
+        var colorRefs = db.md_color_references.Where(s => s.c_baogia_id == baogiaId).ToList();
+        var colorRefsAdd = new List<md_color_reference>();
 
-        db.md_color_references.DeleteAllOnSubmit(db.md_color_references.Where(s => s.c_baogia_id == baogiaId));
+        //db.md_color_references.DeleteAllOnSubmit(db.md_color_references.Where(s => s.c_baogia_id == baogiaId));
         var spsMau = db.md_sanphams.Where(s => s.trangthai == "DHD" & (s.laMacon ?? false) == false & maThos.Contains(s.ma_sanpham.Substring(0, 12))).OrderBy(s => s.ma_sanpham).ToList();
         foreach (var spMau in spsMau)
         {
@@ -46,14 +47,14 @@ public class ExcuteSignalR
                     colorRef.ngaycapnhat = DateTime.Now;
                     colorRef.mota = "";
                     colorRef.hoatdong = false;
-                    colorRefs.Add(colorRef);
+                    colorRefsAdd.Add(colorRef);
                 }
             }
         }
 
-        if (colorRefs.Count > 0)
+        if (colorRefsAdd.Count > 0)
         {
-            db.md_color_references.InsertAllOnSubmit(colorRefs);
+            db.md_color_references.InsertAllOnSubmit(colorRefsAdd);
             db.SubmitChanges();
         }
 

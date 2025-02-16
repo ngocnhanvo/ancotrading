@@ -368,17 +368,18 @@ public class QuotationQRController : IHttpHandler
             {
                 try
                 {
-                    string bgid = Guid.NewGuid().ToString().Replace("-", "");
+                    //string bgid = Guid.NewGuid().ToString().Replace("-", "");
+                    string bgid = bgqr.c_baogiaqr_id;
                     String sochungtu = jqGridHelper.Utils.taoChungTuQO(bgqr.md_doitackinhdoanh_id, 1, DateTime.Now.Year.ToString());
                     c_baogia bg = bgqr.Cast<c_baogia>();
                     bg.c_baogia_id = bgid;
                     bg.sobaogia = sochungtu;
                     db.c_baogias.InsertOnSubmit(bg);
 
-                    foreach (c_chitietbaogiaqr ctbgqr in db.c_chitietbaogiaqrs.Where(s => s.c_baogiaqr_id == c_baogia_id))
+                    foreach (var ctbgqr in db.c_chitietbaogiaqrs.Where(s => s.c_baogiaqr_id == c_baogia_id))
                     {
                         c_chitietbaogia ctbg = ctbgqr.Cast<c_chitietbaogia>();
-                        ctbg.c_chitietbaogia_id = Guid.NewGuid().ToString().Replace("-", "");
+                        ctbg.c_chitietbaogia_id = ctbgqr.c_chitietbaogiaqr_id;
                         ctbg.c_baogia_id = bgid;
                         db.c_chitietbaogias.InsertOnSubmit(ctbg);
                         db.c_chitietbaogiaqrs.DeleteOnSubmit(ctbgqr);
