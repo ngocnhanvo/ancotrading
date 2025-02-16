@@ -136,7 +136,7 @@ public class QuotationQRController : IHttpHandler
             mail.Attachments = new List<System.Net.Mail.Attachment>();
 
             var fileBytes = new List<FileSave>();
-            foreach(var file in json.files)
+            foreach (var file in json.files)
             {
                 var fileB = Convert.FromBase64String(file.data);
                 fileBytes.Add(new FileSave() { fileBytes = fileB, filePath = file.name });
@@ -177,7 +177,7 @@ public class QuotationQRController : IHttpHandler
             db.c_baogiaqr_lichsus.InsertOnSubmit(ls);
 
 
-            foreach(var fileByte in fileBytes)
+            foreach (var fileByte in fileBytes)
             {
                 var path = $"{pathMain}/{ls.c_baogiaqr_lichsu_id}";
                 if (!Directory.Exists(path))
@@ -262,7 +262,7 @@ public class QuotationQRController : IHttpHandler
             string name = $"{nv.manv}-Quotation-.xls", mime = "";
             long size = 0;
             string linkDic = ExcuteSignalRStatic.mapPathSignalR($"~/SendMail/quotation/{bg.c_baogiaqr_id}");
-            if(!Directory.Exists(linkDic))
+            if (!Directory.Exists(linkDic))
                 Directory.CreateDirectory(linkDic);
             string link = $"{linkDic}/{name}", data = "";
 
@@ -299,28 +299,42 @@ public class QuotationQRController : IHttpHandler
     #region oper
     public void del(HttpContext context)
     {
+        string msg = "";
         String id = context.Request.Form["id"];
         var qo = db.c_baogiaqrs.Single(q => q.c_baogiaqr_id.Equals(id));
-        if (qo.md_trangthai_id.Equals("SOANTHAO"))
+        if (qo == null)
         {
-            foreach (var ctbg in db.c_chitietbaogiaqrs.Where(s => s.c_baogiaqr_id == id))
-            {
-                db.c_chitietbaogiaqrs.DeleteOnSubmit(ctbg);
-            }
-
-            foreach (var colorRef in db.md_color_references.Where(s => s.c_baogia_id == id))
-            {
-                db.md_color_references.DeleteOnSubmit(colorRef);
-            }
-            db.SubmitChanges();
-
-            db.c_baogiaqrs.DeleteOnSubmit(qo);
-            db.SubmitChanges();
+            msg = "Không tìm thấy báo giá đã chọn";
+            goto EndEventHandler;
         }
-        else
+
+        if(qo.daguiMail.GetValueOrDefault(false))
         {
-            jqGridHelper.Utils.writeResult(0, "Không thể xóa báo giá đã hiệu lực!");
+            msg = "Báo giá đã được gửi mail và lưu trữ";
+            goto EndEventHandler;
         }
+
+        foreach (var ctbg in db.c_chitietbaogiaqrs.Where(s => s.c_baogiaqr_id == id))
+        {
+            db.c_chitietbaogiaqrs.DeleteOnSubmit(ctbg);
+        }
+
+        foreach (var colorRef in db.md_color_references.Where(s => s.c_baogia_id == id))
+        {
+            db.md_color_references.DeleteOnSubmit(colorRef);
+        }
+        db.SubmitChanges();
+
+        var pathMain = ExcuteSignalRStatic.mapPathSignalR($"~/SendMail/quotation/{qo.c_baogiaqr_id}");
+        if (Directory.Exists(pathMain))
+            Directory.Delete(pathMain, true);
+        db.c_baogiaqrs.DeleteOnSubmit(qo);
+        db.SubmitChanges();
+
+    EndEventHandler:;
+
+        if(msg.Length > 0)
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     #region load
