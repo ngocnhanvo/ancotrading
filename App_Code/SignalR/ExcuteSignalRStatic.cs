@@ -337,22 +337,19 @@ public static class ExcuteSignalRStatic
         {
             var indexMimeImg = color.LastIndexOf(".");
             var colorFull = indexMimeImg <= -1 ? color + ".jpg" : color;
-            var mimeImg = colorFull.Substring(colorFull.LastIndexOf("."));
+            //var mimeImg = colorFull.Substring(colorFull.LastIndexOf("."));
             string msLink1 = Public.imgColor;
             string msLink2 = Public.imgProduct;
-            
-            if (color.Length >= 11)
-            {
-                image1 = mapPathSignalR("~/" + msLink1) + colorFull;
-                if (File.Exists(image1))
-                    image2 = msLink1 + colorFull;
-            }
-
-            if(string.IsNullOrWhiteSpace(image2))
-                image1 = mapPathSignalR("~/" + msLink2) + colorFull;
-
+            image1 = mapPathSignalR($@"~/{msLink1}{colorFull}");
             if (File.Exists(image1))
-                image2 = msLink2 + colorFull;
+                image2 = msLink1 + colorFull;
+
+            if (string.IsNullOrWhiteSpace(image2))
+            {
+                image1 = mapPathSignalR($@"~/{msLink2}{colorFull}");
+                if (File.Exists(image1))
+                    image2 = msLink2 + colorFull;
+            }
             
             if(string.IsNullOrWhiteSpace(image2))
                 image2 = Public.imgNotFound;
