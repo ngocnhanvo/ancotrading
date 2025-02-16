@@ -332,31 +332,37 @@ public static class ExcuteSignalRStatic
 
     public static string getImageColor(string color)
     {
-        string image = "";
+        string image1 = "", image2 = "";
         try
         {
             var indexMimeImg = color.LastIndexOf(".");
             var colorFull = indexMimeImg <= -1 ? color + ".jpg" : color;
             var mimeImg = colorFull.Substring(colorFull.LastIndexOf("."));
-            string msLink = Public.imgProduct;
+            string msLink1 = Public.imgColor;
+            string msLink2 = Public.imgProduct;
+            
             if (color.Length >= 11)
             {
-                msLink = Public.imgColor;
+                image1 = mapPathSignalR("~/" + msLink1) + colorFull;
+                if (File.Exists(image1))
+                    image2 = msLink1 + colorFull;
             }
 
-            image = mapPathSignalR("~/" + msLink) + colorFull;
+            if(string.IsNullOrWhiteSpace(image2))
+                image1 = mapPathSignalR("~/" + msLink2) + colorFull;
 
-            if (File.Exists(image))
-                image = msLink + colorFull;
-            else
-                image = Public.imgNotFound;
+            if (File.Exists(image1))
+                image2 = msLink2 + colorFull;
+            
+            if(string.IsNullOrWhiteSpace(image2))
+                image2 = Public.imgNotFound;
         }
         catch(Exception ex)
         {
-            image = "Error:" + ex.Message;
+            image2 = "Error:" + ex.Message;
         }
 
-        return image;
+        return image2;
     }
 
     public static AvariablePrj.OutPutInnerOuter getTextFromInner(string inner, string outer, string slinner, string slouter)
