@@ -18,6 +18,8 @@ public static class Helper
     public static string HIEULUC = "HIEULUC";
     public static string KETTHUC = "KETTHUC";
     public static string HUY = "HUY";
+    public static string NK = "NK";
+    public static string XK = "XK";
     public static string HDBS = "HDBS", HDDG = "HDDG", HDCT = "HDCT", HDTEM_BAOBI = "HDTEM-BAOBI";
     #endregion bien toan cuc
 

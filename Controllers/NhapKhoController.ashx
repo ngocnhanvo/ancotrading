@@ -114,8 +114,8 @@ public class NhapXuatController : IHttpHandler
                 }
                 else
                 {
-                    String update = "update c_dongnhapxuat set hoatdong = 1 where c_nhapxuat_id = @id";
-                    mdbc.ExcuteNonQuery(update, "@id", id);
+                    //String update = "update c_dongnhapxuat set hoatdong = 1 where c_nhapxuat_id = @id";
+                    //mdbc.ExcuteNonQuery(update, "@id", id);
 
                     mdbc.ExcuteNonProcedure("dbo.p_hieulucnhapxuat", "@nhapxuat_id", id);
 
