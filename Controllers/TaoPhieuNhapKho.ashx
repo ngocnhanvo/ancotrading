@@ -72,7 +72,7 @@ public class TaoPhieuNhapKho : IHttpHandler
                     c_nhapxuat obj = new c_nhapxuat();
                     obj.c_nhapxuat_id = id;
                     int stt = 10;
-
+                    var c_dongdsdh_ids = new System.Collections.Generic.List<string>();
                     foreach (phieuNhapKho item in productList)
                     {
                         if (item.sl_nhapthucte > 0)
@@ -105,12 +105,14 @@ public class TaoPhieuNhapKho : IHttpHandler
                             sobj.line = stt;
                             stt += 10;
                             db.c_dongnhapxuats.InsertOnSubmit(sobj);
+
+                            c_dongdsdh_ids.Add(sobj.c_dongdsdh_id);
                         }
                     }
-                    
+
                     //string sqlCount = @"select count(*) from c_nhapxuat where md_loaichungtu_id = 'NK' and c_donhang_id = '" + obj.c_donhang_id +"'";
                     //int count = (int)mdbc.ExecuteScalar(sqlCount);
-                    var count = db.c_nhapxuats.Where(s => s.md_loaichungtu_id == Helper.NK & s.c_donhang_id == obj.c_donhang_id).Count();
+                    var count = db.c_dongnhapxuats.Where(s => s.c_nhapxuat_id != obj.c_nhapxuat_id & c_dongdsdh_ids.Contains(s.c_dongdsdh_id)).Count();
                     if (count == 0)
                     {
                         foreach(c_phidathang pdh in db.c_phidathangs.Where(s=> s.c_danhsachdathang_id == dsdh_id))
