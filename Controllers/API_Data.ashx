@@ -244,7 +244,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         ExcuteSignalRStatic.getDongGoiResult ttdg = null;
         if (themDongGoi)
         {
-            ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id, db);
+            ttdg = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id, db);
             if (ttdg != null)
             {
                 var dDVT = ExcuteSignalRStatic.getTextFromInner(ttdg.dvtinner, ttdg.dvtouter, ttdg.sl_inner.ToString(), ttdg.sl_outer.ToString());
