@@ -170,7 +170,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
             foreach (var sp in sps.Skip(skip).Take(take))
             {
-                var item = dequyTTSP(sp, sps, true, true, result.dateStr, db);
+                var item = dequyTTSP(sp, sps, true, true, true, result.dateStr, db);
                 var mabo = sp.ma_sanpham.Substring(9, 2).ToString();
                 var mabo_0 = mabo.Substring(0, 1).ToString();
 
