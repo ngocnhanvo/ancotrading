@@ -265,7 +265,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 cbm = ttdg.cbm.GetValueOrDefault(0).ToString();
             }
 
-            
+
             var ttgsp = ExcuteSignalRStatic.getPrice(sp.md_sanpham_id, db);
             if (ttgsp != null)
                 price = ttgsp.GetValueOrDefault(0).ToString("#,#0.00");
@@ -291,6 +291,11 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         item.colors = new List<ThongTinSP>();
         if (themMau)
         {
+            string cl = item.itemNo.Substring(0, 2), dt = item.itemNo.Substring(6, 2), ms = item.itemNo.Substring(12, 2);
+            var mausac = db.md_mausacs.Where(s => s.code_cl == cl & s.code_dt == dt & s.code_mau == ms).FirstOrDefault();
+            string mau = mausac == null ? "" : mausac.ta_ngan;
+            item.colorName = mau;
+
             var maTho = sp.ma_sanpham.Substring(0, 12);
             var spsMau = sps.Where(s => s.ma_sanpham.StartsWith(maTho)).OrderBy(s => s.ma_sanpham).ToList();
             foreach (var spMau in spsMau)
