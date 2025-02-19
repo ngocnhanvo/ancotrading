@@ -14,6 +14,8 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     {
         public string dateStr { get; set; }
         public string itemNo { get; set; }
+        public string description { get; set; }
+        public string colorName { get; set; }
         public string packing { get; set; }
         public string palletSize { get; set; }
         public string qtyCont { get; set; }
@@ -168,31 +170,32 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
             foreach (var sp in sps.Skip(skip).Take(take))
             {
-                var item = dequyTTSP(sp, sps, true, result.dateStr, db);
+                var item = dequyTTSP(sp, sps, true, true, result.dateStr, db);
                 var mabo = sp.ma_sanpham.Substring(9, 2).ToString();
                 var mabo_0 = mabo.Substring(0, 1).ToString();
-                if (
-                    mabo != "S1"
-                    & new string[] { "B", "L", "S", "X" }.Contains(mabo_0))
+
+                var ma09 = sp.ma_sanpham.Substring(0, 9);
+                var ma113 = sp.ma_sanpham.Substring(11, 3);
+                var mas = new List<string>();
+                var bientaus = new string[] { "0", "B", "L", "X", "S" };
+                foreach(var bientau in bientaus)
                 {
-                    var ma09 = sp.ma_sanpham.Substring(0, 9) + "0";
-                    var ma12 = sp.ma_sanpham.Substring(12, 2);
-                    var mas = new List<string>();
                     for (var i = 0; i < 10; i++)
                     {
-                        mas.Add(ma09 + i + ma12);
-                    }
-
-                    var spsCai = sps.Where(s =>
-                        s.ma_sanpham != sp.ma_sanpham
-                        & mas.Contains(s.ma_sanpham)
-                        ).ToList();
-                    foreach (var spCai in spsCai)
-                    {
-                        var itemCai = dequyTTSP(spCai, sps, true, result.dateStr, db);
-                        item.sizes.Add(itemCai);
+                        mas.Add($"{ma09}{bientau}{i}{ma113}");
                     }
                 }
+
+                var spsCai = sps.Where(s =>
+                    s.ma_sanpham != sp.ma_sanpham
+                    & mas.Contains(s.ma_sanpham)
+                    ).ToList();
+                foreach (var spCai in spsCai)
+                {
+                    var itemCai = dequyTTSP(spCai, sps, true, false, result.dateStr, db);
+                    item.sizes.Add(itemCai);
+                }
+                item.sizes = item.sizes.OrderBy(s => s.itemNo.Substring(10, 2)).ToList();
 
                 rsps.Add(item);
             }
@@ -235,28 +238,32 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         context.Response.Write(msg);
     }
 
-    public ThongTinSP dequyTTSP(md_sanpham sp, List<md_sanpham> sps, bool themMau, string dateStr, LinqDBDataContext db)
+    public ThongTinSP dequyTTSP(md_sanpham sp, List<md_sanpham> sps, bool themMau, bool themAnh, string dateStr, LinqDBDataContext db)
     {
-        var ttdg = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id, db);
         string packing = "-", palletSize = "-", qtyCont = "-", cbm = "";
-        if (ttdg != null)
+        ExcuteSignalRStatic.getDongGoiResult ttdg = null;
+        if (themMau)
         {
-            var dDVT = ExcuteSignalRStatic.getTextFromInner(ttdg.dvtinner, ttdg.dvtouter, ttdg.sl_inner.ToString(), ttdg.sl_outer.ToString());
-            var inner = dDVT.inner;
-            var outer = dDVT.outer;
-            if (!string.IsNullOrWhiteSpace(inner.Replace(" ", "")))
+            ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id, db);
+            if (ttdg != null)
             {
-                packing = $@"{inner}, {outer}";
+                var dDVT = ExcuteSignalRStatic.getTextFromInner(ttdg.dvtinner, ttdg.dvtouter, ttdg.sl_inner.ToString(), ttdg.sl_outer.ToString());
+                var inner = dDVT.inner;
+                var outer = dDVT.outer;
+                if (!string.IsNullOrWhiteSpace(inner.Replace(" ", "")))
+                {
+                    packing = $@"{inner}, {outer}";
+                }
+
+                palletSize = $@"L{ttdg.l2_mix}xW{ttdg.w2_mix}xH{ttdg.h2_mix} cm";
+
+                if (ttdg.soluonggoi_ctn_40hc.GetValueOrDefault(0) != 0)
+                {
+                    qtyCont = $@"{ttdg.soluonggoi_ctn_40hc} {dDVT.quantity}/40HC'";
+                }
+
+                cbm = ttdg.cbm.GetValueOrDefault(0).ToString();
             }
-
-            palletSize = $@"L{ttdg.l2_mix}xW{ttdg.w2_mix}xH{ttdg.h2_mix} cm";
-
-            if (ttdg.soluonggoi_ctn_40hc.GetValueOrDefault(0) != 0)
-            {
-                qtyCont = $@"{ttdg.soluonggoi_ctn_40hc} {dDVT.quantity}/40HC'";
-            }
-
-            cbm = ttdg.cbm.GetValueOrDefault(0).ToString();
         }
 
         string price = "";
@@ -266,17 +273,20 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         var item = new ThongTinSP();
         item.dateStr = dateStr;
         item.itemNo = sp.ma_sanpham;
+        item.description = sp.mota_tienganh;
         item.packing = packing;
         item.palletSize = palletSize;
         item.qtyCont = qtyCont;
         item.price = price;
         item.amount = "1";
         item.cbm = cbm;
-        //item.image = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
-        var imagePath = ExcuteSignalRStatic.mapPathSignalR($"~/{ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham)}");
-        byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
-        string base64String = Convert.ToBase64String(imageBytes);
-        item.image = base64String;
+        if (themAnh)
+        {
+            var imagePath = ExcuteSignalRStatic.mapPathSignalR($"~/{ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham)}");
+            byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
+            string base64String = Convert.ToBase64String(imageBytes);
+            item.image = base64String;
+        }
         item.sizes = new List<ThongTinSP>();
         item.colors = new List<ThongTinSP>();
         if (themMau)
@@ -285,7 +295,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
             var spsMau = sps.Where(s => s.ma_sanpham.StartsWith(maTho)).OrderBy(s => s.ma_sanpham).ToList();
             foreach (var spMau in spsMau)
             {
-                var itemMau = dequyTTSP(spMau, sps, false, dateStr, db);
+                var itemMau = dequyTTSP(spMau, sps, false, false, dateStr, db);
                 item.colors.Add(itemMau);
             }
         }
