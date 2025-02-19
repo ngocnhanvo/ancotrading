@@ -192,7 +192,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                     ).ToList();
                 foreach (var spCai in spsCai)
                 {
-                    var itemCai = dequyTTSP(spCai, sps, true, false, result.dateStr, db);
+                    var itemCai = dequyTTSP(spCai, sps, false, true, false, result.dateStr, db);
                     item.sizes.Add(itemCai);
                 }
                 item.sizes = item.sizes.OrderBy(s => s.itemNo.Substring(10, 2)).ToList();
@@ -238,11 +238,11 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         context.Response.Write(msg);
     }
 
-    public ThongTinSP dequyTTSP(md_sanpham sp, List<md_sanpham> sps, bool themMau, bool themAnh, string dateStr, LinqDBDataContext db)
+    public ThongTinSP dequyTTSP(md_sanpham sp, List<md_sanpham> sps, bool themDongGoi, bool themMau, bool themAnh, string dateStr, LinqDBDataContext db)
     {
-        string packing = "-", palletSize = "-", qtyCont = "-", cbm = "";
+        string packing = "-", palletSize = "-", qtyCont = "-", cbm = "", price = "";
         ExcuteSignalRStatic.getDongGoiResult ttdg = null;
-        if (themMau)
+        if (themDongGoi)
         {
             ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id, db);
             if (ttdg != null)
@@ -264,12 +264,12 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
                 cbm = ttdg.cbm.GetValueOrDefault(0).ToString();
             }
-        }
 
-        string price = "";
-        var ttgsp = ExcuteSignalRStatic.getPrice(sp.md_sanpham_id, db);
-        if (ttgsp != null)
-            price = ttgsp.GetValueOrDefault(0).ToString("#,#0.00");
+            
+            var ttgsp = ExcuteSignalRStatic.getPrice(sp.md_sanpham_id, db);
+            if (ttgsp != null)
+                price = ttgsp.GetValueOrDefault(0).ToString("#,#0.00");
+        }
         var item = new ThongTinSP();
         item.dateStr = dateStr;
         item.itemNo = sp.ma_sanpham;
@@ -295,7 +295,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
             var spsMau = sps.Where(s => s.ma_sanpham.StartsWith(maTho)).OrderBy(s => s.ma_sanpham).ToList();
             foreach (var spMau in spsMau)
             {
-                var itemMau = dequyTTSP(spMau, sps, false, false, dateStr, db);
+                var itemMau = dequyTTSP(spMau, sps, false, false, false, dateStr, db);
                 item.colors.Add(itemMau);
             }
         }
