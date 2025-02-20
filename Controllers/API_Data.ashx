@@ -187,8 +187,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 }
 
                 var spsCai = sps.Where(s =>
-                    s.ma_sanpham != sp.ma_sanpham
-                    & mas.Contains(s.ma_sanpham)
+                    mas.Contains(s.ma_sanpham)
                     ).ToList();
                 foreach (var spCai in spsCai)
                 {
