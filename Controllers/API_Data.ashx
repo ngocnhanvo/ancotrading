@@ -189,25 +189,25 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 }
 
                 var spsCai = sps.Where(s => mas.Contains(s.ma_sanpham)).ToList();
-                
+
                 var boS = spsCai.Where(s => s.ma_sanpham.Substring(9, 1) == "S").Select(s => s.ma_sanpham.Substring(9, 2)).FirstOrDefault();
 
                 foreach (var spCai in spsCai)
                 {
                     var itemCai = dequyTTSP(spCai, sps, false, true, false, result.dateStr, db);
-                    var maBT = spCai.ma_sanpham.Substring(9, 1);
-                    if (bientaus2.Contains(maBT))
+                    var maBT = spCai.ma_sanpham.Substring(9, 2);
+                    if (bientaus2.Contains(maBT.Substring(0,1)))
                     {
                         var boId = db.md_bos.Where(s => s.ma_bo_cha == boS & s.ma_bo == maBT).Select(s => s.md_bo_id).FirstOrDefault();
-                        var boCTs = db.md_bo_chitiets.Where(s => s.md_bo_id == boId).ToList();
+                        var boCTs = db.md_bo_chitiets.Where(s => s.md_bo_id == boId).OrderBy(s => s.md_bo_detail).ToList();
                         foreach(var boCT in boCTs)
                         {
-                            var caiCT = spsCai.Where(s => s.ma_sanpham.Substring(9, 2) == boCT.md_bo_detail).FirstOrDefault();
-                            if(caiCT != null)
+                            var caiCT = spsCai.Where(s => s.ma_sanpham.Substring(9, 2) == boCT.md_bo_detail).Select(s => s.ma_sanpham).FirstOrDefault();
+                            if (!string.IsNullOrWhiteSpace(caiCT))
                             {
                                 itemCai.sizes.Add(new ThongTinSP() {
                                     dateStr = dateStr,
-                                    itemNo = caiCT.ma_sanpham
+                                    itemNo = caiCT
                                 });
                             }
                         }
