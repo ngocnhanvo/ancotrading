@@ -212,11 +212,9 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                             }
                         }
                     }
-
                     item.sizes.Add(itemCai);
                 }
                 item.sizes = item.sizes.OrderBy(s => s.itemNo.Substring(10, 2)).ToList();
-
                 rsps.Add(item);
             }
             result.sps = rsps;
@@ -288,7 +286,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
             var ttgsp = ExcuteSignalRStatic.getPrice(sp.md_sanpham_id, db);
             if (ttgsp != null)
-                price = ttgsp.GetValueOrDefault(0).ToString("#,#0.00");
+                price = ttgsp.GetValueOrDefault(0).ToString();
         }
         var item = new ThongTinSP();
         item.dateStr = dateStr;
