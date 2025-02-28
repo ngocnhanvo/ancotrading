@@ -144,6 +144,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         var result = new ThongTin();
         try
         {
+            string msp = context.Request.Params["msp"];
             int skip = context.Request.Params["skip"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
             int take = context.Request.Params["take"].removeAllSpaceOrTrimText(true).ToNullableInt().GetValueOrDefault(0);
             string dateStr = context.Request.Params["dateStr"].removeAllSpaceOrTrimText(true);
@@ -162,7 +163,10 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
             if (sps == null | skip == 0)
             {
-                sps = db.md_sanphams.Where(s => s.trangthai == "DHD" & (s.laMacon ?? false) == false).OrderBy(s => s.ma_sanpham).ToList();
+                var spsP = db.md_sanphams.Where(s => s.trangthai == "DHD" & (s.laMacon ?? false) == false);
+                if (!string.IsNullOrWhiteSpace(msp))
+                    spsP = spsP.Where(s => s.ma_sanpham == msp);
+                sps = spsP.OrderBy(s => s.ma_sanpham).ToList();
                 context.Session["sps"] = sps;
             }
 
@@ -177,8 +181,8 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 var ma09 = sp.ma_sanpham.Substring(0, 9);
                 var ma113 = sp.ma_sanpham.Substring(11, 3);
                 var mas = new List<string>();
-                var bientaus1 = new string[] { "0", "S" };
-                var bientaus2 = new string[] { "B", "L", "X" };
+                var bientaus1 = new string[] { "0" };
+                var bientaus2 = new string[] { "B", "L", "X", "S" };
                 var bientaus = bientaus1.Concat(bientaus2).ToArray();
                 foreach(var bientau in bientaus)
                 {

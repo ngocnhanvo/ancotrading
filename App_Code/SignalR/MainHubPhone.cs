@@ -82,6 +82,7 @@ public class MainHubPhone : Hub
             string nguoilienhe = parrams.nguoilienhe + "";
             string note = parrams.note + "";
             string note2 = parrams.note2 + "";
+            string qotype = parrams.qotype + "";
             string json_data = parrams.json_data + "";
             var d = JsonConvert.DeserializeObject<List<Objects.Json_product>>(json_data);
 
@@ -138,6 +139,7 @@ public class MainHubPhone : Hub
                     hoatdong = hd,
                     gia_db = gia_db,
                     emailKH = email,
+                    loaiBG = qotype == "1",
                     ngaytao = DateTime.Now,
                     ngaycapnhat = DateTime.Now
                 };

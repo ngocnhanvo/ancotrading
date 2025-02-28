@@ -1,4 +1,4 @@
-//Update at 15/02/2025 23:50:39
+//Update at 28/02/2025 13:46:24
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -3716,6 +3716,7 @@ private System.Nullable<bool> _gia_db;
 private System.Nullable<bool> _ghepbo;
 private string _emailKH;
 private System.Nullable<bool> _daguiMail;
+private System.Nullable<bool> _loaiBG;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -3780,6 +3781,8 @@ partial void OnemailKHChanging(string value);
 partial void OnemailKHChanged();
 partial void OndaguiMailChanging(System.Nullable<bool> value);
 partial void OndaguiMailChanged();
+partial void OnloaiBGChanging(System.Nullable<bool> value);
+partial void OnloaiBGChanged();
 #endregion
 public c_baogia()
 {
@@ -4355,6 +4358,25 @@ this.OndaguiMailChanged();
 }
 }
 }
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_loaiBG", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @loaiBG
+{
+get
+{
+return this._loaiBG;
+}
+set
+{
+if ((this._loaiBG != value))
+{
+this.OnloaiBGChanging(value);
+this.SendPropertyChanging();
+this._loaiBG = value;
+this.SendPropertyChanged("loaiBG");
+this.OnloaiBGChanged();
+}
+}
+}
 public event PropertyChangingEventHandler PropertyChanging;
 public event PropertyChangedEventHandler PropertyChanged;
 protected virtual void SendPropertyChanging()
@@ -4408,6 +4430,7 @@ private System.Nullable<bool> _gia_db;
 private System.Nullable<bool> _ghepbo;
 private string _emailKH;
 private System.Nullable<bool> _daguiMail;
+private System.Nullable<bool> _loaiBG;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -4472,6 +4495,8 @@ partial void OnemailKHChanging(string value);
 partial void OnemailKHChanged();
 partial void OndaguiMailChanging(System.Nullable<bool> value);
 partial void OndaguiMailChanged();
+partial void OnloaiBGChanging(System.Nullable<bool> value);
+partial void OnloaiBGChanged();
 #endregion
 public c_baogiaqr()
 {
@@ -5044,6 +5069,25 @@ this.SendPropertyChanging();
 this._daguiMail = value;
 this.SendPropertyChanged("daguiMail");
 this.OndaguiMailChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_loaiBG", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @loaiBG
+{
+get
+{
+return this._loaiBG;
+}
+set
+{
+if ((this._loaiBG != value))
+{
+this.OnloaiBGChanging(value);
+this.SendPropertyChanging();
+this._loaiBG = value;
+this.SendPropertyChanged("loaiBG");
+this.OnloaiBGChanged();
 }
 }
 }
@@ -20370,6 +20414,7 @@ private string _sophieunhap;
 private System.Nullable<System.DateTime> _ngay_tigia;
 private System.Nullable<bool> _vinhgia_vnd;
 private System.Nullable<bool> _dagui;
+private System.Nullable<bool> _pnk_dautien;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -20442,6 +20487,8 @@ partial void Onvinhgia_vndChanging(System.Nullable<bool> value);
 partial void Onvinhgia_vndChanged();
 partial void OndaguiChanging(System.Nullable<bool> value);
 partial void OndaguiChanged();
+partial void Onpnk_dautienChanging(System.Nullable<bool> value);
+partial void Onpnk_dautienChanged();
 #endregion
 public c_nhapxuat()
 {
@@ -21090,6 +21137,25 @@ this.SendPropertyChanging();
 this._dagui = value;
 this.SendPropertyChanged("dagui");
 this.OndaguiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_pnk_dautien", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @pnk_dautien
+{
+get
+{
+return this._pnk_dautien;
+}
+set
+{
+if ((this._pnk_dautien != value))
+{
+this.Onpnk_dautienChanging(value);
+this.SendPropertyChanging();
+this._pnk_dautien = value;
+this.SendPropertyChanged("pnk_dautien");
+this.Onpnk_dautienChanged();
 }
 }
 }
@@ -32139,7 +32205,6 @@ private string _lienket2;
 private string _doituong_dinhkem;
 private System.Nullable<System.DateTime> _ngayxacnhan;
 private string _nguoixacnhan;
-private string _lydotuchoi;
 private string _nguoitao;
 private string _vaitrotao;
 private string _bophantao;
@@ -32156,6 +32221,7 @@ private System.Nullable<System.DateTime> _ngaytao;
 private System.Nullable<System.DateTime> _ngaycapnhat;
 private string _mota;
 private System.Nullable<bool> _hoatdong;
+private string _lydotuchoi;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -32178,8 +32244,6 @@ partial void OnngayxacnhanChanging(System.Nullable<System.DateTime> value);
 partial void OnngayxacnhanChanged();
 partial void OnnguoixacnhanChanging(string value);
 partial void OnnguoixacnhanChanged();
-partial void OnlydotuchoiChanging(string value);
-partial void OnlydotuchoiChanged();
 partial void OnnguoitaoChanging(string value);
 partial void OnnguoitaoChanged();
 partial void OnvaitrotaoChanging(string value);
@@ -32212,6 +32276,8 @@ partial void OnmotaChanging(string value);
 partial void OnmotaChanged();
 partial void OnhoatdongChanging(System.Nullable<bool> value);
 partial void OnhoatdongChanged();
+partial void OnlydotuchoiChanging(string value);
+partial void OnlydotuchoiChanged();
 #endregion
 public md_ghichuhdlh()
 {
@@ -32385,25 +32451,6 @@ this.SendPropertyChanging();
 this._nguoixacnhan = value;
 this.SendPropertyChanged("nguoixacnhan");
 this.OnnguoixacnhanChanged();
-}
-}
-}
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_lydotuchoi", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
-public string @lydotuchoi
-{
-get
-{
-return this._lydotuchoi;
-}
-set
-{
-if ((this._lydotuchoi != value))
-{
-this.OnlydotuchoiChanging(value);
-this.SendPropertyChanging();
-this._lydotuchoi = value;
-this.SendPropertyChanged("lydotuchoi");
-this.OnlydotuchoiChanged();
 }
 }
 }
@@ -32708,6 +32755,25 @@ this.SendPropertyChanging();
 this._hoatdong = value;
 this.SendPropertyChanged("hoatdong");
 this.OnhoatdongChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_lydotuchoi", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @lydotuchoi
+{
+get
+{
+return this._lydotuchoi;
+}
+set
+{
+if ((this._lydotuchoi != value))
+{
+this.OnlydotuchoiChanging(value);
+this.SendPropertyChanging();
+this._lydotuchoi = value;
+this.SendPropertyChanged("lydotuchoi");
+this.OnlydotuchoiChanged();
 }
 }
 }
