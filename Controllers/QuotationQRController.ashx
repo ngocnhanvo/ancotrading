@@ -49,8 +49,8 @@ public class QuotationQRController : IHttpHandler
             case "createEmail":
                 this.createEmail(context);
                 break;
-            case "chuyenThanhQO":
-                this.chuyenThanhQO(context);
+            case "chuyenThanhPO":
+                this.chuyenThanhPO(context);
                 break;
             case "chonMau":
                 this.chonMau(context);
@@ -454,87 +454,224 @@ public class QuotationQRController : IHttpHandler
     }
 
     #region load
-    public void chuyenThanhQO(HttpContext context)
+    public void chuyenThanhPO(HttpContext context)
     {
-        string c_baogia_id = context.Request.Form["id"];
-        c_baogiaqr bgqr = db.c_baogiaqrs.FirstOrDefault(s => s.c_baogiaqr_id == c_baogia_id);
-        Dictionary<string, object> lstMsg = new Dictionary<string, object>();
-        int status = 0;
-        string mess = "";
-        if (bgqr != null)
+        string qoId = context.Request.QueryString["qoId"];
+        string option = context.Request.QueryString["option"];
+        string optionType = context.Request.QueryString["optionType"];
+        string sct = "", msg = "";
+        bool isform = true;
+
+        var bg = db.c_baogiaqrs.FirstOrDefault(p => p.c_baogiaqr_id.Equals(qoId));
+        if (bg == null)
         {
-            md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == bgqr.md_doitackinhdoanh_id).FirstOrDefault();
+            msg = "Không tìm thấy báo giá";
+            goto EndEventHandler;
+        }
 
-            if (string.IsNullOrEmpty(dtkd.ma_dtkd))
+        if (bg.md_trangthai_id.Equals(Helper.SOANTHAO))
+        {
+            bg.md_trangthai_id = Helper.HIEULUC;
+        }
+
+        try
+        {
+            String md_paymentterm_id = db.md_paymentterms.Take(1).FirstOrDefault().md_paymentterm_id;
+            int count_qotopo = (from c in db.c_donhangs where c.c_baogia_id.Equals(qoId) select new { c.sochungtu }).Count();
+            if (count_qotopo > 0)
             {
-                mess += "<br>Thiếu mã đối tác.";
-            }
-            if (string.IsNullOrEmpty(dtkd.ten_dtkd))
-            {
-                mess += "<br>Thiếu tên đối tác.";
-            }
-            if (string.IsNullOrEmpty(dtkd.tel))
-            {
-                mess += "<br>Thiếu số điện thoại của đối tác.";
-            }
-            if (string.IsNullOrEmpty(dtkd.fax))
-            {
-                mess += "<br>Thiếu số Fax.";
-            }
-            if (string.IsNullOrEmpty(dtkd.md_quocgia_id))
-            {
-                mess += "<br>Thiếu quốc gia.";
-            }
-            if (string.IsNullOrEmpty(dtkd.md_khuvuc_id))
-            {
-                mess += "<br>Thiếu khu vực.";
+                msg = $@"Không thể tạo vì P/O tươnng ứng đã được tạo truớc đó!";
+                goto EndEventHandler;
             }
 
-            if (mess.Length > 0)
+            if (bg.isform == true & option == "0")
             {
-                mess = mess.Substring(4);
+                msg = $@"Không thể tạo vì {bg.sobaogia} là Q/O mẫu!";
+                goto EndEventHandler;
             }
+
+            var cangbienIds = db.c_chitietbaogiaqrs.Where(s => s.c_baogiaqr_id == qoId).Select(s => s.md_cangbien_id).Distinct().ToList();
+            var count = cangbienIds.Count;
+            if ((option == "1" || option == "0") & count > 1)
+            {
+                msg = $@"Không thể tạo vì Q/O có hai cảng biển!";
+                goto EndEventHandler;
+            }
+
+            //1. Q/O BT -> P/O BT , P/O SR
+            //2. Q/O SR -> P/O BT , P/O SR
+            //3. Q.O SR 2CB -> P/O SR hoac 2 P/O 2 CB
+            switch (option)
+            {
+                case "0":
+                    count = 1;
+                    break;
+                case "1":
+                    count = 1;
+                    break;
+                case "2":
+                    if (optionType == "po")
+                        count = 2;
+                    else
+                        count = 1;
+                    break;
+                default:
+                    count = 1;
+                    break;
+            }
+
+            if (optionType == "po")
+                isform = false;
             else
+                isform = true;
+
+
+            md_nganhang ng = db.md_nganhangs.Take(1).FirstOrDefault();
+            decimal muchoahong = 0;
+
+            md_nguoilienhe nguoilienhe = db.md_nguoilienhes.FirstOrDefault(p => p.md_doitackinhdoanh_id.Equals(bg.md_doitackinhdoanh_id));
+            if (nguoilienhe != null)
             {
-                try
-                {
-                    //string bgid = Guid.NewGuid().ToString().Replace("-", "");
-                    string bgid = bgqr.c_baogiaqr_id;
-                    String sochungtu = jqGridHelper.Utils.taoChungTuQO(bgqr.md_doitackinhdoanh_id, 1, DateTime.Now.Year.ToString());
-                    c_baogia bg = bgqr.Cast<c_baogia>();
-                    bg.c_baogia_id = bgid;
-                    bg.sobaogia = sochungtu;
-                    db.c_baogias.InsertOnSubmit(bg);
-
-                    foreach (var ctbgqr in db.c_chitietbaogiaqrs.Where(s => s.c_baogiaqr_id == c_baogia_id))
-                    {
-                        c_chitietbaogia ctbg = ctbgqr.Cast<c_chitietbaogia>();
-                        ctbg.c_chitietbaogia_id = ctbgqr.c_chitietbaogiaqr_id;
-                        ctbg.c_baogia_id = bgid;
-                        db.c_chitietbaogias.InsertOnSubmit(ctbg);
-                        db.c_chitietbaogiaqrs.DeleteOnSubmit(ctbgqr);
-                    }
-
-                    db.c_baogiaqrs.DeleteOnSubmit(bgqr);
-                    db.SubmitChanges();
-                    status = 1;
-                    mess = sochungtu;
-                }
-                catch (Exception ex)
-                {
-                    mess = ex.Message;
-                }
+                muchoahong = nguoilienhe.muchoahong == null ? 0 : nguoilienhe.muchoahong.Value;
             }
+
+            foreach (var cangbienId in cangbienIds)
+            {
+                string id = ImportUtils.getNEWID();
+                string sochungtu = jqGridHelper.Utils.taoChungTuPO(bg.md_doitackinhdoanh_id, isform == true ? 1 : 0, DateTime.Now.Year.ToString());
+                //--
+                var dh = new c_donhang();
+                dh.c_donhang_id = id;
+                dh.sochungtu = sochungtu;
+                dh.c_baogia_id = bg.c_baogiaqr_id;
+
+                dh.donhang_mau = isform;
+
+                dh.md_doitackinhdoanh_id = bg.md_doitackinhdoanh_id;
+                dh.ngaylap = DateTime.Now;
+                dh.nguoilap = UserUtils.getUser(context);
+
+                dh.md_cangbien_id = cangbienId;
+
+                dh.discount = 0;
+                dh.shipmentdate = DateTime.Now;
+                dh.shipmenttime = DateTime.Now;
+                dh.md_paymentterm_id = md_paymentterm_id;
+                dh.md_trongluong_id = bg.md_trongluong_id;
+                dh.md_kichthuoc_id = bg.md_kichthuoc_id;
+                dh.payer = "";
+                dh.isdonhangtmp = false;
+
+                dh.cont20 = 0;
+                dh.cont40 = 0;
+                dh.cont40hc = 0;
+                dh.cont45 = 0;
+                dh.contle = 0;
+
+                if (nguoilienhe != null)
+                {
+                    dh.md_nguoilienhe_id = nguoilienhe.doitaclienquan;
+                }
+
+                dh.hoahong = muchoahong;
+                dh.portdischarge = "";
+                dh.amount = bg.totalquo;
+                dh.totalcbm = bg.totalcbm;
+                dh.totalcbf = bg.totalcbf;
+                dh.ismakepi = false;
+                dh.md_trangthai_id = Helper.SOANTHAO;
+                dh.md_dongtien_id = bg.md_dongtien_id;
+                dh.md_nganhang_id = ng.md_nganhang_id;
+                dh.ngaytao = DateTime.Now;
+                dh.nguoitao = UserUtils.getUser(context);
+                dh.ngaycapnhat = DateTime.Now;
+                dh.nguoicapnhat = UserUtils.getUser(context);
+                dh.hoatdong = true;
+                dh.ghichu = bg.mota;
+
+                int sothutu = 10;
+
+                //--
+                sct += sochungtu + ",";
+                //Tạo dòng đơn hàng
+                var lstQOD = (from p in db.c_chitietbaogiaqrs
+                              where p.c_baogiaqr_id.Equals(bg.c_baogiaqr_id)
+                              select p);
+                //--2 cang bien
+                if (count == 2)
+                    lstQOD = (from p in db.c_chitietbaogiaqrs
+                              where p.c_baogiaqr_id.Equals(bg.c_baogiaqr_id) && p.md_cangbien_id.Equals(cangbienId)
+                              select p);
+
+                var lstPOD = new List<c_dongdonhang>();
+
+                // Chạy qua từng dòng QO tạo dòng PO
+                foreach (var item in lstQOD)
+                {
+                    var ddh = new c_dongdonhang();
+                    ddh.c_dongdonhang_id = ImportUtils.getNEWID();
+                    ddh.c_donhang_id = id;
+                    ddh.md_sanpham_id = item.md_sanpham_id;
+                    ddh.ma_sanpham_khach = item.ma_sanpham_khach;
+                    ddh.mota_tiengviet = item.mota_tiengviet;
+                    ddh.mota_tienganh = item.mota_tienganh;
+                    ddh.md_donggoi_id = item.md_donggoi_id;
+                    ddh.giafob = item.giafob;
+                    ddh.soluong = item.soluong;
+                    // ddh.soluong_dathang = item.soluong;
+                    ddh.soluong_dathang = 0;
+                    ddh.soluong_conlai = item.soluong;
+                    ddh.soluong_daxuat = 0;
+                    ddh.sl_inner = item.sl_inner;
+                    ddh.l1 = item.l1;
+                    ddh.w1 = item.w1;
+                    ddh.h1 = item.h1;
+                    ddh.sl_outer = item.sl_outer;
+                    ddh.l2 = item.l2;
+                    ddh.w2 = item.w2;
+                    ddh.h2 = item.h2;
+                    ddh.v2 = item.v2;
+                    ddh.sl_cont = item.sl_cont;
+                    ddh.vd = item.vd;
+                    ddh.vn = item.vn;
+                    ddh.vl = item.vl;
+                    ddh.ghichu_vachngan = item.ghichu_vachngan;
+                    ddh.nhacungungid = db.md_sanphams.FirstOrDefault(sp => sp.md_sanpham_id.Equals(item.md_sanpham_id)).nhacungung;
+                    ddh.ngaytao = DateTime.Now;
+                    ddh.ngaycapnhat = DateTime.Now;
+                    ddh.nguoitao = UserUtils.getUser(context);
+                    ddh.nguoicapnhat = UserUtils.getUser(context);
+                    ddh.hoatdong = true;
+                    ddh.sothutu = sothutu;
+                    ddh.trangthai = item.trangthai;
+                    sothutu += 10;
+
+                    //lstPOD.Add(ddh);
+                    db.c_dongdonhangs.InsertOnSubmit(ddh);
+                }
+                db.c_donhangs.InsertOnSubmit(dh);
+                db.SubmitChanges();
+
+                string sql_update = $@"update c_dongdonhang set ngaycapnhat = getdate() where c_donhang_id = '${id}'";
+                mdbc.ExcuteNonQuery(sql_update);
+            }
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+    EndEventHandler:;
+        if(msg.Length <= 0)
+        {
+            sct = sct.Remove(sct.Length - 1);
+            msg = $@"Ðã tạo PO thành công với số chứng từ {sct}.";
         }
         else
         {
-            mess = "Không tìm thấy báo giá, hãy làm mới lại lưới dữ liệu.";
+            msg = $@"Lỗi: {msg}";
         }
-
-        lstMsg.Add("status", status);
-        lstMsg.Add("mess", mess);
-
-        context.Response.Write(JsonConvert.SerializeObject(lstMsg));
+        context.Response.Write(msg);
     }
 
     public void load(HttpContext context)

@@ -1465,76 +1465,200 @@
                 }
             });
         }
-        var funcChuyenQRThanhQO = function () {
-            var qoId = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
-					if (qoId === null) {
-						alert('Hãy chọn một báo giá');
-					} else {
-						var name = 'dialog-ghepbo-qo';
-						var title = 'Chuyển thành QO';
-						var content = `
-							<table style="width:100%">
-								<tr>
-									<td  colspan=2>
-										<label style="font-weight: bold;font-size: 13px;">Bạn có chắc chắn muốn chuyển dòng này thành QO?</label>
-										<br>
-										<label style="font-weight: bold;font-size: 13px; line-height: 2">Lưu ý:</label>
-										<br>
-										<label style="font-style:italic; color: blue; line-height: 2">
-											Khi đã thực hiện thao tác sẽ không thể hoàn tác.
-										</label>
-									</td>
-								</tr>
-							</table>`;
 
-						$('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
-						$('#' + name).dialog({
-							modal: true, 
-							open: function(event, ui) {
-								//hide close button.
-								$(this).parent().children().children('.ui-dialog-titlebar-close').hide();
-							}, 
-							buttons: [
+        var funcChuyenQRThanhPO_showHide = function() {
+            let myGrid = $('#grid_ds_quotationqr'),
+                selRowId = myGrid.jqGrid('getGridParam', 'selrow'),
+                celValue = myGrid.jqGrid('getCell', selRowId, 'isform'),
+                dlg = '#dialog-create-poqr';
+		    
+		    $( '#printRequired', dlg).on( "click", function() {
+			    $('.t_po', dlg).show();
+			    $('.t_po1', dlg).hide();
+			    $('.t_po2', dlg).hide();
+		    });
+		
+		    $( '#print1CB', dlg ).on( "click", function() {
+			    $('.t_po', dlg).hide();
+			    $('.t_po1', dlg).show();
+			    $('.t_po2', dlg).hide();
+		    });
+		
+		    $( '#print2CB', dlg).on( "click", function() {
+			    $('.t_po', dlg).hide();
+			    $('.t_po1', dlg).hide();
+			    $('.t_po2', dlg).show();
+		    });
+		
+		    if(celValue == "True")
+		    {
+			    $('#print1CB', dlg).click();
+			    $('.printRequired', dlg).hide();
+		    }
+		    else
+		    {
+                $('#printRequired', dlg).click();
+                $('.print1CB', dlg).hide();
+                $('.print2CB', dlg).hide();
+		    }
+        }
+
+        var funcChuyenQRThanhPO = function () {
+            let qoId = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
+            if (qoId === null) {
+                alert('Hãy chọn một báo giá');
+                return;
+            }
+
+            msg = "Có phải bạn muốn tạo P/O từ quotation này.?";
+            let p = `<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><span id="dialog-caution">${msg}</span></p>`;
+            let h3 = `<h3 style="padding: 10px" class="ui-state-highlight ui-corner-all">${p}<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div></h3>`;
+				 
+		    let name = 'dialog-create-poqr';
+		    let title = 'Thông Báo';
+            let content = `${h3}
+            <table style="width:100%">
+				<tr style="height: 25px;">
+					<td></td>
+					<td>
+						<input class="printRequired" id="printRequired" type="radio" name="rdoPrintType" value="printRequired" checked="checked" />
+						<label class="printRequired" for="printRequired">Tạo P/O Từ Quotation</label>
+						<table class="t_po" style="width:100%; padding-left: 50px; border: 1px solid;">
+							<tr style="height: 25px;">
+								<td colspan="2">
+									<input id="po" value="po" name="po_chs" type="radio" checked="checked" />
+									<label for="po">Thành P/O</label>
+								</td>
+							</tr>
+							<tr style="height: 25px;">
+								<td colspan="2">
+									<input id="por" value="por" name="po_chs" type="radio" />
+									<label for="por">Thành P/O Mẫu</label>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr style="height: 25px;">
+					<td></td>
+
+					<td>
+						<input class="print1CB" id="print1CB" type="radio" name="rdoPrintType" value="print1CB" />
+						<label class="print1CB" for="print1CB">Tạo P/O Từ Quotation Mẫu</label>
+						<table class="t_po1" style="width:100%; padding-left: 50px; border: 1px solid;">
+							<tr style="height: 25px;">
+								<td colspan="2">
+									<input id="po1" value="po" name="po_chs1" type="radio" checked="checked" />
+									<label for="po1">Thành P/O</label>
+								</td>
+							</tr>
+							<tr style="height: 25px;">
+								<td colspan="2">
+									<input id="por1" value="por" name="po_chs1" type="radio" >
+									<label for="por1">Thành P/O Mẫu</label>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr style="height: 25px;">
+					<td></td>
+					<td>
+						<input class="print2CB" id="print2CB" type="radio" name="rdoPrintType" value="print2CB" />
+						<label class="print2CB" for="print2CB">Tạo P/O Từ Quotation Mẫu Có 2 Cảng Biển</label>
+						<table class="t_po2" style="width:100%; padding-left: 50px; border: 1px solid;">
+							<tr style="height: 25px;">
+								<td colspan="2">
+									<input id="po2" value="po" name="po_chs2" type="radio" checked="checked"/>
+									<label for="po2">Thành P/O</label>
+								</td>
+							</tr>
+							<tr style="height: 25px;">
+								<td colspan="2">
+									<input id="por2" value="por" name="po_chs2" type="radio" >
+									<label for="por2">Thành P/O Mẫu</label>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>`;
+
+		    $('body').append(`<div title="${title}" id="${name}">${content}</div>`);
+
+		    $(`#${name}`).dialog({
+                modal: true,
+                open: function (event, ui) {
+                    funcChuyenQRThanhPO_showHide();
+                    //hide close button.
+                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                },
+                buttons: [
+                    {
+                        id: "btn-create-poqr",
+                        text: "Có",
+                        click: function() {
+						    //1. Q/O BT -> P/O BT , P/O SR
+						    //2. Q/O SR -> P/O BT , P/O SR
+						    //3. Q.O SR 2CB -> P/O SR hoac 2 P/O 2 CB
+                            let printType = $('input[name=rdoPrintType]:checked', '#'+name).val();
+                            let optionType = "";
+						
+						    let option = 0, check = 0;
+                            if (typeof printType == 'undefined') {
+                                alert('Hãy chọn cách tạo P/O.!');
+                                return;
+                            }
+                            if (printType == "printRequired")
 							{
-								id: "btn-chuyenthanhqo-ok",
-								text: "Đồng ý",
-                                    click: function () {
-                                        $("#btn-chuyenthanhqo-ok").button("disable");
-                                        $("#btn-chuyenthanhqo-close").button("disable");
-                                        $('#' + name).prepend('<div id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>');
-                                        $.post('Controllers/QuotationQRController.ashx?action=chuyenThanhQO&id='+qoId,
-                                            { "id": qoId }, function (res) {
-                                                res = JSON.parse(res);
+                                option = 0;
+								optionType = $('input[name=po_chs]:checked', '#'+name).val();
+                            }
+							else if (printType == "print1CB")
+							{
+                                option = 1;
+								optionType =  $('input[name=po_chs1]:checked', '#'+name).val();
+                            }
+							else if (printType == "print2CB")
+							{
+                                option = 2;
+								optionType =  $('input[name=po_chs2]:checked', '#'+name).val();
+                            }
 
-                                                if (res.status === 0) {
-                                                    $('#' + name).html(`<div style="color:red">${res.mess}</div>`);
-                                                }
-                                                else {
-                                                    $('#' + name).html(`<div style="color:blue">QO: "${res.mess}" đã được tạo thành công.</div>`);
-                                                    $('#grid_ds_quotationqr').jqGrid().trigger('reloadGrid');
-                                                    $('#grid_ds_chitietquotationqr').jqGrid().trigger('reloadGrid');
-                                                }
-                                                $("#btn-chuyenthanhqo-close").button("enable");
-                                        });
+                            $("#wait").css("display", "block");
+                            $("#btn-close-poqr").button("disable");
+                            $.get(`Controllers/QuotationQRController.ashx?action=chuyenThanhPO&qoId=${qoId}&option=${option}&optionType=${optionType}`, function (result) {
+								//$('#dialog-caution').css({ 'color': 'green' });
+								$('#dialog-create-poqr').find('#dialog-caution').html(result);
+
+                                if (result.indexOf("Lỗi:") != -1)
+                                    $("#btn-create-poqr").button("enable");
+                                else {
+                                    $('#grid_ds_quotationqr')[0].triggerToolbar();
+                                    $("#btn-create-poqr").button("disable");
                                 }
-							},
-							{
-								id: "btn-chuyenthanhqo-close",
-								text: "Thoát",
-								click: function() {
-									$(this).dialog("destroy").remove();
-								}
-							}
-							]
-						});
-					}
-        };
+                                $("#wait").css("display", "none");
+								$("#btn-close-poqr span").text("Thoát");
+								$("#btn-close-poqr").button("enable");
+							});
+                        }
+                    },
+				    {
+                        id: "btn-close-poqr",
+                        text: "Không",
+                        click: function() {
+                            $(this).dialog("destroy").remove();
+                        }
+                    }
+                ]
+            });
+        }
 
         $("#grid_ds_quotationqr").jqGrid('navGrid', "#grid_ds_quotationqr-pager").jqGrid('navButtonAdd', "#grid_ds_quotationqr-pager",
         {
             caption: "",
             buttonicon: "ui-icon-battery-3",
-            onClickButton: funcChuyenQRThanhQO,
+            onClickButton: funcChuyenQRThanhPO,
             title: "Chuyển thành QO",
             cursor: "pointer"
         });

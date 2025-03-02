@@ -1224,7 +1224,9 @@ public class DonHangController : IHttpHandler
                     // String sqlDetails = "delete c_dongdonhang where c_donhang_id IN (" + id + ")";
                     // mdbc.ExcuteNonQuery(sqlDetails);
                     // mdbc.ExcuteNonQuery(sql);
-
+                    var bgqr = db.c_baogiaqrs.Where(s => s.c_baogiaqr_id == donhang.c_baogia_id).FirstOrDefault();
+                    if (bgqr != null)
+                        bgqr.md_trangthai_id = Helper.SOANTHAO;
                     db.c_donhangs.DeleteOnSubmit(donhang);
                     db.SubmitChanges();
 
