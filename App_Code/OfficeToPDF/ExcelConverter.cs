@@ -480,6 +480,8 @@ namespace OfficeToPDF
                         var widthImg = (int)(widthR * percent);
                         var heightImg = (int)(heightR * percent - 3.5);
                         widthImg = widthImg > width ? (int)(width - 1) : widthImg;
+                        widthImg = (int)(widthImg * 0.9);
+                        heightImg = (int)(heightImg * 0.9);
                         var rateColumnAndPicture = (width - widthImg) / 2;
                         rateColumnAndPicture = rateColumnAndPicture <= 0 ? 0 : rateColumnAndPicture;
 
@@ -489,6 +491,7 @@ namespace OfficeToPDF
                         var Left = (float)((double)oRange.Left + rateColumnAndPicture);
                         var Top = (float)((double)oRange.Top + rateRowAndPicture);
 
+                        
                         var pic = worksheet.Shapes.AddPicture(image.link, Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoCTrue, Left, Top, widthImg, heightImg);
 
                         pictureR.Dispose();

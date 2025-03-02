@@ -13,6 +13,12 @@ public static class UserUtils
         return ur;
     }
 
+    public static string getEmailCompany(LinqDBDataContext db)
+    {
+        var adminEmail = db.nhanviens.Where(s => s.manv == "admin@email").FirstOrDefault();
+        return adminEmail == null ? "" : adminEmail.email;
+    }
+
     //Mail KCS
     public static string mailKCS = "";
     //Mail Ke Toan NCU

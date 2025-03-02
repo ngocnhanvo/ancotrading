@@ -35,6 +35,26 @@
         $('#tabs-quotationqr-details').tabs();
     });
 
+    function ShowPBGCu_grid_ds_quotationqr(frmID, action) {
+        let ShowPBGCu = function () {
+            let chkPBGCu = $('#chkPBGCu', frmID);
+            let tr_phienbangiacu = $('#tr_phienbangiacu', frmID);
+            if (chkPBGCu.prop('checked') == true) {
+                tr_phienbangiacu.show();
+            }
+            else {
+                tr_phienbangiacu.hide();
+            }
+        }
+
+        let chkPBGCu_ = $('#chkPBGCu', frmID);
+        chkPBGCu_.off('change');
+        chkPBGCu_.change(function () {
+            ShowPBGCu();
+        });
+        ShowPBGCu();
+    }
+
     function funcPrint() {
         var qoId = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
         var name = 'dialog-print-qo';
@@ -143,7 +163,7 @@
                     , 'Đồng Tiền', 'Kích Thước', 'QO mẫu', 'Ngày Tạo'
                     , 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật'
                     , 'Ghi chú', 'Hoạt động', 'Giá đặc biệt'
-                    , 'Giá FOB phiên bản cũ', 'Phiên bản giá cũ', 'Đã gửi mail']"
+                    , 'Giá FOB phiên bản cũ', 'Phiên bản giá cũ', 'Đã gửi mail', 'In có thành tiền']"
             RowNumbers="true"
             OndblClickRow = "function(rowid) {
 								$('#edit_grid_ds_quotationqr').click();
@@ -266,7 +286,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'select'
-                 , editoptions: { dataUrl: 'Controllers/QuotationQRController.ashx?action=getSelectOption_cb' }
+                 , editoptions: { dataUrl: 'Controllers/QuotationController.ashx?action=getSelectOption_cb' }
 				 , editrules: { required:true }
 				 , formoptions:{label:'Cảng Biển ' + ip_fd()} 
             },
@@ -463,6 +483,16 @@
                 , align: 'center'
                 , editoptions:{ value:'True:False', defaultValue: 'False' }
                 , formatter: 'checkbox'
+            },
+            {
+                fixed: true, name: 'loaiBG', hidden: false
+                , index: 'baogia.loaiBG'
+                , width: 100
+                , editable:true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions:{ value:'True:False', defaultValue: 'False' }
+                , formatter: 'checkbox'
             }
             ]"
             GridComplete = "
@@ -476,7 +506,7 @@
             Height = "170"
             MultiSelect = "false" 
             ShowAdd ="false"
-            ShowEdit ="false"
+            ShowEdit ="true"
             ShowDel = "true"
             AddFormOptions=" 
                 errorTextFormat:function(data) { 
@@ -558,7 +588,7 @@
                 SortName="sp.ma_sanpham" 
                 SortOrder="asc"
                 UrlFileAction="Controllers/QuotationQRDetailController.ashx" 
-                ColNames="['c_chitietbaogia_id', 'Báo Giá', 'TT', 'Trạng Thái', 'STT', 'Mã SP', 'Mã SP', 'HS Code', 'Mã SP Khách',  
+                ColNames="['c_chitietbaogiaqr_id', 'Báo Giá', 'TT', 'Trạng Thái', 'STT', 'Mã SP', 'Mã SP', 'HS Code', 'Mã SP Khách',  
 				'Giá FOB', 'Số Lượng',  'Đóng Gói', 'Đóng Gói Inner', 'L1', 'W1', 'H1', 'Đóng Gói Outer', 'L2', 'W2', 'H2','Weight', 'V2', 'SL Cont',  'Ghi Chú', 
 				'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt Động', 'Độc quyền']"
                 FilterToolbar="true"
@@ -569,8 +599,8 @@
 				}"
                 ColModel = "[
                 {
-                    fixed: true, name: 'c_chitietbaogia_id'
-                    , index: 'ctbg.c_chitietbaogia_id'
+                    fixed: true, name: 'c_chitietbaogiaqr_id'
+                    , index: 'ctbg.c_chitietbaogiaqr_id'
                     , width: 100
                     , hidden: true 
                     , editable:true
@@ -1075,6 +1105,8 @@
                 UrlFileAction="Controllers/ColorReferencesController.ashx" 
                 ColNames="['md_color_reference_id', 'Số Báo Giá', 'Màu', 'Url', 'Filter', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô Tả', 'Mặc Định']"
                 FilterToolbar="true"
+                RowNum="99999"
+                RowList="[99999]"
                 RowNumbers="true"
                 OndblClickRow = "
                     function(rowid) { 
@@ -1240,7 +1272,7 @@
                 , errorTextFormat:function(data) { 
                     return 'Lỗi: ' + data.responseText 
                 }"
-                MultiSelect = "false"
+                MultiSelect = "true"
                 runat="server" />
         </div>
 
@@ -1425,7 +1457,7 @@
                 success: function(packingHtml) {
 			        var arr_pkl = packingHtml.split('(##)'); 
 			        if (packingHtml != 'null') {
-                        $dgoi.removeAttr("disabled").html(arr_pkl[0]);
+                        $dgoi.removeAttr("disabled").html($(arr_pkl[0]).html());
 				        $("#docquyen").val(arr_pkl[1]);
                     } else {
                         $dgoi.html("<option value=''>Không tìm thấy đóng gói!</option>");
@@ -1553,6 +1585,88 @@
 				});
             },
             title: "Gửi email",
+            cursor: "pointer"
+        });
+
+        $("#grid_ds_color_referencesqr").jqGrid('navGrid', "#grid_ds_color_referencesqr-pager").jqGrid('navButtonAdd', "#grid_ds_color_referencesqr-pager",
+        {
+            caption: "Chọn màu",
+            buttonicon: "ui-icon-circle-check",
+            onClickButton: function () {
+                const qoId = $('#grid_ds_quotationqr').jqGrid('getGridParam', 'selrow');
+                let dlgId = 'dlgSelectColorQR';
+                if ($(`#${dlgId}`).attr('id'))
+                    $(`#${dlgId}`).dialog("destroy").remove();
+                const selIds = $('#grid_ds_color_referencesqr').jqGrid('getGridParam', 'selarrrow');
+                if (selIds.length <= 0) {
+                    alert(`Chọn ít nhất một màu sắc`);
+                    return;
+                }
+
+                let maxHeight = window.innerHeight - 200;
+                let htmlMau = ``;
+                selIds.map((selId) => {
+                    let sel = $('#grid_ds_color_referencesqr').getRowData(selId);
+                    htmlMau += `<tr style="height:20px;"><td>${sel.mau}:<td><td>${sel.url}</td></tr>`;
+                });
+                $('body').append(`
+                    <div title="Chọn màu" id="${dlgId}">
+                        <div style="max-height: ${maxHeight}px">
+                            <div style="background-color: #FFF;padding: 5px;position: sticky;top: 0;">
+                                <span>Các màu đã chọn</span>
+                                <select id="hoatdong${dlgId}">
+                                    <option value="1">Chọn màu</option>
+                                    <option value="0">Hủy chọn màu</option>
+                                </select>
+                            </div>
+                            <table style="width: 100%;background-color: #fafafa;padding: 5px;">${htmlMau}</table>
+                        </div>
+                    </div>`
+                );
+
+				$(`#${dlgId}`).dialog({
+					modal: true, 
+                    width: 300,
+                    maxHeight: maxHeight,
+                    open: function (event, ui) {
+                        
+                    },
+                    buttons: [
+						{
+							id: `btn-${dlgId}-ok`,
+							text: "Đồng ý",
+                                click: function () {
+                                    $(`#btn-${dlgId}-ok`).button("disable");
+                                    $(`#btn-${dlgId}-close`).button("disable");
+                                    $(`#${dlgId}`).append('<div id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>');
+                                    $.post('Controllers/QuotationQRController.ashx?action=chonMau',
+                                        { id: qoId, selIds: selIds.toString(), hoatdong: $(`#hoatdong${dlgId}`).val() }, function (res) {
+                                            res = JSON.parse(res);
+                                            if (res.status === 0) {
+                                                $(`#${dlgId}`).html(`<div style="color:red">${res.mess}</div>`);
+                                            }
+                                            else {
+                                                $(`#${dlgId}`).html(`<div style="color:blue">Cập nhật thành công.</div>`);
+                                                $('#grid_ds_color_referencesqr')[0].triggerToolbar();
+                                            }
+                                            $(`#btn-${dlgId}-close`).button("enable");
+                                    });
+                            }
+						},
+						{
+							id: `btn-${dlgId}-close`,
+							text: "Thoát",
+							click: function() {
+								$(this).dialog("destroy").remove();
+							}
+						}
+					],
+                    close: function () {
+                        $(`#${dlgId}`).dialog("destroy").remove();
+                    }
+				});
+            },
+            title: "Chọn màu",
             cursor: "pointer"
         });
 

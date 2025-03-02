@@ -52,9 +52,15 @@ public class QuotationQRController : IHttpHandler
             case "chuyenThanhQO":
                 this.chuyenThanhQO(context);
                 break;
+            case "chonMau":
+                this.chonMau(context);
+                break;
             default:
                 switch (oper)
                 {
+                    case "edit":
+                        this.edit(context);
+                        break;
                     case "del":
                         this.del(context);
                         break;
@@ -64,6 +70,50 @@ public class QuotationQRController : IHttpHandler
                 }
                 break;
         }
+    }
+
+    public void chonMau(HttpContext context)
+    {
+        var id = context.Request.Form["id"];
+        var selIds = context.Request.Form["selIds"].removeAllSpaceOrTrimText(false).Split(',').Where(s => s != null).ToList();
+        var hoatdong = context.Request.Form["hoatdong"].removeAllSpaceOrTrimText(false) == "1";
+        string msg = "";
+        bool status = false;
+        try
+        {
+            var bg = db.c_baogiaqrs.Where(s => s.c_baogiaqr_id == id).FirstOrDefault();
+            if (bg.md_trangthai_id != Helper.SOANTHAO)
+            {
+                msg = $@"Báo giá không ở trạng thái ""Soạn Thảo""";
+                goto EndEventHandler;
+            }
+
+            var colors = db.md_color_references.Where(s => s.c_baogia_id == bg.c_baogiaqr_id & selIds.Contains(s.md_color_reference_id)).ToList();
+            if (colors.Count <= 0)
+            {
+                msg = $@"Không có màu sắc nào được chọn";
+                goto EndEventHandler;
+            }
+
+            foreach (var color in colors)
+                color.hoatdong = hoatdong;
+            db.SubmitChanges();
+            status = true;
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+    EndEventHandler:;
+
+        dynamic result = new
+        {
+            msg,
+            status
+        };
+
+        context.Response.Write(JsonConvert.SerializeObject(result));
     }
 
     public void sendEmail(HttpContext context)
@@ -252,14 +302,16 @@ public class QuotationQRController : IHttpHandler
                 goto EndEventHandler;
             }
 
+
             from = nv.email;
             to = string.IsNullOrWhiteSpace(bg.emailKH) ? kh.email : bg.emailKH;
-            //cc = nv.email_cc;
+            cc = UserUtils.getEmailCompany(db);
             bcc = from;
             subject = tmp.subject_mail;
             body = tmp.content_mail.Replace("%0D", "<br/>").Replace("[ten_dtkd]", kh.ten_dtkd);
-
-            string name = $"{nv.manv}-Quotation-.xls", mime = "";
+            var arrPrice = new string[] { "without price", "with price" };
+            string strPrice = arrPrice[bg.loaiBG.GetValueOrDefault(false) ? 1 : 0];
+            string name = $"{kh.ma_dtkd}-AncoQuotation-{DateTime.Now.ToString("yyyy-MM-dd")} ({strPrice}).xls", mime = "";
             long size = 0;
             string linkDic = ExcuteSignalRStatic.mapPathSignalR($"~/SendMail/quotation/{bg.c_baogiaqr_id}");
             if (!Directory.Exists(linkDic))
@@ -297,6 +349,70 @@ public class QuotationQRController : IHttpHandler
     }
 
     #region oper
+    public void edit(HttpContext context)
+    {
+        string msg = "";
+        try
+        {
+            var hoatdongs = new string[] { "true", "on" };
+            var inCoGia = hoatdongs.Contains(context.Request.Form["loaiBG"].removeAllSpaceOrTrimText(false).ToLower());
+            var hd = hoatdongs.Contains(context.Request.Form["hoatdong"].removeAllSpaceOrTrimText(false).ToLower());
+            var gia_db = hoatdongs.Contains(context.Request.Form["gia_db"].removeAllSpaceOrTrimText(false).ToLower());
+
+            string c_baogia_id = context.Request.Form["id"];
+            var m = db.c_baogiaqrs.Where(p => p.c_baogiaqr_id == c_baogia_id).FirstOrDefault();
+            if (m == null)
+            {
+                msg = "Không tìm thấy báo giá đã chọn";
+                goto EndEventHandler;
+            }
+
+            if (m.md_trangthai_id.Equals(Helper.HIEULUC))
+            {
+                msg = "Không thể chỉnh sửa khi báo giá đã hiệu lực!";
+                goto EndEventHandler;
+            }
+
+            m.ngaybaogia = DateTime.ParseExact(context.Request.Form["ngaybaogia"], "dd/MM/yyyy", null);
+            m.ngayhethan = DateTime.ParseExact(context.Request.Form["ngayhethan"], "dd/MM/yyyy", null);
+
+            if (m.ngaybaogia > m.ngayhethan)
+            {
+                msg = "Ngày báo giá không được lớn hơn ngày hết hạn!";
+                goto EndEventHandler;
+            }
+
+            m.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
+            m.shipmenttime = int.Parse(context.Request.Form["shipmenttime"]);
+            m.md_trongluong_id = context.Request.Form["md_trongluong_id"];
+            m.md_cangbien_id = context.Request.Form["md_cangbien_id"];
+            m.md_kichthuoc_id = context.Request.Form["md_kichthuoc_id"];
+            m.moq_item_color = context.Request.Form["moq_item_color"];
+            m.mota = context.Request.Form["mota"];
+            m.hoatdong = hd;
+            m.gia_db = gia_db;
+            m.loaiBG = inCoGia;
+            m.ngaycapnhat = DateTime.Now;
+            m.nguoicapnhat = UserUtils.getUser(context);
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+    EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Cập nhật thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
+    }
+
     public void del(HttpContext context)
     {
         string msg = "";
@@ -308,7 +424,7 @@ public class QuotationQRController : IHttpHandler
             goto EndEventHandler;
         }
 
-        if(qo.daguiMail.GetValueOrDefault(false))
+        if (qo.daguiMail.GetValueOrDefault(false))
         {
             msg = "Báo giá đã được gửi mail và lưu trữ";
             goto EndEventHandler;
@@ -333,7 +449,7 @@ public class QuotationQRController : IHttpHandler
 
     EndEventHandler:;
 
-        if(msg.Length > 0)
+        if (msg.Length > 0)
             jqGridHelper.Utils.writeResult(0, msg);
     }
 
@@ -493,7 +609,7 @@ public class QuotationQRController : IHttpHandler
             ngaybaogia, ngayhethan, cb.ten_cangbien, baogia.shipmenttime, baogia.moq_item_color,  tl.ten_trongluong, 
             baogia.totalcbm, baogia.totalcbf, baogia.totalquo, dt.ma_iso, kt.ten_kichthuoc, baogia.isform,  
             baogia.ngaytao, baogia.nguoitao, baogia.ngaycapnhat, baogia.nguoicapnhat, baogia.mota, baogia.hoatdong, 
-            baogia.gia_db, baogia.daguiMail, baogia.chkPBGCu, baogia.phienbangiacu,
+            baogia.gia_db, baogia.daguiMail, baogia.loaiBG, baogia.chkPBGCu, baogia.phienbangiacu,
             ROW_NUMBER() OVER (ORDER BY {2} {3}) as RowNum 
             FROM c_baogiaqr baogia with (nolock) 
 			LEFT JOIN md_doitackinhdoanh dtkd with (nolock) on baogia.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id 
@@ -542,6 +658,7 @@ public class QuotationQRController : IHttpHandler
             xml += "<cell><![CDATA[" + row["chkPBGCu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phienbangiacu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["daguiMail"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["loaiBG"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

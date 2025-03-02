@@ -127,6 +127,9 @@ public class BaoGiaReport
 				        , dg.sl_inner * (SELECT dbo.f_convertKgToPounds(sp.trongluong, bg.md_trongluong_id))  as n_w_inner
 				        , dg.sl_outer * (SELECT dbo.f_convertKgToPounds(sp.trongluong, bg.md_trongluong_id)) as n_w_outer
                         , hscode.thanhphan
+                        , ctbg.soluong as qty
+                        , round(ctbg.soluong * ctbg.giafob, 2) as amount
+                        , isnull(bg.loaiBG, 0) as inCoGia
                     from 
 	                    {2} bg
 				        left join {3} ctbg ON bg.{2}_id = ctbg.{2}_id
@@ -200,13 +203,14 @@ public class BaoGiaReport
 
     private HSSFWorkbook CreateHSSFWorkbook(DataTable dtDetails, DataTable dtDistinct, DataTable dtReferences)
     {
-
+        var inCoGia = new string[] { "true", "on", "1" }.Contains(dtDetails.Rows[0]["inCoGia"].ToString().ToLower());
         String tenkt = dtDetails.Rows[0]["ten_kichthuoc"].ToString().ToLower();
         String tentl = dtDetails.Rows[0]["ten_trongluong"].ToString().ToLower();
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
         ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
 
-        var config = new ExportExcel(hssfworkbook, 0, 23);
+        var config = new ExportExcel(hssfworkbook, 0, 32);
+        var info = new PrintAnco2.InfoExcel();
         var ex_fm = new Excel_Format(hssfworkbook);
         var celltext = ex_fm.getcell(10, false, true, "", "L", "T");
         var cellTextCenterBoderAll = ex_fm.getcell(10, false, true, "LRTB", "C", "T");
@@ -297,7 +301,7 @@ public class BaoGiaReport
             = hStyle.BorderTop
             = NPOI.SS.UserModel.BorderStyle.Thin;
         //--
-        for (int i = 0; i <= 30; i++)
+        for (int i = 0; i <= 32; i++)
         {
             headerColumn.CreateCell(i).CellStyle = hStyle;
             headerColumn2.CreateCell(i).CellStyle = hStyle;
@@ -389,6 +393,12 @@ public class BaoGiaReport
         headerColumn.GetCell(30).SetCellValue("Material");
         s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 30, 30));
 
+        headerColumn.GetCell(31).SetCellValue("Quantity");
+        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 31, 31));
+
+        headerColumn.GetCell(32).SetCellValue("Amount");
+        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 32, 32));
+
         ICellStyle border = hssfworkbook.CreateCellStyle();
         border.BorderBottom = border.BorderLeft
             = border.BorderRight
@@ -408,13 +418,28 @@ public class BaoGiaReport
         s1.SetColumnWidth(20, 3000);
         s1.SetColumnWidth(21, 4000);
 
-        s1.SetColumnWidth(24, 0);
-        s1.SetColumnWidth(25, 0);
-        s1.SetColumnWidth(26, 0);
-        s1.SetColumnWidth(27, 0);
-        s1.SetColumnWidth(28, 0);
-        s1.SetColumnWidth(29, 0);
-        s1.SetColumnWidth(30, 0);
+        s1.SetColumnWidth(24, 2000);
+        s1.SetColumnHidden(24, true);
+        s1.SetColumnWidth(25, 2000);
+        s1.SetColumnHidden(25, true);
+        s1.SetColumnWidth(26, 2000);
+        s1.SetColumnHidden(26, true);
+        s1.SetColumnWidth(27, 2000);
+        s1.SetColumnHidden(27, true);
+        s1.SetColumnWidth(28, 2000);
+        s1.SetColumnHidden(28, true);
+        s1.SetColumnWidth(29, 2000);
+        s1.SetColumnHidden(29, true);
+        s1.SetColumnWidth(30, 2000);
+        s1.SetColumnHidden(30, true);
+
+        s1.SetColumnWidth(31, 3000);
+        s1.SetColumnWidth(32, 4000);
+        if(!inCoGia)
+        {
+            s1.SetColumnHidden(31, true);
+            s1.SetColumnHidden(32, true);
+        }
 
         //SO
         ICellStyle cellNumBorder = hssfworkbook.CreateCellStyle();
@@ -537,17 +562,19 @@ public class BaoGiaReport
             s1.GetRow(rowDt).CreateCell(28).SetCellValue(double.Parse(dtDetails.Rows[i]["inner_"].ToString()));
             s1.GetRow(rowDt).CreateCell(29).SetCellValue(double.Parse(dtDetails.Rows[i]["sl_outer"].ToString()));
             s1.GetRow(rowDt).CreateCell(30).SetCellValue(dtDetails.Rows[i]["thanhphan"].ToString());
+            s1.GetRow(rowDt).CreateCell(31).SetCellValue(double.Parse(dtDetails.Rows[i]["qty"].ToString()));
+            s1.GetRow(rowDt).CreateCell(32).SetCellValue(double.Parse(dtDetails.Rows[i]["amount"].ToString()));
         }
 
         rowDt = row;
         for (int i = 0; i < dtDetails.Rows.Count; i++)
         {
             rowDt++;
-            for (int j = 0; j <= 30; j++)
+            for (int j = 0; j <= 32; j++)
             {
                 if (j == 0)
                     s1.GetRow(rowDt).GetCell(j).CellStyle = cellTextCenterBoderAll;
-                else if (new int[] { 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 27 }.Contains(j))
+                else if (new int[] { 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 27, 31, 32 }.Contains(j))
                 {
                     s1.GetRow(rowDt).GetCell(j).CellStyle = cellStyleRight;
                 }
@@ -573,6 +600,11 @@ public class BaoGiaReport
         row = rowDt + 1;
 
         s1.CreateRow(row).CreateCell(0).SetCellValue("Color References:");
+        string col31 = info.Alphabet[31], col32 = info.Alphabet[32];
+        s1.GetRow(row).CreateCell(31).SetCellFormula($@"SUM({col31}1:{col31}{row})");
+        s1.GetRow(row).GetCell(31).CellStyle = cellBold;
+        s1.GetRow(row).CreateCell(32).SetCellFormula($@"SUM({col32}1:{col32}{row})");
+        s1.GetRow(row).GetCell(32).CellStyle = cellBold;
         int lineNum = 2;
         for (int i = 0; i < dtDistinct.Rows.Count; i++)
         {
@@ -587,10 +619,15 @@ public class BaoGiaReport
             s1.CreateRow(row);
 
             var rowMS = row;
+            int cell = 0;
             for (int j = 0; j < items.Count; j++)
             {
-                if (j + 1 % 4 == 0 | j == 0)
+                int sodu = j;
+                var chiaHet = sodu % 4 == 0;
+                if (chiaHet | j == 0)
                 {
+                    cell = 0;
+                    rowMS = row;
                     for (var iR = 0; iR < lineNum; iR++)
                     {
                         row++;
@@ -599,15 +636,19 @@ public class BaoGiaReport
                             s1.GetRow(row).HeightInPoints = 70;
                     }
                 }
+                else
+                {
+                    cell++;
+                }
 
-                s1.GetRow(rowMS - 1).CreateCell(5 + j * 3).SetCellValue("Color " + items[j]["codemau"].ToString());
-                s1.GetRow(rowMS).CreateCell(5 + j * 3).SetCellValue(items[j]["mau"].ToString());
+                s1.GetRow(rowMS - 1).CreateCell(5 + cell * 3).SetCellValue("Color " + items[j]["codemau"].ToString());
+                s1.GetRow(rowMS).CreateCell(5 + cell * 3).SetCellValue(items[j]["mau"].ToString());
                 try
                 {
                     var imgPath = ExcuteSignalRStatic.getImageColor(items[j]["url"].ToString());
                     if (imgPath.StartsWith("Error"))
                     {
-                        s1.GetRow(rowMS + 1).CreateCell(5 + j * 3).SetCellValue(imgPath);
+                        s1.GetRow(rowMS + 1).CreateCell(5 + cell * 3).SetCellValue(imgPath);
                     }
                     else
                     {
@@ -619,9 +660,9 @@ public class BaoGiaReport
 
                         var patriarch = s1.CreateDrawingPatriarch();
                         var anchor = new HSSFClientAnchor(0, 0, 0, 0
-                            , 5 + j * 3
+                            , 5 + cell * 3
                             , rowMS + 1
-                            , 7 + j * 3
+                            , 7 + cell * 3
                             , rowMS + 2
                         );
                         anchor.AnchorType = 2;

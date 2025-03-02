@@ -150,6 +150,8 @@ public class QuotationQRDetailController : IHttpHandler
     public void del(HttpContext context)
     {
         string msg = "";
+        var exec = new ExcuteSignalR();
+        string username = UserUtils.getUser(context);
         String id = context.Request.Form["id"];
         var dbg = db.c_chitietbaogiaqrs.Where(s => s.c_chitietbaogiaqr_id == id).FirstOrDefault();
         if (dbg == null)
@@ -168,16 +170,10 @@ public class QuotationQRDetailController : IHttpHandler
         var sp = db.md_sanphams.Where(s => s.md_sanpham_id == dbg.md_sanpham_id).FirstOrDefault();
         if(sp != null)
         {
-            string maTho = sp.ma_sanpham.Substring(0, 9);
-            var spsCLs = from a in db.c_chitietbaogiaqrs
-                         join b in db.md_sanphams on a.md_sanpham_id equals b.md_sanpham_id
-                         where a.c_baogiaqr_id == bg.c_baogiaqr_id & b.ma_sanpham.StartsWith(maTho) & a.c_chitietbaogiaqr_id != dbg.c_chitietbaogiaqr_id
-                         select a;
-            if (spsCLs.ToList().Count <= 0)
-            {
-                var colors = db.md_color_references.Where(s => s.c_baogia_id == bg.c_baogiaqr_id & s.filter.StartsWith(maTho)).ToList();
-                db.md_color_references.DeleteAllOnSubmit(colors);
-            }
+            var spids = db.c_chitietbaogiaqrs.Where(s => s.c_baogiaqr_id == bg.c_baogiaqr_id).Select(s => s.md_sanpham_id).ToList();
+            var sps = db.md_sanphams.Where(s => spids.Contains(s.md_sanpham_id)).ToList();
+            sps.Remove(sp);
+            exec.createColorRefer(db, sps, bg.c_baogiaqr_id, username);
         }
 
         db.c_chitietbaogiaqrs.DeleteOnSubmit(dbg);

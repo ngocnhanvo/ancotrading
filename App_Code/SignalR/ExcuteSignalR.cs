@@ -18,8 +18,19 @@ public class ExcuteSignalR
     {
         string msg = "";
         var maThos = sps.Select(s => s.ma_sanpham.Substring(0, 12)).Distinct().ToList();
+        var maTho09s = sps.Select(s => s.ma_sanpham.Substring(0, 9)).Distinct().ToList();
         var filters = sps.Select(s => s.ma_sanpham.Substring(0, 9) + s.ma_sanpham.Substring(12, 2)).Distinct().ToList();
         var colorRefs = db.md_color_references.Where(s => s.c_baogia_id == baogiaId).ToList();
+        foreach(var colorRef in colorRefs)
+        {
+            string filter = colorRef.filter.Substring(0, 9);
+            if (!maTho09s.Contains(filter))
+            {
+                colorRefs.Remove(colorRef);
+            }
+        }
+        //colorRefs = colorRefs.Where(s => !maTho09s.Contains(s.filter.Substring(0, 9))).ToList();
+        //db.md_color_references.DeleteAllOnSubmit(colorRefs);
         var colorRefsAdd = new List<md_color_reference>();
 
         //db.md_color_references.DeleteAllOnSubmit(db.md_color_references.Where(s => s.c_baogia_id == baogiaId));
@@ -28,7 +39,11 @@ public class ExcuteSignalR
         {
             string cl = spMau.ma_sanpham.Substring(0, 2), dt = spMau.ma_sanpham.Substring(6, 2), ms = spMau.ma_sanpham.Substring(12, 2);
             var filter = spMau.ma_sanpham.Substring(0, 9) + ms;
-            if (!filters.Contains(filter))
+            if (filters.Contains(filter))
+            {
+                db.md_color_references.DeleteAllOnSubmit(colorRefs.Where(s => s.filter == filter));
+            }
+            else
             {
                 var colorRef = colorRefs.Where(s => s.c_baogia_id == baogiaId & s.filter == filter).FirstOrDefault();
                 if (colorRef == null)
@@ -48,6 +63,7 @@ public class ExcuteSignalR
                     colorRef.mota = "";
                     colorRef.hoatdong = false;
                     colorRefsAdd.Add(colorRef);
+                    colorRefs.Add(colorRef);
                 }
             }
         }

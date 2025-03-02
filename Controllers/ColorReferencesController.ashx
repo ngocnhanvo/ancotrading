@@ -45,8 +45,8 @@ public class ColorReferencesController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -59,12 +59,12 @@ public class ColorReferencesController : IHttpHandler
         m.mau = context.Request.Form["mau"];
         m.url = context.Request.Form["url"];
         m.filter = context.Request.Form["filter"];
-        
+
         m.mota = context.Request.Form["mota"];
         m.hoatdong = hd;
         m.ngaycapnhat = DateTime.Now;
         m.nguoicapnhat = UserUtils.getUser(context);
-        
+
         db.SubmitChanges();
     }
 
@@ -74,7 +74,7 @@ public class ColorReferencesController : IHttpHandler
         bool hd = false;
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-        
+
         md_color_reference mnu = new md_color_reference
         {
             md_color_reference_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
@@ -82,8 +82,8 @@ public class ColorReferencesController : IHttpHandler
             mau = context.Request.Form["mau"],
             url = context.Request.Form["url"],
             filter = context.Request.Form["filter"],
-            
-            
+
+
             mota = context.Request.Form["mota"],
             hoatdong = hd,
             nguoitao = UserUtils.getUser(context),
@@ -99,18 +99,64 @@ public class ColorReferencesController : IHttpHandler
 
     public void del(HttpContext context)
     {
-        String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-        String sql = "update md_color_reference set hoatdong = 0 where md_color_reference_id IN (" + id + ")";
-        mdbc.ExcuteNonQuery(sql);
+        //String id = context.Request.Form["id"];
+        //id = id.Insert(0, "'");
+        //id = id.Insert(id.Length, "'");
+        //id = id.Replace(",", "','");
+        //String sql = "update md_color_reference set hoatdong = 0 where md_color_reference_id IN (" + id + ")";
+        //mdbc.ExcuteNonQuery(sql);
+
+        string msg = "", trangthaiBG = "";
+        var ids = context.Request.Form["id"].removeAllSpaceOrTrimText(true).Split(',').Where(s => s != null).ToList();
+        var colors = db.md_color_references.Where(s => ids.Contains(s.md_color_reference_id)).ToList();
+        var bgId = colors.Select(s => s.c_baogia_id).FirstOrDefault();
+        var bg = db.c_baogias.Where(s => s.c_baogia_id == bgId).FirstOrDefault();
+        if(bg == null)
+        {
+            var bgqr = db.c_baogiaqrs.Where(s => s.c_baogiaqr_id == bgId).FirstOrDefault();
+            if(bgqr == null)
+            {
+                msg = "Không tìm thấy báo giá";
+                goto EndEventHandler;
+            }
+            else
+            {
+                trangthaiBG = bgqr.md_trangthai_id;
+            }
+        }
+        else
+        {
+            trangthaiBG = bg.md_trangthai_id;
+        }
+
+        if(!trangthaiBG.Contains(Helper.SOANTHAO))
+        {
+            msg = "Báo giá không ở trạng thái Soạn Thảo";
+            goto EndEventHandler;
+        }
+
+        foreach(var color in colors)
+        {
+            db.md_color_references.DeleteOnSubmit(color);
+        }
+        db.SubmitChanges();
+
+    EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void load(HttpContext context)
     {
         String quotationId = context.Request.QueryString["quotationId"];
-        
+
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
 
@@ -123,7 +169,7 @@ public class ColorReferencesController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
         String sqlCount = @"SELECT COUNT(1) AS count 
             FROM md_color_reference color with (nolock)
 			Left join c_baogia bg with (nolock) on color.c_baogia_id = bg.c_baogia_id
@@ -136,7 +182,7 @@ public class ColorReferencesController : IHttpHandler
         else {
             sqlCount = String.Format(sqlCount, 0, filter);
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -172,7 +218,7 @@ public class ColorReferencesController : IHttpHandler
 			 Left join c_baogia bg with (nolock) on bg.c_baogia_id = color.c_baogia_id 
              WHERE color.c_baogia_id = N'{0}' {1} 
              )P where RowNum > @start AND RowNum < @end ";
-        
+
         if (quotationId != null)
         {
             strsql = String.Format(strsql, quotationId, filter, sidx, sord);
@@ -181,7 +227,7 @@ public class ColorReferencesController : IHttpHandler
         {
             strsql = String.Format(strsql, 0, filter, sidx, sord);
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
