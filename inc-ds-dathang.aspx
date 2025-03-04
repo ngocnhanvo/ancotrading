@@ -1090,22 +1090,25 @@
             <uc1:jqGrid ID="grid_phidathang"
                 SortName="ngaytao"
                 SortOrder="ASC"
-                UrlFileAction="Controllers/PhiDathangController.ashx"
+                UrlFileAction="Controllers/PhiDatHangController.ashx"
                 RowNumbers="true"
-                OndblClickRow="function(rowid) { $(this).jqGrid('editGridRow', rowid,
-                                                    {
-                                                        afterSubmit: function(rs, postdata){
-                                                            return showMsgDialog(rs);
-                                                        }
-                                                        , beforeShowForm: function (formid) {
-                                                            formid.closest('div.ui-jqdialog').dialogCenter(); 
-                                                        }
-                                                        , errorTextFormat:function(data) { 
-                                                            return 'Lỗi: ' + data.responseText 
-                                                        }
+                OndblClickRow="
+                    function(rowid) { 
+                        $(this).jqGrid('editGridRow', rowid,
+                        {
+                            afterSubmit: function(rs, postdata){
+                                return showMsgDialog(rs);
+                            }
+                            , beforeShowForm: function (formid) {
+                                formid.closest('div.ui-jqdialog').dialogCenter(); 
+                            }
+                            , errorTextFormat:function(data) { 
+                                return 'Lỗi: ' + data.responseText 
+                            }
                                                         
-                                                    }
-                                                ); }"
+                        }); 
+                    }
+                "
                 ColModel="[
             {
                 name: 'c_phidathang_id'
@@ -1147,6 +1150,17 @@
                  , align: 'center'
                  , editoptions:{ value:'True:False', defaultValue: 'True' }
                  , formatter: 'checkbox'
+            },
+            {
+                name: 'trangthai'
+                , label: 'Trạng thái'
+                , index: 'tt.trangthai'
+                , stype: 'select'
+                , searchoptions:{sopt:['eq'], value:':[ALL];CHUAGUI:Chưi gửi;DAGUI:Đã gửi;DANHAN:Đã nhận;TUCHOI:Từ chối' }
+                , fixed:true 
+                , width: 100
+                , editable: false
+                , align: 'center'
             },
             {
                 name: 'ngaytao'

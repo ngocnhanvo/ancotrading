@@ -66,9 +66,10 @@ public class API_System : IHttpHandler
 
         if (File.Exists(path))
         {
+            string encodedFileName = Uri.EscapeDataString(name);
             context.Response.Clear();
             context.Response.Buffer = true;
-            context.Response.AddHeader("Content-Disposition", "attachment;filename=" + name);
+            context.Response.AddHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFileName);
             context.Response.Charset = "";
             context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
             context.Response.WriteFile(path);

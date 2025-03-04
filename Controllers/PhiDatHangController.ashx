@@ -174,8 +174,7 @@ public class PhiDatHangController : IHttpHandler
             filter = f.ToScript();
         }
 
-        String sqlCount = "SELECT COUNT(*) AS count FROM c_phidathang WHERE 1=1 {0} and c_danhsachdathang_id ='"+poId+"'";
-        sqlCount = String.Format(sqlCount, filter, poId);
+        string sqlCount = $@"SELECT COUNT(1) AS count FROM c_phidathang WHERE 1=1 {filter} and c_danhsachdathang_id ='{poId}'";
         
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
@@ -203,13 +202,17 @@ public class PhiDatHangController : IHttpHandler
             sidx = "bc.md_bocai_id";
         }
 
-        string strsql = "select * from( " +
-            " select bc.* " +
-            " , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            " FROM c_phidathang bc WHERE 1=1 {0} and c_danhsachdathang_id = '" +poId+"'"+
-            " )P where RowNum > @start AND RowNum < @end";
-        strsql = string.Format(strsql, filter);
-        System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
+        string strsql = $@"
+        select * from (
+            select bc.*, 
+                ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
+            FROM 
+                c_phidathang bc WHERE 1=1 {filter} and c_danhsachdathang_id = '{poId}'
+        )P 
+        where 
+        P.RowNum > @start AND P.RowNum < @end";
+
+        var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
         xml += "<page>" + page + "</page>";
@@ -222,6 +225,7 @@ public class PhiDatHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["c_danhsachdathang_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sotien"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["isphicong"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["trangthai"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
