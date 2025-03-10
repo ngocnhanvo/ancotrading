@@ -154,11 +154,16 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
             var rsps = new List<ThongTinSP>();
             List<md_sanpham> sps = null;
+            List<md_kieudang> kds = null;
             foreach(var key in context.Session.Keys)
             {
                 if(key.ToString() == "sps")
                 {
                     sps = context.Session["sps"] as List<md_sanpham>;
+                }
+                else if(key.ToString() == "kds")
+                {
+                    kds = context.Session["kds"] as List<md_kieudang>;
                 }
             }
 
@@ -171,11 +176,17 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 context.Session["sps"] = sps;
             }
 
+            if (kds == null | skip == 0)
+            {
+                kds = db.md_kieudangs.Where(s=>s.trangthai == Helper.HIEULUC).ToList();
+                context.Session["kds"] = kds;
+            }
+
             var continueStep = sps.Count > skip + take;
 
             foreach (var sp in sps.Skip(skip).Take(take))
             {
-                var item = dequyTTSP(sp, sps, true, true, true, result.dateStr, db);
+                var item = dequyTTSP(sp, sps, true, true, true, result.dateStr, db, kds);
                 var mabo = sp.ma_sanpham.Substring(9, 2).ToString();
                 var mabo_0 = mabo.Substring(0, 1).ToString();
 
@@ -199,7 +210,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
                 foreach (var spCai in spsCai)
                 {
-                    var itemCai = dequyTTSP(spCai, sps, false, true, false, result.dateStr, db);
+                    var itemCai = dequyTTSP(spCai, sps, false, true, false, result.dateStr, db, kds);
                     var maBT = spCai.ma_sanpham.Substring(9, 2);
                     if (bientaus2.Contains(maBT.Substring(0,1)))
                     {
@@ -261,7 +272,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         context.Response.Write(msg);
     }
 
-    public ThongTinSP dequyTTSP(md_sanpham sp, List<md_sanpham> sps, bool themDongGoi, bool themMau, bool themAnh, string dateStr, LinqDBDataContext db)
+    public ThongTinSP dequyTTSP(md_sanpham sp, List<md_sanpham> sps, bool themDongGoi, bool themMau, bool themAnh, string dateStr, LinqDBDataContext db, List<md_kieudang> kds)
     {
         string packing = "-", palletSize = "-", qtyCont = "-", cbm = "", price = "";
         ExcuteSignalRStatic.getDongGoiResult ttdg = null;
@@ -303,8 +314,8 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         item.price = price;
         item.amount = "1";
         item.cbm = cbm;
-        string kt = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
-        item.size = ExcuteSignalRStatic.getSizeRectOrRound(db,sp, kt);
+        string kt = $"{sp.l_cm}x{sp.w_cm}xH{sp.h_cm}cm";
+        item.size = ExcuteSignalRStatic.getSizeRectOrRound(db,sp, kt, kds);
         if (themAnh)
         {
             var imagePath = ExcuteSignalRStatic.mapPathSignalR($"~/{ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham)}");
@@ -325,7 +336,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
             var spsMau = sps.Where(s => s.ma_sanpham.StartsWith(maTho)).OrderBy(s => s.ma_sanpham).ToList();
             foreach (var spMau in spsMau)
             {
-                var itemMau = dequyTTSP(spMau, sps, false, false, false, dateStr, db);
+                var itemMau = dequyTTSP(spMau, sps, false, false, false, dateStr, db, kds);
                 item.colors.Add(itemMau);
             }
         }

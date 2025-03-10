@@ -434,11 +434,15 @@ public static class ExcuteSignalRStatic
         };
     }
 
-    public static string getSizeRectOrRound(LinqDBDataContext db, md_sanpham sp, string kichthuoc)
+    public static string getSizeRectOrRound(LinqDBDataContext db, md_sanpham sp, string kichthuoc, List<md_kieudang> kds = null)
     {
-        var kd = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.md_kieudang_id).Select(s => s.ma_kieudang).FirstOrDefault();
+        string kd = "";
+        if(kds == null)
+            kd = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.md_kieudang_id).Select(s => s.ma_kieudang).FirstOrDefault();
+        else
+            kd = kds.Where(s => s.md_kieudang_id == sp.md_kieudang_id).Select(s => s.ma_kieudang).FirstOrDefault();
 
-        if(kd == "ROU")
+        if (kd == "ROU")
         {
             kichthuoc = "D" + kichthuoc.Split('x')[0] + "x" + kichthuoc.Split('x')[2];
         }
