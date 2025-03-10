@@ -23,6 +23,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         public string amount { get; set; }
         public string cbm { get; set; }
         public string image { get; set; }
+        public string size { get; set; }
         public List<ThongTinSP> sizes { get; set; }
         public List<ThongTinSP> colors { get; set; }
     }
@@ -302,6 +303,8 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         item.price = price;
         item.amount = "1";
         item.cbm = cbm;
+        string kt = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
+        item.size = ExcuteSignalRStatic.getSizeRectOrRound(db,sp, kt);
         if (themAnh)
         {
             var imagePath = ExcuteSignalRStatic.mapPathSignalR($"~/{ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham)}");
