@@ -10,7 +10,6 @@ using System.Collections.Generic;
 
 public class TaoPhieuNhapKho : IHttpHandler
 {
-
     public void ProcessRequest(HttpContext context)
     {
         string action = context.Request.Form["action"].ToString();
@@ -26,6 +25,9 @@ public class TaoPhieuNhapKho : IHttpHandler
         {
             LinqDBDataContext db = new LinqDBDataContext();
             string jsondata = context.Request.Form["grid_form"].ToString();
+            string so_cont = context.Request.Form["so_cont"].removeAllSpaceOrTrimText(true);
+            string so_seal = context.Request.Form["so_seal"].removeAllSpaceOrTrimText(true);
+            string loai_cont = context.Request.Form["loai_cont"].removeAllSpaceOrTrimText(true);
             var dsdh = new c_danhsachdathang();
             string dsdh_id = "", diengiai = "";
             IList<JToken> tokenList = JToken.Parse(jsondata).ToList();
@@ -79,7 +81,8 @@ public class TaoPhieuNhapKho : IHttpHandler
                         {
                             c_dongnhapxuat sobj = new c_dongnhapxuat();
                             obj.c_donhang_id = item.c_donhang_id;
-                            sobj.c_dongnhapxuat_id = Security.EncodeMd5Hash(DateTime.Now.ToString() + item.c_dongdonhang_id);
+                            sobj.md_xuatban_id = item.md_xuatban_id;
+                            sobj.c_dongnhapxuat_id = Helper.getNewId();
                             sobj.c_nhapxuat_id = id;
                             sobj.c_dongdonhang_id = item.c_dongdonhang_id;
                             sobj.c_dongdsdh_id = item.c_dongdsdh_id;
@@ -141,7 +144,14 @@ public class TaoPhieuNhapKho : IHttpHandler
                     obj.sophieu = chungtu.tiento + "/" + chungtu.so_duocgan + "/" + chungtu.hauto;
                     chungtu.so_duocgan = chungtu.so_duocgan + 1;
                     obj.socontainer = 1;
-                    obj.loaicont = dh.loai_cont;
+                    obj.container = so_cont;
+                    obj.soseal = so_seal;
+                    var cont = new DataAcess.md_loaicont();
+                    var loaicont = cont.get().Where(s => s.ten == loai_cont).Select(s => s.ma).FirstOrDefault();
+                    if (string.IsNullOrWhiteSpace(loai_cont))
+                        obj.loaicont = dh.loai_cont;
+                    else
+                        obj.loaicont = loaicont;
 
                     md_kho kho = db.md_khos.Where(ct => !ct.md_kho_id.Equals("")).FirstOrDefault();
 

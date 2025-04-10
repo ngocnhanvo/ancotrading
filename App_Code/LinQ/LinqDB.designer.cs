@@ -1,4 +1,4 @@
-//Update at 28/02/2025 13:46:24
+//Update at 10/04/2025 14:42:54
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -12998,6 +12998,7 @@ private string _nguoicapnhat;
 private string _mota;
 private System.Nullable<bool> _hoatdong;
 private string _dongnhapxuat_ref;
+private string _md_xuatban_id;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -13042,6 +13043,8 @@ partial void OnhoatdongChanging(System.Nullable<bool> value);
 partial void OnhoatdongChanged();
 partial void Ondongnhapxuat_refChanging(string value);
 partial void Ondongnhapxuat_refChanged();
+partial void Onmd_xuatban_idChanging(string value);
+partial void Onmd_xuatban_idChanged();
 #endregion
 public c_dongnhapxuat()
 {
@@ -13424,6 +13427,25 @@ this.SendPropertyChanging();
 this._dongnhapxuat_ref = value;
 this.SendPropertyChanged("dongnhapxuat_ref");
 this.Ondongnhapxuat_refChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_md_xuatban_id", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @md_xuatban_id
+{
+get
+{
+return this._md_xuatban_id;
+}
+set
+{
+if ((this._md_xuatban_id != value))
+{
+this.Onmd_xuatban_idChanging(value);
+this.SendPropertyChanging();
+this._md_xuatban_id = value;
+this.SendPropertyChanged("md_xuatban_id");
+this.Onmd_xuatban_idChanged();
 }
 }
 }
@@ -22259,6 +22281,7 @@ private System.Nullable<bool> _hoatdong;
 private string _mota;
 private string _nguoicapnhat;
 private System.Nullable<bool> _sauHL;
+private string _trangthai;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -22285,6 +22308,8 @@ partial void OnnguoicapnhatChanging(string value);
 partial void OnnguoicapnhatChanged();
 partial void OnsauHLChanging(System.Nullable<bool> value);
 partial void OnsauHLChanged();
+partial void OntrangthaiChanging(string value);
+partial void OntrangthaiChanged();
 #endregion
 public c_phidathang()
 {
@@ -22496,6 +22521,25 @@ this.SendPropertyChanging();
 this._sauHL = value;
 this.SendPropertyChanged("sauHL");
 this.OnsauHLChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_trangthai", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @trangthai
+{
+get
+{
+return this._trangthai;
+}
+set
+{
+if ((this._trangthai != value))
+{
+this.OntrangthaiChanging(value);
+this.SendPropertyChanging();
+this._trangthai = value;
+this.SendPropertyChanged("trangthai");
+this.OntrangthaiChanged();
 }
 }
 }

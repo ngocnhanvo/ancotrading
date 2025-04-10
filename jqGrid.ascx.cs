@@ -25,6 +25,7 @@ public partial class jqGrid : System.Web.UI.UserControl
         , _showDel = "false"
         , _showSearch = "false"
         , _showView = "true"
+        , _showReorder = "true"
         , _showRefresh = "true"
         , _cellEdit = "false"
         , _afterRefresh = ""
@@ -437,6 +438,18 @@ public partial class jqGrid : System.Web.UI.UserControl
     {
         get { return _showDel; }
         set { _showDel = value; }
+    }
+
+    public String ShowView
+    {
+        get { return _showView; }
+        set { _showView = value; }
+    }
+
+    public String ShowReorder
+    {
+        get { return _showReorder; }
+        set { _showReorder = value; }
     }
 
     public String MultiSelect

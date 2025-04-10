@@ -140,13 +140,13 @@
     });
 
 
-    function funcCreatePI(postData) {
+    function funcCreatePNKfromPI(postData) {
         var msg = "";
         var gridData = jQuery("#grid_ds_dachon_taophieunhapxuat");
         var ids = gridData.jqGrid('getDataIDs');
 
         if (ids.length == 0) {
-            msg = "Hãy chọn danh sách sản phẩm mà bạn muốn tạo phiếu xuất.!";
+            msg = "Hãy chọn danh sách sản phẩm mà bạn muốn tạo phiếu nhập.!";
             // append dialog-taoky to body
             $('body').append('<div title="Thông Báo" id=\"dialog-taophieunhapxuat-tupi\"><h3>' + msg + '</h3></div>');
 
@@ -164,7 +164,7 @@
                 }
             });
         } else {
-            msg = "Có phải bạn muốn phiếu xuất từ danh sách sản phẩm này.?";
+            msg = "Có phải bạn muốn tạo phiếu nhập từ danh sách sản phẩm này.?";
             var p = '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><span id="dialog-caution">' + msg + '</span></p>';
             var h3 = '<h3 style="padding: 10px" class="ui-state-highlight ui-corner-all">' + p + '<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div></h3>';
 
@@ -236,8 +236,7 @@
     <uc1:jqGrid  ID="grid_ds_dathang_taophieunhapxuat" 
             Caption="Danh Sách Đặt Hàng"
             SortName="dsdh.c_danhsachdathang_id" 
-            UrlFileAction="Controllers/DanhSachDatHangTaoPhieuXuatController.ashx" 
-                        
+            UrlFileAction="Controllers/DanhSachDatHangTaoPhieuXuatController.ashx"       
 			AfterRefresh = "function(){ 
                 var gridData = jQuery('#grid_ds_dachon_chiatachpo')
                 var ids = gridData.jqGrid('getDataIDs');
@@ -646,7 +645,7 @@
 						var gridData = jQuery(this).getRowData();
                         var postData = JSON.stringify(gridData);
                         //alert(postData);
-                        funcCreatePI(postData);
+                        funcCreatePNKfromPI(postData);
                     }
                  });
              });

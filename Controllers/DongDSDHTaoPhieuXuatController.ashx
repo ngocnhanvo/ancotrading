@@ -2,17 +2,113 @@
 
 using System;
 using System.Web;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
 
 public class DongDSDHTaoPhieuXuatController : IHttpHandler {
+    private LinqDBDataContext db = new LinqDBDataContext();
 
     public void ProcessRequest(HttpContext context)
     {
-        this.load(context);
+        String action, oper;
+        action = context.Request.QueryString["action"];
+        oper = context.Request.Params["oper"];
+        switch (action)
+        {
+            default:
+                switch (oper)
+                {
+                    case "loadPXK":
+                        this.loadPXK(context);
+                        break;
+                    default:
+                        this.load(context);
+                        break;
+                }
+                break;
+        }
+    }
+
+    public void loadPXK(HttpContext context)
+    {
+        string msg = "";
+        string poId = context.Request.QueryString["poId"];
+        var item = new Dictionary<string, object>();
+        string madtkd = "ANCO1";
+        try
+        {
+            if (string.IsNullOrWhiteSpace(poId))
+                msg = "[]";
+            else
+            {
+                item["md_xuatban_id"] = poId;
+
+                msg = Extension.GetModule(
+                    Extension.API_ALL(madtkd) + "?oper=getPhieuXKsCDH",
+                                    item
+                                );
+            }
+
+            var datas = JsonConvert.DeserializeObject<List<DataAcess.md_xuatban_cdh>>(msg);
+            var dsdhId = datas.Select(s => s.c_danhsachdathang_id).FirstOrDefault();
+            var xbId = datas.Select(s => s.md_xuatban_id).FirstOrDefault();
+            var dhId = db.c_danhsachdathangs.Where(s => s.c_danhsachdathang_id == dsdhId).Select(s=>s.c_donhang_id).FirstOrDefault();
+            string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
+            xml += "<rows>";
+            xml += "<page>" + 1 + "</page>";
+            xml += "<total>" + 1 + "</total>";
+            xml += "<records>" + datas.Count + "</records>";
+            foreach (var row in datas)
+            {
+                var spid = db.md_sanphams.Where(s => s.ma_sanpham == row.md_sanpham_id).Select(s => s.md_sanpham_id).FirstOrDefault();
+                var ddh = db.c_dongdonhangs.Where(s => s.c_donhang_id == dhId & s.md_sanpham_id == spid).FirstOrDefault();
+                var ddsdh = db.c_dongdsdhs.Where(s => s.c_danhsachdathang_id == dsdhId & s.md_sanpham_id == spid).FirstOrDefault();
+                string c_dongdonhang_id = "", ma_sanpham_khach = "", ddsdhId = "";
+                decimal? soluong = null, soluong_dathang = null, soluong_conlai = null;
+                if(ddh != null)
+                {
+                    c_dongdonhang_id = ddh.c_dongdonhang_id;
+                    ma_sanpham_khach = ddh.ma_sanpham_khach;
+                }
+
+                if (ddsdh != null)
+                {
+                    ddsdhId = ddsdh.c_dongdsdh_id;
+                    soluong = ddsdh.sl_dathang;
+                    soluong_dathang = ddsdh.sl_dathang;
+                    soluong_conlai = ddsdh.sl_conlai;
+                }
+
+                xml += "<row>";
+                xml += "<cell><![CDATA[" + xbId + "]]></cell>";
+                xml += "<cell><![CDATA[" + dhId + "]]></cell>";
+                xml += "<cell><![CDATA[" + dsdhId + "]]></cell>";
+                xml += "<cell><![CDATA[" + c_dongdonhang_id + "]]></cell>";
+                xml += "<cell><![CDATA[" + ddsdhId + "]]></cell>";
+                xml += "<cell><![CDATA[" + spid + "]]></cell>";
+                xml += "<cell><![CDATA[" + row.md_sanpham_id + "]]></cell>";
+                xml += "<cell><![CDATA[" + ma_sanpham_khach + "]]></cell>";
+                xml += "<cell><![CDATA[" + soluong + "]]></cell>";
+                xml += "<cell><![CDATA[" + row.sl_nhapthucte.DropTrailingZeros() + "]]></cell>";
+                xml += "<cell><![CDATA[" + soluong_dathang + "]]></cell>";
+                xml += "<cell><![CDATA[" + soluong_conlai + "]]></cell>";
+                xml += "</row>";
+            }
+            xml += "</rows>";
+            msg = xml;
+        }
+        catch (Exception ex)
+        {
+            msg = ex.ToString();
+        }
+
+        context.Response.Write(msg);
     }
 
     public void load(HttpContext context)
     {
-        
+
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
 
@@ -112,7 +208,7 @@ public class DongDSDHTaoPhieuXuatController : IHttpHandler {
         xml += "</rows>";
         context.Response.Write(xml);
     }
- 
+
     public bool IsReusable {
         get {
             return false;
