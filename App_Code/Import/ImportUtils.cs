@@ -274,6 +274,12 @@ public static class ImportUtils
         return ms;
     }
 
+    public static md_phukien getPhuKien(String CodePK, String CodeChungLoai, String CodeDeTai)
+    {
+        md_phukien ms = db.md_phukiens.FirstOrDefault(p => p.code_pk.Equals(CodePK) && p.code_dt.Equals(CodeDeTai) && p.code_cl.Equals(CodeChungLoai));
+        return ms;
+    }
+
     public static md_hscode getHSCode(String maHsCode)
     {
         md_hscode hs = db.md_hscodes.FirstOrDefault(p => p.ma_hscode.Equals(maHsCode));
