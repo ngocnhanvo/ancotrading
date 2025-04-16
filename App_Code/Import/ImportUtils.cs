@@ -274,9 +274,9 @@ public static class ImportUtils
         return ms;
     }
 
-    public static md_phukien getPhuKien(String CodePK, String CodeChungLoai, String CodeDeTai)
+    public static md_phukien getPhuKien(String CodePK)
     {
-        md_phukien ms = db.md_phukiens.FirstOrDefault(p => p.code_pk.Equals(CodePK) && p.code_dt.Equals(CodeDeTai) && p.code_cl.Equals(CodeChungLoai));
+        md_phukien ms = db.md_phukiens.FirstOrDefault(p => p.code_pk.Equals(CodePK));
         return ms;
     }
 

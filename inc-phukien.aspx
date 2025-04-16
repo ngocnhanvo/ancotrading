@@ -189,21 +189,12 @@
         UrlFileAction="Controllers/PhuKienMainController.ashx" 
 		BtnPrint="funcPrintPhuKien"
         GridComplete = "var o = $(this).parent().parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 65);"
-        ColNames="['md_phukien_id', 'Trạng thái', 'Chủng loại', 'Đề tài', 'Code phụ kiện', 'Tên Tiếng Việt', 'Tên Tiếng Anh', 'Tên Tiếng Việt Dài', 'Tên Tiếng Anh Dài', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Ghi chú', 'Hoạt động']"
         RowNumbers="true"
         FilterToolbar="true"
 		FuncChangeStatus="ChangeStatusPhuKien"
-        OndblClickRow = "function(rowid) { /*$(this).jqGrid('editGridRow', rowid,{
-            beforeShowForm: function (formid) {
-            formid.closest('div.ui-jqdialog').dialogCenter(); 
-        }
-        , afterSubmit: function(rs, postdata) {
-            return showMsgDialog(rs);
-        }
-        , errorTextFormat:function(data) { 
-            return 'Lỗi: ' + data.responseText 
-        }
-        } );*/ }"
+        OndblClickRow = "function(rowid) {
+            $('#edit_grid_ds_phukienmain').click();
+        }"
         OnSelectRow = "
             function(ids) {
 		        if(ids != null) {
@@ -217,7 +208,9 @@
         "
         ColModel = "[
         {
-            fixed: true, name: 'md_phukien_id'
+            fixed: true
+            , name: 'md_phukien_id'
+            , label: 'md_phukien_id'
             , index: 'md_phukien_id'
             , width: 100
             , hidden: true 
@@ -226,7 +219,9 @@
             , key: true
         },
 		{
-            fixed: true, name: 'trangthai'
+            fixed: true
+            , name: 'trangthai'
+            , label: 'Trạng thái'
             , index: 'ms.trangthai'
             , width: 100
             , editable:false
@@ -238,27 +233,10 @@
             , viewable: false
             , sortable: true
         },
-		{
-			fixed: true, name: 'md_chungloai_id'
-			, index: 'cl.code_cl'
-			, editable: false
-			, align: 'center'
-			, width: 100
-			, edittype: 'text'
-			, hidden: false
-		},
-		{
-			fixed: true, name: 'md_detai_id'
-			, index: 'dt.code_dt'
-			, align: 'center'
-			, width: 100
-			, edittype: 'select'
-			, editable:true
-			, hidden: false
-			, editoptions: { dataUrl: 'Controllers/DeTaiMainController.ashx?action=getoption' }
-		},
         {
-            fixed: true, name: 'code_pk'
+            fixed: true
+            , name: 'code_pk'
+            , label: 'Mã phụ kiện'
             , index: 'code_pk'
 			, align: 'center'
             , editable: true
@@ -266,37 +244,26 @@
             , edittype: 'text'
         },
         {
-            fixed: true, name: 'tv_ngan'
+            fixed: true
+            , name: 'tv_ngan'
+            , label: 'Tên Tiếng Việt'
             , index: 'ms.tv_ngan'
             , editable: true
             , width: 250
             , edittype: 'text'
         },
         {
-            fixed: true, name: 'ta_ngan'
+            fixed: true
+            , name: 'ta_ngan'
+            , label: 'Tên Tiếng Anh'
             , index: 'ms.ta_ngan'
             , editable: true
             , width: 250
             , edittype: 'text'
         },
         {
-			fixed: true, name: 'tv_dai'
-			, index: 'ms.tv_dai'
-			, width: 250
-			, edittype: 'text'
-			, editable: false
-			, hidden: true
-        },
-        {
-            fixed: true, name: 'ta_dai'
-            , index: 'ms.ta_dai'
-            , width: 250
-            , edittype: 'text'
-            , editable:false
-			, hidden: true
-        },
-        {
             fixed: true, name: 'ngaytao'
+            , label: 'Ngày tạo'
             , index: 'ms.ngaytao'
             , width: 100
             , editable:false
@@ -305,6 +272,7 @@
         },
         {
             fixed: true, name: 'nguoitao'
+            , label: 'Người tạo'
             , index: 'ms.nguoitao'
             , width: 100
             , editable:false
@@ -313,6 +281,7 @@
         },
         {
             fixed: true, name: 'ngaycapnhat'
+            , label: 'Ngày cập nhật'
             , index: 'ms.ngaycapnhat'
             , width: 100
             , editable:false
@@ -321,6 +290,7 @@
         },
         {
             fixed: true, name: 'nguoicapnhat'
+            , label: 'Người cập nhật'
             , index: 'ms.nguoicapnhat'
             , width: 100
             , editable:false
@@ -329,6 +299,7 @@
         },
         {
             fixed: true, name: 'mota'
+            , label: 'Mô tả'
             , index: 'ms.mota'
             , width: 100
             , editable:true
@@ -337,6 +308,7 @@
         },
         {
             fixed: true, name: 'hoatdong', hidden: true
+            , label: 'Hoạt động'
             , index: 'ms.hoatdong'
             , width: 100
             , editable:true

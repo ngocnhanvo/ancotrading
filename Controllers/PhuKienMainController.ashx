@@ -194,15 +194,15 @@ public class PhuKienMainController : IHttpHandler
         { hd = true; }
 
         String parDeTai_Id = context.Request.Form["md_detai_id"];
-        var code_cl_dt = db.md_detais.Where(dt=>dt.md_detai_id.Equals(parDeTai_Id)).Select(s=>new { s.code_dt, s.code_cl, s.md_chungloai_id }).FirstOrDefault();
+        //var code_cl_dt = db.md_detais.Where(dt=>dt.md_detai_id.Equals(parDeTai_Id)).Select(s=>new { s.code_dt, s.code_cl, s.md_chungloai_id }).FirstOrDefault();
 
         var m = db.md_phukiens.Single(p => p.md_phukien_id == context.Request.Form["id"]);
         //m.md_phukien_id = context.Request.Form["md_mausac_id"];
-        m.md_chungloai_id = code_cl_dt.md_chungloai_id;
-        m.md_detai_id = parDeTai_Id;
+        //m.md_chungloai_id = code_cl_dt.md_chungloai_id;
+        //m.md_detai_id = parDeTai_Id;
         m.code_pk = context.Request.Form["code_pk"];
-        m.code_cl = code_cl_dt.code_cl;
-        m.code_dt = code_cl_dt.code_dt;
+        //m.code_cl = code_cl_dt.code_cl;
+        //m.code_dt = code_cl_dt.code_dt;
         m.tv_ngan = context.Request.Form["tv_ngan"];
         m.ta_ngan = context.Request.Form["ta_ngan"];
         m.tv_dai = context.Request.Form["tv_dai"];
@@ -229,11 +229,11 @@ public class PhuKienMainController : IHttpHandler
         var mnu = new md_phukien
         {
             md_phukien_id = Helper.getNewId(),
-            md_chungloai_id = code_cl_dt.md_chungloai_id,
+            //md_chungloai_id = code_cl_dt.md_chungloai_id,
             md_detai_id = parDeTai_Id,
             code_pk = context.Request.Form["code_pk"],
-            code_cl = code_cl_dt.code_cl,
-            code_dt = code_cl_dt.code_dt,
+            //code_cl = code_cl_dt.code_cl,
+            //code_dt = code_cl_dt.code_dt,
             tv_ngan = context.Request.Form["tv_ngan"],
             ta_ngan = context.Request.Form["ta_ngan"],
             tv_dai = context.Request.Form["tv_dai"],
@@ -348,13 +348,9 @@ public class PhuKienMainController : IHttpHandler
             xml += "<row>";
             xml += "<cell><![CDATA[" + row["md_phukien_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["trangthai"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["code_cl"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["code_dt"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["code_pk"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tv_ngan"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ta_ngan"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["tv_dai"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["ta_dai"] + "]]></cell>";
 			
 			if(row["ngaytao"].ToString() != null & row["ngaytao"].ToString() != "")
 				xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
