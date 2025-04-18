@@ -48,23 +48,25 @@ public class HangHoaImportController : IHttpHandler
                 if(next == true) {
                     String cellMaKD = row.GetCell(1).Value == null ? String.Empty : row.GetCell(1).Value.ToString();
                     String cellMaCN = row.GetCell(2).Value == null ? String.Empty : row.GetCell(2).Value.ToString();
-                    String cellMaDVT = row.GetCell(3).Value == null ? String.Empty : row.GetCell(3).Value.ToString();
-                    decimal cellL = row.GetCell(4).Value == null ? 0 : decimal.Parse(row.GetCell(4).Value.ToString());
-                    decimal cellW = row.GetCell(5).Value == null ? 0 : decimal.Parse(row.GetCell(5).Value.ToString());
-                    decimal cellH = row.GetCell(6).Value == null ? 0 : decimal.Parse(row.GetCell(6).Value.ToString());
-                    decimal cellTrongLuong = row.GetCell(7).Value == null ? 0 : decimal.Parse(row.GetCell(7).Value.ToString());
-                    decimal cellDienTich = row.GetCell(8).Value == null ? 0 : decimal.Parse(row.GetCell(8).Value.ToString());
-                    decimal cellTheTich = row.GetCell(9).Value == null ? 0 : decimal.Parse(row.GetCell(9).Value.ToString());
-                    String cellMaNhomNangLuc = row.GetCell(10).Value == null ? String.Empty : row.GetCell(10).Value.ToString();
-                    String cellMaCangBien = row.GetCell(11).Value == null ? String.Empty : row.GetCell(11).Value.ToString();
-                    //String cellMaDongGoi = row.GetCell(11).Value == null ? String.Empty : row.GetCell(11).Value.ToString();
-                    String cellNhaCungUng = row.GetCell(12).Value == null ? String.Empty : row.GetCell(12).Value.ToString();
-                    String cellHSCode = row.GetCell(13).Value == null ? String.Empty : row.GetCell(13).Value.ToString();
-                    String cellTrangThai = row.GetCell(14).Value == null ? String.Empty : row.GetCell(14).Value.ToString();
-                    String cellChucNangSP = row.GetCell(15).Value == null ? String.Empty : row.GetCell(15).Value.ToString();
-                    String cellNgayXacNhan = row.GetCell(16).Value == null ? String.Empty : row.GetCell(16).Value.ToString();
-                    String cellHinhThucBan = row.GetCell(17).Value == null ? String.Empty : row.GetCell(17).Value.ToString();
-                    String cellGhiChu = row.GetCell(18).Value == null ? String.Empty : row.GetCell(18).Value.ToString();
+                    String cellMaPK = row.GetCell(3).Value == null ? String.Empty : row.GetCell(3).Value.ToString();
+                    String cellMaDVT = row.GetCell(4).Value == null ? String.Empty : row.GetCell(4).Value.ToString();
+                    decimal cellL = row.GetCell(5).Value == null ? 0 : decimal.Parse(row.GetCell(5).Value.ToString());
+                    decimal cellW = row.GetCell(6).Value == null ? 0 : decimal.Parse(row.GetCell(6).Value.ToString());
+                    decimal cellH = row.GetCell(7).Value == null ? 0 : decimal.Parse(row.GetCell(7).Value.ToString());
+                    decimal cellTrongLuong = row.GetCell(8).Value == null ? 0 : decimal.Parse(row.GetCell(8).Value.ToString());
+                    decimal cellDienTich = row.GetCell(9).Value == null ? 0 : decimal.Parse(row.GetCell(9).Value.ToString());
+                    decimal cellTheTich = row.GetCell(10).Value == null ? 0 : decimal.Parse(row.GetCell(10).Value.ToString());
+                    String cellMaNhomNangLuc = row.GetCell(11).Value == null ? String.Empty : row.GetCell(11).Value.ToString();
+                    String cellMaCangBien = row.GetCell(12).Value == null ? String.Empty : row.GetCell(12).Value.ToString();
+                    String cellNhaCungUng = row.GetCell(13).Value == null ? String.Empty : row.GetCell(13).Value.ToString();
+                    String cellHSCode = row.GetCell(14).Value == null ? String.Empty : row.GetCell(14).Value.ToString();
+                    String cellTrangThai = row.GetCell(15).Value == null ? String.Empty : row.GetCell(15).Value.ToString();
+                    String cellChucNangSP = row.GetCell(16).Value == null ? String.Empty : row.GetCell(16).Value.ToString();
+                    String cellNgayXacNhan = row.GetCell(17).Value == null ? String.Empty : row.GetCell(17).Value.ToString();
+                    String cellHinhThucBan = row.GetCell(18).Value == null ? String.Empty : row.GetCell(18).Value.ToString();
+                    String cellGhiChu = row.GetCell(19).Value == null ? String.Empty : row.GetCell(19).Value.ToString();
+
+                    var pk = ImportUtils.getPhuKien(cellMaPK);
                     md_kieudang kd = ImportUtils.getKieuDang(cellMaKD);
                     md_chucnang cn = ImportUtils.getChucNang(cellMaCN);
                     md_donvitinhsanpham dvt = ImportUtils.getDonViTinhSanPham(cellMaDVT);
@@ -165,12 +167,13 @@ public class HangHoaImportController : IHttpHandler
 
                     if (next)
                     {
+                        string pkid = pk == null ? "" : pk.md_phukien_id;
                         // Import san pham
                         md_sanpham sp = ImportUtils.getSanPham(cellMaHH);
                         HangHoaImport import = new HangHoaImport(cellMaHH, cl.md_chungloai_id, kd.md_kieudang_id, cn.md_chucnang_id,
                             dvt.md_donvitinhsanpham_id, cellL, cellW, cellH, cellTrongLuong, cellDienTich, cellTheTich, nnl.md_nhomnangluc_id,
                             cb.md_cangbien_id, dtkd.md_doitackinhdoanh_id, hscode.md_hscode_id,
-                            cellTrangThai, cellChucNangSP, cellNgayXacNhan, cellHinhThucBan, cellGhiChu);
+                            cellTrangThai, cellChucNangSP, cellNgayXacNhan, cellHinhThucBan, cellGhiChu, pkid);
 
                         if (sp == null)
                         {
@@ -218,7 +221,7 @@ public class HangHoaImportController : IHttpHandler
             }
             catch (Exception ex)
             {
-                context.Response.Write(String.Format("<div style=\"color:red\">Dòng {0} xảy ra lỗi {1}</div>", i + 1, ex.Message));
+                context.Response.Write(String.Format("<div style=\"color:red\">Dòng {0} xảy ra lỗi {1}</div>", i + 1, ex.ToString()));
             }
         }
 
@@ -229,7 +232,7 @@ public class HangHoaImportController : IHttpHandler
             {
                 Row row = cellCollection.Rows[i];
                 String cellMaHH = row.GetCell(0).Value == null ? String.Empty : row.GetCell(0).Value.ToString();
-                decimal cellL = row.GetCell(4).Value == null ? 0 : decimal.Parse(row.GetCell(4).Value.ToString());
+                decimal cellL = row.GetCell(5).Value == null ? 0 : decimal.Parse(row.GetCell(5).Value.ToString());
                 md_sanpham sp = ImportUtils.getSanPham(cellMaHH);
                 if (sp != null)
                 {

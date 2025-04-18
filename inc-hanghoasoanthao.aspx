@@ -338,6 +338,24 @@
                 , editrules:{ required:true }
             },
             {
+                fixed: true, name: 'md_phukien_id'
+                , label: 'Tên PK'
+                , index: 'pk.tv_ngan'
+                , width: 50
+                , edittype: 'select'
+                , editable:true
+                , editrules : { required:true, edithidden:true }
+                , editoptions: { dataUrl: 'Controllers/PhuKienMainController.ashx?action=getoption' }
+            },
+            {
+                fixed: true, name: 'code_pk'
+                , label: 'Mã PK'
+                , index: 'pk.code_pk'
+                , width: 50
+                , edittype: 'text'
+                , editable:false
+            },
+            {
                 fixed: true, name: 'mota_tiengviet'
                 , label: 'Mô tả TV'
                 , index: 'sp.mota_tiengviet'

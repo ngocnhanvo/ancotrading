@@ -180,7 +180,7 @@ public class PhuKienMainController : IHttpHandler
 
     public void getSelectOption(HttpContext context)
     {
-        String sql = "select md_mausac_id, code_mau from md_mausac where hoatdong = 1 order by code_mau desc";
+        String sql = "select md_phukien_id, tv_ngan from md_phukien order by code_pk asc";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }

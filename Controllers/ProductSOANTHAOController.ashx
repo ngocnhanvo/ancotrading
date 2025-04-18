@@ -363,6 +363,7 @@ public class ProductSOANTHAOController : IHttpHandler
             //m.mota_tienganh = context.Request.Form["mota_tienganh"];
             m.md_chucnang_id = context.Request.Form["md_chucnang_id"];
             m.md_kieudang_id = context.Request.Form["md_kieudang_id"];
+            m.md_phukien_id = context.Request.Form["md_phukien_id"];
             //m.chucnang_tiengviet = context.Request.Form["chucnang_tiengviet"];
             //m.chucnang_tienganh = context.Request.Form["chucnang_tienganh"];
 
@@ -534,6 +535,7 @@ public class ProductSOANTHAOController : IHttpHandler
 	            left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
 	            left join md_kieudang kd on sp.md_kieudang_id = kd.md_kieudang_id
                 left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id
+                left join md_phukien pk on sp.md_phukien_id = pk.md_phukien_id
             WHERE 
 	            1=1
                 {0}
@@ -574,6 +576,8 @@ public class ProductSOANTHAOController : IHttpHandler
 	                , kd.ma_kieudang as ma_kd
 	                , cn.ten_tv as ten_cn
 	                , cn.ma_chucnang as ma_cn
+                    , pk.tv_ngan
+                    , pk.code_pk
 	                , dvt.ten_dvt as tendvt
 	                , sp.mota_tiengviet,  sp.mota_tienganh
 	                , sp.L_inch, sp.W_inch, sp.H_inch, sp.L_cm, sp.W_cm, sp.H_cm, sp.Trongluong, sp.dientich, sp.thetich
@@ -591,7 +595,8 @@ public class ProductSOANTHAOController : IHttpHandler
 	                left join md_cangbien cb on sp.md_cangbien_id = cb.md_cangbien_id
 	                left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
 	                left join md_kieudang kd on sp.md_kieudang_id = kd.md_kieudang_id                     
-                    left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id	            
+                    left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id	
+                    left join md_phukien pk on sp.md_phukien_id = pk.md_phukien_id
                 WHERE 
 	                1=1 {2}
                     AND sp.hoatdong = 1 

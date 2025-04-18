@@ -1,4 +1,4 @@
-//Update at 11/04/2025 13:37:51
+//Update at 19/04/2025 01:23:59
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -41109,6 +41109,7 @@ private string _inoutdoorWeb;
 private string _hinhanh;
 private string _hinhanhWeb;
 private System.Nullable<bool> _laMacon;
+private string _md_phukien_id;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -41203,6 +41204,8 @@ partial void OnhinhanhWebChanging(string value);
 partial void OnhinhanhWebChanged();
 partial void OnlaMaconChanging(System.Nullable<bool> value);
 partial void OnlaMaconChanged();
+partial void Onmd_phukien_idChanging(string value);
+partial void Onmd_phukien_idChanged();
 #endregion
 public md_sanpham()
 {
@@ -42060,6 +42063,25 @@ this.SendPropertyChanging();
 this._laMacon = value;
 this.SendPropertyChanged("laMacon");
 this.OnlaMaconChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_md_phukien_id", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @md_phukien_id
+{
+get
+{
+return this._md_phukien_id;
+}
+set
+{
+if ((this._md_phukien_id != value))
+{
+this.Onmd_phukien_idChanging(value);
+this.SendPropertyChanging();
+this._md_phukien_id = value;
+this.SendPropertyChanged("md_phukien_id");
+this.Onmd_phukien_idChanged();
 }
 }
 }

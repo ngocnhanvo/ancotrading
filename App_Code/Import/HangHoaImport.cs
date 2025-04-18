@@ -16,7 +16,7 @@ public class HangHoaImport : ImportOriginal
 {
     private decimal l, w, h, trongLuong, dienTich, theTich;
     private String maHangHoa, maChungLoai, maKieuDang, maChucNang, maDonViTinh, maNhomNangLuc, 
-        maCangBien, maNhaCungUng, maHSCode, trangThai, ghiChu, chucNangSP, ngayXacNhan, hinhThucBan;
+        maCangBien, maNhaCungUng, maHSCode, trangThai, ghiChu, chucNangSP, ngayXacNhan, hinhThucBan, pkid;
 
 	public String GhiChu
     {
@@ -142,12 +142,12 @@ public class HangHoaImport : ImportOriginal
         , decimal dienTich
         , decimal theTich
         , String md_nhomnangluc_id, String md_cangbien_id, String md_doitackinhdoanh_id, String md_hscode_id, 
-        String trangthai, String chucnangsp, String ngayXacNhan, String hinhThucBan, String ghichu)
+        String trangthai, String chucnangsp, String ngayXacNhan, String hinhThucBan, String ghichu, string pkid)
         : this(maHangHoa, md_chungloai_id, md_kieudang_id, md_chucnang_id, md_donvitinhsanpham_id, l, w, h, trongLuong
               , dienTich
               , theTich
               , md_nhomnangluc_id, md_cangbien_id, md_doitackinhdoanh_id, md_hscode_id, trangthai, 
-             chucnangsp, ngayXacNhan, hinhThucBan, ghichu, DateTime.Now, "admin", DateTime.Now, "admin", true)
+             chucnangsp, ngayXacNhan, hinhThucBan, ghichu, pkid, DateTime.Now, "admin", DateTime.Now, "admin", true)
     {
 
     }
@@ -157,9 +157,9 @@ public class HangHoaImport : ImportOriginal
         , decimal dienTich
         , decimal theTich
         , String md_nhomnangluc_id
-        , String md_cangbien_id, 
-        String md_doitackinhdoanh_id, String md_hscode_id, String trangthai, String chucnangsp, String ngayXacNhan, String hinhThucBan, String ghichu
-        , DateTime ngayTao, String nguoiTao, DateTime ngayCapNhat, String nguoiCapNhat, bool hoatDong)
+        , String md_cangbien_id
+        , String md_doitackinhdoanh_id, String md_hscode_id, String trangthai, String chucnangsp, String ngayXacNhan, String hinhThucBan, String ghichu
+        , string pkid, DateTime ngayTao, String nguoiTao, DateTime ngayCapNhat, String nguoiCapNhat, bool hoatDong)
     {
         this.maHangHoa = maHangHoa;
         this.maChungLoai = md_chungloai_id;
@@ -172,6 +172,7 @@ public class HangHoaImport : ImportOriginal
         this.trongLuong = trongLuong;
         this.dienTich = dienTich;
         this.theTich = theTich;
+        this.pkid = pkid;
         this.maNhomNangLuc = md_nhomnangluc_id;
         this.maCangBien = md_cangbien_id;
         this.maNhaCungUng = md_doitackinhdoanh_id;
@@ -205,6 +206,7 @@ public class HangHoaImport : ImportOriginal
         sp.md_kieudang_id = maKieuDang;
         sp.md_chucnang_id = maChucNang;
         sp.md_chungloai_id = maChungLoai;
+        sp.md_phukien_id = pkid;
         sp.md_donvitinhsanpham_id = maDonViTinh;
         sp.l_cm = l;
         sp.h_cm = h;
@@ -246,6 +248,7 @@ public class HangHoaImport : ImportOriginal
         md_sanpham o = db.md_sanphams.FirstOrDefault(p => p.ma_sanpham.Equals(maHangHoa));
         o.md_kieudang_id = maKieuDang;
         o.md_chucnang_id = maChucNang;
+        o.md_phukien_id = pkid;
         o.md_donvitinhsanpham_id = maDonViTinh;
         o.l_cm = l;
         o.w_cm = w;
