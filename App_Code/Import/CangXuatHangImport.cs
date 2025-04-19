@@ -53,18 +53,30 @@ public class CangXuatHangImport : ImportOriginal
 
     public void Import()
     {
-        String insert = "insert into md_cangxuathang(md_cangxuathang_id, md_sanpham_id, md_cangbien_id, macdinh, ngaytao, nguoitao, ngaycapnhat, nguoicapnhat, hoatdong) values( " +
-            " (select RIGHT(sys.fn_sqlvarbasetostr(HashBytes('MD5', CAST(GETDATE() as nvarchar(32)) + CAST(NEWID() as nvarchar(255)) )),32)) " +
-            " , @md_sanpham_id, @md_cangbien_id, @macdinh, @ngaytao, @nguoitao, @ngaycapnhat, @nguoicapnhat, @hoatdong)";
-        mdbc.ExcuteNonQuery(insert
-            , "@md_sanpham_id", maSanPham 
-            , "@md_cangbien_id", maCangBien
-            , "@macdinh", true
-            , "@ngaytao", ngayTao
-            , "@nguoitao", nguoiTao
-            , "@ngaycapnhat", ngayCapNhat
-            , "@nguoicapnhat", nguoiCapNhat
-            , "@hoatdong", hoatDong);
+        var cxh = new md_cangxuathang();
+        cxh.md_cangxuathang_id = Helper.getNewId();
+        cxh.md_sanpham_id = maSanPham;
+        cxh.md_cangbien_id = maCangBien;
+        cxh.macdinh = true;
+        cxh.ngaytao = ngayTao;
+        cxh.ngaycapnhat = ngayCapNhat;
+        cxh.nguoitao = nguoiTao;
+        cxh.nguoicapnhat = nguoiCapNhat;
+        cxh.hoatdong = hoatDong;
+        db.md_cangxuathangs.InsertOnSubmit(cxh);
+        db.SubmitChanges();
+        //String insert = "insert into md_cangxuathang(md_cangxuathang_id, md_sanpham_id, md_cangbien_id, macdinh, ngaytao, nguoitao, ngaycapnhat, nguoicapnhat, hoatdong) values( " +
+        //    " (select RIGHT(sys.fn_sqlvarbasetostr(HashBytes('MD5', CAST(GETDATE() as nvarchar(32)) + CAST(NEWID() as nvarchar(255)) )),32)) " +
+        //    " , @md_sanpham_id, @md_cangbien_id, @macdinh, @ngaytao, @nguoitao, @ngaycapnhat, @nguoicapnhat, @hoatdong)";
+        //mdbc.ExcuteNonQuery(insert
+        //    , "@md_sanpham_id", maSanPham 
+        //    , "@md_cangbien_id", maCangBien
+        //    , "@macdinh", true
+        //    , "@ngaytao", ngayTao
+        //    , "@nguoitao", nguoiTao
+        //    , "@ngaycapnhat", ngayCapNhat
+        //    , "@nguoicapnhat", nguoiCapNhat
+        //    , "@hoatdong", hoatDong);
     }
 
     LinqDBDataContext db = new LinqDBDataContext();

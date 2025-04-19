@@ -624,6 +624,8 @@ public class ProductSOANTHAOController : IHttpHandler
             xml += "<cell><![CDATA[" + row["ma_kd"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_cn"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_cn"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tv_ngan"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["code_pk"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["mota_tiengviet"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["mota_tienganh"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tendvt"] + "]]></cell>";
