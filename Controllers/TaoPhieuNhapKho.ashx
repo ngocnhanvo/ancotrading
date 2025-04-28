@@ -99,7 +99,12 @@ public class TaoPhieuNhapKho : IHttpHandler
                             sobj.slthuc_nhapxuat = item.sl_nhapthucte;
                             sobj.sl_dathang = item.sl_dathang;
                             sobj.dongia = db.c_dongdsdhs.Single(ddh => ddh.c_dongdsdh_id.Equals(item.c_dongdsdh_id)).gianhap;
-
+                            sobj.sl_inner = item.sl_inner;
+                            sobj.dvt_inner = item.dvt_inner;
+                            sobj.sl_outer = item.sl_outer;
+                            sobj.dvt_outer = item.dvt_outer;
+                            sobj.tenkien = item.tenkien;
+                            sobj.sokien = item.sokien;
                             sobj.hoatdong = true;
                             sobj.ngaytao = DateTime.Now;
                             sobj.ngaycapnhat = DateTime.Now;

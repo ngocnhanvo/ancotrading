@@ -1,4 +1,4 @@
-//Update at 19/04/2025 01:23:59
+//Update at 29/04/2025 03:01:10
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -13009,6 +13009,12 @@ private string _mota;
 private System.Nullable<bool> _hoatdong;
 private string _dongnhapxuat_ref;
 private string _md_xuatban_id;
+private System.Nullable<decimal> _sl_inner;
+private System.Nullable<decimal> _sl_outer;
+private string _dvt_inner;
+private string _dvt_outer;
+private string _tenkien;
+private System.Nullable<decimal> _sokien;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -13055,6 +13061,18 @@ partial void Ondongnhapxuat_refChanging(string value);
 partial void Ondongnhapxuat_refChanged();
 partial void Onmd_xuatban_idChanging(string value);
 partial void Onmd_xuatban_idChanged();
+partial void Onsl_innerChanging(System.Nullable<decimal> value);
+partial void Onsl_innerChanged();
+partial void Onsl_outerChanging(System.Nullable<decimal> value);
+partial void Onsl_outerChanged();
+partial void Ondvt_innerChanging(string value);
+partial void Ondvt_innerChanged();
+partial void Ondvt_outerChanging(string value);
+partial void Ondvt_outerChanged();
+partial void OntenkienChanging(string value);
+partial void OntenkienChanged();
+partial void OnsokienChanging(System.Nullable<decimal> value);
+partial void OnsokienChanged();
 #endregion
 public c_dongnhapxuat()
 {
@@ -13456,6 +13474,120 @@ this.SendPropertyChanging();
 this._md_xuatban_id = value;
 this.SendPropertyChanged("md_xuatban_id");
 this.Onmd_xuatban_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_sl_inner", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @sl_inner
+{
+get
+{
+return this._sl_inner;
+}
+set
+{
+if ((this._sl_inner != value))
+{
+this.Onsl_innerChanging(value);
+this.SendPropertyChanging();
+this._sl_inner = value;
+this.SendPropertyChanged("sl_inner");
+this.Onsl_innerChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_sl_outer", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @sl_outer
+{
+get
+{
+return this._sl_outer;
+}
+set
+{
+if ((this._sl_outer != value))
+{
+this.Onsl_outerChanging(value);
+this.SendPropertyChanging();
+this._sl_outer = value;
+this.SendPropertyChanged("sl_outer");
+this.Onsl_outerChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_dvt_inner", DbType="Nvarchar(100)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @dvt_inner
+{
+get
+{
+return this._dvt_inner;
+}
+set
+{
+if ((this._dvt_inner != value))
+{
+this.Ondvt_innerChanging(value);
+this.SendPropertyChanging();
+this._dvt_inner = value;
+this.SendPropertyChanged("dvt_inner");
+this.Ondvt_innerChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_dvt_outer", DbType="Nvarchar(100)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @dvt_outer
+{
+get
+{
+return this._dvt_outer;
+}
+set
+{
+if ((this._dvt_outer != value))
+{
+this.Ondvt_outerChanging(value);
+this.SendPropertyChanging();
+this._dvt_outer = value;
+this.SendPropertyChanged("dvt_outer");
+this.Ondvt_outerChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tenkien", DbType="Nvarchar(100)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @tenkien
+{
+get
+{
+return this._tenkien;
+}
+set
+{
+if ((this._tenkien != value))
+{
+this.OntenkienChanging(value);
+this.SendPropertyChanging();
+this._tenkien = value;
+this.SendPropertyChanged("tenkien");
+this.OntenkienChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_sokien", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @sokien
+{
+get
+{
+return this._sokien;
+}
+set
+{
+if ((this._sokien != value))
+{
+this.OnsokienChanging(value);
+this.SendPropertyChanging();
+this._sokien = value;
+this.SendPropertyChanged("sokien");
+this.OnsokienChanged();
 }
 }
 }

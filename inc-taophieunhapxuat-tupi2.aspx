@@ -673,7 +673,67 @@
                     , sortable: false
                     , align: 'right'
                     , label: 'SL còn lại'
-                } 
+                },
+                {
+                    fixed: true, name: 'sl_inner'
+                    , index: 'sl_inner'
+                    , width: 80
+                    , editable: false
+                    , edittype: 'text'
+                    , sortable: false
+                    , align: 'right'
+                    , label: 'SL inner'
+                },
+                {
+                    fixed: true, name: 'dvt_inner'
+                    , index: 'dvt_inner'
+                    , width: 80
+                    , editable: false
+                    , edittype: 'text'
+                    , sortable: false
+                    , align: 'center'
+                    , label: 'Đvt inner'
+                },
+                {
+                    fixed: true, name: 'sl_outer'
+                    , index: 'sl_outer'
+                    , width: 80
+                    , editable: false
+                    , edittype: 'text'
+                    , sortable: false
+                    , align: 'right'
+                    , label: 'SL outer'
+                },
+                {
+                    fixed: true, name: 'dvt_inner'
+                    , index: 'dvt_inner'
+                    , width: 80
+                    , editable: false
+                    , edittype: 'text'
+                    , sortable: false
+                    , align: 'center'
+                    , label: 'Đvt outer'
+                },
+                {
+                    fixed: true, name: 'tenkien'
+                    , index: 'tenkien'
+                    , width: 100
+                    , editable: false
+                    , edittype: 'text'
+                    , sortable: false
+                    , align: 'center'
+                    , label: 'Tên kiện'
+                },
+                {
+                    fixed: true, name: 'sokien'
+                    , index: 'sokien'
+                    , width: 80
+                    , editable: false
+                    , edittype: 'text'
+                    , sortable: false
+                    , align: 'right'
+                    , label: 'Số kiện'
+                }
             ]"
             ShowRefresh="false"
             ShowSearch="false"

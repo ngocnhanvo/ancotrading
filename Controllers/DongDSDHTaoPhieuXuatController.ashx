@@ -93,6 +93,12 @@ public class DongDSDHTaoPhieuXuatController : IHttpHandler {
                 xml += "<cell><![CDATA[" + row.sl_nhapthucte.DropTrailingZeros() + "]]></cell>";
                 xml += "<cell><![CDATA[" + soluong_dathang + "]]></cell>";
                 xml += "<cell><![CDATA[" + soluong_conlai + "]]></cell>";
+                xml += "<cell><![CDATA[" + row.sl_inner + "]]></cell>";
+                xml += "<cell><![CDATA[" + row.dvt_inner + "]]></cell>";
+                xml += "<cell><![CDATA[" + row.sl_outer + "]]></cell>";
+                xml += "<cell><![CDATA[" + row.dvt_outer + "]]></cell>";
+                xml += "<cell><![CDATA[" + row.tenkien + "]]></cell>";
+                xml += "<cell><![CDATA[" + row.sokien + "]]></cell>";
                 xml += "</row>";
             }
             xml += "</rows>";
