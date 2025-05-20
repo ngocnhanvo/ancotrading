@@ -648,6 +648,177 @@
                         funcCreatePNKfromPI(postData);
                     }
                  });
+
+                 $("#grid_ds_dathang_taophieunhapxuat").jqGrid('navButtonAdd', '#grid_ds_dathang_taophieunhapxuat-pager', {
+                     caption: "",
+                     title: "Tạo phiếu nhập từ Excel",
+                     buttonicon: "icon-pi",
+                     onClickButton: function () {
+                         let idsel = $("#grid_ds_dathang_taophieunhapxuat").jqGrid('getGridParam', 'selrow');
+                         let data = $("#grid_ds_dathang_taophieunhapxuat").getRowData(idsel);
+                         console.log(data);
+                         let dsdhid = data.c_danhsachdathang_id;
+                         if (!dsdhid) {
+                             alert(`Chưa chọn đơn đặt hàng`);
+                             return;
+                         }
+
+                        $('body').append(`
+                            <div title="Nhập liệu từ excel" id="dialog-taophieunhapxuat-tuexcel">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td>
+                                            <div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a style="float:right;color:blue;cursor:pointer;" target="_blank" href="ExcelImport/0-Phiếu nhập kho.xls">Tải về mẫu nhập liệu</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input id="file-taophieunhapxuat-tuexcel" type="file" accept=".xls,.xlsx" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div style="padding-top:10px;" class="divResult"></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        `);
+
+                        let $div = $('#dialog-taophieunhapxuat-tuexcel'), $divRS = $div.find('.divResult');
+                        let $btnSelFile = $('#file-taophieunhapxuat-tuexcel');
+                        let $btnOK, $btnCancel;
+                        let postData = [], so_cont = '', so_seal = '', loai_cont = '';
+                        // create new dialog
+                        $div.dialog({
+                            modal: true,
+                            width: window.innerWidth >= 650 ? 600 : window.innerWidth - 50,
+                            height: window.innerHeight - window.innerHeight/3,
+                            close: function (event, ui) {
+                                $(this).dialog("destroy").remove();
+                            },
+                            open: function (event, ui) {
+                                $btnOK = $('#btn-ok-taophieunhapxuat-tuexcel');
+                                $btnCancel = $('#btn-cancel-taophieunhapxuat-tuexcel');
+
+                                $btnOK.button('option', 'disabled', true);
+                                $btnSelFile.click(function () {
+                                    $btnSelFile.val('');
+                                });
+                                $btnSelFile.change(function () {
+                                    try {
+                                        let trTHall = ``, trTDall = ``;
+                                        taptin = this.files[0];
+                                        excelToJSON.parseExcel(taptin, function () {
+                                            let json = excelToJSON.json[0];
+                                            jsonFromFile = json;
+                                            let columns = [];
+                                            for (let i in json) {
+                                                let row = json[i];
+
+                                                if (columns.length <= 0)
+                                                    columns = Object.keys(row);
+
+                                                postData.push({
+                                                    md_xuatban_id: '',
+                                                    c_donhang_id: '',
+                                                    c_danhsachdathang_id: dsdhid,
+                                                    c_dongdonhang_id: '',
+                                                    c_dongdsdh_id: '',
+                                                    md_sanpham_id: '',
+                                                    ma_sanpham: row[columns[3]],
+                                                    ma_sanpham_khach: row[columns[4]],
+                                                    sl_po: 0,
+                                                    sl_nhapthucte: row[columns[9]],
+                                                    sl_dathang: 0,
+                                                    sl_conlai: 0,
+                                                    sl_inner: row[columns[5]],
+                                                    dvt_inner: row[columns[6]],
+                                                    sl_outer: row[columns[7]],
+                                                    dvt_outer: row[columns[8]],
+                                                    tenkien: row[columns[10]],
+                                                    sokien: row[columns[11]]
+                                                });
+                                                
+
+                                                let trTH = ``, trTD = ``,
+                                                    thS = 'border-width:thin; border-style:solid; padding:3px;',
+                                                    tdS = 'border-width:thin; border-style:solid; padding:3px;';
+                                                for (let ic in columns) {
+                                                    let cn = columns[ic];
+                                                    if (i == 0)
+                                                        trTH += `<th style="${thS}">${cn}</th>`;
+
+                                                    trTD += `<td style="${tdS}">${typeof(row[cn]) == 'undefined' ? "" : row[cn]}</td>`;
+                                                }
+
+                                                if (i == 0) {
+                                                    trTHall = `<tr>${trTH}</tr>`;
+                                                    so_cont = row[columns[0]];
+                                                    loai_cont = row[columns[1]];
+                                                    so_seal = row[columns[2]]; 
+                                                }
+                                                trTDall += `<tr>${trTD}</tr>`;
+                                            }
+                                            $divRS.html(`<table style="width:100%;">${trTHall}${trTDall}</table>`);
+                                            $btnOK.button('option', 'disabled', false);
+                                        });
+                                    }
+                                    catch (r) {
+                                        console.error(r);
+                                        taptin = null;
+                                        jsonFromFile = [];
+                                        $divRS.html('');
+                                    }
+                                });
+                            },
+                            buttons: [
+                                {
+                                    id: "btn-ok-taophieunhapxuat-tuexcel",
+                                    text: "Có",
+                                    click: function () {
+                                        if (postData.length <= 0) {
+                                            alert('Không tìm thấy dữ liệu đã chọn');
+                                            return;
+                                        }
+                                        $btnSelFile.val('');
+                                        $("#wait").css("display", "block");
+                                        $btnOK.button('option', 'disabled', true);
+                                        $btnCancel.button('option', 'disabled', true);
+
+                                        $.ajax({
+                                            url: "Controllers/TaoPhieuNhapKho.ashx",
+                                            type: "POST",
+                                            datetype: "json",
+                                            data: { grid_form: JSON.stringify(postData), action: "TaoPhieuNhap", so_cont: so_cont, so_seal: so_seal, loai_cont: loai_cont },
+                                            error: function (rs) {
+                                                Popup("Error", 500, 400, rs.responseText);
+                                            },
+                                            success: function (rs) {
+                                                postData = [];
+                                                $divRS.html(rs);
+                                                $("#wait").css("display", "none");
+                                                $btnCancel.button('option', 'disabled', false);
+                                            }
+                                        });
+                                    }
+                                },
+                                {
+                                    id: "btn-cancel-taophieunhapxuat-tuexcel",
+                                    text: "Không",
+                                    click: function() {
+                                        $(this).dialog("destroy").remove();
+                                    }
+                                }
+                            ]
+                        });
+                    }
+                 });
              });
         </script>
         <table class="ui-layout-center" id="grid_ds_dachon_taophieunhapxuat"></table>

@@ -705,7 +705,7 @@
                     , label: 'SL outer'
                 },
                 {
-                    fixed: true, name: 'dvt_inner'
+                    fixed: true, name: 'dvt_outer'
                     , index: 'dvt_inner'
                     , width: 80
                     , editable: false

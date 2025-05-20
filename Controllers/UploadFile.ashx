@@ -43,7 +43,7 @@ public class UploadFile : IHttpHandler
                 var rgxSanPhamF = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-F[0-9]$");
                 var rgxDeTai = new Regex("^[0-9][0-9]-[0-9][0-9]$");
                 var rgxMauSac = new Regex("^[0-9][0-9]-[0-9][0-9]-[0-9][0-9]$");
-                var rgxMauSac2 = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-[0-9][0-9]$");
+                var rgxMauSac2 = new Regex("^[0-9][0-9]-[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]-[0-9a-zA-Z][0-9a-zA-Z]$");
                 var rgxMauSac3 = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-F[0-9]-[0-9][0-9]$");
                 var rgxMauSac4 = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-G[0-9]-[0-9][0-9]$");
                 if (rgxDeTai.IsMatch(filterName))
