@@ -713,7 +713,7 @@ public class BaoGiaReport
 
         row++;
         s1.CreateRow(row).CreateCell(0).SetCellValue("");
-        s1.GetRow(row).CreateCell(1).SetCellValue("Order of 1x20\" can be accepted, but if the value is under 8000 USD, the extra charge of 250 USD will be added into the proforma invoice/commercial invoice");
+        s1.GetRow(row).CreateCell(1).SetCellValue(@"Order of 1x20"" can be accepted, but the extra charge of 250 USD will be added into the proforma invoice / commercial invoice");
         s1.GetRow(row).GetCell(1).CellStyle = celltext;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
 
