@@ -20,7 +20,7 @@ public static class Helper
     public static string HUY = "HUY";
     public static string NK = "NK";
     public static string XK = "XK";
-    public static string HDBS = "HDBS", HDDG = "HDDG", HDCT = "HDCT", HDTEM_BAOBI = "HDTEM-BAOBI";
+    public static string HDBS = "HDBS", HDDG = "HDDG", HDCT = "HDCT", HDTEM_BAOBI = "HDTEM-BAOBI", PYCM = "PYCM";
     #endregion bien toan cuc
 
     public static void removeFileWithPath(string path)

@@ -1,4 +1,4 @@
-//Update at 29/04/2025 03:01:10
+//Update at 09/06/2025 14:40:48
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -15000,6 +15000,7 @@ private System.Nullable<bool> _phanbodiscount;
 private string _c_danhsachdathang_id;
 private string _sct_dsdh;
 private System.Nullable<bool> _chuyenphiDSDH;
+private string _loai;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -15120,6 +15121,8 @@ partial void Onsct_dsdhChanging(string value);
 partial void Onsct_dsdhChanged();
 partial void OnchuyenphiDSDHChanging(System.Nullable<bool> value);
 partial void OnchuyenphiDSDHChanged();
+partial void OnloaiChanging(string value);
+partial void OnloaiChanged();
 #endregion
 public c_donhang()
 {
@@ -16224,6 +16227,25 @@ this.SendPropertyChanging();
 this._chuyenphiDSDH = value;
 this.SendPropertyChanged("chuyenphiDSDH");
 this.OnchuyenphiDSDHChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_loai", DbType="Nvarchar(50)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @loai
+{
+get
+{
+return this._loai;
+}
+set
+{
+if ((this._loai != value))
+{
+this.OnloaiChanging(value);
+this.SendPropertyChanging();
+this._loai = value;
+this.SendPropertyChanged("loai");
+this.OnloaiChanged();
 }
 }
 }
@@ -20848,7 +20870,7 @@ this.Onmd_kho_idChanged();
 }
 }
 }
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_soseal", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_soseal", DbType="Nvarchar(255)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
 public string @soseal
 {
 get

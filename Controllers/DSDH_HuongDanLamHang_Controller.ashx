@@ -66,10 +66,26 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             string title = $@"", body = $@"";
             var coDG = tts.Where(s => s.tentaptin.StartsWith(Helper.HDDG)).Count() > 0;
             var coBB = tts.Where(s => s.tentaptin.StartsWith(Helper.HDTEM_BAOBI)).Count() > 0;
-            if (coDG & coBB)
+            var coYCM = tts.Where(s => s.tentaptin.StartsWith(Helper.PYCM)).Count() > 0;
+            if (coDG & coBB & coYCM)
+            {
+                title = $@"Hướng dẩn bổ sung đóng gói, bao bì và phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
+                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói, bao bì và phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            }
+            else if (coDG & coBB)
             {
                 title = $@"Hướng dẩn bổ sung đóng gói và bao bì cho đơn hàng {dsdh.so_po}";
                 body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói và bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            }
+            else if (coDG & coYCM)
+            {
+                title = $@"Hướng dẩn bổ sung đóng gói và phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
+                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói và phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            }
+            else if (coBB & coYCM)
+            {
+                title = $@"Hướng dẫn tem, bao bì và phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
+                body = $@"<div>Tập tin đính kèm là phần hướng dẫn tem, bao bì và phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
             }
             else if (coDG)
             {
@@ -78,8 +94,13 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             }
             else if (coBB)
             {
-                title = $@"Hướng dẫn tem,bao bì cho đơn hàng {dsdh.so_po}";
-                body = $@"<div>Tập tin đính kèm là phần hướng dẫn tem,bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+                title = $@"Hướng dẫn tem, bao bì cho đơn hàng {dsdh.so_po}";
+                body = $@"<div>Tập tin đính kèm là phần hướng dẫn tem, bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            }
+            else if (coYCM)
+            {
+                title = $@"Phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
+                body = $@"<div>Tập tin đính kèm là phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
             }
 
             var attachments = new List<System.Net.Mail.Attachment>();
@@ -260,9 +281,9 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
                 {
                     msg += $@"<div error style='color:red'>{fileName}: phải là word hoặc excel</div>";
                 }
-                else if (!name.StartsWith(Helper.HDDG) & !name.StartsWith(Helper.HDTEM_BAOBI))
+                else if (!name.StartsWith(Helper.HDDG) & !name.StartsWith(Helper.HDTEM_BAOBI) & !name.StartsWith(Helper.PYCM))
                 {
-                    msg += $@"<div error style='color:red'>{fileName}: tên phải bắt đầu bằng {Helper.HDDG} hoặc {Helper.HDTEM_BAOBI}</div>";
+                    msg += $@"<div error style='color:red'>{fileName}: tên phải bắt đầu bằng {Helper.HDDG}, {Helper.HDTEM_BAOBI} hoặc {Helper.PYCM}</div>";
                 }
                 else
                 {

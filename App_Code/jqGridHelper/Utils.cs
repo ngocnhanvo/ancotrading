@@ -79,7 +79,7 @@ namespace jqGridHelper
 
 
 
-        public static string taoChungTuPO(string md_doitackinhdoanh_id, int isdonhangmau, string namchungtu)
+        public static string taoChungTuPO(string md_doitackinhdoanh_id, int isdonhangmau, string namchungtu, string loaiDH = "")
         {
             LinqDBDataContext db = new LinqDBDataContext();
             string result = "";
@@ -118,7 +118,10 @@ namespace jqGridHelper
                 namht = item[2].ToString();
                 namct = item[3].ToString();
             }
-           
+
+            if (!string.IsNullOrWhiteSpace(loaiDH))
+                makhachhang = makhachhang + "_" + loaiDH;
+
             if (isdonhangmau == 0)//la don hang cua khach
             {
 

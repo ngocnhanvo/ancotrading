@@ -163,7 +163,7 @@ public class DonHangController : IHttpHandler
             string msg = "";
             string id = context.Request.QueryString["poId"];
             c_donhang dh = db.c_donhangs.Where(p => p.c_donhang_id.Equals(id)).FirstOrDefault();
-            string sochungtu = jqGridHelper.Utils.taoChungTuPO(dh.md_doitackinhdoanh_id, dh.donhang_mau == true ? 1 : 0, DateTime.Now.Year.ToString());
+            string sochungtu = jqGridHelper.Utils.taoChungTuPO(dh.md_doitackinhdoanh_id, dh.donhang_mau == true ? 1 : 0, DateTime.Now.Year.ToString(), dh.loai);
 
             string sqlCount = @"select count(b.trangthai) as count from c_dongdonhang a left join md_sanpham b on a.md_sanpham_id = b.md_sanpham_id where a.c_donhang_id  = '" + id + @"' and b.trangthai != 'DHD'";
 
@@ -829,6 +829,7 @@ public class DonHangController : IHttpHandler
             string msg = "";
             int check = 0;
             int donhangmau_ = 0;
+            String loaiDH = context.Request.Form["loai"];
             String dh_mau = context.Request.Form["donhang_mau"].ToLower();
             String dagui_mail = context.Request.Form["dagui_mail"].ToLower();
             String donhang_tmp = context.Request.Form["isdonhangtmp"].ToLower();
@@ -902,7 +903,7 @@ public class DonHangController : IHttpHandler
                 {
                     c_donhang mnu = new c_donhang();
                     mnu.c_donhang_id = ImportUtils.getNEWID();
-
+                    mnu.loai = loaiDH;
                     mnu.md_trangthai_id = "SOANTHAO";
                     mnu.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
                     mnu.c_baogia_id = context.Request.Form["c_baogia_id"];
@@ -942,7 +943,7 @@ public class DonHangController : IHttpHandler
                     }
 
                     mnu.md_banggia_id = context.Request.Form["md_banggia_id"];
-                    mnu.sochungtu = jqGridHelper.Utils.taoChungTuPO(context.Request.Form["md_doitackinhdoanh_id"], donhangmau_, mnu.ngaylap.Value.Year.ToString());
+                    mnu.sochungtu = jqGridHelper.Utils.taoChungTuPO(context.Request.Form["md_doitackinhdoanh_id"], donhangmau_, mnu.ngaylap.Value.Year.ToString(), loaiDH);
 
                     mnu.chuyenphiDSDH = chuyenphiDSDH;
                     mnu.phanbodiscount = phanbodiscount;
@@ -1354,6 +1355,7 @@ public class DonHangController : IHttpHandler
             dh.chkPBGCu,
             dh.phienbangiacu,
             dh.ghichu,
+            dh.loai,
             dh.phanbodiscount,
             dh.chuyenphiDSDH,
             dh.discount_hehang,
@@ -1416,6 +1418,7 @@ public class DonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["contle"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["dagui_mail"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ismakepi"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["loai"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";

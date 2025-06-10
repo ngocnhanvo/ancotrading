@@ -1478,6 +1478,20 @@
                  , formoptions: { colpos: 1, rowpos: 23 }
                  , hidden: true
             },
+             {
+                 name: 'loai'   
+                 , label: 'Loại ĐH'
+                 , align: 'center'
+                 , index: 'loai'
+                 , editable: true
+                 , fixed:true , width: 50
+                 , edittype: 'select'
+                 , align: 'center'
+                 , editoptions: {style:'width:150px', value: ':Bình thường;PTSP:Phát triển sản phẩm' }
+                 , formoptions: { colpos: 1, rowpos: 29 }
+                 , hidden: true
+                 , editrules: { edithidden: true }
+            },
             {
                 name: 'ngaytao'
                 , label: 'Ngày tạo'
@@ -1692,6 +1706,7 @@
                     var frmID = '#' + formid.attr('id');
 					$('#gia_db', frmID).prop('disabled', false);
 					$('#donhang_mau', frmID).prop('disabled', false);
+                    $('#loai', frmID).prop('disabled', false);
 					$('#chkPBGCu', frmID).prop('disabled', false);
                     ShowPBGCu_grid_ds_po(frmID);
                     disableSelOption('#md_cangbien_id', frmID, false);
@@ -1713,6 +1728,7 @@
 					var frmID = '#' + formid.attr('id');
                     $('#gia_db', frmID).prop('disabled', true);
 					$('#donhang_mau', frmID).prop('disabled', true);
+                    $('#loai', frmID).prop('disabled', true);
 					$('#chkPBGCu', frmID).prop('disabled', true);
                     ShowPBGCu_grid_ds_po(frmID);
                     disableSelOption('#md_cangbien_id', frmID, true);
