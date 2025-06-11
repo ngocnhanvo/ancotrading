@@ -64,44 +64,89 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).FirstOrDefault();
 
             string title = $@"", body = $@"";
+            var arr = new List<string>();
             var coDG = tts.Where(s => s.tentaptin.StartsWith(Helper.HDDG)).Count() > 0;
             var coBB = tts.Where(s => s.tentaptin.StartsWith(Helper.HDTEM_BAOBI)).Count() > 0;
             var coYCM = tts.Where(s => s.tentaptin.StartsWith(Helper.PYCM)).Count() > 0;
-            if (coDG & coBB & coYCM)
+            var coPTSP = tts.Where(s => s.tentaptin.StartsWith(Helper.PTSP)).Count() > 0;
+
+            if (coDG)
+                arr.Add("đóng gói");
+            if (coDG)
+                arr.Add("tem, bao bì");
+            if (coYCM)
+                arr.Add("phiếu yêu cầu mẫu");
+            if (coPTSP)
+                arr.Add("phiếu phát triển sản phẩm");
+
+            var count = arr.Count;
+            for(var i = 0; i < count; i++)
             {
-                title = $@"Hướng dẩn bổ sung đóng gói, bao bì và phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
-                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói, bao bì và phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+                if (i == 0)
+                {
+                    title = "Hướng dẫn bổ sung";
+                    body = "<div>Tập tin đính kèm là phần hướng dẫn";
+                }
+                if (i < count)
+                {
+                    title += " ";
+                    title += arr[i];
+                    title += ",";
+                    body += " ";
+                    body += arr[i];
+                    body += ",";
+                }
+                else
+                {
+                    title += " và ";
+                    title += arr[i];
+                    title += $"cho đơn hàng {dsdh.so_po}";
+                    body += " và ";
+                    body += arr[i];
+                    body += $"cho đơn hàng số: {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+                }
             }
-            else if (coDG & coBB)
-            {
-                title = $@"Hướng dẩn bổ sung đóng gói và bao bì cho đơn hàng {dsdh.so_po}";
-                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói và bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
-            }
-            else if (coDG & coYCM)
-            {
-                title = $@"Hướng dẩn bổ sung đóng gói và phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
-                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói và phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
-            }
-            else if (coBB & coYCM)
-            {
-                title = $@"Hướng dẫn tem, bao bì và phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
-                body = $@"<div>Tập tin đính kèm là phần hướng dẫn tem, bao bì và phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
-            }
-            else if (coDG)
-            {
-                title = $@"Hướng dẫn đóng gói cho đơn hàng {dsdh.so_po}";
-                body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
-            }
-            else if (coBB)
-            {
-                title = $@"Hướng dẫn tem, bao bì cho đơn hàng {dsdh.so_po}";
-                body = $@"<div>Tập tin đính kèm là phần hướng dẫn tem, bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
-            }
-            else if (coYCM)
-            {
-                title = $@"Phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
-                body = $@"<div>Tập tin đính kèm là phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
-            }
+
+            //if (coDG & coBB & coPTSP)
+            //{
+            //    title = $@"Hướng dẩn bổ sung đóng gói, bao bì và phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
+            //    body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói, bao bì và phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            //}
+            //if (coDG & coBB & coYCM)
+            //{
+            //    title = $@"Hướng dẩn bổ sung đóng gói, bao bì và phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
+            //    body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói, bao bì và phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            //}
+            //else if (coDG & coBB)
+            //{
+            //    title = $@"Hướng dẩn bổ sung đóng gói và bao bì cho đơn hàng {dsdh.so_po}";
+            //    body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói và bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            //}
+            //else if (coDG & coYCM)
+            //{
+            //    title = $@"Hướng dẩn bổ sung đóng gói và phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
+            //    body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói và phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            //}
+            //else if (coBB & coYCM)
+            //{
+            //    title = $@"Hướng dẫn tem, bao bì và phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
+            //    body = $@"<div>Tập tin đính kèm là phần hướng dẫn tem, bao bì và phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            //}
+            //else if (coDG)
+            //{
+            //    title = $@"Hướng dẫn đóng gói cho đơn hàng {dsdh.so_po}";
+            //    body = $@"<div>Tập tin đính kèm là phần hướng dẫn đóng gói cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            //}
+            //else if (coBB)
+            //{
+            //    title = $@"Hướng dẫn tem, bao bì cho đơn hàng {dsdh.so_po}";
+            //    body = $@"<div>Tập tin đính kèm là phần hướng dẫn tem, bao bì cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            //}
+            //else if (coYCM)
+            //{
+            //    title = $@"Phiếu yêu cầu mẫu cho đơn hàng {dsdh.so_po}";
+            //    body = $@"<div>Tập tin đính kèm là phiếu yêu cầu mẫu cho đơn hàng số : {dsdh.so_po} của DSDH số {dsdh.sochungtu}.</div>";
+            //}
 
             var attachments = new List<System.Net.Mail.Attachment>();
             foreach (var tt in tts)
@@ -281,9 +326,9 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
                 {
                     msg += $@"<div error style='color:red'>{fileName}: phải là word hoặc excel</div>";
                 }
-                else if (!name.StartsWith(Helper.HDDG) & !name.StartsWith(Helper.HDTEM_BAOBI) & !name.StartsWith(Helper.PYCM))
+                else if (!name.StartsWith(Helper.HDDG) & !name.StartsWith(Helper.HDTEM_BAOBI) & !name.StartsWith(Helper.PYCM) & !name.StartsWith(Helper.PTSP))
                 {
-                    msg += $@"<div error style='color:red'>{fileName}: tên phải bắt đầu bằng {Helper.HDDG}, {Helper.HDTEM_BAOBI} hoặc {Helper.PYCM}</div>";
+                    msg += $@"<div error style='color:red'>{fileName}: tên phải bắt đầu bằng {Helper.HDDG}, {Helper.HDTEM_BAOBI}, {Helper.PYCM} hoặc {Helper.PTSP}</div>";
                 }
                 else
                 {
