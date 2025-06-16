@@ -128,6 +128,15 @@ public class TaoPhieuNhapKho : IHttpHandler
                             sobj.dvt_outer = item.dvt_outer;
                             sobj.tenkien = item.tenkien;
                             sobj.sokien = item.sokien;
+                            sobj.nw = item.nw;
+                            sobj.gw = item.gw;
+                            sobj.cbm = item.cbm;
+                            sobj.l_inner = item.l_inner;
+                            sobj.w_inner = item.w_inner;
+                            sobj.h_inner = item.h_inner;
+                            sobj.l_master = item.l_master;
+                            sobj.w_master = item.w_master;
+                            sobj.h_master = item.h_master;
                             sobj.hoatdong = true;
                             sobj.ngaytao = DateTime.Now;
                             sobj.ngaycapnhat = DateTime.Now;

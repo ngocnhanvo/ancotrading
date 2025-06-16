@@ -741,8 +741,17 @@
                                                     dvt_inner: row[columns[6]],
                                                     sl_outer: row[columns[7]],
                                                     dvt_outer: row[columns[8]],
-                                                    tenkien: row[columns[10]],
-                                                    sokien: row[columns[11]]
+                                                    sokien: row[columns[10]],
+                                                    tenkien: row[columns[11]],
+                                                    nw: row[columns[12]],
+                                                    gw: row[columns[13]],
+                                                    cbm: row[columns[14]],
+                                                    l_inner: row[columns[15]],
+                                                    w_inner: row[columns[16]],
+                                                    h_inner: row[columns[17]],
+                                                    l_master: row[columns[18]],
+                                                    w_master: row[columns[19]],
+                                                    h_master: row[columns[20]]
                                                 });
                                                 
 

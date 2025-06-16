@@ -1,4 +1,4 @@
-//Update at 09/06/2025 14:40:48
+//Update at 16/06/2025 09:06:06
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -13015,6 +13015,15 @@ private string _dvt_inner;
 private string _dvt_outer;
 private string _tenkien;
 private System.Nullable<decimal> _sokien;
+private System.Nullable<decimal> _l_inner;
+private System.Nullable<decimal> _w_inner;
+private System.Nullable<decimal> _h_inner;
+private System.Nullable<decimal> _l_master;
+private System.Nullable<decimal> _w_master;
+private System.Nullable<decimal> _h_master;
+private System.Nullable<decimal> _nw;
+private System.Nullable<decimal> _gw;
+private System.Nullable<decimal> _cbm;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -13073,6 +13082,24 @@ partial void OntenkienChanging(string value);
 partial void OntenkienChanged();
 partial void OnsokienChanging(System.Nullable<decimal> value);
 partial void OnsokienChanged();
+partial void Onl_innerChanging(System.Nullable<decimal> value);
+partial void Onl_innerChanged();
+partial void Onw_innerChanging(System.Nullable<decimal> value);
+partial void Onw_innerChanged();
+partial void Onh_innerChanging(System.Nullable<decimal> value);
+partial void Onh_innerChanged();
+partial void Onl_masterChanging(System.Nullable<decimal> value);
+partial void Onl_masterChanged();
+partial void Onw_masterChanging(System.Nullable<decimal> value);
+partial void Onw_masterChanged();
+partial void Onh_masterChanging(System.Nullable<decimal> value);
+partial void Onh_masterChanged();
+partial void OnnwChanging(System.Nullable<decimal> value);
+partial void OnnwChanged();
+partial void OngwChanging(System.Nullable<decimal> value);
+partial void OngwChanged();
+partial void OncbmChanging(System.Nullable<decimal> value);
+partial void OncbmChanged();
 #endregion
 public c_dongnhapxuat()
 {
@@ -13588,6 +13615,177 @@ this.SendPropertyChanging();
 this._sokien = value;
 this.SendPropertyChanged("sokien");
 this.OnsokienChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_l_inner", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @l_inner
+{
+get
+{
+return this._l_inner;
+}
+set
+{
+if ((this._l_inner != value))
+{
+this.Onl_innerChanging(value);
+this.SendPropertyChanging();
+this._l_inner = value;
+this.SendPropertyChanged("l_inner");
+this.Onl_innerChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_w_inner", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @w_inner
+{
+get
+{
+return this._w_inner;
+}
+set
+{
+if ((this._w_inner != value))
+{
+this.Onw_innerChanging(value);
+this.SendPropertyChanging();
+this._w_inner = value;
+this.SendPropertyChanged("w_inner");
+this.Onw_innerChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_h_inner", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @h_inner
+{
+get
+{
+return this._h_inner;
+}
+set
+{
+if ((this._h_inner != value))
+{
+this.Onh_innerChanging(value);
+this.SendPropertyChanging();
+this._h_inner = value;
+this.SendPropertyChanged("h_inner");
+this.Onh_innerChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_l_master", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @l_master
+{
+get
+{
+return this._l_master;
+}
+set
+{
+if ((this._l_master != value))
+{
+this.Onl_masterChanging(value);
+this.SendPropertyChanging();
+this._l_master = value;
+this.SendPropertyChanged("l_master");
+this.Onl_masterChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_w_master", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @w_master
+{
+get
+{
+return this._w_master;
+}
+set
+{
+if ((this._w_master != value))
+{
+this.Onw_masterChanging(value);
+this.SendPropertyChanging();
+this._w_master = value;
+this.SendPropertyChanged("w_master");
+this.Onw_masterChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_h_master", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @h_master
+{
+get
+{
+return this._h_master;
+}
+set
+{
+if ((this._h_master != value))
+{
+this.Onh_masterChanging(value);
+this.SendPropertyChanging();
+this._h_master = value;
+this.SendPropertyChanged("h_master");
+this.Onh_masterChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nw", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @nw
+{
+get
+{
+return this._nw;
+}
+set
+{
+if ((this._nw != value))
+{
+this.OnnwChanging(value);
+this.SendPropertyChanging();
+this._nw = value;
+this.SendPropertyChanged("nw");
+this.OnnwChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_gw", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @gw
+{
+get
+{
+return this._gw;
+}
+set
+{
+if ((this._gw != value))
+{
+this.OngwChanging(value);
+this.SendPropertyChanging();
+this._gw = value;
+this.SendPropertyChanged("gw");
+this.OngwChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_cbm", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @cbm
+{
+get
+{
+return this._cbm;
+}
+set
+{
+if ((this._cbm != value))
+{
+this.OncbmChanging(value);
+this.SendPropertyChanging();
+this._cbm = value;
+this.SendPropertyChanged("cbm");
+this.OncbmChanged();
 }
 }
 }
