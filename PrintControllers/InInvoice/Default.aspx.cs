@@ -367,7 +367,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         s1.AddMergedRegion(new CellRangeAddress(0, 0, 0, 6));
         s1.GetRow(0).HeightInPoints = 30;
 
-        s1.CreateRow(1).CreateCell(0).SetCellValue("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
+        s1.CreateRow(1).CreateCell(0).SetCellValue(Public.diaChiNoTA);
         s1.GetRow(1).GetCell(0).CellStyle = styleCenter12;
         s1.AddMergedRegion(new CellRangeAddress(1, 1, 0, 6));
         s1.GetRow(1).HeightInPoints = 22;
@@ -986,7 +986,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         s1.CreateRow(r).CreateCell(0).SetCellValue(@"Add:");
         s1.GetRow(r).GetCell(0).CellStyle = style12;
 
-        s1.GetRow(r).CreateCell(1).SetCellValue(@"3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
+        s1.GetRow(r).CreateCell(1).SetCellValue(Public.diaChiNoTA);
         s1.GetRow(r).GetCell(1).CellStyle = style12;
 
         s1.GetRow(r).HeightInPoints = 22;

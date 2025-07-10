@@ -104,7 +104,7 @@ public class BaoGiaPdf
             Paragraph pCompany = new Paragraph("ANCO COMPANY LIMITED", times_13);
             pCompany.Alignment = 1;
 
-            Paragraph pAddress = new Paragraph("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam", times_8);
+            Paragraph pAddress = new Paragraph(Public.diaChiNoTA, times_8);
             pAddress.Alignment = 1;
 
             Paragraph pInfo = new Paragraph("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com", times_8);

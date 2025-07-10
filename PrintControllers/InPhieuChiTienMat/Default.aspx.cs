@@ -1137,7 +1137,7 @@ public class XtraReport2 : DevExpress.XtraReports.UI.XtraReport
             this.xrLabel48.SizeF = new System.Drawing.SizeF(296.67F, 17F);
             this.xrLabel48.StylePriority.UseFont = false;
             this.xrLabel48.StylePriority.UseTextAlignment = false;
-            this.xrLabel48.Text = "3B/2 Kp.1B,P.An Phú, TX.Thuận An, BD";
+            this.xrLabel48.Text = Public.diaChiNo;
             this.xrLabel48.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             // 
             // xrLabel49
@@ -1907,7 +1907,7 @@ public class XtraReport2 : DevExpress.XtraReports.UI.XtraReport
             this.diachi1.SizeF = new System.Drawing.SizeF(296.67F, 17F);
             this.diachi1.StylePriority.UseFont = false;
             this.diachi1.StylePriority.UseTextAlignment = false;
-            this.diachi1.Text = "3B/2 Kp.1B,P.An Phú, TX.Thuận An, BD";
+            this.diachi1.Text = Public.diaChiNo;
             this.diachi1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             // 
             // quydoi

@@ -50,7 +50,7 @@
             </td>
             <td>
                 <b style="font-size:15px">ANCO COMPANY LIMITED</b><br />
-                3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam <br />
+                <%=Public.diaChiNoTA %> <br />
                 Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com
             </td>
         </tr>

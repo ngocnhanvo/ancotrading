@@ -65,18 +65,23 @@ public partial class PrintControllers_InPhieuNhapHang_Default : System.Web.UI.Pa
 			bangchu = VNN_ConvertMoney.convert(tien, ma_iso);
 			bangso = VNN_ConvertMoney.sep_thous(VNN_ConvertMoney.autoRound((decimal)tien, 2).ToString(), ",", ".");
 			
-			str = String.Format(@" select
-			N'007.100. 0321642' as sotk_no,
-			N'CÔNG TY TNHH AN CƠ BÌNH DƯƠNG' as tentk_no,
-			N'3B/2 Kp.1B,P.An Phú, TX.Thuận An, Bình Dương' as diachi_no,
-			N'VCB-HCM' as nganhang_no,
-			N'          /          / 20' + SUBSTRING(so_c, CHARINDEX('/',so_c) + 1, 2) as ngaychi,
-			N'{0}' as dongtien, 
-			N'{1}' as sotk_co, N'{2}' as tentk_co, N'{3}' as diachi_co, N'{4}' as nganhang_co,
-			N'{5}' as tongtien, N'{6}' as tongtien_bangchu, N'{7}' as noidung
+			str = $@"
+            select
+			    N'007.100. 0321642' as sotk_no,
+			    N'CÔNG TY TNHH AN CƠ BÌNH DƯƠNG' as tentk_no,
+			    N'{Public.diaChiNo}' as diachi_no,
+			    N'VCB-HCM' as nganhang_no,
+			    N'          /          / 20' + SUBSTRING(so_c, CHARINDEX('/',so_c) + 1, 2) as ngaychi,
+			    N'{ma_iso}' as dongtien, 
+			    N'{so_taikhoan}' as sotk_co, 
+                N'{ten_dtkd}' as tentk_co, 
+                N'{diachi}' as diachi_co, 
+                N'{nganhang}' as nganhang_co,
+			    N'{bangso}' as tongtien, 
+                N'{bangchu}' as tongtien_bangchu, 
+                N'{cttc.diengiai}' as noidung
 			from c_chitietthuchi
-			where c_chitietthuchi_id = N'{8}'", 
-			ma_iso, so_taikhoan, ten_dtkd, diachi, nganhang, bangso, bangchu, cttc.diengiai, id);
+			where c_chitietthuchi_id = N'{id}'";
         }
 		return str;
     }

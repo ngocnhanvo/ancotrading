@@ -190,7 +190,7 @@ public class ExportExcel
         if (haveTTAnco == true)
         {
             lstHeader.Add("ANCO COMPANY LIMITED");
-            lstHeader.Add("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
+            lstHeader.Add(Public.diaChiNoTA);
             lstHeader.Add("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com");
         }
         lstHeader.Add(title);
@@ -319,7 +319,7 @@ public class ExportExcel
 
             string[] a = {
                 "ANCO COMPANY LIMITED",
-                "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam",
+                Public.diaChiNoTA,
                 "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com",
                 string.IsNullOrEmpty(title) ? "PROFORMA INVOICE" : title
             };

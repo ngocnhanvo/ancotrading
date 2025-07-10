@@ -100,7 +100,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         //Dòng 2
         row++;
         var row2 = s1.CreateRow(row);
-        row2.CreateCell(getCell).SetCellValue("3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
+        row2.CreateCell(getCell).SetCellValue(Public.diaChiNoTA);
         row2.GetCell(getCell).CellStyle = s8_notBold_notWrapT_notBorder_CENTER;
         s1.AddMergedRegion(new CellRangeAddress(row, row, getCell, maxColumn));
         //Dòng 3

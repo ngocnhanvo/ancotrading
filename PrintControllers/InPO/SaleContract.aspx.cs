@@ -299,7 +299,7 @@ public partial class PrintControllers_SaleContract_Default : System.Web.UI.Page
             s1.CreateRow(row).CreateCell(0).SetCellValue(c[i]);
             string rich_text = " {0} \n {1} \n Tel:{2} \n Fax{3}";
             if (i == 0)
-                rich_text = "ANCO COMPANY LTD. \n 3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam";
+                rich_text = $"ANCO COMPANY LTD. \n {Public.diaChiNoTA}";
             HSSFRichTextString rich = new HSSFRichTextString(String.Format(rich_text, dt.Rows[0]["ten_dtkd"].ToString(), dt.Rows[0]["diachi"].ToString(), dt.Rows[0]["tel"].ToString(), dt.Rows[0]["fax"].ToString()));
             if (i <= 2)
             {

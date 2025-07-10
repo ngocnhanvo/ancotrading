@@ -437,7 +437,7 @@ public class rptBL : DevExpress.XtraReports.UI.XtraReport
             this.xrLabel15.SizeF = new System.Drawing.SizeF(526.2915F, 23.25003F);
             this.xrLabel15.StylePriority.UseFont = false;
             this.xrLabel15.StylePriority.UseTextAlignment = false;
-            this.xrLabel15.Text = "3B/2, 1B Hamlet, An Phu Ward,";
+            this.xrLabel15.Text = Public.diaChiNoTA2;
             this.xrLabel15.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             // 
             // xrLabel56
@@ -788,7 +788,7 @@ public class rptBL : DevExpress.XtraReports.UI.XtraReport
             this.xrLabel2.SizeF = new System.Drawing.SizeF(725.6249F, 22.20834F);
             this.xrLabel2.StylePriority.UseFont = false;
             this.xrLabel2.StylePriority.UseTextAlignment = false;
-            this.xrLabel2.Text = "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam";
+            this.xrLabel2.Text = Public.diaChiNoTA;
             this.xrLabel2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // xrLabel38

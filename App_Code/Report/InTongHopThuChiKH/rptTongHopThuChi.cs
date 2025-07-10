@@ -324,7 +324,7 @@ public class rptTongHopThuChi : DevExpress.XtraReports.UI.XtraReport
         this.xrLabel2.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
         this.xrLabel2.SizeF = new System.Drawing.SizeF(848.9583F, 23F);
         this.xrLabel2.StylePriority.UseTextAlignment = false;
-        this.xrLabel2.Text = "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam";
+        this.xrLabel2.Text = Public.diaChiNoTA;
         this.xrLabel2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
         // 
         // xrLabel1

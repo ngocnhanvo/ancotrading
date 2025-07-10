@@ -300,7 +300,7 @@ public partial class PrintControllers_InDonHang_DonHangQR : System.Web.UI.Page
         IPicture signaturePicturelogo = patriarchlogo.CreatePicture(anchorlogo, indexlogo);
 		//
 		//set A1 - A4
-		string[] a = { "ANCO COMPANY LIMITED","3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam","Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com","PROFORMA INVOICE"};
+		string[] a = { "ANCO COMPANY LIMITED", Public.diaChiNoTA, "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com","PROFORMA INVOICE"};
 		for(int i = 0; i < a.Count(); i++)
 		{		
 			s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);

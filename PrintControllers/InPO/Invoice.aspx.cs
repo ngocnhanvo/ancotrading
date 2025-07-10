@@ -254,7 +254,7 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
         int heigh = 22;
         int row = 0;
         //set A1 - A3
-        string[] a = { "ANCO COMPANY LIMITED", "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam", "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com", "COMMERCIAL INVOICE" };
+        string[] a = { "ANCO COMPANY LIMITED", Public.diaChiNoTA, "Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com", "COMMERCIAL INVOICE" };
         for (int i = 0; i < a.Count(); i++)
         {
             s1.CreateRow(row).CreateCell(0).SetCellValue(a[i]);
@@ -728,7 +728,7 @@ public partial class PrintControllers_Invoice_Default : System.Web.UI.Page
 
         //set A6 - A12
         string[] f = { "Infavour of:", "Add:", " " };
-        string[] f_value = { "thongtinnganhang", "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam", "Account no.:007.137.0321634 At bank: Joint Stock Commercial Bank For Foreign Trade of Vietnam (VIETCOMBANK), 10 Vo Van Kiet street , Dist.1 , Ho Chi Minh City ,Vietnam. Tel.: (84-28) 38297245, Fax: (84-28) 38297228, Swift code: BFTVVNVX007" };
+        string[] f_value = { "thongtinnganhang", Public.diaChiNoTA, "Account no.:007.137.0321634 At bank: Joint Stock Commercial Bank For Foreign Trade of Vietnam (VIETCOMBANK), 10 Vo Van Kiet street , Dist.1 , Ho Chi Minh City ,Vietnam. Tel.: (84-28) 38297245, Fax: (84-28) 38297228, Swift code: BFTVVNVX007" };
         for (int i = 0; i < f.Count(); i++)
         {
             s1.CreateRow(row).CreateCell(0).SetCellValue(f[i]);

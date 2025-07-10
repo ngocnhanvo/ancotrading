@@ -257,7 +257,7 @@ public class rptPaymentRequest : DevExpress.XtraReports.UI.XtraReport
             this.xrLabel18.SizeF = new System.Drawing.SizeF(745F, 23.00001F);
             this.xrLabel18.StylePriority.UseFont = false;
             this.xrLabel18.StylePriority.UseTextAlignment = false;
-            this.xrLabel18.Text = "3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam";
+            this.xrLabel18.Text = Public.diaChiNoTA;
             this.xrLabel18.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             // 
             // xrLabel17

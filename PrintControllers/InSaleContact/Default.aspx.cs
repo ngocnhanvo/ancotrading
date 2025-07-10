@@ -400,7 +400,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         s1.AddMergedRegion(new CellRangeAddress(3, 3, 0, 1));
         s1.GetRow(3).HeightInPoints = 55;
 
-        HSSFRichTextString richSeller = new HSSFRichTextString("ANCO COMPANY LTD. \n3B/2, 1B Hamlet, An Phu Ward, Thuan An Dist., Binh Duong Province, Vietnam");
+        HSSFRichTextString richSeller = new HSSFRichTextString($"ANCO COMPANY LTD. \n{Public.diaChiNoTA}");
         s1.GetRow(3).CreateCell(2).SetCellValue(richSeller);
         s1.GetRow(3).GetCell(2).CellStyle = style12TopBold;
         s1.AddMergedRegion(new CellRangeAddress(3, 3, 2, 7));
