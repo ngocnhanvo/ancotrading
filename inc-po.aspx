@@ -596,7 +596,7 @@
                         if (printType == "printRequired") {
                             if (poId != null) {
                                 closeWin();
-                                printURL += "InYeuCauXuatHang/ycxh220524.aspx";
+                                printURL += "InYeuCauXuatHang/";
                                 win = window.open(printURL + "?c_donhang_id=" + poId, "In Phiếu Xuất", windowSize);
                             } else {
                                 alert('Bạn chưa chọn đơn hàng cần in.!');
