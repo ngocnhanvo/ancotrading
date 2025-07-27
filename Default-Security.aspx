@@ -265,10 +265,8 @@
 
 <!-- Add Media helper (this is optional) -->
 <script type="text/javascript" src="jQuery/FancyBox/helpers/jquery.fancybox-media.js"></script>
-<script type="text/javascript" src="Scripts/tableToExcel.js"></script>
-<script type="text/javascript" src="Scripts/xlsx.full.min.js"></script>
 
-<script type="text/javascript">
+<SCRIPT type="text/javascript">
 	var username_public = "<%=manv%>";
     // function show message dialog
     function showMsgDialog(data) {
@@ -475,7 +473,7 @@
 		var today = dd+'/'+mm+'/'+yyyy;
 		return today;
 	}
-</script>
+</SCRIPT>
 <style type="text/css">
     #page_header, #tabs-main,  #tab_buttons, #tab_panels, .tab-panel 
     {
@@ -875,7 +873,7 @@
 		<!--/ footer -->
 	</div>
 	
-	<script type="text/javascript" id="publicScriptVNN">
+	<script id="publicScriptVNN">
 		var vnnIsAdmin = '<%=isadmin%>';
 		
 		function funcPrintSPPublic(namegrid, status_) {
@@ -1126,41 +1124,12 @@
 	        });
 	    };
 
-        var uuidv4 = function () {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        };
-
-        var excelToJSON = {
-            json: [],
-            parseExcel: function (file, callback) {
-                excelToJSON.json = [];
-                var reader = new FileReader();
-
-                reader.onload = function (e) {
-                    var data = e.target.result;
-                    var workbook = XLSX.read(data, {
-                        type: 'binary'
-                    });
-                    let jsonLc = [];
-                    workbook.SheetNames.forEach(function (sheetName) {
-                        // Here is your object
-                        let XL_row_object = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
-                        jsonLc.push(XL_row_object);
-                    });
-                    excelToJSON.json = jsonLc;
-                    callback();
-                };
-
-                reader.onerror = function (ex) {
-                    console.log(ex);
-                };
-
-                reader.readAsBinaryString(file);
-            }
-        };
+	    var uuidv4 = function() {
+	        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+	            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+	            return v.toString(16);
+	        });
+	    }
 
 	    $(document).bind("mousedown", function (e) {
 	        if (!$(e.target).parents(".custom-menu-vnn").length > 0) {

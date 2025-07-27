@@ -367,12 +367,7 @@
             FuncTaoPhieuXuatKho="createPhieuXuatKho"
             BtnPrint="funcPrintNK"
             FuncTaoPhieuXuatKhoN="function(){ add_tab('Tạo phiếu xuất kho nhiều phiếu nhập', 'inc-taophieuxuat-nhieuphieunhat.aspx')}"
-            FuncTaoPhieuNhapXuat="function(){ 
-                if(confirm(`Tạo phiếu nhập kho từ ANCO1`))
-                    add_tab('Tạo phiếu nhập kho từ AC1', 'inc-taophieunhapxuat-tupi2.aspx')
-                else
-                    add_tab('Tạo phiếu nhập kho', 'inc-taophieunhapxuat-tupi.aspx')
-            }"
+            FuncTaoPhieuNhapXuat="function(){ add_tab('Tạo phiếu nhập kho', 'inc-taophieunhapxuat-tupi.aspx')}"
             UrlFileAction="Controllers/NhapKhoController.ashx" 
             FilterToolbar="true"
             ColNames="['c_nhapxuat_id', 'TT', 'Đã gửi', 'Đơn Hàng', 'Số Phiếu', 'Số Phiếu NX'

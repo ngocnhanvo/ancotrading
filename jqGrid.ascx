@@ -86,7 +86,7 @@
                               , add: <%= _overrideAdd != ""? "false" : _showAdd %>
                               , edit: <%= _overrideEdit != ""? "false" : _showEdit %>
                               , search: <%= _showSearch %> 
-                              , view: <%= _showView %>
+                              , view : <%= _showView %> 
                               , refresh:<%= _showRefresh %> 
                               <%= _afterRefresh == ""? "" : ",afterRefresh :" + _afterRefresh %>
                             }
@@ -149,8 +149,7 @@
         });
         /* - _overrideDelete */
         <% } else { }%>
-
-        <%if (_showReorder == "true") {%>
+		
 		$("#<%=ID%>").jqGrid('navButtonAdd', '#<%=ID%>-pager',
 		{ caption: "Columns",
 			title: "Reorder Columns",
@@ -164,7 +163,7 @@
 				});
 			}
 		});
-		<%}%>
+		
 		
         
         <% if(!_btnPrint.Equals("")) { %>
