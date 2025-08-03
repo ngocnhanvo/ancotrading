@@ -140,18 +140,18 @@ public static class UserUtils
         itemJS["phi"] = "";
 
         var baogia = db.c_baogias.Where(d => d.c_baogia_id.Equals(c_baogia_id)).
-            Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, s.ngaybaogia }).FirstOrDefault();
+            Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, s.ngaybaogia, pbgdb = "" }).FirstOrDefault();
 
         if (baogia == null)
         {
             baogia = db.c_baogiaqrs.Where(d => d.c_baogiaqr_id.Equals(c_baogia_id)).
-            Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, s.ngaybaogia }).FirstOrDefault(); ;
+            Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, s.ngaybaogia, pbgdb = "" }).FirstOrDefault(); ;
         }
 
         if (baogia == null)
         {
             baogia = db.c_donhangs.Where(d => d.c_donhang_id.Equals(c_baogia_id)).
-            Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, ngaybaogia = s.ngaylap }).FirstOrDefault(); ;
+            Select(s => new { s.md_doitackinhdoanh_id, s.phienbangiacu, s.chkPBGCu, s.gia_db, ngaybaogia = s.ngaylap, pbgdb = s.phienbangiadacbiet }).FirstOrDefault(); ;
         }
 
         var sp = db.md_sanphams.FirstOrDefault(s => s.md_sanpham_id.Equals(md_sanpham_id));
@@ -176,10 +176,21 @@ public static class UserUtils
                 else if (baogia.gia_db == true)
                 {
                     string md_doitackinhdoanh_id = baogia.md_doitackinhdoanh_id;
-                    var items = mdbc.GetDataFromProcedure("getGiaMuaSp_Dacbiet", "@md_sanpham_id", md_sanpham_id, "@md_doitackinhdoanh_id", md_doitackinhdoanh_id, "@ngaytinhgia", baogia.ngaybaogia.Value.ToString("yyyy-MM-dd HH:mm"));
-                    itemJS["gia"] = items.Rows[0]["gia"].ToString();
-                    itemJS["barcode"] = items.Rows[0]["barcode"].ToString();
-                    itemJS["phi"] = items.Rows[0]["phi"].ToString();
+                    var items = db.md_giasanphams.Where(s => s.md_sanpham_id == md_sanpham_id & s.md_phienbangia_id == baogia.pbgdb).FirstOrDefault();
+                    if (items != null)
+                    {
+                        itemJS["gia"] = items.gia.ToString();
+                        itemJS["barcode"] = items.barcode.ToString();
+                        itemJS["phi"] = items.phi.ToString();
+                        itemJS["makhach"] = items.mota.ToString();
+                    }
+                    else
+                    {
+                        itemJS["gia"] = "0";
+                        itemJS["barcode"] = "";
+                        itemJS["phi"] = "0";
+                        itemJS["makhach"] = "";
+                    }
                 }
                 //Lấy theo giá chuẩn
                 else

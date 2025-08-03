@@ -104,10 +104,8 @@
         let docquyen = $('#tr_docquyen', frm);
         let editphiTr = $('#tr_editphi', frm);
         let editphi = $('#editphi', frm);
-        
         if (celgia_db == 'True') {
             giafob.prop('disabled', true);
-
             editphi.off('change');
             editphi.change(function () {
                 phifob.prop('disabled', !editphi.prop('checked'));
@@ -884,9 +882,9 @@
     }
 
     function ShowPBGCu_grid_ds_po(frmID, action) {
-        var ShowPBGCu = function () {
-            var chkPBGCu = $('#chkPBGCu', frmID);
-            var tr_phienbangiacu = $('#tr_phienbangiacu', frmID);
+        let ShowPBGCu = function () {
+            let chkPBGCu = $('#chkPBGCu', frmID);
+            let tr_phienbangiacu = $('#tr_phienbangiacu', frmID);
             if (chkPBGCu.prop('checked') == true) {
                 tr_phienbangiacu.show();
             }
@@ -895,7 +893,7 @@
             }
         }
 
-        var chkPBGCu_ = $('#chkPBGCu', frmID);
+        let chkPBGCu_ = $('#chkPBGCu', frmID);
         chkPBGCu_.off('change');
         chkPBGCu_.change(function () {
             ShowPBGCu();
@@ -969,6 +967,33 @@
             $('#discount_hehang').prop('disabled', true);
 
         $('#discount_hehang').change();
+
+        let ShowPBGDB = function () {
+            let $gia_db = $('#gia_db', frmID);
+            let $phienbangiadacbiet = $('#phienbangiadacbiet', frmID);
+            if (action == 'edit') {
+                $phienbangiadacbiet.prop('disabled', true);
+            }
+            else {
+                if ($gia_db.prop('checked') == true) {
+                    $phienbangiadacbiet.prop('disabled', false);
+                    $phienbangiadacbiet.css('background', '#FFF');
+                }
+                else {
+                    $phienbangiadacbiet.prop('disabled', true);
+                    $phienbangiadacbiet.css('background', '');
+                    $phienbangiadacbiet.val('');
+                    $phienbangiadacbiet.prev().val('');
+                }
+            }
+        }
+
+        let $gia_db = $('#gia_db', frmID);
+        $gia_db.off('click');
+        $gia_db.click(function () {
+            ShowPBGDB();
+        });
+        ShowPBGDB();
     }
 </script>
 <DIV class="ui-layout-center ui-widget-content" id="lay-center-po" style="padding:0;">
@@ -1488,7 +1513,7 @@
                  , edittype: 'select'
                  , align: 'center'
                  , editoptions: {style:'width:150px', value: ':Bình thường;PTSP:Phát triển sản phẩm' }
-                 , formoptions: { colpos: 1, rowpos: 29 }
+                 , formoptions: { colpos: 1, rowpos: 30 }
                  , hidden: true
                  , editrules: { edithidden: true }
             },
@@ -1564,6 +1589,19 @@
                  , formatter: 'checkbox'
                  , editoptions:{ value:'True:False', defaultValue: 'False' }
                  , formoptions: { colpos: 1, rowpos: 28 }
+            },
+            {
+                fixed: true
+                , name: 'phienbangiadacbiet'
+                , label: 'PBG đặc biệt'
+                , index: 'phienbangiadacbiet'
+                , width: 100
+                , editable: true
+                , edittype: 'text'
+                , editoptions:{ dataInit: function (elem) { format_donhang_phienbangiadacbiet.create(elem); } }
+                , hidden: false 
+                , editrules:{ edithidden : true }
+                , formoptions: { colpos: 1, rowpos: 29 }
             },
             {
                 fixed: true
@@ -1730,7 +1768,7 @@
 					$('#donhang_mau', frmID).prop('disabled', true);
                     $('#loai', frmID).prop('disabled', true);
 					$('#chkPBGCu', frmID).prop('disabled', true);
-                    ShowPBGCu_grid_ds_po(frmID);
+                    ShowPBGCu_grid_ds_po(frmID, 'edit');
                     disableSelOption('#md_cangbien_id', frmID, true);
                     disableSelOption('#phienbangiacu', frmID, true);
                 }, 

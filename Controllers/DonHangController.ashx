@@ -152,7 +152,7 @@ public class DonHangController : IHttpHandler
             msg = e.Message;
         }
 
-    EndEventHandler:;
+        EndEventHandler:;
         context.Response.Write(msg);
     }
 
@@ -836,6 +836,9 @@ public class DonHangController : IHttpHandler
             String gia_db = context.Request.Form["gia_db"].ToLower();
             string chkPBGCu_str = context.Request.Form["chkPBGCu"];
             string phienbangiacu = context.Request.Form["phienbangiacu"];
+            string phienbangiadacbiet = context.Request.Form["phienbangiadacbiet"];
+            if (!string.IsNullOrWhiteSpace(phienbangiadacbiet))
+                phienbangiadacbiet = db.md_phienbangias.Where(s => s.ten_phienbangia == phienbangiadacbiet).Select(s => s.md_phienbangia_id).FirstOrDefault();
 
             string phanbodiscountStr = (context.Request.Form["phanbodiscount"] + "").ToLower();
             var phanbodiscount = phanbodiscountStr.Equals("on") || phanbodiscountStr.Equals("true");
@@ -933,6 +936,7 @@ public class DonHangController : IHttpHandler
                     mnu.ismakepi = false;
                     mnu.customer_order_no = context.Request.Form["customer_order_no"];
                     mnu.gia_db = isgiadb;
+                    mnu.phienbangiadacbiet = phienbangiadacbiet;
                     mnu.chkPBGCu = chkPBGCu;
                     mnu.phienbangiacu = phienbangiacu;
                     mnu.ghichu = context.Request.Form["ghichu"];
@@ -1352,6 +1356,7 @@ public class DonHangController : IHttpHandler
             dh.hoahong, dh.ngaydieuchinh, 
             dh.ngaytao, dh.nguoitao, dh.ngaycapnhat, dh.nguoicapnhat, dh.mota, dh.hoatdong, 
             dh.gia_db,
+            pbg.ten_phienbangia,
             dh.chkPBGCu,
             dh.phienbangiacu,
             dh.ghichu,
@@ -1369,6 +1374,7 @@ public class DonHangController : IHttpHandler
 			left join md_kichthuoc kt with (nolock) on dh.md_kichthuoc_id = kt.md_kichthuoc_id
 			left join md_dongtien dtien with (nolock) on dh.md_dongtien_id = dtien.md_dongtien_id
 			left join md_nganhang ngh with (nolock) on dh.md_nganhang_id = ngh.md_nganhang_id
+            left join md_phienbangia pbg with (nolock) on dh.phienbangiadacbiet = pbg.md_phienbangia_id
             WHERE 1 = 1 {0} {4} {1} )P where RowNum > @start AND RowNum < @end";
 
         strsql = String.Format(strsql,
@@ -1426,6 +1432,7 @@ public class DonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["gia_db"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["ten_phienbangia"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["chkPBGCu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phienbangiacu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
