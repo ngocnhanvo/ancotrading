@@ -1,4 +1,4 @@
-//Update at 02/08/2025 15:54:52
+//Update at 08/08/2025 06:56:01
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -9870,6 +9870,7 @@ private System.Nullable<decimal> _phi;
 private System.Nullable<bool> _editphi;
 private string _code_cl;
 private string _md_chungloai_id;
+private System.Nullable<decimal> _tanggia;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -9966,6 +9967,8 @@ partial void Oncode_clChanging(string value);
 partial void Oncode_clChanged();
 partial void Onmd_chungloai_idChanging(string value);
 partial void Onmd_chungloai_idChanged();
+partial void OntanggiaChanging(System.Nullable<decimal> value);
+partial void OntanggiaChanged();
 #endregion
 public c_dongdonhang()
 {
@@ -10842,6 +10845,25 @@ this.SendPropertyChanging();
 this._md_chungloai_id = value;
 this.SendPropertyChanged("md_chungloai_id");
 this.Onmd_chungloai_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tanggia", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @tanggia
+{
+get
+{
+return this._tanggia;
+}
+set
+{
+if ((this._tanggia != value))
+{
+this.OntanggiaChanging(value);
+this.SendPropertyChanging();
+this._tanggia = value;
+this.SendPropertyChanged("tanggia");
+this.OntanggiaChanged();
 }
 }
 }
@@ -15222,6 +15244,9 @@ private string _sct_dsdh;
 private System.Nullable<bool> _chuyenphiDSDH;
 private string _loai;
 private string _phienbangiadacbiet;
+private System.Nullable<bool> _tanggiahehang;
+private System.Nullable<decimal> _tanggia;
+private string _tanggiahehang_value;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -15346,6 +15371,12 @@ partial void OnloaiChanging(string value);
 partial void OnloaiChanged();
 partial void OnphienbangiadacbietChanging(string value);
 partial void OnphienbangiadacbietChanged();
+partial void OntanggiahehangChanging(System.Nullable<bool> value);
+partial void OntanggiahehangChanged();
+partial void OntanggiaChanging(System.Nullable<decimal> value);
+partial void OntanggiaChanged();
+partial void Ontanggiahehang_valueChanging(string value);
+partial void Ontanggiahehang_valueChanged();
 #endregion
 public c_donhang()
 {
@@ -16488,6 +16519,63 @@ this.SendPropertyChanging();
 this._phienbangiadacbiet = value;
 this.SendPropertyChanged("phienbangiadacbiet");
 this.OnphienbangiadacbietChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tanggiahehang", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @tanggiahehang
+{
+get
+{
+return this._tanggiahehang;
+}
+set
+{
+if ((this._tanggiahehang != value))
+{
+this.OntanggiahehangChanging(value);
+this.SendPropertyChanging();
+this._tanggiahehang = value;
+this.SendPropertyChanged("tanggiahehang");
+this.OntanggiahehangChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tanggia", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @tanggia
+{
+get
+{
+return this._tanggia;
+}
+set
+{
+if ((this._tanggia != value))
+{
+this.OntanggiaChanging(value);
+this.SendPropertyChanging();
+this._tanggia = value;
+this.SendPropertyChanged("tanggia");
+this.OntanggiaChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tanggiahehang_value", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @tanggiahehang_value
+{
+get
+{
+return this._tanggiahehang_value;
+}
+set
+{
+if ((this._tanggiahehang_value != value))
+{
+this.Ontanggiahehang_valueChanging(value);
+this.SendPropertyChanging();
+this._tanggiahehang_value = value;
+this.SendPropertyChanged("tanggiahehang_value");
+this.Ontanggiahehang_valueChanged();
 }
 }
 }

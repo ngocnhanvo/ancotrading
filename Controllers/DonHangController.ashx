@@ -914,6 +914,7 @@ public class DonHangController : IHttpHandler
                     mnu.nguoilap = UserUtils.getUser(context);
                     mnu.md_cangbien_id = context.Request.Form["md_cangbien_id"];
                     mnu.discount = decimal.Parse(context.Request.Form["discount"]);
+                    mnu.tanggia = context.Request.Form["tanggia"].ToNullableDecimal().GetValueOrDefault(0);
                     mnu.shipmentdate = DateTime.ParseExact(context.Request.Form["shipmentdate"], "dd/MM/yyyy", null);
                     mnu.shipmenttime = DateTime.ParseExact(context.Request.Form["shipmenttime"], "dd/MM/yyyy", null);
                     mnu.md_paymentterm_id = context.Request.Form["md_paymentterm_id"];
@@ -1076,11 +1077,15 @@ public class DonHangController : IHttpHandler
                 {
                     m.discount_hehang = context.Request.Form["discount_hehang"] == "True";
                     m.discount_hehang_value = m.discount_hehang.GetValueOrDefault(false) ? context.Request.Form["discount_hehang_value"] : "";
+                    m.tanggiahehang = context.Request.Form["tanggiahehang"] == "True";
+                    m.tanggiahehang_value = m.tanggiahehang.GetValueOrDefault(false) ? context.Request.Form["tanggiahehang_value"] : "";
                     m.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
                     m.sochungtu = context.Request.Form["sochungtu"];
                     m.ngaylap = DateTime.ParseExact(context.Request.Form["ngaylap"], "dd/MM/yyyy", null);
                     //m.nguoilap = UserUtils.getUser(context);
                     m.md_cangbien_id = context.Request.Form["md_cangbien_id"];
+
+                    m.tanggia = context.Request.Form["tanggia"].ToNullableDecimal().GetValueOrDefault(0);
                     m.discount = decimal.Parse(context.Request.Form["discount"]);
                     m.shipmentdate = DateTime.ParseExact(context.Request.Form["shipmentdate"], "dd/MM/yyyy", null);
                     m.shipmenttime = DateTime.ParseExact(context.Request.Form["shipmenttime"], "dd/MM/yyyy", null);
@@ -1159,9 +1164,9 @@ public class DonHangController : IHttpHandler
                         {
                             if (m.discount_hehang.GetValueOrDefault(false))
                             {
-
                                 foreach (var cdh in db.c_dongdonhangs.Where(s => s.c_donhang_id == m.c_donhang_id).ToList())
                                 {
+                                    Public.TangGiaHehangValue(m, cdh, db);
                                     var t = Public.DiscountHehangValue(m.discount_hehang_value, cdh, db);
                                     cdh.giafob = t.giafob;
                                     cdh.discount = t.discount;
@@ -1171,6 +1176,7 @@ public class DonHangController : IHttpHandler
                             {
                                 foreach (var cdh in db.c_dongdonhangs.Where(s => s.c_donhang_id == m.c_donhang_id).ToList())
                                 {
+                                    Public.TangGiaHehangValue(m, cdh, db);
                                     cdh.giafob = cdh.giachuan == null ? cdh.giafob : cdh.giachuan;
                                     cdh.discount = 0;
                                 }
@@ -1355,6 +1361,9 @@ public class DonHangController : IHttpHandler
             (case when md_nguoilienhe_id is null then '' else (select ma_dtkd from md_doitackinhdoanh where md_doitackinhdoanh_id = dh.md_nguoilienhe_id) end) as nguoilienhe, 
             dh.hoahong, dh.ngaydieuchinh, 
             dh.ngaytao, dh.nguoitao, dh.ngaycapnhat, dh.nguoicapnhat, dh.mota, dh.hoatdong, 
+            dh.tanggia,
+            dh.tanggiahehang,
+            dh.tanggiahehang_value,
             dh.gia_db,
             pbg.ten_phienbangia,
             dh.chkPBGCu,
@@ -1431,6 +1440,9 @@ public class DonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["nguoicapnhat"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tanggia"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tanggiahehang"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tanggiahehang_value"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["gia_db"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_phienbangia"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["chkPBGCu"] + "]]></cell>";

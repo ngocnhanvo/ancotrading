@@ -560,20 +560,28 @@ public class DongDonHangController : IHttpHandler
             sidx = "ddh.c_dongdonhang_id";
         }
 
-        string strsql = @"
+        if (poId == null)
+        {
+            poId = "0";
+        }
+
+        string strsql = $@"
+            select 
+                P.*, 
+                P.giasautang - 
+                (
+                    case 
+                        when isnull(P.phanbodiscount, 0) = 1
+                        then P.giasautang * P.discount / 100
+                        else 0 
+                    end
+                )
+                as giahopdong
+            from (
                 select 
-                    P.* 
-                    , (P.giafob + P.phi) - 
-                    (
-                        case 
-                            when isnull(P.phanbodiscount, 0) = 1
-                            then (P.giafob + P.phi) * P.discount / 100
-                            else 0 
-                        end
-                    )
-                    as giahopdong
-                from(
-                    select
+                    P.*, (P.giafob + P.phi) + (P.giafob * P.tanggia / 100) as giasautang
+                from (
+                    SELECT
                         ddh.c_dongdonhang_id
                         , dh.c_donhang_id
                         , sp.trangthai
@@ -585,6 +593,7 @@ public class DongDonHangController : IHttpHandler
                         , ddh.giafob
                         , isnull(ddh.phi, 0) as phi
                         , (case when isnull(dh.discount, 0) > 0 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discount
+                        , (case when isnull(dh.tanggia, 0) > 0 then isnull(dh.tanggia, 0) else isnull(ddh.tanggia, 0) end) as tanggia
                         , dh.phanbodiscount
                         , ddh.soluong
                         , dg.ten_donggoi
@@ -593,28 +602,21 @@ public class DongDonHangController : IHttpHandler
                         , ddh.sl_cont, ddh.v2, dtkd.ma_dtkd, ddh.ngaytao, ddh.nguoitao
                         , ddh.ngaycapnhat,  ddh.nguoicapnhat, ddh.mota
                         , ddh.hoatdong ,ddh.trangthai as trangthai_ddh, ddh.docquyen, ddh.barcode, ddh.editphi
-                        , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            @" FROM
-                c_dongdonhang ddh
-                left join c_donhang dh on ddh.c_donhang_id = dh.c_donhang_id
-                left join md_sanpham sp on ddh.md_sanpham_id = sp.md_sanpham_id
-                left join md_kieudang kd on kd.md_kieudang_id = sp.md_kieudang_id
-                left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
-                left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id
-                left join md_doitackinhdoanh dtkd on ddh.nhacungungid = dtkd.md_doitackinhdoanh_id
-            WHERE
-                dh.c_donhang_id = N'{0}' " + filter +
-            @" )P
-            WHERE RowNum > @start AND RowNum < @end";
-
-        if (poId != null)
-        {
-            strsql = string.Format(strsql, poId);
-        }
-        else
-        {
-            strsql = string.Format(strsql, 0);
-        }
+                        , ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
+                    FROM
+                        c_dongdonhang ddh
+                        left join c_donhang dh on ddh.c_donhang_id = dh.c_donhang_id
+                        left join md_sanpham sp on ddh.md_sanpham_id = sp.md_sanpham_id
+                        left join md_kieudang kd on kd.md_kieudang_id = sp.md_kieudang_id
+                        left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
+                        left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id
+                        left join md_doitackinhdoanh dtkd on ddh.nhacungungid = dtkd.md_doitackinhdoanh_id
+                    WHERE
+                        dh.c_donhang_id = N'{poId}' {filter}
+                )P
+            )P
+            WHERE RowNum > @start AND RowNum < @end
+        ";
 
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
@@ -637,6 +639,7 @@ public class DongDonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["giafob"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tanggia"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["giahopdong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phanbodiscount"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["soluong"] + "]]></cell>";

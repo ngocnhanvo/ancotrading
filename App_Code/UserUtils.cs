@@ -759,8 +759,11 @@ public static class UserUtils
 
     public static decimal getGiaHopDongPO(c_donhang dh, c_dongdonhang ddh, int? round, bool? pbds)
     {
+        var giaFOB = ddh.giafob.GetValueOrDefault(0);
+        var pt_tanggia = dh.tanggia.GetValueOrDefault(0) > 0 ? dh.tanggia.GetValueOrDefault(0) : ddh.tanggia.GetValueOrDefault(0);
+        var gt_tanggia = giaFOB * pt_tanggia / 100;
         pbds = pbds == null ? dh.phanbodiscount.GetValueOrDefault(false) : pbds.GetValueOrDefault(false);
-        var giaFOBvaPhi = ddh.giafob.GetValueOrDefault(0) + ddh.phi.GetValueOrDefault(0);
+        var giaFOBvaPhi = giaFOB + ddh.phi.GetValueOrDefault(0) + gt_tanggia;
         var discount = dh.discount.GetValueOrDefault(0) > 0 ? dh.discount.GetValueOrDefault(0) : (decimal)ddh.discount.GetValueOrDefault(0);
         var phanBoDiscountVaoGia = pbds.GetValueOrDefault(false) ? giaFOBvaPhi * discount / 100 : 0;
         var giaHopDong = giaFOBvaPhi - phanBoDiscountVaoGia;

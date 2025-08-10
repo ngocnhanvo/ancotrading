@@ -362,4 +362,12 @@ public static class Extension
         else
             return null;
     }
+
+    public static decimal? ToNullableDecimal(this string s)
+    {
+        if (!string.IsNullOrWhiteSpace(s))
+            return decimal.Parse(s);
+        else
+            return null;
+    }
 }

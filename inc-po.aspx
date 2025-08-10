@@ -994,6 +994,41 @@
             ShowPBGDB();
         });
         ShowPBGDB();
+
+        let $prtghh = $('#tanggiahehang_value').parent();
+
+        let tanggiahehangClick = function () {
+            let tghh = $('#tanggiahehang').prop('checked');
+            let $tghhv = $('#tanggiahehang_value');
+            let $tg = $('#tanggia');
+            if (tghh == true) {
+                $tg.prop('disabled', true);
+                $tg.val(0);
+                $prtghh.show();
+                $prtghh.prev().show();
+                $prtghh.prev().hide();
+                $prtghh.attr('colspan', 2);
+                $tghhv.css('width', '80%');
+            }
+            else {
+                $tg.prop('disabled', false);
+                $tghhv.val('');
+                $prtghh.hide();
+                $prtghh.prev().hide();
+            }
+        };
+        $('#tanggiahehang').off('change');
+        $('#tanggiahehang').change(function () {
+            tanggiahehangClick();
+        });
+        tanggiahehangClick();
+
+        if (action == 'edit') {
+            $('#tanggiahehang').prop('disabled', false);
+        }
+        else {
+            $('#tanggiahehang').prop('disabled', true);
+        }
     }
 </script>
 <DIV class="ui-layout-center ui-widget-content" id="lay-center-po" style="padding:0;">
@@ -1577,7 +1612,46 @@
                 , formatter: 'checkbox'
                 , editoptions:{ value:'True:False', defaultValue: 'True' }
                 , formoptions: { colpos: 1, rowpos: 27 }
-            },		
+            },
+            {
+                 name: 'tanggia'
+                 , hidden: true
+                 , label: 'Tăng giá (%)'
+                 , index: 'tanggia'
+                 , editable: true
+                 , fixed:true , width: 50
+                 , edittype: 'text'
+                 , formoptions: { colpos: 2, rowpos: 11 }
+                 , editoptions:{ defaultValue: '0'}
+                 , editrules: { number:true, minValue: 0, edithidden: true }
+                 , align: 'right'
+            },
+            {
+                fixed: true, name: 'tanggiahehang'
+                , label: 'Tăng giá theo Hệ Hàng'
+                , hidden: true
+                , editrules:{
+                    edithidden:true
+                }
+                , editable: true
+                , edittype: 'checkbox'
+                , align: 'center'
+                , editoptions: { value:'True:False', defaultValue: 'False' }
+                , formatter: 'checkbox'
+                , formoptions: { colpos: 2, rowpos: 12 }
+            },
+            {
+                fixed: true, name: 'tanggiahehang_value'
+                , label: 'tanggiahehang_value'
+                , hidden: true
+                , editrules:{
+                    edithidden:true
+                }
+                , editoptions:{ dataInit: function (elem) { format_donhang_tanggiahehangvalue.create(elem); } }
+                , editable: true
+                , align: 'center'
+                , formoptions: { colpos: 2, rowpos: 13 }
+            },
 			{
                  name: 'gia_db'   
                  , label: 'Giá ĐB'
@@ -1657,7 +1731,7 @@
                 , align: 'center'
                 , editoptions: { value:'True:False', defaultValue: 'False' }
                 , formatter: 'checkbox'
-                , formoptions: { colpos: 2, rowpos: 11 }
+                , formoptions: { colpos: 2, rowpos: 15 }
             },
             {
                 fixed: true, name: 'chuyenphiDSDH'
@@ -1671,7 +1745,7 @@
                 , align: 'center'
                 , editoptions: { value:'True:False', defaultValue: 'True' }
                 , formatter: 'checkbox'
-                , formoptions: { colpos: 2, rowpos: 12 }
+                , formoptions: { colpos: 2, rowpos: 16 }
             },
             {
                 fixed: true, name: 'discount_hehang'
@@ -1685,7 +1759,7 @@
                 , align: 'center'
                 , editoptions: { value:'True:False', defaultValue: 'False' }
                 , formatter: 'checkbox'
-                , formoptions: { colpos: 2, rowpos: 13 }
+                , formoptions: { colpos: 2, rowpos: 17 }
             },
             {
                 fixed: true, name: 'discount_hehang_value'
@@ -1696,7 +1770,7 @@
                 }
                 , editable: true
                 , align: 'center'
-                , formoptions: { colpos: 2, rowpos: 14 }
+                , formoptions: { colpos: 2, rowpos: 18 }
             }
             ]"
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
@@ -2056,6 +2130,19 @@
 				name: 'discount'
 				, label: 'Discount(%)'
 				, index: 'ddh.discount'
+				, fixed:true , width: 100
+				, edittype: 'text'
+				, editable: false
+				, editrules: { required:true, number: true }
+				, editoptions:{ defaultValue: '0' }
+				, align: 'right'
+				, formatter:'currency'
+				, formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+			},
+            {
+				name: 'tanggia'
+				, label: 'Tăng giá (%)'
+				, index: 'ddh.tanggia'
 				, fixed:true , width: 100
 				, edittype: 'text'
 				, editable: false

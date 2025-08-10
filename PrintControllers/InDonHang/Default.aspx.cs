@@ -234,137 +234,138 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
         string select = string.Format(@"
             SELECT 
-                B.*
-                , CASE
-				    WHEN B.sl_inner = 0
-				    THEN B.n_w_inner + B.t_thung_outer
-
-				    WHEN B.dvt_inner like N'%ctn%' and B.dvt_outer like N'%ctn%'
-				    THEN B.n_w_master + B.t_thung_outer
-
-				    WHEN B.dvt_inner like N'%ctn%' and B.dvt_outer like N'%pal%'
-				    THEN B.g_w_inner + 20
-
-				    WHEN B.dvt_inner like N'%ctn%' and B.dvt_outer like N'%crt%'
-				    THEN B.g_w_inner + 5
-
-				    WHEN B.dvt_inner like N'%bun%' and B.dvt_outer like N'%crt%'
-				    THEN B.g_w_inner + 5
-
-				    WHEN B.dvt_inner like N'%bun%' and B.dvt_outer like N'%pal%'
-				    THEN B.g_w_inner + 20
-
-				    WHEN B.sl_inner = 0 and B.dvt_outer like N'%pal%'
-				    THEN B.g_w_inner + 25
-				ELSE 0 END as g_w_master
-			FROM
-			(
+                C.*,
+                C.giafob * C.soluong as amount
+            FROM (
                 SELECT 
-                    A.*
-                    , A.giafob * A.soluong as amount
-                    
-                    , (select dbo.get_commodity(N'{0}') )  + ' products' as commodity
-                    , '{1}' as money
-                    , '{4}' as diengiaicong
-                    , '{5}' as diengiaitru
-                    , isnull('{6}',0) as phicong
-                    , isnull('{7}',0) as phitru
-                    , N'{8}' as no_cont
-                    , (case when isnull(A.phanbodiscount, 0) = 1 then A.discountHHVal else null end) as discountHH
+                    B.*
+                    , B.giasautang - 
+                    (
+                        case 
+                            when isnull(B.phanbodiscount, 0) = 1
+                            then B.giasautang * B.discount / 100
+                            else 0 
+                        end
+                    ) as giafob
                     , CASE
-					    WHEN A.dvt_inner like N'%bun%'
-					    THEN A.n_w_inner + 0.5
-					    WHEN A.dvt_inner like N'%crt%'  
-					    THEN A.n_w_inner + 3
-					    WHEN A.dvt_inner like N'%ctn%'  
-					    THEN A.n_w_inner + t_thung_inner
-					ELSE 0 END as g_w_inner
-                    
-				FROM (
-                    select 
-						dh.{9}_id
-						, dh.sochungtu
-                        , dh.phanbodiscount
-                        , dh.customer_order_no
-						, dtkd.ten_dtkd
-                        , dtkd.diachi
-                        , dtkd.tel
-                        , dtkd.fax
-						, dh.payer
-                        , dh.ngaylap 
-						, sp.ma_sanpham
-						, convert(nvarchar,isnull(ddh.sl_inner, 0)) + ' ' + dvt_inner.ten_dvt as ten_donggoi_inner
-						, convert(nvarchar,isnull(ddh.sl_outer, 0)) + ' ' + dvt_outer.ten_dvt as ten_donggoi_outer
-						, ddh.ma_sanpham_khach
-                        , ddh.mota_tienganh
-						, ddh.sl_outer
-                        , ddh.sl_inner
-						, (case ddh.sl_outer when 0 then ' ' else (cast(ddh.sl_outer as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) end) as ten_donggoi
-						, ddh.soluong
-                        , (case when isnull(dh.discount, 0) > 0 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discountHHVal
-                        , dvt.ten_dvt as dvt_sp
-                        , cast((
-                            case 
-                                when isnull(dh.phanbodiscount, 0) = 0
-                                then ddh.giafob + isnull(ddh.phi, 0)
-                                else 
-                                    (ddh.giafob + isnull(ddh.phi, 0)) - 
-                                    (ddh.giafob + isnull(ddh.phi, 0)) * 
-                                    (
-                                        case when dh.discount > 0 then dh.discount else ddh.discount end
-                                    ) / 100 + 0.00000000000001
-                            end
-                        ) as decimal(18,2)) as giafob
-                        
-                        , isnull('{2}', 0) as dis
-						, cast('{2}' as decimal(18,2)) as dis1
-                        , N'{3}' as discount_hehang_value
+				        WHEN B.sl_inner = 0
+				        THEN B.n_w_inner + B.t_thung_outer
 
-                        , isnull(ddh.giachuan, ddh.giafob) as giachuan
-                        , isnull(ddh.phi, 0) as phi
-						, sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch
-                        , convert(varchar, dh.shipmenttime, 106) as shipmenttime
-                        , cb.ten_cangbien
-                        , pmt.ten_paymentterm
-                        , dh.ghichu
-                        , ('In favor of ANCO COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
-						, ddh.v2 as cbm
-                        , (sp.trongluong * ddh.soluong) as trongluong
-                        , (case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
-						, (case dg.sl_inner when 0 then ' ' else (cast(dg.sl_inner as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as sl_inner_
-						, dh.portdischarge
-                        , CASE WHEN dh.hoahong is null THEN 0 ELSE dh.hoahong END as hoahong
-						, (case when md_nguoilienhe_id is null then '' else (select ma_dtkd from md_doitackinhdoanh where md_doitackinhdoanh_id = dh.md_nguoilienhe_id) end) as nguoinhan
-						, ddh.l1, ddh.w1, ddh.h1 , ddh.l2, ddh.w2, ddh.h2, hs.hscode as ma_hscode
-						, dvt_outer.ten_dvt as dvt_outer
-						, dvt_inner.ten_dvt as dvt_inner
-						, (ddh.l2 + ddh.w2) * (ddh.w2 * ddh.h2) / 5400 as t_thung_outer
-						, (ddh.l1 + ddh.w1) * (ddh.w1 * ddh.h1) / 5400 as t_thung_inner
-						, case when dh.md_trongluong_id is not null then dg.sl_outer * sp.trongluong else 0 end as n_w_master
-						, case when dh.md_trongluong_id is not null then dg.sl_inner * sp.trongluong else 0 end as n_w_inner
-						, kt.ten_kichthuoc
-                        , tl.ten_trongluong
-                        , ddh.barcode
-					from
-						{9} dh
-						left join {10} ddh on dh.{9}_id = ddh.{9}_id
-						left join md_doitackinhdoanh dtkd on dh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
-						left join md_sanpham sp on ddh.md_sanpham_id = sp.md_sanpham_id
-						left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id
-						left join md_donvitinh dvt_outer on dvt_outer.md_donvitinh_id = dg.dvt_outer
-						left join md_donvitinh dvt_inner on dvt_inner.md_donvitinh_id = dg.dvt_inner				
-						left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
-						left join md_cangbien cb on dh.md_cangbien_id = cb.md_cangbien_id
-						left join md_paymentterm pmt on dh.md_paymentterm_id = pmt.md_paymentterm_id
-						left join md_nganhang ngh on dh.md_nganhang_id = ngh.md_nganhang_id
-						left join md_kichthuoc kt on dh.md_kichthuoc_id = kt.md_kichthuoc_id
-						left join md_trongluong tl on dh.md_trongluong_id = tl.md_trongluong_id
-						left join md_hscode hs on sp.md_hscode_id = hs.md_hscode_id
-                    where 1=1
-				) A
-            ) B
-			where B.{9}_id = N'{0}' 
-            order by B.ma_sanpham asc"
+				        WHEN B.dvt_inner like N'%ctn%' and B.dvt_outer like N'%ctn%'
+				        THEN B.n_w_master + B.t_thung_outer
+
+				        WHEN B.dvt_inner like N'%ctn%' and B.dvt_outer like N'%pal%'
+				        THEN B.g_w_inner + 20
+
+				        WHEN B.dvt_inner like N'%ctn%' and B.dvt_outer like N'%crt%'
+				        THEN B.g_w_inner + 5
+
+				        WHEN B.dvt_inner like N'%bun%' and B.dvt_outer like N'%crt%'
+				        THEN B.g_w_inner + 5
+
+				        WHEN B.dvt_inner like N'%bun%' and B.dvt_outer like N'%pal%'
+				        THEN B.g_w_inner + 20
+
+				        WHEN B.sl_inner = 0 and B.dvt_outer like N'%pal%'
+				        THEN B.g_w_inner + 25
+				    ELSE 0 END as g_w_master
+			    FROM
+			    (
+                    SELECT 
+                        A.*
+                        , (A.giafob0 + A.phi) + (A.giafob0 * A.tanggia / 100) as giasautang
+                        , (select dbo.get_commodity(N'{0}') )  + ' products' as commodity
+                        , '{1}' as money
+                        , '{4}' as diengiaicong
+                        , '{5}' as diengiaitru
+                        , isnull('{6}',0) as phicong
+                        , isnull('{7}',0) as phitru
+                        , N'{8}' as no_cont
+                        , (case when isnull(A.phanbodiscount, 0) = 1 then A.discountHHVal else null end) as discountHH
+                        , CASE
+					        WHEN A.dvt_inner like N'%bun%'
+					        THEN A.n_w_inner + 0.5
+					        WHEN A.dvt_inner like N'%crt%'  
+					        THEN A.n_w_inner + 3
+					        WHEN A.dvt_inner like N'%ctn%'  
+					        THEN A.n_w_inner + t_thung_inner
+					    ELSE 0 END as g_w_inner
+                    
+				    FROM (
+                        select 
+						    dh.{9}_id
+						    , dh.sochungtu
+                            , dh.phanbodiscount
+                            , dh.customer_order_no
+						    , dtkd.ten_dtkd
+                            , dtkd.diachi
+                            , dtkd.tel
+                            , dtkd.fax
+						    , dh.payer
+                            , dh.ngaylap 
+						    , sp.ma_sanpham
+						    , convert(nvarchar,isnull(ddh.sl_inner, 0)) + ' ' + dvt_inner.ten_dvt as ten_donggoi_inner
+						    , convert(nvarchar,isnull(ddh.sl_outer, 0)) + ' ' + dvt_outer.ten_dvt as ten_donggoi_outer
+						    , ddh.ma_sanpham_khach
+                            , ddh.mota_tienganh
+						    , ddh.sl_outer
+                            , ddh.sl_inner
+						    , (case ddh.sl_outer when 0 then ' ' else (cast(ddh.sl_outer as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer)) end) as ten_donggoi
+						    , ddh.soluong
+                            , (case when isnull(dh.discount, 0) > 0 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discountHHVal
+                            , dvt.ten_dvt as dvt_sp
+                            , isnull('{2}', 0) as dis
+						    , cast('{2}' as decimal(18,2)) as dis1
+                            , N'{3}' as discount_hehang_value
+                            , isnull(ddh.giachuan, ddh.giafob) as giachuan
+                            , ddh.giafob as giafob0
+                            , isnull(ddh.phi, 0) as phi
+						    , sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch
+                            , convert(varchar, dh.shipmenttime, 106) as shipmenttime
+                            , cb.ten_cangbien
+                            , pmt.ten_paymentterm
+                            , dh.ghichu
+                            , ('In favor of ANCO COMPANY LTD. Account No. : ' + ngh.thongtin) as mota
+						    , ddh.v2 as cbm
+                            , (sp.trongluong * ddh.soluong) as trongluong
+                            , (case ddh.sl_outer when 0 then 0 else (ddh.soluong / ddh.sl_outer) end ) as ofpack
+						    , (case dg.sl_inner when 0 then ' ' else (cast(dg.sl_inner as nvarchar) + ' '+ (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner)) end) as sl_inner_
+						    , dh.portdischarge
+                            , CASE WHEN dh.hoahong is null THEN 0 ELSE dh.hoahong END as hoahong
+						    , (case when md_nguoilienhe_id is null then '' else (select ma_dtkd from md_doitackinhdoanh where md_doitackinhdoanh_id = dh.md_nguoilienhe_id) end) as nguoinhan
+						    , ddh.l1, ddh.w1, ddh.h1 , ddh.l2, ddh.w2, ddh.h2, hs.hscode as ma_hscode
+						    , dvt_outer.ten_dvt as dvt_outer
+						    , dvt_inner.ten_dvt as dvt_inner
+						    , (ddh.l2 + ddh.w2) * (ddh.w2 * ddh.h2) / 5400 as t_thung_outer
+						    , (ddh.l1 + ddh.w1) * (ddh.w1 * ddh.h1) / 5400 as t_thung_inner
+						    , case when dh.md_trongluong_id is not null then dg.sl_outer * sp.trongluong else 0 end as n_w_master
+						    , case when dh.md_trongluong_id is not null then dg.sl_inner * sp.trongluong else 0 end as n_w_inner
+						    , kt.ten_kichthuoc
+                            , tl.ten_trongluong
+                            , ddh.barcode
+                            , (case when isnull(dh.discount, 0) > 0 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discount
+                            , (case when isnull(dh.tanggia, 0) > 0 then isnull(dh.tanggia, 0) else isnull(ddh.tanggia, 0) end) as tanggia
+					    from
+						    {9} dh
+						    left join {10} ddh on dh.{9}_id = ddh.{9}_id
+						    left join md_doitackinhdoanh dtkd on dh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
+						    left join md_sanpham sp on ddh.md_sanpham_id = sp.md_sanpham_id
+						    left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id
+						    left join md_donvitinh dvt_outer on dvt_outer.md_donvitinh_id = dg.dvt_outer
+						    left join md_donvitinh dvt_inner on dvt_inner.md_donvitinh_id = dg.dvt_inner				
+						    left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
+						    left join md_cangbien cb on dh.md_cangbien_id = cb.md_cangbien_id
+						    left join md_paymentterm pmt on dh.md_paymentterm_id = pmt.md_paymentterm_id
+						    left join md_nganhang ngh on dh.md_nganhang_id = ngh.md_nganhang_id
+						    left join md_kichthuoc kt on dh.md_kichthuoc_id = kt.md_kichthuoc_id
+						    left join md_trongluong tl on dh.md_trongluong_id = tl.md_trongluong_id
+						    left join md_hscode hs on sp.md_hscode_id = hs.md_hscode_id
+                        where 1=1
+                            AND dh.{9}_id = N'{0}' 
+				    ) A
+                ) B
+            ) C
+            order by C.ma_sanpham asc"
             , c_donhang_id == null ? "" : c_donhang_id
             , totalWord
             , dh.discount.GetValueOrDefault(0)
