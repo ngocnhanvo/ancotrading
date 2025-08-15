@@ -289,6 +289,8 @@ public class DanhSachDatHangController : IHttpHandler
                     , mailObj["noidung"].ToString()
                     , atts
                 );
+
+                File.Delete(fileXNXH);
             }
         }
     }
@@ -828,6 +830,7 @@ public class DanhSachDatHangController : IHttpHandler
     public void sendMail(HttpContext context)
     {
         string sendType = context.Request.QueryString["sendType"];
+        string fileXNXH = context.Request.Form["xnxh"];
         //--
         string sendMailType = context.Request.QueryString["sendMailType"];
         //--
@@ -983,15 +986,45 @@ public class DanhSachDatHangController : IHttpHandler
                         noidung = noidung.Replace("[GIATRIDONHANG]", giatridonhang.ToString());
                         noidungKhongGia = noidungKhongGia.Replace("[GIATRIDONHANG]", "đã ẩn");
 
+                        var atts = new List<System.Net.Mail.Attachment>();
+                        System.Net.Mail.Attachment att =  new System.Net.Mail.Attachment(fileXNXH);
+                        string name = "Phiếu XNXH.xls";
+                        att.Name = name;
+                        atts.Add(att);
+
                         if (sendMail[i] == "newKcs" || sendMail[i] == "Kcs")
                         {
                             if (sendType == "toAllPlus")
                             {
-                                mail.Send(nv.email, UserUtils.mailKCS, nv.email_cc, "", tmp.subject_mail, noidung, fileDDHs[0] + ";" + fileDDHs[1]);
+                                att = new System.Net.Mail.Attachment(fileDDHs[0]);
+                                name = "Đơn đặt hàng.xls";
+                                att.Name = name;
+                                atts.Add(att);
+
+                                att = new System.Net.Mail.Attachment(fileDDHs[1]);
+                                name = "Đơn đặt hàng.pdf";
+                                att.Name = name;
+                                atts.Add(att);
+
+                                mail.Send(nv.email, UserUtils.mailKCS, nv.email_cc, "", tmp.subject_mail, noidung, atts);
                             }
                             else
                             {
-                                mail.Send(nv.email, UserUtils.mailKCS, nv.email_cc, "", tmp.subject_mail, noidung, fileDDHs[0] + ";" + fileDDHs[1] + ";" + path + fileNameExcel);
+                                att = new System.Net.Mail.Attachment(fileDDHs[0]);
+                                name = "Đơn đặt hàng.xls";
+                                att.Name = name;
+                                atts.Add(att);
+
+                                att = new System.Net.Mail.Attachment(fileDDHs[1]);
+                                name = "Đơn đặt hàng.pdf";
+                                att.Name = name;
+                                atts.Add(att);
+
+                                att = new System.Net.Mail.Attachment(path + fileNameExcel);
+                                name = "Thông tin sản phẩm.xls";
+                                att.Name = name;
+                                atts.Add(att);
+                                mail.Send(nv.email, UserUtils.mailKCS, nv.email_cc, "", tmp.subject_mail, noidung, atts);
                             }
                             resp += String.Format("Đã gửi mail thành công đến:<br/>{0}<br/>{1}<br/>", nv.email_cc, UserUtils.mailKCS);
                         }
@@ -1035,9 +1068,43 @@ public class DanhSachDatHangController : IHttpHandler
                                     if (sendMail[i] == "newNcu" | sendMail[i] == "Ncu")
                                     {
                                         if (!string.IsNullOrEmpty(doitac.email))
-                                            mail.Send(nv.email, doitac.email, nv.email_cc, "", tmp.subject_mail, noidung, fileDDHs[0] + ";" + fileDDHs[1] + ";" + pathInBaoBi);
+                                        {
+                                            att = new System.Net.Mail.Attachment(fileDDHs[0]);
+                                            name = "Đơn đặt hàng.xls";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            att = new System.Net.Mail.Attachment(fileDDHs[1]);
+                                            name = "Đơn đặt hàng.pdf";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            att = new System.Net.Mail.Attachment(pathInBaoBi);
+                                            name = "Thông tin bao bì.xls";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            mail.Send(nv.email, doitac.email, nv.email_cc, "", tmp.subject_mail, noidung, atts);
+                                        }
                                         if (!string.IsNullOrEmpty(doitac.emailkt))
-                                            mail.Send(nv.email, doitac.emailkt, "", "", tmp.subject_mail, noidungKhongGia, fileDDHsKhongGia[0] + ";" + fileDDHsKhongGia[1] + ";" + pathInBaoBi);
+                                        {
+                                            att = new System.Net.Mail.Attachment(fileDDHsKhongGia[0]);
+                                            name = "Đơn đặt hàng.xls";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            att = new System.Net.Mail.Attachment(fileDDHsKhongGia[1]);
+                                            name = "Đơn đặt hàng.pdf";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            att = new System.Net.Mail.Attachment(pathInBaoBi);
+                                            name = "Thông tin bao bì.xls";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            mail.Send(nv.email, doitac.emailkt, "", "", tmp.subject_mail, noidungKhongGia, atts);
+                                        }
                                     }
                                 }
                                 else
@@ -1045,14 +1112,60 @@ public class DanhSachDatHangController : IHttpHandler
                                     if (sendMail[i] == "newNcu" | sendMail[i] == "Ncu")
                                     {
                                         if (!string.IsNullOrEmpty(doitac.email))
-                                            mail.Send(nv.email, doitac.email, nv.email_cc, "", tmp.subject_mail, noidung, fileDDHs[0] + ";" + fileDDHs[1] + ";" + pathInBaoBi + ";" + path + fileNameExcel);
+                                        {
+                                            att = new System.Net.Mail.Attachment(fileDDHs[0]);
+                                            name = "Đơn đặt hàng.xls";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            att = new System.Net.Mail.Attachment(fileDDHs[1]);
+                                            name = "Đơn đặt hàng.pdf";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            att = new System.Net.Mail.Attachment(pathInBaoBi);
+                                            name = "Thông tin bao bì.xls";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            att = new System.Net.Mail.Attachment(path + fileNameExcel);
+                                            name = "Thông tin sản phẩm.xls";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            mail.Send(nv.email, doitac.email, nv.email_cc, "", tmp.subject_mail, noidung, atts);
+                                        }
                                         if (!string.IsNullOrEmpty(doitac.emailkt))
-                                            mail.Send(nv.email, doitac.emailkt, "", "", tmp.subject_mail, noidungKhongGia, fileDDHsKhongGia[0] + ";" + fileDDHsKhongGia[1] + ";" + pathInBaoBi + ";" + path + fileNameExcel);
+                                        {
+                                            att = new System.Net.Mail.Attachment(fileDDHsKhongGia[0]);
+                                            name = "Đơn đặt hàng.xls";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            att = new System.Net.Mail.Attachment(fileDDHsKhongGia[1]);
+                                            name = "Đơn đặt hàng.pdf";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            att = new System.Net.Mail.Attachment(pathInBaoBi);
+                                            name = "Thông tin bao bì.xls";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            att = new System.Net.Mail.Attachment(path + fileNameExcel);
+                                            name = "Thông tin sản phẩm.xls";
+                                            att.Name = name;
+                                            atts.Add(att);
+
+                                            mail.Send(nv.email, doitac.emailkt, "", "", tmp.subject_mail, noidungKhongGia, atts);
+                                        }
                                     }
                                 }
                                 resp += string.Format("<br/>Đã gửi mail thành công đến:<br/>{0}<br/>{1}<br/>", ccSend, toSend);
                             }
                         }
+
+                        File.Delete(fileXNXH);
                     }
                 }
                 if (next)
@@ -1069,7 +1182,8 @@ public class DanhSachDatHangController : IHttpHandler
             }
             catch (Exception ex)
             {
-                context.Response.Write(ex.Message);
+                File.Delete(fileXNXH);
+                context.Response.Write(ex.ToString());
             }
         }
     }

@@ -310,12 +310,13 @@
                                             sendMailType += sendKTNCU + ",";
                                         }
                                     }
-
-                                    $.get("Controllers/DanhSachDatHangController.ashx?action=sendmail&piId=" + piId + "&sendType=" + sendType + "&sendMailType=" + sendMailType, function (result) {
-                                        $('#sendpi #content').html(result);
-                                        $("#btn-close span").text("Thoát");
-                                        $("#btn-close").button("enable");
-                                        $('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
+                                    $.get(`PrintControllers/InBaoCaoAncotrading/phieuXNXH.aspx?id=${piId}`, function (rs) {
+                                        $.post(`Controllers/DanhSachDatHangController.ashx?action=sendmail&piId=${piId}&sendType=${sendType}&sendMailType=${sendMailType}`, {xnxh: rs}, function (result) {
+                                            $('#sendpi #content').html(result);
+                                            $("#btn-close span").text("Thoát");
+                                            $("#btn-close").button("enable");
+                                            $('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
+                                        });
                                     });
                                 }
 

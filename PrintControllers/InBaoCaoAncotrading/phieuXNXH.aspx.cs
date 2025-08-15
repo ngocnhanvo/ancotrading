@@ -91,7 +91,7 @@ public partial class PrintControllers_InBaoCaoAncotrading_phieuXNXH : System.Web
                 sp.mota_tienganh as mota,
                 dg.sl_inner as pkin1,
                 dvti.ten_dvt as pkin2,
-                round(dds.sl_dathang/1, 2) as nop,
+                (case when dg.sl_outer > 0 then round(dds.sl_dathang/dg.sl_outer, 2) else 0 end) as nop,
                 sp.trongluong * dds.sl_dathang as nw,
                 sp.trongluong * dds.sl_dathang as gw,
                 ddh.v2 as cbm,
