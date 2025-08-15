@@ -399,11 +399,17 @@
 
 <script>
     function guidonhang() {
-        var piId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selarrrow');
+        var piId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selarrrow'); 
         if (piId == null) {
-            alert('Hãy chọn một báo giá mà bạn muốn gửi!');
-        } else {
-
+            alert('Hãy chọn một đơn đặt hàng mà bạn muốn gửi!');
+        }
+        else if (piId.length < 1) {
+            alert('Hãy chọn một đơn đặt hàng!');
+        }
+        else if (piId.length > 1) {
+            alert('Chỉ được chọn đơn đặt hàng!');
+        }
+        else {
             $('body').append(`
 				<div title='Gửi đơn hàng' id='guidonhang'>
 					<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>
@@ -423,13 +429,15 @@
                         click: function () {
                             $('#btn-ok').button('option', 'disabled', true);
                             $('#wait').show();
-                            $.post('Controllers/DanhSachDatHangController.ashx?action=guidonhang&piId=' + piId,
-                                { id: piId.toString() }, function (result) {
+                            $.get(`PrintControllers/InBaoCaoAncotrading/phieuXNXH.aspx?id=${piId}`, function (rs) {
+                                $.post(`Controllers/DanhSachDatHangController.ashx?action=guidonhang&piId=${piId}`,
+                                { id: piId.toString(), xnxh: rs }, function (result) {
                                     $('.dlg_content').html(result);
                                     $('#btn-ok').button('option', 'disabled', false);
                                     $('#wait').hide();
                                     $('#grid_ds_dathang')[0].triggerToolbar();
                                 });
+                            });
                         }
                     }
                     , {

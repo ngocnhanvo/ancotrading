@@ -639,28 +639,39 @@ namespace OfficeToPDF
 
                 excelConvert.endRow = infoExcel.rptFooter;
                 excelConvert.endColumn = maxColumn;
-                var msg = excelConvert.ConvertInterop(urlExcel, printCf.isPDF.GetValueOrDefault(false) ? urlPDF : urlExcel, null);
+                string urlFN = printCf.isPDF.GetValueOrDefault(false) ? urlPDF : urlExcel;
+                var msg = excelConvert.ConvertInterop(urlExcel, urlFN, null);
 
                 if (msg.Length <= 0)
                 {
-                    if (printCf.isPDF.GetValueOrDefault(false))
+                    var download = viewer.Attributes != null ? viewer.Attributes["download"] == "1" : false;
+                    if (download)
                     {
-                        context.Response.Redirect(string.Format("../../../ViewPDFPublic/index.aspx?urlpdf=../FileUpload/{0}.pdf&zoomprint=0.999&zoom=page-width&remove=true&namedown={1}", filename, DisplayName));
+                        context.Response.Clear();
+                        context.Response.Write(urlFN);
+                        context.Response.End();
                     }
                     else
                     {
-                        var xfileRead = new FileStream(urlExcel, FileMode.Open, FileAccess.ReadWrite);
-                        var memoryStream = new MemoryStream();
-                        xfileRead.CopyTo(memoryStream);
-                        xfileRead.Close();
-                        xfileRead.Dispose();
-                        File.Delete(urlExcel);
+                        if (printCf.isPDF.GetValueOrDefault(false))
+                        {
+                            context.Response.Redirect(string.Format("../../../ViewPDFPublic/index.aspx?urlpdf=../FileUpload/{0}.pdf&zoomprint=0.999&zoom=page-width&remove=true&namedown={1}", filename, DisplayName));
+                        }
+                        else
+                        {
+                            var xfileRead = new FileStream(urlExcel, FileMode.Open, FileAccess.ReadWrite);
+                            var memoryStream = new MemoryStream();
+                            xfileRead.CopyTo(memoryStream);
+                            xfileRead.Close();
+                            xfileRead.Dispose();
+                            File.Delete(urlExcel);
 
-                        context.Response.ContentType = "application/vnd.ms-excel";
-                        context.Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}.xls", DisplayName));
-                        context.Response.Clear();
-                        context.Response.BinaryWrite(memoryStream.ToArray());
-                        context.Response.End();
+                            context.Response.ContentType = "application/vnd.ms-excel";
+                            context.Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}.xls", DisplayName));
+                            context.Response.Clear();
+                            context.Response.BinaryWrite(memoryStream.ToArray());
+                            context.Response.End();
+                        }
                     }
                 }
                 else

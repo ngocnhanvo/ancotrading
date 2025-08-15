@@ -251,8 +251,35 @@ public class DanhSachDatHangController : IHttpHandler
             if (!string.IsNullOrWhiteSpace(mailNN))
                 emailkt = emailkt + "," + mailNN;
 
+            string fileXNXH = context.Request.Form["xnxh"];
             if (!string.IsNullOrEmpty(emailkt))
             {
+                var atts = new List<System.Net.Mail.Attachment>();
+                var att = new System.Net.Mail.Attachment(fileXNXH);
+                var name = "Phiếu XNXH.xls";
+                att.Name = name;
+                atts.Add(att);
+
+                att = new System.Net.Mail.Attachment(fileTTSP);
+                name = "Thông tin sản phẩm.xls";
+                att.Name = name;
+                atts.Add(att);
+
+                att = new System.Net.Mail.Attachment(fileDDHsKhongGia[0]);
+                name = "Đơn đặt hàng.xls";
+                att.Name = name;
+                atts.Add(att);
+
+                att = new System.Net.Mail.Attachment(fileDDHsKhongGia[1]);
+                name = "Đơn đặt hàng.pdf";
+                att.Name = name;
+                atts.Add(att);
+
+                att = new System.Net.Mail.Attachment(fileXNBB);
+                name = "Xác nhận bao bì.xls";
+                att.Name = name;
+                atts.Add(att);
+
                 mail.Send(
                     nv.email
                     , emailkt
@@ -260,7 +287,7 @@ public class DanhSachDatHangController : IHttpHandler
                     , ""
                     , mailObj["tieude"].ToString()
                     , mailObj["noidung"].ToString()
-                    , fileTTSP + ";" + fileDDHsKhongGia[0] + ";" + fileXNBB + ";" + fileDDHsKhongGia[1]
+                    , atts
                 );
             }
         }
@@ -1232,7 +1259,7 @@ public class DanhSachDatHangController : IHttpHandler
 
         db.SubmitChanges();
 
-    EndEventHandler:;
+        EndEventHandler:;
     }
 
     public void add(HttpContext context)
@@ -1351,7 +1378,7 @@ public class DanhSachDatHangController : IHttpHandler
             msg = ex.Message;
         }
 
-    EndEventHandler:;
+        EndEventHandler:;
 
         if(msg.Length <= 0)
         {

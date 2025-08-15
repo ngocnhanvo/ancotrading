@@ -119,6 +119,7 @@ public class PrintAnco2
         var context = HttpContext.Current;
         string msg = "";
         var export = new OfficeToPDF.ExportData();
+        export.viewer = viewer;
         type = string.IsNullOrEmpty(type) ? "0" : type;
         if (type == "0")
         {
