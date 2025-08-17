@@ -228,7 +228,84 @@
             });
         }
     }
-    
+
+
+    setTimeout(function () {
+        $("#grid_ds_dathang_taophieunhapxuat").jqGrid('navButtonAdd', '#grid_ds_dathang_taophieunhapxuat-pager', {
+            caption: ""
+            , title: "Tạo phiếu nhập từ Excel"
+            , buttonicon: "icon-pi"
+            , onClickButton: function () {
+                $('body').append(`
+                    <div title="Tạo phiếu nhập kho từ excel" id="dialog-taophieunhapxuat-tuexcel">
+                        <div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>
+                        <div id="dialog-caution">
+                            <input type="file" id="fileNKE" accept=".xls,.xlsx" />
+                        </div>
+                    </div>
+                `);
+
+                // create new dialog
+                $('#dialog-taophieunhapxuat-tuexcel').dialog({
+                    modal: true
+                    , open: function(event, ui) {
+                        //hide close button.
+                        $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                    }
+                    , buttons:
+                    [
+                        {
+                            id: "btn-dialog-taophieunhapxuat-tuexcel",
+                            text: "Có",
+                            click: function() {
+                                let ajaxStart = function() {
+                                    $("#wait").css("display", "block");
+                                    $("#btn-dialog-taophieunhapxuat-tuexcel").button("disable");
+                                    $("#btn-close").button("disable");
+                                };
+
+                                let ajaxComplete = function() {
+                                    $("#wait").css("display", "none");
+                                    $("#btn-close span").text("Thoát");
+                                    $("#btn-close").button("enable");
+                                };
+
+                                ajaxStart();
+                                let formData = new FormData();
+                                formData.append('action', 'TaoPhieuNhapExcel');
+                                formData.append('file', $('#fileNKE')[0].files[0]);
+							    $.ajax({
+                                    url: "Controllers/TaoPhieuNhapKho.ashx",
+                                    type: "POST",
+                                    data: formData,
+                                    processData: false, 
+                                    contentType: false, 
+                                    error: function (rs) {
+                                        ajaxComplete();
+                                        Popup("Error", 500, 400, rs.responseText);
+                                    },
+                                    success: function (rs) {
+                                        if (rs.substr(0, 6) == 'false#')
+                                            rs = `<div style='color:red'>${rs.substr(6)}</div>`;
+
+                                        $('#dialog-taophieunhapxuat-tuexcel').find('#dialog-caution').html(rs);
+                                        ajaxComplete();
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            id: "btn-close",
+                            text: "Không",
+                            click: function() {
+                                $(this).dialog("destroy").remove();
+                            }
+                        }
+                    ]
+                });
+            }
+        });
+    }, 1000);
 </script>
 
 
