@@ -222,6 +222,7 @@ public class TaoPhieuNhapKho : IHttpHandler
         md_sochungtu chungtu = db.md_sochungtus.Where(ct => ct.ten_sochungtu.Equals("Nhập kho")).FirstOrDefault();
         var obj = new c_nhapxuat();
         obj.c_nhapxuat_id = id;
+        obj.c_donhang_id = dh.c_donhang_id;
         obj.md_doitackinhdoanh_id = dsdh.md_doitackinhdoanh_id;
         obj.sophieu = $"{chungtu.tiento}/{chungtu.so_duocgan}/{chungtu.hauto}";
         chungtu.so_duocgan = chungtu.so_duocgan + 1;
