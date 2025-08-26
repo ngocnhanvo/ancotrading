@@ -1,0 +1,14 @@
+select xk.sophieu, nk.sophieu
+from c_nhapxuat xk
+left join c_dongnhapxuat dxk on dxk.c_nhapxuat_id = xk.c_nhapxuat_id
+cross apply (
+	select nk.sophieu
+	from c_nhapxuat nk
+	left join c_dongnhapxuat dnk on dnk.c_nhapxuat_id = nk.c_nhapxuat_id
+	where 
+		dnk.c_dongnhapxuat_id = dxk.dongnhapxuat_ref
+		and nk.md_loaichungtu_id = 'NK'
+) nk
+where xk.md_loaichungtu_id = 'XK'
+group by xk.sophieu, nk.sophieu
+order by substring(xk.sophieu, 9, 2), substring(xk.sophieu, 0, 8), nk.sophieu

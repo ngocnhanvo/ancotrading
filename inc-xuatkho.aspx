@@ -292,7 +292,7 @@
 			FuncSendMail="sendMailXK"
             UrlFileAction="Controllers/XuatKhoController.ashx"
             BtnPrint="funcPrintXK"
-            ColNames="['c_nhapxuat_id', 'TT', 'PO Tham Chiếu', 'Số Phiếu', 'Số Seal', 'Số Container', 'Loại Cont', 'Ngày Tạo', 'Người Tạo', 'Ngày Giao Nhận', 'Đối Tác', 'Người Giao', 'Người Nhập', 'Số Phiếu Khách', 'Ngày Phiếu', 'Kho',   'Loại Chứng Từ', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
+            ColNames="['c_nhapxuat_id', 'TT', 'PO Tham Chiếu', 'Số Phiếu', 'Số Seal', 'Số Container', 'Loại Cont', 'Tare', 'MG', 'VGM', 'Ngày Tạo', 'Người Tạo', 'Ngày Giao Nhận', 'Đối Tác', 'Người Giao', 'Người Nhập', 'Số Phiếu Khách', 'Ngày Phiếu', 'Kho',   'Loại Chứng Từ', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
             RowNumbers="true"
             FilterToolbar="true"
             OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid,{ 
@@ -363,6 +363,27 @@
                  , edittype: 'select'
                  , editoptions: { value:'CONT20:Cont 20;CONT40:Cont 40;CONT45:Cont 45;40HC:40HC;LE:Cont Lẻ' }
 				 , formoptions: { label:'Loại Cont' + ip_fd()}
+            },
+            {
+                 fixed: true, name: 'tare'
+                 , index: 'tare'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'mg'
+                 , index: 'mg'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'vgm'
+                 , index: 'vgm'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
             },
 			{
                 fixed: true, name: 'ngaytao'

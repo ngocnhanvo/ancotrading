@@ -19,7 +19,7 @@ public class XuatKhoController : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
-			case "startsendmail":
+            case "startsendmail":
                 this.startSendMail(context);
                 break;
             case "sendmail":
@@ -28,7 +28,7 @@ public class XuatKhoController : IHttpHandler
             case "activexk":
                 this.ActiveXuatKho(context);
                 break;
-			case "deactivexk":
+            case "deactivexk":
                 this.DeactiveXuatKho(context);
                 break;
             case "getoption":
@@ -53,8 +53,8 @@ public class XuatKhoController : IHttpHandler
                 break;
         }
     }
-	
-	public void startSendMail(HttpContext context)
+
+    public void startSendMail(HttpContext context)
     {
         try
         {
@@ -131,7 +131,7 @@ public class XuatKhoController : IHttpHandler
                 AND nx.c_nhapxuat_id = N'{1}' order by dnx.line asc", MoneyToWord.ConvertMoneyToTextVND(total), c_nhapxuat_id == null ? "" : c_nhapxuat_id);
         return str;
     }
-    
+
 
     public void sendMail(HttpContext context)
     {
@@ -141,7 +141,7 @@ public class XuatKhoController : IHttpHandler
         String path = context.Server.MapPath("~/FileSendMail/");
         String xuatKhoPdf = manv + "Xuat-Kho-{0}-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + ".pdf";
         String nhapKhoPdf = manv + "Nhap-Kho-{0}-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + "-{1}-" + ".pdf";
-        
+
         nhanvien nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
         md_mailtemplate tmp = db.md_mailtemplates.FirstOrDefault(p => p.use_for.Equals("KETOAN") && p.default_mail.Equals(true));
 
@@ -188,7 +188,7 @@ public class XuatKhoController : IHttpHandler
             next = false;
             msg += "Không chiết xuất được phiếu xuất kho!" + e.Message;
         }
-		
+
         try
         {
             string getNhapKhoId = "select c_nhapxuat_id, sophieu from c_nhapxuat where c_nhapxuat_id IN ( select c_nhapxuat_id from c_dongnhapxuat dnx where dnx.c_dongnhapxuat_id in( select dongnhapxuat_ref from c_dongnhapxuat where c_nhapxuat_id = '" + xkId + "' ))";
@@ -252,12 +252,12 @@ public class XuatKhoController : IHttpHandler
                 {
                     string resp = "";
                     GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value);
-                   // mail.Send(nv.email, "hongphuong@ancopottery.com", nv.email_cc, "", tmp.subject_mail, tmp.content_mail.Replace("%0D", "<br/>"), files);
+                    // mail.Send(nv.email, "hongphuong@ancopottery.com", nv.email_cc, "", tmp.subject_mail, tmp.content_mail.Replace("%0D", "<br/>"), files);
                     mail.Send(nv.email, "binhpn@ancopottery.com", nv.email_cc, "", tmp.subject_mail, tmp.content_mail.Replace("%0D", "<br/>"), files);
-					
-				//	resp += String.Format("Đã gửi mail thành công đến:<br/>{0}<br/>{1}<br/>", nv.email_cc, "hongphuong@ancopottery.com");
+
+                    //	resp += String.Format("Đã gửi mail thành công đến:<br/>{0}<br/>{1}<br/>", nv.email_cc, "hongphuong@ancopottery.com");
                     resp += String.Format("Đã gửi mail thành công đến:<br/>{0}<br/>{1}<br/>", nv.email_cc, "binhpn@ancopottery.com");
-					context.Response.Write(resp);
+                    context.Response.Write(resp);
                 }
             }
             catch (Exception ex)
@@ -265,8 +265,8 @@ public class XuatKhoController : IHttpHandler
                 context.Response.Write(ex.Message);
             }
         }else{
-			context.Response.Write(msg);
-		}
+            context.Response.Write(msg);
+        }
     }
 
     public void ActiveXuatKho(HttpContext context)
@@ -302,16 +302,16 @@ public class XuatKhoController : IHttpHandler
 
             if (next)
             {
-				mdbc.ExcuteNonProcedure("dbo.p_hieulucnhapxuat", "@nhapxuat_id", id);
-				
+                mdbc.ExcuteNonProcedure("dbo.p_hieulucnhapxuat", "@nhapxuat_id", id);
+
                 m.md_trangthai_id = "HIEULUC";
                 db.SubmitChanges();
-                context.Response.Write(String.Format("Hiệu lực phiếu xuất kho {0} thành công.!", m.sophieu));    
+                context.Response.Write(String.Format("Hiệu lực phiếu xuất kho {0} thành công.!", m.sophieu));
             }
         }
     }
-	
-	public void DeactiveXuatKho(HttpContext context)
+
+    public void DeactiveXuatKho(HttpContext context)
     {
         String id = context.Request.QueryString["xkId"];
         c_nhapxuat m = db.c_nhapxuats.Single(p => p.c_nhapxuat_id.Equals(id));
@@ -319,51 +319,51 @@ public class XuatKhoController : IHttpHandler
         {
             context.Response.Write(String.Format("Hiệu trạng thái của phiếu xuất {0} đã là soạn thảo.!", m.sophieu));
         }
-		else if(m.cr_invoice == true)
-		{
-			context.Response.Write(String.Format("Phiếu xuất {0} đã tạo invoice.!", m.sophieu));
-		}
+        else if(m.cr_invoice == true)
+        {
+            context.Response.Write(String.Format("Phiếu xuất {0} đã tạo invoice.!", m.sophieu));
+        }
         else
         {
             bool next = true;
             if (next)
             {
-				mdbc.ExcuteNonProcedure("dbo.p_soanthaonhapxuat", "@nhapxuat_id", id);
-				
+                mdbc.ExcuteNonProcedure("dbo.p_soanthaonhapxuat", "@nhapxuat_id", id);
+
                 m.md_trangthai_id = "SOANTHAO";
                 db.SubmitChanges();
-                context.Response.Write(String.Format("Thay đổi trạng thái \"Soạn thảo\" phiếu xuất kho {0} thành công.!", m.sophieu));    
+                context.Response.Write(String.Format("Thay đổi trạng thái \"Soạn thảo\" phiếu xuất kho {0} thành công.!", m.sophieu));
             }
         }
     }
-    
+
     public void getSelectOption(HttpContext context)
     {
         String sql = "select c_nhapxuat_id, sophieu from c_nhapxuat where hoatdong = 1 AND md_loaichungtu_id = N'XK'";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
-		string soseal = context.Request.Form["soseal"];
-		string container = context.Request.Form["container"];
-		string loaicont = context.Request.Form["loaicont"];
-		
-		c_nhapxuat m = db.c_nhapxuats.Single(p => p.c_nhapxuat_id == context.Request.Form["id"]);
-		
-		string sqlCount = @"select count(*) from c_nhapxuat where c_nhapxuat_id != '"+ context.Request.Form["id"] +"' and md_loaichungtu_id = 'XK' and (soseal = '" + context.Request.Form["soseal"] + "' or container = '"+ context.Request.Form["container"] +"') and sophieunx = '" + m.sophieunx +"'";
-		int count = (int)mdbc.ExecuteScalar(sqlCount);
-		
+        string soseal = context.Request.Form["soseal"];
+        string container = context.Request.Form["container"];
+        string loaicont = context.Request.Form["loaicont"];
+
+        c_nhapxuat m = db.c_nhapxuats.Single(p => p.c_nhapxuat_id == context.Request.Form["id"]);
+
+        string sqlCount = @"select count(*) from c_nhapxuat where c_nhapxuat_id != '"+ context.Request.Form["id"] +"' and md_loaichungtu_id = 'XK' and (soseal = '" + context.Request.Form["soseal"] + "' or container = '"+ context.Request.Form["container"] +"') and sophieunx = '" + m.sophieunx +"'";
+        int count = (int)mdbc.ExecuteScalar(sqlCount);
+
         bool hd = false;
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-		if(count > 0 & loaicont != "LE")
-		{
-			jqGridHelper.Utils.writeResult(0, "Số Seal hoặc số container số đã tồn tại! Chỉ được phép chọn Cont Lẻ");
-		}
+        if(count > 0 & loaicont != "LE")
+        {
+            jqGridHelper.Utils.writeResult(0, "Số Seal hoặc số container số đã tồn tại! Chỉ được phép chọn Cont Lẻ");
+        }
         else if (m.md_trangthai_id.Equals("SOANTHAO"))
         {
             //m.c_donhang_id = context.Request.Form["c_donhang_id"];
@@ -380,6 +380,9 @@ public class XuatKhoController : IHttpHandler
             m.socontainer = 1;
             m.container = context.Request.Form["container"];
             m.loaicont = context.Request.Form["loaicont"];
+            m.tare = context.Request.Form["tare"].ToNullableDecimal();
+            m.mg = context.Request.Form["mg"].ToNullableDecimal();
+            m.vgm = context.Request.Form["vgm"].ToNullableDecimal();
             //m.md_trangthai_id = context.Request.Form["md_trangthai_id"];
             //m.md_loaichungtu_id = context.Request.Form["md_loaichungtu_id"];
 
@@ -392,9 +395,9 @@ public class XuatKhoController : IHttpHandler
             db.SubmitChanges();
         }else
         {
-            jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi trạng thái là hiệu lực!");            
-        }		
-        
+            jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi trạng thái là hiệu lực!");
+        }
+
     }
 
     public void add(HttpContext context)
@@ -468,7 +471,7 @@ public class XuatKhoController : IHttpHandler
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
         bool isadmin = db.nhanviens.FirstOrDefault(p => p.manv.Equals(UserUtils.getUser(context))).isadmin.Value;
-        
+
         //// filter
         String filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
@@ -488,18 +491,18 @@ public class XuatKhoController : IHttpHandler
             strAccount += String.Format(", '{0}'", item);
         }
         strAccount = String.Format("'{0}'{1}", manv, strAccount);
-        
+
 
         String sqlCount = "SELECT COUNT(*) AS count " +
-			" FROM c_nhapxuat nx " +
-			" Left join md_doitackinhdoanh dtkd on nx.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " +
-			" Left join md_kho kho on nx.md_kho_id = kho.md_kho_id " +
+            " FROM c_nhapxuat nx " +
+            " Left join md_doitackinhdoanh dtkd on nx.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " +
+            " Left join md_kho kho on nx.md_kho_id = kho.md_kho_id " +
             " WHERE 1 = 1" +
             " {0} " +
             " AND nx.md_loaichungtu_id = N'XK' " + filter;
 
         sqlCount = String.Format(sqlCount, isadmin == true ? "" : " AND nx.nguoitao IN(" + strAccount + ") ");
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -526,26 +529,27 @@ public class XuatKhoController : IHttpHandler
             sidx = "nx.c_nhapxuat_id";
         }
 
-        string strsql = "select * from( " +
-            " select nx.c_nhapxuat_id, nx.md_trangthai_id " +
-            " , nx.sophieunx " +
-            " , nx.sophieu " +
-            " , nx.ngay_giaonhan, dtkd.ma_dtkd, nx.nguoigiao, nx.nguoinhan " +
-            " , nx.sophieukhach, nx.ngay_phieu, kho.ten_kho " +
-            " , nx.soseal, nx.container, nx.loaicont " +
-            " , nx.md_loaichungtu_id, nx.ngaytao, nx.nguoitao, nx.ngaycapnhat, nx.nguoicapnhat " +
-            " , nx.mota, nx.hoatdong " +
-            " , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            " FROM c_nhapxuat nx " +
-			" Left join md_doitackinhdoanh dtkd on nx.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " +
-			" Left join md_kho kho on nx.md_kho_id = kho.md_kho_id " +
-            " WHERE 1 = 1" +
-            " {0} " +
-            " AND nx.md_loaichungtu_id = N'XK' " + filter +
-            " )P where RowNum > @start AND RowNum < @end";
+        string where = isadmin == true ? "" : $"AND nx.nguoitao IN({strAccount}) ";
 
-        strsql = String.Format(strsql, isadmin == true ? "" : "AND nx.nguoitao IN(" + strAccount + ") ");
-        
+        string strsql = $@"select * from(
+            select nx.c_nhapxuat_id, nx.md_trangthai_id 
+            , nx.sophieunx 
+            , nx.sophieu 
+            , nx.ngay_giaonhan, dtkd.ma_dtkd, nx.nguoigiao, nx.nguoinhan 
+            , nx.sophieukhach, nx.ngay_phieu, kho.ten_kho 
+            , nx.soseal, nx.container, nx.loaicont 
+            , nx.md_loaichungtu_id, nx.tare, nx.mg, nx.vgm
+            , nx.ngaytao, nx.nguoitao, nx.ngaycapnhat, nx.nguoicapnhat 
+            , nx.mota, nx.hoatdong 
+            , ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum 
+            FROM c_nhapxuat nx 
+			Left join md_doitackinhdoanh dtkd on nx.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id 
+			Left join md_kho kho on nx.md_kho_id = kho.md_kho_id 
+            WHERE 1 = 1
+            {where} 
+            AND nx.md_loaichungtu_id = N'XK' {filter}
+            )P where RowNum > @start AND RowNum < @end";
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
@@ -559,10 +563,13 @@ public class XuatKhoController : IHttpHandler
             xml += "<cell><![CDATA[" + row["md_trangthai_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sophieunx"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sophieu"] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row["soseal"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["soseal"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["container"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["loaicont"] + "]]></cell>";
-			xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tare"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["mg"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["vgm"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngay_giaonhan"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";
@@ -571,7 +578,7 @@ public class XuatKhoController : IHttpHandler
             xml += "<cell><![CDATA[" + row["sophieukhach"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngay_phieu"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_kho"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["md_loaichungtu_id"] + "]]></cell>";            
+            xml += "<cell><![CDATA[" + row["md_loaichungtu_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoicapnhat"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";

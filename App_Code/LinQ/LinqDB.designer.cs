@@ -1,4 +1,4 @@
-//Update at 08/08/2025 06:56:01
+//Update at 25/08/2025 14:39:57
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -20931,6 +20931,9 @@ private System.Nullable<System.DateTime> _ngay_tigia;
 private System.Nullable<bool> _vinhgia_vnd;
 private System.Nullable<bool> _dagui;
 private System.Nullable<bool> _pnk_dautien;
+private System.Nullable<decimal> _tare;
+private System.Nullable<decimal> _mg;
+private System.Nullable<decimal> _vgm;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -21005,6 +21008,12 @@ partial void OndaguiChanging(System.Nullable<bool> value);
 partial void OndaguiChanged();
 partial void Onpnk_dautienChanging(System.Nullable<bool> value);
 partial void Onpnk_dautienChanged();
+partial void OntareChanging(System.Nullable<decimal> value);
+partial void OntareChanged();
+partial void OnmgChanging(System.Nullable<decimal> value);
+partial void OnmgChanged();
+partial void OnvgmChanging(System.Nullable<decimal> value);
+partial void OnvgmChanged();
 #endregion
 public c_nhapxuat()
 {
@@ -21672,6 +21681,63 @@ this.SendPropertyChanging();
 this._pnk_dautien = value;
 this.SendPropertyChanged("pnk_dautien");
 this.Onpnk_dautienChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tare", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @tare
+{
+get
+{
+return this._tare;
+}
+set
+{
+if ((this._tare != value))
+{
+this.OntareChanging(value);
+this.SendPropertyChanging();
+this._tare = value;
+this.SendPropertyChanged("tare");
+this.OntareChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mg", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @mg
+{
+get
+{
+return this._mg;
+}
+set
+{
+if ((this._mg != value))
+{
+this.OnmgChanging(value);
+this.SendPropertyChanging();
+this._mg = value;
+this.SendPropertyChanged("mg");
+this.OnmgChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_vgm", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @vgm
+{
+get
+{
+return this._vgm;
+}
+set
+{
+if ((this._vgm != value))
+{
+this.OnvgmChanging(value);
+this.SendPropertyChanging();
+this._vgm = value;
+this.SendPropertyChanged("vgm");
+this.OnvgmChanged();
 }
 }
 }

@@ -374,7 +374,7 @@
             , 'Ngày Giao Nhận', 'Mã Đối Tác', 'Đối Tác', 'Người Giao', 'Người Nhập', 'Số Phiếu Khách'
             , 'Ngày Phiếu', 'Kho', 'Số Seal', 'Số Container', 'Loại Cont', 'Phí cộng', 'Phí trừ'
             , 'Discount(%)', 'Tổng tiền'
-            , 'Loại Chứng Từ', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật'
+            , 'Loại Chứng Từ', 'Tare', 'MG', 'VGM', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật'
             , 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
             RowNumbers="true"
             OndblClickRow = "function(rowid) { 
@@ -555,6 +555,27 @@
                  , width: 100
                  , edittype: 'select'
                  , editoptions: { value:'NK:Nhập Kho;XK:Xuất Kho' }
+            },
+            {
+                 fixed: true, name: 'tare'
+                 , index: 'tare'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'mg'
+                 , index: 'mg'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
+            },
+            {
+                 fixed: true, name: 'vgm'
+                 , index: 'vgm'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
             },
             {
                 fixed: true, name: 'ngaytao'

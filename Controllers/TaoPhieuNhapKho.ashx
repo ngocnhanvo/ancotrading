@@ -90,12 +90,12 @@ public class TaoPhieuNhapKho : IHttpHandler
         row = rows.Rows[11];
         var noigiaohang = row.GetCell(1).Value;
         row = rows.Rows[12];
-        var tare = row.GetCell(1).Value;
+        var tare = getValue(row.GetCell(1)).ToString().ToNullableDecimal();
         row = rows.Rows[13];
-        var mg = row.GetCell(1).Value;
+        var mg = getValue(row.GetCell(1)).ToString().ToNullableDecimal();
         row = rows.Rows[14];
-        var vmg = row.GetCell(1).Value;
-
+        var vgm = getValue(row.GetCell(1)).ToString().ToNullableDecimal();
+        string soctn = "", soseal = "", loaictn = "";
         var dh = db.c_donhangs.Where(s => s.sochungtu == soPO).FirstOrDefault();
 
         var dsdh = db.c_danhsachdathangs.Where(s => s.sochungtu == dsdhso).FirstOrDefault();
@@ -161,6 +161,12 @@ public class TaoPhieuNhapKho : IHttpHandler
                 break;
             }
 
+            if(i == saveI)
+            {
+                soctn = ctn.ToString();
+                soseal = seal.ToString();
+                loaictn = type.ToString();
+            }
             var sp = db.md_sanphams.Where(s => s.ma_sanpham == msp).FirstOrDefault();
             var ddh = db.c_dongdonhangs.Where(s => s.c_donhang_id == dh.c_donhang_id & s.md_sanpham_id == sp.md_sanpham_id).FirstOrDefault();
             var ddsdh = db.c_dongdsdhs.Where(s => s.c_danhsachdathang_id == dsdh.c_danhsachdathang_id & s.md_sanpham_id == sp.md_sanpham_id).FirstOrDefault();
@@ -170,7 +176,6 @@ public class TaoPhieuNhapKho : IHttpHandler
             sobj.c_dongdonhang_id = ddh.c_dongdonhang_id;
             sobj.c_dongdsdh_id = ddsdh.c_dongdsdh_id;
             sobj.md_sanpham_id = sp.md_sanpham_id;
-
             // lấy mô tả của sản phẩm
             sobj.mota_tiengviet = sp.mota_tiengviet;
 
@@ -227,7 +232,6 @@ public class TaoPhieuNhapKho : IHttpHandler
         obj.sophieu = $"{chungtu.tiento}/{chungtu.so_duocgan}/{chungtu.hauto}";
         chungtu.so_duocgan = chungtu.so_duocgan + 1;
         obj.socontainer = 1;
-        obj.loaicont = dh.loai_cont;
         md_kho kho = db.md_khos.Where(ct => !ct.md_kho_id.Equals("")).FirstOrDefault();
         obj.md_kho_id = kho.md_kho_id;
         obj.ngay_phieu = DateTime.Now;
@@ -241,6 +245,12 @@ public class TaoPhieuNhapKho : IHttpHandler
         obj.ngaycapnhat = DateTime.Now;
         obj.hoatdong = true;
         obj.md_loaichungtu_id = "NK";
+        obj.container = soctn;
+        obj.soseal = soseal;
+        obj.loaicont = string.IsNullOrWhiteSpace(loaictn) ? dh.loai_cont : loaictn;
+        obj.tare = tare;
+        obj.mg = mg;
+        obj.vgm = vgm;
         obj.md_trangthai_id = Helper.SOANTHAO;
         db.c_nhapxuats.InsertOnSubmit(obj);
         db.SubmitChanges();

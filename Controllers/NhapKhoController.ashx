@@ -248,7 +248,9 @@ public class NhapXuatController : IHttpHandler
             m.loaicont = context.Request.Form["loaicont"];
             m.phicong = (context.Request.Form["phicong"] == "" ? 0 : decimal.Parse(context.Request.Form["phicong"]));
             m.phitru = (context.Request.Form["phitru"] == "" ? 0 : decimal.Parse(context.Request.Form["phitru"]));
-
+            m.tare = context.Request.Form["tare"].ToNullableDecimal();
+            m.mg = context.Request.Form["mg"].ToNullableDecimal();
+            m.vgm = context.Request.Form["vgm"].ToNullableDecimal();
             m.mota = context.Request.Form["mota"];
             m.hoatdong = hd;
             m.ngaycapnhat = DateTime.Now;
@@ -406,26 +408,30 @@ public class NhapXuatController : IHttpHandler
             sidx = "nx.c_nhapxuat_id";
         }
 
-        string strsql = "select * from( " +
-            " select nx.c_nhapxuat_id, nx.md_trangthai_id, nx.dagui, dh.sochungtu, nx.sophieu, nx.sophieunx " +
-            "   , nx.ngay_giaonhan, dtkd.ma_dtkd, dtkd.ten_dtkd, nx.nguoigiao, nx.nguoinhan " +
-            "   , nx.sophieukhach, nx.ngay_phieu, kho.ten_kho " +
-            "   , nx.soseal, nx.container, nx.loaicont " +
-            "   , nx.md_loaichungtu_id, nx.ngaytao, nx.nguoitao, nx.ngaycapnhat, nx.nguoicapnhat " +
-            "   , nx.mota, nx.hoatdong, phicong, phitru, grandtotal, nx.discount " +
-            "   , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            " FROM c_nhapxuat nx " +
-            " Left join c_donhang dh on nx.c_donhang_id = dh.c_donhang_id " +
-            " Left join md_doitackinhdoanh dtkd on nx.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id " +
-            " Left join md_kho kho on nx.md_kho_id = kho.md_kho_id " +
-            " WHERE 1 = 1 " +
-            " {0} " +
-            "  AND nx.md_loaichungtu_id = N'NK' " + filter +
-            " )P where RowNum > @start AND RowNum < @end";
+        var where = isadmin == true ? "" : $"AND nx.nguoitao IN({strAccount})";
 
-        strsql = String.Format(strsql, isadmin == true ? "" : "AND nx.nguoitao IN(" + strAccount + ") ");
+        string strsql = $@"
+            select * from(
+                select nx.c_nhapxuat_id, nx.md_trangthai_id, nx.dagui, dh.sochungtu, nx.sophieu, nx.sophieunx
+                , nx.ngay_giaonhan, dtkd.ma_dtkd, dtkd.ten_dtkd, nx.nguoigiao, nx.nguoinhan
+                , nx.sophieukhach, nx.ngay_phieu, kho.ten_kho
+                , nx.soseal, nx.container, nx.loaicont, nx.md_loaichungtu_id
+                , tare, mg, vgm
+                , nx.ngaytao, nx.nguoitao, nx.ngaycapnhat, nx.nguoicapnhat
+                , nx.mota, nx.hoatdong, phicong, phitru, grandtotal, nx.discount
+                , ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
+                FROM c_nhapxuat nx
+                Left join c_donhang dh on nx.c_donhang_id = dh.c_donhang_id
+                Left join md_doitackinhdoanh dtkd on nx.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
+                Left join md_kho kho on nx.md_kho_id = kho.md_kho_id
+                WHERE 1=1
+                {where}
+                AND nx.md_loaichungtu_id = N'NK' {filter}
+            )P where RowNum > @start AND RowNum < @end";
 
-        System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
+
+
+        var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
         xml += "<page>" + page + "</page>";
@@ -456,6 +462,9 @@ public class NhapXuatController : IHttpHandler
             xml += "<cell><![CDATA[" + row["discount"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["grandtotal"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["md_loaichungtu_id"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tare"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["mg"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["vgm"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";

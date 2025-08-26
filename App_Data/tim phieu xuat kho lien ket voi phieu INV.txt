@@ -1,0 +1,14 @@
+select xk.so_inv, nk.sophieu
+from c_packinginvoice xk
+left join c_dongpklinv dxk on dxk.c_packinginvoice_id = xk.c_packinginvoice_id
+cross apply (
+	select nk.sophieu
+	from c_nhapxuat nk
+	left join c_dongnhapxuat dnk on dnk.c_nhapxuat_id = nk.c_nhapxuat_id
+	where 
+		dnk.c_dongnhapxuat_id = dxk.c_dongnhapxuat_id
+		and nk.md_loaichungtu_id = 'XK'
+) nk
+where xk.md_trangthai_id = 'HIEULUC'
+group by xk.so_inv, nk.sophieu
+order by xk.so_inv, nk.sophieu
