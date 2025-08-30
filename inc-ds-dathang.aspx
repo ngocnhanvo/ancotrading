@@ -115,46 +115,52 @@
         var piId = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
         var name = 'dialog-print-pi';
         var title = 'Trích xuất dữ liệu';
-        var content = '<table style="width:100%">' +
-            '<tr>' +
-            '<td>' +
-            '<input id="printRequired" type="radio" name="rdoPrintType" value="printRequired" checked="checked" />' +
-            '<label for="printRequired">Chiết xuất đơn đặt hàng</label>' +
-            '</td>' +
+        var content = `
+            <table style="width:100%">
+            <tr>
+                <td>
+                    <input id="printRequired" type="radio" name="rdoPrintType" value="printRequired" checked="checked" />
+                    <label for="printRequired">Chiết xuất đơn đặt hàng</label>
+                </td>
+                <td>
+                    <input id="printPoTem" type="radio" name="rdoPrintType" value="printPoTem" />
+                    <label for="printPoTem">In chi tiết tem bao bì</label>
+                </td>
+            </tr>
 
-            '<td>' +
-            '<input id="printPoTem" type="radio" name="rdoPrintType" value="printPoTem" />' +
-            '<label for="printPoTem">In chi tiết tem bao bì</label>' +
-            '</td>' +
-            '</tr>' +
+            <tr>
+                <td>
+                    <input id="printST_DS" type="radio" name="rdoPrintType" value="printST_DS" />
+                    <label for="printST_DS">Chiết xuất tất cả ds đặt hàng</label>
+                </td>
+                <td>
+                    <input id="printPoBaoBi" type="radio" name="rdoPrintType" value="printPoBaoBi" />
+                    <label for="printPoBaoBi">In bao bì</label>
+                </td>
+            </tr>
 
-            '<tr>' +
-            '<td>' +
-            '<input id="printST_DS" type="radio" name="rdoPrintType" value="printST_DS" />' +
-            '<label for="printST_DS">Chiết xuất tất cả ds đặt hàng</label>' +
-            '</td>' +
+            <tr>
+                <td>
+                    <input id="printDSDH" type="radio" name="rdoPrintType" value="printDSDH" />
+                    <label for="printDSDH">In đơn đặt hàng</label>
+                </td>
 
+                <td>
+                    <input id="printPoXml" type="radio" name="rdoPrintType" value="printPoXml" />
+                    <label for="printPoXml">In đơn hàng xml</label>
+                </td>
+            </tr>
 
-            '<td>' +
-            '<input id="printPoBaoBi" type="radio" name="rdoPrintType" value="printPoBaoBi" />' +
-            '<label for="printPoBaoBi">In bao bì</label>' +
-            '</td>' +
-            '</tr>' +
+            <tr>
+                <td>
+                    <input id="printXNXH" type="radio" name="rdoPrintType" value="printXNXH" />
+                    <label for="printXNXH">In phiếu XNXH</label>
+                </td>
 
-            '<tr>' +
-            '<td>' +
-            '<input id="printDSDH" type="radio" name="rdoPrintType" value="printDSDH" />' +
-            '<label for="printDSDH">In đơn đặt hàng</label>' +
-            '</td>' +
-
-            '<td>' +
-            '<input id="printPoXml" type="radio" name="rdoPrintType" value="printPoXml" />' +
-            '<label for="printPoXml">In đơn hàng xml</label>' +
-            '</td>' +
-
-
-            '</tr>' +
-            '</table>';
+                <td>
+                </td>
+            </tr>
+            </table>`;
 
         $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
         $('#' + name).dialog({
@@ -219,6 +225,9 @@
                             } else if (printType == "printST_DS") {
                                 printURL += "InDSDH_Soanthao/";
                                 window.open(printURL, "Chiết xuất tất cả các DSDH đang \"Soạn Thảo\"", windowSize);
+                            } else if (printType == "printXNXH") {
+                                printURL += `InBaoCaoAncotrading/phieuXNXH.aspx?id=${piId}&download=0`;
+                                window.open(printURL, "Chiết xuất phiếu xác nhận xuất hàng", windowSize);
                             }
                         } else {
                             alert('Hãy chọn cách in.!');

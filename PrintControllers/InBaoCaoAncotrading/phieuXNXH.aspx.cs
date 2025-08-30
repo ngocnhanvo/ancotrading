@@ -24,7 +24,8 @@ public partial class PrintControllers_InBaoCaoAncotrading_phieuXNXH : System.Web
             viewReport(sql);
         });
 
-        ReportViewer1.Attributes["download"] = "1";
+        var download = Request.QueryString["download"].removeAllSpaceOrTrimText(true);
+        ReportViewer1.Attributes["download"] = string.IsNullOrWhiteSpace(download) ? "1" : download;
         PrintAnco2.exportDataWithType(task, sql, inPDF, nameTemp, nameRpt, ReportViewer1, true);
     }
 
