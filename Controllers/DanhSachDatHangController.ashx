@@ -310,7 +310,12 @@ public class DanhSachDatHangController : IHttpHandler
     {
         String manv = UserUtils.getUser(context);
         var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
-        var smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
+        md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
+        if (nv != null && nv.smtp != null)
+        {
+            // Lấy theo cấu hình smtp của nhân viên
+            smtp = db.md_smtps.FirstOrDefault(p => p.md_smtp_id.Equals(nv.smtp));
+        }
         var mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
         var tmp = db.md_mailtemplates.FirstOrDefault(p => p.use_for.Equals("PI") && p.ten_template == "PI_VG");
         string msg = "", vnn_msg = "";
@@ -848,6 +853,11 @@ public class DanhSachDatHangController : IHttpHandler
 
         // Lấy thông tin smtp
         md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
+        if (nv != null && nv.smtp != null)
+        {
+            // Lấy theo cấu hình smtp của nhân viên
+            smtp = db.md_smtps.FirstOrDefault(p => p.md_smtp_id.Equals(nv.smtp));
+        }
         //-- c_danhsachdathang_id
         String piId = context.Request.QueryString["piId"];
         //--
