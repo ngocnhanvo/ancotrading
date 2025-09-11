@@ -66,9 +66,9 @@ public class TaoPhieuNhapKho : IHttpHandler
         return msg;
     }
 
-    public object getValue(Cell cell)
+    public object getValue(Cell cell, bool layStr = false)
     {
-        return cell == null ? "" : cell.Value;
+        return cell == null ? "" : (layStr ? cell.StringValue : cell.Value);
     }
 
     public void taoPhieuNhapExcel(HttpContext context, string file)
@@ -90,11 +90,11 @@ public class TaoPhieuNhapKho : IHttpHandler
         row = rows.Rows[11];
         var noigiaohang = row.GetCell(1).Value;
         row = rows.Rows[12];
-        var tare = getValue(row.GetCell(1)).ToString().ToNullableDecimal();
+        var tare = getValue(row.GetCell(1), true).ToString().ToNullableDecimal();
         row = rows.Rows[13];
-        var mg = getValue(row.GetCell(1)).ToString().ToNullableDecimal();
+        var mg = getValue(row.GetCell(1), true).ToString().ToNullableDecimal();
         row = rows.Rows[14];
-        var vgm = getValue(row.GetCell(1)).ToString().ToNullableDecimal();
+        var vgm = getValue(row.GetCell(1), true).ToString().ToNullableDecimal();
         string soctn = "", soseal = "", loaictn = "";
         var dh = db.c_donhangs.Where(s => s.sochungtu == soPO).FirstOrDefault();
 
@@ -181,7 +181,7 @@ public class TaoPhieuNhapKho : IHttpHandler
 
             sobj.md_donvitinh_id = sp.md_donvitinhsanpham_id;
             sobj.slphai_nhapxuat = ddsdh.sl_dathang;
-            //sobj.slthuc_nhapxuat = sl.ToString().ToNullableDecimal();
+            sobj.slthuc_nhapxuat = sl.ToString().ToNullableDecimal();
             sobj.sl_dathang = ddsdh.sl_dathang;
             sobj.dongia = ddsdh.gianhap;
 
