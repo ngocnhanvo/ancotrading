@@ -90,11 +90,11 @@ public class TaoPhieuNhapKho : IHttpHandler
         row = rows.Rows[11];
         var noigiaohang = row.GetCell(1).Value;
         row = rows.Rows[12];
-        //var tare = getValue(row.GetCell(1), true).ToString().ToNullableDecimal();
-        //row = rows.Rows[13];
-        //var mg = getValue(row.GetCell(1), true).ToString().ToNullableDecimal();
-        //row = rows.Rows[14];
-        //var vgm = getValue(row.GetCell(1), true).ToString().ToNullableDecimal();
+        var tare = getValue(row.GetCell(1), true).ToString().ToNullableDecimal();
+        row = rows.Rows[13];
+        var mg = getValue(row.GetCell(1), true).ToString().ToNullableDecimal();
+        row = rows.Rows[14];
+        var vgm = getValue(row.GetCell(1), true).ToString().ToNullableDecimal();
         string soctn = "", soseal = "", loaictn = "";
         var dh = db.c_donhangs.Where(s => s.sochungtu == soPO).FirstOrDefault();
 
@@ -248,9 +248,9 @@ public class TaoPhieuNhapKho : IHttpHandler
         obj.container = soctn;
         obj.soseal = soseal;
         obj.loaicont = string.IsNullOrWhiteSpace(loaictn) ? dh.loai_cont : loaictn;
-        //obj.tare = tare;
-        //obj.mg = mg;
-        //obj.vgm = vgm;
+        obj.tare = tare;
+        obj.mg = mg;
+        obj.vgm = vgm;
         obj.md_trangthai_id = Helper.SOANTHAO;
         db.c_nhapxuats.InsertOnSubmit(obj);
         db.SubmitChanges();
