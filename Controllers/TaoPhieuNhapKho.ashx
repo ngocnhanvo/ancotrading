@@ -155,7 +155,7 @@ public class TaoPhieuNhapKho : IHttpHandler
             //cell++;
             //var h2 = getValue(row.GetCell(cell));
 
-            if(msp == "Tổng cộng")
+            if(msp.ToLower().Contains("tổng cộng"))
             {
                 saveI = i;
                 break;
@@ -181,7 +181,7 @@ public class TaoPhieuNhapKho : IHttpHandler
 
             sobj.md_donvitinh_id = sp.md_donvitinhsanpham_id;
             sobj.slphai_nhapxuat = ddsdh.sl_dathang;
-            sobj.slthuc_nhapxuat = sl.ToString().ToNullableDecimal();
+            //sobj.slthuc_nhapxuat = sl.ToString().ToNullableDecimal();
             sobj.sl_dathang = ddsdh.sl_dathang;
             sobj.dongia = ddsdh.gianhap;
 
