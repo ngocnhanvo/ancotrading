@@ -77,16 +77,16 @@ public class ThuChiController : IHttpHandler
                     thu.md_trangthai_id = "HIEULUC";
                     db.SubmitChanges();
 
-                    string sql = "select distinct c_packinginvoice_id from c_chitietthuchi where c_thuchi_id = '" + id + "'";
-                    DataTable data = mdbc.GetData(sql);
-                    foreach (DataRow item in data.Rows)
+                    var pklids = db.c_chitietthuchis.Where(s => s.c_thuchi_id == id).Select(s => s.c_packinginvoice_id).Distinct().ToList();
+                    var pkls = db.c_packinginvoices.Where(s => pklids.Contains(s.c_packinginvoice_id)).ToList();
+                    foreach (var pkl in pkls)
                     {
-                        c_packinginvoice pkl = db.c_packinginvoices.SingleOrDefault(p => p.c_packinginvoice_id.Equals(item[0].ToString()));
                         pkl.ngaycapnhat = DateTime.Now;
                         pkl.mota = pkl.mota;
                         db.SubmitChanges();
                         //mdbc.ExcuteNonQuery("update c_packinginvoice set ngaycapnhat = getdate() where c_packinginvoice_id = '"+item[0]+"'");
                     }
+
                     context.Response.Write("Hiệu lực phiếu thu thành công!");
                 }
                 else
@@ -145,7 +145,7 @@ public class ThuChiController : IHttpHandler
                 goto EndEventHandler;
             }
 
-            
+
             var sotien = context.Request.Form["sotien"].removeAllSpaceOrTrimText(false).ToNullableDecimal();
             if(!string.IsNullOrWhiteSpace(mnu.kt_tienve_id))
             {
