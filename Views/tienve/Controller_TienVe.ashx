@@ -197,14 +197,20 @@ public class Controller_TienVe : IHttpHandler
                 msg = $@"Không tìm thấy khách hàng đã chọn";
                 goto EndEventHandler;
             }
-            else if(string.IsNullOrWhiteSpace(dtkd.ma_dtkd))
+            if(string.IsNullOrWhiteSpace(dtkd.ma_dtkd))
             {
                 msg = $@"Không tìm thấy khách hàng đã chọn";
                 goto EndEventHandler;
             }
+            var tienkhach = context.Request.Form["tienkhach"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
+            if(tienkhach < tv.sotienghico)
+            {
+                msg = $@"Tiền khách không được nhỏ hơn số tiền ghi có ({tienkhach.DropTrailingZeros()} < {tv.sotienghico.DropTrailingZeros()})";
+                goto EndEventHandler;
+            }
 
             tv.mota = context.Request.Form["mota"].removeAllSpaceOrTrimText(true);
-            tv.tienkhach = context.Request.Form["tienkhach"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
+            tv.tienkhach = tienkhach;
             tv.phi = tv.tienkhach.GetValueOrDefault(0) - tv.sotienghico.GetValueOrDefault(0);
             tv.conlai = tv.tienkhach.GetValueOrDefault(0) - tv.tongtienphanbo.GetValueOrDefault(0);
             tv.dtkd_id = dtkd.md_doitackinhdoanh_id;
