@@ -205,7 +205,7 @@ public class Controller_TienVe : IHttpHandler
 
             tv.mota = context.Request.Form["mota"].removeAllSpaceOrTrimText(true);
             tv.tienkhach = context.Request.Form["tienkhach"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
-            tv.phi = tv.sotienghico.GetValueOrDefault(0) - tv.tienkhach.GetValueOrDefault(0);
+            tv.phi = tv.tienkhach.GetValueOrDefault(0) - tv.sotienghico.GetValueOrDefault(0);
             tv.conlai = tv.tienkhach.GetValueOrDefault(0) - tv.tongtienphanbo.GetValueOrDefault(0);
             tv.dtkd_id = dtkd.md_doitackinhdoanh_id;
             tv.ngaycapnhat = DateTime.Now;
