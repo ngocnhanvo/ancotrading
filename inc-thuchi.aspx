@@ -60,7 +60,7 @@
     function quydoi() {
         var sotien = $("#sotien", "#FrmGrid_grid_ds_phaithu").val();
         var tygia = $("#tygia", "#FrmGrid_grid_ds_phaithu").val();
-        var tienVnd = sotien * tygia;
+        var tienVnd = (sotien * tygia).toFixed(0);
         $('#quydoi_vnd', "#FrmGrid_grid_ds_phaithu").val(tienVnd);
     }
 
@@ -491,6 +491,7 @@
             ColNames="['c_chitietthuchi_id', 'Phiếu', 'Thu Chi', 'TK Nợ', 'TK Có', 'Số Tiền', 'Quy Đổi', 'Diễn Giải',  'P/O', 'Packing list/Invoice', 'Là tiền cọc', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
             RowNumbers="true"
             OverrideAdd = "function(){addDetailPhaiThu('add')}"
+            OverrideEdit = "function(){addDetailPhaiThu('edit');}"
             OndblClickRow = "function(){addDetailPhaiThu('edit')}"
             FuncPhanBoCocInv="phanBoCocInvoice"
             ColModel = "[
@@ -697,6 +698,7 @@
             RowNumbers="true"
             FilterToolbar="true"
             OverrideAdd = "function(){addDetailKhoanPhi('add');}"
+            OverrideEdit = "function(){addDetailKhoanPhi('edit');}"
             OndblClickRow = "function(){addDetailKhoanPhi('edit');}"
             
             ColModel = "[

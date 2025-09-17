@@ -81,17 +81,27 @@ public class DaoRules
     /// <returns></returns>
     public menu GetMenu()
     {
-        menu mnu = db.menus.FirstOrDefault(p => p.url.Equals(this.GetFileName()));
-        return mnu;
+        string urlmain = this.GetFileName();
+        var mnus = db.menus.Where(p => p.url.Contains(urlmain)).ToList();
+        menu menu = null;
+        foreach (var mnu in mnus)
+        {
+            String _url = this.GetFileName(mnu.url);
+            if (_url == urlmain)
+                menu = mnu;
+        }
+        return menu;
     }
 
     /// <summary>
     /// Lấy tên trang web
     /// </summary>
     /// <returns></returns>
-    public String GetFileName()
+    public String GetFileName(string _url = "")
     {
-        String _url =_context.Request.Url.AbsolutePath;
+        if(string.IsNullOrWhiteSpace(_url))
+            _url =_context.Request.Url.AbsolutePath;
+
         int i = _url.LastIndexOf('/');
         String str = _url.Substring(i + 1);
         return str;

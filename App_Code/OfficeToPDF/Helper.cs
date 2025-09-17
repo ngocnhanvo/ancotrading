@@ -21,6 +21,7 @@ public static class Helper
     public static string NK = "NK";
     public static string XK = "XK";
     public static string HDBS = "HDBS", HDDG = "HDDG", HDCT = "HDCT", HDTEM_BAOBI = "HDTEM-BAOBI", PYCM = "PYCM", PTSP = "PTSP";
+    public static string[] hoatdongs = new string[] { "true", "on" };
     #endregion bien toan cuc
 
     public static void removeFileWithPath(string path)

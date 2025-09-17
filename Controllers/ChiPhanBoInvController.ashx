@@ -54,7 +54,23 @@ public class ChiPhanBoInvController : IHttpHandler
         string c_chitietthuchi_id = context.Request.QueryString["c_chitietthuchi_id"];
         c_chitietthuchi cttc = db.c_chitietthuchis.FirstOrDefault(p => p.c_chitietthuchi_id.Equals(c_chitietthuchi_id));
 
-        string sql = string.Format("select c_packinginvoice_id, so_pkl from c_packinginvoice where c_packinginvoice_id IN( select c_packinginvoice_id from c_dongpklinv where c_donhang_id = '{0}' )", cttc.c_donhang_id);
+        string sql = $@"
+        select c_packinginvoice_id, so_pkl 
+        from c_packinginvoice 
+        where c_packinginvoice_id IN ( 
+            select c_packinginvoice_id 
+            from c_dongpklinv 
+            where c_donhang_id in (
+                select ctpt.c_donhang_id
+                from c_chitietthuchi ctpt
+                left join c_thuchi pt on pt.c_thuchi_id = ctpt.c_thuchi_id
+                where 
+                    isnull(pt.loai, '') = ''
+                    and pt.md_trangthai_id = '{Helper.HIEULUC}'
+                    and ctpt.isdatcoc = 1
+                    and ctpt.c_donhang_id = '{cttc.c_donhang_id}'
+            )
+        )";
 
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());

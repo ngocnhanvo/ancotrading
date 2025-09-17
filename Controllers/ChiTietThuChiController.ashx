@@ -51,104 +51,158 @@ public class ChiTietThuChiController : IHttpHandler
         //SelectHtmlControl s = new SelectHtmlControl(sql);
         //context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
-        try {
-            string tc = context.Request.Form["istiencoc"];
-            bool istiencoc = false;
-            if (tc != null)
+        string msg = "";
+        try
+        {
+            bool istiencoc = Helper.hoatdongs.Contains(context.Request.Form["istiencoc"].removeAllSpaceOrTrimText(false).ToLower());
+
+            var m = db.c_chitietthuchis.Single(p => p.c_chitietthuchi_id == context.Request.Form["id"]);
+            if (m == null)
             {
-                if (tc.ToLower().Equals("on")) { istiencoc = true; }
+                msg = "Không tìm thấy dòng đã chọn";
+                goto EndEventHandler;
             }
 
-            c_chitietthuchi m = db.c_chitietthuchis.Single(p => p.c_chitietthuchi_id == context.Request.Form["id"]);
-            
             var thuchi = db.c_thuchis.Single(c => c.c_thuchi_id.Equals(m.c_thuchi_id));
-
-            if (thuchi.md_trangthai_id.Equals("SOANTHAO"))
+            if (thuchi == null)
             {
-                m.tk_no = int.Parse(context.Request.Form["tk_no"]);
-                m.tk_co = int.Parse(context.Request.Form["tk_co"]);
-                m.sotien = decimal.Parse(context.Request.Form["sotien"]);
-                m.quydoi = (thuchi.tygia.Value * decimal.Parse(context.Request.Form["sotien"]));
-                m.diengiai = context.Request.Form["diengiai"];
-                m.c_donhang_id = context.Request.Form["c_donhang_id"];
-                m.c_packinginvoice_id = context.Request.Form["c_packinginvoice_id"];
-                m.isdatcoc = istiencoc;
-
-                //m.mota = context.Request.Form["mota"];
-                m.hoatdong = true;
-                m.ngaycapnhat = DateTime.Now;
-                m.nguoicapnhat = UserUtils.getUser(context);
-                m.loaiphieu = context.Request.Form["loaithanhtoan"];
-
-                //if (m.sotien.Value > -thuchi.tienconlai)
-                //{
-                //    jqGridHelper.Utils.writeResult(0, "Số tiền không hợp lệ!");
-                //}
-                //else
-                //{
-                db.SubmitChanges();
-                jqGridHelper.Utils.writeResult(1, "Lưu thành công!");
-                //}
+                msg = "Không tìm thấy phiếu thu";
+                goto EndEventHandler;
             }
-            else {
-                jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi phiếu thu đã hiệu lực!");
+            if (thuchi.md_trangthai_id != Helper.SOANTHAO)
+            {
+                msg = "Phiếu thu không ở trạng thái Soạn Thảo";
+                goto EndEventHandler;
             }
-            
-        }catch(Exception ex){
-            context.Response.Write(ex.Message);
+
+            var sotien = context.Request.Form["sotien"].removeAllSpaceOrTrimText(false).ToNullableDecimal();
+            string loaithanhtoan = context.Request.Form["loaithanhtoan"].removeAllSpaceOrTrimText(false);
+            string c_donhang_id = context.Request.Form["c_donhang_id"].removeAllSpaceOrTrimText(false);
+            string c_packinginvoice_id = context.Request.Form["c_packinginvoice_id"].removeAllSpaceOrTrimText(false);
+            var tv = db.kt_tienves.Where(s => s.kt_tienve_id == thuchi.kt_tienve_id).FirstOrDefault();
+            if (tv != null)
+            {
+                if (sotien != m.sotien)
+                {
+                    msg = $@"Phiếu thu có liên kết với chức năng ""Tiền về"", không thể sửa ""số tiền""";
+                    goto EndEventHandler;
+                }
+
+                if (loaithanhtoan != m.loaiphieu)
+                {
+                    msg = $@"Phiếu thu có liên kết với chức năng ""Tiền về"", không thể sửa ""kiểu hồ sơ liên quan""";
+                    goto EndEventHandler;
+                }
+
+                if (c_donhang_id != m.c_donhang_id.removeAllSpaceOrTrimText(false))
+                {
+                    msg = $@"Phiếu thu có liên kết với chức năng ""Tiền về"", không thể sửa ""đơn hàng""";
+                    goto EndEventHandler;
+                }
+
+                if (c_packinginvoice_id != m.c_packinginvoice_id.removeAllSpaceOrTrimText(false))
+                {
+                    msg = $@"Phiếu thu có liên kết với chức năng ""Tiền về"", không thể sửa ""Invoice""";
+                    goto EndEventHandler;
+                }
+
+                if (istiencoc != m.isdatcoc)
+                {
+                    msg = $@"Phiếu thu có liên kết với chức năng ""Tiền về"", không thể sửa ""Là tiền đặt cọc""";
+                    goto EndEventHandler;
+                }
+            }
+
+            m.tk_no = int.Parse(context.Request.Form["tk_no"]);
+            m.tk_co = int.Parse(context.Request.Form["tk_co"]);
+            m.sotien = sotien;
+            m.quydoi = (thuchi.tygia.GetValueOrDefault(0) * sotien.GetValueOrDefault(0)).DecRound(0);
+            m.diengiai = context.Request.Form["diengiai"];
+            m.c_donhang_id = c_donhang_id;
+            m.c_packinginvoice_id = c_packinginvoice_id;
+            m.isdatcoc = istiencoc;
+            m.hoatdong = true;
+            m.ngaycapnhat = DateTime.Now;
+            m.nguoicapnhat = UserUtils.getUser(context);
+            m.loaiphieu = loaithanhtoan;
+            db.SubmitChanges();
+
         }
-        
+        catch (Exception ex)
+        {
+            msg = ex.ToString();
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Sửa thành công");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     public void add(HttpContext context)
     {
-		string sphieu_id = "6075512b0ec3145bc86241ab1d7f510b", sphieu = "", tiento = "T"; // table hotro
-		hotro ht =  null;
-		ht = db.hotros.Where(s => s.c_chitietthuchi_id == sphieu_id).FirstOrDefault();
-		md_sochungtu sochungtu = db.md_sochungtus.Single(s => s.tiento == tiento);
-		if(ht != null)
-		{
-			if(ht.ngaymoinhat.Value.Year == DateTime.Now.Year)
-			{							
-				if(ht.ngaymoinhat.Value.Month != DateTime.Now.Month)
-				{
-						sochungtu.so_duocgan = 1;
-				}	
-					sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
-				sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
-			}
-			else
-			{
-					sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
-					sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
-			}
-		}
-		else
-		{
-					sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
-					sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
-		}
-        string tc = context.Request.Form["istiencoc"];
-
-        bool istiencoc = false;
-        if (tc != null)
+        string msg = "";
+        try
         {
-            if (tc.ToLower().Equals("on")) { istiencoc = true; }
-        }
-        string c_thuchi_id = context.Request.Form["c_thuchi_id"];
-        //var thuchi = db.c_thuchis.Fir(c => c.c_thuchi_id.Equals(c_thuchi_id));
-        var thuchi = db.c_thuchis.FirstOrDefault(c => c.c_thuchi_id == c_thuchi_id);
-		if (thuchi.md_trangthai_id == "SOANTHAO")
-        {
-            c_chitietthuchi mnu = new c_chitietthuchi
+            string sphieu_id = "6075512b0ec3145bc86241ab1d7f510b", sphieu = "", tiento = "T"; // table hotro
+            hotro ht = null;
+            ht = db.hotros.Where(s => s.c_chitietthuchi_id == sphieu_id).FirstOrDefault();
+            md_sochungtu sochungtu = db.md_sochungtus.Single(s => s.tiento == tiento);
+            if (ht != null)
             {
-                c_chitietthuchi_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                if (ht.ngaymoinhat.Value.Year == DateTime.Now.Year)
+                {
+                    if (ht.ngaymoinhat.Value.Month != DateTime.Now.Month)
+                    {
+                        sochungtu.so_duocgan = 1;
+                    }
+                    sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
+                    sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
+                }
+                else
+                {
+                    sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
+                    sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
+                }
+            }
+            else
+            {
+                sphieu = sochungtu.so_duocgan + sochungtu.tiento + "/" + sochungtu.hauto;
+                sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
+            }
+            bool istiencoc = Helper.hoatdongs.Contains(context.Request.Form["istiencoc"].removeAllSpaceOrTrimText(false).ToLower());
+            string c_thuchi_id = context.Request.Form["c_thuchi_id"];
+            var thuchi = db.c_thuchis.FirstOrDefault(c => c.c_thuchi_id == c_thuchi_id);
+            if (thuchi == null)
+            {
+                msg = $@"Không tìm thấy phiếu thu";
+                goto EndEventHandler;
+            }
+
+            if (thuchi.md_trangthai_id != Helper.SOANTHAO)
+            {
+                msg = $@"Phiếu thu không ở trạng thái Soạn Thảo";
+                goto EndEventHandler;
+            }
+
+            var tv = db.kt_tienves.Where(s => s.kt_tienve_id == thuchi.kt_tienve_id).FirstOrDefault();
+            if (tv != null)
+            {
+                msg = $@"Phiếu thu có liên kết với chức năng ""Tiền về"", không thể thêm mới chi tiết";
+                goto EndEventHandler;
+            }
+
+            var mnu = new c_chitietthuchi
+            {
+                c_chitietthuchi_id = Helper.getNewId(),
                 c_thuchi_id = c_thuchi_id,
-				so_c = sphieu,
+                so_c = sphieu,
                 tk_no = int.Parse(context.Request.Form["tk_no"]),
                 tk_co = int.Parse(context.Request.Form["tk_co"]),
                 sotien = decimal.Parse(context.Request.Form["sotien"]),
@@ -167,60 +221,94 @@ public class ChiTietThuChiController : IHttpHandler
                 nguoicapnhat = UserUtils.getUser(context)
             };
 
-            //if (mnu.sotien.Value > -thuchi.tienconlai)
-            //{
-            //    context.Response.Write("Số tiền không hợp lệ!");    
-            //}
-            //else
-            //{
             db.c_chitietthuchis.InsertOnSubmit(mnu);
-			
-			ht = db.hotros.Where(s => s.c_chitietthuchi_id == sphieu_id).FirstOrDefault();
-			if(ht == null)
-			{
-					ht = new hotro();
-					ht.hotro_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss"));
-					ht.c_chitietthuchi_id = sphieu_id;
-					ht.ngaymoinhat = DateTime.Now;
-					ht.hoatdong = true;
-					ht.ngaytao = DateTime.Now;
-					ht.ngaycapnhat = DateTime.Now;
-					ht.nguoitao = UserUtils.getUser(context);
-					ht.nguoicapnhat = UserUtils.getUser(context);
-					db.hotros.InsertOnSubmit(ht);
-			}
-			else
-			{
-					ht.ngaymoinhat = DateTime.Now;
-					ht.hoatdong = true;
-					ht.nguoicapnhat = UserUtils.getUser(context);
-					ht.ngaycapnhat = DateTime.Now;
-			}
-			
+
+            ht = db.hotros.Where(s => s.c_chitietthuchi_id == sphieu_id).FirstOrDefault();
+            if (ht == null)
+            {
+                ht = new hotro();
+                ht.hotro_id = Helper.getNewId();
+                ht.c_chitietthuchi_id = sphieu_id;
+                ht.ngaymoinhat = DateTime.Now;
+                ht.hoatdong = true;
+                ht.ngaytao = DateTime.Now;
+                ht.ngaycapnhat = DateTime.Now;
+                ht.nguoitao = UserUtils.getUser(context);
+                ht.nguoicapnhat = UserUtils.getUser(context);
+                db.hotros.InsertOnSubmit(ht);
+            }
+            else
+            {
+                ht.ngaymoinhat = DateTime.Now;
+                ht.hoatdong = true;
+                ht.nguoicapnhat = UserUtils.getUser(context);
+                ht.ngaycapnhat = DateTime.Now;
+            }
+
             db.SubmitChanges();
-            jqGridHelper.Utils.writeResult(1, "Tạo mới thành công!");
-            //}
         }
-        else {
-            jqGridHelper.Utils.writeResult(0, "Không thể thêm chi tiết khi phiếu thu đã hiệu lực!");
-        }   
+        catch(Exception ex)
+        {
+            msg = ex.ToString();
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Thêm thành công");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
 
     public void del(HttpContext context)
     {
         String id = context.Request.Form["id"];
+        string msg = "";
 
-        c_chitietthuchi ct = db.c_chitietthuchis.FirstOrDefault(p => p.c_chitietthuchi_id.Equals(id));
-        c_thuchi thuchi = db.c_thuchis.FirstOrDefault(p => p.c_thuchi_id.Equals(ct.c_thuchi_id));
-        if (thuchi.md_trangthai_id.Equals("SOANTHAO"))
+        try
         {
+            var ct = db.c_chitietthuchis.FirstOrDefault(p => p.c_chitietthuchi_id.Equals(id));
+            if (ct == null)
+            {
+                msg = $@"Không tìm thấy dòng đã chọn";
+                goto EndEventHandler;
+            }
+
+            var thuchi = db.c_thuchis.FirstOrDefault(p => p.c_thuchi_id.Equals(ct.c_thuchi_id));
+            if (thuchi == null)
+            {
+                msg = $@"Không tìm thấy phiếu thu";
+                goto EndEventHandler;
+            }
+
+            if (thuchi.md_trangthai_id != Helper.SOANTHAO)
+            {
+                msg = $@"Phiếu thu không ở trạng thái Soạn Thảo";
+                goto EndEventHandler;
+            }
+
+            var tv = db.kt_tienves.Where(s => s.kt_tienve_id == thuchi.kt_tienve_id).FirstOrDefault();
+            if (tv != null)
+            {
+                msg = $@"Phiếu thu có liên kết với chức năng ""Tiền về""";
+                goto EndEventHandler;
+            }
+
             db.c_chitietthuchis.DeleteOnSubmit(ct);
             db.SubmitChanges();
         }
-        else {
-            jqGridHelper.Utils.writeResult(0, "Không thể xóa chi tiết khi phiếu thu đã hiệu lực!");
+        catch (Exception ex)
+        {
+            msg = ex.ToString();
         }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Xóa thành công");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     public void load(HttpContext context)
@@ -229,7 +317,7 @@ public class ChiTietThuChiController : IHttpHandler
         context.Response.Charset = "UTF-8";
 
         String tcId = context.Request.QueryString["tcId"];
-        
+
         //// filter
         String filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
@@ -239,7 +327,7 @@ public class ChiTietThuChiController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
         String sqlCount = "SELECT COUNT(*) AS count " +
             " FROM c_chitietthuchi cttc left join c_thuchi tc on cttc.c_thuchi_id = tc.c_thuchi_id left join c_packinginvoice cpk on cttc.c_packinginvoice_id = cpk.c_packinginvoice_id left join c_donhang dh on cttc.c_donhang_id = dh.c_donhang_id" +
             " WHERE cttc.c_thuchi_id = tc.c_thuchi_id " +
@@ -253,7 +341,7 @@ public class ChiTietThuChiController : IHttpHandler
         {
             sqlCount = string.Format(sqlCount, 0);
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -285,8 +373,8 @@ public class ChiTietThuChiController : IHttpHandler
             " cttc.sotien, cttc.quydoi, cttc.diengiai, cttc.obj_code, cttc.obj_id, " +
             " cttc.obj_num, cttc.isdatcoc, " +
             " (case when obj_code is null then '' else (select sophieu from c_nhapxuat where c_nhapxuat_id = cttc.obj_code) end) as phieunhap, " +
-           // " (case when c_donhang_id is null then '' else (select sochungtu from c_donhang where c_donhang_id = cttc.c_donhang_id) end) as c_donhang_id, " +
-            " dh.sochungtu, " + 
+            // " (case when c_donhang_id is null then '' else (select sochungtu from c_donhang where c_donhang_id = cttc.c_donhang_id) end) as c_donhang_id, " +
+            " dh.sochungtu, " +
             " cpk.so_pkl, " +
             " cttc.ngaytao, cttc.nguoitao, cttc.ngaycapnhat, " +
             " cttc.nguoicapnhat, cttc.mota, cttc.hoatdong, " +
@@ -304,7 +392,7 @@ public class ChiTietThuChiController : IHttpHandler
         {
             strsql = string.Format(strsql, 0);
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
@@ -316,7 +404,7 @@ public class ChiTietThuChiController : IHttpHandler
             xml += "<row>";
             xml += "<cell><![CDATA[" + row["c_chitietthuchi_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["so_c"] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row["sophieu"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["sophieu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tk_no"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tk_co"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sotien"] + "]]></cell>";

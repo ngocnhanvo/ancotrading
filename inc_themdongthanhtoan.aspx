@@ -154,7 +154,7 @@
             var type = eval($(result).find('type').text());
             var message = $(result).find('message').text();
             if (type == 0) {
-                alert(result);
+                alert(message);
             } else {
                 grid.jqGrid().trigger('reloadGrid');
                 $(dialog).dialog('destroy').remove();

@@ -166,7 +166,7 @@
             $('#ds_phanbo').jqGrid('navGrid', '#ds_phanbo-pager', { add: true, edit: true, del: true, search: false, refresh: true },
                 {
                     afterSubmit: function (rs, postdata) {
-						$('#grid_ds_phaithuphanbo')[0].triggerToolbar();
+						$('#ds_phanbo')[0].triggerToolbar();
                         return showMsgDialog(rs);
                     }
                     , beforeShowForm: function (formid) {
@@ -178,7 +178,7 @@
                 }
             , {
                     afterSubmit: function (rs, postdata) {
-						$('#grid_ds_phaithuphanbo')[0].triggerToolbar();
+						$('#ds_phanbo')[0].triggerToolbar();
                         return showMsgDialog(rs);
                     }
                     , beforeShowForm: function (formid) {
