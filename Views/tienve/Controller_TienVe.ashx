@@ -113,23 +113,27 @@ public class Controller_TienVe : IHttpHandler
             cell++;
             var mota = getValue(row.GetCell(cell)).ToString().removeAllSpaceOrTrimText(true);
 
-            var tv = db.kt_tienves.Where(s => s.sothamchieu == stc).FirstOrDefault();
-            if (tv == null)
+            if (!string.IsNullOrWhiteSpace(stc))
             {
-                tv = new kt_tienve();
-                tv.kt_tienve_id = Helper.getNewId();
-                tv.trangthai = Helper.SOANTHAO;
-                tv.sothamchieu = stc;
-                tv.ngaygd = (DateTime?)ngay;
-                tv.sotienghino = sgn;
-                tv.sotienghico = sgc;
-                tv.mota = mota.ToString();
-                tv.ngaytao = DateTime.Now;
-                tv.ngaycapnhat = DateTime.Now;
-                tv.nguoitao = UserUtils.getUser(context);
-                tv.nguoicapnhat = UserUtils.getUser(context);
-                tv.hoatdong = true;
-                tvs.Add(tv);
+                var tv = db.kt_tienves.Where(s => s.sothamchieu == stc).FirstOrDefault();
+                if (tv == null)
+                {
+
+                    tv = new kt_tienve();
+                    tv.kt_tienve_id = Helper.getNewId();
+                    tv.trangthai = Helper.SOANTHAO;
+                    tv.sothamchieu = stc;
+                    tv.ngaygd = (DateTime?)ngay;
+                    tv.sotienghino = sgn;
+                    tv.sotienghico = sgc;
+                    tv.mota = mota.ToString();
+                    tv.ngaytao = DateTime.Now;
+                    tv.ngaycapnhat = DateTime.Now;
+                    tv.nguoitao = UserUtils.getUser(context);
+                    tv.nguoicapnhat = UserUtils.getUser(context);
+                    tv.hoatdong = true;
+                    tvs.Add(tv);
+                }
             }
         }
 
