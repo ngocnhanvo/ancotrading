@@ -243,7 +243,7 @@
                     <div title="Tạo phiếu thu tiền về" id="${iddl}">
                         <div id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>
                         <div style="display:none" id="dialog-caution" class="ui-jqdialog-content ui-widget-content">
-                            <form name="FormPost" id="FrmGrid_grid_ds_tienvephanbo" class="FormGrid" onsubmit="return false;" style="width:100%;overflow:auto;position:relative;height:auto;">
+                            <form name="FormPost" id="FrmGrid_grid_ds_tienvephanbo2" class="FormGrid" onsubmit="return false;" style="width:100%;overflow:auto;position:relative;height:auto;">
                                 <table id="TblGrid_grid_ds_tienvephanbo" class="EditTable" cellspacing="0" cellpadding="0" border="0">
                                 <tbody>
                                     <tr rowpos="2" class="FormData" id="tr_loai">
@@ -328,7 +328,7 @@
                 modal: true
                 , open: function (event, ui) {
                     //hide close button.
-                    $('#ma_khachhang', '#FrmGrid_grid_ds_tienvephanbo').val(rowsel.dtkd_id);
+                    $('#ma_khachhang', '#FrmGrid_grid_ds_tienvephanbo2').val(rowsel.dtkd_id);
                     let currentTime = new Date();
                     let month = parseInt(currentTime.getMonth() + 1);
                     month = month <= 9 ? '0' + month : month;
@@ -336,15 +336,15 @@
                     day = day <= 9 ? '0' + day : day;
                     let year = currentTime.getFullYear();
                     let kq = day + '/' + month + '/' + year;
-                    $('#ngaylapphieu', '#FrmGrid_grid_ds_tienvephanbo').val(kq);
-                    $('#ngay_giaonop', '#FrmGrid_grid_ds_tienvephanbo').val(kq);
-                    $('#ngaylapphieu', '#FrmGrid_grid_ds_tienvephanbo').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
-                    $('#ngay_giaonop', '#FrmGrid_grid_ds_tienvephanbo').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
+                    $('#ngaylapphieu', '#FrmGrid_grid_ds_tienvephanbo2').val(kq);
+                    $('#ngay_giaonop', '#FrmGrid_grid_ds_tienvephanbo2').val(kq);
+                    $('#ngaylapphieu', '#FrmGrid_grid_ds_tienvephanbo2').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
+                    $('#ngay_giaonop', '#FrmGrid_grid_ds_tienvephanbo2').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
 
-                    $('#tygia', '#FrmGrid_grid_ds_tienvephanbo').change(() => {
-                        let st = Number($('#sotien', '#FrmGrid_grid_ds_tienvephanbo').val());
-                        let tg = Number($('#tygia', '#FrmGrid_grid_ds_tienvephanbo').val());
-                        $('#quydoi_vnd', '#FrmGrid_grid_ds_tienvephanbo').val((st * tg).toFixed(0));
+                    $('#tygia', '#FrmGrid_grid_ds_tienvephanbo2').change(() => {
+                        let st = Number($('#sotien', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                        let tg = Number($('#tygia', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                        $('#quydoi_vnd', '#FrmGrid_grid_ds_tienvephanbo2').val((st * tg).toFixed(0));
                     });
 
                     $.get(`Views/tienve/Controller_TienVe_PhanBo.ashx`, { action: 'getAmount', id: id_inc_tienve }, function (st) {
@@ -355,8 +355,8 @@
                         else {
                             $("#wait").css("display", "none");
                             $dlg.find('#dialog-caution').css("display", "");
-                            $('#sotien', '#FrmGrid_grid_ds_tienvephanbo').val(st);
-                            $('#tygia', '#FrmGrid_grid_ds_tienvephanbo').change();
+                            $('#sotien', '#FrmGrid_grid_ds_tienvephanbo2').val(st);
+                            $('#tygia', '#FrmGrid_grid_ds_tienvephanbo2').change();
                             $dlg.dialog("option", "position", "center");
                         }
                     });
@@ -386,17 +386,17 @@
                                 let formData = new FormData();
                                 formData.append('action', 'createReceipt');
                                 formData.append('id', id_inc_tienve);
-                                formData.append('loai', $('#loai', '#FrmGrid_grid_ds_tienvephanbo').val());
-                                formData.append('ngaylapphieu', $('#ngaylapphieu', '#FrmGrid_grid_ds_tienvephanbo').val());
-                                formData.append('nguoi_giaonop', $('#nguoi_giaonop', '#FrmGrid_grid_ds_tienvephanbo').val());
-                                formData.append('ngay_giaonop', $('#ngay_giaonop', '#FrmGrid_grid_ds_tienvephanbo').val());
-                                formData.append('md_dongtien_id', $('#md_dongtien_id', '#FrmGrid_grid_ds_tienvephanbo').val());
-                                formData.append('tygia', $('#tygia', '#FrmGrid_grid_ds_tienvephanbo').val());
-                                formData.append('lydo', $('#lydo', '#FrmGrid_grid_ds_tienvephanbo').val());
-                                formData.append('sochungtu', $('#sochungtu', '#FrmGrid_grid_ds_tienvephanbo').val());
-                                formData.append('quydoi_vnd', $('#quydoi_vnd', '#FrmGrid_grid_ds_tienvephanbo').val());
-                                formData.append('tk_quy', $('#tk_quy', '#FrmGrid_grid_ds_tienvephanbo').val());
-                                formData.append('mota', $('#mota', '#FrmGrid_grid_ds_tienvephanbo').val());
+                                formData.append('loai', $('#loai', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                                formData.append('ngaylapphieu', $('#ngaylapphieu', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                                formData.append('nguoi_giaonop', $('#nguoi_giaonop', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                                formData.append('ngay_giaonop', $('#ngay_giaonop', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                                formData.append('md_dongtien_id', $('#md_dongtien_id', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                                formData.append('tygia', $('#tygia', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                                formData.append('lydo', $('#lydo', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                                formData.append('sochungtu', $('#sochungtu', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                                formData.append('quydoi_vnd', $('#quydoi_vnd', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                                formData.append('tk_quy', $('#tk_quy', '#FrmGrid_grid_ds_tienvephanbo2').val());
+                                formData.append('mota', $('#mota', '#FrmGrid_grid_ds_tienvephanbo2').val());
                                 $.ajax({
                                     url: "Views/tienve/Controller_TienVe_PhanBo.ashx",
                                     type: "POST",

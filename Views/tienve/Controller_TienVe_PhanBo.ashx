@@ -217,7 +217,7 @@ public class Controller_TienVe_PhanBo : IHttpHandler
 
         if (sidx.Equals("") || sidx == null)
         {
-            sidx = sct;
+            sidx = "dh.ngaytao";
         }
 
         if (sord.Equals("") || sord == null)
@@ -238,7 +238,9 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                 ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
             {fromSQL}
         )P 
-        where RowNum > @start AND RowNum < @end";
+        where RowNum > @start AND RowNum < @end
+        order by P.RowNum
+        ";
 
         var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
