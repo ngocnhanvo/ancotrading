@@ -65,7 +65,7 @@ public class ChiPhanBoInvController : IHttpHandler
                 from c_chitietthuchi ctpt
                 left join c_thuchi pt on pt.c_thuchi_id = ctpt.c_thuchi_id
                 where 
-                    isnull(pt.loai, '') = ''
+                    isnull(pt.sophieu, '') like 'PT%'
                     and pt.md_trangthai_id = '{Helper.HIEULUC}'
                     and ctpt.isdatcoc = 1
                     and ctpt.c_donhang_id = '{cttc.c_donhang_id}'
