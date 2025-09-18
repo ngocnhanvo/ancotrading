@@ -77,14 +77,23 @@ public class ThuChiController : IHttpHandler
                     thu.md_trangthai_id = "HIEULUC";
                     db.SubmitChanges();
 
-                    var pklids = db.c_chitietthuchis.Where(s => s.c_thuchi_id == id).Select(s => s.c_packinginvoice_id).Distinct().ToList();
+                    var pklids = db.c_chitietthuchis.Where(s => s.c_thuchi_id == id & !string.IsNullOrEmpty(s.c_packinginvoice_id)).Select(s => s.c_packinginvoice_id).Distinct().ToList();
                     var pkls = db.c_packinginvoices.Where(s => pklids.Contains(s.c_packinginvoice_id)).ToList();
                     foreach (var pkl in pkls)
                     {
                         pkl.ngaycapnhat = DateTime.Now;
                         pkl.mota = pkl.mota;
                         db.SubmitChanges();
-                        //mdbc.ExcuteNonQuery("update c_packinginvoice set ngaycapnhat = getdate() where c_packinginvoice_id = '"+item[0]+"'");
+                    }
+
+                    var dhAll = db.c_chitietthuchis.Where(s => s.c_thuchi_id == id & !string.IsNullOrEmpty(s.c_donhang_id) & s.isdatcoc == true).ToList();
+                    var dhids = dhAll.Select(s => s.c_donhang_id).Distinct();
+                    var dhs = db.c_donhangs.Where(s => dhids.Contains(s.c_donhang_id)).ToList();
+                    foreach (var dh in dhs)
+                    {
+                        var datcoc = dhAll.Where(s => s.c_donhang_id == dh.c_donhang_id).Sum(s => s.sotien.GetValueOrDefault(0));
+                        dh.datcoc = dh.datcoc.GetValueOrDefault(0) + datcoc;
+                        db.SubmitChanges();
                     }
 
                     context.Response.Write("Hiệu lực phiếu thu thành công!");

@@ -1,4 +1,4 @@
-//Update at 17/09/2025 09:44:02
+//Update at 18/09/2025 15:49:31
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -15289,6 +15289,7 @@ private string _phienbangiadacbiet;
 private System.Nullable<bool> _tanggiahehang;
 private System.Nullable<decimal> _tanggia;
 private string _tanggiahehang_value;
+private System.Nullable<decimal> _datcoc;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -15419,6 +15420,8 @@ partial void OntanggiaChanging(System.Nullable<decimal> value);
 partial void OntanggiaChanged();
 partial void Ontanggiahehang_valueChanging(string value);
 partial void Ontanggiahehang_valueChanged();
+partial void OndatcocChanging(System.Nullable<decimal> value);
+partial void OndatcocChanged();
 #endregion
 public c_donhang()
 {
@@ -16618,6 +16621,25 @@ this.SendPropertyChanging();
 this._tanggiahehang_value = value;
 this.SendPropertyChanged("tanggiahehang_value");
 this.Ontanggiahehang_valueChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_datcoc", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @datcoc
+{
+get
+{
+return this._datcoc;
+}
+set
+{
+if ((this._datcoc != value))
+{
+this.OndatcocChanging(value);
+this.SendPropertyChanging();
+this._datcoc = value;
+this.SendPropertyChanged("datcoc");
+this.OndatcocChanged();
 }
 }
 }

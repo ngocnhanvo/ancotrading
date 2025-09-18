@@ -168,8 +168,15 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             tvid = loai;
         }
         //// filter
-        string filter = "", sct = "dh.sochungtu";
-
+        string filter = "", sct = "dh.sochungtu", gtcc = "dh.amount", dtt = "null", conlai = "null";
+        var _search = Helper.hoatdongs.Contains(context.Request.Form["_search"].removeAllSpaceOrTrimText(false).ToLower());
+        if (_search)
+        {
+            String _filters = context.Request.Form["filters"];
+            jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
+            filter = f.ToScript();
+        }
+        
         string fromSQL = $@"
             from c_donhang dh
 	        where 
@@ -182,6 +189,9 @@ public class Controller_TienVe_PhanBo : IHttpHandler
         if(loai == "IN")
         {
             sct = "dh.so_pkl";
+            gtcc = "dh.totalgross";
+            dtt = "dh.tiendatra";
+            conlai = "dh.tienconlai";
             fromSQL = $@"
                 from c_packinginvoice dh
                 where 
@@ -229,6 +239,9 @@ public class Controller_TienVe_PhanBo : IHttpHandler
         select P.* from (
             select 
                 {sct} as sochungtu,
+                {gtcc} as gtcc,
+                {dtt} as dtt,
+                {conlai} as conlai,
                 dh.ngaytao, 
                 dh.nguoitao, 
                 dh.ngaycapnhat, 

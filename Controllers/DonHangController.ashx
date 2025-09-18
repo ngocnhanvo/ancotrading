@@ -394,7 +394,7 @@ public class DonHangController : IHttpHandler
 
                 totalCbm = ddh.ToList().Sum(s=>s.v2.GetValueOrDefault(0));
 
-                msg = string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}", dh.sochungtu, totalCbm, totalSalary, totalQuantity);
+                msg = string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}, Đặt cọc: {4:#,##0.00}", dh.sochungtu, totalCbm, totalSalary, totalQuantity, dh.datcoc.GetValueOrDefault(0));
             }
             else
             {

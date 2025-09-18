@@ -325,17 +325,6 @@
         FuncTaoPKLCungKH="function(){ add_tab('Tạo Packing List - Invoice Cùng Khách Hàng', 'inc-tao-chungtuxuathang-cungkh.aspx')}"
         FuncTaoPKLCungPO="function(){ add_tab('Tạo Packing List - Invoice Cùng PO', 'inc-tao-chungtuxuathang-cungpo.aspx')}"
         UrlFileAction="Controllers/PackingInvoiceController.ashx"
-        ColNames="['c_packinginvoice_id', 'TT' , 'Số Packing List', 'Số Invoice', 'Đơn Hàng', 'Người Tạo'
-                     , 'Ngày Lập', 'Người Lập'
-                     , 'Consignee', 'Notifparty', 'Alsonotifyparty', 'Mv'
-                     , 'Ngày Vận Đơn', 'Nơi Đi', 'Nơi Đến', 'BLNo', 'Commodity', 'Discount', 'Handling Fee'
-                     , 'Diễn Giải Cộng' , 'Giá Trị Cộng', 'Diễn Giải Trừ', 'Giá Trị Trừ'
-                     , 'Diễn Giải Cộng PO', 'Giá Trị Cộng PO', 'Diễn Giải Trừ PO', 'Giá Trị Trừ PO'
-                     , 'Comoodity VN', 'Ngày Mở Tờ Khai', 'Ngày Phải TT'
-                     , 'Total Dis' , 'Total Net', 'Total Gross'
-					 , 'Tiền đặt cọc','Tiền đã trả','Tiền còn lại'
-                     , 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật'
-                     , 'Người Cập Nhật', 'Mô tả', 'Hoạt động', 'Tỷ Giá USD-VND']"
         RowNumbers="true"
         OndblClickRow="function(rowid) { $(this).jqGrid('editGridRow', rowid, {
                 
@@ -354,6 +343,7 @@
         ColModel="[
             {
                 fixed: true, name: 'c_packinginvoice_id'
+                , label: 'c_packinginvoice_id'
                 , index: 'c_packinginvoice_id'
                 , width: 100
                 , hidden: true 
@@ -363,6 +353,7 @@
             },
             {
                  fixed: true, name: 'md_trangthai_id'
+                 , label: 'TT'
                  , index: 'md_trangthai_id'
                  , editable: false
                  , width: 100
@@ -372,6 +363,7 @@
             },
             {
                  fixed: true, name: 'so_pkl'
+                 , label: 'Số Packing List'
                  , index: 'so_pkl'
                  , editable: true
                  , width: 100
@@ -380,6 +372,7 @@
             },
             {
                  fixed: true, name: 'so_inv'
+                 , label: 'Số Invoice'
                  , index: 'so_inv'
                  , editable: true
                  , width: 100
@@ -388,6 +381,7 @@
             },
             {
                  fixed: true, name: 'sodh'
+                 , label: 'Đơn Hàng'
                  , index: 'dbo.LayChungTuDonHang(pi.c_packinginvoice_id)'
                  , editable: false
                  , width: 100
@@ -397,6 +391,7 @@
 			{
                 fixed: true, name: 'nguoitao'
                 , index: 'nguoitao1'
+                , label: 'Người Tạo'
                 , width: 100
                 , editable:true
                 , edittype: 'text'
@@ -407,6 +402,7 @@
             {
                  fixed: true, name: 'ngaylap'
                  , index: 'ngaylap'
+                 , label: 'Ngày Lập'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -416,6 +412,7 @@
             {
                  fixed: true, name: 'nguoilap'
                  , index: 'nguoilap'
+                 , label: 'Người Lập'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -423,6 +420,7 @@
             },
             {
                  fixed: true, name: 'consignee'
+                 , label: 'Consignee'
                  , index: 'consignee'
                  , editable: true
                  , width: 100
@@ -431,6 +429,7 @@
             },
             {
                  fixed: true, name: 'notifparty'
+                 , label: 'Notifparty'
                  , index: 'notifparty'
                  , editable: true
                  , width: 100
@@ -439,6 +438,7 @@
             },
             {
                  fixed: true, name: 'alsonotifyparty'
+                 , label: 'Alsonotifyparty'
                  , index: 'alsonotifyparty'
                  , editable: true
                  , width: 100
@@ -447,6 +447,7 @@
             },
             {
                  fixed: true, name: 'mv'
+                 , label: 'Mv'
                  , index: 'mv'
                  , editable: true
                  , width: 100
@@ -455,6 +456,7 @@
             },
             {
                  fixed: true, name: 'etd'
+                 , label: 'Ngày Vận Đơn'
                  , index: 'etd'
                  , editable: true
                  , width: 100
@@ -464,6 +466,7 @@
             },
             {
                  fixed: true, name: 'noidi'
+                 , label: 'Nơi Đi'
                  , index: 'noidi'
                  , editable: true
                  , width: 100
@@ -473,6 +476,7 @@
             },
             {
                  fixed: true, name: 'noiden'
+                 , label: 'Nơi Đến'
                  , index: 'noiden'
                  , editable: true
                  , width: 100
@@ -481,6 +485,7 @@
             },
             {
                  fixed: true, name: 'blno'
+                 , label: 'BLNo'
                  , index: 'blno'
                  , editable: true
                  , width: 100
@@ -489,6 +494,7 @@
             },
             {
                  fixed: true, name: 'commodity'
+                 , label: 'Commodity'
                  , index: 'commodity'
                  , editable: true
                  , width: 100
@@ -497,6 +503,7 @@
             },
             {
                  fixed: true, name: 'discount'
+                 , label: 'Discount'
                  , index: 'discount'
                  , editable: true
                  , width: 100
@@ -508,6 +515,7 @@
             {
                  fixed: true, name: 'handling_fee'
                  , index: 'handling_fee'
+                 , label: 'Handling Fee'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -517,6 +525,7 @@
             },
             {
                  fixed: true, name: 'diengiai_cong'
+                 , label: 'Diễn Giải Cộng'
                  , index: 'diengiai_cong'
                  , editable: true
                  , width: 100
@@ -525,6 +534,7 @@
             },
             {
                  fixed: true, name: 'giatri_cong'
+                 , label: 'Giá Trị Cộng'
                  , index: 'giatri_cong'
                  , editable: true
                  , width: 100
@@ -535,6 +545,7 @@
             },
             {
                  fixed: true, name: 'diengiai_tru'
+                 , label: 'Diễn Giải Trừ'
                  , index: 'diengiai_tru'
                  , editable: true
                  , width: 100
@@ -544,6 +555,7 @@
             {
                  fixed: true, name: 'giatri_tru'
                  , index: 'giatri_tru'
+                 , label: 'Giá Trị Trừ'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -551,13 +563,10 @@
                  , editoptions:{ defaultValue:'0' }
                  , formoptions: { colpos: 2, rowpos: 8 }
             },
-            
-            
-            
-            
             {
                  fixed: true, name: 'diengiaicong_po'
                  , index: 'diengiaicong_po'
+                 , label: 'Diễn Giải Cộng PO'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -567,6 +576,7 @@
             {
                  fixed: true, name: 'giatricong_po'
                  , index: 'giatricong_po'
+                 , label: 'Giá Trị Cộng PO'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -576,6 +586,7 @@
             },
             {
                  fixed: true, name: 'diengiaitru_po'
+                 , label: 'Diễn Giải Trừ PO'
                  , index: 'diengiaitru_po'
                  , editable: true
                  , width: 100
@@ -586,6 +597,7 @@
             {
                  fixed: true, name: 'giatritru_po'
                  , index: 'giatritru_po'
+                 , label: 'Giá Trị Trừ PO'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
@@ -595,6 +607,7 @@
             },
             {
                  fixed: true, name: 'commodityvn'
+                 , label: 'Comoodity VN'
                  , index: 'commodityvn'
                  , editable: true
                  , width: 100
@@ -603,6 +616,7 @@
             },
             {
                  fixed: true, name: 'ngay_motokhai'
+                 , label: 'Ngày Mở Tờ Khai'
                  , index: 'ngay_motokhai'
                  , editable: true
                  , width: 100
@@ -613,6 +627,7 @@
             {
                  fixed: true, name: 'ngay_phaitt'
                  , index: 'ngay_phaitt'
+                 , label: 'Ngày Phải TT'
                  , editable: false
                  , width: 100
                  , edittype: 'text'
@@ -621,6 +636,7 @@
             },
             {
                  fixed: true, name: 'totaldis'
+                 , label: 'Total Dis'
                  , index: 'totaldis'
                  , editable: true
                  , width: 100
@@ -630,6 +646,7 @@
             },
             {
                  fixed: true, name: 'totalnet'
+                 , label: 'Total Net'
                  , index: 'totalnet'
                  , editable: true
                  , width: 100
@@ -639,6 +656,7 @@
             },            
             {
                  fixed: true, name: 'totalgross'
+                 , label: 'Total Gross'
                  , index: 'totalgross'
                  , editable: true
                  , width: 100
@@ -648,34 +666,38 @@
             },
 			{
                  fixed: true, name: 'tiendatcoc'
+                 , label: 'Tiền đặt cọc'
                  , index: 'tiendatcoc'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
                  , editoptions:{ readonly: 'readonly' }
-                 , formoptions: { colpos: 2, rowpos: 14 }
+                 , formoptions: { colpos: 2, rowpos: 15 }
             },
 			{
                  fixed: true, name: 'tiendatra'
+                 , label: 'Tiền đã trả'
                  , index: 'tiendatra'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
                  , editoptions:{ readonly: 'readonly' }
-                 , formoptions: { colpos: 2, rowpos: 14 }
+                 , formoptions: { colpos: 2, rowpos: 16 }
             },
 			{
                  fixed: true, name: 'tienconlai'
                  , index: 'tienconlai'
+                 , label: 'Tiền còn lại'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
                  , editoptions:{ readonly: 'readonly' }
-                 , formoptions: { colpos: 2, rowpos: 14 }
+                 , formoptions: { colpos: 2, rowpos: 17 }
             },
             {
                 fixed: true, name: 'ngaytao'
                 , index: 'ngaytao'
+                , label: 'Ngày Tạo'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
@@ -685,6 +707,7 @@
             {
                 fixed: true, name: 'nguoitao'
                 , index: 'nguoitao'
+                , label: 'Người Tạo'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
@@ -694,6 +717,7 @@
             {
                 fixed: true, name: 'ngaycapnhat'
                 , index: 'ngaycapnhat'
+                , label: 'Ngày Cập Nhật'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
@@ -703,6 +727,7 @@
             {
                 fixed: true, name: 'nguoicapnhat'
                 , index: 'nguoicapnhat'
+                , label: 'Người Cập Nhật'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
@@ -711,15 +736,17 @@
             },
             {
                 fixed: true, name: 'mota'
+                , label: 'Mô tả'
                 , index: 'mota'
                 , width: 100
                 , editable:true
                 , edittype: 'textarea'
-                , formoptions: { colpos: 2, rowpos: 15 }
+                , formoptions: { colpos: 2, rowpos: 18 }
             },
             {
                 fixed: true, name: 'hoatdong', hidden: true
                 , index: 'hoatdong'
+                , label: 'Hoạt động'
                 , width: 100
                 , editable:true
                 , edittype: 'checkbox'
@@ -729,6 +756,7 @@
             },
             {
                 fixed: true, name: 'tygiaUSD_VND', hidden: false
+                , label: 'Tỷ Giá USD-VND'
                 , index: 'tygiaUSD_VND'
                 , width: 100
                 , editable:false

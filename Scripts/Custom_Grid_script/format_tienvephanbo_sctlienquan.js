@@ -52,7 +52,7 @@ var format_tienvephanbo_sctlienquan = {
             id_elemCP.val(cell.sochungtu);
             $('#dlg_gridSmal_2').dialog("destroy").remove();
         };
-        let widthDialog = 300;
+        let widthDialog = 500;
         $('#dlg_gridSmal_2').dialog({
             modal: true,
             dialogClass: "dialog_index",
@@ -88,8 +88,38 @@ var format_tienvephanbo_sctlienquan = {
                             , label: 'Số chứng từ'
                             , index: loai === 'IN' ? 'dh.so_pkl' : 'dh.sochungtu'
                             , editable: true
-                            , width: 200
+                            , width: 150
                             , edittype: 'text'
+                            , editrules: { required: true }
+                        },
+                        {
+                            fixed: true, name: 'gtcc'
+                            , label: 'Giá trị'
+                            , editable: true
+                            , width: 80
+                            , edittype: 'text'
+                            , search: false
+                            , align: 'right'
+                            , editrules: { required: true }
+                        },
+                        {
+                            fixed: true, name: 'dtt'
+                            , label: 'Đã thanh toán'
+                            , editable: true
+                            , width: 80
+                            , edittype: 'text'
+                            , search: false
+                            , align: 'right'
+                            , editrules: { required: true }
+                        },
+                        {
+                            fixed: true, name: 'conlai'
+                            , label: 'Còn lại'
+                            , editable: true
+                            , width: 80
+                            , edittype: 'text'
+                            , search: false
+                            , align: 'right'
                             , editrules: { required: true }
                         }
                     ],
