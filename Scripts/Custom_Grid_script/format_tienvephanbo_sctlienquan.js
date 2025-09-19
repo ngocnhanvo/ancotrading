@@ -26,6 +26,10 @@ var format_tienvephanbo_sctlienquan = {
             return;
         }
         let loai = $('#loaihd', '#FrmGrid_grid_ds_tienvephanbo').val();
+        if (!loai) {
+            alert('Chưa chọn kiểu hồ sơ');
+            return;
+        }
         // Grid
         $('body').append(`
             <div id="dlg_gridSmal_2"
@@ -88,7 +92,7 @@ var format_tienvephanbo_sctlienquan = {
                             , label: 'Số chứng từ'
                             , index: loai === 'IN' ? 'dh.so_pkl' : 'dh.sochungtu'
                             , editable: true
-                            , width: 150
+                            , width: loai === 'IN' ? 150 : 200
                             , edittype: 'text'
                             , editrules: { required: true }
                         },
@@ -111,6 +115,7 @@ var format_tienvephanbo_sctlienquan = {
                             , search: false
                             , align: 'right'
                             , editrules: { required: true }
+                            , hidden: loai === 'PO'
                         },
                         {
                             fixed: true, name: 'conlai'
@@ -121,6 +126,7 @@ var format_tienvephanbo_sctlienquan = {
                             , search: false
                             , align: 'right'
                             , editrules: { required: true }
+                            , hidden: loai === 'PO'
                         }
                     ],
                     ondblClickRow: function (rowid) {

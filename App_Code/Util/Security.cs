@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 
 public static class Security
 {
+    public static string[] userSQL = new string[] { "superadmin", "admin" };
     /// <summary>
     /// Permission For User
     /// </summary>

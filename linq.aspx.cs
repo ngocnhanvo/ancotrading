@@ -13,7 +13,7 @@ public partial class Linq : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         var user = UserUtils.getUser(Context);
-        if (user != "superadmin")
+        if (!Security.userSQL.Contains(user))
         {
             Response.Redirect("Default-Security.aspx");
         }

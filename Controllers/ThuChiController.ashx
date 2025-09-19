@@ -77,7 +77,7 @@ public class ThuChiController : IHttpHandler
                     thu.md_trangthai_id = "HIEULUC";
                     db.SubmitChanges();
 
-                    var pklids = db.c_chitietthuchis.Where(s => s.c_thuchi_id == id & !string.IsNullOrEmpty(s.c_packinginvoice_id)).Select(s => s.c_packinginvoice_id).Distinct().ToList();
+                    var pklids = db.c_chitietthuchis.Where(s => s.c_thuchi_id == id & (s.c_packinginvoice_id ?? "") != "").Select(s => s.c_packinginvoice_id).Distinct().ToList();
                     var pkls = db.c_packinginvoices.Where(s => pklids.Contains(s.c_packinginvoice_id)).ToList();
                     foreach (var pkl in pkls)
                     {
@@ -86,7 +86,7 @@ public class ThuChiController : IHttpHandler
                         db.SubmitChanges();
                     }
 
-                    var dhAll = db.c_chitietthuchis.Where(s => s.c_thuchi_id == id & !string.IsNullOrEmpty(s.c_donhang_id) & s.isdatcoc == true).ToList();
+                    var dhAll = db.c_chitietthuchis.Where(s => s.c_thuchi_id == id & (s.c_donhang_id ?? "") != "" & s.isdatcoc == true).ToList();
                     var dhids = dhAll.Select(s => s.c_donhang_id).Distinct();
                     var dhs = db.c_donhangs.Where(s => dhids.Contains(s.c_donhang_id)).ToList();
                     foreach (var dh in dhs)
