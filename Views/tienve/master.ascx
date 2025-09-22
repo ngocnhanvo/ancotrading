@@ -4,6 +4,57 @@
 <script type="text/javascript">
     var tienve_value_dtkd = `<%=tienve_value_dtkd%>`;
 
+    function printTienVe() {
+        let piId = $('#grid_ds_tienve').jqGrid('getGridParam', 'selrow');
+        let name = 'dialog-print-tienve-pi';
+        let title = 'Trích xuất dữ liệu';
+        let content = `
+            <table style="width:100%">
+            <tr>
+                <td>
+                    <input id="printTienVe" type="radio" name="rdoPrintType" checked="checked" />
+                    <label for="printTienVe">Chiết xuất tiền về</label>
+                </td>
+            </tr>
+            </table>
+        `;
+
+        $('body').append(`<div title="${title}" id="${name}">${content}</div>`);
+        $(`#${name}`).dialog({
+            width: 300,
+            modal: true
+            , open: function (event, ui) {
+                //hide close button.
+                $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+            }
+            , buttons: [
+                {
+                    id: `btn-print-ok-${name}`,
+                    text: "In",
+                    click: function () {
+                        let printType = $('input[name=rdoPrintType]:checked', `#${name}`).attr('id');
+                        let printURL = "Views/tienve/";
+                        let windowSize = "width=700,height=700,scrollbars=yes";
+                        if (typeof printType == 'undefined') {
+                            alert(`Chưa chọn kiểu in`);
+                            return;
+                        }
+                        
+                        printURL += `${printType}.aspx?id=${piId}&download=0`;
+                        window.open(printURL, "Chiết xuất tiền về", windowSize);
+                    }
+                },
+                {
+                    id: `btn-print-close-${name}`,
+                    text: "Thoát",
+                    click: function () {
+                        $(this).dialog("destroy").remove();
+                    }
+                }
+            ]
+        });
+    }
+
     function funcActiveTienVe() {
         let id = $("#grid_ds_tienve").jqGrid('getGridParam', 'selrow');
         if (id == null) {
@@ -67,6 +118,7 @@
     UrlFileAction="Views/tienve/Controller_TienVe.ashx"
     FilterToolbar="true"
     RowNumbers="true"
+    BtnPrint="printTienVe"
     OndblClickRow="
         function(rowid) { 
             $(`#edit_grid_ds_tienve`).click();     

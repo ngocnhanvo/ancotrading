@@ -728,12 +728,16 @@ namespace OfficeToPDF
 
             if (isDate)
             {
-                var fmt = columnT.CellStyle.GetDataFormatString().Replace("\\{", "").Replace("\\}", "").Replace("m", "M").Replace("p", "m");
+                var fmtORG = columnT.CellStyle.GetDataFormatString().Replace("\\{", "").Replace("\\}", "");
+                var fmt = fmtORG.Replace("m", "M").Replace("p", "m");
                 var data = dt.Rows[iRow][nameColumnData];
                 try
                 {
                     if (!object.Equals(data, null))
+                    {
                         columnT.SetCellValue(((DateTime)data).ToString(fmt));
+                        columnT.CellStyle.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfwb, fmtORG);
+                    }
                 }
                 catch (Exception ex)
                 {
