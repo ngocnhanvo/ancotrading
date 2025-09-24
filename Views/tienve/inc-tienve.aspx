@@ -3,6 +3,7 @@
 <%@ Register Src="~/jqGrid.ascx" TagName="jqGrid" TagPrefix="uc1" %>
 <%@ Register Src="master.ascx" TagName="tienve" TagPrefix="master" %>
 <%@ Register Src="tienvephanbo.ascx" TagName="phanbo" TagPrefix="detail" %>
+<%@ Register Src="tienvenganhang.ascx" TagName="nganhang" TagPrefix="detail" %>
 <%@ Import Namespace="System.Linq" %>
 <%@ Import Namespace="System.Xml.Linq" %>
 
@@ -33,8 +34,10 @@
     <div class="ui-layout-center" id="tabs-tienve-details">
         <ul>
             <li><a href="#tienve-details-1">Chi tiết tiền về</a></li>
+            <li><a href="#tienve-details-2">Bank receipt</a></li>
         </ul>
         <detail:phanbo runat="server" />
+        <detail:nganhang runat="server" />
     </div>
 </div>
 
@@ -45,4 +48,5 @@
 <script type="text/javascript">
     createRightPanel('grid_ds_tienve');
     createRightPanel('grid_ds_tienvephanbo');
+    createRightPanel('grid_ds_tienvenganhang');
 </script>

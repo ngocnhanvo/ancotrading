@@ -46,6 +46,7 @@ public partial class Views_tienve_printTienVe : System.Web.UI.Page
 	            tv.sotienghino,
 	            tv.sotienghico,
 	            tv.mota,
+                tv.mota2,
 	            inv.tinv,
 	            inv.sinv,
 	            po.tpo,

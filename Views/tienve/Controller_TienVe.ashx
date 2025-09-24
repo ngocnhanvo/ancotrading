@@ -7,9 +7,7 @@ using System.Linq;
 using System.Data;
 using ExcelLibrary.SpreadSheet;
 using System.Collections.Generic;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-using NPOI.HSSF.UserModel;
+using System.IO;
 public class Controller_TienVe : IHttpHandler
 {
     private LinqDBDataContext db = new LinqDBDataContext();
@@ -214,6 +212,7 @@ public class Controller_TienVe : IHttpHandler
             }
 
             tv.mota = context.Request.Form["mota"].removeAllSpaceOrTrimText(true);
+            tv.mota2 = context.Request.Form["mota2"].removeAllSpaceOrTrimText(true);
             tv.tienkhach = tienkhach;
             tv.phi = tv.tienkhach.GetValueOrDefault(0) - tv.sotienghico.GetValueOrDefault(0);
             tv.conlai = tv.tienkhach.GetValueOrDefault(0) - tv.tongtienphanbo.GetValueOrDefault(0);
@@ -271,8 +270,23 @@ public class Controller_TienVe : IHttpHandler
             var cttvs = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == tv.kt_tienve_id).ToList();
             foreach (var cttv in cttvs)
                 db.kt_tienve_phanbos.DeleteOnSubmit(cttv);
+
+            var tts = db.md_taptins.Where(s => s.lienket == tv.kt_tienve_id).ToList();
+            var links = new List<string>();
+            foreach (var taptin in tts)
+            {
+                db.md_taptins.DeleteOnSubmit(taptin);
+                links.Add(ExcuteSignalRStatic.mapPathSignalR($@"~/{taptin.path}"));
+            }
+
             db.kt_tienves.DeleteOnSubmit(tv);
             db.SubmitChanges();
+
+            foreach (var link in links)
+            {
+                if (File.Exists(link))
+                    File.Delete(link);
+            }
         }
         catch(Exception ex)
         {
@@ -349,6 +363,7 @@ public class Controller_TienVe : IHttpHandler
 	            tv.tongtienphanbo,
 	            tv.conlai,
 	            dtkd.ma_dtkd,
+                tv.mota2,
                 tv.ngaytao, 
                 tv.nguoitao, 
                 tv.ngaycapnhat, 

@@ -268,6 +268,15 @@
         , editoptions: { style: 'width:200px', value: tienve_value_dtkd }
     },
     {
+        fixed: true, name: 'mota2'
+        , index: 'tv.mota2'
+        , label: 'Mô tả thêm'
+        , width: 100
+        , editable:true
+        , edittype: 'textarea'
+        , editoptions: { readonly: false }
+    },
+    {
         fixed: true, name: 'ngaytao'
         , index: 'ngaytao'
         , width: 100
@@ -371,6 +380,7 @@
 			ids=0;
 		id_inc_tienve = ids;
         $('#grid_ds_tienvephanbo')[0].triggerToolbar();
+        $('#grid_ds_tienvenganhang')[0].triggerToolbar();
     }"
     runat="server" />
 

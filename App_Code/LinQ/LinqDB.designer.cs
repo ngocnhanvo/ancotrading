@@ -1,4 +1,4 @@
-//Update at 18/09/2025 15:49:31
+//Update at 24/09/2025 12:09:54
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -26006,6 +26006,7 @@ private string _mota;
 private System.Nullable<bool> _hoatdong;
 private string _phieuthu_id;
 private string _trangthai;
+private string _mota2;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -26066,6 +26067,8 @@ partial void Onphieuthu_idChanging(string value);
 partial void Onphieuthu_idChanged();
 partial void OntrangthaiChanging(string value);
 partial void OntrangthaiChanged();
+partial void Onmota2Changing(string value);
+partial void Onmota2Changed();
 #endregion
 public kt_tienve()
 {
@@ -26600,6 +26603,25 @@ this.SendPropertyChanging();
 this._trangthai = value;
 this.SendPropertyChanged("trangthai");
 this.OntrangthaiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota2", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @mota2
+{
+get
+{
+return this._mota2;
+}
+set
+{
+if ((this._mota2 != value))
+{
+this.Onmota2Changing(value);
+this.SendPropertyChanging();
+this._mota2 = value;
+this.SendPropertyChanged("mota2");
+this.Onmota2Changed();
 }
 }
 }
