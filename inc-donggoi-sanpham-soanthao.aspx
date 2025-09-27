@@ -178,19 +178,6 @@
                 UrlFileAction="Controllers/PackingControllerSOANTHAO.ashx"
 				BtnPrint="funcPrintNT"
 				FuncChangeStatus="ChangeStatus"
-                ColNames="['md_donggoi_id', 'Trạng thái', 'Mã Đóng Gói', 'Tên Đóng Gói', 'SL Inner'
-                        , 'ĐVT Inner','L1', 'W1','H1','SL Outer'
-                        , 'ĐVT Outer','L2','W2'
-                        , 'H2','V2','Số Lượng Cont Mix'
-                        , 'SL Gói/cnt20'
-                        , 'SL Gói/cnt40'
-                        , 'SL Gói/cnt40 HC'
-                        , 'VD', 'VN', 'VL', 'Ghi Chú Vách Ngăn'
-                        , 'Mix Cho Phép Sử Dụng', 'Ngày Xác Nhận'
-						, 'Ghi chú'
-						, 'Đổi giá theo ĐG'
-						, 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật'
-                        , 'Hoạt động']"
                 RowNumbers="true"
                 OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid,{   
                     width:700,
@@ -208,6 +195,7 @@
                 ColModel = "[
                 {
                     fixed: true, name: 'md_donggoi_id'
+                    , label: 'md_donggoi_id'
                     , index: 'dg.md_donggoi_id'
                     , width: 100
                     , hidden: true 
@@ -217,6 +205,7 @@
                 },
 				{
 					fixed: true, name: 'trangthai'
+                    , label: 'Trạng thái'
 					, index: 'trangthai'
 					, width: 100
 					, editable:false
@@ -228,22 +217,25 @@
 					, hidden : true
 				},
                 {
-                     fixed: true, name: 'ma_donggoi'
-                     , index: 'dg.ma_donggoi'
-                     , editable: true
-                     , width: 100
-                     , edittype: 'text'
+                    fixed: true, name: 'ma_donggoi'
+                    , label: 'Mã Đóng Gói'
+                    , index: 'dg.ma_donggoi'
+                    , editable: true
+                    , width: 100
+                    , edittype: 'text'
                 },
                 {
-                     fixed: true, name: 'ten_donggoi'
-                     , index: 'dg.ten_donggoi'
-                     , editable: false
-                     , width: 100
-                     , edittype: 'text'
-					 , hidden : true
+                    fixed: true, name: 'ten_donggoi'
+                    , label: 'Tên Đóng Gói'
+                    , index: 'dg.ten_donggoi'
+                    , editable: false
+                    , width: 100
+                    , edittype: 'text'
+					, hidden : true
                 },
                 {
                     fixed: true, name: 'sl_inner'
+                    , label: 'SL Inner'
                     , index: 'dg.sl_inner'
                     , width: 50
                     , edittype: 'text'
@@ -254,6 +246,7 @@
                 },
                 {
                     fixed: true, name: 'dvtinner'
+                    , label: 'ĐVT Inner'
                     , index: 'dvt.ten_dvt'
                     , width: 50
                     , edittype: 'select'
@@ -264,6 +257,7 @@
                 },
                 {
                     fixed: true, name: 'l1'
+                    , label: 'L1'
                     , index: 'dg.l1'
                     , width: 50
                     , edittype: 'text'
@@ -274,6 +268,7 @@
                 },
                 {
                     fixed: true, name: 'w1'
+                    , label: 'W1'
                     , index: 'dg.w1'
                     , width: 50
                     , edittype: 'text'
@@ -284,6 +279,7 @@
                 },
                 {
                     fixed: true, name: 'h1'
+                    , label: 'H1'
                     , index: 'dg.h1'
                     , width: 50
                     , edittype: 'text'
@@ -294,6 +290,7 @@
                 },
                 {
                     fixed: true, name: 'sl_outer'
+                    , label: 'SL Outer'
                     , index: 'dg.sl_outer'
                     , width: 50
                     , edittype: 'text'
@@ -304,6 +301,7 @@
                 },
                 {
                     fixed: true, name: 'dvtouter'
+                    , label: 'ĐVT Outer'
                     , index: 'dvt.ten_dvt'
                     , width: 50
                     , edittype: 'select'
@@ -314,6 +312,7 @@
                 },
                 {
                     fixed: true, name: 'l2_mix'
+                    , label: 'L2'
                     , index: 'dg.l2_mix'
                     , width: 50
                     , edittype: 'text'
@@ -324,6 +323,7 @@
                 },
                 {
                     fixed: true, name: 'w2_mix'
+                    , label: 'W2'
                     , index: 'dg.w2_mix'
                     , width: 50
                     , edittype: 'text'
@@ -334,6 +334,7 @@
                 },
                 {
                     fixed: true, name: 'h2_mix'
+                    , label: 'H2'
                     , index: 'dg.h2_mix'
                     , width: 50
                     , edittype: 'text'
@@ -344,6 +345,7 @@
                 },
                 {
                     fixed: true, name: 'v2'
+                    , label: 'V2'
                     , index: 'dg.v2'
                     , width: 50
                     , edittype: 'text'
@@ -355,6 +357,7 @@
                 },
                 {
                     fixed: true, name: 'sl_cont_mix'
+                    , label: 'Số Lượng Cont Mix'
                     , index: 'dg.sl_cont_mix'
                     , width: 50
                     , edittype: 'text'
@@ -366,6 +369,7 @@
                 },
                 {
                     fixed: true, name: 'soluonggoi_ctn_20'
+                    , label: 'SL Gói/cnt20'
                     , index: 'dg.soluonggoi_ctn_20'
                     , width: 50
                     , edittype: 'text'
@@ -376,6 +380,7 @@
                 },
 				{
                     fixed: true, name: 'soluonggoi_ctn'
+                    , label: 'SL Gói/cnt40'
                     , index: 'dg.soluonggoi_ctn'
                     , width: 50
                     , edittype: 'text'
@@ -386,6 +391,7 @@
                 },
 				{
                     fixed: true, name: 'soluonggoi_ctn_40hc'
+                    , label: 'SL Gói/cnt40 HC'
                     , index: 'dg.soluonggoi_ctn_40hc'
                     , width: 50
                     , edittype: 'text'
@@ -396,6 +402,7 @@
                 },
                 {
                     fixed: true, name: 'vd'
+                    , label: 'VD'
                     , index: 'dg.vd'
                     , width: 50
                     , edittype: 'text'
@@ -408,6 +415,7 @@
                 },
                 {
                     fixed: true, name: 'vn'
+                    , label: 'VN'
                     , index: 'dg.vn'
                     , width: 50
                     , edittype: 'text'
@@ -420,6 +428,7 @@
                 },
                 {
                     fixed: true, name: 'vl'
+                    , label: 'VL'
                     , index: 'dg.vl'
                     , width: 50
                     , edittype: 'text'
@@ -432,6 +441,7 @@
                 },
                 {
                     fixed: true, name: 'ghichu_vachngan'
+                    , label: 'Ghi Chú Vách Ngăn'
                     , index: 'dg.ghichu_vachngan'
                     , width: 50
                     , edittype: 'textarea'
@@ -441,6 +451,7 @@
                 },
                 {
                     fixed: true, name: 'mix_chophepsudung'
+                    , label: 'Mix Cho Phép Sử Dụng'
                     , index: 'dg.mix_chophepsudung'
                     , width: 50
                     , edittype: 'checkbox'
@@ -451,6 +462,7 @@
                 },
                 {
 					fixed: true, name: 'ngayxacnhan'
+                    , label: 'Ngày Xác Nhận'
 					, index: 'dg.ngayxacnhan'
 					, editable: true
 					, width: 50
@@ -483,6 +495,7 @@
 				},
 				{
                     fixed: true, name: 'mota'
+                    , label: 'Ghi chú'
                     , index: 'dg.mota'
                     , width: 50
                     , editable:true
@@ -494,6 +507,7 @@
 				{
                     fixed: true
 					, name: 'doigia_donggoi'
+                    , label: 'Đổi giá theo ĐG'
                     , index: 'dg.doigia_donggoi'
                     , width: 50
                     , edittype: 'checkbox'
@@ -506,7 +520,34 @@
                     , formoptions: { colpos: 2, rowpos: 7 }
                 },
                 {
+                    fixed: true, name: 'tldg'
+                    , label: 'TLDG'
+                    , index: 'dg.tldg'
+                    , width: 70
+                    , edittype: 'text'
+                    , editable:true
+                    , editrules:{ number:true, required:true }
+                    , editoptions:{ defaultValue: '0' }
+                    , align : 'right'
+                    , formoptions: { colpos: 2, rowpos: 9 }
+					, hidden : false
+                },
+                {
+                    fixed: true, name: 'cpdg'
+                    , label: 'CPDG'
+                    , index: 'dg.cpdg'
+                    , width: 70
+                    , edittype: 'text'
+                    , editable:true
+                    , editrules:{ number:true, required:true }
+                    , editoptions:{ defaultValue: '0' }
+                    , align : 'right'
+                    , formoptions: { colpos: 2, rowpos: 10 }
+					, hidden : false
+                },
+                {
                     fixed: true, name: 'ngaytao'
+                    , label: 'Ngày Tạo'
                     , index: 'dg.ngaytao'
                     , width: 50
                     , editable:false
@@ -515,6 +556,7 @@
                 },
                 {
                     fixed: true, name: 'nguoitao'
+                    , label: 'Người Tạo'
                     , index: 'dg.nguoitao'
                     , width: 50
                     , editable:false
@@ -523,6 +565,7 @@
                 },
                 {
                     fixed: true, name: 'ngaycapnhat'
+                    , label: 'Ngày Cập Nhật'
                     , index: 'dg.ngaycapnhat'
                     , width: 50
                     , editable:false
@@ -531,6 +574,7 @@
                 },
                 {
                     fixed: true, name: 'nguoicapnhat'
+                    , label: 'Người Cập Nhật'
                     , index: 'dg.nguoicapnhat'
                     , width: 50
                     , editable:false
@@ -539,6 +583,7 @@
                 },
                 {
                     fixed: true, name: 'hoatdong', hidden: true
+                    , label: 'Hoạt động'
                     , index: 'dg.hoatdong'
                     , width: 50
                     , editable:true

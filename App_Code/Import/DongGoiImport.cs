@@ -262,7 +262,7 @@ using ExcelLibrary.SpreadSheet;
 public class DongGoiImport : ImportOriginal
 {
     public void Import(string maDongGoi, string tenDongGoi, decimal sl_inner, string dvt_inner, decimal l1, decimal w1, decimal h1, decimal sl_outer, string dvt_outer, decimal l2_mix, decimal w2_mix, decimal h2_mix,
-	decimal slcont40, decimal slcont20, decimal slcont40hc, String nxn, string ghichu, bool dgdg)
+	decimal slcont40, decimal slcont20, decimal slcont40hc, String nxn, string ghichu, bool dgdg, decimal? tldg, decimal? cpdg)
     {
         md_donggoi o = new md_donggoi();
         o.md_donggoi_id = ImportUtils.getNEWID();
@@ -282,6 +282,8 @@ public class DongGoiImport : ImportOriginal
         o.soluonggoi_ctn_20 = slcont20;
         o.soluonggoi_ctn = slcont40;
         o.soluonggoi_ctn_40hc = slcont40hc;
+        o.tldg = tldg;
+        o.cpdg = cpdg;
         
 		//o.vd = vd;
         //o.vn = vn;
@@ -307,7 +309,7 @@ public class DongGoiImport : ImportOriginal
     LinqDBDataContext db = new LinqDBDataContext();
 
     public void Update(string maDongGoi, string tenDongGoi, decimal sl_inner, string dvt_inner, decimal l1, decimal w1, decimal h1, decimal sl_outer, string dvt_outer, decimal l2_mix, decimal w2_mix, decimal h2_mix,
-	decimal slcont40, decimal slcont20, decimal slcont40hc, String nxn, string ghichu, bool dgdg)
+	decimal slcont40, decimal slcont20, decimal slcont40hc, String nxn, string ghichu, bool dgdg, decimal? tldg, decimal? cpdg)
     {
         md_donggoi o = db.md_donggois.FirstOrDefault(p => p.ma_donggoi.Equals(maDongGoi));
         if(o != null) {
@@ -326,8 +328,10 @@ public class DongGoiImport : ImportOriginal
 			o.soluonggoi_ctn_20 = slcont20;
 			o.soluonggoi_ctn = slcont40;
 			o.soluonggoi_ctn_40hc = slcont40hc;
+            o.tldg = tldg;
+            o.cpdg = cpdg;
 
-			o.ngaycapnhat = DateTime.Now;
+            o.ngaycapnhat = DateTime.Now;
 			o.nguoicapnhat = "admin";
 			o.hoatdong = true;
 			if(string.IsNullOrEmpty(nxn))

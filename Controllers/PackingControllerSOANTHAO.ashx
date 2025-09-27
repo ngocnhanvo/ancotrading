@@ -233,7 +233,9 @@ public class PackingController : IHttpHandler
             m.vl = decimal.Parse(context.Request.Form["vl"]);
             m.ghichu_vachngan = context.Request.Form["ghichu_vachngan"];
             m.mix_chophepsudung = mix;
-			
+			m.tldg = context.Request.Form["tldg"].removeAllSpaceOrTrimText(false).ToNullableDecimal();
+            m.cpdg = context.Request.Form["cpdg"].removeAllSpaceOrTrimText(false).ToNullableDecimal();
+
 			if(context.Request.Form["ngayxacnhan"] != "")
 			{
 				m.ngayxacnhan = DateTime.ParseExact(context.Request.Form["ngayxacnhan"], "dd/MM/yyyy", null);
@@ -314,9 +316,10 @@ public class PackingController : IHttpHandler
                 vn = decimal.Parse(context.Request.Form["vn"]),
                 vl = decimal.Parse(context.Request.Form["vl"]),
                 ghichu_vachngan = context.Request.Form["ghichu_vachngan"],
-				trangthai = "SOANTHAO",
+				trangthai = Helper.SOANTHAO,
                 mix_chophepsudung = mix,
-                
+                tldg = context.Request.Form["tldg"].removeAllSpaceOrTrimText(false).ToNullableDecimal(),
+                cpdg = context.Request.Form["cpdg"].removeAllSpaceOrTrimText(false).ToNullableDecimal(),
                 ngayxacnhan = nxn,
 				doigia_donggoi = dgdg_chk,
                 mota = context.Request.Form["mota"],
@@ -358,9 +361,8 @@ public class PackingController : IHttpHandler
             filter = f.ToScript();
         }
 
-        String sqlCount = "SELECT COUNT(*) AS count " +
-            " FROM md_donggoi dg where dg.trangthai = 'SOANTHAO' and 1=1 " + filter;
-        
+        String sqlCount = $@"SELECT COUNT(1) AS count FROM md_donggoi dg where dg.trangthai = 'SOANTHAO' and 1=1 {filter}";
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -387,59 +389,72 @@ public class PackingController : IHttpHandler
             sidx = "ten_donggoi";
         }
 
-        string strsql = "select * from( " +
-            " select md_donggoi_id, ma_donggoi, ten_donggoi, sl_inner " +
-            " , (select ten_dvt from md_donvitinh dvt where dvt.md_donvitinh_id = dg.dvt_inner) as dvtinner " +
-            " , l1, w1, h1, sl_outer " +
-            " , (select ten_dvt from md_donvitinh dvt where dvt.md_donvitinh_id = dg.dvt_outer) as dvtouter " +
-            " , l2_mix, w2_mix, h2_mix, v2, sl_cont_mix, soluonggoi_ctn_20,soluonggoi_ctn,soluonggoi_ctn_40hc, vd, vn, vl, ghichu_vachngan " +
-            ", mix_chophepsudung, dg.ngayxacnhan, dg.doigia_donggoi, dg.ngaytao, dg.nguoitao, dg.ngaycapnhat, dg.nguoicapnhat, dg.mota, dg.hoatdong , dg.trangthai, " +
-            " ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            " FROM md_donggoi dg where dg.trangthai = 'SOANTHAO' and 1=1 " + filter + 
-            " )P where RowNum > @start AND RowNum < @end";
-        
-        
-        System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
-        string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
-        xml += "<rows>";
-        xml += "<page>" + page + "</page>";
-        xml += "<total>" + total_page + "</total>";
-        xml += "<records>" + count + "</records>";
+        string strsql = $@"
+            select * from(
+                select 
+                    md_donggoi_id
+                    , dg.trangthai
+                    , ma_donggoi
+                    , ten_donggoi
+                    , sl_inner
+                    , (select ten_dvt from md_donvitinh dvt where dvt.md_donvitinh_id = dg.dvt_inner) as dvtinner
+                    , l1
+                    , w1
+                    , h1
+                    , sl_outer
+                    , (select ten_dvt from md_donvitinh dvt where dvt.md_donvitinh_id = dg.dvt_outer) as dvtouter
+                    , l2_mix
+                    , w2_mix
+                    , h2_mix
+                    , v2
+                    , sl_cont_mix
+                    , soluonggoi_ctn_20
+                    ,soluonggoi_ctn
+                    ,soluonggoi_ctn_40hc
+                    , vd
+                    , vn
+                    , vl
+                    , ghichu_vachngan
+                    , mix_chophepsudung
+                    , dg.ngayxacnhan
+                    , dg.mota
+                    , dg.doigia_donggoi
+                    , dg.tldg, dg.cpdg
+                    , dg.ngaytao
+                    , dg.nguoitao
+                    , dg.ngaycapnhat
+                    , dg.nguoicapnhat
+                    , dg.hoatdong
+                    , ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
+                FROM md_donggoi dg where dg.trangthai = 'SOANTHAO' and 1=1 {filter}
+            )P where RowNum > @start AND RowNum < @end";
+
+
+        var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
+        string xml = $@"<?xml version=""1.0"" encoding=""UTF-8"" ?>";
+        xml += $@"<rows>";
+        xml += $@"<page>{page}</page>";
+        xml += $@"<total>{total_page}</total>";
+        xml += $@"<records>{count}</records>";
         foreach (System.Data.DataRow row in dt.Rows)
         {
             xml += "<row>";
-            xml += "<cell><![CDATA[" + row[0] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[31] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[1] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[2] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[3] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[4] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[5] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[6] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[7] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[9] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[10] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[11] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[12] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[13] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[14] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[15] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[16] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[17] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[18] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[19] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[20] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[21] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[22] + "]]></cell>";
-            xml += "<cell><![CDATA[" + (!row[23].ToString().Equals("") ? DateTime.Parse(row[23].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-			xml += "<cell><![CDATA[" + row[29] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[24] + "]]></cell>";
-			xml += "<cell><![CDATA[" + DateTime.Parse(row[25].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[26] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[27].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[28] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[30] + "]]></cell>";
+            foreach (System.Data.DataColumn column in dt.Columns)
+            {
+                if (column.DataType == System.Type.GetType("System.DateTime"))
+                {
+                    try
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)row[column.ColumnName]).ToString("dd/MM/yyyy"));
+                    }
+                    catch
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
+                    }
+                }
+                else
+                    xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
+            }
             xml += "</row>";
         }
         xml += "</rows>";

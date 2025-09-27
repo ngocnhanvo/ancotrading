@@ -1,4 +1,4 @@
-//Update at 24/09/2025 12:09:54
+//Update at 27/09/2025 13:32:47
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -32406,6 +32406,8 @@ private System.Nullable<System.DateTime> _ngayxacnhan;
 private System.Nullable<decimal> _trongluong;
 private System.Nullable<bool> _doigia_donggoi;
 private string _trangthai;
+private System.Nullable<decimal> _tldg;
+private System.Nullable<decimal> _cpdg;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -32478,6 +32480,10 @@ partial void Ondoigia_donggoiChanging(System.Nullable<bool> value);
 partial void Ondoigia_donggoiChanged();
 partial void OntrangthaiChanging(string value);
 partial void OntrangthaiChanged();
+partial void OntldgChanging(System.Nullable<decimal> value);
+partial void OntldgChanged();
+partial void OncpdgChanging(System.Nullable<decimal> value);
+partial void OncpdgChanged();
 #endregion
 public md_donggoi()
 {
@@ -33126,6 +33132,44 @@ this.SendPropertyChanging();
 this._trangthai = value;
 this.SendPropertyChanged("trangthai");
 this.OntrangthaiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tldg", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @tldg
+{
+get
+{
+return this._tldg;
+}
+set
+{
+if ((this._tldg != value))
+{
+this.OntldgChanging(value);
+this.SendPropertyChanging();
+this._tldg = value;
+this.SendPropertyChanged("tldg");
+this.OntldgChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_cpdg", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @cpdg
+{
+get
+{
+return this._cpdg;
+}
+set
+{
+if ((this._cpdg != value))
+{
+this.OncpdgChanging(value);
+this.SendPropertyChanging();
+this._cpdg = value;
+this.SendPropertyChanged("cpdg");
+this.OncpdgChanged();
 }
 }
 }

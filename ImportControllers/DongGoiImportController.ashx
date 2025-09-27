@@ -7,14 +7,14 @@ using ExcelLibrary;
 
 public class DongGoiImportController : IHttpHandler
 {
-    
+
     public void ProcessRequest (HttpContext context) {
         String filename = context.Request.QueryString["filename"];
         String file = context.Server.MapPath("../FileUpload/" + filename);
-		int j = file.LastIndexOf(".");
-		if(file.Substring(j) != ".xls") {
-			file = ConvertXLSXToXLS.ConvertWorkbookXSSFToHSSF(file);
-		}
+        int j = file.LastIndexOf(".");
+        if(file.Substring(j) != ".xls") {
+            file = ConvertXLSXToXLS.ConvertWorkbookXSSFToHSSF(file);
+        }
         Workbook wb = Workbook.Load(file);
         Worksheet ws = wb.Worksheets[0];
         this.NewFromCellCollection(context, ws.Cells);
@@ -105,8 +105,8 @@ public class DongGoiImportController : IHttpHandler
         }
     }
 	*/
-	
-	public void NewFromCellCollection(HttpContext context, CellCollection cellCollection)
+
+    public void NewFromCellCollection(HttpContext context, CellCollection cellCollection)
     {
         //for (int i = 1; i < 5; i++)
         for (int i = 1; i < cellCollection.Rows.Count; i++)
@@ -125,33 +125,28 @@ public class DongGoiImportController : IHttpHandler
                 decimal cellL2 = row.GetCell(8).Value == null ? 0 : decimal.Parse(row.GetCell(8).Value.ToString());
                 decimal cellW2 = row.GetCell(9).Value == null ? 0 : decimal.Parse(row.GetCell(9).Value.ToString());
                 decimal cellH2 = row.GetCell(10).Value == null ? 0 : decimal.Parse(row.GetCell(10).Value.ToString());
-				decimal cellSL_Cont20 = row.GetCell(11).Value == null ? 0 : decimal.Parse(row.GetCell(11).Value.ToString());
-				decimal cellSL_Cont40 = row.GetCell(12).Value == null ? 0 : decimal.Parse(row.GetCell(12).Value.ToString());
+                decimal cellSL_Cont20 = row.GetCell(11).Value == null ? 0 : decimal.Parse(row.GetCell(11).Value.ToString());
+                decimal cellSL_Cont40 = row.GetCell(12).Value == null ? 0 : decimal.Parse(row.GetCell(12).Value.ToString());
                 decimal cellSL_Cont40HC = row.GetCell(13).Value == null ? 0 : decimal.Parse(row.GetCell(13).Value.ToString());
                 // decimal cellVD = row.GetCell(13).Value == null ? 0 : decimal.Parse(row.GetCell(13).Value.ToString());
                 // decimal cellVN = row.GetCell(14).Value == null ? 0 : decimal.Parse(row.GetCell(14).Value.ToString());
                 // decimal cellVL = row.GetCell(15).Value == null ? 0 : decimal.Parse(row.GetCell(15).Value.ToString());
-				String cellGhiChu = row.GetCell(15).Value == null ? String.Empty : row.GetCell(15).Value.ToString();
-				String cellDGDG = row.GetCell(16).Value == null ? String.Empty : row.GetCell(16).Value.ToString();
                 String ngayXacNhan = row.GetCell(14).Value == null ? String.Empty : row.GetCell(14).Value.ToString();;
+                String cellGhiChu = row.GetCell(15).Value == null ? String.Empty : row.GetCell(15).Value.ToString();
+                String cellDGDG = row.GetCell(16).Value == null ? String.Empty : row.GetCell(16).Value.ToString();
 
-                // if (row.GetCell(14).Value != null)
-                // {
-                    // if (row.GetCell(14).Value.ToString() != "")
-                    // {
-                        // ngayXacNhan = row.GetCell(14).DateTimeValue;
-                    // }
-                // }
+                var tldg = row.GetCell(17).Value == null ? 0 : row.GetCell(17).StringValue.removeAllSpaceOrTrimText(false).ToNullableDecimal();
+                var cpdg = row.GetCell(18).Value == null ? 0 : row.GetCell(18).StringValue.removeAllSpaceOrTrimText(false).ToNullableDecimal();
 
                 md_donvitinh dvt_inner = ImportUtils.getDonViTinh(cellDvt_Inner);
                 md_donvitinh dvt_outer = ImportUtils.getDonViTinh(cellDvt_Outer);
-                
+
                 String msg = "";
                 msg += String.Format("<div>--- Import Dòng {0} ---</div>", i + 1);
 
                 bool next = true, dgdg = false;
-				if(cellDGDG == "1") { dgdg = true; }
-				
+                if(cellDGDG == "1") { dgdg = true; }
+
                 if (dvt_inner == null)
                 {
                     next = false;
@@ -171,7 +166,7 @@ public class DongGoiImportController : IHttpHandler
                     {
                         DongGoiImport import = new DongGoiImport();
                         import.Import(cellTenDG, cellSL_Outer.ToString() + " " + cellDvt_Outer, cellSL_Inner, dvt_inner.md_donvitinh_id, cellL1, cellW1, cellH1
-                        , cellSL_Outer, dvt_outer.md_donvitinh_id, cellL2, cellW2, cellH2, cellSL_Cont40, cellSL_Cont20, cellSL_Cont40HC, ngayXacNhan, cellGhiChu, dgdg);
+                        , cellSL_Outer, dvt_outer.md_donvitinh_id, cellL2, cellW2, cellH2, cellSL_Cont40, cellSL_Cont20, cellSL_Cont40HC, ngayXacNhan, cellGhiChu, dgdg, tldg, cpdg);
 
                         msg += String.Format("<div style=\"color:green\">Đã tạo mới một đóng gói!</div>");
                     }
@@ -179,7 +174,7 @@ public class DongGoiImportController : IHttpHandler
                     {
                         DongGoiImport import = new DongGoiImport();
                         import.Update(cellTenDG, cellSL_Outer.ToString() + " " + cellDvt_Outer, cellSL_Inner, dvt_inner.md_donvitinh_id, cellL1, cellW1, cellH1
-                        , cellSL_Outer, dvt_outer.md_donvitinh_id, cellL2, cellW2, cellH2, cellSL_Cont40, cellSL_Cont20, cellSL_Cont40HC, ngayXacNhan, cellGhiChu, dgdg);
+                        , cellSL_Outer, dvt_outer.md_donvitinh_id, cellL2, cellW2, cellH2, cellSL_Cont40, cellSL_Cont20, cellSL_Cont40HC, ngayXacNhan, cellGhiChu, dgdg, tldg, cpdg);
 
                         msg += String.Format("<div style=\"color:green\">Cập nhật đóng gói thành công!</div>");
                     }
@@ -193,7 +188,7 @@ public class DongGoiImportController : IHttpHandler
             }
         }
     }
-	
+
     public bool IsReusable {
         get {
             return false;
