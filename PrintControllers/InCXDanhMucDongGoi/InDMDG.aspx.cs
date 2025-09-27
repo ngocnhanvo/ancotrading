@@ -35,7 +35,7 @@ public partial class PrintControllers_InDMDG_Default : System.Web.UI.Page
 			(select dvt.ten_dvt from md_donvitinh dvt where dvt.md_donvitinh_id = dg.dvt_outer) as [DVTOuter], 
 			dg.l2_mix as [L2], dg.w2_mix as [W2], dg.h2_mix as [H2],dg.v2 as [V2],
 			dg.soluonggoi_ctn_20 as [SL Gói/cnt20], dg.soluonggoi_ctn as [SL Gói/cnt40], dg.soluonggoi_ctn_40hc as [SL Gói/cnt40hc],
-			CONVERT(char(10), dg.ngayxacnhan,103) as [Ngày xác nhận],dg.mota as [Ghi chú]
+			CONVERT(char(10), dg.ngayxacnhan,103) as [Ngày xác nhận],dg.mota as [Ghi chú], dg.tldg as [TL ĐG], dg.cpdg as [CP ĐG]
 			
 		from md_donggoi dg where 1=1 {0}", filter);
 
@@ -95,7 +95,7 @@ public partial class PrintControllers_InDMDG_Default : System.Web.UI.Page
 				{
 									
 					string[] arr_number = {
-						"SLInner","SLOuter","L1","W1","H1","L2","W2","H2","V2","SL Gói/cnt20","SL Gói/cnt40","SL Gói/cnt40hc"
+						"SLInner","SLOuter","L1","W1","H1","L2","W2","H2","V2","SL Gói/cnt20","SL Gói/cnt40","SL Gói/cnt40hc", "TL ĐG", "CP ĐG"
 					};
 					if(arr_number.Contains(col.ColumnName)) {
 						double number = 0;
