@@ -30,6 +30,7 @@ var format_tienvephanbo_sctlienquan = {
             alert('Chưa chọn kiểu hồ sơ');
             return;
         }
+        let frmId = id_elem.closest('form').attr('id');
         // Grid
         $('body').append(`
             <div id="dlg_gridSmal_2"
@@ -54,6 +55,7 @@ var format_tienvephanbo_sctlienquan = {
             let cell = gridMaster.getRowData(rowid);
             id_elem.val(cell.sochungtu);
             id_elemCP.val(cell.sochungtu);
+            $('#sotien', `#${frmId}`).val(loai === 'PO' ? cell.gtcc : cell.conlai);
             $('#dlg_gridSmal_2').dialog("destroy").remove();
         };
         let widthDialog = 500;
@@ -90,9 +92,9 @@ var format_tienvephanbo_sctlienquan = {
                         {
                             fixed: true, name: 'sochungtu'
                             , label: 'Số chứng từ'
-                            , index: loai === 'IN' ? 'dh.so_pkl' : 'dh.sochungtu'
+                            , index: loai === 'PO' ? 'dh.sochungtu' : 'dh.so_pkl'
                             , editable: true
-                            , width: loai === 'IN' ? 150 : 200
+                            , width: loai === 'PO' ? 200 : 150
                             , edittype: 'text'
                             , editrules: { required: true }
                         },

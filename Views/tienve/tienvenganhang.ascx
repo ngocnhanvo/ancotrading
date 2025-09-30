@@ -80,7 +80,7 @@
             },
             {
                 name: 'nguoitao'
-                , label: 'Người tạo'
+                , label: 'Người thêm file'
                 , index: 'tt.nguoitao'
                 , fixed:true 
                 , width: 100

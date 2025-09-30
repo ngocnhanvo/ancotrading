@@ -111,6 +111,33 @@
                 ]
         });
     }
+
+function format_tienve_motathem(cellvalue, options, rowObject) {
+    //let type = options.colModel.editoptions.typeLoad;
+    const CONLAI_INDEX = 10; 
+    let conlai = 0; 
+    if (rowObject && rowObject.nodeType === 1) { 
+        conlai = $(rowObject).find('cell').eq(CONLAI_INDEX).text();
+    } else {
+        conlai = rowObject.conlai;
+    }
+
+    conlai = isNaN(conlai) ? 0 : Number(conlai);
+
+    cellvalue = cellvalue ? cellvalue : "";
+    let text = cellvalue.trim();
+    if (text.length > 0) {
+        if (conlai > 0) {
+            if (text.substr(0,1) == '*') {
+                let txt20 = text.length <= 20 ? text : text.substr(0, 20);
+                let txt21 = text.length <= 20 ? "" : text.substr(21);
+                text = `<span style='color:red; font-size: 14px'>${txt20}</span><span>${txt21}</span>`;
+            }
+        }
+    }
+
+    return `<div title="${cellvalue}">${text}</div>`;
+};
 </script>
 
 <uc1:jqGrid ID="grid_ds_tienve"
@@ -274,6 +301,8 @@
         , width: 100
         , editable:true
         , edittype: 'textarea'
+        , formatter: format_tienve_motathem
+        , unformat: disable_formatter
         , editoptions: { readonly: false }
     },
     {
@@ -287,11 +316,12 @@
     },
     {
         fixed: true, name: 'nguoitao'
+        , label: 'Người import'
         , index: 'nguoitao'
         , width: 100
         , editable:false
         , edittype: 'text'
-        , hidden: true 
+        , hidden: false
         , editrules:{ edithidden : true }
     },
     {

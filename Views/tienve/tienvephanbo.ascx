@@ -112,11 +112,12 @@
     },
     {
         fixed: true, name: 'nguoitao'
+        , label: 'Người phân bổ'
         , index: 'cttc.nguoitao'
         , width: 100
         , editable:false
         , edittype: 'text'
-        , hidden: true 
+        , hidden: false
         , editrules:{ edithidden : true }
     },
     {
