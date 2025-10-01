@@ -153,6 +153,9 @@ public class Controller_TienVe : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
+            case "ketthuc":
+                this.ketthuc(context);
+                break;
             default:
                 switch (oper)
                 {
@@ -171,6 +174,43 @@ public class Controller_TienVe : IHttpHandler
                 }
                 break;
         }
+    }
+
+    public void ketthuc(HttpContext context)
+    {
+        string msg = "";
+        string tvid = context.Request.Form["id"];
+        try
+        {
+            var tv = db.kt_tienves.Where(s => s.kt_tienve_id == tvid).FirstOrDefault();
+            if (tv == null)
+            {
+                msg = $@"Không tìm thấy dòng ""tiền về"" đã chọn";
+                goto EndEventHandler;
+            }
+
+            if(tv.trangthai != Helper.HIEULUC)
+            {
+                msg = $@"Dòng ""tiền về"" không ở trạng thái Hiệu Lực";
+                goto EndEventHandler;
+            }
+
+            tv.trangthai = Helper.KETTHUC;
+            tv.ngaycapnhat = DateTime.Now;
+            tv.nguoicapnhat = UserUtils.getUser(context);
+            db.SubmitChanges();
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length > 0)
+            jqGridHelper.Utils.writeResult(0, msg);
+        else
+            jqGridHelper.Utils.writeResult(1, "Kêt thúc thành công");
     }
 
     public void edit(HttpContext context)

@@ -12,8 +12,21 @@
             <table style="width:100%">
             <tr>
                 <td>
-                    <input id="printTienVe" type="radio" name="rdoPrintType" checked="checked" />
-                    <label for="printTienVe">Chiết xuất tiền về</label>
+                    <div>
+                        <input id="printTienVe" type="radio" name="rdoPrintType" checked="checked" />
+                        <label for="printTienVe">Chiết xuất tiền về</label>
+                    </div>
+                    <div style="display:flex; width:99%;">
+                        <div>
+                            <label for="printTienVe_tungay">Từ ngày</label>
+                            <input id="printTienVe_tungay" autocomplete="off" type="text" style="width:100%"/>
+                        </div>
+                        <div style="width:14px;"></div>
+                        <div>
+                            <label for="printTienVe_denngay">Đến ngày</label>
+                            <input id="printTienVe_denngay" autocomplete="off" type="text" style="width:100%"/>
+                        </div>
+                    </div>
                 </td>
             </tr>
             </table>
@@ -26,6 +39,8 @@
             , open: function (event, ui) {
                 //hide close button.
                 $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                $('#printTienVe_tungay').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
+                $('#printTienVe_denngay').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
             }
             , buttons: [
                 {
@@ -39,8 +54,18 @@
                             alert(`Chưa chọn kiểu in`);
                             return;
                         }
-                        
-                        printURL += `${printType}.aspx?id=${piId}&download=0`;
+
+                        let tungay = $('#printTienVe_tungay').val();
+                        if (!tungay) {
+                            alert(`Chưa chọn từ ngày`);
+                            return;
+                        }
+                        let denngay = $('#printTienVe_denngay').val();
+                        if (!denngay) {
+                            alert(`Chưa chọn đến ngày`);
+                            return;
+                        }
+                        printURL += `${printType}.aspx?id=${piId}&download=0&tungay=${tungay}&denngay=${denngay}`;
                         window.open(printURL, "Chiết xuất tiền về", windowSize);
                     }
                 },
@@ -55,22 +80,27 @@
         });
     }
 
-    function funcActiveTienVe() {
+    function funcKetThucTienVe() {
         let id = $("#grid_ds_tienve").jqGrid('getGridParam', 'selrow');
         if (id == null) {
-            alert('Chưa chọn phiếu muốn hiệu lực.!');
+            alert('Chưa chọn tiền về muốn kết thúc.!');
             return;
         }
 
-        let msg = "Có phải bạn muốn hiệu lực phiếu thu này.?";
-        let p = '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><span id="dialog-caution">' + msg + '</span></p>';
-        let h3 = '<h3 style="padding: 10px" class="ui-state-highlight ui-corner-all">' + p + '<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div></h3>';
-
-        // append dialog-taoky to body
-        $('body').append('<div title="Thông Báo" id=\"dialog-active-phieuthu\">' + h3 + '</div>');
+        let name = 'dialog-ketthuc-tienve-pi';
+        let title = 'Kết thúc tiền về';
+        let content = `
+            <div>
+                <h3 style="padding: 10px" class="ui-state-highlight ui-corner-all" id="dialog-caution">Có phải bạn muốn kết thúc dòng tiền về này?</h3>
+                <div style="display:none" id="wait">
+                    <img style="width:30px; height:30px" src="iconcollection/loading.gif"/>
+                </div>
+            </div>
+        `;
+        $('body').append(`<div title="${title}" id="${name}">${content}</div>`);
 
         // create new dialog
-        $('#dialog-active-phieuthu').dialog({
+        $(`#${name}`).dialog({
             modal: true
             , open: function (event, ui) {
                 //hide close button.
@@ -79,30 +109,35 @@
             , buttons:
                 [
                     {
-                        id: "btn-active-phieuthu",
+                        id: `btn-yes-${name}`,
                         text: "Có",
                         click: function () {
-                            $("#dialog-caution").ajaxStart(function () {
+                            let ajaxStart = function () {
                                 $("#wait").css("display", "block");
                                 $("#btn-active-phieuthu").button("disable");
                                 $("#btn-close").button("disable");
-                            });
+                            };
 
-                            $("#dialog-caution").ajaxComplete(function () {
+                            let ajaxComplete = function () {
                                 $("#wait").css("display", "none");
                                 $("#btn-close span").text("Thoát");
                                 $("#btn-close").button("enable");
-                            });
+                            };
 
-                            $.get("Controllers/ThuChiController.ashx?action=activephieuthu&id=" + id, function (result) {
-                                //$('#dialog-caution').css({ 'color': 'green' });
-                                $('#dialog-active-phieuthu').find('#dialog-caution').html(result);
-                                $('#grid_ds_tienve').jqGrid().trigger('reloadGrid');
+                            ajaxStart();
+                            $.post(`Views/tienve/Controller_TienVe.ashx?action=ketthuc`, {id: id }, function (result) {
+                                ajaxComplete();
+                                let $xmlObject = $(result); 
+                                let ok = $xmlObject.find('type').text() == '1';
+                                let msg = $xmlObject.find('message').text();
+                                $(`#${name}`).find('#dialog-caution').html(msg);
+                                if (ok)
+                                    $('#grid_ds_tienve')[0].triggerToolbar();
                             });
                         }
                     },
                     {
-                        id: "btn-close",
+                        id: `btn-close-${name}`,
                         text: "Không",
                         click: function () {
                             $(this).dialog("destroy").remove();
@@ -146,6 +181,7 @@ function format_tienve_motathem(cellvalue, options, rowObject) {
     FilterToolbar="true"
     RowNumbers="true"
     BtnPrint="printTienVe"
+    FuncKetThuc="funcKetThucTienVe"
     OndblClickRow="
         function(rowid) { 
             $(`#edit_grid_ds_tienve`).click();     

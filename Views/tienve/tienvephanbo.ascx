@@ -233,7 +233,6 @@
                 alert('Chưa chọn tiền về');
                 return;
             }
-            console.log(rowsel);
             if(!rowsel.dtkd_id) {
                 alert('Chưa chọn khách hàng');
                 return;

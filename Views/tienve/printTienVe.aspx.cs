@@ -38,8 +38,11 @@ public partial class Views_tienve_printTienVe : System.Web.UI.Page
     {
         string id = context.Request.QueryString["id"];
         string manv = context.User.Identity.Name.removeAllSpaceOrTrimText(true);
-
+        string tungay = context.Request.QueryString["tungay"];
+        string denngay = context.Request.QueryString["denngay"];
         string sql = $@"	 
+            declare @tungay datetime = convert(datetime, '{tungay} 00:00:00', 103)
+            declare @denngay datetime = convert(datetime, '{denngay} 23:59:59', 103)
             select 
 	            tv.ngaygd,
 	            tv.sothamchieu,
@@ -87,8 +90,9 @@ public partial class Views_tienve_printTienVe : System.Web.UI.Page
             ) po
             where
                 1=1
+                and tv.ngaygd between @tungay and @denngay
             order by
-                tv.ngaygd, tv.sothamchieu
+                tv.ngaygd desc, tv.sothamchieu
 		";
 
         //throw new ArgumentNullException(sql);
