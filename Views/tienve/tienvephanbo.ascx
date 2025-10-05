@@ -1,6 +1,28 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="tienvephanbo.ascx.cs" Inherits="Views_tienve_tienvephanbo" %>
 <%@ Register src="~/jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
-
+<script type="text/javascript">
+    var tienvephanbo_tinhphi = function ($this, type) {
+        if (type == 0) {
+            let style = `cursor: pointer;`;
+            style += `user-select: none;`;
+            style += `display: inline;`;
+            style += `text-decoration: underline;`;
+            style += `color: blue;`;
+            style += `margin-left: 10px;`;
+            return `<div style="${style}" onclick="tienvephanbo_tinhphi(this, 1)">Tính phí</div>`;
+        }
+        else {
+            let $frm = $('#FrmGrid_grid_ds_tienvephanbo');
+            let $tctt = $frm.find('#sotien');
+            let $phi = $frm.find('#phi');
+            $phi.val('Loading...');
+            $.post(`Views/tienve/Controller_TienVe_PhanBo.ashx?action=layPhi`, { id: id_inc_tienve, tctt: $tctt.val() }, function (rs) {
+                rs = JSON.parse(rs);
+                $phi.val(rs.phi);
+            });
+        }
+    };
+</script>
 <div id="tienve-details-1">
 <uc1:jqGrid  ID="grid_ds_tienvephanbo" 
     FilterToolbar="true"
@@ -100,6 +122,35 @@
         , formatter:'currency'
         , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
         , editoptions:{ defaultValue: '0' }
+        , formoptions: { label: 'Phí' + tienvephanbo_tinhphi(null, 0) }
+    }, 
+    {
+        fixed: true, name: 'tpb_inv'
+        , index: 'cttv.tpb_inv'
+        , label: 'Tiền phân bổ cọc INV'
+        , editable: false
+        , width: 100
+        , edittype: 'text'
+        , editrules: {number:true, required:true, defaultValue: '0'}
+        , align:'right'
+        , formatter:'currency'
+        , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+        , editoptions:{ defaultValue: '0' }
+        , hidden: true
+    }, 
+    {
+        fixed: true, name: 'tcl'
+        , index: 'cttv.tcl'
+        , label: 'Tiền còn lại'
+        , editable: false
+        , width: 100
+        , edittype: 'text'
+        , editrules: {number:true, required:true, defaultValue: '0'}
+        , align:'right'
+        , formatter:'currency'
+        , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+        , editoptions:{ defaultValue: '0' }
+        , hidden: true
     }, 
     {
         fixed: true, name: 'ngaytao'
@@ -224,6 +275,7 @@
 
 <script type="text/javascript">
     var tygia_tienvephanbo = <%=tygia%>;
+
     $("#grid_ds_tienvephanbo").jqGrid('navButtonAdd', '#grid_ds_tienvephanbo-pager', {
         caption: "Tạo phiếu thu",
         title: "Tạo phiếu tthu",
@@ -413,6 +465,92 @@
 
                                         if (rs.lastIndexOf('error') <= -1) {
                                             $('#grid_ds_tienve')[0].triggerToolbar();
+                                            $('#grid_ds_tienvephanbo')[0].triggerToolbar();
+                                        }
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            id: `btn-close-${iddl}`,
+                            text: "Không",
+                            click: function () {
+                                $(this).dialog("destroy").remove();
+                            }
+                        }
+                    ]
+            });
+        }
+    });
+
+    $("#grid_ds_tienvephanbo").jqGrid('navButtonAdd', '#grid_ds_tienvephanbo-pager', {
+        caption: "Làm mới TPBINV",
+        title: "Làm mới tiền phân bổ INV",
+        onClickButton: function () {
+            alert(`Chức năng đã được bảo trì, chờ chỉnh sửa`);
+            return;
+
+            let rowsel = $('#grid_ds_tienve').getRowData(id_inc_tienve);
+            if (!rowsel) {
+                alert('Chưa chọn tiền về');
+                return;
+            }
+
+            let iddl = "dialog-tienvelammoiphanbo";
+            $('body').append(`
+                    <div title="Làm mới tiền phân bổ" id="${iddl}">
+                        <div id="wait" style="display:none"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>
+                        <div id="dialog-caution" class="ui-jqdialog-content ui-widget-content">
+                            Thực hiện chức năng này?
+                        </div>
+                    </div>
+                `);
+            let $dlg = $(`#${iddl}`); 
+            $dlg.dialog({
+                modal: true
+                , open: function (event, ui) {
+                    
+                },
+                close: function () {
+                    $(`#btn-close-${iddl}`).click();
+                },
+                buttons:
+                    [
+                        {
+                            id: `btn-ok-${iddl}`,
+                            text: "Có",
+                            click: function () {
+                                let ajaxStart = function () {
+                                    $("#wait").css("display", "block");
+                                    $(`#btn-ok-${iddl}`).button("disable");
+                                    $(`#btn-close-${iddl}`).button("disable");
+                                };
+
+                                let ajaxComplete = function () {
+                                    $("#wait").css("display", "none");
+                                    $(`#btn-close-${iddl} span`).text("Thoát");
+                                    $(`#btn-close-${iddl}`).button("enable");
+                                };
+
+                                ajaxStart();
+                                let formData = new FormData();
+                                formData.append('action', 'lammoiTienPhanBo');
+                                formData.append('id', id_inc_tienve);
+                                $.ajax({
+                                    url: "Views/tienve/Controller_TienVe_PhanBo.ashx",
+                                    type: "POST",
+                                    data: formData,
+                                    processData: false,
+                                    contentType: false,
+                                    error: function (rs) {
+                                        ajaxComplete();
+                                        Popup("Error", 500, 400, rs.responseText);
+                                    },
+                                    success: function (rs) {
+                                        $dlg.find('#dialog-caution').html(rs);
+                                        ajaxComplete();
+
+                                        if (rs.lastIndexOf('error') <= -1) {
                                             $('#grid_ds_tienvephanbo')[0].triggerToolbar();
                                         }
                                     }

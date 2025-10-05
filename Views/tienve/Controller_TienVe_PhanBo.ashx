@@ -9,7 +9,6 @@ using System.Data;
 public class Controller_TienVe_PhanBo : IHttpHandler
 {
     private LinqDBDataContext db = new LinqDBDataContext();
-
     public void ProcessRequest(HttpContext context)
     {
         String action, oper;
@@ -25,6 +24,12 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                 break;
             case "createReceipt":
                 this.createReceipt(context);
+                break;
+            case "lammoiTienPhanBo":
+                this.lammoiTienPhanBo(context);
+                break;
+            case "layPhi":
+                this.layPhi(context);
                 break;
             default:
                 switch (oper)
@@ -43,6 +48,63 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                         break;
                 }
                 break;
+        }
+    }
+
+    public decimal layPhi(HttpContext context, string id = "", kt_tienve tv = null, decimal tiencoc_thanhtoan = 0)
+    {
+        bool sg = false;
+        decimal phi = 0, ptv = 0, tktv = 0;
+        if(tv == null)
+        {
+            sg = true;
+            id = context.Request.Form["id"].removeAllSpaceOrTrimText(false);
+            tiencoc_thanhtoan = context.Request.Form["tctt"].removeAllSpaceOrTrimText(false).ToNullableDecimal().GetValueOrDefault(0);
+            tv = db.kt_tienves.Where(s => s.kt_tienve_id == id).FirstOrDefault();
+        }
+
+        if (tv != null)
+        {
+            ptv = tv.phi.GetValueOrDefault(0);
+            tktv = tv.tienkhach.GetValueOrDefault(0);
+            if(tktv > 0)
+                phi = Math.Round(tiencoc_thanhtoan * ptv / tktv, 2, MidpointRounding.AwayFromZero);
+        }
+
+        if(sg)
+        {
+            var rs = new { phi, ptv, tktv };
+            context.Response.Write(Newtonsoft.Json.JsonConvert.SerializeObject(rs));
+        }
+
+        return phi;
+    }
+
+    public void lammoiTienPhanBo(HttpContext context, string id = "")
+    {
+        bool sg = false;
+        if(string.IsNullOrWhiteSpace(id))
+        {
+            sg = true;
+            id = context.Request.Form["id"].removeAllSpaceOrTrimText(false);
+        }
+        var kttvs = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == id & s.loaihd == "PO").ToList();
+        foreach(var cttv in kttvs)
+        {
+            var dhid = db.c_donhangs.Where(s => s.sochungtu == cttv.sctlienquan).Select(s=>s.c_donhang_id).FirstOrDefault();
+
+            var invids = db.c_dongpklinvs.Where(s => s.c_donhang_id == dhid).Select(s => s.c_packinginvoice_id).Distinct().ToList();
+
+            var cttcs = db.c_dongphanboinvs.Where(s => invids.Contains(s.c_packinginvoice_id)).ToList();
+
+            cttv.tpb_inv = cttcs.Sum(s => s.sotienphanbo.GetValueOrDefault(0));
+        }
+
+        db.SubmitChanges();
+
+        if(sg)
+        {
+            context.Response.Write("Cập nhập tiền phân bổ thành công");
         }
     }
 
@@ -85,7 +147,7 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             mnu.ngaylapphieu = DateTime.ParseExact(context.Request.Form["ngaylapphieu"], "dd/MM/yyyy", null);
             mnu.nguoi_giaonop = context.Request.Form["nguoi_giaonop"];
             mnu.ngay_giaonop = DateTime.ParseExact(context.Request.Form["ngay_giaonop"], "dd/MM/yyyy", null);
-            mnu.sotien = cttvs.Sum(s => s.sotien.GetValueOrDefault(0) + s.phi.GetValueOrDefault(0));
+            mnu.sotien = cttvs.Sum(s => s.sotien.GetValueOrDefault(0));
             mnu.md_dongtien_id = context.Request.Form["md_dongtien_id"];
             mnu.tygia = decimal.Parse(context.Request.Form["tygia"]);
             mnu.lydo = context.Request.Form["lydo"];
@@ -119,7 +181,7 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                 cttv.trangthai = Helper.HIEULUC;
 
                 var istiencoc = cttv.loaihd == "PO" ? "true" : "false";
-                var sotien = cttv.sotien + cttv.phi;
+                var sotien = cttv.sotien.GetValueOrDefault(0);
                 var poID = db.c_donhangs.Where(s => s.sochungtu == cttv.sctlienquan).Select(s => s.c_donhang_id).FirstOrDefault();
                 var invID = db.c_packinginvoices.Where(s => s.so_pkl == cttv.sctlienquan).Select(s => s.c_packinginvoice_id).FirstOrDefault();
                 msgs.Add(Public.add_CTPT(db, context, istiencoc, mnu.c_thuchi_id, mnu, "0", "0", sotien.ToString(), "", poID, invID, cttv.loaihd, cttv.kt_tienve_phanbo_id));
@@ -147,7 +209,7 @@ public class Controller_TienVe_PhanBo : IHttpHandler
         var kocoId = string.IsNullOrWhiteSpace(id);
         if(kocoId)
             id = context.Request.QueryString["id"];
-        var st = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == id & s.trangthai == Helper.SOANTHAO).ToList().Sum(s => s.sotien.GetValueOrDefault(0) + s.phi.GetValueOrDefault(0));
+        var st = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == id & s.trangthai == Helper.SOANTHAO).ToList().Sum(s => s.sotien.GetValueOrDefault(0));
 
         if (kocoId)
             context.Response.Write(st);
@@ -176,7 +238,7 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
         string fromSQL = $@"
             from c_donhang dh
 	        where 
@@ -346,12 +408,12 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                 }
             }
 
-            var tienphanbocu = cttv.sotien.GetValueOrDefault(0) + cttv.phi.GetValueOrDefault(0);
+            var tienphanbocu = cttv.sotien.GetValueOrDefault(0);
             var sotien = context.Request.Form["sotien"].removeAllSpaceOrTrimText(false).ToNullableDecimal().GetValueOrDefault(0);
-            var phi = context.Request.Form["phi"].removeAllSpaceOrTrimText(false).ToNullableDecimal().GetValueOrDefault(0);
-            if(sotien + phi > tv.conlai + tienphanbocu)
+            var phi = layPhi(context, null, tv, sotien);
+            if(sotien > tv.conlai + tienphanbocu)
             {
-                msg = $@"Tổng tiền phân bổ vượt quá giới hạn {(sotien + phi).DropTrailingZeros()} > {(tv.conlai  + tienphanbocu).DropTrailingZeros()}";
+                msg = $@"Tổng tiền phân bổ vượt quá giới hạn {sotien.DropTrailingZeros()} > {(tv.conlai  + tienphanbocu).DropTrailingZeros()}";
                 goto EndEventHandler;
             }
 
@@ -361,7 +423,7 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             cttv.phi = phi;
             cttv.ngaycapnhat = DateTime.Now;
             cttv.nguoicapnhat = UserUtils.getUser(context);
-            tv.tongtienphanbo = tv.tongtienphanbo - tienphanbocu + sotien + phi;
+            tv.tongtienphanbo = tv.tongtienphanbo - tienphanbocu + sotien;
             tv.conlai = tv.tienkhach - tv.tongtienphanbo;
             db.SubmitChanges();
         }
@@ -424,10 +486,10 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             }
 
             var sotien = context.Request.Form["sotien"].removeAllSpaceOrTrimText(false).ToNullableDecimal().GetValueOrDefault(0);
-            var phi = context.Request.Form["phi"].removeAllSpaceOrTrimText(false).ToNullableDecimal().GetValueOrDefault(0);
-            if(sotien + phi > tv.conlai)
+            var phi = layPhi(context, null, tv, sotien);
+            if(sotien > tv.conlai)
             {
-                msg = $@"Tổng tiền phân bổ vượt quá giới hạn {(sotien + phi).DropTrailingZeros()} > {tv.conlai.DropTrailingZeros()}";
+                msg = $@"Tổng tiền phân bổ vượt quá giới hạn {sotien.DropTrailingZeros()} > {tv.conlai.DropTrailingZeros()}";
                 goto EndEventHandler;
             }
 
@@ -444,10 +506,12 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             cttv.ngaycapnhat = DateTime.Now;
             cttv.nguoicapnhat = UserUtils.getUser(context);
             db.kt_tienve_phanbos.InsertOnSubmit(cttv);
-            tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) + sotien + phi;
+            tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) + sotien;
             tv.conlai = tv.tienkhach - tv.tongtienphanbo;
             tv.trangthai = Helper.HIEULUC;
             db.SubmitChanges();
+
+            //lammoiTienPhanBo(context, tv.kt_tienve_id);
         }
         catch(Exception ex)
         {
@@ -571,6 +635,8 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                 cttv.sctlienquan,
                 cttv.sotien,
 	            cttv.phi,
+                cttv.tpb_inv,
+                cttv.sotien - isnull(cttv.tpb_inv, 0) as tcl,
                 cttv.ngaytao, 
                 cttv.nguoitao, 
                 cttv.ngaycapnhat, 

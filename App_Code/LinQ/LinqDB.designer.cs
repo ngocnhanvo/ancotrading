@@ -1,4 +1,4 @@
-//Update at 27/09/2025 13:32:47
+//Update at 03/10/2025 11:33:24
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -26672,6 +26672,8 @@ private string _mota;
 private System.Nullable<bool> _hoatdong;
 private string _loaihd;
 private string _trangthai;
+private System.Nullable<decimal> _tpb_inv;
+private System.Nullable<decimal> _tcl;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -26724,6 +26726,10 @@ partial void OnloaihdChanging(string value);
 partial void OnloaihdChanged();
 partial void OntrangthaiChanging(string value);
 partial void OntrangthaiChanged();
+partial void Ontpb_invChanging(System.Nullable<decimal> value);
+partial void Ontpb_invChanged();
+partial void OntclChanging(System.Nullable<decimal> value);
+partial void OntclChanged();
 #endregion
 public kt_tienve_phanbo()
 {
@@ -27182,6 +27188,44 @@ this.SendPropertyChanging();
 this._trangthai = value;
 this.SendPropertyChanged("trangthai");
 this.OntrangthaiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tpb_inv", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @tpb_inv
+{
+get
+{
+return this._tpb_inv;
+}
+set
+{
+if ((this._tpb_inv != value))
+{
+this.Ontpb_invChanging(value);
+this.SendPropertyChanging();
+this._tpb_inv = value;
+this.SendPropertyChanged("tpb_inv");
+this.Ontpb_invChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tcl", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @tcl
+{
+get
+{
+return this._tcl;
+}
+set
+{
+if ((this._tcl != value))
+{
+this.OntclChanging(value);
+this.SendPropertyChanging();
+this._tcl = value;
+this.SendPropertyChanged("tcl");
+this.OntclChanged();
 }
 }
 }
