@@ -234,7 +234,7 @@ public static class Helper
         string values, string md_doitackinhdoanh_id, string ctd_ngaychi, string thueStr,
         string ltt, string loaiphieu2, string tkno, string tkco, string diengiai,
         string c_donhang_id, string c_packinginvoice_id, string mota,
-        string sotien, string c_nhapxuat_id, string sotaikhoan, string nganhang)
+        string sotien, string c_nhapxuat_id, string sotaikhoan, string nganhang, string tvpbid = "")
     {
         string msg = "";
 
@@ -344,6 +344,7 @@ public static class Helper
                             mnu.mota = mota;
                             mnu.sotaikhoan = sotaikhoan;
                             mnu.nganhang = nganhang;
+                            mnu.kt_tienve_phanbo_id = tvpbid;
                             mnu.hoatdong = true;
                             mnu.ngaytao = DateTime.Now;
                             mnu.ngaycapnhat = DateTime.Now;
@@ -380,6 +381,7 @@ public static class Helper
                         mnu.mota = mota;
                         mnu.sotaikhoan = sotaikhoan;
                         mnu.nganhang = nganhang;
+                        mnu.kt_tienve_phanbo_id = tvpbid;
                         mnu.hoatdong = true;
                         mnu.ngaytao = DateTime.Now;
                         mnu.ngaycapnhat = DateTime.Now;

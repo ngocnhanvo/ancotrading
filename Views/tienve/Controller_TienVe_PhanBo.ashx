@@ -25,6 +25,9 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             case "createReceipt":
                 this.createReceipt(context);
                 break;
+            case "createPayment":
+                this.createPayment(context);
+                break;
             case "lammoiTienPhanBo":
                 this.lammoiTienPhanBo(context);
                 break;
@@ -108,6 +111,129 @@ public class Controller_TienVe_PhanBo : IHttpHandler
         }
     }
 
+    public void createPayment(HttpContext context)
+    {
+        string msg = "";
+        var msgs = new List<string>();
+        string id = context.Request.Form["id"];
+        try
+        {
+            var tv = db.kt_tienves.Where(s => s.kt_tienve_id == id).FirstOrDefault();
+            if (tv == null)
+            {
+                msg = $@"Không tìm thấy dòng ""tiền về"" đã chọn";
+                goto EndEventHandler;
+            }
+
+            if(tv.trangthai != Helper.HIEULUC)
+            {
+                msg = $@"Dòng ""tiền về"" phải ở trạng thái Hiệu Lực";
+                goto EndEventHandler;
+            }
+
+            var cttvs = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == tv.kt_tienve_id & s.trangthai == Helper.SOANTHAO & s.loaihd == "CK").ToList();
+
+            string loai = context.Request.Form["loai"];
+            var sochungtu = db.md_sochungtus.Single(s => s.tiento.Equals("PC"));
+            string sphieu = sochungtu.tiento + "/" + sochungtu.so_duocgan + "/" + sochungtu.hauto;
+            bool check = (bool)mdbc.ExecuteScalarProcedure("p_kiemtragiaodich", "@date", (DateTime.ParseExact(context.Request.Form["ngaylapphieu"], "dd/MM/yyyy", null)).ToString("MM/dd/yyyy"),"@md_doitackinhdoanh_id", tv.dtkd_id);
+            if (!check.Equals(true))
+            {
+                msg = "Không thể thêm giao dịch vào kỳ kế toán đã đóng!";
+                goto EndEventHandler;
+            }
+            var mnu = new c_thuchi();
+            mnu.c_thuchi_id = Helper.getNewId();
+            mnu.sophieu = sphieu;
+            mnu.loai = loai;
+            mnu.md_doitackinhdoanh_id = tv.dtkd_id;
+            mnu.ngaylapphieu = DateTime.ParseExact(context.Request.Form["ngaylapphieu"], "dd/MM/yyyy", null);
+            mnu.nguoi_giaonop = context.Request.Form["nguoi_giaonop"];
+            mnu.ngay_giaonop = DateTime.ParseExact(context.Request.Form["ngay_giaonop"], "dd/MM/yyyy", null);
+            mnu.sotien = cttvs.Sum(s => s.sotien.GetValueOrDefault(0));
+            mnu.md_dongtien_id = context.Request.Form["md_dongtien_id"];
+            mnu.tygia = decimal.Parse(context.Request.Form["tygia"]);
+            mnu.lydo = context.Request.Form["lydo"];
+            mnu.sochungtu = context.Request.Form["sochungtu"];
+            mnu.quydoi_vnd = context.Request.Form["quydoi_vnd"].removeAllSpaceOrTrimText(false).ToNullableDecimal();
+            mnu.tk_quy = context.Request.Form["tk_quy"].removeAllSpaceOrTrimText(false).ToNullableInt();
+            mnu.tongcackhoan = 0;
+            mnu.tongkhoanphi = 0;
+            mnu.tienconlai = mnu.tongcackhoan - mnu.sotien + mnu.tongkhoanphi;
+            mnu.md_trangthai_id = Helper.SOANTHAO;
+            string md_loaichungtu_id = db.md_loaichungtus.Where(s => s.kieu_doituong == "PC").Select(s => s.md_loaichungtu_id).FirstOrDefault();
+            mnu.md_loaichungtu_id = md_loaichungtu_id;
+            mnu.ispaymentin = false;
+            mnu.mota = context.Request.Form["mota"];
+            mnu.hoatdong = true;
+            mnu.kt_tienve_id = tv.kt_tienve_id;
+            mnu.nguoitao = UserUtils.getUser(context);
+            mnu.nguoicapnhat = UserUtils.getUser(context);
+            mnu.ngaytao = DateTime.Now;
+            mnu.ngaycapnhat = DateTime.Now;
+            db.c_thuchis.InsertOnSubmit(mnu);
+            sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
+
+            if (tv.conlai <= 0)
+                tv.trangthai = Helper.KETTHUC;
+            db.SubmitChanges();
+
+            foreach(var cttv in cttvs)
+            {
+                cttv.phieuthu_id = mnu.c_thuchi_id;
+                cttv.trangthai = Helper.HIEULUC;
+                var sotien = cttv.sotien.GetValueOrDefault(0);
+                var poID = db.c_donhangs.Where(s => s.sochungtu == cttv.sctlienquan).Select(s => s.c_donhang_id).FirstOrDefault();
+                var invID = db.c_packinginvoices.Where(s => s.so_pkl == cttv.sctlienquan).Select(s => s.c_packinginvoice_id).FirstOrDefault();
+
+                string loai2 = "CK";
+                string tc = "false";
+                string tiencong = "0";
+                string c_thuchi_id = mnu.c_thuchi_id;
+                string ids = "";
+                string values = "";
+                string md_doitackinhdoanh_id = "";
+                string ctd_ngaychi = DateTime.Now.ToString("dd/MM/yyyy");
+                string thueStr = "0";
+                string ltt = "IN";
+                string loaiphieu2 = "";
+                string tkno = "331";
+                string tkco = "112";
+                string diengiai = "";
+                string c_donhang_id = "";
+                string c_packinginvoice_id = invID;
+                string mota = "";
+                string sotien2 = sotien.ToString();
+                string c_nhapxuat_id = "";
+                string sotaikhoan = "";
+                string nganhang = "";
+                string msg2 = Helper.themChiTietUyNhiemChi(context, db,
+                    loai2, tc, tiencong, c_thuchi_id, ids, values, md_doitackinhdoanh_id,
+                    ctd_ngaychi, thueStr, ltt, loaiphieu2, tkno, tkco, diengiai, c_donhang_id,
+                    c_packinginvoice_id, mota, sotien2, c_nhapxuat_id, sotaikhoan, nganhang, cttv.kt_tienve_phanbo_id
+                    );
+
+                db.SubmitChanges();
+                msgs.Add(msg2);
+            }
+
+            msgs = msgs.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+            if(msgs.Count > 0)
+                msg = string.Join("<br>", msgs);
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length > 0)
+            context.Response.Write($@"<div style='color:red' class='error'>{msg}</div>");
+        else
+            context.Response.Write($@"<div style='color:blue'>Tạo phiếu chi thành công</div>");
+    }
+
     public void createReceipt(HttpContext context)
     {
         string msg = "";
@@ -128,7 +254,7 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                 goto EndEventHandler;
             }
 
-            var cttvs = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == tv.kt_tienve_id & s.trangthai == Helper.SOANTHAO).ToList();
+            var cttvs = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == tv.kt_tienve_id & s.trangthai == Helper.SOANTHAO & s.loaihd != "CK").ToList();
 
             string loai = context.Request.Form["loai"];
             var sochungtu = db.md_sochungtus.Single(s => s.tiento.Equals("PT"));
@@ -209,7 +335,23 @@ public class Controller_TienVe_PhanBo : IHttpHandler
         var kocoId = string.IsNullOrWhiteSpace(id);
         if(kocoId)
             id = context.Request.QueryString["id"];
-        var st = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == id & s.trangthai == Helper.SOANTHAO).ToList().Sum(s => s.sotien.GetValueOrDefault(0));
+
+        var phieuthu = string.IsNullOrWhiteSpace(context.Request.QueryString["tpc"].removeAllSpaceOrTrimText(false));
+
+        decimal st = 0;
+
+        if(phieuthu)
+            st = db.kt_tienve_phanbos.Where(s =>
+                s.kt_tienve_id == id &
+                s.trangthai == Helper.SOANTHAO &
+                s.loaihd != "CK"
+                ).ToList().Sum(s => s.sotien.GetValueOrDefault(0));
+        else
+            st = db.kt_tienve_phanbos.Where(s =>
+                s.kt_tienve_id == id &
+                s.trangthai == Helper.SOANTHAO &
+                s.loaihd == "CK"
+                ).ToList().Sum(s => s.sotien.GetValueOrDefault(0));
 
         if (kocoId)
             context.Response.Write(st);
@@ -248,7 +390,7 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                 {filter}
         ";
 
-        if(loai == "IN")
+        if(loai != "PO")
         {
             sct = "dh.so_pkl";
             gtcc = "dh.totalgross";
@@ -391,15 +533,6 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             var sct = context.Request.Form["sctlienquan"].removeAllSpaceOrTrimText(true);
             if (loai == "IN")
             {
-                var inv = db.c_packinginvoices.Where(s => s.so_pkl == sct).FirstOrDefault();
-                if (inv == null)
-                {
-                    msg = $@"Không tìm thấy Invoice";
-                    goto EndEventHandler;
-                }
-            }
-            else
-            {
                 var po = db.c_donhangs.Where(s => s.sochungtu == sct).FirstOrDefault();
                 if (po == null)
                 {
@@ -407,14 +540,39 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                     goto EndEventHandler;
                 }
             }
+            else
+            {
+                var inv = db.c_packinginvoices.Where(s => s.so_pkl == sct).FirstOrDefault();
+                if (inv == null)
+                {
+                    msg = $@"Không tìm thấy Invoice";
+                    goto EndEventHandler;
+                }
+            }
 
             var tienphanbocu = cttv.sotien.GetValueOrDefault(0);
             var sotien = context.Request.Form["sotien"].removeAllSpaceOrTrimText(false).ToNullableDecimal().GetValueOrDefault(0);
             var phi = layPhi(context, null, tv, sotien);
-            if(sotien > tv.conlai + tienphanbocu)
+
+            var loaiCK = loai == "CK";
+            if (loaiCK)
             {
-                msg = $@"Tổng tiền phân bổ vượt quá giới hạn {sotien.DropTrailingZeros()} > {(tv.conlai  + tienphanbocu).DropTrailingZeros()}";
-                goto EndEventHandler;
+                phi = 0;
+                var tdc = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == tv.kt_tienve_id & s.loaihd == "CK").ToList().Sum(s => s.sotien.GetValueOrDefault(0));
+                var tcl = tv.tienkhach.GetValueOrDefault(0) - tdc;
+                if (sotien > tcl + tienphanbocu)
+                {
+                    msg = $@"Tiền chi vượt quá giới hạn {sotien.DropTrailingZeros()} > {(tcl + tienphanbocu).DropTrailingZeros()}";
+                    goto EndEventHandler;
+                }
+            }
+            else
+            {
+                if(sotien > tv.conlai + tienphanbocu)
+                {
+                    msg = $@"Tổng tiền phân bổ vượt quá giới hạn {sotien.DropTrailingZeros()} > {(tv.conlai  + tienphanbocu).DropTrailingZeros()}";
+                    goto EndEventHandler;
+                }
             }
 
             cttv.loaihd = loai;
@@ -423,8 +581,11 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             cttv.phi = phi;
             cttv.ngaycapnhat = DateTime.Now;
             cttv.nguoicapnhat = UserUtils.getUser(context);
-            tv.tongtienphanbo = tv.tongtienphanbo - tienphanbocu + sotien;
-            tv.conlai = tv.tienkhach - tv.tongtienphanbo;
+            if (!loaiCK)
+            {
+                tv.tongtienphanbo = tv.tongtienphanbo - tienphanbocu + sotien;
+                tv.conlai = tv.tienkhach - tv.tongtienphanbo;
+            }
             db.SubmitChanges();
         }
         catch(Exception ex)
@@ -466,16 +627,7 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             }
 
             var sct = context.Request.Form["sctlienquan"].removeAllSpaceOrTrimText(true);
-            if (loai == "IN")
-            {
-                var inv = db.c_packinginvoices.Where(s => s.so_pkl == sct).FirstOrDefault();
-                if (inv == null)
-                {
-                    msg = $@"Không tìm thấy Invoice";
-                    goto EndEventHandler;
-                }
-            }
-            else
+            if (loai == "PO")
             {
                 var po = db.c_donhangs.Where(s => s.sochungtu == sct).FirstOrDefault();
                 if (po == null)
@@ -484,13 +636,37 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                     goto EndEventHandler;
                 }
             }
+            else
+            {
+                var inv = db.c_packinginvoices.Where(s => s.so_pkl == sct).FirstOrDefault();
+                if (inv == null)
+                {
+                    msg = $@"Không tìm thấy Invoice";
+                    goto EndEventHandler;
+                }
+            }
 
             var sotien = context.Request.Form["sotien"].removeAllSpaceOrTrimText(false).ToNullableDecimal().GetValueOrDefault(0);
             var phi = layPhi(context, null, tv, sotien);
-            if(sotien > tv.conlai)
+            var loaiCK = loai == "CK";
+            if (loaiCK)
             {
-                msg = $@"Tổng tiền phân bổ vượt quá giới hạn {sotien.DropTrailingZeros()} > {tv.conlai.DropTrailingZeros()}";
-                goto EndEventHandler;
+                phi = 0;
+                var tdc = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == tv.kt_tienve_id & s.loaihd == "CK").ToList().Sum(s => s.sotien.GetValueOrDefault(0));
+                var tcl = tv.tienkhach.GetValueOrDefault(0) - tdc;
+                if (sotien > tcl)
+                {
+                    msg = $@"Tổng tiền chi vượt quá giới hạn {sotien.DropTrailingZeros()} > {tcl.DropTrailingZeros()}";
+                    goto EndEventHandler;
+                }
+            }
+            else
+            {
+                if (sotien > tv.conlai)
+                {
+                    msg = $@"Tổng tiền phân bổ vượt quá giới hạn {sotien.DropTrailingZeros()} > {tv.conlai.DropTrailingZeros()}";
+                    goto EndEventHandler;
+                }
             }
 
             var cttv = new kt_tienve_phanbo();
@@ -506,8 +682,11 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             cttv.ngaycapnhat = DateTime.Now;
             cttv.nguoicapnhat = UserUtils.getUser(context);
             db.kt_tienve_phanbos.InsertOnSubmit(cttv);
-            tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) + sotien;
-            tv.conlai = tv.tienkhach - tv.tongtienphanbo;
+            if (!loaiCK)
+            {
+                tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) + sotien;
+                tv.conlai = tv.tienkhach - tv.tongtienphanbo;
+            }
             tv.trangthai = Helper.HIEULUC;
             db.SubmitChanges();
 
@@ -553,8 +732,12 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                 goto EndEventHandler;
             }
 
-            tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) - (cttv.sotien.GetValueOrDefault(0) + cttv.phi.GetValueOrDefault(0));
-            tv.conlai = tv.tienkhach - tv.tongtienphanbo;
+            var loaiCK = cttv.loaihd == "CK";
+            if (!loaiCK)
+            {
+                tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) - (cttv.sotien.GetValueOrDefault(0) + cttv.phi.GetValueOrDefault(0));
+                tv.conlai = tv.tienkhach - tv.tongtienphanbo;
+            }
 
             var cttvs = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == tv.kt_tienve_id & s.kt_tienve_phanbo_id != cttv.kt_tienve_phanbo_id).Count();
             if(cttvs <= 0)

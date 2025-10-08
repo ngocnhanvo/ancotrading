@@ -96,66 +96,95 @@ public class ChiTietPhaiChiController : IHttpHandler
 
     public void edit(HttpContext context)
     {
+        string msg = "";
         string tiencong = context.Request.Form["sotiencong"];
         string ngaychi = context.Request.Form["ctd_ngaychi"];
         string ltt = context.Request.Form["loaithanhtoan"];
         string lp2 = ltt == "KH" ? context.Request.Form["loaiphieu2"] : "";
 
-        if(tiencong == null || tiencong == "")
+        if (tiencong == null || tiencong == "")
             tiencong = "0";
-        try {
+
+        try
+        {
             string tc = context.Request.Form["istiencoc"];
             bool istiencoc = false;
             if (tc != null)
             {
                 if (tc.ToLower().Equals("on")) { istiencoc = true; }
             }
-            c_chitietthuchi m = db.c_chitietthuchis.Single(p => p.c_chitietthuchi_id == context.Request.Form["id"]);
+
+            var m = db.c_chitietthuchis.Single(p => p.c_chitietthuchi_id == context.Request.Form["id"]);
+            if (m == null)
+            {
+                msg = "Không tìm thấy dòng đã chọn";
+                goto EndEventHandler;
+            }
+
             c_thuchi chi = db.c_thuchis.FirstOrDefault(p => p.c_thuchi_id.Equals(m.c_thuchi_id));
+            if (chi == null)
+            {
+                msg = "Không tìm thấy phiếu chi";
+                goto EndEventHandler;
+            }
+            if (chi.md_trangthai_id != Helper.SOANTHAO)
+            {
+                msg = "Phiếu chi không ở trạng thái Soạn Thảo";
+                goto EndEventHandler;
+            }
+
+            var tv = db.kt_tienves.Where(s => s.kt_tienve_id == chi.kt_tienve_id).FirstOrDefault();
+            if (tv != null)
+            {
+                msg = $@"Phiếu chi có liên kết với chức năng ""Tiền về"", không thể sửa";
+                goto EndEventHandler;
+            }
+
             string loai = context.Request.Form["loai"];
             string md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id2"];
-            /*if(m.loai == "TM")
-				md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id3"];*/
-            if (chi.md_trangthai_id.Equals("SOANTHAO"))
+
+            m.tk_no = int.Parse(context.Request.Form["tkno"]);
+            m.tk_co = int.Parse(context.Request.Form["tkco"]);
+            m.md_doitackinhdoanh_id = md_doitackinhdoanh_id;
+            m.dtkd_id_ThuChi = chi.md_doitackinhdoanh_id;
+            m.dtkd_val_ThuChi = chi.doitacValue;
+            m.sotien = decimal.Parse(context.Request.Form["sotien"]);
+            m.sotiencong = decimal.Parse(tiencong);
+            m.md_bophan_id = context.Request.Form["md_bophan_id"];
+            m.ngaychi = DateTime.ParseExact(ngaychi, "dd/MM/yyyy", null);
+            m.quydoi = (chi.tygia.Value * decimal.Parse(context.Request.Form["sotien"]));
+            m.diengiai = context.Request.Form["diengiai"];
+            m.c_donhang_id = context.Request.Form["c_donhang_id"];
+            m.c_packinginvoice_id = context.Request.Form["c_packinginvoice_id"];
+            m.obj_code = context.Request.Form["c_nhapxuat_id"];
+            m.loaiphieu = ltt;
+            m.loaiphieu2 = lp2;
+            m.thue = int.Parse(context.Request.Form["thue"]);
+            if (m.loaiphieu.Equals("IN"))
             {
-                m.tk_no = int.Parse(context.Request.Form["tkno"]);
-                m.tk_co = int.Parse(context.Request.Form["tkco"]);
-                m.md_doitackinhdoanh_id = md_doitackinhdoanh_id;
-                m.dtkd_id_ThuChi = chi.md_doitackinhdoanh_id;
-                m.dtkd_val_ThuChi = chi.doitacValue;
-                m.sotien = decimal.Parse(context.Request.Form["sotien"]);
-                m.sotiencong = decimal.Parse(tiencong);
-                m.md_bophan_id = context.Request.Form["md_bophan_id"];
-                m.ngaychi = DateTime.ParseExact(ngaychi, "dd/MM/yyyy", null);
-                m.quydoi = (chi.tygia.Value * decimal.Parse(context.Request.Form["sotien"]));
-                m.diengiai = context.Request.Form["diengiai"];
-                m.c_donhang_id = context.Request.Form["c_donhang_id"];
-                m.c_packinginvoice_id = context.Request.Form["c_packinginvoice_id"];
-                m.obj_code = context.Request.Form["c_nhapxuat_id"];
-                m.loaiphieu = ltt;
-                m.loaiphieu2 = lp2;
-                m.thue = int.Parse(context.Request.Form["thue"]);
-                if (m.loaiphieu.Equals("IN"))
-                {
-                    m.c_packinginvoice_id = context.Request.Form["inv"];
-                }
-                m.isdatcoc = istiencoc;
-
-                m.mota = context.Request.Form["mota"];
-                m.hoatdong = true;
-                m.ngaycapnhat = DateTime.Now;
-                m.nguoicapnhat = UserUtils.getUser(context);
-
-                db.SubmitChanges();
-                jqGridHelper.Utils.writeResult(1, "Lưu thành công!");
+                m.c_packinginvoice_id = context.Request.Form["inv"];
             }
-            else {
-                jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi phiếu chi đã hiệu lực.");
-            }
+            m.isdatcoc = istiencoc;
+
+            m.mota = context.Request.Form["mota"];
+            m.hoatdong = true;
+            m.ngaycapnhat = DateTime.Now;
+            m.nguoicapnhat = UserUtils.getUser(context);
+
+            db.SubmitChanges();
+            jqGridHelper.Utils.writeResult(1, "Lưu thành công!");
         }
-        catch (Exception ex) {
-            context.Response.Write(ex.Message);
+        catch (Exception ex)
+        {
+            msg = ex.Message;
         }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Sửa thành công");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     public void add(HttpContext context)
@@ -194,7 +223,7 @@ public class ChiTietPhaiChiController : IHttpHandler
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Thêm thành công.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 jqGridHelper.Utils.writeResult(0, ex.Message);
             }
@@ -207,19 +236,52 @@ public class ChiTietPhaiChiController : IHttpHandler
 
     public void del(HttpContext context)
     {
-        var id = context.Request.Form["id"];
-        var ct = db.c_chitietthuchis.FirstOrDefault(p => p.c_chitietthuchi_id.Equals(id));
-        var chi = db.c_thuchis.FirstOrDefault(p => p.c_thuchi_id.Equals(ct.c_thuchi_id));
-        if (chi.md_trangthai_id.Equals("SOANTHAO"))
+        String id = context.Request.Form["id"];
+        string msg = "";
+
+        try
         {
+            var ct = db.c_chitietthuchis.FirstOrDefault(p => p.c_chitietthuchi_id.Equals(id));
+            if (ct == null)
+            {
+                msg = $@"Không tìm thấy dòng đã chọn";
+                goto EndEventHandler;
+            }
+
+            var thuchi = db.c_thuchis.FirstOrDefault(p => p.c_thuchi_id.Equals(ct.c_thuchi_id));
+            if (thuchi == null)
+            {
+                msg = $@"Không tìm thấy phiếu chi";
+                goto EndEventHandler;
+            }
+
+            if (thuchi.md_trangthai_id != Helper.SOANTHAO)
+            {
+                msg = $@"Phiếu chi không ở trạng thái Soạn Thảo";
+                goto EndEventHandler;
+            }
+
+            var tv = db.kt_tienves.Where(s => s.kt_tienve_id == thuchi.kt_tienve_id).FirstOrDefault();
+            if (tv != null)
+            {
+                msg = $@"Phiếu chi có liên kết với chức năng ""Tiền về""";
+                goto EndEventHandler;
+            }
+
             db.c_chitietthuchis.DeleteOnSubmit(ct);
             db.SubmitChanges();
-            jqGridHelper.Utils.writeResult(1, "Xóa thành công!");
         }
-        else
+        catch (Exception ex)
         {
-            jqGridHelper.Utils.writeResult(0, "Không thể xóa khi phiếu chi đã hiệu lực.");
+            msg = ex.ToString();
         }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Xóa thành công");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     public void load(HttpContext context)
@@ -329,7 +391,7 @@ public class ChiTietPhaiChiController : IHttpHandler
             xml += "<cell><![CDATA[" + row["sochungtu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["so_pkl"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_bophan"] + "]]></cell>";
-            if(row["ngaychi"].ToString() != null & row["ngaychi"].ToString() != "")
+            if (row["ngaychi"].ToString() != null & row["ngaychi"].ToString() != "")
                 xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaychi"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             else
                 xml += "<cell><![CDATA[]]></cell>";
@@ -352,7 +414,8 @@ public class ChiTietPhaiChiController : IHttpHandler
         context.Response.Write(xml);
     }
 
-    public void loadPN(HttpContext context) {
+    public void loadPN(HttpContext context)
+    {
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
         //String sqlCount = "select count(*) from c_nhapxuat where md_loaichungtu_id = 'NK' and md_trangthai_id = 'HIEULUC' and md_doitackinhdoanh_id = '"+md_doitackinhdoanh_id+"'";
@@ -367,8 +430,8 @@ public class ChiTietPhaiChiController : IHttpHandler
             filter = f.ToScript();
         }
         String sqlCount = "select count(cnx.c_nhapxuat_id) from c_nhapxuat cnx, c_donhang cdh" +
-        " WHERE cnx.c_donhang_id = cdh.c_donhang_id "+
-        " and cnx.md_loaichungtu_id = 'NK' and cnx.md_trangthai_id = 'HIEULUC' and cnx.md_doitackinhdoanh_id = '"+md_doitackinhdoanh_id+"'" +
+        " WHERE cnx.c_donhang_id = cdh.c_donhang_id " +
+        " and cnx.md_loaichungtu_id = 'NK' and cnx.md_trangthai_id = 'HIEULUC' and cnx.md_doitackinhdoanh_id = '" + md_doitackinhdoanh_id + "'" +
         " and cnx.grandtotal > 0 " + filter +
         " and (cnx.grandtotal - (select coalesce(sum(sotien), 0) from c_chitietthuchi where obj_code = cnx.c_nhapxuat_id)) > 0";
         String sidx = context.Request.QueryString["sidx"];
@@ -391,12 +454,12 @@ public class ChiTietPhaiChiController : IHttpHandler
         end = (page * limit) + 1;
 
         string strsql = "select *, (P.thanhtien - P.datra) as conlaiphaitra from (" +
-            " select cnx.c_nhapxuat_id, cnx.sophieu as sochungtu, cdh.sochungtu as sodonhang, cnx.grandtotal as thanhtien,  "+
+            " select cnx.c_nhapxuat_id, cnx.sophieu as sochungtu, cdh.sochungtu as sodonhang, cnx.grandtotal as thanhtien,  " +
             " ROW_NUMBER() OVER (ORDER BY cnx.sophieu asc) as RowNum, " +
             " (select coalesce(sum(sotien), 0) from c_chitietthuchi where obj_code = cnx.c_nhapxuat_id) as datra  " +
             " FROM c_nhapxuat cnx , c_donhang cdh" +
-            " WHERE cnx.c_donhang_id = cdh.c_donhang_id "+
-            " and cnx.md_loaichungtu_id = 'NK' and cnx.md_trangthai_id = 'HIEULUC' and cnx.md_doitackinhdoanh_id = '"+md_doitackinhdoanh_id+"'"+
+            " WHERE cnx.c_donhang_id = cdh.c_donhang_id " +
+            " and cnx.md_loaichungtu_id = 'NK' and cnx.md_trangthai_id = 'HIEULUC' and cnx.md_doitackinhdoanh_id = '" + md_doitackinhdoanh_id + "'" +
             " and cnx.grandtotal > 0 " + filter +
             " and (cnx.grandtotal - (select coalesce(sum(sotien), 0) from c_chitietthuchi where obj_code = cnx.c_nhapxuat_id)) > 0" +
             " )P where RowNum > @start AND RowNum < @end order by RowNum";
@@ -423,7 +486,8 @@ public class ChiTietPhaiChiController : IHttpHandler
         context.Response.Write(xml);
 
     }
-    public void loadInvoice(HttpContext context){
+    public void loadInvoice(HttpContext context)
+    {
 
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
