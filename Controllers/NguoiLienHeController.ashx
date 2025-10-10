@@ -142,7 +142,7 @@ public class NguoiLienHeController : IHttpHandler
     {
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
-        String md_doitackinhdoanh_id = context.Request.QueryString["md_doitackinhdoanh_id"];
+        String md_doitackinhdoanh_id = context.Request.QueryString["id"];
         
         String sqlCount = "SELECT COUNT(*) AS count " + 
             @"FROM md_doitackinhdoanh dt

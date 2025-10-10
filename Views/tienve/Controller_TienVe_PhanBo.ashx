@@ -553,26 +553,11 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             var tienphanbocu = cttv.sotien.GetValueOrDefault(0);
             var sotien = context.Request.Form["sotien"].removeAllSpaceOrTrimText(false).ToNullableDecimal().GetValueOrDefault(0);
             var phi = layPhi(context, null, tv, sotien);
-
-            var loaiCK = loai == "CK";
-            if (loaiCK)
+            phi = loai == "CK" ? 0 : phi;
+            if(sotien > tv.conlai + tienphanbocu)
             {
-                phi = 0;
-                var tdc = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == tv.kt_tienve_id & s.loaihd == "CK").ToList().Sum(s => s.sotien.GetValueOrDefault(0));
-                var tcl = tv.tienkhach.GetValueOrDefault(0) - tdc;
-                if (sotien > tcl + tienphanbocu)
-                {
-                    msg = $@"Tiền chi vượt quá giới hạn {sotien.DropTrailingZeros()} > {(tcl + tienphanbocu).DropTrailingZeros()}";
-                    goto EndEventHandler;
-                }
-            }
-            else
-            {
-                if(sotien > tv.conlai + tienphanbocu)
-                {
-                    msg = $@"Tổng tiền phân bổ vượt quá giới hạn {sotien.DropTrailingZeros()} > {(tv.conlai  + tienphanbocu).DropTrailingZeros()}";
-                    goto EndEventHandler;
-                }
+                msg = $@"Tổng tiền phân bổ vượt quá giới hạn {sotien.DropTrailingZeros()} > {(tv.conlai  + tienphanbocu).DropTrailingZeros()}";
+                goto EndEventHandler;
             }
 
             cttv.loaihd = loai;
@@ -581,11 +566,8 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             cttv.phi = phi;
             cttv.ngaycapnhat = DateTime.Now;
             cttv.nguoicapnhat = UserUtils.getUser(context);
-            if (!loaiCK)
-            {
-                tv.tongtienphanbo = tv.tongtienphanbo - tienphanbocu + sotien;
-                tv.conlai = tv.tienkhach - tv.tongtienphanbo;
-            }
+            tv.tongtienphanbo = tv.tongtienphanbo - tienphanbocu + sotien;
+            tv.conlai = tv.tienkhach - tv.tongtienphanbo;
             db.SubmitChanges();
         }
         catch(Exception ex)
@@ -648,25 +630,12 @@ public class Controller_TienVe_PhanBo : IHttpHandler
 
             var sotien = context.Request.Form["sotien"].removeAllSpaceOrTrimText(false).ToNullableDecimal().GetValueOrDefault(0);
             var phi = layPhi(context, null, tv, sotien);
-            var loaiCK = loai == "CK";
-            if (loaiCK)
+            phi = loai == "CK" ? 0 : phi;
+
+            if (sotien > tv.conlai)
             {
-                phi = 0;
-                var tdc = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == tv.kt_tienve_id & s.loaihd == "CK").ToList().Sum(s => s.sotien.GetValueOrDefault(0));
-                var tcl = tv.tienkhach.GetValueOrDefault(0) - tdc;
-                if (sotien > tcl)
-                {
-                    msg = $@"Tổng tiền chi vượt quá giới hạn {sotien.DropTrailingZeros()} > {tcl.DropTrailingZeros()}";
-                    goto EndEventHandler;
-                }
-            }
-            else
-            {
-                if (sotien > tv.conlai)
-                {
-                    msg = $@"Tổng tiền phân bổ vượt quá giới hạn {sotien.DropTrailingZeros()} > {tv.conlai.DropTrailingZeros()}";
-                    goto EndEventHandler;
-                }
+                msg = $@"Tổng tiền phân bổ vượt quá giới hạn {sotien.DropTrailingZeros()} > {tv.conlai.DropTrailingZeros()}";
+                goto EndEventHandler;
             }
 
             var cttv = new kt_tienve_phanbo();
@@ -682,11 +651,8 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             cttv.ngaycapnhat = DateTime.Now;
             cttv.nguoicapnhat = UserUtils.getUser(context);
             db.kt_tienve_phanbos.InsertOnSubmit(cttv);
-            if (!loaiCK)
-            {
-                tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) + sotien;
-                tv.conlai = tv.tienkhach - tv.tongtienphanbo;
-            }
+            tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) + sotien;
+            tv.conlai = tv.tienkhach - tv.tongtienphanbo;
             tv.trangthai = Helper.HIEULUC;
             db.SubmitChanges();
 
@@ -732,12 +698,9 @@ public class Controller_TienVe_PhanBo : IHttpHandler
                 goto EndEventHandler;
             }
 
-            var loaiCK = cttv.loaihd == "CK";
-            if (!loaiCK)
-            {
-                tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) - (cttv.sotien.GetValueOrDefault(0) + cttv.phi.GetValueOrDefault(0));
-                tv.conlai = tv.tienkhach - tv.tongtienphanbo;
-            }
+
+            tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) - (cttv.sotien.GetValueOrDefault(0) + cttv.phi.GetValueOrDefault(0));
+            tv.conlai = tv.tienkhach - tv.tongtienphanbo;
 
             var cttvs = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == tv.kt_tienve_id & s.kt_tienve_phanbo_id != cttv.kt_tienve_phanbo_id).Count();
             if(cttvs <= 0)

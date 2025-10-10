@@ -388,7 +388,7 @@ function format_tienve_motathem(cellvalue, options, rowObject) {
         , editrules:{ edithidden : true }
     }
     ]"
-    GridComplete="var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 90); if($('#md_doitackinhdoanh_id').attr('id') == null) { $('#grid_ds_tienve-pager_left .ui-icon-plus').click(); $.jgrid.hideModal('#editmodgrid_ds_tienve', { gbox: '#gbox_grid_ds_tienve'}); }; id_inc_tienve ?  $(this).setSelection(id_inc_tienve, false) : null"
+    GridComplete="var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 87); if($('#md_doitackinhdoanh_id').attr('id') == null) { $('#grid_ds_tienve-pager_left .ui-icon-plus').click(); $.jgrid.hideModal('#editmodgrid_ds_tienve', { gbox: '#gbox_grid_ds_tienve'}); }; id_inc_tienve ?  $(this).setSelection(id_inc_tienve, false) : null"
     Height="170"
     MultiSelect="false"
     ShowAdd="false"

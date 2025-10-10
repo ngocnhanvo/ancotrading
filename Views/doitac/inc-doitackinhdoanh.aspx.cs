@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-public partial class inc_doitackinhdoanh : System.Web.UI.Page
+public partial class Views_doitac_inc_doitackinhdoanh : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
