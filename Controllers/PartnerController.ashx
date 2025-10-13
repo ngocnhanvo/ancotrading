@@ -388,12 +388,11 @@ public class PartnerController : IHttpHandler
 
     public void del(HttpContext context)
     {
+        string msg = "";
         String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
+        
         // Kiem tra NCC da dc su dung
-        string sqlCount = @"DECLARE @SearchStr nvarchar(MAX) = " + id + @"
+        string sqlCount = @"DECLARE @SearchStr nvarchar(MAX) = '" + id + @"'
 							DECLARE @Results TABLE (ColumnName nvarchar(370), ColumnValue nvarchar(3630))
 							SET NOCOUNT ON
 							DECLARE @TableName nvarchar(256), @ColumnName nvarchar(128), @SearchStr2 nvarchar(110)
@@ -441,14 +440,38 @@ public class PartnerController : IHttpHandler
         int count = (int)mdbc.ExecuteScalar(sqlCount);
         if(count > 0)
         {
-            jqGridHelper.Utils.writeResult(0, "ĐT/ Kinh doanh đang được sử dụng, không thể xóa!");
+            msg = "ĐT/ Kinh doanh đang được sử dụng, không thể xóa!";
+            goto EndEventHandler;
         }
-        else
+
+        try
         {
-            String sql = "delete from md_doitackinhdoanh where md_doitackinhdoanh_id IN (" + id + ")";
-            mdbc.ExcuteNonQuery(sql);
-            jqGridHelper.Utils.writeResult(1, "Xóa thành công.");
+            var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == id).FirstOrDefault();
+            if(dtkd == null)
+            {
+                msg = "Không tìm thấy đối tác";
+                goto EndEventHandler;
+            }
+            var nlhs = db.md_nguoilienhes.Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id).ToList();
+            db.md_nguoilienhes.DeleteAllOnSubmit(nlhs);
+            var spds = db.md_doitackinhdoanh_spds.Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id).ToList();
+            db.md_doitackinhdoanh_spds.DeleteAllOnSubmit(spds);
+
+            db.md_doitackinhdoanhs.DeleteOnSubmit(dtkd);
+            db.SubmitChanges();
         }
+
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length > 0)
+            jqGridHelper.Utils.writeResult(0, msg);
+        else
+            jqGridHelper.Utils.writeResult(1, "Xóa thành công.");
     }
 
     public void load(HttpContext context)

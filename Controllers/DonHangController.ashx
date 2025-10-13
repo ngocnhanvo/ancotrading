@@ -1245,6 +1245,17 @@ public class DonHangController : IHttpHandler
                     {
                         db.c_dongdonhangs.DeleteOnSubmit(ddh);
                     }
+
+                    foreach (var ddh in db.c_phidonhangs.Where(s => s.c_donhang_id == id))
+                    {
+                        db.c_phidonhangs.DeleteOnSubmit(ddh);
+                    }
+
+                    foreach (var ddh in db.c_donhang_spds.Where(s => s.c_donhang_id == id))
+                    {
+                        db.c_donhang_spds.DeleteOnSubmit(ddh);
+                    }
+
                     db.SubmitChanges();
                     jqGridHelper.Utils.writeResult(1, "Xóa thành công!");
                 }

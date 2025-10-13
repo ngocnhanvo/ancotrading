@@ -109,6 +109,9 @@ public class ImportController : IHttpHandler {
                 case "phukien":
                     context.Response.Redirect("PhuKienmportController.ashx?filename=" + fileName);
                     break;
+                case "shippingdetail":
+                    context.Response.Redirect("ShippingDetailmportController.ashx?filename=" + fileName);
+                    break;
                 default:
                     context.Response.Write("Vui lòng chọn bảng cần import.");
                     break;

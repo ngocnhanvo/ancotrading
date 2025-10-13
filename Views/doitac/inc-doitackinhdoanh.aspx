@@ -2,6 +2,7 @@
 <%@ Register Src="~/jqGrid.ascx" TagName="jqGrid" TagPrefix="uc1" %>
 <%@ Register Src="master.ascx" TagName="doitac" TagPrefix="master" %>
 <%@ Register Src="nguoilienhe.ascx" TagName="nlh" TagPrefix="detail" %>
+<%@ Register Src="shippingdetail.ascx" TagName="spdt" TagPrefix="detail" %>
 <script type="text/javascript">
     var id_inc_dtkd = "";
     $(document).ready(function () {
@@ -12,6 +13,7 @@
                     var h = $("#layout-south-dtkd").height();
                     $("#grid_ds_doitackinhdoanh").setGridHeight(h - 95);
                     $("#grid_ds_nguoilienhe").setGridHeight(h - 95);
+                    $("#grid_ds_dtkd_spdt").setGridHeight(h - 95);
                 }
             },
             center: {
@@ -110,8 +112,10 @@
     <div class="ui-layout-center" id="tabs-dtkd-details">
         <ul>
             <li><a href="#dtkd-details-1">Người liên hệ</a></li>
+            <li><a href="#dtkd-details-2">Shipping Detail</a></li>
         </ul>
         <detail:nlh runat="server" />
+        <detail:spdt runat="server" />
     </div>
  </div>
             
@@ -122,4 +126,5 @@
 <script type="text/javascript">
     createRightPanel('grid_ds_doitackinhdoanh');
     createRightPanel('grid_ds_nguoilienhe');
+    createRightPanel('grid_ds_dtkd_spdt');
 </script>

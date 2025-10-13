@@ -1,7 +1,8 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="inc-po.aspx.cs" Inherits="inc_po" %>
 <%@ Register src="jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
-
+<%@ Register Src="~/Views/po/shippingdetail.ascx" TagName="spdt" TagPrefix="detail" %>
 <script>
+    var id_inc_po = '';
     function updateMoTaGiaPO_CallBack(c_donhang_id, md_sanpham_id) {
         var frm = "#FrmGrid_grid_ds_chitietpo";
         $.ajax({
@@ -148,9 +149,11 @@
                     var o = $("#tabs-donhang-details")
                     $("#grid_ds_chitietpo").setGridWidth(o.width());
                     $("#grid_khoanphi").setGridWidth(o.width());
+                    $("#grid_ds_donhang_spdt").setGridWidth(o.width());
 
                     $("#grid_ds_chitietpo").setGridHeight(o.height() - 97);
                     $("#grid_khoanphi").setGridHeight(o.height() - 97);
+                    $("#grid_ds_donhang_spdt").setGridHeight(o.height() - 97);
                 }
             }
         });
@@ -1048,24 +1051,7 @@
 			MultiSelect="true"
            
             RowNumbers="true"
-            OndblClickRow = "function(rowid) { 
-				/*$(this).jqGrid('editGridRow', rowid, {
-					width: 700
-					, afterSubmit: function(rs, postdata){
-						return showMsgDialog(rs);
-					}
-					, beforeShowForm: function (formid) {
-						checkbox_khoanphilq();
-						$('#gia_db','#' + formid.attr('id')).prop('disabled', true);
-						$('#donhang_mau','#' + formid.attr('id')).prop('disabled', true);
-						$('#md_cangbien_id','#' + formid.attr('id')).prop('disabled', true);
-						formid.closest('div.ui-jqdialog').dialogCenter();
-					}
-					, errorTextFormat:function(data) { 
-						return 'Lỗi: ' + data.responseText 
-					}
-					, afterShowForm: createOnchange
-				});*/
+            OndblClickRow = "function(rowid) {
                 $('#edit_grid_ds_po').click();
 			}"
             ColModel = "[
@@ -1780,6 +1766,7 @@
             ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
             ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
             OnSelectRow = "function(ids) {
+                id_inc_po = ids;
 				var chk_box = $('#jqg_grid_ds_po_' + ids);
 				setTimeout(function() {
 					if(!chk_box.prop('checked')) { ids = null; }
@@ -1805,7 +1792,7 @@
                     $('#grid_khoanphi').jqGrid('getGridParam', 'postData').poId = ids;
 					$('#grid_ds_chitietpo')[0].triggerToolbar();
                     $('#grid_khoanphi')[0].triggerToolbar();
-
+                    $('#grid_ds_donhang_spdt')[0].triggerToolbar();
 				},10);
 			}"
 		    AddFormOptions=" 
@@ -1948,10 +1935,11 @@
 <DIV class="ui-layout-south ui-widget-content" id="layout-south-po"> 
 	<div class="ui-layout-center" id="tabs-donhang-details">
         <ul>
-            <li><a href="#donhang-details">Các dòng P/O</a></li>
-            <li><a href="#khoanphi-details">Các khoản phí liên quan</a></li>
+            <li><a href="#donhang-details-1">Các dòng P/O</a></li>
+            <li><a href="#donhang-details-2">Các khoản phí liên quan</a></li>
+            <li><a href="#donhang-details-3">Shipping Detail</a></li>
         </ul>
-        <div id="donhang-details">
+        <div id="donhang-details-1">
             <uc1:jqGrid  ID="grid_ds_chitietpo" 
             SortName="ddh.sothutu" 
             SortOrder="desc"
@@ -2569,7 +2557,7 @@
             runat="server" />
         </div>
         
-        <div id="khoanphi-details">
+        <div id="donhang-details-2">
             <uc1:jqGrid  ID="grid_khoanphi" 
             SortName="bc.ngaytao" 
             SortOrder="ASC"
@@ -2915,6 +2903,8 @@
             }"
             runat="server" />
         </div>
+
+        <detail:spdt runat="server" />
     </div>
 	
 		<div class="ui-layout-east" style="text-align:center; background:#f4f0ec">

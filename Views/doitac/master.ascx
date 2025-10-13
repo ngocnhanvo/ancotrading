@@ -19,6 +19,7 @@
 			ids=0;
 		id_inc_dtkd = ids;
         $('#grid_ds_nguoilienhe')[0].triggerToolbar();
+        $('#grid_ds_dtkd_spdt')[0].triggerToolbar();
     }"
     ColModel = "[
     {
@@ -131,15 +132,15 @@
         , editable:true
     },
     {
-            fixed: true, name: 'tenqg'
-            , label: 'Quốc Gia'
-            , index: 'qg.ten_quocgia'
-            , editable: true
-            , width: 100
-            , edittype: 'select'
-            , editoptions: { dataUrl: 'Controllers/CountryController.ashx?action=getoption' }
-            , hidden: true
-            , editrules:{ edithidden:true }
+        fixed: true, name: 'tenqg'
+        , label: 'Quốc Gia'
+        , index: 'qg.ten_quocgia'
+        , editable: true
+        , width: 100
+        , edittype: 'select'
+        , editoptions: { dataUrl: 'Controllers/CountryController.ashx?action=getoption' }
+        , hidden: true
+        , editrules:{ edithidden:true }
     },
     {
         fixed: true, name: 'tenkv'
@@ -215,26 +216,26 @@
 		, editoptions:{ value:'True:False', defaultValue: 'False' }
     },
     {
-            fixed: true, name: 'md_cangbien_id'
-            , label: 'Thuộc cảng biển'
-            , index: 'cangbien'
-            , editable: true
-            , width: 100
-            , edittype: 'select'
-            , editoptions: { dataUrl: 'Controllers/PortController.ashx?action=getoption' }
-            , hidden: false
-            , editrules:{ edithidden:true }
+        fixed: true, name: 'md_cangbien_id'
+        , label: 'Thuộc cảng biển'
+        , index: 'cangbien'
+        , editable: true
+        , width: 100
+        , edittype: 'select'
+        , editoptions: { dataUrl: 'Controllers/PortController.ashx?action=getoption' }
+        , hidden: false
+        , editrules:{ edithidden:true }
     },
 	{
-            fixed: true, name: 'md_nguondtkd_id'
-            , label: 'Nguồn đối tác'
-            , index: 'ndt.ten_nguondtkd'
-            , editable: true
-            , width: 100
-            , edittype: 'select'
-            , editoptions: { dataUrl: 'Controllers/NguonDoiTacController.ashx?action=getoption' }
-            , hidden: false
-            , editrules:{ edithidden:true }
+        fixed: true, name: 'md_nguondtkd_id'
+        , label: 'Nguồn đối tác'
+        , index: 'ndt.ten_nguondtkd'
+        , editable: true
+        , width: 100
+        , edittype: 'select'
+        , editoptions: { dataUrl: 'Controllers/NguonDoiTacController.ashx?action=getoption' }
+        , hidden: false
+        , editrules:{ edithidden:true }
     },
     {
         fixed: true, name: 'ngaytao'
