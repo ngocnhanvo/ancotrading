@@ -990,8 +990,7 @@ public class DonHangController : IHttpHandler
                     if (check == 0)
                     {
                         db.c_donhangs.InsertOnSubmit(mnu);
-                        db.SubmitChanges();
-
+                        
                         var spd = db.md_doitackinhdoanh_spds.Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id).OrderByDescending(s=>s.ngaytao).FirstOrDefault();
                         if(spd != null)
                         {
@@ -1016,6 +1015,7 @@ public class DonHangController : IHttpHandler
                             spd2.hoatdong = true;
                             db.c_donhang_spds.InsertOnSubmit(spd2);
                         }
+                        db.SubmitChanges();
                         jqGridHelper.Utils.writeResult(1, "Thêm mới thành công!");
                     }
                     else
