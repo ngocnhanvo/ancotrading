@@ -118,6 +118,7 @@ public partial class PrintControllers_InBaoCaoAncotrading_phieuXNXH : System.Web
 	            left join md_donvitinh dvtm on dg.dvt_outer = dvtm.md_donvitinh_id
             where
                 1=1
+            order by sp.ma_sanpham
 		";
 
         //throw new ArgumentNullException(sql);

@@ -72,7 +72,7 @@ public class DSDH_HuongDanLamHang_Controller : IHttpHandler
 
             if (coDG)
                 arr.Add("đóng gói");
-            if (coDG)
+            if (coBB)
                 arr.Add("tem, bao bì");
             if (coYCM)
                 arr.Add("phiếu yêu cầu mẫu");

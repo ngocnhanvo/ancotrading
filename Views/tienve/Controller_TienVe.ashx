@@ -217,8 +217,12 @@ public class Controller_TienVe : IHttpHandler
     {
         string msg = "";
         string tvid = context.Request.Form["id"];
+        string mota2 = context.Request.Form["mota2"].removeAllSpaceOrTrimText(true);
+        string mota = context.Request.Form["mota"].removeAllSpaceOrTrimText(true);
+        string dtkdId = context.Request.Form["dtkd_id"].removeAllSpaceOrTrimText(true);
         try
         {
+            var tienkhach = context.Request.Form["tienkhach"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
             var tv = db.kt_tienves.Where(s => s.kt_tienve_id == tvid).FirstOrDefault();
             if (tv == null)
             {
@@ -226,13 +230,33 @@ public class Controller_TienVe : IHttpHandler
                 goto EndEventHandler;
             }
 
-            if(tv.trangthai != Helper.SOANTHAO)
+
+            if (tv.trangthai == Helper.HIEULUC)
             {
-                msg = $@"Dòng ""tiền về"" không ở trạng thái Soạn Thảo";
+                if (mota != tv.mota)
+                {
+                    msg = $@"Không thể sửa ""mô tả/diễn giải"" khi ""tiền về"" không ở trạng thái Soạn Thảo";
+                    goto EndEventHandler;
+                }
+
+                if (tienkhach != tv.tienkhach)
+                {
+                    msg = $@"Không thể sửa ""Tiền khách"" khi ""tiền về"" không ở trạng thái Soạn Thảo";
+                    goto EndEventHandler;
+                }
+
+                if (dtkdId != tv.dtkd_id)
+                {
+                    msg = $@"Không thể sửa ""Khách hàng"" khi ""tiền về"" không ở trạng thái Soạn Thảo";
+                    goto EndEventHandler;
+                }
+            }
+            else if (tv.trangthai == Helper.KETTHUC)
+            {
+                msg = $@"Dòng ""tiền về"" đã Kết Thúc";
                 goto EndEventHandler;
             }
 
-            string dtkdId = context.Request.Form["dtkd_id"].removeAllSpaceOrTrimText(true);
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == dtkdId).FirstOrDefault();
             if(dtkd == null)
             {
@@ -244,15 +268,15 @@ public class Controller_TienVe : IHttpHandler
                 msg = $@"Không tìm thấy khách hàng đã chọn";
                 goto EndEventHandler;
             }
-            var tienkhach = context.Request.Form["tienkhach"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
+            
             if(tienkhach < tv.sotienghico)
             {
                 msg = $@"Tiền khách không được nhỏ hơn số tiền ghi có ({tienkhach.DropTrailingZeros()} < {tv.sotienghico.DropTrailingZeros()})";
                 goto EndEventHandler;
             }
 
-            tv.mota = context.Request.Form["mota"].removeAllSpaceOrTrimText(true);
-            tv.mota2 = context.Request.Form["mota2"].removeAllSpaceOrTrimText(true);
+            tv.mota = mota;
+            tv.mota2 = mota2;
             tv.tienkhach = tienkhach;
             tv.phi = tv.tienkhach.GetValueOrDefault(0) - tv.sotienghico.GetValueOrDefault(0);
             tv.conlai = tv.tienkhach.GetValueOrDefault(0) - tv.tongtienphanbo.GetValueOrDefault(0);

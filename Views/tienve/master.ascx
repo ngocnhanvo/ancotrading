@@ -264,7 +264,7 @@ function format_tienve_motathem(cellvalue, options, rowObject) {
         fixed: true, name: 'mota'
         , index: 'tv.mota'
         , label: 'Mô tả/Diễn giải'
-        , width: 100
+        , width: 300
         , editable:true
         , edittype: 'textarea'
         , editoptions: { readonly: true }

@@ -947,15 +947,17 @@ public class DanhSachDatHangController : IHttpHandler
                     giatridonhang = dsdh.total.Value - discount + cong - tru;
                 }
 
-                tmp.subject_mail = tmp.subject_mail.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
-                tmp.subject_mail = tmp.subject_mail.Replace("[SOPO]", dsdh.so_po);
-                tmp.subject_mail = tmp.subject_mail.Replace("[NGAYLAP]", dsdh.ngaylap == null ? "" : dsdh.ngaylap.Value.ToString("dd/MM/yyyy"));
+                string tieude = tmp.subject_mail;
+                tieude = tieude.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
+                tieude = tieude.Replace("[SOPO]", dsdh.so_po);
+                tieude = tieude.Replace("[NGAYLAP]", dsdh.ngaylap == null ? "" : dsdh.ngaylap.Value.ToString("dd/MM/yyyy"));
 
-                tmp.content_mail = tmp.content_mail.Replace("[NHACUNGUNG]", doitac.ten_dtkd);
-                tmp.content_mail = tmp.content_mail.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
-                tmp.content_mail = tmp.content_mail.Replace("[NGAYGIAOHANG]", dsdh.hangiaohang_po.Value.ToString("dd/MM/yyyy"));
-                tmp.content_mail = tmp.content_mail.Replace("[SOLUONGMAHANG]", countProduct.ToString());
-                tmp.content_mail = tmp.content_mail.Replace("[SOPO]", dsdh.so_po);
+                string content = tmp.content_mail;
+                content = content.Replace("[NHACUNGUNG]", doitac.ten_dtkd);
+                content = content.Replace("[CHUNGTUDATHANG]", dsdh.sochungtu);
+                content = content.Replace("[NGAYGIAOHANG]", dsdh.hangiaohang_po.Value.ToString("dd/MM/yyyy"));
+                content = content.Replace("[SOLUONGMAHANG]", countProduct.ToString());
+                content = content.Replace("[SOPO]", dsdh.so_po);
 
                 GoogleMail mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
                 string resp = "";
@@ -988,7 +990,7 @@ public class DanhSachDatHangController : IHttpHandler
 
                     if (next == true)
                     {
-                        string noidung = tmp.content_mail
+                        string noidung = content
                             .Replace("%0D", "<br/>")
                             .Replace("[NGAYLAP]", dsdh.ngaylap.Value.ToString("dd/MM/yyyy"));
                         string noidungKhongGia = noidung;
@@ -1016,7 +1018,7 @@ public class DanhSachDatHangController : IHttpHandler
                                 att.Name = name;
                                 atts.Add(att);
 
-                                mail.Send(nv.email, UserUtils.mailKCS, nv.email_cc, "", tmp.subject_mail, noidung, atts);
+                                mail.Send(nv.email, UserUtils.mailKCS, nv.email_cc, "", tieude, noidung, atts);
                             }
                             else
                             {
@@ -1034,7 +1036,7 @@ public class DanhSachDatHangController : IHttpHandler
                                 name = "Thông tin sản phẩm.xls";
                                 att.Name = name;
                                 atts.Add(att);
-                                mail.Send(nv.email, UserUtils.mailKCS, nv.email_cc, "", tmp.subject_mail, noidung, atts);
+                                mail.Send(nv.email, UserUtils.mailKCS, nv.email_cc, "", tieude, noidung, atts);
                             }
                             resp += String.Format("Đã gửi mail thành công đến:<br/>{0}<br/>{1}<br/>", nv.email_cc, UserUtils.mailKCS);
                         }
@@ -1094,7 +1096,7 @@ public class DanhSachDatHangController : IHttpHandler
                                             att.Name = name;
                                             atts.Add(att);
 
-                                            mail.Send(nv.email, doitac.email, nv.email_cc, "", tmp.subject_mail, noidung, atts);
+                                            mail.Send(nv.email, doitac.email, nv.email_cc, "", tieude, noidung, atts);
                                         }
                                         if (!string.IsNullOrEmpty(doitac.emailkt))
                                         {
@@ -1113,7 +1115,7 @@ public class DanhSachDatHangController : IHttpHandler
                                             att.Name = name;
                                             atts.Add(att);
 
-                                            mail.Send(nv.email, doitac.emailkt, "", "", tmp.subject_mail, noidungKhongGia, atts);
+                                            mail.Send(nv.email, doitac.emailkt, "", "", tieude, noidungKhongGia, atts);
                                         }
                                     }
                                 }
@@ -1143,7 +1145,7 @@ public class DanhSachDatHangController : IHttpHandler
                                             att.Name = name;
                                             atts.Add(att);
 
-                                            mail.Send(nv.email, doitac.email, nv.email_cc, "", tmp.subject_mail, noidung, atts);
+                                            mail.Send(nv.email, doitac.email, nv.email_cc, "", tieude, noidung, atts);
                                         }
                                         if (!string.IsNullOrEmpty(doitac.emailkt))
                                         {
@@ -1167,7 +1169,7 @@ public class DanhSachDatHangController : IHttpHandler
                                             att.Name = name;
                                             atts.Add(att);
 
-                                            mail.Send(nv.email, doitac.emailkt, "", "", tmp.subject_mail, noidungKhongGia, atts);
+                                            mail.Send(nv.email, doitac.emailkt, "", "", tieude, noidungKhongGia, atts);
                                         }
                                     }
                                 }
