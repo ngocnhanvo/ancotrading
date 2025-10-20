@@ -298,7 +298,7 @@
     ShowEdit ="<%$ Code: DaoRules.GetRuleEdit(Context).ToString().ToLower() %>"
     ShowDel = "<%$ Code: DaoRules.GetRuleDel(Context).ToString().ToLower() %>"
     AddFormOptions="
-        width:400,
+        width:450,
         beforeShowForm: function (formid) {
             chosen_qgkv(formid.attr('id'));
 			formid.closest('div.ui-jqdialog').dialogCenter(); 
@@ -311,7 +311,7 @@
         }
     "
     EditFormOptions ="
-        width:400,
+        width:450,
         beforeShowForm: function (formid) {
             chosen_qgkv(formid.attr('id'));
 			formid.closest('div.ui-jqdialog').dialogCenter(); 

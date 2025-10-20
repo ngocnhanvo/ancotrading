@@ -49,11 +49,15 @@ public class PartnerNghiepVuController : IHttpHandler
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
-        bool hd= false, ncc = false;
-        
+        String incc = context.Request.Form["isncc"].ToLower();
+        bool hd, ncc;
+        hd = ncc = false;
+
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-	
+
+        if (incc.Equals("on") || incc.Equals("true"))
+        { ncc = true; }
         md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(p => p.ma_dtkd.Equals(context.Request.Form["ma_dtkd"]) && !p.md_doitackinhdoanh_id.Equals(context.Request.Form["md_doitackinhdoanh_id"]));
         if (dtkd == null)
         {
@@ -61,8 +65,8 @@ public class PartnerNghiepVuController : IHttpHandler
             m.md_loaidtkd_id = context.Request.Form["tenloai"];
             m.md_quocgia_id = context.Request.Form["tenqg"];
             m.md_khuvuc_id = context.Request.Form["tenkv"];
-			m.md_nguondtkd_id = context.Request.Form["md_nguondtkd_id"];
-            //m.md_banggia_id = context.Request.Form["banggia"] == "" ? null : context.Request.Form["banggia"];
+            m.md_nguondtkd_id = context.Request.Form["md_nguondtkd_id"];
+            m.md_banggia_id = context.Request.Form["banggia"] == "" ? null : context.Request.Form["banggia"];
             m.ma_dtkd = context.Request.Form["ma_dtkd"];
             m.ten_dtkd = context.Request.Form["ten_dtkd"];
             m.daidien = context.Request.Form["daidien"];
@@ -70,13 +74,15 @@ public class PartnerNghiepVuController : IHttpHandler
             m.tel = context.Request.Form["tel"];
             m.fax = context.Request.Form["fax"];
             m.email = context.Request.Form["email"];
+            m.emailkt = context.Request.Form["emailkt"];
             m.url = context.Request.Form["url"];
             m.diachi = context.Request.Form["diachi"];
-            //m.so_taikhoan = context.Request.Form["so_taikhoan"];
-            //m.nganhang = context.Request.Form["nganhang"];
+            m.so_taikhoan = context.Request.Form["so_taikhoan"];
+            m.nganhang = context.Request.Form["nganhang"];
             m.masothue = context.Request.Form["masothue"];
+            m.tong_congno = decimal.Parse(context.Request.Form["tong_congno"]);
             m.isncc = ncc;
-            //m.md_cangbien_id = context.Request.Form["md_cangbien_id"];
+            m.md_cangbien_id = context.Request.Form["md_cangbien_id"];
 
             m.mota = context.Request.Form["mota"];
             m.hoatdong = hd;
@@ -94,23 +100,26 @@ public class PartnerNghiepVuController : IHttpHandler
     public void add(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
-        bool hd = false, ncc = false;
+        String incc = context.Request.Form["isncc"].ToLower();
+        bool hd, ncc;
+        hd = ncc = false;
 
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
 
+        if (incc.Equals("on") || incc.Equals("true"))
+        { ncc = true; }
+
         md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(p => p.ma_dtkd.Equals(context.Request.Form["ma_dtkd"]));
         if (dtkd == null)
         {
-			string md_quocgia_id = context.Request.Form["tenqg"];
-			md_quocgia qg = db.md_quocgias.FirstOrDefault(s=>s.md_quocgia_id == md_quocgia_id);
             md_doitackinhdoanh mnu = new md_doitackinhdoanh
             {
                 md_doitackinhdoanh_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
                 md_loaidtkd_id = context.Request.Form["tenloai"],
-                md_quocgia_id = qg.md_quocgia_id,
+                md_quocgia_id = context.Request.Form["tenqg"],
                 md_khuvuc_id = context.Request.Form["tenkv"],
-				md_nguondtkd_id = context.Request.Form["md_nguondtkd_id"],
+                md_nguondtkd_id = context.Request.Form["md_nguondtkd_id"],
                 md_banggia_id = context.Request.Form["banggia"] == "" ? null : context.Request.Form["banggia"],
                 ma_dtkd = context.Request.Form["ma_dtkd"],
                 ten_dtkd = context.Request.Form["ten_dtkd"],
@@ -119,12 +128,13 @@ public class PartnerNghiepVuController : IHttpHandler
                 tel = context.Request.Form["tel"],
                 fax = context.Request.Form["fax"],
                 email = context.Request.Form["email"],
+                emailkt = context.Request.Form["emailkt"],
                 url = context.Request.Form["url"],
-                diachi = context.Request.Form["diachi"] + ", " + qg.ten_quocgia,
+                diachi = context.Request.Form["diachi"],
                 so_taikhoan = context.Request.Form["so_taikhoan"],
                 nganhang = context.Request.Form["nganhang"],
                 masothue = context.Request.Form["masothue"],
-                tong_congno = 0,
+                tong_congno = decimal.Parse(context.Request.Form["tong_congno"]),
                 isncc = ncc,
                 md_cangbien_id = context.Request.Form["md_cangbien_id"],
                 islienhe = false,
@@ -149,12 +159,11 @@ public class PartnerNghiepVuController : IHttpHandler
 
     public void del(HttpContext context)
     {
+        string msg = "";
         String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-		// Kiem tra NCC da dc su dung
-        string sqlCount = @"DECLARE @SearchStr nvarchar(MAX) = " + id + @"
+        
+        // Kiem tra NCC da dc su dung
+        string sqlCount = @"DECLARE @SearchStr nvarchar(MAX) = '" + id + @"'
 							DECLARE @Results TABLE (ColumnName nvarchar(370), ColumnValue nvarchar(3630))
 							SET NOCOUNT ON
 							DECLARE @TableName nvarchar(256), @ColumnName nvarchar(128), @SearchStr2 nvarchar(110)
@@ -199,17 +208,41 @@ public class PartnerNghiepVuController : IHttpHandler
 								END    
 							END
 							SELECT count(distinct ColumnName) as count FROM @Results WHERE ColumnName != '[dbo].[md_doitackinhdoanh]'";
-		int count = (int)mdbc.ExecuteScalar(sqlCount);
-		if(count > 0)
-		{
-			jqGridHelper.Utils.writeResult(0, "ĐT/ Kinh doanh đang được sử dụng, không thể xóa!");
-		}
-		else
-		{
-			String sql = "delete from md_doitackinhdoanh where md_doitackinhdoanh_id IN (" + id + ")";
-			mdbc.ExcuteNonQuery(sql);
-			jqGridHelper.Utils.writeResult(1, "Xóa thành công.");
-		}
+        int count = (int)mdbc.ExecuteScalar(sqlCount);
+        if(count > 0)
+        {
+            msg = "ĐT/ Kinh doanh đang được sử dụng, không thể xóa!";
+            goto EndEventHandler;
+        }
+
+        try
+        {
+            var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == id).FirstOrDefault();
+            if(dtkd == null)
+            {
+                msg = "Không tìm thấy đối tác";
+                goto EndEventHandler;
+            }
+            var nlhs = db.md_nguoilienhes.Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id).ToList();
+            db.md_nguoilienhes.DeleteAllOnSubmit(nlhs);
+            var spds = db.md_doitackinhdoanh_spds.Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id).ToList();
+            db.md_doitackinhdoanh_spds.DeleteAllOnSubmit(spds);
+
+            db.md_doitackinhdoanhs.DeleteOnSubmit(dtkd);
+            db.SubmitChanges();
+        }
+
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length > 0)
+            jqGridHelper.Utils.writeResult(0, msg);
+        else
+            jqGridHelper.Utils.writeResult(1, "Xóa thành công.");
     }
 
     public void load(HttpContext context)
@@ -274,7 +307,7 @@ public class PartnerNghiepVuController : IHttpHandler
 
         string strsql = @"SELECT * FROM( 
             SELECT dtkd.md_doitackinhdoanh_id, dtkd.md_loaidtkd_id, dtkd.md_quocgia_id, dtkd.md_khuvuc_id, 
-			dtkd.ma_dtkd, dtkd.ten_dtkd, dtkd.daidien, dtkd.chucvu, dtkd.tel, dtkd.fax, dtkd.email, dtkd.url, dtkd.diachi, 
+			dtkd.ma_dtkd, dtkd.ten_dtkd, dtkd.daidien, dtkd.chucvu, dtkd.tel, dtkd.fax, dtkd.email, dtkd.emailkt, dtkd.url, dtkd.diachi, 
 			dtkd.md_banggia_id, dtkd.so_taikhoan, dtkd.nganhang, dtkd.masothue, dtkd.tong_congno, dtkd.isncc, 
 			dtkd.ngaytao, dtkd.nguoitao, dtkd.ngaycapnhat, dtkd.nguoicapnhat, dtkd.mota, dtkd.hoatdong, dtkd.islienhe, dtkd.isdocquyen, dtkd.md_cangbien_id, 
 			qg.ten_quocgia as tenqg, kv.ten_khuvuc as tenkv, ldt.ten_loaidtkd as tenloai, 
@@ -317,6 +350,7 @@ public class PartnerNghiepVuController : IHttpHandler
             xml += "<cell><![CDATA[" + row["tel"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["fax"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["email"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["emailkt"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["url"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["diachi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tenqg"] + "]]></cell>";
