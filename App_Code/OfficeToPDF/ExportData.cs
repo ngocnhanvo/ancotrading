@@ -735,15 +735,21 @@ namespace OfficeToPDF
                 {
                     if (!object.Equals(data, null))
                     {
-                        columnT.SetCellValue(((DateTime)data).ToString(fmt));
-                        columnT.CellStyle.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfwb, fmtORG);
+                        if (data != DBNull.Value)
+                        {
+                            columnT.SetCellValue(((DateTime)data).ToString(fmt));
+                            columnT.CellStyle.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfwb, fmtORG);
+                        }
+                        else
+                        {
+                            columnT.SetCellValue("");
+                            columnT.SetCellType(CellType.Blank);
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    var e = new Exception("some error");
-                    e.Data.Add("data", data);
-                    throw e;
+                    throw new Exception(ex.ToString());
                 }
             }
             else if (isNumber)

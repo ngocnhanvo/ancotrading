@@ -319,12 +319,21 @@
                                             sendMailType += sendKTNCU + ",";
                                         }
                                     }
-                                    $.get(`PrintControllers/InBaoCaoAncotrading/phieuXNXH.aspx?id=${piId}`, function (rs) {
-                                        $.post(`Controllers/DanhSachDatHangController.ashx?action=sendmail&piId=${piId}&sendType=${sendType}&sendMailType=${sendMailType}`, {xnxh: rs}, function (result) {
-                                            $('#sendpi #content').html(result);
-                                            $("#btn-close span").text("Thoát");
-                                            $("#btn-close").button("enable");
-                                            $('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
+                                    $.get(`PrintControllers/InBaoCaoAncotrading/phieuHangHoaChuaXN.aspx?id=${piId}`, function (rs1) {
+                                        $.get(`PrintControllers/InBaoCaoAncotrading/phieuDongGoiChuaXN.aspx?id=${piId}`, function (rs2) {
+                                            $.get(`PrintControllers/InBaoCaoAncotrading/phieuXNXH.aspx?id=${piId}`, function (rs3) {
+                                                $.post(`Controllers/DanhSachDatHangController.ashx?action=sendmail&piId=${piId}&sendType=${sendType}&sendMailType=${sendMailType}`,
+                                                    {
+                                                        hhcxn: rs1,
+                                                        dgcxn: rs2,
+                                                        xnxh: rs3
+                                                    }, function (result) {
+                                                    $('#sendpi #content').html(result);
+                                                    $("#btn-close span").text("Thoát");
+                                                    $("#btn-close").button("enable");
+                                                    $('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
+                                                });
+                                            });
                                         });
                                     });
                                 }

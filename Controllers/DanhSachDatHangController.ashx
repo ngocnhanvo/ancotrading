@@ -835,6 +835,8 @@ public class DanhSachDatHangController : IHttpHandler
     public void sendMail(HttpContext context)
     {
         string sendType = context.Request.QueryString["sendType"];
+        string fileHHCXN = context.Request.Form["hhcxn"];
+        string fileDGCXN = context.Request.Form["dgcxn"];
         string fileXNXH = context.Request.Form["xnxh"];
         //--
         string sendMailType = context.Request.QueryString["sendMailType"];
@@ -999,10 +1001,26 @@ public class DanhSachDatHangController : IHttpHandler
                         noidungKhongGia = noidungKhongGia.Replace("[GIATRIDONHANG]", "đã ẩn");
 
                         var atts = new List<System.Net.Mail.Attachment>();
-                        System.Net.Mail.Attachment att =  new System.Net.Mail.Attachment(fileXNXH);
+                        var att =  new System.Net.Mail.Attachment(fileXNXH);
                         string name = "Phiếu XNXH.xls";
                         att.Name = name;
                         atts.Add(att);
+
+                        if(File.Exists(fileHHCXN))
+                        {
+                            att =  new System.Net.Mail.Attachment(fileHHCXN);
+                            name = "Hàng hóa chưa xác nhận.xls";
+                            att.Name = name;
+                            atts.Add(att);
+                        }
+
+                        if(File.Exists(fileDGCXN))
+                        {
+                            att =  new System.Net.Mail.Attachment(fileDGCXN);
+                            name = "Đóng gói chưa xác nhận.xls";
+                            att.Name = name;
+                            atts.Add(att);
+                        }
 
                         if (sendMail[i] == "newKcs" || sendMail[i] == "Kcs")
                         {
@@ -1177,7 +1195,12 @@ public class DanhSachDatHangController : IHttpHandler
                             }
                         }
 
-                        File.Delete(fileXNXH);
+                        if(File.Exists(fileXNXH))
+                            File.Delete(fileXNXH);
+                        if(File.Exists(fileHHCXN))
+                            File.Delete(fileHHCXN);
+                        if(File.Exists(fileDGCXN))
+                            File.Delete(fileDGCXN);
                     }
                 }
                 if (next)
@@ -1194,7 +1217,12 @@ public class DanhSachDatHangController : IHttpHandler
             }
             catch (Exception ex)
             {
-                File.Delete(fileXNXH);
+                if(File.Exists(fileXNXH))
+                    File.Delete(fileXNXH);
+                if(File.Exists(fileHHCXN))
+                    File.Delete(fileHHCXN);
+                if(File.Exists(fileDGCXN))
+                    File.Delete(fileDGCXN);
                 context.Response.Write(ex.ToString());
             }
         }
