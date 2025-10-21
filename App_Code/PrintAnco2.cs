@@ -94,11 +94,19 @@ public class PrintAnco2
             msg = "Không có dữ liệu";
         }
 
+        var download = viewer.Attributes != null ? viewer.Attributes["download"] == "1" : false;
         if (msg.Length > 0)
-            msg = string.Format(@"<center><h1>{0}</h1></center>", msg);
+        {
+            if (!download)
+                msg = $@"<center><h1>{msg}</h1></center>";
+        }
 
         if (showMsg & msg.Length > 0)
+        {
+            context.Response.Clear();
             context.Response.Write(msg);
+            context.Response.End();
+        }
 
         return msg;
     }
@@ -217,8 +225,20 @@ public class PrintAnco2
             msg = string.Format(@"Cách in này không được sử dụng cho báo cáo hoặc mẫu in ""{0}"", hãy chọn một cách in khác", viewer.Report.DisplayName);
         }
 
-        if (showMsg & msg.Length> 0)
-            HttpContext.Current.Response.Write("<center><h1>"+ msg + "</h1></center>");
+        if (showMsg & msg.Length > 0)
+        {
+            var download = viewer.Attributes != null ? viewer.Attributes["download"] == "1" : false;
+            if (download)
+            {
+                context.Response.Clear();
+                context.Response.Write(msg);
+                context.Response.End();
+            }
+            else
+            {
+                HttpContext.Current.Response.Write("<center><h1>" + msg + "</h1></center>");
+            }
+        }
 
         return msg;
     }

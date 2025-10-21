@@ -252,6 +252,9 @@ public class DanhSachDatHangController : IHttpHandler
                 emailkt = emailkt + "," + mailNN;
 
             string fileXNXH = context.Request.Form["xnxh"];
+            string fileHHCXN = context.Request.Form["hhcxn"];
+            string fileDGCXN = context.Request.Form["dgcxn"];
+
             if (!string.IsNullOrEmpty(emailkt))
             {
                 var atts = new List<System.Net.Mail.Attachment>();
@@ -259,6 +262,22 @@ public class DanhSachDatHangController : IHttpHandler
                 var name = "Phiếu XNXH.xls";
                 att.Name = name;
                 atts.Add(att);
+
+                if(File.Exists(fileHHCXN))
+                {
+                    att =  new System.Net.Mail.Attachment(fileHHCXN);
+                    name = "Hàng hóa chưa xác nhận.xls";
+                    att.Name = name;
+                    atts.Add(att);
+                }
+
+                if(File.Exists(fileDGCXN))
+                {
+                    att =  new System.Net.Mail.Attachment(fileDGCXN);
+                    name = "Đóng gói chưa xác nhận.xls";
+                    att.Name = name;
+                    atts.Add(att);
+                }
 
                 att = new System.Net.Mail.Attachment(fileTTSP);
                 name = "Thông tin sản phẩm.xls";
@@ -290,7 +309,7 @@ public class DanhSachDatHangController : IHttpHandler
                     , atts
                 );
 
-                File.Delete(fileXNXH);
+                xoaTaptinSauMails(fileXNXH, fileHHCXN, fileDGCXN);
             }
         }
     }
@@ -1195,12 +1214,7 @@ public class DanhSachDatHangController : IHttpHandler
                             }
                         }
 
-                        if(File.Exists(fileXNXH))
-                            File.Delete(fileXNXH);
-                        if(File.Exists(fileHHCXN))
-                            File.Delete(fileHHCXN);
-                        if(File.Exists(fileDGCXN))
-                            File.Delete(fileDGCXN);
+                        xoaTaptinSauMails(fileXNXH, fileHHCXN, fileDGCXN);
                     }
                 }
                 if (next)
@@ -1217,15 +1231,20 @@ public class DanhSachDatHangController : IHttpHandler
             }
             catch (Exception ex)
             {
-                if(File.Exists(fileXNXH))
-                    File.Delete(fileXNXH);
-                if(File.Exists(fileHHCXN))
-                    File.Delete(fileHHCXN);
-                if(File.Exists(fileDGCXN))
-                    File.Delete(fileDGCXN);
+                xoaTaptinSauMails(fileXNXH, fileHHCXN, fileDGCXN);
                 context.Response.Write(ex.ToString());
             }
         }
+    }
+
+    public void xoaTaptinSauMails(string fileXNXH, string fileHHCXN, string fileDGCXN)
+    {
+        if(File.Exists(fileXNXH))
+            File.Delete(fileXNXH);
+        if(File.Exists(fileHHCXN))
+            File.Delete(fileHHCXN);
+        if(File.Exists(fileDGCXN))
+            File.Delete(fileDGCXN);
     }
 
     public void activePI(HttpContext context)

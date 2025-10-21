@@ -448,13 +448,22 @@
                         click: function () {
                             $('#btn-ok').button('option', 'disabled', true);
                             $('#wait').show();
-                            $.get(`PrintControllers/InBaoCaoAncotrading/phieuXNXH.aspx?id=${piId}`, function (rs) {
-                                $.post(`Controllers/DanhSachDatHangController.ashx?action=guidonhang&piId=${piId}`,
-                                { id: piId.toString(), xnxh: rs }, function (result) {
-                                    $('.dlg_content').html(result);
-                                    $('#btn-ok').button('option', 'disabled', false);
-                                    $('#wait').hide();
-                                    $('#grid_ds_dathang')[0].triggerToolbar();
+                            $.get(`PrintControllers/InBaoCaoAncotrading/phieuHangHoaChuaXN.aspx?id=${piId}`, function (rs1) {
+                                $.get(`PrintControllers/InBaoCaoAncotrading/phieuDongGoiChuaXN.aspx?id=${piId}`, function (rs2) {
+                                    $.get(`PrintControllers/InBaoCaoAncotrading/phieuXNXH.aspx?id=${piId}`, function (rs3) {
+                                        $.post(`Controllers/DanhSachDatHangController.ashx?action=guidonhang&piId=${piId}`,
+                                            {
+                                                id: piId.toString(),
+                                                hhcxn: rs1,
+                                                dgcxn: rs2,
+                                                xnxh: rs3
+                                            }, function (result) {
+                                            $('.dlg_content').html(result);
+                                            $('#btn-ok').button('option', 'disabled', false);
+                                            $('#wait').hide();
+                                            $('#grid_ds_dathang')[0].triggerToolbar();
+                                        });
+                                    });
                                 });
                             });
                         }
