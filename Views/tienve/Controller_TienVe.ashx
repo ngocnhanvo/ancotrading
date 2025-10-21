@@ -65,9 +65,12 @@ public class Controller_TienVe : IHttpHandler
             if (cell != null)
             {
                 if (!cell.IsEmpty)
+                {
                     kq = cell.Value;
+                    kq = kq.ToString().removeAllSpaceOrTrimText(false).Replace("USD", "").Replace(",", "");
+                }
                 else
-                    kq = null;
+                    kq = "";
             }
             else
                 kq = null;
@@ -105,9 +108,9 @@ public class Controller_TienVe : IHttpHandler
             cell++;
             var stc = getValue(row.GetCell(cell)).ToString().removeAllSpaceOrTrimText(true);
             cell++;
-            var sgn = getValue(row.GetCell(cell)).ToString().ToNullableDecimal();
+            var sgn = getValue(row.GetCell(cell), "number").ToString().ToNullableDecimal();
             cell++;
-            var sgc = getValue(row.GetCell(cell)).ToString().ToNullableDecimal();
+            var sgc = getValue(row.GetCell(cell), "number").ToString().ToNullableDecimal();
             cell++;
             var mota = getValue(row.GetCell(cell)).ToString().removeAllSpaceOrTrimText(true);
 
@@ -268,7 +271,7 @@ public class Controller_TienVe : IHttpHandler
                 msg = $@"Không tìm thấy khách hàng đã chọn";
                 goto EndEventHandler;
             }
-            
+
             if(tienkhach < tv.sotienghico)
             {
                 msg = $@"Tiền khách không được nhỏ hơn số tiền ghi có ({tienkhach.DropTrailingZeros()} < {tv.sotienghico.DropTrailingZeros()})";
