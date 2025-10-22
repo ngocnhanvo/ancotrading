@@ -59,7 +59,7 @@ public partial class ReportWizard_RptKhachHang_rpt_DanhSachInvoiceChamTT : Syste
 		            pkl.tienconlai, 
 		            pkl.etd as ngayvandon
 		            FROM c_packinginvoice pkl WITH (NOLOCK)
-		            where etd between @startdate and @enddate and pkl.md_trangthai_id = 'HIEULUC'
+		            where etd between @startdate and @enddate and pkl.md_trangthai_id = 'HIEULUC' and isnull(pkl.tienconlai, 0) > 0
 	            )A
 	            left join (
 		            select dpkl.c_packinginvoice_id, pmt.ten_paymentterm, pmt.mota, pmt.songayphaithanhtoan  
