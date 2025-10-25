@@ -100,21 +100,26 @@ public class SelectHtmlControl
         String str = "<select>";
         foreach (DataRow item in dt.Rows)
         {
-			string other_str = "";
+			string other_str = "", cpdg = "";
 			
 			try {
 				other_str = item[2].ToString();
 			}
 			catch { }
-			
+
+            try
+            {
+                cpdg = item[3].ToString();
+            }
+            catch { }
+
+            string selected = "";
             if (item[0].ToString().Equals(id))
             {
-                str += string.Format("<option other=\"{2}\" selected=\"selected\" value=\"{0}\">{1}</option>", item[0], item[1], other_str);
+                selected = "selected";
             }
-            else
-            {
-                str += string.Format("<option other=\"{2}\" value=\"{0}\">{1}</option>", item[0], item[1], other_str);
-            }
+
+            str += $@"<option other=""{other_str}"" cpdg=""{cpdg}"" {selected} value=""{item[0]}"">{item[1]}</option>";
         }
         str += "</select>";
         return str;

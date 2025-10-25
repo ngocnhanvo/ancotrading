@@ -26,6 +26,9 @@ public class DongDonHangController : IHttpHandler
             case "getmotagia":
                 this.getMoTaGia(context);
                 break;
+            case "tatcacpdg0":
+                this.tatcacpdg0(context);
+                break;
             default:
                 switch (oper)
                 {
@@ -44,6 +47,44 @@ public class DongDonHangController : IHttpHandler
                 }
                 break;
         }
+    }
+
+    public void tatcacpdg0(HttpContext context)
+    {
+        String id = context.Request.Form["id"];
+        string msg = "";
+
+        try
+        {
+            var dh = db.c_donhangs.FirstOrDefault(c => c.c_donhang_id.Equals(id));
+            if (dh == null)
+            {
+                msg = "Không thể tìm thấy đơn hàng";
+                goto EndEventHandler;
+            }
+
+            if (dh.md_trangthai_id != Helper.SOANTHAO)
+            {
+                msg = "Đơn hàng không ở trạng thái Soạn Thảo";
+                goto EndEventHandler;
+            }
+
+            var ddhs = db.c_dongdonhangs.Where(s => s.c_donhang_id == dh.c_donhang_id).ToList();
+            foreach (var ddh in ddhs)
+                ddh.cpdg = 0;
+            db.SubmitChanges();
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if(msg.Length > 0)
+            jqGridHelper.Utils.writeResult(0, msg);
+        else
+            jqGridHelper.Utils.writeResult(1, "Tất cả chi phí đóng gói trong đơn hàng đã được cập nhật bằng 0");
     }
 
     public void getMoTaGia(HttpContext context)
@@ -171,6 +212,8 @@ public class DongDonHangController : IHttpHandler
                     m.vd = donggoi.vd;
                     m.vn = donggoi.vn;
                     m.vl = donggoi.vl;
+                    m.cpdg = context.Request.Form["cpdg"].removeAllSpaceOrTrimText(false).ToNullableDecimal();
+                    m.apdung_cpdg = Helper.hoatdongs.Contains(context.Request.Form["apdung_cpdg"].removeAllSpaceOrTrimText(false).ToLower());
                     m.ghichu_vachngan = donggoi.ghichu_vachngan;
                     m.sl_cont = donggoi.soluonggoi_ctn;
                     m.ghichu = context.Request.Form["ghichu"];
@@ -413,6 +456,8 @@ public class DongDonHangController : IHttpHandler
             mnu.giafob = gia_sp;
             mnu.giachuan = null;
             mnu.discount = 0;
+            mnu.cpdg = context.Request.Form["cpdg"].removeAllSpaceOrTrimText(false).ToNullableDecimal();
+            mnu.apdung_cpdg = Helper.hoatdongs.Contains(context.Request.Form["apdung_cpdg"].removeAllSpaceOrTrimText(false).ToLower());
             mnu.editphi = (context.Request.Form["editphi"] + "").ToLower() == "true";
 
             if(donhang.discount_hehang.GetValueOrDefault(false) == true)
@@ -568,7 +613,7 @@ public class DongDonHangController : IHttpHandler
         string strsql = $@"
             select 
                 P.*, 
-                P.giasautang - 
+                P.giasautang + P.cpdg2 - 
                 (
                     case 
                         when isnull(P.phanbodiscount, 0) = 1
@@ -579,7 +624,9 @@ public class DongDonHangController : IHttpHandler
                 as giahopdong
             from (
                 select 
-                    P.*, (P.giafob + P.phi) + (P.giafob * P.tanggia / 100) as giasautang
+                    P.*
+                    , (P.giafob + P.phi) + (P.giafob * P.tanggia / 100) as giasautang
+                    , (case when P.apdung_cpdg = 1 then isnull(P.cpdg, 0) else 0 end) as cpdg2
                 from (
                     SELECT
                         ddh.c_dongdonhang_id
@@ -599,7 +646,7 @@ public class DongDonHangController : IHttpHandler
                         , dg.ten_donggoi
                         , ddh.sl_inner
                         , ddh.l1, ddh.w1, ddh.h1,  ddh.sl_outer, ddh.l2, ddh.w2, ddh.h2
-                        , ddh.sl_cont, ddh.v2, dtkd.ma_dtkd, ddh.ngaytao, ddh.nguoitao
+                        , ddh.sl_cont, ddh.v2, ddh.cpdg, ddh.apdung_cpdg, dtkd.ma_dtkd, ddh.ngaytao, ddh.nguoitao
                         , ddh.ngaycapnhat,  ddh.nguoicapnhat, ddh.mota
                         , ddh.hoatdong ,ddh.trangthai as trangthai_ddh, ddh.docquyen, ddh.barcode, ddh.editphi
                         , ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
@@ -638,6 +685,8 @@ public class DongDonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["giafobGoc"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["giafob"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["cpdg"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["apdung_cpdg"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tanggia"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["giahopdong"] + "]]></cell>";

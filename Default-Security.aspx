@@ -1131,8 +1131,8 @@
 	        });
 	    }
 
-	    $(document).bind("mousedown", function (e) {
-	        if (!$(e.target).parents(".custom-menu-vnn").length > 0) {
+        $(document).bind("mousedown", function (e) {
+	        if ($(e.target).parents("ul.custom-menu-vnn").length <= 0 & !$(e.target).is("ul.custom-menu-vnn")) {
 	            $(".custom-menu-vnn").fadeOut(300);
 	        }
         });

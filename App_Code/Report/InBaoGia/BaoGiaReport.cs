@@ -130,6 +130,7 @@ public class BaoGiaReport
                         , ctbg.soluong as qty
                         , round(ctbg.soluong * ctbg.giafob, 2) as amount
                         , isnull(bg.loaiBG, 0) as inCoGia
+                        , isnull(ctbg.cpdg, 0) as cpdg
                     from 
 	                    {2} bg
 				        left join {3} ctbg ON bg.{2}_id = ctbg.{2}_id
@@ -301,7 +302,7 @@ public class BaoGiaReport
             = hStyle.BorderTop
             = NPOI.SS.UserModel.BorderStyle.Thin;
         //--
-        for (int i = 0; i <= 32; i++)
+        for (int i = 0; i <= 33; i++)
         {
             headerColumn.CreateCell(i).CellStyle = hStyle;
             headerColumn2.CreateCell(i).CellStyle = hStyle;
@@ -399,6 +400,9 @@ public class BaoGiaReport
         headerColumn.GetCell(32).SetCellValue("Amount");
         s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 32, 32));
 
+        headerColumn.GetCell(33).SetCellValue("CPĐG");
+        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 33, 33));
+
         ICellStyle border = hssfworkbook.CreateCellStyle();
         border.BorderBottom = border.BorderLeft
             = border.BorderRight
@@ -440,6 +444,9 @@ public class BaoGiaReport
             s1.SetColumnHidden(31, true);
             s1.SetColumnHidden(32, true);
         }
+
+        s1.SetColumnWidth(33, 2000);
+        s1.SetColumnHidden(33, true);
 
         //SO
         ICellStyle cellNumBorder = hssfworkbook.CreateCellStyle();
@@ -564,17 +571,18 @@ public class BaoGiaReport
             s1.GetRow(rowDt).CreateCell(30).SetCellValue(dtDetails.Rows[i]["thanhphan"].ToString());
             s1.GetRow(rowDt).CreateCell(31).SetCellValue(double.Parse(dtDetails.Rows[i]["qty"].ToString()));
             s1.GetRow(rowDt).CreateCell(32).SetCellValue(double.Parse(dtDetails.Rows[i]["amount"].ToString()));
+            s1.GetRow(rowDt).CreateCell(33).SetCellValue(double.Parse(dtDetails.Rows[i]["cpdg"].ToString()));
         }
 
         rowDt = row;
         for (int i = 0; i < dtDetails.Rows.Count; i++)
         {
             rowDt++;
-            for (int j = 0; j <= 32; j++)
+            for (int j = 0; j <= 33; j++)
             {
                 if (j == 0)
                     s1.GetRow(rowDt).GetCell(j).CellStyle = cellTextCenterBoderAll;
-                else if (new int[] { 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 27, 31, 32 }.Contains(j))
+                else if (new int[] { 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 27, 31, 32, 33 }.Contains(j))
                 {
                     s1.GetRow(rowDt).GetCell(j).CellStyle = cellStyleRight;
                 }

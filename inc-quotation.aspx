@@ -543,9 +543,11 @@ function sendMailQuotation() {
 
 
 function updatePackingQO_CallBack(md_sanpham_id) {
-    var c_chitietbaogia_id = $("#c_chitietbaogia_id").val();
-	var c_baogia_id = $('#grid_ds_quotation').jqGrid('getGridParam', 'selrow');
-    $("#md_donggoi_id").html("<option value=''>Đang tải đóng gói...</option>").attr("disabled", "disabled");
+    let frm = "#FrmGrid_grid_ds_chitietquotation";
+    let c_chitietbaogia_id = $("#c_chitietbaogia_id").val();
+    let c_baogia_id = $('#grid_ds_quotation').jqGrid('getGridParam', 'selrow');
+    let $dg = $("#md_donggoi_id", frm);
+    $dg.html("<option value=''>Đang tải đóng gói...</option>").attr("disabled", "disabled");
     $.ajax({
     url: "Controllers/PackingController.ashx?action=getoptionselected&c_chitietbaogia_id=" + c_chitietbaogia_id + "&md_sanpham_id=" + md_sanpham_id +
 	"&c_baogia_id=" + c_baogia_id,
@@ -553,10 +555,19 @@ function updatePackingQO_CallBack(md_sanpham_id) {
         success: function(packingHtml) {
 			var arr_pkl = packingHtml.split('(##)'); 
 			if (packingHtml != 'null') {
-                $("#md_donggoi_id").removeAttr("disabled").html(arr_pkl[0]);
-				$("#docquyen").val(arr_pkl[1]);
-            } else {
-                $("#md_donggoi_id").html("<option value=''>Không tìm thấy đóng gói!</option>");
+                $dg.removeAttr("disabled").html(arr_pkl[0]);
+                $("#docquyen", frm).val(arr_pkl[1]);
+                $dg.off('change');
+                    let action = $('#edithdgrid_ds_chitietquotation').text();
+                    $dg.change(function () {
+                        let cpdg = $(this).find('option:selected').attr('cpdg');
+                        $("#cpdg", frm).val(cpdg);
+                    });
+                    if (action.lastIndexOf('Thêm') > -1)
+                        $dg.change();
+            }
+            else {
+                $dg.html("<option value=''>Không tìm thấy đóng gói!</option>");
             }
         }
     });
@@ -1160,6 +1171,19 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
                     , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
                 },
                 {
+				    name: 'cpdg'
+				    , label: 'CPĐG'
+				    , index: 'ctbg.cpdg'
+				    , fixed:true , width: 100
+				    , edittype: 'text'
+				    , editable: true
+				    , editrules: { required:true, number: true }
+				    , editoptions:{ defaultValue: '0' }
+				    , align: 'right'
+				    , formatter:'currency'
+				    , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+			    },
+                {
                     fixed: true, name: 'soluong', label: 'Số Lượng'
                     , index: 'ctbg.soluong'
                     , width: 100
@@ -1277,7 +1301,6 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
                     , editable:false
                     , align:'right'
                 },
-				
                 {
                     fixed: true, name: 'sl_cont', label: 'SL Cont'
                     , index: 'ctbg.sl_cont'
@@ -1398,7 +1421,7 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
                             return [false,'Hãy chọn một quotation mới có thể tạo chi tiết.!'];
                         }else{
                             postdata.c_baogia_id = masterId;
-                            var check_thaydoi = $('#md_donggoi_id > option:selected').attr('other');
+                            var check_thaydoi = $('#md_donggoi_id &gt; option:selected').attr('other');
 							var check_docquyen = $('#docquyen','#FrmGrid_grid_ds_chitietquotation').val();
 							if(check_thaydoi.toUpperCase() == 'TRUE')
 							{
@@ -1470,7 +1493,7 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
                             return [false,'Hãy chọn một quotation mới có thể tạo chi tiết.!'];
                         }else{
                             postdata.c_baogia_id = masterId;
-							var check_thaydoi = $('#md_donggoi_id > option:selected').attr('other');
+							var check_thaydoi = $('#md_donggoi_id &gt; option:selected').attr('other');
 							var check_docquyen = $('#docquyen','#FrmGrid_grid_ds_chitietquotation').val();
 							if(check_thaydoi.toUpperCase() == 'TRUE')
 							{

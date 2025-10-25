@@ -239,7 +239,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             FROM (
                 SELECT 
                     B.*
-                    , B.giasautang - 
+                    , B.giasautang + B.cpdg2 - 
                     (
                         case 
                             when isnull(B.phanbodiscount, 0) = 1
@@ -345,6 +345,8 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                             , ddh.barcode
                             , (case when isnull(dh.discount, 0) > 0 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discount
                             , (case when isnull(dh.tanggia, 0) > 0 then isnull(dh.tanggia, 0) else isnull(ddh.tanggia, 0) end) as tanggia
+                            , ddh.cpdg
+                            , (case when ddh.apdung_cpdg = 1 then isnull(ddh.cpdg, 0) else 0 end) as cpdg2
 					    from
 						    {9} dh
 						    left join {10} ddh on dh.{9}_id = ddh.{9}_id
@@ -761,9 +763,17 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
         columnHeaders.Add(new columnHeader()
         {
+            text = "CPĐG",
+            value = "cpdg",
+            columnAt = 34,
+            width = 0
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
             text = "Discount (%)",
             value = "discountHH",
-            columnAt = 34,
+            columnAt = 35,
             width = 0
         });
 
@@ -994,7 +1004,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     cel_row_t.SetCellValue(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val));
                     cel_row_t.CellStyle = cellSoLuong;
                 }
-                else if (new string[] { "giafob", "giachuan", "phi" }.Contains(columnHeader.value))
+                else if (new string[] { "giafob", "giachuan", "phi", "cpdg" }.Contains(columnHeader.value))
                 {
                     var val = dt.Rows[i][columnHeader.value].ToString();
                     cel_row_t.SetCellValue(Math.Round(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val), 2));

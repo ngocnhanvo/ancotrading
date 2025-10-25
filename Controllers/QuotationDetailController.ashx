@@ -123,6 +123,7 @@ public class QuotationDetailController : IHttpHandler
                     m.vd = donggoi.vd;
                     m.vn = donggoi.vn;
                     m.vl = donggoi.vl;
+                    m.cpdg = context.Request.Form["cpdg"].removeAllSpaceOrTrimText(false).ToNullableDecimal();
                     m.ghichu_vachngan = donggoi.ghichu_vachngan;
 
                     m.mota = context.Request.Form["mota"];
@@ -324,6 +325,7 @@ public class QuotationDetailController : IHttpHandler
 							vd = vd,
 							vn = vn,
 							vl = vl,
+                            cpdg = context.Request.Form["cpdg"].removeAllSpaceOrTrimText(false).ToNullableDecimal(),
 							sl_cont = soluonggoi_ctn,
 							ghichu = context.Request.Form["ghichu"],
 							docquyen = docquyen,
@@ -531,8 +533,8 @@ public class QuotationDetailController : IHttpHandler
 		}
         string strsql = @"select * from(
             select ctbg.c_chitietbaogia_id, bg.c_baogia_id, sp.trangthai, ctbg.trangthai as trangthai_ctbg, ctbg.sothutu, sp.md_sanpham_id, sp.ma_sanpham, hs.hscode, ctbg.ma_sanpham_khach,
-            ctbg.giafob, ctbg.soluong, dg.ten_donggoi, ctbg.sl_inner,
-            ctbg.l1, ctbg.w1, ctbg.h1, ctbg.sl_outer, ctbg.l2, ctbg.w2, ctbg.h2, sp.trongluong, sp.dientich, ctbg.v2,  ctbg.sl_cont,
+            ctbg.giafob, ctbg.cpdg, ctbg.soluong, dg.ten_donggoi, ctbg.sl_inner,
+            ctbg.l1, ctbg.w1, ctbg.h1, ctbg.sl_outer, ctbg.l2, ctbg.w2, ctbg.h2, sp.trongluong, sp.dientich, ctbg.v2, ctbg.sl_cont,
             ctbg.ghichu, ctbg.ngaytao, ctbg.nguoitao, ctbg.ngaycapnhat, ctbg.nguoicapnhat, ctbg.mota, ctbg.hoatdong, ctbg.docquyen,
             ROW_NUMBER() OVER ({1}) as RowNum 
             

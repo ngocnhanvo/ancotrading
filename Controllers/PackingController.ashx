@@ -169,11 +169,20 @@ public class PackingController : IHttpHandler
             docquyen = check_hanghoadocquyen(md_sanpham_id, dtkd_id);
         }
 
-        String sql = String.Format("select dg.md_donggoi_id, dg.ten_donggoi, dg.doigia_donggoi " +
-                " FROM md_donggoi dg, md_donggoisanpham dgsp " +
-                " WHERE dg.hoatdong = 1 " +
-                " AND dg.md_donggoi_id = dgsp.md_donggoi_id " +
-                " AND dgsp.md_sanpham_id = '{0}' order by dgsp.macdinh desc ", md_sanpham_id);
+        String sql = $@"
+            select 
+                dg.md_donggoi_id, 
+                dg.ten_donggoi, 
+                dg.doigia_donggoi,
+                dg.cpdg
+            FROM 
+                md_donggoi dg
+                left join md_donggoisanpham dgsp on dg.md_donggoi_id = dgsp.md_donggoi_id
+            WHERE 
+                dg.hoatdong = 1
+                AND dgsp.md_sanpham_id = '{md_sanpham_id}' 
+            order by dgsp.macdinh desc 
+        ";
 
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToSelected(md_donggoi_id) + "(##)" + docquyen);

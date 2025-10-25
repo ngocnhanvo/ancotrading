@@ -199,6 +199,7 @@ public class Controller_TienVe : IHttpHandler
             }
 
             tv.trangthai = Helper.KETTHUC;
+            tv.mota = tv.mota + Public.ketThucTienVe(db, tv.kt_tienve_id);
             tv.ngaycapnhat = DateTime.Now;
             tv.nguoicapnhat = UserUtils.getUser(context);
             db.SubmitChanges();

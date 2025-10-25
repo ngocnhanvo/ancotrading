@@ -298,7 +298,10 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             sochungtu.so_duocgan = sochungtu.so_duocgan + sochungtu.buocnhay;
 
             if (tv.conlai <= 0)
+            {
                 tv.trangthai = Helper.KETTHUC;
+                //tv.mota = tv.mota + Public.ketThucTienVe(db, tv.kt_tienve_id);
+            }
             db.SubmitChanges();
 
             foreach(var cttv in cttvs)

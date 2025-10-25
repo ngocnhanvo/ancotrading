@@ -1,4 +1,4 @@
-//Update at 13/10/2025 14:07:50
+//Update at 25/10/2025 13:17:23
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -6033,6 +6033,7 @@ private string _mota;
 private System.Nullable<bool> _hoatdong;
 private string _trangthai;
 private string _docquyen;
+private System.Nullable<decimal> _cpdg;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -6107,6 +6108,8 @@ partial void OntrangthaiChanging(string value);
 partial void OntrangthaiChanged();
 partial void OndocquyenChanging(string value);
 partial void OndocquyenChanged();
+partial void OncpdgChanging(System.Nullable<decimal> value);
+partial void OncpdgChanged();
 #endregion
 public c_chitietbaogia()
 {
@@ -6777,6 +6780,25 @@ this.OndocquyenChanged();
 }
 }
 }
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_cpdg", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @cpdg
+{
+get
+{
+return this._cpdg;
+}
+set
+{
+if ((this._cpdg != value))
+{
+this.OncpdgChanging(value);
+this.SendPropertyChanging();
+this._cpdg = value;
+this.SendPropertyChanged("cpdg");
+this.OncpdgChanged();
+}
+}
+}
 public event PropertyChangingEventHandler PropertyChanging;
 public event PropertyChangedEventHandler PropertyChanged;
 protected virtual void SendPropertyChanging()
@@ -6835,6 +6857,7 @@ private string _mota;
 private System.Nullable<bool> _hoatdong;
 private string _trangthai;
 private string _docquyen;
+private System.Nullable<decimal> _cpdg;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -6909,6 +6932,8 @@ partial void OntrangthaiChanging(string value);
 partial void OntrangthaiChanged();
 partial void OndocquyenChanging(string value);
 partial void OndocquyenChanged();
+partial void OncpdgChanging(System.Nullable<decimal> value);
+partial void OncpdgChanged();
 #endregion
 public c_chitietbaogiaqr()
 {
@@ -7576,6 +7601,25 @@ this.SendPropertyChanging();
 this._docquyen = value;
 this.SendPropertyChanged("docquyen");
 this.OndocquyenChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_cpdg", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @cpdg
+{
+get
+{
+return this._cpdg;
+}
+set
+{
+if ((this._cpdg != value))
+{
+this.OncpdgChanging(value);
+this.SendPropertyChanging();
+this._cpdg = value;
+this.SendPropertyChanged("cpdg");
+this.OncpdgChanged();
 }
 }
 }
@@ -9933,6 +9977,8 @@ private System.Nullable<bool> _editphi;
 private string _code_cl;
 private string _md_chungloai_id;
 private System.Nullable<decimal> _tanggia;
+private System.Nullable<decimal> _cpdg;
+private System.Nullable<bool> _apdung_cpdg;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -10031,6 +10077,10 @@ partial void Onmd_chungloai_idChanging(string value);
 partial void Onmd_chungloai_idChanged();
 partial void OntanggiaChanging(System.Nullable<decimal> value);
 partial void OntanggiaChanged();
+partial void OncpdgChanging(System.Nullable<decimal> value);
+partial void OncpdgChanged();
+partial void Onapdung_cpdgChanging(System.Nullable<bool> value);
+partial void Onapdung_cpdgChanged();
 #endregion
 public c_dongdonhang()
 {
@@ -10926,6 +10976,44 @@ this.SendPropertyChanging();
 this._tanggia = value;
 this.SendPropertyChanged("tanggia");
 this.OntanggiaChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_cpdg", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @cpdg
+{
+get
+{
+return this._cpdg;
+}
+set
+{
+if ((this._cpdg != value))
+{
+this.OncpdgChanging(value);
+this.SendPropertyChanging();
+this._cpdg = value;
+this.SendPropertyChanged("cpdg");
+this.OncpdgChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_apdung_cpdg", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @apdung_cpdg
+{
+get
+{
+return this._apdung_cpdg;
+}
+set
+{
+if ((this._apdung_cpdg != value))
+{
+this.Onapdung_cpdgChanging(value);
+this.SendPropertyChanging();
+this._apdung_cpdg = value;
+this.SendPropertyChanged("apdung_cpdg");
+this.Onapdung_cpdgChanged();
 }
 }
 }
