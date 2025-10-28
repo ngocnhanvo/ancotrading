@@ -495,7 +495,7 @@
 				},
 				{
                     fixed: true, name: 'mota'
-                    , label: 'Ghi chú'
+                    , label: 'Mô tả Đ.Gói'
                     , index: 'dg.mota'
                     , width: 50
                     , editable:true

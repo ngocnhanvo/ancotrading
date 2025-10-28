@@ -124,4 +124,34 @@ public class SelectHtmlControl
         str += "</select>";
         return str;
     }
+
+    public string ToDongGoiSelected(String id)
+    {
+        DataTable dt = mdbc.GetData(_sql);
+        String str = "<select>";
+        foreach (DataRow item in dt.Rows)
+        {
+            string dg_id = item[0].ToString();
+            string dg_ma = item[1].ToString();
+            string dg_sli = item[2].ToString();
+            string dg_dvi = item[3].ToString();
+            string dg_slo = item[4].ToString();
+            string dg_dvo = item[5].ToString();
+            string dg_ten = item[6].ToString();
+            string dg_dgia = item[7].ToString();
+            string dg_cpdg = item[8].ToString();
+            string dg_mota = item[9].ToString();
+
+            string selected = "";
+            if (dg_id.Equals(id))
+            {
+                selected = "selected";
+            }
+
+            string text = $"{dg_ma} ({dg_sli} {dg_dvi} // {dg_slo} {dg_dvo})";
+            str += $@"<option other=""{dg_dgia}"" cpdg=""{dg_cpdg}"" mtdg=""{dg_mota}"" {selected} value=""{dg_id}"">{text}</option>";
+        }
+        str += "</select>";
+        return str;
+    }
 }

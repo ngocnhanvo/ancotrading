@@ -644,6 +644,7 @@ public class DongDonHangController : IHttpHandler
                         , dh.phanbodiscount
                         , ddh.soluong
                         , dg.ten_donggoi
+                        , dg.mota as motadonggoi
                         , ddh.sl_inner
                         , ddh.l1, ddh.w1, ddh.h1,  ddh.sl_outer, ddh.l2, ddh.w2, ddh.h2
                         , ddh.sl_cont, ddh.v2, ddh.cpdg, ddh.apdung_cpdg, dtkd.ma_dtkd, ddh.ngaytao, ddh.nguoitao
@@ -693,6 +694,7 @@ public class DongDonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["phanbodiscount"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["soluong"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_donggoi"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["motadonggoi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sl_inner"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["l1"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["w1"] + "]]></cell>";

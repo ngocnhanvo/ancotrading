@@ -172,12 +172,20 @@ public class PackingController : IHttpHandler
         String sql = $@"
             select 
                 dg.md_donggoi_id, 
+                dg.ma_donggoi,
+                dg.sl_inner,
+                dvti.ten_dvt as dvtinner,
+                dg.sl_outer,
+                dvto.ten_dvt as dvtouter,
                 dg.ten_donggoi, 
                 dg.doigia_donggoi,
-                dg.cpdg
+                dg.cpdg,
+                dg.mota
             FROM 
                 md_donggoi dg
                 left join md_donggoisanpham dgsp on dg.md_donggoi_id = dgsp.md_donggoi_id
+                left join md_donvitinh dvti on dg.dvt_inner = dvti.md_donvitinh_id
+                left join md_donvitinh dvto on dg.dvt_outer = dvto.md_donvitinh_id
             WHERE 
                 dg.hoatdong = 1
                 AND dgsp.md_sanpham_id = '{md_sanpham_id}' 
@@ -185,7 +193,7 @@ public class PackingController : IHttpHandler
         ";
 
         SelectHtmlControl s = new SelectHtmlControl(sql);
-        context.Response.Write(s.ToSelected(md_donggoi_id) + "(##)" + docquyen);
+        context.Response.Write(s.ToDongGoiSelected(md_donggoi_id) + "(##)" + docquyen);
     }
 
     public void getSelectOption(HttpContext context)

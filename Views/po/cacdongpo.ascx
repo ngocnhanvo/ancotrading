@@ -85,8 +85,11 @@
                     $("#md_donggoi_id", frm).off('change');
                     let action = $('#edithdgrid_ds_chitietpo').text();
                     $("#md_donggoi_id", frm).change(function () {
-                        let cpdg = $(this).find('option:selected').attr('cpdg');
+                        let $sel = $(this).find('option:selected');
+                        let cpdg = $sel.attr('cpdg');
                         $("#cpdg", frm).val(cpdg);
+                        let mtdg = $sel.attr('mtdg');
+                        $("#motadonggoi", frm).val(mtdg);
                     });
                     if (action.lastIndexOf('Thêm') > -1)
                         $("#md_donggoi_id", frm).change();
@@ -379,8 +382,7 @@
         , align: 'right'
         , formatter:'number'
         , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
-    },
-            
+    },        
     {
         name: 'md_donggoi_id'
 		, label: 'Đóng Gói'
@@ -391,6 +393,17 @@
         , editoptions: { 'value' : 'Chọn đóng gói' }
 		, hidden:true 
 		, editrules: { edithidden:true }
+    },
+    {
+        name: 'motadonggoi'
+		, label: 'Mô tả ĐG'
+        , index: 'dg.mota'
+        , fixed:true , width: 100
+        , edittype: 'text'
+        , editable: true
+		, hidden:true 
+		, editrules: {edithidden:true}
+        , editoptions: {disabled: true, style: 'width:80%; opacity:0.85; font-weight:bold'}
     },
     {
         name: 'sl_inner'
