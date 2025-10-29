@@ -53,7 +53,8 @@ public class Controller_TienVe : IHttpHandler
             if (cell != null)
             {
                 if (!cell.IsEmpty)
-                    kq = cell.DateTimeValue;
+                    if(!string.IsNullOrWhiteSpace(cell.StringValue))
+                        kq = cell.DateTimeValue;
                 else
                     kq = null;
             }

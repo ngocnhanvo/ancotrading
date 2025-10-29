@@ -534,7 +534,7 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             }
 
             var sct = context.Request.Form["sctlienquan"].removeAllSpaceOrTrimText(true);
-            if (loai == "IN")
+            if (loai == "PO")
             {
                 var po = db.c_donhangs.Where(s => s.sochungtu == sct).FirstOrDefault();
                 if (po == null)
@@ -702,7 +702,7 @@ public class Controller_TienVe_PhanBo : IHttpHandler
             }
 
 
-            tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) - (cttv.sotien.GetValueOrDefault(0) + cttv.phi.GetValueOrDefault(0));
+            tv.tongtienphanbo = tv.tongtienphanbo.GetValueOrDefault(0) - cttv.sotien.GetValueOrDefault(0);
             tv.conlai = tv.tienkhach - tv.tongtienphanbo;
 
             var cttvs = db.kt_tienve_phanbos.Where(s => s.kt_tienve_id == tv.kt_tienve_id & s.kt_tienve_phanbo_id != cttv.kt_tienve_phanbo_id).Count();
