@@ -422,9 +422,16 @@ public static class UserUtils
             {
                 phiDiscount = ddonhang.phi.GetValueOrDefault(0);
             }
-            
-            if (maNCC == "ANCO1" & coGiaMua)
-                giaNhap2BD = -1;
+
+            var msps = new string[] { "36", "42", "49", "98" };
+            if (msps.Contains(sp.ma_sanpham.Substring(0, 2)))
+                coGiaMua = true;
+
+            if (maNCC == "ANCO1")
+            {
+                if(coGiaMua)
+                    giaNhap2BD = -1;
+            }
 
             if (giaNhap2BD > -1)
             {
