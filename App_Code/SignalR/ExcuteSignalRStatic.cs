@@ -253,7 +253,7 @@ public static class ExcuteSignalRStatic
             string kd = msp.Substring(0, 9);
             image = mapPathSignalR("~/" + msLink);
 
-            //Neu co hinh anh mau sac cua F
+            //Neu co hinh anh mau sac cua toan bo ma sp hoạc F
             if (File.Exists(image + msp + ".jpg"))
                 image = msLink + msp + ".jpg";
             else if (File.Exists(image + msp + ".png"))
@@ -289,7 +289,7 @@ public static class ExcuteSignalRStatic
             string kd = msp.Substring(0, 9);
             image = mapPathSignalR("~/" + msLink);
             
-            //Neu co hinh anh mau sac cua F
+            //Neu co hinh anh mau sac cua toan bo ma sp hoac F
             if (File.Exists(image + msp + ".jpg"))
                 image = msLink + msp + ".jpg";
             //Neu co hinh anh mau sac cua S
