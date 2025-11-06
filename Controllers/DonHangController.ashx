@@ -347,64 +347,7 @@ public class DonHangController : IHttpHandler
         context.Response.ContentType = "text/plain";
         context.Response.Charset = "UTF-8";
         string c_donhang_id = context.Request.QueryString["poId"];
-        string msg = "";
-        try
-        {
-            decimal totalQuantity = 0, totalSalary = 0, totalCbm = 0;
-            decimal phicong = 0, phitru = 0;
-            c_donhang dh = db.c_donhangs.FirstOrDefault(d => d.c_donhang_id.Equals(c_donhang_id));
-            if (dh != null)
-            {
-                var ddh = from c in db.c_dongdonhangs where c.c_donhang_id.Equals(dh.c_donhang_id) select c;
-                var phiDH = from phi in db.c_phidonhangs where phi.c_donhang_id.Equals(dh.c_donhang_id) select phi;
-
-                totalQuantity = ddh.Sum(p => p.soluong).Value;
-                phicong = phiDH.Where(p => p.phitang.Equals(true)).ToList().Sum(s=>s.phi.GetValueOrDefault(0));
-                phitru = phiDH.Where(p => p.phitang.Equals(false)).ToList().Sum(s=>s.phi.GetValueOrDefault(0));
-
-                if (dh.phanbodiscount.GetValueOrDefault(false))
-                {
-                    totalSalary = ddh.ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, 2, true)).DecRound(2);
-                }
-                else
-                {
-                    if (dh.discount > 0)
-                    {
-                        totalSalary = ddh.ToList().Sum(p => p.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, p, 2, false)).DecRound(2);
-                        decimal discountVal = (totalSalary * dh.discount.Value / 100).DecRound(2);
-                        totalSalary = totalSalary - discountVal;
-                    }
-                    else
-                    {
-                        var ddh2s = ddh.ToList()
-                                .Select(s=> new { cl = s.code_cl, dc = s.discount.GetValueOrDefault(0), st = s.soluong.GetValueOrDefault(0) * UserUtils.getGiaHopDongPO(dh, s, 2, dh.phanbodiscount.GetValueOrDefault(false)) })
-                                .GroupBy(s=> new { s.cl, s.dc })
-                                .Select(s=> new { s.Key.cl, s.Key.dc, st = s.Sum(t=>t.st) })
-                                .ToList();
-
-                        totalSalary = 0;
-                        foreach(var ddh2 in ddh2s)
-                        {
-                            totalSalary += ddh2.st - Math.Round(ddh2.st * (decimal)ddh2.dc / 100, 2, MidpointRounding.AwayFromZero);
-                        }
-                    }
-                }
-
-                totalSalary = totalSalary + phicong - phitru;
-
-                totalCbm = ddh.ToList().Sum(s=>s.v2.GetValueOrDefault(0));
-
-                msg = string.Format("Đơn hàng:{0}, CBM:{1:#,##0.000}, Amount:{2:#,##0.00}, Quantity:{3:#,##0}, Đặt cọc: {4:#,##0.00}", dh.sochungtu, totalCbm, totalSalary, totalQuantity, dh.datcoc.GetValueOrDefault(0));
-            }
-            else
-            {
-                msg = "Đơn hàng này đã bị xóa, hãy thử làm mới dữ liệu.";
-            }
-        }
-        catch (Exception e)
-        {
-            msg = e.Message;
-        }
+        string msg = Public.triggerDonHang(db, null, c_donhang_id);
         context.Response.Write(msg);
     }
 
@@ -990,7 +933,7 @@ public class DonHangController : IHttpHandler
                     if (check == 0)
                     {
                         db.c_donhangs.InsertOnSubmit(mnu);
-                        
+
                         var spd = db.md_doitackinhdoanh_spds.Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id).OrderByDescending(s=>s.ngaytao).FirstOrDefault();
                         if(spd != null)
                         {
@@ -1213,6 +1156,7 @@ public class DonHangController : IHttpHandler
                         }
 
                         db.SubmitChanges();
+                        Public.triggerDonHang(db, m, null, true);
                         jqGridHelper.Utils.writeResult(1, "Cập nhật thành công!");
                     }
                     else

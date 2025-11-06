@@ -34,7 +34,7 @@
                  , editable: true
                  , width: 100
                  , edittype: 'select'
-                 , editoptions:{ value:'PTSP:Phát Triển Sản Phẩm;NGHVU:Nghiệp Vụ;KETOAN:Kế Toán;BAOCAO:Báo Cáo Thống Kê;HETHONG:Hệ Thống' }
+                 , editoptions:{ value:'PTSP:Phát Triển Sản Phẩm;NGHVU:Nghiệp Vụ;KETOAN:Kế Toán;CHUNGTU:Chứng từ;BAOCAO:Báo Cáo Thống Kê;HETHONG:Hệ Thống' }
             },
             {
                  fixed: true, name: 'title'

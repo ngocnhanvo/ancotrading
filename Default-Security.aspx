@@ -27,13 +27,13 @@
 
     System.Data.DataTable dt = new System.Data.DataTable();
 
-    bool PTSP, NGHVU, KETOAN, BAOCAO, HETHONG;
-    PTSP = NGHVU = KETOAN = BAOCAO = HETHONG = false;
+    bool PTSP, NGHVU, KETOAN, BAOCAO, HETHONG, CHUNGTU;
+    PTSP = NGHVU = KETOAN = BAOCAO = HETHONG = CHUNGTU = false;
 
     if (isadmin)
     {
         dt = mdbc.GetData(sqlAdmin);
-        PTSP = NGHVU = KETOAN = BAOCAO = HETHONG = true;
+        PTSP = NGHVU = KETOAN = BAOCAO = HETHONG = CHUNGTU = true;
         xemgiaHH = xemgiaNoiHH = xemgiaHHST = xemgiaHHNHD = xemgiaHHDQ = xemgiaDSDH = true;
         chietxuatHH = chietxuatHHST = chietxuatHHNHD =
         chietxuatHHDQ = chietxuatLHH = chietxuatDGSP =
@@ -48,17 +48,19 @@
         #region XemGia
         var xemgiaFld = (from myRow in dt.AsEnumerable()
                          where myRow.Field<string>("mamenu") == "c8a12cddaf85c128673b499264846938"
-                         select new {
+                         select new
+                         {
                              gia = myRow.Field<bool>("gia"),
                              vaitro = myRow.Field<string>("tenvt")
                          }).FirstOrDefault();
-		
-		if(xemgiaFld != null) {
-			if (xemgiaFld.gia == true)
-				xemgiaHH = true;
-			if (xemgiaFld.vaitro != "Nghiệp Vụ")
-				xemgiaNoiHH = true;
-		}
+
+        if (xemgiaFld != null)
+        {
+            if (xemgiaFld.gia == true)
+                xemgiaHH = true;
+            if (xemgiaFld.vaitro != "Nghiệp Vụ")
+                xemgiaNoiHH = true;
+        }
 
         xemgiaHHST = (from myRow in dt.AsEnumerable()
                       where myRow.Field<string>("mamenu") == "68ff4867b9727e6f4bb055821fe1fa75"
@@ -155,6 +157,11 @@
             if (row["module_id"].Equals("HETHONG") && truyxuat)
             {
                 HETHONG = true;
+            }
+
+            if (row["module_id"].Equals("CHUNGTU") && truyxuat)
+            {
+                CHUNGTU = true;
             }
         }
     }
@@ -597,6 +604,9 @@
 				<% if (KETOAN){ %>
 				    <li><a href="#tab-ketoan">Kế toán</a></li>
 				<% } %>
+                <% if (CHUNGTU){ %>
+				    <li><a href="#tab-chungtu">Chứng từ</a></li>
+				<% } %>
 				<% if (BAOCAO){ %>
 				    <li><a href="#tab-baocao-thongke">Báo cáo thống kê</a></li>
 				<% } %>
@@ -741,6 +751,44 @@
 
 			</div>
 			<!-- / ke toan -->
+			<%} %>
+
+            <% if (CHUNGTU) { %>
+			<div class="tab-content" id="tab-chungtu">
+				<div class="sc_menu">
+					<ul class="sc_menu">
+						<% foreach (System.Data.DataRow row in dt.Rows) { %>
+                        <%  String mamenu, title, module_id, tenmenu, image, url;
+                            int sortorder;
+                            mamenu = row[0].ToString();
+                            module_id = row[1].ToString();
+                            title = row[2].ToString();
+                            tenmenu = row[3].ToString();
+                            image = row[4].ToString();
+                            url = row[5].ToString();
+                            sortorder = int.Parse(row[6].ToString());
+                        %>
+                        
+
+						<% if (module_id.Equals("CHUNGTU")) { %>
+						    <li>
+						        <div class="items" id="<%= mamenu %>" title="<%= title %>"
+								    onclick="add_tab('<%= tenmenu %>', '<%= url %>')">
+								    <div>
+									    <img class="icon" src="images/icon/<%= image %>" />
+								    </div>
+								    <div class="name">
+									    <span><%= tenmenu%></span>
+								    </div>
+							    </div>
+							</li>
+					    <%  } // end if 
+                       } // end for %>
+					</ul>
+					<div class="clear"></div>
+				</div>
+
+			</div>
 			<%} %>
 			
 			

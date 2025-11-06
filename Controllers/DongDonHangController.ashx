@@ -268,8 +268,8 @@ public class DongDonHangController : IHttpHandler
                     if (check == 0)
                     {
                         db.SubmitChanges();
+                        Public.triggerDonHang(db, donhang, null, true);
                         jqGridHelper.Utils.writeResult(1, "Cập nhật thành công!");
-
                     }
                     else
                     {
@@ -521,6 +521,8 @@ public class DongDonHangController : IHttpHandler
             mnu.docquyen = docquyen;
             db.c_dongdonhangs.InsertOnSubmit(mnu);
             db.SubmitChanges();
+
+            Public.triggerDonHang(db, donhang, null, true);
         }
         //}
         //  catch (Exception ex)
@@ -544,6 +546,7 @@ public class DongDonHangController : IHttpHandler
         {
             db.c_dongdonhangs.DeleteOnSubmit(ddh);
             db.SubmitChanges();
+            Public.triggerDonHang(db, dh, null, true);
             jqGridHelper.Utils.writeResult(1, "Xóa dòng thành công!");
         }
     }
