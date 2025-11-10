@@ -1334,11 +1334,7 @@ public class DonHangController : IHttpHandler
             dh.shipmentdate, pmt.ten_paymentterm, ngh.ma_nganhang,  tl.ten_trongluong, 
             dtien.ma_iso as tendongtien, kt.ten_kichthuoc, 
             dh.payer, dh.portdischarge, 
-			(
-				dh.amount - (dh.amount * dh.discount)/100 + 
-				isnull((select SUM(phi) from c_phidonhang where phitang = 1 and c_donhang_id = dh.c_donhang_id), 0) -
-				isnull((select SUM(phi) from c_phidonhang where phitang = 0 and c_donhang_id = dh.c_donhang_id), 0)
-			) as amount, 
+			dh.amount,
             dh.totalcbm, dh.totalcbf, dh.dagui_mail, 
             dh.cont20, dh.cont40, dh.cont40hc, dh.contle, dh.cont45, 
             dh.ismakepi, dh.isdonhangtmp, 
