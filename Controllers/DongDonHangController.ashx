@@ -29,6 +29,9 @@ public class DongDonHangController : IHttpHandler
             case "tatcacpdg0":
                 this.tatcacpdg0(context);
                 break;
+            case "capnhatAmount":
+                this.capnhatAmount(context);
+                break;
             default:
                 switch (oper)
                 {
@@ -46,6 +49,15 @@ public class DongDonHangController : IHttpHandler
                         break;
                 }
                 break;
+        }
+    }
+
+    public void capnhatAmount(HttpContext context)
+    {
+        var dhs = db.c_donhangs.Where(s=>s.md_trangthai_id != Helper.KETTHUC).ToList();
+        foreach(var dh in dhs)
+        {
+            Public.triggerDonHang(db, dh, null, true);
         }
     }
 
