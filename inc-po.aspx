@@ -932,6 +932,19 @@
                  , stype : 'select'
                  , searchoptions:{sopt:['eq'], value:':[ALL];SOANTHAO:SOẠN THẢO;HIEULUC:HIỆU LỰC;KETTHUC:KẾT THÚC' }
             },
+            {
+                 name: 'trangthaict'
+                 , label: 'TT Chứng từ'
+                 , index: 'trangthaict'
+                 , editable: false
+                 , fixed:true , width: 100
+                 , edittype: 'text'
+                 , align:'center'
+                 , formatter: 'trangthai'
+                 , search : true
+                 , stype : 'select'
+                 , searchoptions:{sopt:['eq'], value:':[ALL];CHUAGUI:Chưa gửi;DAGUI:Đã gửi;DAHIEULUC:Đã nhận;TUCHOI:Từ chối' }
+            },
 			{
                  name: 'md_doitackinhdoanh_id'
                  , label: 'Khách Hàng'
@@ -1726,7 +1739,7 @@
 		        buttonicon: "ui-icon-cancel",
 		        title: "Hủy đơn hàng",
 		        onClickButton: HuyDonHang
-                });
+            });
 
             if (vnnIsAdmin == 'True') {
                 $("#grid_ds_po").jqGrid('navButtonAdd', '#grid_ds_po-pager',
@@ -1779,6 +1792,125 @@
                         }
                     });
             }
+
+            $("#grid_ds_po").jqGrid('navButtonAdd', '#grid_ds_po-pager',
+            {
+                caption: "",
+                buttonicon: "ui-icon-lightbulb",
+                title: "Gửi chứng từ",
+                onClickButton: function () {
+                    let ids = $("#grid_ds_po").jqGrid('getGridParam', 'selarrrow');
+                    let options = '';
+                    for (let i in ids) {
+                        let id = ids[i];
+                        let row = $("#grid_ds_po").getRowData(id);
+                        options += `<option value="${id}">${row.sochungtu}</option>`;
+                    }
+
+                    let iddlg = 'dialog-chuyenchungtu';
+                    $('body').append(`<div title="Gửi đến chứng từ" id="${iddlg}">
+                        <div style="display:none" id="waitChuyenChungTu"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>
+                        <div style="margin-top:5px;">
+                            <table style="width:100%">
+                                <tr>
+                                    <td>Đơn hàng ưu tiên</td>
+                                    <td><select id="dhut_po">${options}</select></td>
+                                </tr>
+                                <tr>
+                                    <td>Số lượng cont</td>
+                                    <td><input id="slcont_po" type="number"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Loại cont</td>
+                                    <td>
+                                        <select id="loaicont_po">
+                                            <option role="option" value="CONT20">Cont 20</option>
+                                            <option role="option" value="CONT40">Cont 40</option>
+                                            <option role="option" value="40HC">40HC</option>
+                                            <option role="option" value="CONT45">Cont 45</option>
+                                            <option role="option" value="LE">Cont LCL</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>NXH điều chỉnh</td>
+                                    <td><input id="nxhdc_po" style="width:100px" type="text"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Ghi chú</td>
+                                    <td><textarea id="ghichu_po"></textarea></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <label>Tập tin đính kèm</label><br>
+                                        <input style="margin-top: 7px;" type="file" multiple id="ttdk1_po" accept=".xls,.xlsx,.doc,.docx,.pdf" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>`);
+
+                    // create new dialog
+                    $(`#${iddlg}`).dialog({
+                        modal: true
+                        , open: function (event, ui) {
+                            //hide close button.
+                            $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                            $('#nxhdc_po').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
+                        }
+                        , buttons: {
+                            'Đồng ý': function () {
+                                let slcont = Number($('#slcont_po').val());
+                                if (!slcont) {
+                                    alert(`SL cont phải là số`);
+                                    return;
+                                }
+
+                                if (isNaN(slcont)) {
+                                    alert(`SL cont phải là số`);
+                                    return;
+                                }
+
+                                let $wait = $('#waitChuyenChungTu');
+                                $wait.css('display', '');
+                                let page = $('#grid_ds_po').getGridParam("page");
+                                let data = new FormData();
+                                data.append('action', 'ChuyenChungTu');
+                                data.append('id', ids.toString());
+                                data.append('dhut_po', $('#dhut_po').val());
+                                data.append('slcont_po', $('#slcont_po').val());
+                                data.append('loaicont_po', $('#loaicont_po').val());
+                                data.append('nxhdc_po', $('#nxhdc_po').val());
+                                data.append('ghichu_po', $('#ghichu_po').val());
+                                let fileList = $('#ttdk1_po')[0].files;
+                                for (let i = 0; i < fileList.length; i++) {
+                                    data.append('ttdk1_po', fileList[i]);
+                                }
+                                $.ajax({
+                                    url: 'Controllers/DonHangController.ashx',
+                                    data: data,
+                                    type: 'POST',
+                                    processData: false,
+                                    contentType: false,
+                                    success: function (result) {
+                                        if (!result) {
+                                            $('#grid_ds_po').trigger("reloadGrid", [{ current: true, page: page }]);
+                                            $(`#${iddlg}`).dialog("destroy").remove();
+                                        }
+                                        else {
+                                            alert(result);
+                                            $wait.css('display', 'none');
+                                        }
+                                    }
+                                });
+                            },
+                            'Thoát': function () {
+                                $(this).dialog("destroy").remove();
+                            }
+                        }
+                    });
+                }
+            });
 	    });
     </script>
 	

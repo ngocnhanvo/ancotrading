@@ -54,6 +54,9 @@ public class DonHangController : IHttpHandler
             case "ChuyenDonHang":
                 this.ChuyenDonHang(context);
                 break;
+            case "ChuyenChungTu":
+                this.ChuyenChungTu(context);
+                break;
             default:
                 switch (oper)
                 {
@@ -84,6 +87,178 @@ public class DonHangController : IHttpHandler
             ms.Seek(0, System.IO.SeekOrigin.Begin);
             return (T)dcs.ReadObject(ms);
         }
+    }
+
+    public void ChuyenChungTu(HttpContext context)
+    {
+        string msg = "";
+        var dhut_po = context.Request.Form["dhut_po"].removeAllSpaceOrTrimText(true);
+        var slcont_po = context.Request.Form["slcont_po"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
+        var loaicont_po = context.Request.Form["loaicont_po"].removeAllSpaceOrTrimText(true);
+        var nxhdc_po = context.Request.Form["nxhdc_po"].removeAllSpaceOrTrimText(true);
+        var ghichu_po = context.Request.Form["ghichu_po"].removeAllSpaceOrTrimText(true);
+        var files = context.Request.Files;
+        var lengthF = files.Count;
+
+        try
+        {
+            string[] ids = context.Request.Params["id"].Split(',');
+            var dhs = db.c_donhangs.Where(s => ids.Contains(s.c_donhang_id)).ToList();
+            var dhst = dhs.Where(s => s.md_trangthai_id == Helper.SOANTHAO).Select(s => s.sochungtu).OrderBy(s=>s).ToList();
+            if(dhst.Count > 0)
+            {
+                msg = $@"Đơn hàng ""{string.Join(", ", dhst)}"" chưa Hiệu Lực";
+                goto EndEventHandler;
+            }
+
+            var chuaguis = new string[] { Helper.CHUAGUI, Helper.TUCHOI };
+            var dhdg = dhs.Where(s => !chuaguis.Contains(s.trangthaict) & !string.IsNullOrEmpty(s.trangthaict)).Select(s => s.sochungtu).OrderBy(s=>s).ToList();
+            if(dhdg.Count > 0)
+            {
+                msg = $@"Đơn hàng ""{string.Join(", ", dhdg)}"" đã gửi trước đó";
+                goto EndEventHandler;
+            }
+
+            int count = 0;
+            string idut = "", sctut = "";
+            dhs = dhs.OrderBy(s => s.c_donhang_id == dhut_po ? 0 : 1).ToList();
+            foreach(var dh in dhs)
+            {
+                dh.trangthaict = Helper.DAGUI;
+                var hsct = new c_donhangchungtu();
+                hsct.c_donhangchungtu_id = Helper.getNewId();
+                hsct.trangthai = Helper.SOANTHAO;
+                hsct.c_donhang_id = dh.c_donhang_id;
+                if (dh.c_donhang_id == dhut_po)
+                {
+                    hsct.slcont = slcont_po;
+                    hsct.loaicont = loaicont_po;
+                    hsct.mota = ghichu_po;
+                    idut = hsct.c_donhangchungtu_id;
+                    sctut = dh.sochungtu;
+                }
+                else
+                {
+                    hsct.dongghep = dhut_po;
+                }
+                hsct.ngaytao = DateTime.Now;
+                hsct.ngaycapnhat = DateTime.Now;
+                hsct.nguoitao = UserUtils.getUser(context);
+                hsct.nguoicapnhat = UserUtils.getUser(context);
+                hsct.hoatdong = true;
+                db.c_donhangchungtus.InsertOnSubmit(hsct);
+                count++;
+            }
+
+            var fileTypes = new string[] { ".doc", ".docx", ".xls", ".xlsx", ".pdf" };
+            var pathRoot = "taptin/chungtu";
+            for (int i = 1; i <= lengthF; i++)
+            {
+                string fileName = files[i - 1].FileName.removeAllSpaceOrTrimText(true);
+                int mimeI = fileName.LastIndexOf(".");
+                string mime = fileName.Substring(mimeI).ToLower();
+                string name = fileName.Substring(0, mimeI);
+                if (!fileTypes.Contains(mime))
+                {
+                    msg = $@"{fileName}: phải là word, pdf hoặc excel";
+                    goto EndEventHandler;
+                }
+                else
+                {
+                    var taptin = db.md_taptins.Where(p => p.tentaptin == fileName & p.doituong_dinhkem == "HSCT" & p.lienket == idut).FirstOrDefault();
+                    if (taptin == null)
+                    {
+                        var id = Helper.getNewId();
+                        var path = $"{pathRoot}/{id}{mime}";
+                        taptin = new md_taptin();
+                        taptin.md_taptin_id = id;
+                        taptin.lienket = idut;
+                        taptin.trangthai = Helper.CHUAGUI;
+                        taptin.doituong_dinhkem = "HSCT";
+                        taptin.tentaptin = fileName;
+                        taptin.path = path;
+                        taptin.size = files[i - 1].ContentLength;
+                        taptin.mimetype = mime;
+                        taptin.hoatdong = true;
+                        taptin.ngaytao = DateTime.Now;
+                        taptin.nguoitao = UserUtils.getUser(context);
+                        db.md_taptins.InsertOnSubmit(taptin);
+                    }
+                    else
+                    {
+                        msg = $@"{fileName}: đã tồn tại trước đó";
+                        goto EndEventHandler;
+                    }
+                }
+            }
+
+            if (count == 0)
+                msg = "Không có đơn hàng nào được chuyển tới chứng từ";
+            else
+            {
+                db.SubmitChanges();
+                for (int i = 1; i <= lengthF; i++)
+                {
+                    string fileName = files[i - 1].FileName.removeAllSpaceOrTrimText(true);
+                    var taptin = db.md_taptins.Where(p => p.tentaptin == fileName & p.doituong_dinhkem == "HSCT" & p.lienket == idut).FirstOrDefault();
+                    if (taptin != null)
+                    {
+                        var path = $"{pathRoot}/{taptin.md_taptin_id}{taptin.mimetype}";
+                        path = ExcuteSignalRStatic.mapPathSignalR($"~/{path}");
+                        files[i - 1].SaveAs(path);
+                    }
+                }
+
+                try
+                {
+                    string manv = UserUtils.getUser(context);
+                    var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
+                    var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
+                    if(!string.IsNullOrWhiteSpace(nv.smtp))
+                    {
+                        smtp = db.md_smtps.Where(s => s.md_smtp_id == nv.smtp).FirstOrDefault();
+                    }
+                    var mail = new GoogleMail();
+                    mail.Email = nv.email;
+                    mail.Password = nv.email_pass;
+                    mail.Smtp = smtp.smtpserver;
+                    mail.Port = smtp.port.Value;
+                    mail.Ssl = smtp.use_ssl.GetValueOrDefault(false);
+
+                    string scts = string.Join(", ", dhs.Select(s => s.sochungtu).ToList());
+                    string title = $@"Gửi CT đơn hàng ""{scts}""", body = $@"Đơn hàng ưu tiên ""{sctut}""";
+                    var attachments = new List<System.Net.Mail.Attachment>();
+                    var tts = db.md_taptins.Where(p => p.doituong_dinhkem == "HSCT" & p.lienket == idut).ToList();
+                    foreach (var tt in tts)
+                    {
+                        var attachment = new System.Net.Mail.Attachment(ExcuteSignalRStatic.mapPathSignalR($"~/{tt.path}"));
+                        attachment.Name = tt.tentaptin;
+                        attachments.Add(attachment);
+                    }
+
+                    mail.Send(
+                        nv.email
+                        , "vongocnhancd10cntt2@gmail.com"
+                        , nv.email_cc
+                        , ""
+                        , title
+                        , body
+                        , attachments
+                    );
+                }
+                catch (Exception ex)
+                {
+                    msg = ex.ToString();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            msg = e.Message;
+        }
+
+        EndEventHandler:;
+        context.Response.Write(msg);
     }
 
     public void ChuyenDonHang(HttpContext context)
@@ -1328,7 +1503,7 @@ public class DonHangController : IHttpHandler
         }
 
         string strsql = @"select * from( 
-            select dh.c_donhang_id, dh.md_trangthai_id, dh.donhang_mau, dh.sochungtu, dh.customer_order_no, 
+            select dh.c_donhang_id, dh.md_trangthai_id, dh.trangthaict, dh.donhang_mau, dh.sochungtu, dh.customer_order_no, 
             dtkd.ma_dtkd, dh.ngaylap, dh.nguoilap, 
             cbien.ten_cangbien, dh.discount, dh.shipmenttime, 
             dh.shipmentdate, pmt.ten_paymentterm, ngh.ma_nganhang,  tl.ten_trongluong, 
@@ -1381,6 +1556,7 @@ public class DonHangController : IHttpHandler
             xml += "<row>";
             xml += "<cell><![CDATA[" + row["c_donhang_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["md_trangthai_id"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["trangthaict"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sochungtu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["customer_order_no"] + "]]></cell>";

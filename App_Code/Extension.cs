@@ -370,4 +370,12 @@ public static class Extension
         else
             return null;
     }
+
+    public static DateTime? ToNullableDate(this string s)
+    {
+        if (!string.IsNullOrWhiteSpace(s))
+            return DateTime.ParseExact(s, fmtDate, null);
+        else
+            return null;
+    }
 }
