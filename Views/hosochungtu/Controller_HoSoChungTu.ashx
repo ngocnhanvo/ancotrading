@@ -155,7 +155,7 @@ public class Controller_HoSoChungTu : IHttpHandler
             hsct.ngayCutOff = ngayCutOff.ToNullableDate();
             hsct.ngayXuong = ngayXuong.ToNullableDate();
             if (hsct.ngayCutOff != null & hsct.ngayXuong == null)
-                hsct.ngayXuong = hsct.ngayCutOff.Value.AddDays(-7);
+                hsct.ngayXuong = hsct.ngayCutOff.Value.AddDays(-2);
 
             hsct.mota = mota;
             hsct.ngaycapnhat = DateTime.Now;
