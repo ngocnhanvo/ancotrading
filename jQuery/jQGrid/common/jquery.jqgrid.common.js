@@ -9,16 +9,37 @@
 jQuery.extend($.fn.fmatter, {
     trangthai: function(cellvalue, options, rowdata) {
         if (cellvalue == 'DAGUI') {
-            return '<span title = "DAGUI">Đã Gửi</span>';
-        } else if (cellvalue == 'DANHAN') {
-            return '<span title = "DANHAN">Đã Xem</span>';
-        } else if (cellvalue == 'DAHIEULUC') {
-            return '<span title = "DAHIEULUC">Đã Nhận</span>';
-        } else if (cellvalue == 'TUCHOI') {
-            return '<span title = "TUCHOI">Từ chối</span>';
+            return '<span title="DAGUI">Đã Gửi</span>';
+        }
+        else if (cellvalue == 'DANHAN') {
+            return '<span title="DANHAN">Đã Xem</span>';
+        }
+        else if (cellvalue == 'DAHIEULUC') {
+            return '<span title="DAHIEULUC">Đã Nhận</span>';
+        }
+        else if (cellvalue == 'TUCHOI') {
+            return '<span title="TUCHOI">Từ chối</span>';
+        }
+        else if (cellvalue == 'SOANTHAO') {
+            return '<span title="SOANTHAO">Soạn thảo</span>';
+        }
+        else if (cellvalue == 'HIEULUC') {
+            return '<span title="HIEULUC">Hiệu lực</span>';
+        }
+        else if (cellvalue == 'KETTHUC') {
+            return '<span title="KETTHUC">Kết thúc</span>';
+        }
+        else if (cellvalue == 'DAGUIBC') {
+            return '<span title="DAGUIBC">Đã gửi book container</span>';
+        }
+        else if (cellvalue == 'DACOLT') {
+            return '<span title="DACOLT">Đã có lịch tàu</span>';
+        }
+        else if (cellvalue == 'DAKEOC') {
+            return '<span title="DACOLT">Đã kéo cont/xuất hàng</span>';
         }
 		else {
-            return '<span title = "CHUAGUI">Chưa Gửi</span>';
+            return '<span title="CHUAGUI">Chưa Gửi</span>';
         }
     }
 });

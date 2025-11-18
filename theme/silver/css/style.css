@@ -242,7 +242,8 @@ table.view-capacity tr td
 input:disabled {
     /* color: gray; */
     opacity: 0.7;
-    border-color: rgba(118, 118, 118, 0.3);
+    /*border-color: rgba(118, 118, 118, 0.3);*/
+    border-color: rgba(0, 0, 0, 1);
 }
 
 .ui-widget-overlay {

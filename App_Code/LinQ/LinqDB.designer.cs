@@ -1,4 +1,4 @@
-//Update at 12/11/2025 01:23:30
+//Update at 19/11/2025 00:41:21
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -15409,6 +15409,7 @@ private System.Nullable<decimal> _tanggia;
 private string _tanggiahehang_value;
 private System.Nullable<decimal> _datcoc;
 private string _trangthaict;
+private System.Nullable<System.DateTime> _ngaypass;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -15543,6 +15544,8 @@ partial void OndatcocChanging(System.Nullable<decimal> value);
 partial void OndatcocChanged();
 partial void OntrangthaictChanging(string value);
 partial void OntrangthaictChanged();
+partial void OnngaypassChanging(System.Nullable<System.DateTime> value);
+partial void OnngaypassChanged();
 #endregion
 public c_donhang()
 {
@@ -16783,6 +16786,25 @@ this.OntrangthaictChanged();
 }
 }
 }
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaypass", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaypass
+{
+get
+{
+return this._ngaypass;
+}
+set
+{
+if ((this._ngaypass != value))
+{
+this.OnngaypassChanging(value);
+this.SendPropertyChanging();
+this._ngaypass = value;
+this.SendPropertyChanged("ngaypass");
+this.OnngaypassChanged();
+}
+}
+}
 public event PropertyChangingEventHandler PropertyChanging;
 public event PropertyChangedEventHandler PropertyChanged;
 protected virtual void SendPropertyChanging()
@@ -17534,6 +17556,7 @@ private System.Nullable<System.DateTime> _ngayETD;
 private System.Nullable<System.DateTime> _ngayETA;
 private System.Nullable<System.DateTime> _ngayXuong;
 private System.Nullable<System.DateTime> _ngayCutOff;
+private System.Nullable<System.DateTime> _ngayBHXN;
 private System.Nullable<System.DateTime> _ngaytao;
 private string _nguoitao;
 private System.Nullable<System.DateTime> _ngaycapnhat;
@@ -17575,6 +17598,8 @@ partial void OnngayXuongChanging(System.Nullable<System.DateTime> value);
 partial void OnngayXuongChanged();
 partial void OnngayCutOffChanging(System.Nullable<System.DateTime> value);
 partial void OnngayCutOffChanged();
+partial void OnngayBHXNChanging(System.Nullable<System.DateTime> value);
+partial void OnngayBHXNChanged();
 partial void OnngaytaoChanging(System.Nullable<System.DateTime> value);
 partial void OnngaytaoChanged();
 partial void OnnguoitaoChanging(string value);
@@ -17861,6 +17886,25 @@ this.SendPropertyChanging();
 this._ngayCutOff = value;
 this.SendPropertyChanged("ngayCutOff");
 this.OnngayCutOffChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngayBHXN", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngayBHXN
+{
+get
+{
+return this._ngayBHXN;
+}
+set
+{
+if ((this._ngayBHXN != value))
+{
+this.OnngayBHXNChanging(value);
+this.SendPropertyChanging();
+this._ngayBHXN = value;
+this.SendPropertyChanged("ngayBHXN");
+this.OnngayBHXNChanged();
 }
 }
 }

@@ -18,8 +18,8 @@ public class Controller_HoSoChungTu : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
-            case "hieuluc":
-                this.hieuluc(context);
+            case "selectnhanvienCT":
+                this.selectnhanvienCT(context);
                 break;
             case "ketthuc":
                 this.ketthuc(context);
@@ -44,44 +44,16 @@ public class Controller_HoSoChungTu : IHttpHandler
         }
     }
 
-    public void hieuluc(HttpContext context)
+    public void selectnhanvienCT(HttpContext context)
     {
-        string msg = "";
-        string id = context.Request.Form["id"];
-        try
+        string str = "";
+        str += "<select><option value=\"\"></option>";
+        foreach (var nhanvien in db.nhanviens.Where(s=>s.hoatdong == true))
         {
-            var hsct = db.c_donhangchungtus.Where(s => s.c_donhangchungtu_id == id).FirstOrDefault();
-            if (hsct == null)
-            {
-                msg = $@"Không tìm thấy dòng ""Hồ sơ"" đã chọn";
-                goto EndEventHandler;
-            }
-
-            if (hsct.trangthai != Helper.SOANTHAO)
-            {
-                msg = $@"Hồ sơ không ở trạng thái Soạn Thảo";
-                goto EndEventHandler;
-            }
-
-            var donhang = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
-            if (donhang != null)
-                donhang.trangthaict = "DAHIEULUC";
-            hsct.trangthai = Helper.HIEULUC;
-            hsct.ngaycapnhat = DateTime.Now;
-            hsct.nguoicapnhat = UserUtils.getUser(context);
-            db.SubmitChanges();
+            str += string.Format("<option value=\"{0}\">{1}</option>", nhanvien.manv, nhanvien.manv);
         }
-        catch(Exception ex)
-        {
-            msg = ex.Message;
-        }
-
-        EndEventHandler:;
-
-        if (msg.Length > 0)
-            jqGridHelper.Utils.writeResult(0, msg);
-        else
-            jqGridHelper.Utils.writeResult(1, "Hiệu lực thành công");
+        str += "</select>";
+        context.Response.Write(str);
     }
 
     public void ketthuc(HttpContext context)
@@ -135,7 +107,9 @@ public class Controller_HoSoChungTu : IHttpHandler
         string ngayETA = context.Request.Form["ngayETA"].removeAllSpaceOrTrimText(true);
         string ngayXuong = context.Request.Form["ngayXuong"].removeAllSpaceOrTrimText(true);
         string ngayCutOff = context.Request.Form["ngayCutOff"].removeAllSpaceOrTrimText(true);
+        string ngayBHXN = context.Request.Form["ngayBHXN"].removeAllSpaceOrTrimText(true);
         string mota = context.Request.Form["mota"].removeAllSpaceOrTrimText(true);
+        string trangthai = context.Request.Form["trangthai"].removeAllSpaceOrTrimText(true);
         try
         {
             var hsct = db.c_donhangchungtus.Where(s => s.c_donhangchungtu_id == id).FirstOrDefault();
@@ -151,16 +125,38 @@ public class Controller_HoSoChungTu : IHttpHandler
                 goto EndEventHandler;
             }
 
+            if(hsct.trangthai != Helper.SOANTHAO & trangthai == Helper.SOANTHAO)
+            {
+                msg = $@"Hồ sơ đã Hiệu lực trước đó";
+                goto EndEventHandler;
+            }
+
+            if(hsct.trangthai == Helper.SOANTHAO & trangthai != Helper.SOANTHAO)
+            {
+                var donhang = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
+                if (donhang != null)
+                    donhang.trangthaict = "DAHIEULUC";
+            }
+
+            hsct.trangthai = trangthai;
             hsct.ngaydieuchinh = ngaydieuchinh.ToNullableDate();
             hsct.ngaypass = ngaypass.ToNullableDate();
             hsct.ngaychuyenhoso = ngaychuyenhoso.ToNullableDate();
             hsct.nhanvienCT = nhanvienCT;
             hsct.ngayBookCont = ngayBookCont.ToNullableDate();
             hsct.bookingNo = bookingNo;
-            hsct.ngayETD = ngayETD.ToNullableDate();
             hsct.ngayETA = ngayETA.ToNullableDate();
-            hsct.ngayXuong = ngayXuong.ToNullableDate();
+
+            hsct.ngayETD = ngayETD.ToNullableDate();
+            hsct.ngayBHXN = ngayBHXN.ToNullableDate();
+            if (hsct.ngayETD != null & hsct.ngayBHXN == null)
+                hsct.ngayBHXN = hsct.ngayETD.Value.AddDays(-7);
+
             hsct.ngayCutOff = ngayCutOff.ToNullableDate();
+            hsct.ngayXuong = ngayXuong.ToNullableDate();
+            if (hsct.ngayCutOff != null & hsct.ngayXuong == null)
+                hsct.ngayXuong = hsct.ngayCutOff.Value.AddDays(-7);
+
             hsct.mota = mota;
             hsct.ngaycapnhat = DateTime.Now;
             hsct.nguoicapnhat = UserUtils.getUser(context);
@@ -305,7 +301,7 @@ public class Controller_HoSoChungTu : IHttpHandler
                 , dh2.shipmenttime
                 , DATEADD(day, -7, dh2.shipmenttime) as hangiaohang_po
                 , dh.ngaydieuchinh
-                , dh.ngaypass
+                , dh2.ngaypass
                 , dh.ngaychuyenhoso
                 , dh2.nguoilap
                 , dh.nhanvienCT
@@ -320,6 +316,7 @@ public class Controller_HoSoChungTu : IHttpHandler
                 , dh.bookingNo
                 , dh.ngayETD
                 , dh.ngayETA
+                , dh.ngayBHXN
                 , dh.ngayXuong
                 , dh.ngayCutOff
                 , dh.mota

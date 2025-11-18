@@ -134,12 +134,14 @@ public class DonHangController : IHttpHandler
                     hsct.slcont = slcont_po;
                     hsct.loaicont = loaicont_po;
                     hsct.mota = ghichu_po;
+                    hsct.ngaydieuchinh = nxhdc_po.ToNullableDate();
+                    hsct.ngaychuyenhoso = DateTime.Now;
                     idut = hsct.c_donhangchungtu_id;
                     sctut = dh.sochungtu;
                 }
                 else
                 {
-                    hsct.dongghep = dhut_po;
+                    hsct.dongghep = dh.sochungtu;
                 }
                 hsct.ngaytao = DateTime.Now;
                 hsct.ngaycapnhat = DateTime.Now;
@@ -802,8 +804,13 @@ public class DonHangController : IHttpHandler
         try
         {
             String result = "";
-            String poId = context.Request.QueryString["poId"];
-
+            String poId = context.Request.Form["poId"];
+            var ngaypass = context.Request.Form["ngaypass"].removeAllSpaceOrTrimText(false).ToNullableDate();
+            if(ngaypass == null)
+            {
+                context.Response.Write("Hiện tại trạng thái đơn hàng đã là hiệu lực!");
+                goto EndEventHandler;
+            }
             c_donhang donhang = db.c_donhangs.FirstOrDefault(p => p.c_donhang_id.Equals(poId));
             if (donhang != null)
             {
@@ -833,14 +840,16 @@ public class DonHangController : IHttpHandler
                         else if (donhang.isdonhangtmp.Equals(true) | donhang.donhang_mau.Equals(true))
                         {
                             c_donhang dh = db.c_donhangs.Single(p => p.c_donhang_id == poId);
-                            dh.md_trangthai_id = "HIEULUC";
+                            dh.md_trangthai_id = Helper.HIEULUC;
+                            dh.ngaypass = ngaypass;
                             db.SubmitChanges();
                             result += "Hiệu lực đơn hàng thành công.! <br/>";
                         }
                         else
                         {
                             c_donhang dh = db.c_donhangs.Single(p => p.c_donhang_id == poId);
-                            dh.md_trangthai_id = "HIEULUC";
+                            dh.md_trangthai_id = Helper.HIEULUC;
+                            dh.ngaypass = ngaypass;
                             db.SubmitChanges();
                             result += "Hiệu lực đơn hàng thành công.! <br/>";
                             /*
@@ -927,6 +936,8 @@ public class DonHangController : IHttpHandler
         {
             context.Response.Write(ex.ToString());
         }
+
+        EndEventHandler:;
     }
 
     public void getSelectOption(HttpContext context)
@@ -1529,6 +1540,7 @@ public class DonHangController : IHttpHandler
             dh.chuyenphiDSDH,
             dh.discount_hehang,
             dh.discount_hehang_value,
+            dh.ngaypass,
             ROW_NUMBER() OVER (ORDER BY {2} {3}) as RowNum 
             FROM c_donhang dh with (nolock)
 			left join md_doitackinhdoanh dtkd with (nolock) on dh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
@@ -1608,6 +1620,7 @@ public class DonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["chuyenphiDSDH"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount_hehang"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount_hehang_value"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + ((!row["ngaypass"].ToString().Equals("")) ? DateTime.Parse(row["ngaypass"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

@@ -94,7 +94,7 @@
             });
         } else {
             var sochungtu = $('#grid_ds_po').jqGrid('getCell', id, 'sochungtu');
-            msg = "Có phải bạn muốn hiệu lực PO '" + sochungtu + "'.?";
+            msg = `Có phải bạn muốn hiệu lực PO ${sochungtu}.?<br><br><label>Điền ngày kiểm hóa</label><br><input id="ngaypassPO" type="text"/>`;
             var p = '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span><span id="dialog-caution">' + msg + '</span></p>';
             var h3 = '<h3 style="padding: 10px" class="ui-state-highlight ui-corner-all">' + p + '<div style="display:none" id="wait"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div></h3>';
 
@@ -107,6 +107,7 @@
                 , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                    $('#ngaypassPO').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy', altFormat: 'dd/mm/yy'  });
                 }
                 , buttons:
                 [
@@ -118,7 +119,7 @@
                             $("#btn-active").button("disable");
                             $("#btn-close").button("disable");
 
-                            $.get("Controllers/DonHangController.ashx?action=activepo&poId=" + id, function (result) {
+                            $.post("Controllers/DonHangController.ashx?action=activepo", {ngaypass: $('#ngaypassPO').val(), poId: id}, function (result) {
                                 $("#wait").css("display", "none");
                                 $("#btn-close span").text("Thoát");
                                 $("#btn-close").button("enable");
@@ -1623,6 +1624,18 @@
                 , editable: true
                 , align: 'center'
                 , formoptions: { colpos: 2, rowpos: 18 }
+            },
+            {
+                fixed: true, name: 'ngaypass'
+                , label: 'Ngày pass kiểm hóa'
+                , hidden: true
+                , editrules:{
+                    edithidden:true
+                }
+                , editable: true
+                , align: 'center'
+                , formoptions: { colpos: 1, rowpos: 31 }
+                , editoptions: { disabled: true, dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); if (currentTime) {  currentTime.setDate(currentTime.getDate() + 7) }; var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
             }
             ]"
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
