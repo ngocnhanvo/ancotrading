@@ -469,7 +469,7 @@
     },
     {
         name: 'ngayBHXN'
-        , label: 'Ngày BHXN'
+        , label: 'Ngày bán hàng XNXH'
         , index: 'dh.ngayBHXN'
         , editable: true
         , fixed: true 
