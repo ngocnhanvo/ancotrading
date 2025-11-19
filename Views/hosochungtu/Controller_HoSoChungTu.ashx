@@ -48,7 +48,7 @@ public class Controller_HoSoChungTu : IHttpHandler
     {
         string str = "";
         str += "<select><option value=\"\"></option>";
-        foreach (var nhanvien in db.nhanviens.Where(s=>s.hoatdong == true))
+        foreach (var nhanvien in db.nhanviens.Where(s => s.hoatdong == true).OrderBy(s => s.manv))
         {
             str += string.Format("<option value=\"{0}\">{1}</option>", nhanvien.manv, nhanvien.manv);
         }
@@ -80,7 +80,7 @@ public class Controller_HoSoChungTu : IHttpHandler
             hsct.nguoicapnhat = UserUtils.getUser(context);
             db.SubmitChanges();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = ex.Message;
         }
@@ -125,13 +125,13 @@ public class Controller_HoSoChungTu : IHttpHandler
                 goto EndEventHandler;
             }
 
-            if(hsct.trangthai != Helper.SOANTHAO & trangthai == Helper.SOANTHAO)
+            if (hsct.trangthai != Helper.SOANTHAO & trangthai == Helper.SOANTHAO)
             {
                 msg = $@"Hồ sơ đã Hiệu lực trước đó";
                 goto EndEventHandler;
             }
 
-            if(hsct.trangthai == Helper.SOANTHAO & trangthai != Helper.SOANTHAO)
+            if (hsct.trangthai == Helper.SOANTHAO & trangthai != Helper.SOANTHAO)
             {
                 var donhang = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
                 if (donhang != null)
@@ -162,7 +162,7 @@ public class Controller_HoSoChungTu : IHttpHandler
             hsct.nguoicapnhat = UserUtils.getUser(context);
             db.SubmitChanges();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = ex.Message;
         }
@@ -194,14 +194,14 @@ public class Controller_HoSoChungTu : IHttpHandler
                 goto EndEventHandler;
             }
 
-            if(hsct.trangthai != Helper.SOANTHAO)
+            if (hsct.trangthai != Helper.SOANTHAO)
             {
                 msg = $@"Dòng ""hồ sơ"" không ở trạng thái Soạn Thảo";
                 goto EndEventHandler;
             }
 
             var dh = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
-            if(dh != null)
+            if (dh != null)
             {
                 if (dh.md_trangthai_id == Helper.SOANTHAO)
                     dh.trangthaict = Helper.CHUAGUI;
@@ -226,7 +226,7 @@ public class Controller_HoSoChungTu : IHttpHandler
                     File.Delete(link);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = ex.Message;
         }

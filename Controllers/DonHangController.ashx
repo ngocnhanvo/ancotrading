@@ -818,7 +818,20 @@ public class DonHangController : IHttpHandler
                 switch (trangthai)
                 {
                     case "HIEULUC":
-                        context.Response.Write("Hiện tại trạng thái đơn hàng đã là hiệu lực!");
+                        if(donhang.ngaypass != null)
+                            context.Response.Write("Ngày pass kiểm hóa đã được thêm trước đó");
+                        else
+                        {
+                            if(ngaypass == null)
+                                context.Response.Write("Ngày pass kiểm hóa không thể trống");
+                            else
+                            {
+                                donhang.ngaypass = ngaypass;
+                                donhang.ngaycapnhat = DateTime.Now;
+                                db.SubmitChanges();
+                                result += "Bổ sung ngày pass kiểm hóa thành công <br/>";
+                            }
+                        }
                         break;
                     case "KETTHUC":
                         context.Response.Write("Hiện tại trạng thái đơn hàng đã là kết thúc!");
