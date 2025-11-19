@@ -104,16 +104,16 @@ public class DonHangController : IHttpHandler
         {
             string[] ids = context.Request.Params["id"].Split(',');
             var dhs = db.c_donhangs.Where(s => ids.Contains(s.c_donhang_id)).ToList();
-            var dhst = dhs.Where(s => s.md_trangthai_id == Helper.SOANTHAO).Select(s => s.sochungtu).OrderBy(s=>s).ToList();
-            if(dhst.Count > 0)
+            var dhst = dhs.Where(s => s.md_trangthai_id == Helper.SOANTHAO).Select(s => s.sochungtu).OrderBy(s => s).ToList();
+            if (dhst.Count > 0)
             {
                 msg = $@"Đơn hàng ""{string.Join(", ", dhst)}"" chưa Hiệu Lực";
                 goto EndEventHandler;
             }
 
             var chuaguis = new string[] { Helper.CHUAGUI, Helper.TUCHOI };
-            var dhdg = dhs.Where(s => !chuaguis.Contains(s.trangthaict) & !string.IsNullOrEmpty(s.trangthaict)).Select(s => s.sochungtu).OrderBy(s=>s).ToList();
-            if(dhdg.Count > 0)
+            var dhdg = dhs.Where(s => !chuaguis.Contains(s.trangthaict) & !string.IsNullOrEmpty(s.trangthaict)).Select(s => s.sochungtu).OrderBy(s => s).ToList();
+            if (dhdg.Count > 0)
             {
                 msg = $@"Đơn hàng ""{string.Join(", ", dhdg)}"" đã gửi trước đó";
                 goto EndEventHandler;
@@ -122,7 +122,7 @@ public class DonHangController : IHttpHandler
             int count = 0;
             string idut = "", sctut = "";
             dhs = dhs.OrderBy(s => s.c_donhang_id == dhut_po ? 0 : 1).ToList();
-            foreach(var dh in dhs)
+            foreach (var dh in dhs)
             {
                 dh.trangthaict = Helper.DAGUI;
                 var hsct = new c_donhangchungtu();
@@ -216,7 +216,7 @@ public class DonHangController : IHttpHandler
                     string manv = UserUtils.getUser(context);
                     var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
                     var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
-                    if(!string.IsNullOrWhiteSpace(nv.smtp))
+                    if (!string.IsNullOrWhiteSpace(nv.smtp))
                     {
                         smtp = db.md_smtps.Where(s => s.md_smtp_id == nv.smtp).FirstOrDefault();
                     }
@@ -271,7 +271,7 @@ public class DonHangController : IHttpHandler
         {
             user = user.Trim();
             var nv = db.nhanviens.Where(s => s.manv == user).FirstOrDefault();
-            if(nv == null)
+            if (nv == null)
             {
                 msg = string.Format("Không tìm thấy tài khoản có mã là {0}.", user);
                 goto EndEventHandler;
@@ -279,11 +279,11 @@ public class DonHangController : IHttpHandler
 
             string[] ids = context.Request.Params["id"].Split(',');
             int count = 0;
-            foreach(var id in ids)
+            foreach (var id in ids)
             {
                 //Don hang
                 var dh = db.c_donhangs.Where(p => p.c_donhang_id.Equals(id)).FirstOrDefault();
-                if(dh != null)
+                if (dh != null)
                 {
                     if (dh.nguoilap != nv.manv)
                     {
@@ -309,7 +309,7 @@ public class DonHangController : IHttpHandler
                     }
                     //Danh Sach Dat Hang
                     var dsdhs = db.c_danhsachdathangs.Where(s => s.c_donhang_id == dh.c_donhang_id).ToList();
-                    foreach(var dsdh in dsdhs)
+                    foreach (var dsdh in dsdhs)
                     {
                         dsdh.nguoi_dathang = nv.manv;
                         dsdh.nguoi_phutrach = nv.manv;
@@ -805,12 +805,6 @@ public class DonHangController : IHttpHandler
         {
             String result = "";
             String poId = context.Request.Form["poId"];
-            var ngaypass = context.Request.Form["ngaypass"].removeAllSpaceOrTrimText(false).ToNullableDate();
-            if(ngaypass == null)
-            {
-                context.Response.Write("Hiện tại trạng thái đơn hàng đã là hiệu lực!");
-                goto EndEventHandler;
-            }
             c_donhang donhang = db.c_donhangs.FirstOrDefault(p => p.c_donhang_id.Equals(poId));
             if (donhang != null)
             {
@@ -818,20 +812,7 @@ public class DonHangController : IHttpHandler
                 switch (trangthai)
                 {
                     case "HIEULUC":
-                        if(donhang.ngaypass != null)
-                            context.Response.Write("Ngày pass kiểm hóa đã được thêm trước đó");
-                        else
-                        {
-                            if(ngaypass == null)
-                                context.Response.Write("Ngày pass kiểm hóa không thể trống");
-                            else
-                            {
-                                donhang.ngaypass = ngaypass;
-                                donhang.ngaycapnhat = DateTime.Now;
-                                db.SubmitChanges();
-                                result += "Bổ sung ngày pass kiểm hóa thành công <br/>";
-                            }
-                        }
+                        context.Response.Write("Hiện tại trạng thái đơn hàng đã là hiệu lực!");
                         break;
                     case "KETTHUC":
                         context.Response.Write("Hiện tại trạng thái đơn hàng đã là kết thúc!");
@@ -854,7 +835,6 @@ public class DonHangController : IHttpHandler
                         {
                             c_donhang dh = db.c_donhangs.Single(p => p.c_donhang_id == poId);
                             dh.md_trangthai_id = Helper.HIEULUC;
-                            dh.ngaypass = ngaypass;
                             db.SubmitChanges();
                             result += "Hiệu lực đơn hàng thành công.! <br/>";
                         }
@@ -862,7 +842,6 @@ public class DonHangController : IHttpHandler
                         {
                             c_donhang dh = db.c_donhangs.Single(p => p.c_donhang_id == poId);
                             dh.md_trangthai_id = Helper.HIEULUC;
-                            dh.ngaypass = ngaypass;
                             db.SubmitChanges();
                             result += "Hiệu lực đơn hàng thành công.! <br/>";
                             /*
@@ -949,8 +928,6 @@ public class DonHangController : IHttpHandler
         {
             context.Response.Write(ex.ToString());
         }
-
-        EndEventHandler:;
     }
 
     public void getSelectOption(HttpContext context)
@@ -1084,6 +1061,9 @@ public class DonHangController : IHttpHandler
                     mnu.phienbangiacu = phienbangiacu;
                     mnu.ghichu = context.Request.Form["ghichu"];
 
+                    if (mnu.ngaypass == null)
+                        mnu.ngaypass = context.Request.Form["ngaypass"].removeAllSpaceOrTrimText(false).ToNullableDate();
+
                     if (!context.Request.Form["ngaydieuchinh"].Equals(""))
                     {
                         mnu.ngaydieuchinh = DateTime.ParseExact(context.Request.Form["ngaydieuchinh"], "dd/MM/yyyy", null);
@@ -1133,8 +1113,8 @@ public class DonHangController : IHttpHandler
                     {
                         db.c_donhangs.InsertOnSubmit(mnu);
 
-                        var spd = db.md_doitackinhdoanh_spds.Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id).OrderByDescending(s=>s.ngaytao).FirstOrDefault();
-                        if(spd != null)
+                        var spd = db.md_doitackinhdoanh_spds.Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id).OrderByDescending(s => s.ngaytao).FirstOrDefault();
+                        if (spd != null)
                         {
                             var spd2 = new c_donhang_spd();
                             spd2.c_donhang_spd_id = Helper.getNewId();
@@ -1227,14 +1207,22 @@ public class DonHangController : IHttpHandler
             md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(p => p.md_doitackinhdoanh_id.Equals(context.Request.Form["md_doitackinhdoanh_id"]));
             md_cangbien cb = db.md_cangbiens.FirstOrDefault(p => p.md_cangbien_id.Equals(md_cangbien_id));
             c_donhang m = db.c_donhangs.Single(p => p.c_donhang_id == context.Request.Form["id"]);
-            if (m.md_trangthai_id.Equals("HIEULUC"))
+            if (m.md_trangthai_id.Equals(Helper.HIEULUC))
             {
                 m.portdischarge = context.Request.Form["portdischarge"];
                 m.mota = context.Request.Form["mota"];
                 m.ghichu = context.Request.Form["ghichu"];
+                var ngaypass = context.Request.Form["ngaypass"].removeAllSpaceOrTrimText(false).ToNullableDate();
+                if (m.ngaypass == null)
+                    m.ngaypass = ngaypass;
+                else if (m.ngaypass != ngaypass)
+                {
+                    jqGridHelper.Utils.writeResult(0, "Không thể đổi ngày pass kiểm hóa khi đơn hàng đã hiệu lực và ngày đã có giá trị trước đó.");
+                    goto EndEventHandler;
+                }
                 db.SubmitChanges();
             }
-            else if(m.md_doitackinhdoanh_id != dtkd.md_doitackinhdoanh_id)
+            else if (m.md_doitackinhdoanh_id != dtkd.md_doitackinhdoanh_id)
             {
                 jqGridHelper.Utils.writeResult(0, "Không thể đổi khách hàng.");
             }
@@ -1282,6 +1270,7 @@ public class DonHangController : IHttpHandler
                     m.hoahong = decimal.Parse(context.Request.Form["hoahong"]);
                     m.md_nguoilienhe_id = context.Request.Form["md_nguoilienhe_id"];
                     m.ghichu = context.Request.Form["ghichu"];
+                    m.ngaypass = context.Request.Form["ngaypass"].removeAllSpaceOrTrimText(false).ToNullableDate();
 
                     if (!context.Request.Form["ngaydieuchinh"].Equals(""))
                     {
@@ -1373,6 +1362,8 @@ public class DonHangController : IHttpHandler
         {
             jqGridHelper.Utils.writeResult(0, ex + "");
         }
+
+        EndEventHandler:;
     }
 
     public void del(HttpContext context)
