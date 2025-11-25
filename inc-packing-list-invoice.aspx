@@ -389,7 +389,7 @@
                  , formoptions: { colpos: 1, rowpos: 2 }
             },
 			{
-                fixed: true, name: 'nguoitao'
+                fixed: true, name: 'nguoitao', hidden: true
                 , index: 'nguoitao1'
                 , label: 'Người Tạo'
                 , width: 100
@@ -410,7 +410,7 @@
                  , formoptions: { colpos: 1, rowpos: 4 }
             },
             {
-                 fixed: true, name: 'nguoilap'
+                 fixed: true, name: 'nguoilap', hidden: true
                  , index: 'nguoilap'
                  , label: 'Người Lập'
                  , editable: true
@@ -419,7 +419,7 @@
                  , formoptions: { colpos: 1, rowpos: 5 }
             },
             {
-                 fixed: true, name: 'consignee'
+                 fixed: true, name: 'consignee', hidden: true
                  , label: 'Consignee'
                  , index: 'consignee'
                  , editable: true
@@ -428,7 +428,7 @@
                  , formoptions: { colpos: 1, rowpos: 6 }
             },
             {
-                 fixed: true, name: 'notifparty'
+                 fixed: true, name: 'notifparty', hidden: true
                  , label: 'Notifparty'
                  , index: 'notifparty'
                  , editable: true
@@ -437,7 +437,7 @@
                  , formoptions: { colpos: 1, rowpos: 7 }
             },
             {
-                 fixed: true, name: 'alsonotifyparty'
+                 fixed: true, name: 'alsonotifyparty', hidden: true
                  , label: 'Alsonotifyparty'
                  , index: 'alsonotifyparty'
                  , editable: true

@@ -131,11 +131,29 @@ public class Controller_HoSoChungTu : IHttpHandler
                 goto EndEventHandler;
             }
 
+            var donhang = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
             if (hsct.trangthai == Helper.SOANTHAO & trangthai != Helper.SOANTHAO)
             {
-                var donhang = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
                 if (donhang != null)
+                {
                     donhang.trangthaict = "DAHIEULUC";
+                }
+            }
+
+            if(trangthai != hsct.trangthai)
+            {
+                if(!string.IsNullOrWhiteSpace(hsct.dongghep) & donhang.sochungtu != hsct.dongghep)
+                {
+                    msg = $@"Hồ sơ có đơn hàng được ghép với đơn hàng ""{hsct.dongghep}""";
+                    goto EndEventHandler;
+                }
+                else
+                {
+                    foreach(var hsctk in db.c_donhangchungtus.Where(s=>s.dongghep == donhang.sochungtu & s.c_donhangchungtu_id != hsct.c_donhangchungtu_id))
+                    {
+                        hsctk.trangthai = trangthai;
+                    }
+                }
             }
 
             hsct.trangthai = trangthai;

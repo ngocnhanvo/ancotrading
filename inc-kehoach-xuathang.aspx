@@ -516,31 +516,20 @@
             FuncActive="activeKHXH"
             FuncKetThuc="KetThucKeHoach"
             FuncAutoKetThuc="AuToKetThucKeHoach"
-            ColNames="['c_kehoachxuathang_id','TT','Khách Hàng', 'Đơn Hàng'
-                    , 'Danh Sách Đặt Hàng', 'Nhà Cung Ứng', 'CL Hàng', 'CBM', 'CBM Còn Lại', 'Shipment Time(P/O)'
-                    , 'Shipment Time(KH)', 'Ngày Xong Hàng', 'Ngày Xong Hàng(D/C)', 'Tem,Bao Bì Trễ Nhất', 'KO Tem'
-                    , 'Ngày Xác Nhận Tem', 'KO Bao Bì', 'Ngày Xác Nhận Bao Bì'
-					, 'Ngày Kiểm Hàng', 'Khách Không Kiểm Hàng', 'Ngày Khách Kiểm Hàng', 'Kết quả kiểm hàng', 'Ngày Vận Đơn(ETD)'
-					, 'Nhân Viên Chứng Từ', 'Người Lập DSDH', 'Trễ(NV)', 'Trễ(NCU)'
-					, 'Ngày Mở Tờ Khai'
-                    , 'Tháng', 'Năm',  'Ghi Chú'
-                    , 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật'
-                    , 'Người Cập Nhật', 'Mô Tả', 'Hoạt Động']"
             RowNumbers="true"
             OndblClickRow = "dupEditKeHoachXH"
             ColModel = "[
             {
-                fixed: true, name: 'c_kehoachxuathang_id'
+                fixed: true, name: 'c_kehoachxuathang_id', label: 'c_kehoachxuathang_id'
                 , index: 'c_kehoachxuathang_id'
                 , width: 100
                 , editable:true
                 , edittype: 'text'
                 , key: true
                 , hidden:true
-				, formoptions: { colpos: 1, rowpos: 1}
             },
             {
-                 fixed: true, name: 'md_trangthai_id'
+                 fixed: true, name: 'md_trangthai_id', label: 'TT', hidden: true
                  , index: 'kh.md_trangthai_id'
                  , editable: false
                  , width: 100
@@ -551,326 +540,178 @@
                  , search : true
                  , stype : 'select'
                  , searchoptions:{sopt:['in'], value:'SOANTHAO,HIEULUC:SOẠN THẢO & HIỆU LỰC;:[ALL];SOANTHAO:SOẠN THẢO;HIEULUC:HIỆU LỰC;KETTHUC:KẾT THÚC' }
-				 , formoptions: { colpos: 1, rowpos: 2}
+            },
+            {
+                 fixed: true, name: 'nguoilap', label: 'Người lập'
+                 , index: 'nv.hoten'
+                 , editable: false
+                 , width: 100
+                 , edittype: 'text'
             },
 			{
-                fixed: true, name: 'khachhang'
+                fixed: true, name: 'khachhang', label: 'Khách hàng'
                 , index: 'khachhang.ma_dtkd'
                 , width: 100
                 , editable: false
                 , edittype: 'text'
                 , editoptions: { readonly: 'readonly' }
-				, formoptions: { colpos: 1, rowpos: 3}
             },
             {
-                fixed: true, name: 'c_donhang_id'
+                fixed: true, name: 'c_donhang_id', label: 'PO'
                 , index: 'dh.sochungtu'
                 , width: 100
                 , editable: false
                 , edittype: 'text'
-				, formoptions: { colpos: 1, rowpos: 4}
-            },
-			{
-                 fixed: true, name: 'c_danhsachdathang_id'
-                 , index: 'kh.c_danhsachdathang_id'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-                 , editoptions: { readonly: 'readonly' }
-				 , formoptions: { colpos: 1, rowpos: 5 }
             },
             {
-                fixed: true, name: 'md_doitackinhdoanh_id'
+                fixed: true, name: 'md_doitackinhdoanh_id', label: 'Nhà cung ứng'
                 , index: 'dtkd.ma_dtkd'
                 , width: 70
                 , editable: true
                 , edittype: 'text'
                 , editoptions: { readonly: 'readonly' }
-				, formoptions: { colpos: 1, rowpos: 6 }
             },
             {
-                 fixed: true, name: 'chungloaihang'
+                 fixed: true, name: 'chungloaihang', label: 'Chủng loại hàng'
                  , index: 'kh.chungloaihang'
                  , editable: true
                  , width: 50
-                 , edittype: 'textarea'
-				, formoptions: { colpos: 1, rowpos: 7}				 
+                 , edittype: 'textarea'			 
             },
             {
-                 fixed: true, name: 'cbm'
-                 , index: 'kh.cbm'
-                 , editable: true
+                 fixed: true, name: 'cont20', label: '20'
+                 , index: 'kh.chungloaihang'
+                 , editable: false
                  , width: 50
-                 , edittype: 'text'   
-                 , editoptions: { readonly: 'readonly' }              
-                 , align:'right'
-				 , formoptions: { colpos: 1, rowpos: 8}
+                 , edittype: 'text'				 
             },
             {
-                 fixed: true, name: 'cbm_conlai'
-                 , index: 'kh.cbm'
-                 , editable: true
+                 fixed: true, name: 'cont40', label: '40dc'
+                 , index: 'kh.chungloaihang'
+                 , editable: false
                  , width: 50
-                 , edittype: 'text'   
-                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 3, prefix: ''}   
-                 , align:'right'
-				 , formoptions: { colpos: 1, rowpos: 9}
+                 , edittype: 'text'				 
             },
             {
-                 fixed: true, name: 'shipmenttime'
+                 fixed: true, name: 'cont40hc', label: '40hc'
+                 , index: 'kh.chungloaihang'
+                 , editable: false
+                 , width: 50
+                 , edittype: 'text'				 
+            },
+            {
+                 fixed: true, name: 'contle', label: 'LCL'
+                 , index: 'kh.contle'
+                 , editable: false
+                 , width: 50
+                 , edittype: 'text'				 
+            },
+            {
+                 fixed: true, name: 'shipmenttime', label: 'Shipment Time'
                  , index: 'kh.shipmenttime'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
                  , editoptions: { readonly: 'readonly' }
-				 , formoptions: { colpos: 1, rowpos: 10}
             },
             {
-                 fixed: true, name: 'ngaygiaohang'
-                 , index: 'kh.ngaygiaohang'
-                 , editable: false
-                 , width: 100
-                 , edittype: 'text'
-                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-				 , hidden: true
-				 , formoptions: { colpos: 1, rowpos: 11}
-            },
-			{
-                 fixed: true, name: 'ngayxonghang_xxn'
-                 , index: 'kh.ngayxonghang_xxn'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-				 , editoptions: { readonly: 'readonly' }
-				 , formatter: nxh_xxn
-				 , formoptions: { colpos: 1, rowpos: 12}
-            },
-            {
-                 fixed: true, name: 'ngayxonghang'
+                 fixed: true, name: 'ngayxonghang', label: 'Ngày xong hàng'
                  , index: 'kh.ngayxonghang'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
                  , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-				 , formoptions: { colpos: 1, rowpos: 13}
-            },
-			{
-                 fixed: true, name: 'ngayxacnhanbaobi'
-                 , index: 'kh.ngayxacnhanbaobi'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-				 , formoptions: { colpos: 1, rowpos: 18}
-				 , formatter: xnbb_dnow
             },
             {
-                fixed: true, name: 'khongtem'
-                , index: 'kh.khongtem'
-                , width: 50
-                , editable:true
-                , edittype: 'checkbox'
-                , align: 'center'
-                , editoptions:{ value:'True:False', defaultValue: 'True' }
-                , formatter: 'checkbox'
-				, formoptions: { colpos: 1, rowpos: 14}
-            },
-            {
-                 fixed: true, name: 'ngayxacnhantem'
-                 , index: 'kh.ngayxacnhantem'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-				 , formoptions: { colpos: 1, rowpos: 15}
-            },
-            {
-                fixed: true, name: 'khongbaobi'
-                , index: 'kh.khongbaobi'
-                , width: 50
-                , editable:true
-                , edittype: 'checkbox'
-                , align: 'center'
-                , editoptions:{ value:'True:False', defaultValue: 'True' }
-                , formatter: 'checkbox'
-				, formoptions: { colpos: 1, rowpos: 16}
-            },           
-			{
-                 fixed: true, name: 'ngaytrenhat'
-                 , index: 'P.ngaytrenhat'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-				 , align:'right'
-                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-				 , sortable: true
-				 , formoptions: { colpos: 1, rowpos: 17}
-            },
-            {
-                 fixed: true, name: 'ngaykiemhang'
-                 , index: 'kh.ngaykiemhang'
-                 , editable: false
-                 , width: 100
-                 , edittype: 'text'
-                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-				 , hidden: true
-				 , formoptions: { colpos: 1, rowpos: 19}
-            },
-            {
-                fixed: true, name: 'khongkhachkiem'
-                , index: 'kh.khongkhachkiem'
-                , width: 100
-                , editable:true
-                , edittype: 'checkbox'
-                , align: 'center'
-                , editoptions:{ value:'True:False', defaultValue: 'False' }
-                , formatter: 'checkbox'
-				, hidden: true
-				, formoptions: { colpos: 1, rowpos: 20}
-            },
-            {
-                 fixed: true, name: 'ngaykhachkiem'
-                 , index: 'kh.ngaykhachkiem'
-                 , editable: false
-                 , width: 100
-                 , edittype: 'text'
-                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-				 , hidden: true
-				 , formoptions: { colpos: 1, rowpos: 21}
-            },
-			{
-                 fixed: true, name: 'ketquakiemhang'
+                 fixed: true, name: 'ketquakiemhang', label: 'Kết quả kiểm hàng'
                  , index: 'kh.ketquakiemhang'
                  , editable: false
                  , width: 100
                  , edittype: 'text'
 				 , hidden: true
-				 , formoptions: { colpos: 1, rowpos: 22}
             },
-			{
-                 fixed: true, name: 'etd'
+            {
+                 fixed: true, name: 'etd', label: 'ETD'
                  , index: 'P.etd'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
+                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); } }
+            },
+			{
+                 fixed: true, name: 'Booking no'
+                 , index: 'kh.ngayxacnhanbaobi'
+                 , editable: true
+                 , width: 100
+                 , edittype: 'text'
                  , editoptions: { readonly: 'readonly' }
-				 , formoptions: { colpos: 1, rowpos: 24}
             },
-			{
-                 fixed: true, name: 'nhanvienct'
-                 , index: 'kh.nhanvienct'
+            {
+                 fixed: true, name: 'hxnxh', label: 'Hạn xác nhận XH'
+                 , index: 'P.etd'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
-				 , formoptions: { colpos: 1, rowpos: 23}
-            },
-			{
-                 fixed: true, name: 'nguoilap'
-                 , index: 'nv.hoten'
-                 , editable: false
-                 , width: 100
-                 , edittype: 'text'
-				 , formoptions: { colpos: 1, rowpos: 25}
-            },
-			{
-                 fixed: true, name: 'tre_nv'
-                 , index: 'P.tre_nv'
-                 , editable: false
-                 , width: 100
-                 , edittype: 'text'
-				 , formoptions: { colpos: 1, rowpos: 26}
-            },
-			{
-                 fixed: true, name: 'tre'
-                 , index: 'P.tre'
-                 , editable: false
-                 , width: 100
-                 , edittype: 'text'
-				 , formoptions: { colpos: 1, rowpos: 27}
+                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); } }
             },
             {
-                 fixed: true, name: 'ngayxuathang'
-                 , index: 'kh.ngayxuathang'
+                 fixed: true, name: 'hccct', label: 'Hạn cung cấp chi tiết'
+                 , index: 'P.etd'
                  , editable: true
                  , width: 100
                  , edittype: 'text'
-                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-				 , hidden: true
-				 , formoptions: { colpos: 1, rowpos: 28}
+                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); } }
             },
             {
-                 fixed: true, name: 'thang'
-                 , index: 'kh.thang'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-                 , hidden: true
-				 , formoptions: { colpos: 1, rowpos: 29}
+                fixed: true, name: 'mota', label: 'Ghi chú'
+                , index: 'kh.mota'
+                , width: 100
+                , editable:true
+                , edittype: 'textarea'
+                , hidden: false
             },
             {
-                 fixed: true, name: 'nam'
-                 , index: 'kh.nam'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-                 , hidden: true
-				 , formoptions: { colpos: 1, rowpos: 29}
+                fixed: true, name: 'bhchs', label: 'Bán hàng chuyển hồ sơ'
+                , index: 'kh.mota'
+                , width: 100
+                , editable:true
+                , edittype: 'textarea'
+                , hidden: false
             },
             {
-                 fixed: true, name: 'ghichu'
-                 , index: 'kh.ghichu'
-                 , editable: true
-                 , width: 100
-                 , edittype: 'text'
-				 , formoptions: { colpos: 1, rowpos: 30}
-            },
-            {
-                fixed: true, name: 'ngaytao'
+                fixed: true, name: 'ngaytao', label: 'Ngày tạo'
                 , index: 'kh.ngaytao'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
                 , hidden: true
-				, formoptions: { colpos: 1, rowpos: 31}
             },
             {
-                fixed: true, name: 'nguoitao'
+                fixed: true, name: 'nguoitao', label: 'Người tạo'
                 , index: 'kh.nguoitao'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
 				, hidden: true
-				, formoptions: { colpos: 1, rowpos: 32}
             },
             {
-                fixed: true, name: 'ngaycapnhat'
+                fixed: true, name: 'ngaycapnhat', label: 'Ngày cập nhật'
                 , index: 'kh.ngaycapnhat'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
                 , hidden: true
-				, formoptions: { colpos: 1, rowpos: 33}
             },
             {
-                fixed: true, name: 'nguoicapnhat'
+                fixed: true, name: 'nguoicapnhat', label: 'Người cập nhật'
                 , index: 'kh.nguoicapnhat'
                 , width: 100
                 , editable:false
                 , edittype: 'text'
                 , hidden: true
-				, formoptions: { colpos: 1, rowpos: 34}
             },
             {
-                fixed: true, name: 'mota'
-                , index: 'kh.mota'
-                , width: 100
-                , editable:true
-                , edittype: 'textarea'
-                , hidden: true
-				, formoptions: { colpos: 1, rowpos: 35}
-            },
-            {
-                fixed: true, name: 'hoatdong', hidden: true
+                fixed: true, name: 'hoatdong', hidden: true, label: 'Hoạt động'
                 , index: 'kh.hoatdong'
                 , width: 100
                 , editable:true
@@ -878,7 +719,6 @@
                 , align: 'center'
                 , editoptions:{ value:'True:False', defaultValue: 'True' }
                 , formatter: 'checkbox'
-				, formoptions: { colpos: 1, rowpos: 36}
             }
             ]"
             FilterToolbar="true"

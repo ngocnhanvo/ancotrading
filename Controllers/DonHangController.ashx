@@ -141,7 +141,7 @@ public class DonHangController : IHttpHandler
                 }
                 else
                 {
-                    hsct.dongghep = dh.sochungtu;
+                    hsct.dongghep = sctut;
                 }
                 hsct.ngaytao = DateTime.Now;
                 hsct.ngaycapnhat = DateTime.Now;

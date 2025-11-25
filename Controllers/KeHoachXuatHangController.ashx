@@ -349,8 +349,10 @@ public class KeHoachXuatHangController : IHttpHandler {
 	        ngaygiaohang datetime,
 	        ngayxonghang datetime,
 	        cont20 decimal(18, 4),
-	        cont40 decimal(18, 4),
-	        cont40hc decimal(18, 4),
+            cont40 decimal(18, 4),
+            cont40hc decimal(18, 4),
+            cont45 decimal(18, 4),
+            contle decimal(18, 4),
 	        ngayxuathang datetime,
 	        ghichu nvarchar(MAX),
 	        ketquakiemhang nvarchar(MAX),
@@ -394,9 +396,11 @@ public class KeHoachXuatHangController : IHttpHandler {
             kh.c_danhsachdathang_id, 
 	        kh.ngaygiaohang, 
             kh.ngayxonghang, 
-            kh.cont20, 
-            kh.cont40, 
-            kh.cont40hc, 
+            dh.cont20,
+            dh.cont40,
+            dh.cont40hc,
+            dh.cont45,
+            dh.contle,
             kh.ngayxuathang,
 	        kh.ghichu, 
             kh.ketquakiemhang, 
@@ -466,39 +470,29 @@ public class KeHoachXuatHangController : IHttpHandler {
                 select
                 kh.c_kehoachxuathang_id
 			    , kh.md_trangthai_id
+                , kh.nguoilap
+                , kh.khachhang
 			    , kh.sochungtu as ct_dh 
-                , kh.c_danhsachdathang_id
-			    , kh.ma_dtkd
-			    , kh.chungloaihang 
-                , kh.cbm 
-                , kh.cbm_conlai 
+                , kh.ma_dtkd
+                , kh.chungloaihang
+                , kh.cont20
+                , kh.cont40
+                , kh.cont40hc
+                , kh.cont45
+                , kh.contle
                 , kh.shipmenttime
-			    , kh.ngayxonghang_xxn
-			    , kh.ngayxonghang
-			    , kh.ngayxnbaobi as ngaytrenhat
-			    , kh.khongtem 
-			    , kh.ngayxacnhantem
-			    , kh.khongbaobi
-			    , kh.ngayxacnhanbaobi
-			    , kh.ngaykiemhang
-			    , kh.ngaykhachkiem			
-			    , kh.ketquakiemhang
-			    , (select top 1 inv.ngay_motokhai from @tblINV inv where inv.donhangId = kh.c_donhang_id order by inv.ngay_motokhai asc) as etd
-			    , kh.nguoilap
-			    , kh.tre
-			    , kh.khachhang
-			    , kh.ghichu 
-                , kh.khongkhachkiem
-                , kh.ngayxuathang
-                , kh.ngaygiaohang
-                , kh.thang
-                , kh.nam
-                , kh.nhanvienct  
+                , kh.ngayxonghang
+                , kh.ketquakiemhang
+                , (select top 1 inv.ngay_motokhai from @tblINV inv where inv.donhangId = kh.c_donhang_id order by inv.ngay_motokhai asc) as etd
+			    , null as BookingNo
+			    , null as hxnxh
+			    , null as hccct 
+                , kh.mota
+                , null as bhchs 
                 , kh.ngaytao
                 , kh.nguoitao
                 , kh.ngaycapnhat
                 , kh.nguoicapnhat
-                , kh.mota
                 , kh.hoatdong 
                 , ROW_NUMBER() OVER (ORDER BY {5} {6}) as RowNum 
                 FROM @tblKHXH kh
@@ -543,7 +537,6 @@ public class KeHoachXuatHangController : IHttpHandler {
         var dt = mdbc.GetData(strsql, "@start", start, "@end", end, "@count", 0);
 
         int colCount = dt.Columns.Count;
-
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
         xml += "<page>" + page + "</page>";
@@ -551,53 +544,32 @@ public class KeHoachXuatHangController : IHttpHandler {
         xml += "<records>" + count + "</records>";
         foreach (System.Data.DataRow row in dt.Rows)
         {
-            String a = row[9].ToString();
             xml += "<row>";
-            xml += "<cell><![CDATA[" + row["c_kehoachxuathang_id"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["md_trangthai_id"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["khachhang"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["ct_dh"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["c_danhsachdathang_id"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["chungloaihang"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["cbm"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["cbm_conlai"] + "]]></cell>";
-
-            xml += "<cell><![CDATA[" + (!row["shipmenttime"].ToString().Equals("") ? DateTime.Parse(row["shipmenttime"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-            xml += "<cell><![CDATA[" + (!row["ngaygiaohang"].ToString().Equals("") ? DateTime.Parse(row["ngaygiaohang"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-            xml += "<cell><![CDATA[" + (!row["ngayxonghang_xxn"].ToString().Equals("") ? DateTime.Parse(row["ngayxonghang_xxn"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-            xml += "<cell><![CDATA[" + (!row["ngayxonghang"].ToString().Equals("") ? DateTime.Parse(row["ngayxonghang"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-            xml += "<cell><![CDATA[" + (!row["ngayxacnhanbaobi"].ToString().Equals("") ? DateTime.Parse(row["ngayxacnhanbaobi"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-
-            xml += "<cell><![CDATA[" + row["khongtem"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + (!row["ngayxacnhantem"].ToString().Equals("") ? DateTime.Parse(row["ngayxacnhantem"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-
-            xml += "<cell><![CDATA[" + row["khongbaobi"] + "]]></cell>";
-
-            xml += "<cell><![CDATA[" + (!row["ngaytrenhat"].ToString().Equals("") ? DateTime.Parse(row["ngaytrenhat"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-            xml += "<cell><![CDATA[" + (!row["ngaykiemhang"].ToString().Equals("") ? DateTime.Parse(row["ngaykiemhang"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["khongkhachkiem"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + (!row["ngaykhachkiem"].ToString().Equals("") ? DateTime.Parse(row["ngaykhachkiem"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-
-            xml += "<cell><![CDATA[" + row["ketquakiemhang"] + "]]></cell>";
-
-            xml += "<cell><![CDATA[" + (!row["etd"].ToString().Equals("") ? DateTime.Parse(row["etd"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["nhanvienct"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["nguoilap"] + "]]></cell>";
-
-            xml += "<cell><![CDATA[" + row["tre_nv"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["tre"] + "]]></cell>";
-
-            xml += "<cell><![CDATA[" + (!row["ngayxuathang"].ToString().Equals("") ? DateTime.Parse(row["ngayxuathang"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["thang"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["nam"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["nguoicapnhat"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";
+            foreach (System.Data.DataColumn column in dt.Columns)
+            {
+                if (column.DataType == System.Type.GetType("System.DateTime"))
+                {
+                    try
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)row[column.ColumnName]).ToString("dd/MM/yyyy"));
+                    }
+                    catch
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
+                    }
+                }
+                else if (column.DataType == Type.GetType("System.Decimal"))
+                {
+                    if (row[column.ColumnName] != null)
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
+                    else
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
+                }
+                else
+                {
+                    xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
+                }
+            }
             xml += "</row>";
         }
         xml += "</rows>";
