@@ -29,6 +29,19 @@
             , hidden: true
         },
         {
+            name: 'trangthai'
+            , label: 'TT'
+            , index: 'trangthai'
+            , editable: false
+            , fixed:true , width: 100
+            , edittype: 'text'
+            , align:'center'
+            , formatter: 'trangthai'
+            , search : true
+            , stype : 'select'
+            , searchoptions:{sopt:['eq'], value:':[ALL];CHUAGUI:Chưa gửi;DAGUI:Đã gửi' }
+        },
+        {
             fixed: true, name: 'Forwarder'
             , label: 'Forwarder'
             , index: 'spd.Forwarder'
@@ -206,6 +219,9 @@
             beforeShowForm: function (formid) {
                 formid.closest('div.ui-jqdialog').dialogCenter(); 
             },
+            afterSubmit: function(rs, postdata){
+                return showMsgDialog(rs);
+            },
             errorTextFormat:function(data) { 
                 return 'Lỗi: ' + data.responseText 
         }"
@@ -216,5 +232,65 @@
 
 
 <script type="text/javascript">
-    
+     $("#grid_ds_donhang_spdt").jqGrid('navButtonAdd', '#grid_ds_donhang_spdt-pager',
+        {
+            caption: "",
+            buttonicon: "ui-icon-lightbulb",
+            title: "Gửi chứng từ",
+            onClickButton: function () {
+                let id = $("#grid_ds_donhang_spdt").jqGrid('getGridParam', 'selrow');
+                if (!id) {
+                    alert(`Không tìm thấy shipping detail đã chọn`);
+                    return;
+                }
+
+                let iddlg = 'dialog-chuyenchungtu-spd';
+                $('body').append(`<div title="Gửi đến chứng từ" id="${iddlg}">
+                    <div style="display:none" id="waitChuyenChungTuSPD"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>
+                    <div style="margin-top:5px;">
+                        Bạn muốn chuyển shipping detail đến chứng từ?
+                    </div>
+                </div>`);
+
+                // create new dialog
+                $(`#${iddlg}`).dialog({
+                    modal: true
+                    , open: function (event, ui) {
+                        //hide close button.
+                        $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                    }
+                    , buttons: {
+                        'Đồng ý': function () {
+                            let $wait = $('#waitChuyenChungTuSPD');
+                            $wait.css('display', '');
+                            let page = $('#grid_ds_donhang_spdt').getGridParam("page");
+                            let data = new FormData();
+                            data.append('action', 'guispd');
+                            data.append('id', id.toString());
+                            
+                            $.ajax({
+                                url: 'Views/po/Controller_PO_SPDT.ashx',
+                                data: data,
+                                type: 'POST',
+                                processData: false,
+                                contentType: false,
+                                success: function (result) {
+                                    if (!result) {
+                                        $('#grid_ds_donhang_spdt').trigger("reloadGrid", [{ current: true, page: page }]);
+                                        $(`#${iddlg}`).dialog("destroy").remove();
+                                    }
+                                    else {
+                                        alert(result);
+                                        $wait.css('display', 'none');
+                                    }
+                                }
+                            });
+                        },
+                        'Thoát': function () {
+                            $(this).dialog("destroy").remove();
+                        }
+                    }
+                });
+            }
+        });
 </script>

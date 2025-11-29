@@ -149,6 +149,10 @@ public class DonHangController : IHttpHandler
                 hsct.nguoicapnhat = UserUtils.getUser(context);
                 hsct.hoatdong = true;
                 db.c_donhangchungtus.InsertOnSubmit(hsct);
+
+                var spd = db.c_donhang_spds.Where(s => s.c_donhang_id == dh.c_donhang_id & (s.trangthai ?? "") != Helper.DAGUI).OrderByDescending(s => s.ngaytao).FirstOrDefault();
+                if (spd != null)
+                    spd.trangthai = Helper.DAGUI;
                 count++;
             }
 
@@ -240,7 +244,7 @@ public class DonHangController : IHttpHandler
 
                     mail.Send(
                         nv.email
-                        , "vongocnhancd10cntt2@gmail.com"
+                        , Helper.nhanvienchungtu
                         , nv.email_cc
                         , ""
                         , title

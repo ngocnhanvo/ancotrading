@@ -46,8 +46,8 @@ public class DongNhapXuatController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -57,14 +57,20 @@ public class DongNhapXuatController : IHttpHandler
 
         c_dongnhapxuat m = db.c_dongnhapxuats.Where(p => p.c_dongnhapxuat_id == context.Request.Form["id"]).FirstOrDefault();
         c_nhapxuat nx = db.c_nhapxuats.Where(p => p.c_nhapxuat_id.Equals(m.c_nhapxuat_id)).FirstOrDefault();
-        if (nx.md_trangthai_id == "SOANTHAO")
+        var slphai_nhapxuat = context.Request.Form["slphai_nhapxuat"].removeAllSpaceOrTrimText(false).ToNullableDecimal();
+        var slthuc_nhapxuat = context.Request.Form["slthuc_nhapxuat"].removeAllSpaceOrTrimText(false).ToNullableDecimal();
+        if(slthuc_nhapxuat > slphai_nhapxuat)
+        {
+            jqGridHelper.Utils.writeResult(0, "SL thực nhập không thể lớn hơn SL phải nhập");
+        }
+        if (nx.md_trangthai_id == Helper.SOANTHAO)
         {
             //m.c_nhapxuat_id = context.Request.Form["c_nhapxuat_id"];
             //m.c_dongdonhang_id = context.Request.Form["c_dongdonhang_id"];
             m.md_sanpham_id = context.Request.Form["sanpham_id"];
             m.md_donvitinh_id = context.Request.Form["md_donvitinh_id"];
-            m.slphai_nhapxuat = decimal.Parse(context.Request.Form["slphai_nhapxuat"]);
-            m.slthuc_nhapxuat = decimal.Parse(context.Request.Form["slthuc_nhapxuat"]);
+            m.slphai_nhapxuat = slphai_nhapxuat;
+            m.slthuc_nhapxuat = slthuc_nhapxuat;
             m.dongia = decimal.Parse(context.Request.Form["dongia"]);
             m.sokien_thucte = decimal.Parse(context.Request.Form["sokien_thucte"]);
 
@@ -75,10 +81,10 @@ public class DongNhapXuatController : IHttpHandler
             db.SubmitChanges();
         }
         else
-        { 
+        {
             jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi phiếu Nhập/Xuất đã hiệu lực");
         }
-        
+
     }
 
     public void add(HttpContext context)
@@ -87,7 +93,7 @@ public class DongNhapXuatController : IHttpHandler
         bool hd = false;
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-        
+
         c_dongnhapxuat mnu = new c_dongnhapxuat
         {
             c_dongnhapxuat_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
@@ -99,7 +105,7 @@ public class DongNhapXuatController : IHttpHandler
             slthuc_nhapxuat = decimal.Parse(context.Request.Form["slthuc_nhapxuat"]),
             dongia = decimal.Parse(context.Request.Form["dongia"]),
             sokien_thucte = decimal.Parse(context.Request.Form["sokien_thucte"]),
-            
+
             mota = context.Request.Form["mota"],
             hoatdong = hd,
             nguoitao = UserUtils.getUser(context),
@@ -129,7 +135,7 @@ public class DongNhapXuatController : IHttpHandler
         context.Response.Charset = "UTF-8";
 
         String whId = context.Request.QueryString["whId"];
-        
+
         //// filter
         String filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
@@ -139,12 +145,12 @@ public class DongNhapXuatController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
         String sqlCount = "SELECT COUNT(*) AS count " +
             " FROM c_dongnhapxuat dnx " +
-			" left join c_nhapxuat nx on dnx.c_nhapxuat_id = nx.c_nhapxuat_id " +
-			" left join md_sanpham sp on dnx.md_sanpham_id = sp.md_sanpham_id" +
-			" left join md_donvitinhsanpham dvt on dnx.md_donvitinh_id = dvt.md_donvitinhsanpham_id " +
+            " left join c_nhapxuat nx on dnx.c_nhapxuat_id = nx.c_nhapxuat_id " +
+            " left join md_sanpham sp on dnx.md_sanpham_id = sp.md_sanpham_id" +
+            " left join md_donvitinhsanpham dvt on dnx.md_donvitinh_id = dvt.md_donvitinhsanpham_id " +
             " WHERE dnx.c_nhapxuat_id = N'{0}' " + filter;
 
         if (whId != null)
@@ -155,7 +161,7 @@ public class DongNhapXuatController : IHttpHandler
         {
             sqlCount = string.Format(sqlCount, 0);
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -190,9 +196,9 @@ public class DongNhapXuatController : IHttpHandler
             " , dnx.ngaytao, dnx.nguoitao, dnx.ngaycapnhat, dnx.nguoicapnhat, dnx.mota, dnx.hoatdong, " +
             " ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
             " FROM c_dongnhapxuat dnx " +
-			" Left join c_nhapxuat nx on dnx.c_nhapxuat_id = nx.c_nhapxuat_id " +
-			" Left join md_sanpham sp on dnx.md_sanpham_id = sp.md_sanpham_id " +
-			" Left join md_donvitinhsanpham dvt on dnx.md_donvitinh_id = dvt.md_donvitinhsanpham_id" +
+            " Left join c_nhapxuat nx on dnx.c_nhapxuat_id = nx.c_nhapxuat_id " +
+            " Left join md_sanpham sp on dnx.md_sanpham_id = sp.md_sanpham_id " +
+            " Left join md_donvitinhsanpham dvt on dnx.md_donvitinh_id = dvt.md_donvitinhsanpham_id" +
             " WHERE dnx.c_nhapxuat_id = N'{0}' " + filter +
             ")P WHERE RowNum > @start AND RowNum < @end";
 
@@ -204,7 +210,7 @@ public class DongNhapXuatController : IHttpHandler
         {
             strsql = string.Format(strsql, 0);
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";

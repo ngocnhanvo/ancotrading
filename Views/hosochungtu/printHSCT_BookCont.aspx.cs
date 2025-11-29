@@ -64,7 +64,7 @@ public partial class Views_hosochungtu_printHSCT_BookCont : System.Web.UI.Page
             FROM c_donhangchungtu dh
                 left join c_donhang dh2 on dh2.c_donhang_id = dh.c_donhang_id
                 left join md_doitackinhdoanh kh on kh.md_doitackinhdoanh_id = dh2.md_doitackinhdoanh_id
-                outer apply (select top 1 Consignee, Notify, AlsoNotify, POD from c_donhang_spd where c_donhang_id = dh2.c_donhang_id order by ngaytao desc) spd
+                outer apply (select top 1 Consignee, Notify, AlsoNotify, POD from c_donhang_spd where c_donhang_id = dh2.c_donhang_id and trangthai = 'DAGUI' order by ngaytao desc) spd
             WHERE
                 dh.c_donhangchungtu_id = '{id}'
 		";

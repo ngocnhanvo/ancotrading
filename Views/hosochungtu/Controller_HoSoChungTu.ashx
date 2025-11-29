@@ -136,7 +136,7 @@ public class Controller_HoSoChungTu : IHttpHandler
             {
                 if (donhang != null)
                 {
-                    donhang.trangthaict = "DAHIEULUC";
+                    donhang.trangthaict = Helper.DAHIEULUC;
                 }
             }
 
@@ -152,6 +152,14 @@ public class Controller_HoSoChungTu : IHttpHandler
                     foreach(var hsctk in db.c_donhangchungtus.Where(s=>s.dongghep == donhang.sochungtu & s.c_donhangchungtu_id != hsct.c_donhangchungtu_id))
                     {
                         hsctk.trangthai = trangthai;
+                        var donhangk = db.c_donhangs.Where(s => s.c_donhang_id == hsctk.c_donhang_id).FirstOrDefault();
+                        if (hsctk.trangthai == Helper.SOANTHAO & trangthai != Helper.SOANTHAO)
+                        {
+                            if (donhangk != null)
+                            {
+                                donhangk.trangthaict =  Helper.DAHIEULUC;
+                            }
+                        }
                     }
                 }
             }
@@ -225,6 +233,11 @@ public class Controller_HoSoChungTu : IHttpHandler
                     dh.trangthaict = Helper.CHUAGUI;
                 else
                     dh.trangthaict = Helper.TUCHOI;
+            }
+
+            foreach (var spd in db.c_donhang_spds.Where(s => s.c_donhang_id == dh.c_donhang_id & s.trangthai == Helper.DAGUI))
+            {
+                spd.trangthai = Helper.CHUAGUI;
             }
 
             var tts = db.md_taptins.Where(s => s.lienket == hsct.c_donhangchungtu_id).ToList();
@@ -347,7 +360,7 @@ public class Controller_HoSoChungTu : IHttpHandler
             FROM c_donhangchungtu dh
                 left join c_donhang dh2 on dh2.c_donhang_id = dh.c_donhang_id
                 left join md_doitackinhdoanh kh on kh.md_doitackinhdoanh_id = dh2.md_doitackinhdoanh_id
-                outer apply (select top 1 POD, Forwarder from c_donhang_spd where c_donhang_id = dh2.c_donhang_id order by ngaytao desc) spd
+                outer apply (select top 1 POD, Forwarder from c_donhang_spd where c_donhang_id = dh2.c_donhang_id and trangthai = 'DAGUI' order by ngaytao desc) spd
             WHERE 1=1 {filter}
         )P WHERE RowNum > @start AND RowNum < @end";
 

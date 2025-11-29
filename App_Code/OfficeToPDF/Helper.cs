@@ -10,8 +10,10 @@ using System.Collections.Generic;
 public static class Helper
 {
     #region bien toan cuc
+    public static string nhanvienchungtu = "vongocnhancd10cntt2@gmail.com";
     public static string CHUAGUI = "CHUAGUI";
     public static string DAGUI = "DAGUI";
+    public static string DAHIEULUC = "DAHIEULUC";
     public static string DANHAN = "DANHAN";
     public static string TUCHOI = "TUCHOI";
     public static string SOANTHAO = "SOANTHAO";

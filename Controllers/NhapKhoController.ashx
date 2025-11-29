@@ -89,63 +89,85 @@ public class NhapXuatController : IHttpHandler
 
     public void ActiveNhapKho(HttpContext context)
     {
+        string msg = "";
         try
         {
             String id = context.Request.QueryString["nkId"];
             c_nhapxuat m = db.c_nhapxuats.Single(p => p.c_nhapxuat_id == id);
-            if (m.md_trangthai_id.Equals("HIEULUC"))
+            if (m.md_trangthai_id.Equals(Helper.HIEULUC))
             {
-                context.Response.Write(String.Format("Hiệu trạng thái của phiếu nhập {0} đã là hiệu lực.!", m.sophieu));
+                msg = $@"Hiệu trạng thái của phiếu nhập {m.sophieu} đã là hiệu lực.!";
+                goto EndEventHandler;
             }
-            else
+
+            var dnxs = (from a in db.c_dongnhapxuats
+                        join b in db.md_sanphams on a.md_sanpham_id equals b.md_sanpham_id
+                        where a.c_nhapxuat_id == id
+                        select new { a, b }).ToList();
+
+            var dnxsDK = dnxs.Where(s => (s.a.slthuc_nhapxuat ?? 0) > (s.a.slphai_nhapxuat ?? 0)).Select(s => s.b.ma_sanpham).Distinct().ToList();
+            if (dnxsDK.Count > 0)
             {
-                // kiểm tra số lượng trên danh sách đặt hàng và trên phiếu nhập
-                // đếm dòng danh sách đặt hàng có số lượng còn lại bé hơn 0
-                // và số lượng nhập thực tế của phiếu nhập lớn hơn số lượng còn lại.
-                // nếu kết quả lớn hơn 0 thì không cho hiệu lực vì tồn tại mã hàng đã xuất hết số lượng
-                String sqlCount = @"select count(*) from c_dongdsdh ddsdh 
-								where ddsdh.c_dongdsdh_id IN(
-									select c_dongdsdh_id from c_dongnhapxuat where c_nhapxuat_id = @c_nhapxuat_id AND slthuc_nhapxuat > ddsdh.sl_conlai
-								) AND ddsdh.sl_conlai <= 0";
-                int count = (int)mdbc.ExecuteScalar(sqlCount, "@c_nhapxuat_id", id);
-                if (count > 0)
+                string mahangs = string.Join(",", dnxsDK);
+                msg = $@"Các dòng hàng ""{mahangs}"" có ""số lượng thực nhập"" lớn hơn ""số lượng phải nhập""";
+                goto EndEventHandler;
+            }
+
+            // kiểm tra số lượng trên danh sách đặt hàng và trên phiếu nhập
+            // đếm dòng danh sách đặt hàng có số lượng còn lại bé hơn 0
+            // và số lượng nhập thực tế của phiếu nhập lớn hơn số lượng còn lại.
+            // nếu kết quả lớn hơn 0 thì không cho hiệu lực vì tồn tại mã hàng đã xuất hết số lượng
+            var c_dongdsdh_ids = dnxs.Select(t => t.a.c_dongdsdh_id).ToList();
+            var ddshs = (from a in db.c_dongdsdhs
+                         where
+                             a.sl_conlai <= 0 &
+                             c_dongdsdh_ids.Contains(a.c_dongdsdh_id)
+                         select a
+                            ).ToList().Where(s=>dnxs.Where(t=>t.a.slthuc_nhapxuat > s.sl_conlai & t.a.c_dongdsdh_id == s.c_dongdsdh_id).Count() > 0).ToList();
+            if (ddshs.Count > 0)
+            {
+                msg = $@"Không thể hiệu lực vì phiếu nhập kho {m.sophieu} có chứa mã hàng đã nhập hết số lượng.!";
+                goto EndEventHandler;
+            }
+
+            String update = "update c_dongnhapxuat set hoatdong = 1 where c_nhapxuat_id = @id";
+            mdbc.ExcuteNonQuery(update, "@id", id);
+            mdbc.ExcuteNonProcedure("dbo.p_hieulucnhapxuat", "@nhapxuat_id", id);
+
+            m.md_trangthai_id = Helper.HIEULUC;
+            db.SubmitChanges();
+
+            foreach (c_dongnhapxuat dnx in db.c_dongnhapxuats.Where(s => s.c_nhapxuat_id == id))
+            {
+                c_dongdsdh ddsdh = db.c_dongdsdhs.FirstOrDefault(s => s.c_dongdsdh_id == dnx.c_dongdsdh_id);
+                c_dongdonhang ddh = db.c_dongdonhangs.FirstOrDefault(d => d.c_dongdonhang_id.Equals(dnx.c_dongdonhang_id));
+                if (ddsdh != null & ddh != null)
                 {
-                    context.Response.Write(String.Format("Không thể hiệu lực vì phiếu nhập kho {0} có chứa mã hàng đã nhập hết số lượng.!", m.sophieu));
-                }
-                else
-                {
-                    String update = "update c_dongnhapxuat set hoatdong = 1 where c_nhapxuat_id = @id";
-                    mdbc.ExcuteNonQuery(update, "@id", id);
-
-                    mdbc.ExcuteNonProcedure("dbo.p_hieulucnhapxuat", "@nhapxuat_id", id);
-
-                    m.md_trangthai_id = "HIEULUC";
-                    db.SubmitChanges();
-
-                    foreach(c_dongnhapxuat dnx in db.c_dongnhapxuats.Where(s=>s.c_nhapxuat_id == id)){
-                        c_dongdsdh ddsdh = db.c_dongdsdhs.FirstOrDefault(s=>s.c_dongdsdh_id == dnx.c_dongdsdh_id);
-                        c_dongdonhang ddh = db.c_dongdonhangs.FirstOrDefault(d => d.c_dongdonhang_id.Equals(dnx.c_dongdonhang_id));
-                        if(ddsdh != null & ddh != null) {
-                            c_danhsachdathang dsdh = db.c_danhsachdathangs.FirstOrDefault(s=>s.c_danhsachdathang_id == ddsdh.c_danhsachdathang_id);
-                            if(dsdh != null) {
-                                decimal cbm1row = ddh.v2.Value / ddh.soluong.Value;
-                                decimal sltd_hn = Math.Round(cbm1row * dnx.slthuc_nhapxuat.Value, 3);
-                                foreach(c_kehoachxuathang khxh in db.c_kehoachxuathangs.Where(s=>s.c_danhsachdathang_id == dsdh.sochungtu)) {
-                                    //khxh.cbm = khxh.cbm - sltd_hn;
-                                    khxh.cbm_conlai = khxh.cbm_conlai - sltd_hn;
-                                }
-                            }
+                    c_danhsachdathang dsdh = db.c_danhsachdathangs.FirstOrDefault(s => s.c_danhsachdathang_id == ddsdh.c_danhsachdathang_id);
+                    if (dsdh != null)
+                    {
+                        decimal cbm1row = ddh.v2.Value / ddh.soluong.Value;
+                        decimal sltd_hn = Math.Round(cbm1row * dnx.slthuc_nhapxuat.Value, 3);
+                        foreach (c_kehoachxuathang khxh in db.c_kehoachxuathangs.Where(s => s.c_danhsachdathang_id == dsdh.sochungtu))
+                        {
+                            //khxh.cbm = khxh.cbm - sltd_hn;
+                            khxh.cbm_conlai = khxh.cbm_conlai - sltd_hn;
                         }
                     }
-                    db.SubmitChanges();
-
-                    context.Response.Write(String.Format("Hiệu lực phiếu nhập kho {0} thành công.!", m.sophieu));
                 }
             }
-        }catch(Exception ex)
-        {
-            context.Response.Write("ERROR: " + ex.Message);
+            db.SubmitChanges();
+
+            msg = $@"Hiệu lực phiếu nhập kho {m.sophieu} thành công.!";
         }
+        catch (Exception ex)
+        {
+            msg = $@"ERROR: {ex.Message}";
+        }
+
+        EndEventHandler:;
+
+        context.Response.Write(msg);
     }
 
     public void DeactiveNhapKho(HttpContext context)

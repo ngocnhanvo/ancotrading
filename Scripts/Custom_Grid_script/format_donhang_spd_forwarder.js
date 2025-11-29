@@ -9,7 +9,7 @@ var format_donhang_spd_forwarder = {
             clone.insertBefore(id_elem);
 
             id_elem.css({ 'padding': '2.5px', 'border': '1px solid #000', width: '150px' });
-            id_elem.attr('readonly', true);
+            //id_elem.attr('readonly', true);
             id_elem.parent().append(`
                 <i onclick="format_donhang_spd_forwarder.search(this)"
                 class="span_format_donhang_spd_forwarder fab fa-accusoft" 

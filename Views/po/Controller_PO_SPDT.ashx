@@ -15,12 +15,12 @@ public class Controller_PO_SPDT : IHttpHandler
     public void ProcessRequest(HttpContext context)
     {
         String action, oper;
-        action = context.Request.QueryString["action"];
+        action = context.Request.Params["action"];
         oper = context.Request.Form["oper"];
         switch (action)
         {
-            case "ketthuc":
-                this.ketthuc(context);
+            case "guispd":
+                this.guispd(context);
                 break;
             default:
                 switch (oper)
@@ -42,9 +42,75 @@ public class Controller_PO_SPDT : IHttpHandler
         }
     }
 
-    public void ketthuc(HttpContext context)
+    public void guispd(HttpContext context)
     {
+        string msg = "";
+        string id = context.Request.Form["id"];
+        try
+        {
+            var spd = db.c_donhang_spds.Where(s => s.c_donhang_spd_id == id).FirstOrDefault();
+            if (spd == null)
+            {
+                msg = $@"Không tìm thấy đối tượng cần gửi";
+                goto EndEventHandler;
+            }
 
+            var donhang = db.c_donhangs.Where(s => s.c_donhang_id == spd.c_donhang_id).FirstOrDefault();
+            if (donhang == null)
+            {
+                msg = $@"Không tìm thấy đơn hàng";
+                goto EndEventHandler;
+            }
+
+            if (spd.trangthai == Helper.DAGUI)
+            {
+                msg = $@"Shipping Detail đã được gửi trước đó";
+                goto EndEventHandler;
+            }
+
+            if (donhang.trangthaict != Helper.DAHIEULUC)
+            {
+                msg = $@"Đơn hàng phải ở trạng thái chứng từ là ""Đã nhận"" để sử dụng chức năng này";
+                goto EndEventHandler;
+            }
+
+            spd.trangthai = Helper.DAGUI;
+            string manv = UserUtils.getUser(context);
+            var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
+            var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(nv.smtp))
+            {
+                smtp = db.md_smtps.Where(s => s.md_smtp_id == nv.smtp).FirstOrDefault();
+            }
+            var mail = new GoogleMail();
+            mail.Email = nv.email;
+            mail.Password = nv.email_pass;
+            mail.Smtp = smtp.smtpserver;
+            mail.Port = smtp.port.Value;
+            mail.Ssl = smtp.use_ssl.GetValueOrDefault(false);
+                
+            string title = $@"Thay đổi Shipping Detail cho đơn hàng ""{donhang.sochungtu}""", body = $@"đơn hàng ""{donhang.sochungtu}"" có thay dổi shipping detal";
+            var attachments = new List<System.Net.Mail.Attachment>();
+
+            mail.Send(
+                nv.email
+                , Helper.nhanvienchungtu
+                , nv.email_cc
+                , ""
+                , title
+                , body
+                , attachments
+            );
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+       context.Response.Write(msg);
     }
 
     public void edit(HttpContext context)
@@ -67,9 +133,9 @@ public class Controller_PO_SPDT : IHttpHandler
                 goto EndEventHandler;
             }
 
-            if (donhang.md_trangthai_id != Helper.SOANTHAO)
+            if (spd.trangthai == Helper.DAGUI)
             {
-                msg = $@"Đơn hàng không ở trạng thái Soạn Thảo";
+                msg = $@"Shipping Detail đã được gửi trước đó";
                 goto EndEventHandler;
             }
 
@@ -88,7 +154,7 @@ public class Controller_PO_SPDT : IHttpHandler
             spd.nguoicapnhat = UserUtils.getUser(context);
             db.SubmitChanges();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = ex.Message;
         }
@@ -114,14 +180,22 @@ public class Controller_PO_SPDT : IHttpHandler
                 goto EndEventHandler;
             }
 
-            if (donhang.md_trangthai_id != Helper.SOANTHAO)
+            if (donhang.trangthaict == Helper.DAGUI)
             {
-                msg = $@"Đơn hàng không ở trạng thái Soạn Thảo";
+                msg = $@"Đơn hàng đã gửi, nếu cần sửa shipping detail thì hãy thu hồi bên chứng từ. Chỉ khi chứng từ đã nhận thì mới sử dụng phương pháp bổ sung này.";
+                goto EndEventHandler;
+            }
+
+            var chuagui = db.c_donhang_spds.Where(s => s.c_donhang_id == donhang.c_donhang_id & s.trangthai != Helper.DAGUI).OrderByDescending(s => s.ngaytao).FirstOrDefault();
+            if (chuagui != null)
+            {
+                msg = $@"Đơn hàng còn shipping detail ở trạng thái ""Chưa Gửi""";
                 goto EndEventHandler;
             }
 
             var spd = new c_donhang_spd();
             spd.c_donhang_spd_id = Helper.getNewId();
+            spd.trangthai = Helper.CHUAGUI;
             spd.c_donhang_id = donhang.c_donhang_id;
             spd.Forwarder = context.Request.Form["Forwarder"].removeAllSpaceOrTrimText(true);
             spd.Shipper = context.Request.Form["Shipper"].removeAllSpaceOrTrimText(true);
@@ -142,7 +216,7 @@ public class Controller_PO_SPDT : IHttpHandler
             db.c_donhang_spds.InsertOnSubmit(spd);
             db.SubmitChanges();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = ex.Message;
         }
@@ -176,16 +250,16 @@ public class Controller_PO_SPDT : IHttpHandler
                 goto EndEventHandler;
             }
 
-            if (donhang.md_trangthai_id != Helper.SOANTHAO)
+            if (spd.trangthai == Helper.DAGUI)
             {
-                msg = $@"Đơn hàng không ở trạng thái Soạn Thảo";
+                msg = $@"Shipping detail đã được gửi trước đó";
                 goto EndEventHandler;
             }
 
             db.c_donhang_spds.DeleteOnSubmit(spd);
             db.SubmitChanges();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = ex.Message;
         }
@@ -251,6 +325,7 @@ public class Controller_PO_SPDT : IHttpHandler
             select 
                 spd.c_donhang_spd_id, 
                 spd.c_donhang_id, 
+                spd.trangthai,
                 spd.Forwarder, 
                 spd.Shipper,
                 spd.Consignee,
