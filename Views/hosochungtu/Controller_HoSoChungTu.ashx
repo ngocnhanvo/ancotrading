@@ -151,7 +151,6 @@ public class Controller_HoSoChungTu : IHttpHandler
                 {
                     foreach(var hsctk in db.c_donhangchungtus.Where(s=>s.dongghep == donhang.sochungtu & s.c_donhangchungtu_id != hsct.c_donhangchungtu_id))
                     {
-                        hsctk.trangthai = trangthai;
                         var donhangk = db.c_donhangs.Where(s => s.c_donhang_id == hsctk.c_donhang_id).FirstOrDefault();
                         if (hsctk.trangthai == Helper.SOANTHAO & trangthai != Helper.SOANTHAO)
                         {
@@ -160,6 +159,7 @@ public class Controller_HoSoChungTu : IHttpHandler
                                 donhangk.trangthaict =  Helper.DAHIEULUC;
                             }
                         }
+                        hsctk.trangthai = trangthai;
                     }
                 }
             }
