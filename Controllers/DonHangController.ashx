@@ -1117,30 +1117,30 @@ public class DonHangController : IHttpHandler
                     {
                         db.c_donhangs.InsertOnSubmit(mnu);
 
-                        var spd = db.md_doitackinhdoanh_spds.Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id).OrderByDescending(s => s.ngaytao).FirstOrDefault();
-                        if (spd != null)
-                        {
-                            var spd2 = new c_donhang_spd();
-                            spd2.c_donhang_spd_id = Helper.getNewId();
-                            spd2.c_donhang_id = mnu.c_donhang_id;
-                            spd2.Forwarder = spd.Forwarder;
-                            spd2.Shipper = spd.Shipper;
-                            spd2.Consignee = spd.Consignee;
-                            spd2.Notify = spd.Notify;
-                            spd2.AlsoNotify = spd.AlsoNotify;
-                            spd2.POD = spd.POD;
-                            spd2.PlaceOfDelivery = spd.PlaceOfDelivery;
-                            spd2.AddressForSendingOriginalDocs = spd.AddressForSendingOriginalDocs;
-                            spd2.EmailSendPaymentRequest = spd.EmailSendPaymentRequest;
-                            spd2.CacLoaiCTYC = spd.CacLoaiCTYC;
-                            spd2.mota = "";
-                            spd2.ngaytao = DateTime.Now;
-                            spd2.nguoitao = UserUtils.getUser(context);
-                            spd2.ngaycapnhat = DateTime.Now;
-                            spd2.nguoicapnhat = UserUtils.getUser(context);
-                            spd2.hoatdong = true;
-                            db.c_donhang_spds.InsertOnSubmit(spd2);
-                        }
+                        //var spd = db.md_doitackinhdoanh_spds.Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id).OrderByDescending(s => s.ngaytao).FirstOrDefault();
+                        //if (spd != null)
+                        //{
+                        //    var spd2 = new c_donhang_spd();
+                        //    spd2.c_donhang_spd_id = Helper.getNewId();
+                        //    spd2.c_donhang_id = mnu.c_donhang_id;
+                        //    spd2.Forwarder = spd.Forwarder;
+                        //    spd2.Shipper = spd.Shipper;
+                        //    spd2.Consignee = spd.Consignee;
+                        //    spd2.Notify = spd.Notify;
+                        //    spd2.AlsoNotify = spd.AlsoNotify;
+                        //    spd2.POD = spd.POD;
+                        //    spd2.PlaceOfDelivery = spd.PlaceOfDelivery;
+                        //    spd2.AddressForSendingOriginalDocs = spd.AddressForSendingOriginalDocs;
+                        //    spd2.EmailSendPaymentRequest = spd.EmailSendPaymentRequest;
+                        //    spd2.CacLoaiCTYC = spd.CacLoaiCTYC;
+                        //    spd2.mota = "";
+                        //    spd2.ngaytao = DateTime.Now;
+                        //    spd2.nguoitao = UserUtils.getUser(context);
+                        //    spd2.ngaycapnhat = DateTime.Now;
+                        //    spd2.nguoicapnhat = UserUtils.getUser(context);
+                        //    spd2.hoatdong = true;
+                        //    db.c_donhang_spds.InsertOnSubmit(spd2);
+                        //}
                         db.SubmitChanges();
                         jqGridHelper.Utils.writeResult(1, "Thêm mới thành công!");
                     }

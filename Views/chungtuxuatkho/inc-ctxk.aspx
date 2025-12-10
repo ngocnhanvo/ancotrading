@@ -1,0 +1,66 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="inc-ctxk.aspx.cs" Inherits="Views_chungtuxuatkho_inc_ctxk" %>
+
+<%@ Register Src="~/jqGrid.ascx" TagName="jqGrid" TagPrefix="uc1" %>
+<%@ Register Src="master.ascx" TagName="ctxk" TagPrefix="master" %>
+<%@ Register Src="cacdonghang.ascx" TagName="cdh" TagPrefix="detail" %>
+<%@ Register Src="cackhoanphi.ascx" TagName="ckp" TagPrefix="detail" %>
+<script type="text/javascript">
+    var id_inc_ctxk = "";
+    $(document).ready(function () {
+        $('#layout-center-ctxk').parent().layout({
+            south: {
+                size: "50%"
+                , onresize_end: function () {
+                    var h = $("#layout-south-ctxk").height();
+                    $("#grid_ds_ctxk").setGridHeight(h - 95);
+                }
+            },
+            center: {
+                onresize_end: function () {
+                    var h = $("#layout-center-ctxk").height();
+                    $("#grid_ds_ctxk").setGridHeight(h - 90);
+                }
+            }
+        });
+
+        $('#layout-south-ctxk').layout({
+            center: {
+                onresize: function () {
+                    var o = $("#tabs-ctxk-details")
+                    $("#grid_ds_chitietctxk").setGridWidth(o.width());
+                    $("#grid_ds_chitietctxk").setGridHeight(o.height() - 97);
+                }
+            }
+        });
+
+        $('#tabs-ctxk-details').tabs();
+    });
+</script>
+<div class="ui-layout-south ui-widget-content" id="layout-south-ctxk">
+    <div class="ui-layout-center" id="tabs-ctxk-details">
+         <ul>
+            <li><a href="#ctxk-details-1">Các dòng hàng</a></li>
+            <li><a href="#ctxk-details-2">Chi tiết các khoản</a></li>
+        </ul>
+
+        <detail:cdh runat="server" />
+        <detail:ckp runat="server" />
+    </div>
+    <div class="ui-layout-east" style="text-align:center; background:#f4f0ec">
+		<table style="width:100%; height:100%">
+			<tr>
+				<td>
+					<img id="product-view-ctxk" class="loadingIMG" style="max-width:100%; margin: 0px auto; min-width: 40px;" src="Controllers/API_System.ashx?oper=loadImageProduct&msp=default" />
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+<div class="ui-layout-center ui-widget-content" id="layout-center-ctxk">
+    <master:ctxk runat="server" />
+</div>
+
+<script type="text/javascript">
+    createRightPanel('grid_ds_ctxk');
+</script>

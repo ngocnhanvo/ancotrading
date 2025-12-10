@@ -196,10 +196,10 @@ public class TaoPhieuNhapKho : IHttpHandler
             c_dongdsdh_ids.Add(sobj.c_dongdonhang_id);
         }
 
-        row = rows.Rows[saveI+3];
-        var ddhh = getValue(row.GetCell(1));
-        row = rows.Rows[saveI+5];
-        var chdk = getValue(row.GetCell(1));
+        //row = rows.Rows[saveI+3];
+        //var ddhh = getValue(row.GetCell(1));
+        //row = rows.Rows[saveI+5];
+        //var chdk = getValue(row.GetCell(1));
 
         var count = db.c_dongnhapxuats.Where(s => s.c_nhapxuat_id != id & c_dongdsdh_ids.Contains(s.c_dongdsdh_id)).Count();
         string diengiai = "";

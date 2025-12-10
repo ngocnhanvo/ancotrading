@@ -65,7 +65,7 @@ public class PackingInvoiceController : IHttpHandler
         try
         {
             decimal sum_thanhtien = 0;
-            foreach (c_dongpklinv dong_pkl in db.c_dongpklinvs.ToList().Where(p => p.c_packinginvoice_id.Equals(id)))
+            foreach (var dong_pkl in db.c_dongpklinvs.Where(p => p.c_packinginvoice_id.Equals(id)))
             {
                 sum_thanhtien += dong_pkl.thanhtien.Value;
             }
@@ -83,17 +83,13 @@ public class PackingInvoiceController : IHttpHandler
                            dongnhapxuat_ref = c.dongnhapxuat_ref
                        };
 
-            var nhan2 = from p in nhan
-                        join c in db.c_dongnhapxuats on p.dongnhapxuat_ref equals c.c_dongnhapxuat_id
-                        select new
-                        {
-                            c_nhapxuat_id = c.c_nhapxuat_id
-                        };
+            var nhanids = nhan.Select(s => s.dongnhapxuat_ref).Distinct().ToList();
+
+            var nhan2ids = db.c_dongnhapxuats.Where(s => nhanids.Contains(s.c_dongnhapxuat_id)).Select(s => s.c_nhapxuat_id).Distinct().ToList();
 
 
-            var nhan3 = from p in nhan2
-                        join c in db.c_nhapxuats on p.c_nhapxuat_id equals c.c_nhapxuat_id
-                        select new
+            var nhan3 = db.c_nhapxuats.Where(s => nhan2ids.Contains(s.c_nhapxuat_id)).Select(
+                        c => new
                         {
                             c_nhapxuat_id = c.c_nhapxuat_id,
                             c_donhang_id = c.c_donhang_id,
@@ -126,7 +122,7 @@ public class PackingInvoiceController : IHttpHandler
                             totaldiscount = c.totaldiscount,
                             grandtotal = c.grandtotal,
                             sophieunhap = c.sophieunhap
-                        };
+                        });
 
             decimal sum_thanhtien2 = 0;
             decimal phicong = 0, phitru = 0;

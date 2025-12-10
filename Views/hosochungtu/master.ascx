@@ -12,36 +12,97 @@
             <tr>
                 <td>
                     <div>
-                        <input id="printHSCT_BookCont" type="radio" name="rdoPrintType" checked="checked" />
+                        <input id="printHSCT_BookCont" type="radio" name="rdoPrintType" />
                         <label for="printHSCT_BookCont">In Book Container</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div>
+                        <input id="printHSCT_All" type="radio" name="rdoPrintType" />
+                        <label for="printHSCT_All">Chiết xuất excel theo "shippment time"</label>
+                    </div>
+                    <div style="display:flex; width:99%; padding:5px; background-color:#FFF; margin-top:5px;">
+                        <div>
+                            <label for="printHSCT_tungay">Từ ngày</label>
+                            <input id="printHSCT_tungay" autocomplete="off" type="text" style="width:97%"/>
+                        </div>
+                        <div style="width:14px;"></div>
+                        <div>
+                            <label for="printHSCT_denngay">Đến ngày</label>
+                            <input id="printHSCT_denngay" autocomplete="off" type="text" style="width:97%"/>
+                        </div>
                     </div>
                 </td>
             </tr>
             </table>
         `;
-
+        
         $('body').append(`<div title="${title}" id="${name}">${content}</div>`);
+        let $chks = $('input[name=rdoPrintType]', `#${name}`);
+
         $(`#${name}`).dialog({
             width: 300,
             modal: true
             , open: function (event, ui) {
                 //hide close button.
                 $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                $('#printHSCT_tungay').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
+                $('#printHSCT_denngay').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
+                
+                $chks.change(function () {
+                    let printType = $chks.filter(':checked').attr('id');
+                    if (printType == 'printHSCT_All') {
+                        $('#printHSCT_tungay').prop("disabled", false);
+                        $('#printHSCT_denngay').prop("disabled", false);
+                    }
+                    else {
+                         $('#printHSCT_tungay').prop("disabled", true);
+                        $('#printHSCT_denngay').prop("disabled", true);
+                    }
+                });
+                $('#printHSCT_BookCont').click();
             }
             , buttons: [
                 {
                     id: `btn-print-ok-${name}`,
                     text: "In",
                     click: function () {
-                        let printType = $('input[name=rdoPrintType]:checked', `#${name}`).attr('id');
+                        let printType = $chks.filter(':checked').attr('id');
+                        let printName = $chks.filter(':checked').next().text();
                         let printURL = "Views/hosochungtu/";
                         let windowSize = "width=700,height=700,scrollbars=yes";
                         if (typeof printType == 'undefined') {
                             alert(`Chưa chọn kiểu in`);
                             return;
                         }
-                        printURL += `${printType}.aspx?id=${piId}&download=0`;
-                        window.open(printURL, "Chiết xuất Book Container", windowSize);
+
+                        let tungay = $('#printHSCT_tungay').val();
+                        let denngay = $('#printHSCT_denngay').val();
+                        if (printType == 'printHSCT_All') {
+                            if (!tungay) {
+                                alert(`Chưa chọn từ ngày`);
+                                return;
+                            }
+                            
+                            if (!denngay) {
+                                alert(`Chưa chọn đến ngày`);
+                                return;
+                            }
+                        }
+                        
+                        printURL += `${printType}.aspx?id=${piId}&download=0&tungay=${tungay}&denngay=${denngay}`;
+                        let newWindow = window.open(printURL, printName, windowSize);
+
+                        if (newWindow) {
+                            let inter = setInterval(function () {
+                                if (newWindow.document.title !== undefined) {
+                                    newWindow.document.title = printName;
+                                    clearInterval(inter); 
+                                }
+                            }, 500);
+                        }
                     }
                 },
                 {
@@ -188,6 +249,23 @@
                 ]
         });
     }
+
+    function format_hosochungtu_dongghep(cellvalue, options, rowObject) {
+        //let type = options.colModel.editoptions.typeLoad;
+        cellvalue = !cellvalue ? "" : cellvalue;
+        setTimeout(function () {
+            let uutien = cellvalue.length <= 0;
+            let id = $(rowObject).find('cell').eq(0).text();
+            if (uutien) {
+                $(`#${id}`).css('background', 'beige');
+            }
+            else {
+                $(`#${id}`).css('background', '');
+            }
+        }, 100);
+
+        return `<span title="${cellvalue}">${cellvalue}</span>`;
+    };
 </script>
 
 <uc1:jqGrid ID="grid_ds_hosochungtu"
@@ -236,7 +314,7 @@
     {
         fixed: true
         , name: 'ma_dtkd'
-        , index: 'kh.ma_dtkd'
+        , index: 'kh.md_doitackinhdoanh_id'
         , label: 'Mã số khách'
         , width: 100
         , editable: true
@@ -244,6 +322,8 @@
         , hidden: false
         , align:'center'
         , editoptions: { disabled: true }
+        , stype: 'select'
+        , searchoptions:{ sopt:['eq'], dataUrl: 'Controllers/PartnerController.ashx?action=getsearchoption&isncc=0' } 
     },
     {
         fixed: true
@@ -410,6 +490,8 @@
         , width: 50
         , edittype: 'text'
         , editoptions: { disabled: true }
+        , formatter: format_hosochungtu_dongghep
+        , unformat: disable_formatter
     },
     {
         fixed: true
