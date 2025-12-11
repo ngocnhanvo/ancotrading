@@ -116,20 +116,23 @@
         });
     }
 
-    function funcKetThuchosochungtu() {
+    function funcCapNhatNBHXNhosochungtu() {
         let id = $("#grid_ds_hosochungtu").jqGrid('getGridParam', 'selrow');
         if (id == null) {
-            alert('Chưa chọn hồ sơ muốn kết thúc.!');
+            alert('Chưa chọn hồ sơ muốn cập nhật.!');
             return;
         }
 
-        let name = 'dialog-ketthuc-hosochungtu-pi';
-        let title = 'Kết thúc hồ sơ';
+        let name = 'dialog-capnhatnbhxn-hosochungtu-pi';
+        let title = 'Cập nhật ngày bán hàng xác nhận xuất hàng';
         let content = `
             <div>
-                <h3 style="padding: 10px" class="ui-state-highlight ui-corner-all" id="dialog-caution">Có phải bạn muốn kết thúc hồ sơ này?</h3>
                 <div style="display:none" id="wait">
                     <img style="width:30px; height:30px" src="iconcollection/loading.gif"/>
+                </div>
+                <div id="dialog-caution">
+                    <label for="hsct_ngayBHXN" style="display: inline-block;">Ngày BHXNXH: </label>
+                    <input id="hsct_ngayBHXN" autocomplete="off" type="text" style="padding:3px; display:inline-block;">
                 </div>
             </div>
         `;
@@ -141,6 +144,8 @@
             , open: function (event, ui) {
                 //hide close button.
                 $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                $('#hsct_ngayBHXN').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
+                $('#hsct_ngayBHXN').blur();
             }
             , buttons:
                 [
@@ -148,6 +153,12 @@
                         id: `btn-yes-${name}`,
                         text: "Có",
                         click: function () {
+                            let ngayBHXN = $('#hsct_ngayBHXN').val();
+                            if (!ngayBHXN) {
+                                alert(`Chưa chọn ngày bán hàng xác nhận xuất hàng`);
+                                return;
+                            }
+
                             let ajaxStart = function () {
                                 $("#wait").css("display", "block");
                                 $(`#btn-yes-${name}`).button("disable");
@@ -161,74 +172,7 @@
                             };
 
                             ajaxStart();
-                            $.post(`Views/hosochungtu/Controller_hosochungtu.ashx?action=ketthuc`, {id: id }, function (result) {
-                                ajaxComplete();
-                                let $xmlObject = $(result); 
-                                let ok = $xmlObject.find('type').text() == '1';
-                                let msg = $xmlObject.find('message').text();
-                                $(`#${name}`).find('#dialog-caution').html(msg);
-                                if (ok)
-                                    $('#grid_ds_hosochungtu')[0].triggerToolbar();
-                            });
-                        }
-                    },
-                    {
-                        id: `btn-close-${name}`,
-                        text: "Không",
-                        click: function () {
-                            $(this).dialog("destroy").remove();
-                        }
-                    }
-                ]
-        });
-    }
-
-    function funcHieuLuchosochungtu() {
-        let id = $("#grid_ds_hosochungtu").jqGrid('getGridParam', 'selrow');
-        if (id == null) {
-            alert('Chưa chọn hồ sơ muốn Hiệu Lực.!');
-            return;
-        }
-
-        let name = 'dialog-hieuluc-hosochungtu-pi';
-        let title = 'Hiệu lực hồ sơ';
-        let content = `
-            <div>
-                <h3 style="padding: 10px" class="ui-state-highlight ui-corner-all" id="dialog-caution">Có phải bạn muốn hiệu lực hồ sơ này?</h3>
-                <div style="display:none" id="wait">
-                    <img style="width:30px; height:30px" src="iconcollection/loading.gif"/>
-                </div>
-            </div>
-        `;
-        $('body').append(`<div title="${title}" id="${name}">${content}</div>`);
-
-        // create new dialog
-        $(`#${name}`).dialog({
-            modal: true
-            , open: function (event, ui) {
-                //hide close button.
-                $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
-            }
-            , buttons:
-                [
-                    {
-                        id: `btn-yes-${name}`,
-                        text: "Có",
-                        click: function () {
-                            let ajaxStart = function () {
-                                $("#wait").css("display", "block");
-                                $(`#btn-yes-${name}`).button("disable");
-                                $(`#btn-close-${name}`).button("disable");
-                            };
-
-                            let ajaxComplete = function () {
-                                $("#wait").css("display", "none");
-                                $(`#btn-close-${name} span`).text("Thoát");
-                                $(`#btn-close-${name}`).button("enable");
-                            };
-
-                            ajaxStart();
-                            $.post(`Views/hosochungtu/Controller_hosochungtu.ashx?action=hieuluc`, {id: id }, function (result) {
+                            $.post(`Views/hosochungtu/Controller_hosochungtu.ashx?action=ngayBHXN`, { id:id, ngayBHXN:ngayBHXN }, function (result) {
                                 ajaxComplete();
                                 let $xmlObject = $(result); 
                                 let ok = $xmlObject.find('type').text() == '1';
@@ -454,7 +398,7 @@
     {
         fixed: true
         , name: 'cont40HC'
-        , index: 'dh.cont40HC'
+        , index: 'dh.cont40hc'
         , label: '40HC'
         , editable: true
         , width: 50
@@ -708,5 +652,11 @@
     runat="server" />
 
 <script type="text/javascript">
-    
+    $("#grid_ds_hosochungtu").jqGrid('navButtonAdd', '#grid_ds_hosochungtu-pager',
+        {
+            caption: "",
+            buttonicon: "ui-icon-lightbulb",
+            title: "Cập nhật ngày bán hàng xác nhận xuất hàng",
+            onClickButton: funcCapNhatNBHXNhosochungtu
+        });
 </script>

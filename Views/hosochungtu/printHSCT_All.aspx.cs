@@ -65,11 +65,11 @@ public partial class Views_hosochungtu_printHSCT_All : System.Web.UI.Page
                 , dh.ngaychuyenhoso
                 , dh2.nguoilap
                 , dh.nhanvienCT
-                , (case when dh.loaicont = 'CONT20' then dh.slcont else 0 end) as cont20
-                , (case when dh.loaicont = 'CONT40' then dh.slcont else 0 end) as cont40
-                , (case when dh.loaicont = '40HC' then dh.slcont else 0 end) as cont40HC
-                , (case when dh.loaicont = 'CONT45' then dh.slcont else 0 end) as cont45
-                , (case when dh.loaicont = 'LE' then dh.slcont else 0 end) as contLCL
+                , dh.cont20
+                , dh.cont40
+                , dh.cont40hc
+                , dh.cont45
+                , dh.contLCL
                 , dh.dongghep
                 , spd.Forwarder
                 , dh.ngayBookCont

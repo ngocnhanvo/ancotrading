@@ -1633,6 +1633,16 @@
                 , align: 'center'
                 , formoptions: { colpos: 1, rowpos: 31 }
                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); if (currentTime) {  currentTime.setDate(currentTime.getDate() + 7) }; var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+            },
+            {
+                fixed: true, name: 'ngayBHXN'
+                , label: 'Ngày BHXNXH'
+                , width: 110
+                , hidden: false
+                , editable: false
+                , align: 'center'
+                , formoptions: { colpos: 1, rowpos: 32 }
+                , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); if (currentTime) {  currentTime.setDate(currentTime.getDate() + 7) }; var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
             }
             ]"
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
@@ -1827,20 +1837,24 @@
                                     <td><select id="dhut_po">${options}</select></td>
                                 </tr>
                                 <tr>
-                                    <td>Số lượng cont</td>
-                                    <td><input id="slcont_po" type="number"/></td>
+                                    <td>Cont 20</td>
+                                    <td><input id="slcont20_po" type="number"/></td>
                                 </tr>
                                 <tr>
-                                    <td>Loại cont</td>
-                                    <td>
-                                        <select id="loaicont_po">
-                                            <option role="option" value="CONT20">Cont 20</option>
-                                            <option role="option" value="CONT40">Cont 40</option>
-                                            <option role="option" value="40HC">40HC</option>
-                                            <option role="option" value="CONT45">Cont 45</option>
-                                            <option role="option" value="LE">Cont LCL</option>
-                                        </select>
-                                    </td>
+                                    <td>Cont 40DC</td>
+                                    <td><input id="slcont40_po" type="number"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Cont 40HC</td>
+                                    <td><input id="slcont40hc_po" type="number"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Cont 45</td>
+                                    <td><input id="slcont45_po" type="number"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Cont LCL</td>
+                                    <td><input id="slcontLCL_po" type="number"/></td>
                                 </tr>
                                 <tr>
                                     <td>NXH điều chỉnh</td>
@@ -1870,14 +1884,53 @@
                         }
                         , buttons: {
                             'Đồng ý': function () {
-                                let slcont = Number($('#slcont_po').val());
-                                if (!slcont) {
-                                    alert(`SL cont phải là số`);
+                                let slcont20 = Number($('#slcont20_po').val());
+                                if (!slcont20) {
+                                    alert(`SL cont 20 phải là số`);
+                                    return;
+                                }
+                                if (isNaN(slcont20)) {
+                                    alert(`SL cont 20 phải là số`);
                                     return;
                                 }
 
-                                if (isNaN(slcont)) {
-                                    alert(`SL cont phải là số`);
+                                let slcont40 = Number($('#slcont40_po').val());
+                                if (!slcont40) {
+                                    alert(`SL cont 40DC phải là số`);
+                                    return;
+                                }
+                                if (isNaN(slcont40)) {
+                                    alert(`SL cont 40DC phải là số`);
+                                    return;
+                                }
+
+                                let slcont40hc = Number($('#slcont40hc_po').val());
+                                if (!slcont40hc) {
+                                    alert(`SL cont 40HC phải là số`);
+                                    return;
+                                }
+                                if (isNaN(slcont40hc)) {
+                                    alert(`SL cont 40HC phải là số`);
+                                    return;
+                                }
+
+                                let slcont45 = Number($('#slcont45_po').val());
+                                if (!slcont45) {
+                                    alert(`SL cont 45 phải là số`);
+                                    return;
+                                }
+                                if (isNaN(slcont45)) {
+                                    alert(`SL cont 45 phải là số`);
+                                    return;
+                                }
+
+                                let slcontLCL = Number($('#slcontLCL_po').val());
+                                if (!slcontLCL) {
+                                    alert(`SL cont LCL phải là số`);
+                                    return;
+                                }
+                                if (isNaN(slcontLCL)) {
+                                    alert(`SL cont LCL phải là số`);
                                     return;
                                 }
 
@@ -1888,8 +1941,11 @@
                                 data.append('action', 'ChuyenChungTu');
                                 data.append('id', ids.toString());
                                 data.append('dhut_po', $('#dhut_po').val());
-                                data.append('slcont_po', $('#slcont_po').val());
-                                data.append('loaicont_po', $('#loaicont_po').val());
+                                data.append('slcont20', slcont20);
+                                data.append('slcont40', slcont40);
+                                data.append('slcont40hc', slcont40hc);
+                                data.append('slcont45', slcont45);
+                                data.append('slcontLCL', slcontLCL);
                                 data.append('nxhdc_po', $('#nxhdc_po').val());
                                 data.append('ghichu_po', $('#ghichu_po').val());
                                 let fileList = $('#ttdk1_po')[0].files;

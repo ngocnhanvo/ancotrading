@@ -1,4 +1,4 @@
-//Update at 19/11/2025 00:41:21
+//Update at 11/12/2025 13:23:06
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -15410,6 +15410,7 @@ private string _tanggiahehang_value;
 private System.Nullable<decimal> _datcoc;
 private string _trangthaict;
 private System.Nullable<System.DateTime> _ngaypass;
+private System.Nullable<System.DateTime> _ngayBHXN;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -15546,6 +15547,8 @@ partial void OntrangthaictChanging(string value);
 partial void OntrangthaictChanged();
 partial void OnngaypassChanging(System.Nullable<System.DateTime> value);
 partial void OnngaypassChanged();
+partial void OnngayBHXNChanging(System.Nullable<System.DateTime> value);
+partial void OnngayBHXNChanged();
 #endregion
 public c_donhang()
 {
@@ -16805,6 +16808,25 @@ this.OnngaypassChanged();
 }
 }
 }
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngayBHXN", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngayBHXN
+{
+get
+{
+return this._ngayBHXN;
+}
+set
+{
+if ((this._ngayBHXN != value))
+{
+this.OnngayBHXNChanging(value);
+this.SendPropertyChanging();
+this._ngayBHXN = value;
+this.SendPropertyChanged("ngayBHXN");
+this.OnngayBHXNChanged();
+}
+}
+}
 public event PropertyChangingEventHandler PropertyChanging;
 public event PropertyChangedEventHandler PropertyChanged;
 protected virtual void SendPropertyChanging()
@@ -17566,6 +17588,11 @@ private System.Nullable<bool> _hoatdong;
 private System.Nullable<decimal> _slcont;
 private string _loaicont;
 private string _dongghep;
+private System.Nullable<decimal> _cont20;
+private System.Nullable<decimal> _cont40;
+private System.Nullable<decimal> _cont40hc;
+private System.Nullable<decimal> _cont45;
+private System.Nullable<decimal> _contLCL;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -17618,6 +17645,16 @@ partial void OnloaicontChanging(string value);
 partial void OnloaicontChanged();
 partial void OndongghepChanging(string value);
 partial void OndongghepChanged();
+partial void Oncont20Changing(System.Nullable<decimal> value);
+partial void Oncont20Changed();
+partial void Oncont40Changing(System.Nullable<decimal> value);
+partial void Oncont40Changed();
+partial void Oncont40hcChanging(System.Nullable<decimal> value);
+partial void Oncont40hcChanged();
+partial void Oncont45Changing(System.Nullable<decimal> value);
+partial void Oncont45Changed();
+partial void OncontLCLChanging(System.Nullable<decimal> value);
+partial void OncontLCLChanged();
 #endregion
 public c_donhangchungtu()
 {
@@ -18076,6 +18113,101 @@ this.SendPropertyChanging();
 this._dongghep = value;
 this.SendPropertyChanged("dongghep");
 this.OndongghepChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_cont20", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @cont20
+{
+get
+{
+return this._cont20;
+}
+set
+{
+if ((this._cont20 != value))
+{
+this.Oncont20Changing(value);
+this.SendPropertyChanging();
+this._cont20 = value;
+this.SendPropertyChanged("cont20");
+this.Oncont20Changed();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_cont40", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @cont40
+{
+get
+{
+return this._cont40;
+}
+set
+{
+if ((this._cont40 != value))
+{
+this.Oncont40Changing(value);
+this.SendPropertyChanging();
+this._cont40 = value;
+this.SendPropertyChanged("cont40");
+this.Oncont40Changed();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_cont40hc", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @cont40hc
+{
+get
+{
+return this._cont40hc;
+}
+set
+{
+if ((this._cont40hc != value))
+{
+this.Oncont40hcChanging(value);
+this.SendPropertyChanging();
+this._cont40hc = value;
+this.SendPropertyChanged("cont40hc");
+this.Oncont40hcChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_cont45", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @cont45
+{
+get
+{
+return this._cont45;
+}
+set
+{
+if ((this._cont45 != value))
+{
+this.Oncont45Changing(value);
+this.SendPropertyChanging();
+this._cont45 = value;
+this.SendPropertyChanged("cont45");
+this.Oncont45Changed();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_contLCL", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @contLCL
+{
+get
+{
+return this._contLCL;
+}
+set
+{
+if ((this._contLCL != value))
+{
+this.OncontLCLChanging(value);
+this.SendPropertyChanging();
+this._contLCL = value;
+this.SendPropertyChanged("contLCL");
+this.OncontLCLChanged();
 }
 }
 }

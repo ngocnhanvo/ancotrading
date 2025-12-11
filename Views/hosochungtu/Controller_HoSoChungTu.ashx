@@ -21,8 +21,8 @@ public class Controller_HoSoChungTu : IHttpHandler
             case "selectnhanvienCT":
                 this.selectnhanvienCT(context);
                 break;
-            case "ketthuc":
-                this.ketthuc(context);
+            case "ngayBHXN":
+                this.ngayBHXN(context);
                 break;
             default:
                 switch (oper)
@@ -56,7 +56,7 @@ public class Controller_HoSoChungTu : IHttpHandler
         context.Response.Write(str);
     }
 
-    public void ketthuc(HttpContext context)
+    public void ngayBHXN(HttpContext context)
     {
         string msg = "";
         string id = context.Request.Form["id"];
@@ -69,16 +69,84 @@ public class Controller_HoSoChungTu : IHttpHandler
                 goto EndEventHandler;
             }
 
-            if (hsct.trangthai != Helper.HIEULUC)
+            if (!string.IsNullOrWhiteSpace(hsct.dongghep))
             {
-                msg = $@"Hồ sơ không ở trạng thái Hiệu Lực";
+                msg = $@"Hồ sơ này thuộc đơn hàng được ghép. Bạn Hãy điều chỉnh hồ sơ của đơn hàng ưu tiên ""{hsct.dongghep}""";
                 goto EndEventHandler;
             }
 
-            hsct.trangthai = Helper.KETTHUC;
+            var dh = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
+            if(dh == null)
+            {
+                msg = $@"Không tìm thấy đơn hàng gốc đang liên kết với hồ sơ";
+                goto EndEventHandler;
+            }
+
+            var nvbh = db.nhanviens.Where(s => s.manv == dh.nguoilap).FirstOrDefault();
+            if(nvbh == null)
+            {
+                msg = $@"Không tìm thấy nhân viên bán hàng ""{dh.nguoilap}"" trong danh sách nhân viên";
+                goto EndEventHandler;
+            }
+
+            var ngayBHXN = context.Request.Form["ngayBHXN"].removeAllSpaceOrTrimText(true).ToNullableDate();
+            if(ngayBHXN == null)
+            {
+                msg = $@"Ngày đã chọn không đúng định dạng (dd/MM/yyyy) hoặc đang bị bỏ trống";
+                goto EndEventHandler;
+            }
+
+            hsct.ngayBHXN = ngayBHXN;
+            dh.ngayBHXN = ngayBHXN;
+            var arrDHCLs = new List<string>();
+            var hsct2s = db.c_donhangchungtus.Where(s => s.dongghep == dh.sochungtu).OrderBy(s => s.dongghep).ToList();
+            foreach(var hsct2 in hsct2s)
+            {
+                var dh2 = db.c_donhangs.Where(s => s.c_donhang_id == hsct2.c_donhang_id).FirstOrDefault();
+                if (dh2 != null)
+                {
+                    dh2.ngayBHXN = ngayBHXN;
+                    arrDHCLs.Add(dh2.sochungtu);
+                }
+            }
             hsct.ngaycapnhat = DateTime.Now;
             hsct.nguoicapnhat = UserUtils.getUser(context);
             db.SubmitChanges();
+
+            try
+            {
+                string manv = UserUtils.getUser(context);
+                var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
+                var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
+                if (!string.IsNullOrWhiteSpace(nv.smtp))
+                {
+                    smtp = db.md_smtps.Where(s => s.md_smtp_id == nv.smtp).FirstOrDefault();
+                }
+                var mail = new GoogleMail();
+                mail.Email = nv.email;
+                mail.Password = nv.email_pass;
+                mail.Smtp = smtp.smtpserver;
+                mail.Port = smtp.port.Value;
+                mail.Ssl = smtp.use_ssl.GetValueOrDefault(false);
+                string title = $@"Cập nhật ngày NHXNXH cho đơn hàng ""{dh.sochungtu}""", body = $@"Đơn hàng ưu tiên: ""{dh.sochungtu}""";
+                body += $"<br><br>Đơn hàng còn lại: {string.Join(", ", arrDHCLs)}";
+                body += $"<br><br>Ngày BHXNXH: {ngayBHXN.Value.ToString(Extension.fmtDate)}";
+                var attachments = new List<System.Net.Mail.Attachment>();
+
+                mail.Send(
+                    nv.email
+                    , nvbh.email
+                    , nv.email
+                    , ""
+                    , title
+                    , body
+                    , attachments
+                );
+            }
+            catch (Exception ex)
+            {
+                msg = ex.ToString();
+            }
         }
         catch (Exception ex)
         {
@@ -90,7 +158,7 @@ public class Controller_HoSoChungTu : IHttpHandler
         if (msg.Length > 0)
             jqGridHelper.Utils.writeResult(0, msg);
         else
-            jqGridHelper.Utils.writeResult(1, "Kết thúc thành công");
+            jqGridHelper.Utils.writeResult(1, "Cập nhật ngày bán hàng xác nhận xuất hàng thành công");
     }
 
     public void edit(HttpContext context)
@@ -336,11 +404,11 @@ public class Controller_HoSoChungTu : IHttpHandler
                 , dh.ngaychuyenhoso
                 , dh2.nguoilap
                 , dh.nhanvienCT
-                , (case when dh.loaicont = 'CONT20' then dh.slcont else 0 end) as cont20
-                , (case when dh.loaicont = 'CONT40' then dh.slcont else 0 end) as cont40
-                , (case when dh.loaicont = '40HC' then dh.slcont else 0 end) as cont40HC
-                , (case when dh.loaicont = 'CONT45' then dh.slcont else 0 end) as cont45
-                , (case when dh.loaicont = 'LE' then dh.slcont else 0 end) as contLCL
+                , dh.cont20
+                , dh.cont40
+                , dh.cont40hc
+                , dh.cont45
+                , dh.contLCL
                 , dh.dongghep
                 , spd.Forwarder
                 , dh.ngayBookCont

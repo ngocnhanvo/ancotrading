@@ -93,8 +93,11 @@ public class DonHangController : IHttpHandler
     {
         string msg = "";
         var dhut_po = context.Request.Form["dhut_po"].removeAllSpaceOrTrimText(true);
-        var slcont_po = context.Request.Form["slcont_po"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
-        var loaicont_po = context.Request.Form["loaicont_po"].removeAllSpaceOrTrimText(true);
+        var slcont20_po = context.Request.Form["slcont20"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
+        var slcont40_po = context.Request.Form["slcont40"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
+        var slcont40hc_po = context.Request.Form["slcont40hc"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
+        var slcont45_po = context.Request.Form["slcont45"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
+        var slcontLCL_po = context.Request.Form["slcontLCL"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
         var nxhdc_po = context.Request.Form["nxhdc_po"].removeAllSpaceOrTrimText(true);
         var ghichu_po = context.Request.Form["ghichu_po"].removeAllSpaceOrTrimText(true);
         var files = context.Request.Files;
@@ -131,8 +134,11 @@ public class DonHangController : IHttpHandler
                 hsct.c_donhang_id = dh.c_donhang_id;
                 if (dh.c_donhang_id == dhut_po)
                 {
-                    hsct.slcont = slcont_po;
-                    hsct.loaicont = loaicont_po;
+                    hsct.cont20 = slcont20_po;
+                    hsct.cont40 = slcont40_po;
+                    hsct.cont40hc = slcont40hc_po;
+                    hsct.cont45 = slcont45_po;
+                    hsct.contLCL = slcontLCL_po;
                     hsct.mota = ghichu_po;
                     hsct.ngaydieuchinh = nxhdc_po.ToNullableDate();
                     hsct.ngaychuyenhoso = DateTime.Now;
@@ -1549,6 +1555,7 @@ public class DonHangController : IHttpHandler
             dh.discount_hehang,
             dh.discount_hehang_value,
             dh.ngaypass,
+            dh.ngayBHXN,
             ROW_NUMBER() OVER (ORDER BY {2} {3}) as RowNum 
             FROM c_donhang dh with (nolock)
 			left join md_doitackinhdoanh dtkd with (nolock) on dh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
@@ -1629,6 +1636,7 @@ public class DonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["discount_hehang"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount_hehang_value"] + "]]></cell>";
             xml += "<cell><![CDATA[" + ((!row["ngaypass"].ToString().Equals("")) ? DateTime.Parse(row["ngaypass"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
+            xml += "<cell><![CDATA[" + ((!row["ngayBHXN"].ToString().Equals("")) ? DateTime.Parse(row["ngayBHXN"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";
