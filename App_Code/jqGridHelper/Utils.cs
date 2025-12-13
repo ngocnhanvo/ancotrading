@@ -4,6 +4,7 @@ using System.Web;
 using System.IO;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace jqGridHelper
 {
@@ -79,9 +80,11 @@ namespace jqGridHelper
 
 
 
-        public static string taoChungTuPO(string md_doitackinhdoanh_id, int isdonhangmau, string namchungtu, string loaiDH = "")
+        public static string taoChungTuPO(string md_doitackinhdoanh_id, int isdonhangmau, string namchungtu, string loaiDH = "", LinqDBDataContext db = null)
         {
-            LinqDBDataContext db = new LinqDBDataContext();
+            if(db == null)
+                db = new LinqDBDataContext();
+
             string result = "";
             string ctdh = "";
             string ctmau = "";
@@ -159,6 +162,36 @@ namespace jqGridHelper
                     //nam = (!namht.Equals(namct) ? namht.Substring(2, 2) : namct.Substring(2, 2));
                     result = genericNumberDoc(ctmau) + "/" + makhachhang + "_TI-" + namchungtu.Substring(2, 2);
                 }
+            }
+
+            return result;
+        }
+
+        public static string taoChungTuXuatKho(md_doitackinhdoanh dtkd, LinqDBDataContext db = null)
+        {
+            if (db == null)
+                db = new LinqDBDataContext();
+
+            string result = "";
+            string nam = DateTime.Now.ToString("yy");
+            string makhachhang = dtkd.ma_dtkd.Substring(0, 2);
+
+            var ctxk = db.c_packinginvoices
+                .Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id)
+                .OrderByDescending(s => s.ngaytao)
+                .Select(s => s.so_inv).FirstOrDefault();
+            ctxk = ctxk == null ? "" : ctxk;
+
+            var rgxSCT = new Regex($"^{makhachhang} [0-9][0-9][0-9][0-9]-[0-9][0-9]$");
+            if (!rgxSCT.IsMatch(ctxk))
+                result = $"{makhachhang} 0001-{nam}";
+            else
+            {
+                var indexTT = ctxk.LastIndexOf(" ") + 1;
+                string tiento = ctxk.Substring(0, indexTT);
+                string so = ctxk.Substring(indexTT, 4); 
+                string somoi = genericNumberDoc(so, 4);
+                result = $"{makhachhang} {somoi}-{nam}";
             }
 
             return result;
@@ -247,7 +280,7 @@ namespace jqGridHelper
             return result;
         }
 
-        public static string genericNumberDoc(string doc)
+        public static string genericNumberDoc(string doc, int number_length = 3)
         {
             try
             {
@@ -255,7 +288,7 @@ namespace jqGridHelper
                 sr = sr + 1;
                 string result = sr.ToString();
 
-                while (result.Length < 3)
+                while (result.Length < number_length)
                 {
                     result = "0" + result;
                 }

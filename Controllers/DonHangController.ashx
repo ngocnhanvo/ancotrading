@@ -1080,7 +1080,7 @@ public class DonHangController : IHttpHandler
                     }
 
                     mnu.md_banggia_id = context.Request.Form["md_banggia_id"];
-                    mnu.sochungtu = jqGridHelper.Utils.taoChungTuPO(context.Request.Form["md_doitackinhdoanh_id"], donhangmau_, mnu.ngaylap.Value.Year.ToString(), loaiDH);
+                    mnu.sochungtu = jqGridHelper.Utils.taoChungTuPO(context.Request.Form["md_doitackinhdoanh_id"], donhangmau_, mnu.ngaylap.Value.Year.ToString(), loaiDH, db);
 
                     mnu.chuyenphiDSDH = chuyenphiDSDH;
                     mnu.phanbodiscount = phanbodiscount;

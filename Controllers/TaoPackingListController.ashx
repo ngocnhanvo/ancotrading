@@ -13,9 +13,7 @@ public class TaoPackingListController : IHttpHandler {
     {
         try
         {
-            String txtSoPackingList = context.Request.Form["p[txtSoPackingList]"];
             String arrayPhieuXuat = context.Request.Form["p[arrayPhieuXuat]"].ToString();
-            String txtSoInvoice = context.Request.Form["p[txtSoPackingList]"].removeAllSpaceOrTrimText(true);
             String txtNgayLap = context.Request.Form["p[txtNgayLap]"];
             //String selNoiDi = context.Request.Form["p[selNoiDi]"];
             String selNoiDen = context.Request.Form["p[txtNoiDen]"];
@@ -44,12 +42,14 @@ public class TaoPackingListController : IHttpHandler {
             String md_doitackinhdoanh_id = donhangM.md_doitackinhdoanh_id;
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == md_doitackinhdoanh_id).FirstOrDefault();
 
-            c_packinginvoice p = new c_packinginvoice();
-            p.c_packinginvoice_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddhhmmss"));
-            p.so_pkl = txtSoPackingList;
-            p.so_inv = txtSoInvoice;
-            p.ngaylap = DateTime.ParseExact(txtNgayLap, "dd/MM/yyyy", null);
-            p.etd = DateTime.ParseExact(txtNgayVanDon, "dd/MM/yyyy", null);
+            String txtSoInvoice = jqGridHelper.Utils.taoChungTuXuatKho(dtkd, db);
+
+            var p = new c_packinginvoice();
+            p.c_packinginvoice_id = Helper.getNewId();
+            p.so_pkl = txtSoInvoice;
+            p.so_inv = p.so_pkl;
+            p.ngaylap = txtNgayLap.ToNullableDate();
+            p.etd = txtNgayVanDon.ToNullableDate();
             p.noiden = selNoiDen;
             p.mv = txtSoTau;
 
@@ -57,7 +57,7 @@ public class TaoPackingListController : IHttpHandler {
             p.diengiai_tru = txtDienGiaiTruLai;
             p.giatri_cong = decimal.Parse(txtGiaTriCongThem);
             p.giatri_tru = decimal.Parse(txtGiaTriTruLai);
-            p.md_trangthai_id = "SOANTHAO";
+            p.md_trangthai_id = Helper.SOANTHAO;
             p.thanhtoanxong = false;
             p.discount = UserUtils.getDiscountgPO(donhangM, null);
             p.totaldis = totalnet * p.discount / 100;
@@ -95,9 +95,8 @@ public class TaoPackingListController : IHttpHandler {
             hoadon.ngaytao = DateTime.Now;
             hoadon.ngaycapnhat = DateTime.Now;
             hoadon.hoatdong = true;
-            hoadon.md_trangthai_id = "SOANTHAO";
-
-            double discountHH = 0;
+            hoadon.md_trangthai_id = Helper.SOANTHAO;
+                
             var lstHH = new List<Dictionary<string, object>>();
             foreach (DataRow item in dt.Rows)
             {

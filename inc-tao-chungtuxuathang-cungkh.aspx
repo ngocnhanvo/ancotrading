@@ -591,10 +591,10 @@
     <div style="width:990px; margin:auto">
         <table id="frmFromKH" class="frm-packinglist" style="width:100%; text-align:left">
                 <tr>
-                    <td>Số Packing List/Invoice<b style="color:red">(*)</b></td>
+                    <%--<td>Số Packing List/Invoice<b style="color:red">(*)</b></td>
                     <td>:</td>
                     <td><input id="txtKHSoPackingList" name="txtKHtxtSoPackingList" type="text" required /></td>
-                    <%--<td>Số Invoice</td>
+                    <td>Số Invoice</td>
                     <td>:</td>--%>
                     <td><input id="txtKHSoInvoice" name="txtKHtxtSoInvoice" type="hidden" /></td>
                 </tr>

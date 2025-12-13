@@ -16,6 +16,7 @@ using QRCoder;
 public static class Extension
 {
     public static string fmtDate = "dd/MM/yyyy";
+    public static string fmtDateHHmmss = $"{fmtDate} HH:mm:ss";
 	public static string API_VINHGIA = System.Web.Configuration.WebConfigurationManager.AppSettings["API_VINHGIA"];
 	public static string API_ANCO2 = System.Web.Configuration.WebConfigurationManager.AppSettings["API_ANCO2"];
     public static string API_IPWanApp = System.Web.Configuration.WebConfigurationManager.AppSettings["API_IPWanApp"];

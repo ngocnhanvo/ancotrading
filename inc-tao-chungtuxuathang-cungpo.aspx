@@ -599,12 +599,12 @@
     <div style="width:990px; margin:auto">
             <table id="frmFromPO" class="frm-packinglist" style="width:100%; text-align:left">
                 <tr>
-                    <td>Số Packing List/Invoice<b style="color:red">(*)</b></td>
+                    <%--<td>Số Packing List/Invoice<b style="color:red">(*)</b></td>
                     <td>:</td>
                     <td><input id="txtSoPackingList" name="txtSoPackingList" type="text" /></td>
-                    <%--<td>Số Invoice</td>
-                    <td>:</td>--%>
-                    <td><input id="txtSoInvoice" name="txtSoInvoice" type="hidden" required /></td>
+                    <td>Số Invoice</td>
+                    <td>:</td>
+                    <td><input id="txtSoInvoice" name="txtSoInvoice" type="hidden" required /></td>--%>
                 </tr>
                 
                 <tr>

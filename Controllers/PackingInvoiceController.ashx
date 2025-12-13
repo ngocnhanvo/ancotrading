@@ -762,9 +762,8 @@ public class PackingInvoiceController : IHttpHandler
 
 
 
-
-        String sqlCount = "SELECT COUNT(*) AS count FROM c_packinginvoice pi where 1=1 {0} {1}";
-        sqlCount = String.Format(sqlCount, isadmin == true ? "" : " AND pi.nguoitao IN(" + strAccount + ")", filter);
+        string whereEX = isadmin == true ? "" : $" AND pi.nguoitao IN({strAccount})";
+        String sqlCount = $"SELECT COUNT(1) AS count FROM c_packinginvoice pi where 1=1 {whereEX} {filter}";
 
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
@@ -792,82 +791,106 @@ public class PackingInvoiceController : IHttpHandler
             sidx = "pi.c_packinginvoice_id";
         }
 
-        string strsql = string.Format(@"
-            select * from(
-                select pi.c_packinginvoice_id, pi.md_trangthai_id, pi.so_pkl, pi.so_inv, dbo.LayChungTuDonHang(pi.c_packinginvoice_id) as sodh, pi.nguoitao as nguoitao1,
-                pi.ngaylap, pi.nguoilap,
-                pi.consignee, pi.notifparty, pi.alsonotifyparty, pi.mv,
-                pi.etd, (select ten_cangbien from md_cangbien cb where cb.md_cangbien_id = pi.noidi) as cbdi,
-                pi.noiden,
-                pi.blno, pi.commodity, pi.discount, pi.handling_fee, pi.diengiai_cong, pi.giatri_cong,
-                pi.diengiai_tru, pi.giatri_tru,
-                pi.diengiaicong_po, pi.giatricong_po, pi.diengiaitru_po,pi.giatritru_po,
-                pi.commodityvn, pi.ngay_motokhai,
-                pi.ngay_phaitt, pi.totaldis, pi.totalnet, pi.totalgross,
-                pi.tiendatcoc, pi.tiendatra, pi.tienconlai,
-                pi.ngaytao, pi.nguoitao, pi.ngaycapnhat, pi.nguoicapnhat, pi.mota, pi.hoatdong, pi.tygiaUSD_VND,
-                ROW_NUMBER() OVER (ORDER BY {2} {3}) as RowNum
-                FROM c_packinginvoice pi
-                WHERE 1=1 {0} {1}
-            )P WHERE RowNum > @start AND RowNum < @end",
-            isadmin == true ? "" : " AND pi.nguoitao IN(" + strAccount + ")",
-            filter,
-            sidx,
-            sord
-        );
+        string strsql = $@"
+            select 
+                P.* 
+            from (
+                select 
+                    pi.c_packinginvoice_id, 
+                    pi.md_trangthai_id,
+                    dtkd.ma_dtkd,
+                    pi.so_inv, 
+                    dbo.LayChungTuDonHang(pi.c_packinginvoice_id) as sodh, 
+                    pi.nguoitao as nguoitao1,
+                    pi.ngaylap,
+                    pi.mv,
+                    pi.etd, 
+                    pi.etd2, 
+                    pi.POL, 
+                    pi.POD, 
+                    pi.importCountry, 
+                    pi.blno,
+                    pi.Forwarder, 
+                    pi.ngay_motokhai,
+                    pi.totalgross,
+                    pi.tiendatcoc, 
+                    pi.tiendatra, 
+                    pi.tienconlai,
+                    pi.ngay_phaitt,
+                    pi.khutrung,
+                    pi.ngayCutOff,
+                    pi.checkBL,
+                    pi.LocalCharge,
+                    pi.ngayPayMent,
+                    pi.ngayTelLex,
+                    pi.ghichuCT,
+                    pi.so_pkl, 
+                    pi.nguoilap,
+                    pi.consignee, 
+                    pi.notifparty, 
+                    pi.alsonotifyparty,
+                    (select ten_cangbien from md_cangbien cb where cb.md_cangbien_id = pi.noidi) as cbdi,
+                    pi.noiden,
+                    pi.commodity, 
+                    pi.discount, 
+                    pi.handling_fee, 
+                    pi.diengiai_cong, 
+                    pi.giatri_cong,
+                    pi.diengiai_tru, 
+                    pi.giatri_tru,
+                    pi.diengiaicong_po, 
+                    pi.giatricong_po, 
+                    pi.diengiaitru_po,
+                    pi.giatritru_po,
+                    pi.totaldis, 
+                    pi.totalnet, 
+                    pi.commodityvn, 
+                    pi.ngaytao, 
+                    pi.nguoitao, 
+                    pi.ngaycapnhat, 
+                    pi.nguoicapnhat, 
+                    pi.mota, 
+                    pi.hoatdong,
+                    ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
+                FROM 
+                    c_packinginvoice pi
+                    left join md_doitackinhdoanh dtkd on dtkd.md_doitackinhdoanh_id = pi.md_doitackinhdoanh_id
+                WHERE 
+                    1=1 
+                    {whereEX} 
+                    {filter}
+            ) P 
+            WHERE 
+                RowNum > @start AND RowNum < @end";
 
-        DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
+        var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
         xml += "<page>" + page + "</page>";
         xml += "<total>" + total_page + "</total>";
         xml += "<records>" + count + "</records>";
-        foreach (DataRow row in dt.Rows)
+        foreach (System.Data.DataRow row in dt.Rows)
         {
             xml += "<row>";
-            xml += "<cell><![CDATA[" + row[0] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[1] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[2] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[3] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[4] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[5] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[6].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[7] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[9] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[10] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[11] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[12].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[13] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[14] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[15] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[16] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[17] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[18] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[19] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[20] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[21] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[22] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[23] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[24] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[25] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[26] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[27] + "]]></cell>";
-            xml += "<cell><![CDATA[" + (row[28].ToString() == "" ? "" : DateTime.Parse(row[28].ToString()).ToString("dd/MM/yyyy")) + "]]></cell>";
-            xml += "<cell><![CDATA[" + (row[29].ToString() == "" ? "" : DateTime.Parse(row[29].ToString()).ToString("dd/MM/yyyy")) + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[30] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[31] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[32] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[33] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[34] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[35] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[36].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[37] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[38].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[39] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[40] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[41] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[42] + "]]></cell>";
+            foreach (System.Data.DataColumn column in dt.Columns)
+            {
+                if (column.DataType == System.Type.GetType("System.DateTime"))
+                {
+                    try
+                    {
+                        string fmt = Extension.fmtDate;
+                        if (new string[] { "ngaytao", "ngaycapnhat" }.Contains(column.ColumnName))
+                            fmt = Extension.fmtDateHHmmss;
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)row[column.ColumnName]).ToString(fmt));
+                    }
+                    catch
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
+                    }
+                }
+                else
+                    xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
+            }
             xml += "</row>";
         }
         xml += "</rows>";
