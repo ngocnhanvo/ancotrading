@@ -500,6 +500,16 @@
             , edittype: 'text'
         },
         {
+            fixed: true, name: 'co', hidden: false
+            , label: 'CO'
+            , index: 'co'
+            , editable: true
+            , width: 100
+            , edittype: 'text'
+            , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+            , formoptions: { colpos: 2, rowpos: 11 }
+        },
+        {
             fixed: true, name: 'ngayPayMent', hidden: false
             , label: 'Ngày gửi PAYMENT REQUEST'
             , index: 'ngayPayMent'

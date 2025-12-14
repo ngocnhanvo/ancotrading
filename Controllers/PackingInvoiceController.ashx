@@ -821,6 +821,7 @@ public class PackingInvoiceController : IHttpHandler
                     pi.ngayCutOff,
                     pi.checkBL,
                     pi.LocalCharge,
+                    pi.co,
                     pi.ngayPayMent,
                     pi.ngayTelLex,
                     pi.ghichuCT,
