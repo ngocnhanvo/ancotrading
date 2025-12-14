@@ -201,10 +201,12 @@
             let uutien = cellvalue.length <= 0;
             let id = $(rowObject).find('cell').eq(0).text();
             if (uutien) {
-                $(`#${id}`).css('background', 'beige');
+                //$(`#${id}`).css('background', 'beige');
+                $(`#${id}`).css('box-shadow', 'rgb(223 248 243) 6px 5px 9px 11px inset');
             }
             else {
-                $(`#${id}`).css('background', '');
+                //$(`#${id}`).css('background', '');
+                $(`#${id}`).css('box-shadow', '');
             }
         }, 100);
 
