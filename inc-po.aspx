@@ -1894,54 +1894,11 @@
                         , buttons: {
                             'Đồng ý': function () {
                                 let slcont20 = Number($('#slcont20_po').val());
-                                if (!slcont20) {
-                                    alert(`SL cont 20 phải là số`);
-                                    return;
-                                }
-                                if (isNaN(slcont20)) {
-                                    alert(`SL cont 20 phải là số`);
-                                    return;
-                                }
-
                                 let slcont40 = Number($('#slcont40_po').val());
-                                if (!slcont40) {
-                                    alert(`SL cont 40DC phải là số`);
-                                    return;
-                                }
-                                if (isNaN(slcont40)) {
-                                    alert(`SL cont 40DC phải là số`);
-                                    return;
-                                }
-
                                 let slcont40hc = Number($('#slcont40hc_po').val());
-                                if (!slcont40hc) {
-                                    alert(`SL cont 40HC phải là số`);
-                                    return;
-                                }
-                                if (isNaN(slcont40hc)) {
-                                    alert(`SL cont 40HC phải là số`);
-                                    return;
-                                }
-
                                 let slcont45 = Number($('#slcont45_po').val());
-                                if (!slcont45) {
-                                    alert(`SL cont 45 phải là số`);
-                                    return;
-                                }
-                                if (isNaN(slcont45)) {
-                                    alert(`SL cont 45 phải là số`);
-                                    return;
-                                }
-
                                 let slcontLCL = Number($('#slcontLCL_po').val());
-                                if (!slcontLCL) {
-                                    alert(`SL cont LCL phải là số`);
-                                    return;
-                                }
-                                if (isNaN(slcontLCL)) {
-                                    alert(`SL cont LCL phải là số`);
-                                    return;
-                                }
+                                let slcontLCL = Number($('#slcontLCL_po').val());
 
                                 let $wait = $('#waitChuyenChungTu');
                                 $wait.css('display', '');

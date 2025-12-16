@@ -120,11 +120,16 @@ public class NhapXuatController : IHttpHandler
             var c_dongdsdh_ids = dnxs.Select(t => t.a.c_dongdsdh_id).ToList();
             var ddshs = (from a in db.c_dongdsdhs
                          where
-                             a.sl_conlai <= 0 &
                              c_dongdsdh_ids.Contains(a.c_dongdsdh_id)
                          select a
                             ).ToList().Where(s=>dnxs.Where(t=>t.a.slthuc_nhapxuat > s.sl_conlai & t.a.c_dongdsdh_id == s.c_dongdsdh_id).Count() > 0).ToList();
             if (ddshs.Count > 0)
+            {
+                msg = $@"Không thể hiệu lực vì phiếu nhập kho {m.sophieu} có chứa mã hàng vượt quá số lượng có thể nhập.!";
+                goto EndEventHandler;
+            }
+
+            if (ddshs.Where(s=>s.sl_conlai <= 0).Count() > 0)
             {
                 msg = $@"Không thể hiệu lực vì phiếu nhập kho {m.sophieu} có chứa mã hàng đã nhập hết số lượng.!";
                 goto EndEventHandler;
