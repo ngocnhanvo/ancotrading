@@ -25,6 +25,8 @@ public partial class Views_hosochungtu_printHSCT_All : System.Web.UI.Page
             viewReport(sql);
         });
 
+        var download = Request.QueryString["download"].removeAllSpaceOrTrimText(true);
+        ReportViewer1.Attributes["download"] = string.IsNullOrWhiteSpace(download) ? "1" : download;
         PrintAnco2.exportDataWithType(task, sql, inPDF, nameTemp, nameRpt, ReportViewer1, true);
     }
 
@@ -37,9 +39,26 @@ public partial class Views_hosochungtu_printHSCT_All : System.Web.UI.Page
     {
         var tungay = Request.QueryString["tungay"];
         var denngay = Request.QueryString["denngay"];
-        string sql = $@"
+        var ids = Request.Form["ids"].removeAllSpaceOrTrimText(false).Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+        string whereEX = "";
+        string avaEX = "";
+        if(ids.Count > 0)
+        {
+            tungay = "        ";
+            denngay = "        ";
+            whereEX = $"and dh.c_donhangchungtu_id in ('{string.Join("','", ids)}')";
+        }
+        else
+        {
+            avaEX = $@"
             declare @tungay datetime = convert(datetime, '{tungay} 00:00:00', 103)
             declare @denngay datetime = convert(datetime, '{denngay} 23:59:59', 103)
+            ";
+            whereEX = $"and dh2.shipmenttime between @tungay and @denngay";
+        }
+
+        string sql = $@"
+            {avaEX}
             select
                 '{tungay}' as tungay
                 , '{denngay}' as denngay
@@ -85,7 +104,7 @@ public partial class Views_hosochungtu_printHSCT_All : System.Web.UI.Page
                 left join md_doitackinhdoanh kh on kh.md_doitackinhdoanh_id = dh2.md_doitackinhdoanh_id
                 outer apply (select top 1 POD, Forwarder from c_donhang_spd where c_donhang_id = dh2.c_donhang_id and trangthai = 'DAGUI' order by ngaytao desc) spd
             WHERE 1=1
-                and dh2.shipmenttime between @tungay and @denngay
+                {whereEX}
             order by dh.ngaytao desc
 		";
 

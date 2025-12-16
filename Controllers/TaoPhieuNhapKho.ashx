@@ -169,33 +169,43 @@ public class TaoPhieuNhapKho : IHttpHandler
                     soseal = seal.ToString();
                     loaictn = type.ToString();
                 }
-                var sp = db.md_sanphams.Where(s => s.ma_sanpham == msp).FirstOrDefault();
-                var ddh = db.c_dongdonhangs.Where(s => s.c_donhang_id == dh.c_donhang_id & s.md_sanpham_id == sp.md_sanpham_id).FirstOrDefault();
-                var ddsdh = db.c_dongdsdhs.Where(s => s.c_danhsachdathang_id == dsdh.c_danhsachdathang_id & s.md_sanpham_id == sp.md_sanpham_id).FirstOrDefault();
-                var sobj = new c_dongnhapxuat();
-                sobj.c_dongnhapxuat_id = Helper.getNewId();
-                sobj.c_nhapxuat_id = id;
-                sobj.c_dongdonhang_id = ddh.c_dongdonhang_id;
-                sobj.c_dongdsdh_id = ddsdh.c_dongdsdh_id;
-                sobj.md_sanpham_id = sp.md_sanpham_id;
-                // lấy mô tả của sản phẩm
-                sobj.mota_tiengviet = sp.mota_tiengviet;
+                var sltx = sl.ToString().ToNullableDecimal().GetValueOrDefault(0);
+                if (sltx > 0)
+                {
+                    var sp = db.md_sanphams.Where(s => s.ma_sanpham == msp).FirstOrDefault();
+                    var ddh = db.c_dongdonhangs.Where(s => s.c_donhang_id == dh.c_donhang_id & s.md_sanpham_id == sp.md_sanpham_id).FirstOrDefault();
+                    var ddsdh = db.c_dongdsdhs.Where(s => s.c_danhsachdathang_id == dsdh.c_danhsachdathang_id & s.md_sanpham_id == sp.md_sanpham_id).FirstOrDefault();
+                    var sobj = new c_dongnhapxuat();
+                    sobj.c_dongnhapxuat_id = Helper.getNewId();
+                    sobj.c_nhapxuat_id = id;
+                    sobj.c_dongdonhang_id = ddh.c_dongdonhang_id;
+                    sobj.c_dongdsdh_id = ddsdh.c_dongdsdh_id;
+                    sobj.md_sanpham_id = sp.md_sanpham_id;
+                    // lấy mô tả của sản phẩm
+                    sobj.mota_tiengviet = sp.mota_tiengviet;
 
-                sobj.md_donvitinh_id = sp.md_donvitinhsanpham_id;
-                sobj.slphai_nhapxuat = ddsdh.sl_dathang;
-                sobj.slthuc_nhapxuat = sl.ToString().ToNullableDecimal();
-                sobj.sl_dathang = ddsdh.sl_dathang;
-                sobj.dongia = ddsdh.gianhap;
+                    sobj.md_donvitinh_id = sp.md_donvitinhsanpham_id;
+                    sobj.slphai_nhapxuat = ddsdh.sl_dathang.GetValueOrDefault(0);
+                    sobj.slthuc_nhapxuat = sl.ToString().ToNullableDecimal().GetValueOrDefault(0);
+                    sobj.sl_dathang = ddsdh.sl_dathang;
+                    sobj.dongia = ddsdh.gianhap;
 
-                sobj.hoatdong = true;
-                sobj.ngaytao = DateTime.Now;
-                sobj.ngaycapnhat = DateTime.Now;
-                sobj.nguoitao = UserUtils.getUser(context);
-                sobj.nguoicapnhat = UserUtils.getUser(context);
-                sobj.line = stt;
-                stt += 10;
-                db.c_dongnhapxuats.InsertOnSubmit(sobj);
-                c_dongdsdh_ids.Add(sobj.c_dongdonhang_id);
+                    sobj.hoatdong = true;
+                    sobj.ngaytao = DateTime.Now;
+                    sobj.ngaycapnhat = DateTime.Now;
+                    sobj.nguoitao = UserUtils.getUser(context);
+                    sobj.nguoicapnhat = UserUtils.getUser(context);
+                    sobj.line = stt;
+                    stt += 10;
+                    db.c_dongnhapxuats.InsertOnSubmit(sobj);
+                    c_dongdsdh_ids.Add(sobj.c_dongdonhang_id);
+                }
+            }
+
+            if(c_dongdsdh_ids.Count <= 0)
+            {
+                msg = $"Không có dòng hàng nào được tạo (kiểm tra số lượng thực nhập)";
+                goto EndEventHandler;
             }
 
             //row = rows.Rows[saveI+3];

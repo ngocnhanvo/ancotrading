@@ -11,6 +11,7 @@ public static class Helper
 {
     #region bien toan cuc
     public static string nhanvienchungtu = "vongocnhancd10cntt2@gmail.com";
+    public static string NCC = "NCC";
     public static string CHUAGUI = "CHUAGUI";
     public static string DAGUI = "DAGUI";
     public static string DAHIEULUC = "DAHIEULUC";
@@ -541,5 +542,46 @@ public static class Helper
         }
 
         return kq;
+    }
+
+    public static string writeXML(System.Data.DataTable dt, int page, int total_page, int count)
+    {
+        string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
+        xml += "<rows>";
+        xml += "<page>" + page + "</page>";
+        xml += "<total>" + total_page + "</total>";
+        xml += "<records>" + count + "</records>";
+        foreach (System.Data.DataRow row in dt.Rows)
+        {
+            xml += "<row>";
+            foreach (System.Data.DataColumn column in dt.Columns)
+            {
+                if (column.DataType == System.Type.GetType("System.DateTime"))
+                {
+                    try
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)row[column.ColumnName]).ToString(Extension.fmtDate));
+                    }
+                    catch
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
+                    }
+                }
+                else if (column.DataType == Type.GetType("System.Decimal"))
+                {
+                    if (row[column.ColumnName] != null)
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
+                    else
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
+                }
+                else
+                {
+                    xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
+                }
+            }
+            xml += "</row>";
+        }
+        xml += "</rows>";
+        return xml;
     }
 }

@@ -86,11 +86,11 @@ public class DanhSachDatHangController : IHttpHandler
         var lst = new List<string>();
         lst.Add("");
         lst.Add(null);
-        lst.Add(CHUAGUI);
-        lst.Add(TUCHOI);
-        lst.Add("DAGUI");
-        lst.Add(DANHAN);
-        lst.Add(DAHIEULUC);
+        lst.Add(Helper.CHUAGUI);
+        lst.Add(Helper.TUCHOI);
+        lst.Add(Helper.DAGUI);
+        lst.Add(Helper.DANHAN);
+        lst.Add(Helper.DAHIEULUC);
         var msgs = new List<Dictionary<string, string>>(msgPublics);
         foreach (var msg in msgs)
         {

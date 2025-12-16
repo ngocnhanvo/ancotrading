@@ -1127,9 +1127,11 @@
 	        menu.off('contextmenu');
 	        menu.contextmenu(function (event) {
 	            let leftFunc = $('#' + id + '-pager_left');
-	            leftFunc = leftFunc.find('.ui-pg-button');
-
-	            event.preventDefault();
+                leftFunc = leftFunc.find('.ui-pg-button:visible');
+                event.preventDefault();
+                
+                if (leftFunc.length <= 0)
+                    return;
 	            let selRowIds = $('#' + id).jqGrid('getGridParam', 'selarrrow');
 
 	            if (selRowIds.length <= 1)

@@ -24,6 +24,9 @@ public class Controller_HoSoChungTu : IHttpHandler
             case "ngayBHXN":
                 this.ngayBHXN(context);
                 break;
+            case "sendMail":
+                this.sendMail(context);
+                break;
             default:
                 switch (oper)
                 {
@@ -42,6 +45,87 @@ public class Controller_HoSoChungTu : IHttpHandler
                 }
                 break;
         }
+    }
+
+    public void sendMail(HttpContext context)
+    {
+        string msg = "";
+        var ids = context.Request.Form["ids"].removeAllSpaceOrTrimText(false).Split(',').Where(s=> !string.IsNullOrEmpty(s)).ToList();
+        var nvbhs = context.Request.Form["nvbhs"].removeAllSpaceOrTrimText(false).Split(',').Where(s=> !string.IsNullOrEmpty(s)).ToList();
+        var nccs = context.Request.Form["nccs"].removeAllSpaceOrTrimText(false).Split(',').Where(s=> !string.IsNullOrEmpty(s)).ToList();
+        var tt = context.Request.Form["tt"].removeAllSpaceOrTrimText(true);
+        try
+        {
+            var hscts = db.c_donhangchungtus.Where(s => ids.Contains(s.c_donhangchungtu_id)).ToList();
+            if (hscts.Count <= 0)
+            {
+                msg = $@"Không tìm thấy dòng ""Hồ sơ"" đã chọn";
+                goto EndEventHandler;
+            }
+
+            var nvbhs2 = db.nhanviens.Where(s => nvbhs.Contains(s.manv)).OrderBy(s => s.email).ToList();
+            var nccs2 = db.md_doitackinhdoanhs.Where(s => nccs.Contains(s.ma_dtkd)).OrderBy(s => s.email).ToList();
+            if(nvbhs2.Count <= 0 & nccs2.Count <= 0)
+            {
+                msg = $@"Phải chọn nhân viên hoặc nhà cung cấp để gửi mail";
+                goto EndEventHandler;
+            }
+
+            var arrDHs = new List<string>();
+            foreach(var hsct in hscts)
+            {
+                var dh = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
+                if (dh != null)
+                    arrDHs.Add(dh.sochungtu);
+            }
+
+            if(!File.Exists(tt))
+            {
+                msg = $@"Không chiết xuất được tập tin theo hồ sơ đã chọn";
+                goto EndEventHandler;
+            }
+
+            string manv = UserUtils.getUser(context);
+            var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
+            var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(nv.smtp))
+            {
+                smtp = db.md_smtps.Where(s => s.md_smtp_id == nv.smtp).FirstOrDefault();
+            }
+            var mail = new GoogleMail();
+            mail.Email = nv.email;
+            mail.Password = nv.email_pass;
+            mail.Smtp = smtp.smtpserver;
+            mail.Port = smtp.port.Value;
+            mail.Ssl = smtp.use_ssl.GetValueOrDefault(false);
+            string title = $@"Hồ sơ chứng từ của đơn hàng ""{string.Join(", ", arrDHs.OrderBy(s=>s).ToList())}""", body = $@"Chi tiết vui lòng xem ở tập tin đính kèm";
+            var atts = new List<System.Net.Mail.Attachment>();
+            var att = new System.Net.Mail.Attachment(tt);
+            var name = "Chiết xuất hồ sơ.xls";
+            att.Name = name;
+            atts.Add(att);
+            var emails = nvbhs2.Select(s => s.email).ToList().Concat(nccs2.Select(s => s.email).ToList());
+            mail.Send(
+                nv.email
+                , string.Join(",", emails)
+                , nv.email
+                , ""
+                , title
+                , body
+                , atts
+            );
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length > 0)
+            jqGridHelper.Utils.writeResult(0, msg);
+        else
+            jqGridHelper.Utils.writeResult(1, "Gửi mail thành công");
     }
 
     public void selectnhanvienCT(HttpContext context)
@@ -237,10 +321,23 @@ public class Controller_HoSoChungTu : IHttpHandler
             hsct.ngaypass = ngaypass.ToNullableDate();
             hsct.ngaychuyenhoso = ngaychuyenhoso.ToNullableDate();
             hsct.nhanvienCT = nhanvienCT;
-            hsct.ngayBookCont = ngayBookCont.ToNullableDate();
-            hsct.bookingNo = bookingNo;
-            hsct.ngayETA = ngayETA.ToNullableDate();
 
+            //ngayBookCont
+            var date_ngayBookCont = ngayBookCont.ToNullableDate();
+            if (date_ngayBookCont != null & hsct.ngayBookCont == null)
+            {
+
+            }
+            hsct.ngayBookCont = date_ngayBookCont;
+
+            //bookingNo
+            if(string.IsNullOrEmpty(bookingNo) & string.IsNullOrEmpty(hsct.bookingNo))
+            {
+
+            }
+            hsct.bookingNo = bookingNo;
+
+            hsct.ngayETA = ngayETA.ToNullableDate();
             hsct.ngayETD = ngayETD.ToNullableDate();
             hsct.ngayBHXN = ngayBHXN.ToNullableDate();
             if (hsct.ngayETD != null & hsct.ngayBHXN == null)
@@ -396,29 +493,29 @@ public class Controller_HoSoChungTu : IHttpHandler
                 , kh.ma_dtkd
                 , dh2.sochungtu
                 , dh2.customer_order_no
-                , spd.POD
-                , dh2.shipmenttime
-                , DATEADD(day, -7, dh2.shipmenttime) as hangiaohang_po
-                , dh.ngaydieuchinh
-                , dh2.ngaypass
-                , dh.ngaychuyenhoso
-                , dh2.nguoilap
-                , dh.nhanvienCT
                 , dh.cont20
                 , dh.cont40
                 , dh.cont40hc
                 , dh.cont45
                 , dh.contLCL
                 , dh.dongghep
-                , spd.Forwarder
-                , dh.ngayBookCont
+                , dh.mota
                 , dh.bookingNo
                 , dh.ngayETD
                 , dh.ngayETA
                 , dh.ngayBHXN
                 , dh.ngayXuong
                 , dh.ngayCutOff
-                , dh.mota
+                , dh2.ngaypass
+                , dh2.shipmenttime
+                , DATEADD(day, -7, dh2.shipmenttime) as hangiaohang_po
+                , dh.ngaydieuchinh
+                , dh.ngaychuyenhoso
+                , dh2.nguoilap
+                , dh.nhanvienCT
+                , spd.Forwarder
+                , dh.ngayBookCont
+                , spd.POD
                 , dh.ngaytao
                 , dh.nguoitao
                 , dh.ngaycapnhat

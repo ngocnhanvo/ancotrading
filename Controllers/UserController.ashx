@@ -17,6 +17,9 @@ public class UserController : IHttpHandler {
             case "getoption":
                 this.getSelectOption(context);
                 break;
+            case "loadNVBH":
+                this.loadNVBH(context);
+                break;
             default:
                 switch (oper)
                 {
@@ -35,6 +38,83 @@ public class UserController : IHttpHandler {
                 }
                 break;
         }
+    }
+
+    public void loadNVBH(HttpContext context)
+    {
+        context.Response.ContentType = "text/xml";
+        context.Response.Charset = "UTF-8";
+
+        //// filter
+        String filter = "";
+        bool _search = bool.Parse(context.Request.QueryString["_search"]);
+        if (_search)
+        {
+            String _filters = context.Request.QueryString["filters"];
+            jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
+            filter = f.ToScript();
+        }
+
+        filter += "and vt.tenvt = N'Nghiệp Vụ'";
+
+        string sqlCount = $@"
+            SELECT 
+                COUNT(1) AS count 
+            from 
+                nhanvien nv 
+                left join vaitro vt on nv.mavt = vt.mavt 
+            where 
+                1=1 {filter}";
+
+        int page = int.Parse(context.Request.QueryString["page"]);
+        int limit = int.Parse(context.Request.QueryString["rows"]);
+        String sidx = context.Request.QueryString["sidx"];
+        String sord = context.Request.QueryString["sord"];
+        int total_page;
+        int count = (int)mdbc.ExecuteScalar(sqlCount);
+        int start, end;
+
+        if (count > 0)
+        {
+            total_page = (int)Math.Ceiling(1.0 * count / limit);
+        }
+        else
+        {
+            total_page = 0;
+        }
+
+        if (page > total_page) page = total_page;
+        start = limit * page - limit;
+        end = (page * limit) + 1;
+
+        if (sidx.Equals("") || sidx == null)
+        {
+            sidx = "nv.manv";
+        }
+
+        string strsql = $@"
+            select 
+                P.* 
+            from ( 
+                select 
+                    nv.manv, 
+                    nv.hoten, 
+                    nv.email, 
+                    ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum 
+                from 
+                    nhanvien nv 
+                    left join vaitro vt on nv.mavt = vt.mavt 
+                    left join md_smtp smtp on nv.smtp = smtp.md_smtp_id 
+                where 
+                    1=1 {filter}  
+            )P 
+            where 
+                RowNum > @start AND RowNum < @end"
+         ;
+
+        var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
+        string xml = Helper.writeXML(dt, page, total_page, count);
+        context.Response.Write(xml);
     }
 
     public void getSelectOption(HttpContext context)
@@ -67,8 +147,8 @@ public class UserController : IHttpHandler {
         bool hieuLucDH = context.Request.Form["hieuLucDH"].ToLower() == "true";
         bool themPhiSauHL = context.Request.Form["themPhiSauHL"].ToLower() == "true";
         bool website = context.Request.Form["website"].ToLower() == "true";
-		bool websiteClient = context.Request.Form["websiteClient"].ToLower() == "true";
-		
+        bool websiteClient = context.Request.Form["websiteClient"].ToLower() == "true";
+
         String mk = context.Request.Form["matkhau"];
 
         nhanvien u = db.nhanviens.Single(p => p.manv == context.Request.Form["id"]);
@@ -90,7 +170,7 @@ public class UserController : IHttpHandler {
         u.hieuLucDH = hieuLucDH;
         u.themPhiSauHL = themPhiSauHL;
         u.website = website;
-		u.websiteClient = websiteClient;
+        u.websiteClient = websiteClient;
 
         u.ngaycapnhat = DateTime.Now;
         u.nguoicapnhat = UserUtils.getUser(context);
@@ -121,8 +201,8 @@ public class UserController : IHttpHandler {
         bool hieuLucDH = context.Request.Form["hieuLucDH"].ToLower() == "true";
         bool themPhiSauHL = context.Request.Form["themPhiSauHL"].ToLower() == "true";
         bool website = context.Request.Form["website"].ToLower() == "true";
-		bool websiteClient = context.Request.Form["websiteClient"].ToLower() == "true";
-		
+        bool websiteClient = context.Request.Form["websiteClient"].ToLower() == "true";
+
         String manv = context.Request.Form["manv"];
 
         nhanvien nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
@@ -147,7 +227,7 @@ public class UserController : IHttpHandler {
                 hieuLucDH = hieuLucDH,
                 themPhiSauHL = themPhiSauHL,
                 website = website,
-				websiteClient = websiteClient,
+                websiteClient = websiteClient,
                 mota = context.Request.Form["mota"],
                 hoatdong = hd,
 
@@ -277,7 +357,7 @@ public class UserController : IHttpHandler {
             xml += "<cell><![CDATA[" + row["hieuLucDH"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["themPhiSauHL"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["website"] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row["websiteClient"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["websiteClient"] + "]]></cell>";
 
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";

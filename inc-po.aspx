@@ -1833,6 +1833,15 @@
                         <div style="margin-top:5px;">
                             <table style="width:100%">
                                 <tr>
+                                    <td>Loại chuyển</td>
+                                    <td>
+                                        <select id="loaichuyen_po">
+                                            <option value="Moi">Mới</option>
+                                            <option value="Bosung">Bổ sung</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td>Đơn hàng ưu tiên</td>
                                     <td><select id="dhut_po">${options}</select></td>
                                 </tr>

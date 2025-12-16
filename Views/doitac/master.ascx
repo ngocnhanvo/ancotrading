@@ -33,14 +33,14 @@
         , key: true
     },
     {
-            fixed: true, name: 'tenloai'
-            , label: 'Loại Đối Tác'
-            , index: 'ldt.ten_loaidtkd'
-            , editable: true
-            , width: 100
-            , edittype: 'select'
-            , editoptions: { dataUrl: 'Controllers/CategoryPartnerController.ashx?action=getoption' }
-            , editrules:{ edithidden:true }
+        fixed: true, name: 'tenloai'
+        , label: 'Loại Đối Tác'
+        , index: 'ldt.ten_loaidtkd'
+        , editable: true
+        , width: 100
+        , edittype: 'select'
+        , editoptions: { dataUrl: 'Controllers/CategoryPartnerController.ashx?action=getoption' }
+        , editrules:{ edithidden:true }
     },
     {
         fixed: true, name: 'ma_dtkd'
@@ -291,6 +291,7 @@
         , align: 'center'
         , editoptions:{ value:'True:False', defaultValue: 'True' }
         , formatter: 'checkbox'
+        , editrules:{ edithidden:true }
     }
     ]"
     Height="170"
