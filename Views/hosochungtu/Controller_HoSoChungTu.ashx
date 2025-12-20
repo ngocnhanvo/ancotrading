@@ -18,8 +18,11 @@ public class Controller_HoSoChungTu : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
-            case "selectnhanvienCT":
-                this.selectnhanvienCT(context);
+            case "hieuluc":
+                this.hieuluc(context);
+                break;
+            case "ketthuc":
+                this.ketthuc(context);
                 break;
             case "ngayBHXN":
                 this.ngayBHXN(context);
@@ -47,12 +50,131 @@ public class Controller_HoSoChungTu : IHttpHandler
         }
     }
 
+    private void tudong_CapNhatTrangThaiChoCacHoSoGhep(LinqDBDataContext dblc, c_donhangchungtu hsct, c_donhang donhang)
+    {
+        foreach (var hsctk in dblc.c_donhangchungtus.Where(s => s.dongghep == donhang.sochungtu & s.c_donhangchungtu_id != hsct.c_donhangchungtu_id))
+        {
+            hsctk.trangthai = hsct.trangthai;
+            var donhangk = dblc.c_donhangs.Where(s => s.c_donhang_id == hsctk.c_donhang_id & s.trangthaict != Helper.DAHIEULUC).FirstOrDefault();
+            if (donhangk != null)
+            {
+                if (hsctk.trangthai != Helper.SOANTHAO)
+                {
+                    donhangk.trangthaict = Helper.DAHIEULUC;
+                }
+            }
+        }
+    }
+
+    public void hieuluc(HttpContext context)
+    {
+        string msg = "";
+        string id = context.Request.Form["id"];
+        try
+        {
+            var hsct = db.c_donhangchungtus.Where(s => s.c_donhangchungtu_id == id).FirstOrDefault();
+            if (hsct == null)
+            {
+                msg = $@"Không tìm thấy dòng ""Hồ sơ"" đã chọn";
+                goto EndEventHandler;
+            }
+
+            if (!string.IsNullOrWhiteSpace(hsct.dongghep))
+            {
+                msg = $@"Hồ sơ thuộc đơn hàng được ghép, vui lòng hiệu lực hồ sơ có đơn hàng ưu tiên ""{hsct.dongghep}""";
+                goto EndEventHandler;
+            }
+
+            if (hsct.trangthai != Helper.SOANTHAO)
+            {
+                msg = $@"Hồ sơ không ở trạng thái Soạn Thảo";
+                goto EndEventHandler;
+            }
+
+            var donhang = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
+            if (donhang == null)
+            {
+                msg = $@"Hồ sơ chứa đơn hàng không tồn tại trong hệ thống";
+                goto EndEventHandler;
+            }
+
+            hsct.trangthai = Helper.HIEULUC;
+            hsct.ngaycapnhat = DateTime.Now;
+            hsct.nguoicapnhat = UserUtils.getUser(context);
+            donhang.trangthaict = Helper.DAHIEULUC;
+            tudong_CapNhatTrangThaiChoCacHoSoGhep(db, hsct, donhang);
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length > 0)
+            jqGridHelper.Utils.writeResult(0, msg);
+        else
+            jqGridHelper.Utils.writeResult(1, "Hiệu lực thành công");
+    }
+
+    public void ketthuc(HttpContext context)
+    {
+        string msg = "";
+        string id = context.Request.Form["id"];
+        try
+        {
+            var hsct = db.c_donhangchungtus.Where(s => s.c_donhangchungtu_id == id).FirstOrDefault();
+            if (hsct == null)
+            {
+                msg = $@"Không tìm thấy dòng ""Hồ sơ"" đã chọn";
+                goto EndEventHandler;
+            }
+
+            if (!string.IsNullOrWhiteSpace(hsct.dongghep))
+            {
+                msg = $@"Hồ sơ thuộc đơn hàng được ghép, vui lòng kết thúc hồ sơ có đơn hàng ưu tiên ""{hsct.dongghep}""";
+                goto EndEventHandler;
+            }
+
+            if (hsct.trangthai == Helper.SOANTHAO)
+            {
+                msg = $@"Hồ sơ vẫn còn đang Soạn Thảo";
+                goto EndEventHandler;
+            }
+
+            var donhang = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
+            if (donhang == null)
+            {
+                msg = $@"Hồ sơ chứa đơn hàng không tồn tại trong hệ thống";
+                goto EndEventHandler;
+            }
+
+            hsct.trangthai = Helper.KETTHUC;
+            hsct.ngaycapnhat = DateTime.Now;
+            hsct.nguoicapnhat = UserUtils.getUser(context);
+            tudong_CapNhatTrangThaiChoCacHoSoGhep(db, hsct, donhang);
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length > 0)
+            jqGridHelper.Utils.writeResult(0, msg);
+        else
+            jqGridHelper.Utils.writeResult(1, "Kết thúc thành công");
+    }
+
     public void sendMail(HttpContext context)
     {
         string msg = "";
-        var ids = context.Request.Form["ids"].removeAllSpaceOrTrimText(false).Split(',').Where(s=> !string.IsNullOrEmpty(s)).ToList();
-        var nvbhs = context.Request.Form["nvbhs"].removeAllSpaceOrTrimText(false).Split(',').Where(s=> !string.IsNullOrEmpty(s)).ToList();
-        var nccs = context.Request.Form["nccs"].removeAllSpaceOrTrimText(false).Split(',').Where(s=> !string.IsNullOrEmpty(s)).ToList();
+        var ids = context.Request.Form["ids"].removeAllSpaceOrTrimText(false).Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+        var nvbhs = context.Request.Form["nvbhs"].removeAllSpaceOrTrimText(false).Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+        var nccs = context.Request.Form["nccs"].removeAllSpaceOrTrimText(false).Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
         var tt = context.Request.Form["tt"].removeAllSpaceOrTrimText(true);
         try
         {
@@ -65,21 +187,21 @@ public class Controller_HoSoChungTu : IHttpHandler
 
             var nvbhs2 = db.nhanviens.Where(s => nvbhs.Contains(s.manv)).OrderBy(s => s.email).ToList();
             var nccs2 = db.md_doitackinhdoanhs.Where(s => nccs.Contains(s.ma_dtkd)).OrderBy(s => s.email).ToList();
-            if(nvbhs2.Count <= 0 & nccs2.Count <= 0)
+            if (nvbhs2.Count <= 0 & nccs2.Count <= 0)
             {
                 msg = $@"Phải chọn nhân viên hoặc nhà cung cấp để gửi mail";
                 goto EndEventHandler;
             }
 
             var arrDHs = new List<string>();
-            foreach(var hsct in hscts)
+            foreach (var hsct in hscts)
             {
                 var dh = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
                 if (dh != null)
                     arrDHs.Add(dh.sochungtu);
             }
 
-            if(!File.Exists(tt))
+            if (!File.Exists(tt))
             {
                 msg = $@"Không chiết xuất được tập tin theo hồ sơ đã chọn";
                 goto EndEventHandler;
@@ -98,7 +220,7 @@ public class Controller_HoSoChungTu : IHttpHandler
             mail.Smtp = smtp.smtpserver;
             mail.Port = smtp.port.Value;
             mail.Ssl = smtp.use_ssl.GetValueOrDefault(false);
-            string title = $@"Hồ sơ chứng từ của đơn hàng ""{string.Join(", ", arrDHs.OrderBy(s=>s).ToList())}""", body = $@"Chi tiết vui lòng xem ở tập tin đính kèm";
+            string title = $@"Hồ sơ chứng từ của đơn hàng ""{string.Join(", ", arrDHs.OrderBy(s => s).ToList())}""", body = $@"Chi tiết vui lòng xem ở tập tin đính kèm";
             var atts = new List<System.Net.Mail.Attachment>();
             var att = new System.Net.Mail.Attachment(tt);
             var name = "Chiết xuất hồ sơ.xls";
@@ -128,18 +250,6 @@ public class Controller_HoSoChungTu : IHttpHandler
             jqGridHelper.Utils.writeResult(1, "Gửi mail thành công");
     }
 
-    public void selectnhanvienCT(HttpContext context)
-    {
-        string str = "";
-        str += "<select><option value=\"\"></option>";
-        foreach (var nhanvien in db.nhanviens.Where(s => s.hoatdong == true).OrderBy(s => s.manv))
-        {
-            str += string.Format("<option value=\"{0}\">{1}</option>", nhanvien.manv, nhanvien.manv);
-        }
-        str += "</select>";
-        context.Response.Write(str);
-    }
-
     public void ngayBHXN(HttpContext context)
     {
         string msg = "";
@@ -160,21 +270,21 @@ public class Controller_HoSoChungTu : IHttpHandler
             }
 
             var dh = db.c_donhangs.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
-            if(dh == null)
+            if (dh == null)
             {
                 msg = $@"Không tìm thấy đơn hàng gốc đang liên kết với hồ sơ";
                 goto EndEventHandler;
             }
 
             var nvbh = db.nhanviens.Where(s => s.manv == dh.nguoilap).FirstOrDefault();
-            if(nvbh == null)
+            if (nvbh == null)
             {
                 msg = $@"Không tìm thấy nhân viên bán hàng ""{dh.nguoilap}"" trong danh sách nhân viên";
                 goto EndEventHandler;
             }
 
             var ngayBHXN = context.Request.Form["ngayBHXN"].removeAllSpaceOrTrimText(true).ToNullableDate();
-            if(ngayBHXN == null)
+            if (ngayBHXN == null)
             {
                 msg = $@"Ngày đã chọn không đúng định dạng (dd/MM/yyyy) hoặc đang bị bỏ trống";
                 goto EndEventHandler;
@@ -184,7 +294,7 @@ public class Controller_HoSoChungTu : IHttpHandler
             dh.ngayBHXN = ngayBHXN;
             var arrDHCLs = new List<string>();
             var hsct2s = db.c_donhangchungtus.Where(s => s.dongghep == dh.sochungtu).OrderBy(s => s.dongghep).ToList();
-            foreach(var hsct2 in hsct2s)
+            foreach (var hsct2 in hsct2s)
             {
                 var dh2 = db.c_donhangs.Where(s => s.c_donhang_id == hsct2.c_donhang_id).FirstOrDefault();
                 if (dh2 != null)
@@ -262,12 +372,21 @@ public class Controller_HoSoChungTu : IHttpHandler
         string ngayBHXN = context.Request.Form["ngayBHXN"].removeAllSpaceOrTrimText(true);
         string mota = context.Request.Form["mota"].removeAllSpaceOrTrimText(true);
         string trangthai = context.Request.Form["trangthai"].removeAllSpaceOrTrimText(true);
+        string trangthai2 = context.Request.Form["trangthai2"].removeAllSpaceOrTrimText(true);
+        string ngayKeoCont = context.Request.Form["ngayKeoCont"].removeAllSpaceOrTrimText(true);
+        string ghichusau = context.Request.Form["ghichusau"].removeAllSpaceOrTrimText(true);
         try
         {
             var hsct = db.c_donhangchungtus.Where(s => s.c_donhangchungtu_id == id).FirstOrDefault();
             if (hsct == null)
             {
                 msg = $@"Không tìm thấy dòng ""Hồ sơ"" đã chọn";
+                goto EndEventHandler;
+            }
+
+            if (!string.IsNullOrWhiteSpace(hsct.dongghep))
+            {
+                msg = $@"Hồ sơ thuộc đơn hàng được ghép, vui lòng sửa hồ sơ có đơn hàng ưu tiên ""{hsct.dongghep}""";
                 goto EndEventHandler;
             }
 
@@ -292,51 +411,78 @@ public class Controller_HoSoChungTu : IHttpHandler
                 }
             }
 
-            if(trangthai != hsct.trangthai)
-            {
-                if(!string.IsNullOrWhiteSpace(hsct.dongghep) & donhang.sochungtu != hsct.dongghep)
-                {
-                    msg = $@"Hồ sơ có đơn hàng được ghép với đơn hàng ""{hsct.dongghep}""";
-                    goto EndEventHandler;
-                }
-                else
-                {
-                    foreach(var hsctk in db.c_donhangchungtus.Where(s=>s.dongghep == donhang.sochungtu & s.c_donhangchungtu_id != hsct.c_donhangchungtu_id))
-                    {
-                        var donhangk = db.c_donhangs.Where(s => s.c_donhang_id == hsctk.c_donhang_id).FirstOrDefault();
-                        if (hsctk.trangthai == Helper.SOANTHAO & trangthai != Helper.SOANTHAO)
-                        {
-                            if (donhangk != null)
-                            {
-                                donhangk.trangthaict =  Helper.DAHIEULUC;
-                            }
-                        }
-                        hsctk.trangthai = trangthai;
-                    }
-                }
-            }
-
-            hsct.trangthai = trangthai;
-            hsct.ngaydieuchinh = ngaydieuchinh.ToNullableDate();
-            hsct.ngaypass = ngaypass.ToNullableDate();
-            hsct.ngaychuyenhoso = ngaychuyenhoso.ToNullableDate();
-            hsct.nhanvienCT = nhanvienCT;
-
             //ngayBookCont
             var date_ngayBookCont = ngayBookCont.ToNullableDate();
             if (date_ngayBookCont != null & hsct.ngayBookCont == null)
             {
-
+                if (hsct.trangthai != Helper.HIEULUC)
+                {
+                    msg = $@"Cần hiệu lực trước khi điền ngày book container";
+                    goto EndEventHandler;
+                }
+                hsct.trangthai = Helper.DAGUIBC;
+            }
+            if (hsct.ngayBookCont != null & date_ngayBookCont == null)
+            {
+                msg = $@"Ngày book container không thể bỏ trống khi đã có giá trị";
+                goto EndEventHandler;
             }
             hsct.ngayBookCont = date_ngayBookCont;
 
             //bookingNo
-            if(string.IsNullOrEmpty(bookingNo) & string.IsNullOrEmpty(hsct.bookingNo))
+            var chkValue_bookingNo = string.IsNullOrWhiteSpace(bookingNo);
+            if (!chkValue_bookingNo & string.IsNullOrEmpty(hsct.bookingNo))
             {
-
+                if (hsct.trangthai != Helper.DAGUIBC)
+                {
+                    msg = $@"Cần điền ngày book container trước khi điền Booking No";
+                    goto EndEventHandler;
+                }
+                hsct.trangthai = Helper.DACOLT;
+            }
+            if (hsct.bookingNo.removeAllSpaceOrTrimText(true).Length > 0 & chkValue_bookingNo)
+            {
+                msg = $@"Booking No không thể bỏ trống khi đã có giá trị";
+                goto EndEventHandler;
             }
             hsct.bookingNo = bookingNo;
 
+            //ngayKeoCont
+            var date_ngayKeoCont = ngayKeoCont.ToNullableDate();
+            if (date_ngayKeoCont != null & hsct.ngayKeoCont == null)
+            {
+                if (hsct.trangthai != Helper.DACOLT)
+                {
+                    msg = $@"Cần điền Booking no trước khi điền ngày kéo cont / xuất hàng";
+                    goto EndEventHandler;
+                }
+                hsct.trangthai = Helper.DAKEOC;
+            }
+            if (hsct.ngayKeoCont != null & date_ngayKeoCont == null)
+            {
+                msg = $@"Ngày kéo cont / xuất hàng không thể bỏ trống khi đã có giá trị";
+                goto EndEventHandler;
+            }
+            hsct.ngayKeoCont = date_ngayKeoCont;
+
+            foreach (var hsctk in db.c_donhangchungtus.Where(s => s.dongghep == donhang.sochungtu & s.c_donhangchungtu_id != hsct.c_donhangchungtu_id))
+            {
+                var donhangk = db.c_donhangs.Where(s => s.c_donhang_id == hsctk.c_donhang_id & s.trangthaict != Helper.DAHIEULUC).FirstOrDefault();
+                if (donhangk != null)
+                {
+                    if (hsctk.trangthai != Helper.SOANTHAO)
+                    {
+                        donhangk.trangthaict = Helper.DAHIEULUC;
+                    }
+                }
+                hsctk.trangthai = hsct.trangthai;
+            }
+
+            hsct.trangthai2 = trangthai2;
+            hsct.ngaydieuchinh = ngaydieuchinh.ToNullableDate();
+            hsct.ngaypass = ngaypass.ToNullableDate();
+            hsct.ngaychuyenhoso = ngaychuyenhoso.ToNullableDate();
+            hsct.nhanvienCT = nhanvienCT;
             hsct.ngayETA = ngayETA.ToNullableDate();
             hsct.ngayETD = ngayETD.ToNullableDate();
             hsct.ngayBHXN = ngayBHXN.ToNullableDate();
@@ -349,6 +495,7 @@ public class Controller_HoSoChungTu : IHttpHandler
                 hsct.ngayXuong = hsct.ngayCutOff.Value.AddDays(-2);
 
             hsct.mota = mota;
+            hsct.ghichusau = ghichusau;
             hsct.ngaycapnhat = DateTime.Now;
             hsct.nguoicapnhat = UserUtils.getUser(context);
             db.SubmitChanges();
@@ -413,6 +560,24 @@ public class Controller_HoSoChungTu : IHttpHandler
                 links.Add(ExcuteSignalRStatic.mapPathSignalR($@"~/{taptin.path}"));
             }
 
+            var hsctks = db.c_donhangchungtus.Where(s => s.dongghep == dh.sochungtu).ToList();
+            foreach (var hsctk in hsctks)
+            {
+                var dhk = db.c_donhangs.Where(s => s.c_donhang_id == hsctk.c_donhang_id).FirstOrDefault();
+                if (dhk != null)
+                {
+                    if (dhk.md_trangthai_id == Helper.SOANTHAO)
+                        dhk.trangthaict = Helper.CHUAGUI;
+                    else
+                        dhk.trangthaict = Helper.TUCHOI;
+
+                    foreach (var spdk in db.c_donhang_spds.Where(s => s.c_donhang_id == dhk.c_donhang_id & s.trangthai == Helper.DAGUI))
+                    {
+                        spdk.trangthai = Helper.CHUAGUI;
+                    }
+                }
+                db.c_donhangchungtus.DeleteOnSubmit(hsctk);
+            }
             db.c_donhangchungtus.DeleteOnSubmit(hsct);
             db.SubmitChanges();
 
@@ -490,6 +655,8 @@ public class Controller_HoSoChungTu : IHttpHandler
                 dh.c_donhangchungtu_id
                 , dh.c_donhang_id
                 , dh.trangthai
+                , dh.trangthai2
+                , dh.trangthai2 as trangthai2CP
                 , kh.ma_dtkd
                 , dh2.sochungtu
                 , dh2.customer_order_no
@@ -516,12 +683,14 @@ public class Controller_HoSoChungTu : IHttpHandler
                 , spd.Forwarder
                 , dh.ngayBookCont
                 , spd.POD
+                , dh.ngayKeoCont
+                , dh.ghichusau
                 , dh.ngaytao
                 , dh.nguoitao
                 , dh.ngaycapnhat
                 , dh.nguoicapnhat
                 , dh.hoatdong
-                , ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
+                , ROW_NUMBER() OVER (ORDER BY (CASE WHEN dh.trangthai = 'KETTHUC' THEN 1 ELSE 0 END) ASC, {sidx} {sord}) as RowNum
             FROM c_donhangchungtu dh
                 left join c_donhang dh2 on dh2.c_donhang_id = dh.c_donhang_id
                 left join md_doitackinhdoanh kh on kh.md_doitackinhdoanh_id = dh2.md_doitackinhdoanh_id

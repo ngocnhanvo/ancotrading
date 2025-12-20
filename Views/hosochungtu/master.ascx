@@ -2,7 +2,7 @@
 <%@ Register Src="~/jqGrid.ascx" TagName="jqGrid" TagPrefix="uc1" %>
 
 <script type="text/javascript">
-
+    var nvcts_hosochungtu = <%=nvctsStr%>;
     function printhosochungtu() {
         let piId = $('#grid_ds_hosochungtu').jqGrid('getGridParam', 'selrow');
         let name = 'dialog-print-hosochungtu-pi';
@@ -319,6 +319,140 @@
         });
     }
 
+    function funcKetThuchosochungtu() {
+        let id = $("#grid_ds_hosochungtu").jqGrid('getGridParam', 'selrow');
+        if (id == null) {
+            alert('Chưa chọn hồ sơ muốn kết thúc.!');
+            return;
+        }
+
+        let name = 'dialog-ketthuc-hosochungtu-pi';
+        let title = 'Kết thúc hồ sơ';
+        let content = `
+            <div>
+                <h3 style="padding: 10px" class="ui-state-highlight ui-corner-all" id="dialog-caution">Có phải bạn muốn kết thúc hồ sơ này?</h3>
+                <div style="display:none" id="wait">
+                    <img style="width:30px; height:30px" src="iconcollection/loading.gif"/>
+                </div>
+            </div>
+        `;
+        $('body').append(`<div title="${title}" id="${name}">${content}</div>`);
+
+        // create new dialog
+        $(`#${name}`).dialog({
+            modal: true
+            , open: function (event, ui) {
+                //hide close button.
+                $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+            }
+            , buttons:
+                [
+                    {
+                        id: `btn-yes-${name}`,
+                        text: "Có",
+                        click: function () {
+                            let ajaxStart = function () {
+                                $("#wait").css("display", "block");
+                                $(`#btn-yes-${name}`).button("disable");
+                                $(`#btn-close-${name}`).button("disable");
+                            };
+
+                            let ajaxComplete = function () {
+                                $("#wait").css("display", "none");
+                                $(`#btn-close-${name} span`).text("Thoát");
+                                $(`#btn-close-${name}`).button("enable");
+                            };
+
+                            ajaxStart();
+                            $.post(`Views/hosochungtu/Controller_hosochungtu.ashx?action=ketthuc`, {id: id }, function (result) {
+                                ajaxComplete();
+                                let $xmlObject = $(result); 
+                                let ok = $xmlObject.find('type').text() == '1';
+                                let msg = $xmlObject.find('message').text();
+                                $(`#${name}`).find('#dialog-caution').html(msg);
+                                if (ok)
+                                    $('#grid_ds_hosochungtu')[0].triggerToolbar();
+                            });
+                        }
+                    },
+                    {
+                        id: `btn-close-${name}`,
+                        text: "Không",
+                        click: function () {
+                            $(this).dialog("destroy").remove();
+                        }
+                    }
+                ]
+        });
+    }
+
+    function funcHieuLuchosochungtu() {
+        let id = $("#grid_ds_hosochungtu").jqGrid('getGridParam', 'selrow');
+        if (id == null) {
+            alert('Chưa chọn hồ sơ muốn Hiệu Lực.!');
+            return;
+        }
+
+        let name = 'dialog-hieuluc-hosochungtu-pi';
+        let title = 'Hiệu lực hồ sơ';
+        let content = `
+            <div>
+                <h3 style="padding: 10px" class="ui-state-highlight ui-corner-all" id="dialog-caution">Có phải bạn muốn hiệu lực hồ sơ này?</h3>
+                <div style="display:none" id="wait">
+                    <img style="width:30px; height:30px" src="iconcollection/loading.gif"/>
+                </div>
+            </div>
+        `;
+        $('body').append(`<div title="${title}" id="${name}">${content}</div>`);
+
+        // create new dialog
+        $(`#${name}`).dialog({
+            modal: true
+            , open: function (event, ui) {
+                //hide close button.
+                $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+            }
+            , buttons:
+                [
+                    {
+                        id: `btn-yes-${name}`,
+                        text: "Có",
+                        click: function () {
+                            let ajaxStart = function () {
+                                $("#wait").css("display", "block");
+                                $(`#btn-yes-${name}`).button("disable");
+                                $(`#btn-close-${name}`).button("disable");
+                            };
+
+                            let ajaxComplete = function () {
+                                $("#wait").css("display", "none");
+                                $(`#btn-close-${name} span`).text("Thoát");
+                                $(`#btn-close-${name}`).button("enable");
+                            };
+
+                            ajaxStart();
+                            $.post(`Views/hosochungtu/Controller_hosochungtu.ashx?action=hieuluc`, {id: id }, function (result) {
+                                ajaxComplete();
+                                let $xmlObject = $(result); 
+                                let ok = $xmlObject.find('type').text() == '1';
+                                let msg = $xmlObject.find('message').text();
+                                $(`#${name}`).find('#dialog-caution').html(msg);
+                                if (ok)
+                                    $('#grid_ds_hosochungtu')[0].triggerToolbar();
+                            });
+                        }
+                    },
+                    {
+                        id: `btn-close-${name}`,
+                        text: "Không",
+                        click: function () {
+                            $(this).dialog("destroy").remove();
+                        }
+                    }
+                ]
+        });
+    }
+
     function format_hosochungtu_dongghep(cellvalue, options, rowObject) {
         //let type = options.colModel.editoptions.typeLoad;
         cellvalue = !cellvalue ? "" : cellvalue;
@@ -326,12 +460,26 @@
             let uutien = cellvalue.length <= 0;
             let id = $(rowObject).find('cell').eq(0).text();
             if (uutien) {
-                //$(`#${id}`).css('background', 'beige');
                 $(`#${id}`).css('box-shadow', 'rgb(223 248 243) 6px 5px 9px 11px inset');
             }
             else {
-                //$(`#${id}`).css('background', '');
                 $(`#${id}`).css('box-shadow', '');
+            }
+        }, 100);
+
+        return `<span title="${cellvalue}">${cellvalue}</span>`;
+    };
+
+    function format_hosochungtu_trangthai2(cellvalue, options, rowObject) {
+        cellvalue = !cellvalue ? "" : cellvalue;
+        setTimeout(function () {
+            let bosung = cellvalue == '<%=Helper.Bosung%>';
+            let id = $(rowObject).find('cell').eq(0).text();
+            if (bosung) {
+                $(`#${id} td`).css({ 'color': 'red', 'font-weight': 'bold' });
+            }
+            else {
+                $(`#${id} td`).css({ 'color': '', 'font-weight': '' });
             }
         }, 100);
 
@@ -353,7 +501,8 @@
     RowNum="100"
     RowList="[100, 200, 500, 1000]"
     BtnPrint="printhosochungtu"
-    
+    FuncActive="funcHieuLuchosochungtu"
+    FuncKetThuc="funcKetThuchosochungtu"
     OndblClickRow="
         function(rowid) { 
             $(`#edit_grid_ds_hosochungtu`).click();     
@@ -388,9 +537,33 @@
         , formatter:'trangthai'
         , search : true
         , stype : 'select'
-        , editoptions:{value:'SOANTHAO:Soạn Thảo;HIEULUC:Hiệu lực;DAGUIBC:Đã gửi book container;DACOLT:Đã có lịch tàu;DAKEOC:Đã kéo cont/xuất hàng;KETTHUC: Kết thúc' }
+        , editoptions:{disabled:true, value:'SOANTHAO:Soạn Thảo;HIEULUC:Hiệu lực;DAGUIBC:Đã gửi book container;DACOLT:Đã có lịch tàu;DAKEOC:Đã kéo cont/xuất hàng;KETTHUC: Kết thúc' }
         , searchoptions:{sopt:['eq'], value:':[ALL];SOANTHAO:Soạn Thảo;HIEULUC:Hiệu lực;DAGUIBC:Đã gửi book container;DACOLT:Đã có lịch tàu;DAKEOC:Đã kéo cont/xuất hàng;KETTHUC: Kết thúc' }
     },
+    {
+        name: 'trangthai2'
+        , index: 'dh.trangthai2'
+        , label: 'Trạng thái BS'
+        , editable: true
+        , fixed:true , width: 90
+        , edittype: 'select'
+        , align:'center'
+        , formatter:'trangthai'
+        , search : true
+        , stype : 'select'
+        , editoptions:{value:'Moi:-;Bosung:Bổ sung;DAHIEULUC:Đã nhận' }
+        , searchoptions:{sopt:['eq'], value:':[ALL];Moi:-;Bosung:Bổ sung;DAHIEULUC:Đã nhận' }
+    },
+    {
+        name: 'trangthai2CP'
+        , index: 'dh.trangthai2'
+        , label: 'Trạng thái BS'
+        , editable: false
+        , hidden: true
+        , formatter: format_hosochungtu_trangthai2
+        , unformat: disable_formatter
+    },
+    
     {
         fixed: true
         , name: 'ma_dtkd'
@@ -654,7 +827,7 @@
         , editable: true
         , width: 100
         , edittype: 'select'
-        , editoptions: { dataUrl: 'Views/hosochungtu/Controller_HoSoChungTu.ashx?action=selectnhanvienCT' }
+        , editoptions: { value: nvcts_hosochungtu }
     },
     {
         fixed: true
@@ -688,6 +861,28 @@
         , width: 100
         , edittype: 'text'
         , editoptions: { disabled: true }
+    },
+    {
+        name: 'ngayKeoCont'
+        , label: 'Ngày kéo cont/xuất hàng'
+        , index: 'dh.ngayKeoCont'
+        , editable: true
+        , fixed: true 
+        , width: 100
+        , edittype: 'text'
+        , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy', altFormat: 'dd/mm/yy'  }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+        , search: true
+        , stype: 'text'
+        , align:'center'
+    },
+    {
+        name: 'ghichusau'
+        , label: 'Ghi chú sau'
+        , index: 'dh.ghichusau'
+        , fixed:true
+        , width: 100
+        , editable:true
+        , edittype: 'textarea'
     },
     {
         fixed: true, name: 'ngaytao'

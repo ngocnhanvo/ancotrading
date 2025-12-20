@@ -11,6 +11,8 @@ public static class Helper
 {
     #region bien toan cuc
     public static string nhanvienchungtu = "vongocnhancd10cntt2@gmail.com";
+    public static string TENBP_NGHIEPVU = "Nghiệp Vụ";
+    public static string MACV_TruongBoPhan = "TBP";
     public static string NCC = "NCC";
     public static string CHUAGUI = "CHUAGUI";
     public static string DAGUI = "DAGUI";
@@ -21,6 +23,11 @@ public static class Helper
     public static string HIEULUC = "HIEULUC";
     public static string KETTHUC = "KETTHUC";
     public static string HUY = "HUY";
+    public static string Bosung = "Bosung";
+    public static string Moi = "Moi";
+    public static string DAGUIBC = "DAGUIBC";
+    public static string DACOLT = "DACOLT";
+    public static string DAKEOC = "DAKEOC";
     public static string NK = "NK";
     public static string XK = "XK";
     public static string HDBS = "HDBS", HDDG = "HDDG", HDCT = "HDCT", HDTEM_BAOBI = "HDTEM-BAOBI", PYCM = "PYCM", PTSP = "PTSP";
@@ -542,6 +549,18 @@ public static class Helper
         }
 
         return kq;
+    }
+
+    public static string selectoption_NhanVienChungTu(LinqDBDataContext db)
+    {
+        var nvcts = from a in db.nhanviens
+                    join b in db.vaitros on a.mavt equals b.mavt
+                    where a.hoatdong == true & b.tenvt == "Chứng Từ"
+                    orderby a.manv
+                    select a.manv;
+
+        var rs = nvcts.Select(m => $"{m}:{m}");
+        return $"':;{string.Join(";", rs)}'";
     }
 
     public static string writeXML(System.Data.DataTable dt, int page, int total_page, int count)

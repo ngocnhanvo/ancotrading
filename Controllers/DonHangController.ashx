@@ -100,6 +100,8 @@ public class DonHangController : IHttpHandler
         var slcontLCL_po = context.Request.Form["slcontLCL"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
         var nxhdc_po = context.Request.Form["nxhdc_po"].removeAllSpaceOrTrimText(true);
         var ghichu_po = context.Request.Form["ghichu_po"].removeAllSpaceOrTrimText(true);
+        var loaichuyen_po = context.Request.Form["loaichuyen_po"].removeAllSpaceOrTrimText(true);
+        var laBoSung = loaichuyen_po == Helper.Bosung;
         var files = context.Request.Files;
         var lengthF = files.Count;
 
@@ -114,52 +116,129 @@ public class DonHangController : IHttpHandler
                 goto EndEventHandler;
             }
 
-            var chuaguis = new string[] { Helper.CHUAGUI, Helper.TUCHOI };
-            var dhdg = dhs.Where(s => !chuaguis.Contains(s.trangthaict) & !string.IsNullOrEmpty(s.trangthaict)).Select(s => s.sochungtu).OrderBy(s => s).ToList();
-            if (dhdg.Count > 0)
+            string manv = UserUtils.getUser(context);
+            var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
+            if (nv == null)
             {
-                msg = $@"Đơn hàng ""{string.Join(", ", dhdg)}"" đã gửi trước đó";
+                msg = $@"Không tìm thấy nhân viên đang thực hiện chức năng này";
                 goto EndEventHandler;
             }
 
-            int count = 0;
-            string idut = "", sctut = "";
-            dhs = dhs.OrderBy(s => s.c_donhang_id == dhut_po ? 0 : 1).ToList();
-            foreach (var dh in dhs)
+            var tbps = (from a in db.nhanviens
+                        join b in db.vaitros on a.mavt equals b.mavt
+                        join c in db.vaitro2s on a.vaitro2_id equals c.vaitro2_id
+                        where b.tenvt == Helper.TENBP_NGHIEPVU && c.ma_vt2 == Helper.MACV_TruongBoPhan
+                        orderby a.manv
+                        select a.email).ToList();
+            if (tbps.Count <= 0)
             {
-                dh.trangthaict = Helper.DAGUI;
-                var hsct = new c_donhangchungtu();
-                hsct.c_donhangchungtu_id = Helper.getNewId();
-                hsct.trangthai = Helper.SOANTHAO;
-                hsct.c_donhang_id = dh.c_donhang_id;
-                if (dh.c_donhang_id == dhut_po)
-                {
-                    hsct.cont20 = slcont20_po;
-                    hsct.cont40 = slcont40_po;
-                    hsct.cont40hc = slcont40hc_po;
-                    hsct.cont45 = slcont45_po;
-                    hsct.contLCL = slcontLCL_po;
-                    hsct.mota = ghichu_po;
-                    hsct.ngaydieuchinh = nxhdc_po.ToNullableDate();
-                    hsct.ngaychuyenhoso = DateTime.Now;
-                    idut = hsct.c_donhangchungtu_id;
-                    sctut = dh.sochungtu;
-                }
-                else
-                {
-                    hsct.dongghep = sctut;
-                }
-                hsct.ngaytao = DateTime.Now;
-                hsct.ngaycapnhat = DateTime.Now;
-                hsct.nguoitao = UserUtils.getUser(context);
-                hsct.nguoicapnhat = UserUtils.getUser(context);
-                hsct.hoatdong = true;
-                db.c_donhangchungtus.InsertOnSubmit(hsct);
+                msg = $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_NGHIEPVU}";
+                goto EndEventHandler;
+            }
+            var emailTBPs = string.Join(";", tbps);
 
-                var spd = db.c_donhang_spds.Where(s => s.c_donhang_id == dh.c_donhang_id & (s.trangthai ?? "") != Helper.DAGUI).OrderByDescending(s => s.ngaytao).FirstOrDefault();
-                if (spd != null)
-                    spd.trangthai = Helper.DAGUI;
-                count++;
+            int count = 0;
+            string idut = "", sctut = "", nvctut = "";
+            if (laBoSung)
+            {
+                var dhut = dhs.Where(s => s.c_donhang_id == dhut_po).FirstOrDefault();
+                if (dhut == null)
+                {
+                    msg = $@"Không tìm thấy đơn hàng ưu tiên đã chọn";
+                    goto EndEventHandler;
+                }
+
+                var hsctut = db.c_donhangchungtus.Where(s => s.c_donhang_id == dhut.c_donhang_id).FirstOrDefault();
+                if (dhut == null)
+                {
+                    msg = $@"Không tìm thấy đơn hàng ưu tiên đã chọn";
+                    goto EndEventHandler;
+                }
+
+                if (hsctut == null)
+                {
+                    msg = $@"Đơn hàng ""{dhut.sochungtu}"" không có hồ sơ chứng từ liên kết";
+                    goto EndEventHandler;
+                }
+
+                if (!string.IsNullOrWhiteSpace(hsctut.dongghep))
+                {
+                    msg = $@"Đơn hàng ""{dhut.sochungtu}"" không phải đơn hàng ưu tiên, nó được ghép với đơn ""{hsctut.dongghep}""";
+                    goto EndEventHandler;
+                }
+
+                hsctut.trangthai2 = Helper.Bosung;
+                hsctut.cont20 = slcont20_po;
+                hsctut.cont40 = slcont40_po;
+                hsctut.cont40hc = slcont40hc_po;
+                hsctut.cont45 = slcont45_po;
+                hsctut.contLCL = slcontLCL_po;
+                hsctut.mota = ghichu_po;
+                hsctut.ngaydieuchinh = nxhdc_po.ToNullableDate();
+                hsctut.ngaychuyenhoso = DateTime.Now;
+                idut = hsctut.c_donhangchungtu_id;
+                sctut = dhut.sochungtu;
+                nvctut = db.nhanviens.Where(s => s.manv == dhut.nhanvienCT).Select(s => s.email).FirstOrDefault();
+                count = 1;
+            }
+            else
+            {
+                var chuaguis = new string[] { Helper.CHUAGUI, Helper.TUCHOI };
+                var dhdg = dhs.Where(s => !chuaguis.Contains(s.trangthaict) & !string.IsNullOrEmpty(s.trangthaict)).Select(s => s.sochungtu).OrderBy(s => s).ToList();
+                if (dhdg.Count > 0)
+                {
+                    msg = $@"Đơn hàng ""{string.Join(", ", dhdg)}"" đã gửi trước đó";
+                    goto EndEventHandler;
+                }
+
+                dhs = dhs.OrderBy(s => s.c_donhang_id == dhut_po ? 0 : 1).ToList();
+                foreach (var dh in dhs)
+                {
+                    dh.trangthaict = Helper.DAGUI;
+                    var hsct = new c_donhangchungtu();
+                    hsct.c_donhangchungtu_id = Helper.getNewId();
+                    hsct.trangthai = Helper.SOANTHAO;
+                    hsct.c_donhang_id = dh.c_donhang_id;
+                    hsct.trangthai2 = Helper.Moi;
+                    if (dh.c_donhang_id == dhut_po)
+                    {
+                        hsct.cont20 = slcont20_po;
+                        hsct.cont40 = slcont40_po;
+                        hsct.cont40hc = slcont40hc_po;
+                        hsct.cont45 = slcont45_po;
+                        hsct.contLCL = slcontLCL_po;
+                        hsct.mota = ghichu_po;
+                        hsct.ngaydieuchinh = nxhdc_po.ToNullableDate();
+                        hsct.ngaychuyenhoso = DateTime.Now;
+                        idut = hsct.c_donhangchungtu_id;
+                        sctut = dh.sochungtu;
+                        nvctut = db.nhanviens.Where(s => s.manv == dh.nhanvienCT).Select(s => s.email).FirstOrDefault();
+                    }
+                    else
+                    {
+                        hsct.dongghep = sctut;
+                    }
+                    
+                    hsct.nhanvienCT = dh.nhanvienCT;
+                    hsct.ngaytao = DateTime.Now;
+                    hsct.ngaycapnhat = DateTime.Now;
+                    hsct.nguoitao = UserUtils.getUser(context);
+                    hsct.nguoicapnhat = UserUtils.getUser(context);
+                    hsct.hoatdong = true;
+                    db.c_donhangchungtus.InsertOnSubmit(hsct);
+
+                    var spd = db.c_donhang_spds.Where(s => s.c_donhang_id == dh.c_donhang_id & (s.trangthai ?? "") != Helper.DAGUI).OrderByDescending(s => s.ngaytao).FirstOrDefault();
+                    if (spd != null)
+                        spd.trangthai = Helper.DAGUI;
+
+                    count++;
+                }
+            }
+
+            if(string.IsNullOrWhiteSpace(nvctut))
+            {
+                msg = $@"Đơn hàng ""{sctut}"" chưa chọn nhân viên chứng từ";
+                goto EndEventHandler;
             }
 
             var fileTypes = new string[] { ".doc", ".docx", ".xls", ".xlsx", ".pdf" };
@@ -209,6 +288,7 @@ public class DonHangController : IHttpHandler
             else
             {
                 db.SubmitChanges();
+                var taptins = new List<md_taptin>();
                 for (int i = 1; i <= lengthF; i++)
                 {
                     string fileName = files[i - 1].FileName.removeAllSpaceOrTrimText(true);
@@ -218,18 +298,18 @@ public class DonHangController : IHttpHandler
                         var path = $"{pathRoot}/{taptin.md_taptin_id}{taptin.mimetype}";
                         path = ExcuteSignalRStatic.mapPathSignalR($"~/{path}");
                         files[i - 1].SaveAs(path);
+                        taptins.Add(taptin);
                     }
                 }
 
                 try
                 {
-                    string manv = UserUtils.getUser(context);
-                    var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
                     var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
                     if (!string.IsNullOrWhiteSpace(nv.smtp))
                     {
                         smtp = db.md_smtps.Where(s => s.md_smtp_id == nv.smtp).FirstOrDefault();
                     }
+
                     var mail = new GoogleMail();
                     mail.Email = nv.email;
                     mail.Password = nv.email_pass;
@@ -239,19 +319,25 @@ public class DonHangController : IHttpHandler
 
                     string scts = string.Join(", ", dhs.Select(s => s.sochungtu).ToList());
                     string title = $@"Gửi CT đơn hàng ""{scts}""", body = $@"Đơn hàng ưu tiên ""{sctut}""";
+                    if (laBoSung)
+                    {
+                        title = $@"Gửi CT thông tin bổ sung của đơn hàng ""{sctut}""";
+                        body = "Vui lòng truy cập hệ thống AncoTrading để xem thông tin bổ sung chi tiết";
+                    }
+
                     var attachments = new List<System.Net.Mail.Attachment>();
-                    var tts = db.md_taptins.Where(p => p.doituong_dinhkem == "HSCT" & p.lienket == idut).ToList();
-                    foreach (var tt in tts)
+                    foreach (var tt in taptins)
                     {
                         var attachment = new System.Net.Mail.Attachment(ExcuteSignalRStatic.mapPathSignalR($"~/{tt.path}"));
                         attachment.Name = tt.tentaptin;
                         attachments.Add(attachment);
                     }
 
+                    string cc = $"{nv.email},{emailTBPs}";
                     mail.Send(
                         nv.email
-                        , Helper.nhanvienchungtu
-                        , nv.email_cc
+                        , nvctut
+                        , cc
                         , ""
                         , title
                         , body
@@ -1036,7 +1122,7 @@ public class DonHangController : IHttpHandler
                     c_donhang mnu = new c_donhang();
                     mnu.c_donhang_id = ImportUtils.getNEWID();
                     mnu.loai = loaiDH;
-                    mnu.md_trangthai_id = "SOANTHAO";
+                    mnu.md_trangthai_id = Helper.SOANTHAO;
                     mnu.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
                     mnu.c_baogia_id = context.Request.Form["c_baogia_id"];
                     mnu.ngaylap = DateTime.ParseExact(context.Request.Form["ngaylap"], "dd/MM/yyyy", null);
@@ -1070,7 +1156,7 @@ public class DonHangController : IHttpHandler
                     mnu.chkPBGCu = chkPBGCu;
                     mnu.phienbangiacu = phienbangiacu;
                     mnu.ghichu = context.Request.Form["ghichu"];
-
+                    mnu.nhanvienCT = context.Request.Form["nhanvienCT"].removeAllSpaceOrTrimText(true);
                     if (mnu.ngaypass == null)
                         mnu.ngaypass = context.Request.Form["ngaypass"].removeAllSpaceOrTrimText(false).ToNullableDate();
 
@@ -1217,17 +1303,21 @@ public class DonHangController : IHttpHandler
             md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(p => p.md_doitackinhdoanh_id.Equals(context.Request.Form["md_doitackinhdoanh_id"]));
             md_cangbien cb = db.md_cangbiens.FirstOrDefault(p => p.md_cangbien_id.Equals(md_cangbien_id));
             c_donhang m = db.c_donhangs.Single(p => p.c_donhang_id == context.Request.Form["id"]);
+            var ngaypass = context.Request.Form["ngaypass"].removeAllSpaceOrTrimText(false).ToNullableDate();
+            var nvct = context.Request.Form["nhanvienCT"].removeAllSpaceOrTrimText(true);
+
             if (m.md_trangthai_id.Equals(Helper.HIEULUC))
             {
                 m.portdischarge = context.Request.Form["portdischarge"];
                 m.mota = context.Request.Form["mota"];
                 m.ghichu = context.Request.Form["ghichu"];
-                var ngaypass = context.Request.Form["ngaypass"].removeAllSpaceOrTrimText(false).ToNullableDate();
+                m.nhanvienCT = nvct;
+
                 if (m.ngaypass == null)
                     m.ngaypass = ngaypass;
                 else if (m.ngaypass != ngaypass)
                 {
-                    jqGridHelper.Utils.writeResult(0, "Không thể đổi ngày pass kiểm hóa khi đơn hàng đã hiệu lực và ngày đã có giá trị trước đó.");
+                    jqGridHelper.Utils.writeResult(0, "Không thể đổi ngày pass kiểm hóa khi đơn hàng đã hiệu lực và trường đã có giá trị trước đó.");
                     goto EndEventHandler;
                 }
                 db.SubmitChanges();
@@ -1280,8 +1370,8 @@ public class DonHangController : IHttpHandler
                     m.hoahong = decimal.Parse(context.Request.Form["hoahong"]);
                     m.md_nguoilienhe_id = context.Request.Form["md_nguoilienhe_id"];
                     m.ghichu = context.Request.Form["ghichu"];
-                    m.ngaypass = context.Request.Form["ngaypass"].removeAllSpaceOrTrimText(false).ToNullableDate();
-
+                    m.ngaypass = ngaypass;
+                    m.nhanvienCT = nvct;
                     if (!context.Request.Form["ngaydieuchinh"].Equals(""))
                     {
                         m.ngaydieuchinh = DateTime.ParseExact(context.Request.Form["ngaydieuchinh"], "dd/MM/yyyy", null);
@@ -1330,7 +1420,7 @@ public class DonHangController : IHttpHandler
                     {
                         db.SubmitChanges();
 
-                        if (m.md_trangthai_id == "SOANTHAO")
+                        if (m.md_trangthai_id == Helper.SOANTHAO)
                         {
                             if (m.discount_hehang.GetValueOrDefault(false))
                             {
@@ -1556,6 +1646,7 @@ public class DonHangController : IHttpHandler
             dh.discount_hehang_value,
             dh.ngaypass,
             dh.ngayBHXN,
+            dh.nhanvienCT,
             ROW_NUMBER() OVER (ORDER BY {2} {3}) as RowNum 
             FROM c_donhang dh with (nolock)
 			left join md_doitackinhdoanh dtkd with (nolock) on dh.md_doitackinhdoanh_id = dtkd.md_doitackinhdoanh_id
@@ -1637,6 +1728,7 @@ public class DonHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["discount_hehang_value"] + "]]></cell>";
             xml += "<cell><![CDATA[" + ((!row["ngaypass"].ToString().Equals("")) ? DateTime.Parse(row["ngaypass"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
             xml += "<cell><![CDATA[" + ((!row["ngayBHXN"].ToString().Equals("")) ? DateTime.Parse(row["ngayBHXN"].ToString()).ToString("dd/MM/yyyy") : "") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["nhanvienCT"] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

@@ -154,6 +154,7 @@ public class UserController : IHttpHandler {
         nhanvien u = db.nhanviens.Single(p => p.manv == context.Request.Form["id"]);
         u.matkhau = mk != "" ? Security.EncodeMd5Hash(mk) : u.matkhau;
         u.mavt = context.Request.Form["tenvt"];
+        u.vaitro2_id = context.Request.Form["tencv"].removeAllSpaceOrTrimText(true);
         u.mota = context.Request.Form["mota"];
         u.hoten = context.Request.Form["hoten"];
         u.email = context.Request.Form["email"];
@@ -213,6 +214,7 @@ public class UserController : IHttpHandler {
                 manv = context.Request.Form["manv"],
                 matkhau = Security.EncodeMd5Hash(context.Request.Form["matkhau"]),
                 mavt = context.Request.Form["tenvt"],
+                vaitro2_id = context.Request.Form["tencv"].removeAllSpaceOrTrimText(true),
                 hoten = context.Request.Form["hoten"],
                 email = context.Request.Form["email"],
                 email_pass = context.Request.Form["email_pass"],
@@ -314,10 +316,15 @@ public class UserController : IHttpHandler {
                 P.* 
             from ( 
                 select 
-                    nv.*, vt.tenvt as tenvt, smtp.smtpserver, ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum 
+                    nv.*, 
+                    vt.tenvt as tenvt, 
+                    cv.ten_vt2 as tencv,
+                    smtp.smtpserver, 
+                    ROW_NUMBER() OVER (ORDER BY {0} {1}) as RowNum 
                 from 
                     nhanvien nv 
                     left join vaitro vt on nv.mavt = vt.mavt 
+                    left join vaitro2 cv on nv.vaitro2_id = cv.vaitro2_id 
                     left join md_smtp smtp on nv.smtp = smtp.md_smtp_id 
                 where 
                     1=1 {2}  
@@ -341,6 +348,7 @@ public class UserController : IHttpHandler {
             xml += "<cell><![CDATA[" + row["manv"] + "]]></cell>";
             xml += "<cell><![CDATA[" + "" + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tenvt"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["tencv"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hoten"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["email"] + "]]></cell>";
             xml += "<cell><![CDATA[" + "" + "]]></cell>";

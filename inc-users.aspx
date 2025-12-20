@@ -51,6 +51,15 @@
                 , editoptions: { dataUrl: 'Controllers/RoleController.ashx?action=getoption' }
             },
             {
+                fixed: true, name: 'tencv'
+                , label: 'Chức vụ'
+                , index: 'cv.ten_vt2'
+                , width: 100 
+                , editable:true
+                , edittype: 'select'
+                , editoptions: { dataUrl: 'Views/chucvu/Controller_ChucVu.ashx?action=getoption' }
+            },
+            {
                 fixed: true, name: 'hoten'
                 , label: 'Họ Tên'
                 , index: 'hoten'

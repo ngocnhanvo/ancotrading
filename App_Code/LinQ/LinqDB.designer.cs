@@ -1,4 +1,4 @@
-//Update at 11/12/2025 13:23:06
+//Update at 20/12/2025 14:09:37
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -359,6 +359,9 @@ partial void DeleteuserQRCode(userQRCode instance);
 partial void Inservaitro(vaitro instance);
 partial void Updatevaitro(vaitro instance);
 partial void Deletevaitro(vaitro instance);
+partial void Inservaitro2(vaitro2 instance);
+partial void Updatevaitro2(vaitro2 instance);
+partial void Deletevaitro2(vaitro2 instance);
 #endregion
 
 
@@ -1191,6 +1194,13 @@ public System.Data.Linq.Table<vaitro> vaitros
 get
 {
 return this.GetTable<vaitro>();
+}
+}
+public System.Data.Linq.Table<vaitro2> vaitro2s
+{
+get
+{
+return this.GetTable<vaitro2>();
 }
 }
 }
@@ -15411,6 +15421,7 @@ private System.Nullable<decimal> _datcoc;
 private string _trangthaict;
 private System.Nullable<System.DateTime> _ngaypass;
 private System.Nullable<System.DateTime> _ngayBHXN;
+private string _nhanvienCT;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -15549,6 +15560,8 @@ partial void OnngaypassChanging(System.Nullable<System.DateTime> value);
 partial void OnngaypassChanged();
 partial void OnngayBHXNChanging(System.Nullable<System.DateTime> value);
 partial void OnngayBHXNChanged();
+partial void OnnhanvienCTChanging(string value);
+partial void OnnhanvienCTChanged();
 #endregion
 public c_donhang()
 {
@@ -16827,6 +16840,25 @@ this.OnngayBHXNChanged();
 }
 }
 }
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nhanvienCT", DbType="Nvarchar(50)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @nhanvienCT
+{
+get
+{
+return this._nhanvienCT;
+}
+set
+{
+if ((this._nhanvienCT != value))
+{
+this.OnnhanvienCTChanging(value);
+this.SendPropertyChanging();
+this._nhanvienCT = value;
+this.SendPropertyChanged("nhanvienCT");
+this.OnnhanvienCTChanged();
+}
+}
+}
 public event PropertyChangingEventHandler PropertyChanging;
 public event PropertyChangedEventHandler PropertyChanged;
 protected virtual void SendPropertyChanging()
@@ -17568,6 +17600,7 @@ private string _c_donhangchungtu_id;
 private string _c_danhsachdathang_id;
 private string _c_donhang_id;
 private string _trangthai;
+private string _trangthai2;
 private System.Nullable<System.DateTime> _ngaydieuchinh;
 private System.Nullable<System.DateTime> _ngaypass;
 private System.Nullable<System.DateTime> _ngaychuyenhoso;
@@ -17593,6 +17626,8 @@ private System.Nullable<decimal> _cont40;
 private System.Nullable<decimal> _cont40hc;
 private System.Nullable<decimal> _cont45;
 private System.Nullable<decimal> _contLCL;
+private System.Nullable<System.DateTime> _ngayKeoCont;
+private string _ghichusau;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -17605,6 +17640,8 @@ partial void Onc_donhang_idChanging(string value);
 partial void Onc_donhang_idChanged();
 partial void OntrangthaiChanging(string value);
 partial void OntrangthaiChanged();
+partial void Ontrangthai2Changing(string value);
+partial void Ontrangthai2Changed();
 partial void OnngaydieuchinhChanging(System.Nullable<System.DateTime> value);
 partial void OnngaydieuchinhChanged();
 partial void OnngaypassChanging(System.Nullable<System.DateTime> value);
@@ -17655,6 +17692,10 @@ partial void Oncont45Changing(System.Nullable<decimal> value);
 partial void Oncont45Changed();
 partial void OncontLCLChanging(System.Nullable<decimal> value);
 partial void OncontLCLChanged();
+partial void OnngayKeoContChanging(System.Nullable<System.DateTime> value);
+partial void OnngayKeoContChanged();
+partial void OnghichusauChanging(string value);
+partial void OnghichusauChanged();
 #endregion
 public c_donhangchungtu()
 {
@@ -17733,6 +17774,25 @@ this.SendPropertyChanging();
 this._trangthai = value;
 this.SendPropertyChanged("trangthai");
 this.OntrangthaiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_trangthai2", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @trangthai2
+{
+get
+{
+return this._trangthai2;
+}
+set
+{
+if ((this._trangthai2 != value))
+{
+this.Ontrangthai2Changing(value);
+this.SendPropertyChanging();
+this._trangthai2 = value;
+this.SendPropertyChanged("trangthai2");
+this.Ontrangthai2Changed();
 }
 }
 }
@@ -18208,6 +18268,44 @@ this.SendPropertyChanging();
 this._contLCL = value;
 this.SendPropertyChanged("contLCL");
 this.OncontLCLChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngayKeoCont", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngayKeoCont
+{
+get
+{
+return this._ngayKeoCont;
+}
+set
+{
+if ((this._ngayKeoCont != value))
+{
+this.OnngayKeoContChanging(value);
+this.SendPropertyChanging();
+this._ngayKeoCont = value;
+this.SendPropertyChanged("ngayKeoCont");
+this.OnngayKeoContChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ghichusau", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @ghichusau
+{
+get
+{
+return this._ghichusau;
+}
+set
+{
+if ((this._ghichusau != value))
+{
+this.OnghichusauChanging(value);
+this.SendPropertyChanging();
+this._ghichusau = value;
+this.SendPropertyChanged("ghichusau");
+this.OnghichusauChanged();
 }
 }
 }
@@ -23443,6 +23541,21 @@ private System.Nullable<decimal> _phantramhoahong;
 private System.Nullable<decimal> _hoahongdatra;
 private System.Nullable<bool> _dautien;
 private System.Nullable<double> _tygiaUSD_VND;
+private string _tentau;
+private System.Nullable<System.DateTime> _etd2;
+private string _POL;
+private string _POD;
+private string _importCountry;
+private string _Forwarder;
+private System.Nullable<System.DateTime> _hanthanhtoan;
+private string _khutrung;
+private System.Nullable<System.DateTime> _ngayCutOff;
+private System.Nullable<System.DateTime> _checkBL;
+private string _LocalCharge;
+private System.Nullable<System.DateTime> _co;
+private System.Nullable<System.DateTime> _ngayPayMent;
+private System.Nullable<System.DateTime> _ngayTelLex;
+private string _ghichuCT;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -23541,6 +23654,36 @@ partial void OndautienChanging(System.Nullable<bool> value);
 partial void OndautienChanged();
 partial void OntygiaUSD_VNDChanging(System.Nullable<double> value);
 partial void OntygiaUSD_VNDChanged();
+partial void OntentauChanging(string value);
+partial void OntentauChanged();
+partial void Onetd2Changing(System.Nullable<System.DateTime> value);
+partial void Onetd2Changed();
+partial void OnPOLChanging(string value);
+partial void OnPOLChanged();
+partial void OnPODChanging(string value);
+partial void OnPODChanged();
+partial void OnimportCountryChanging(string value);
+partial void OnimportCountryChanged();
+partial void OnForwarderChanging(string value);
+partial void OnForwarderChanged();
+partial void OnhanthanhtoanChanging(System.Nullable<System.DateTime> value);
+partial void OnhanthanhtoanChanged();
+partial void OnkhutrungChanging(string value);
+partial void OnkhutrungChanged();
+partial void OnngayCutOffChanging(System.Nullable<System.DateTime> value);
+partial void OnngayCutOffChanged();
+partial void OncheckBLChanging(System.Nullable<System.DateTime> value);
+partial void OncheckBLChanged();
+partial void OnLocalChargeChanging(string value);
+partial void OnLocalChargeChanged();
+partial void OncoChanging(System.Nullable<System.DateTime> value);
+partial void OncoChanged();
+partial void OnngayPayMentChanging(System.Nullable<System.DateTime> value);
+partial void OnngayPayMentChanged();
+partial void OnngayTelLexChanging(System.Nullable<System.DateTime> value);
+partial void OnngayTelLexChanged();
+partial void OnghichuCTChanging(string value);
+partial void OnghichuCTChanged();
 #endregion
 public c_packinginvoice()
 {
@@ -24436,6 +24579,291 @@ this.SendPropertyChanging();
 this._tygiaUSD_VND = value;
 this.SendPropertyChanged("tygiaUSD_VND");
 this.OntygiaUSD_VNDChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tentau", DbType="Nvarchar(250)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @tentau
+{
+get
+{
+return this._tentau;
+}
+set
+{
+if ((this._tentau != value))
+{
+this.OntentauChanging(value);
+this.SendPropertyChanging();
+this._tentau = value;
+this.SendPropertyChanged("tentau");
+this.OntentauChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_etd2", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @etd2
+{
+get
+{
+return this._etd2;
+}
+set
+{
+if ((this._etd2 != value))
+{
+this.Onetd2Changing(value);
+this.SendPropertyChanging();
+this._etd2 = value;
+this.SendPropertyChanged("etd2");
+this.Onetd2Changed();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_POL", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @POL
+{
+get
+{
+return this._POL;
+}
+set
+{
+if ((this._POL != value))
+{
+this.OnPOLChanging(value);
+this.SendPropertyChanging();
+this._POL = value;
+this.SendPropertyChanged("POL");
+this.OnPOLChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_POD", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @POD
+{
+get
+{
+return this._POD;
+}
+set
+{
+if ((this._POD != value))
+{
+this.OnPODChanging(value);
+this.SendPropertyChanging();
+this._POD = value;
+this.SendPropertyChanged("POD");
+this.OnPODChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_importCountry", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @importCountry
+{
+get
+{
+return this._importCountry;
+}
+set
+{
+if ((this._importCountry != value))
+{
+this.OnimportCountryChanging(value);
+this.SendPropertyChanging();
+this._importCountry = value;
+this.SendPropertyChanged("importCountry");
+this.OnimportCountryChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Forwarder", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @Forwarder
+{
+get
+{
+return this._Forwarder;
+}
+set
+{
+if ((this._Forwarder != value))
+{
+this.OnForwarderChanging(value);
+this.SendPropertyChanging();
+this._Forwarder = value;
+this.SendPropertyChanged("Forwarder");
+this.OnForwarderChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_hanthanhtoan", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @hanthanhtoan
+{
+get
+{
+return this._hanthanhtoan;
+}
+set
+{
+if ((this._hanthanhtoan != value))
+{
+this.OnhanthanhtoanChanging(value);
+this.SendPropertyChanging();
+this._hanthanhtoan = value;
+this.SendPropertyChanged("hanthanhtoan");
+this.OnhanthanhtoanChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_khutrung", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @khutrung
+{
+get
+{
+return this._khutrung;
+}
+set
+{
+if ((this._khutrung != value))
+{
+this.OnkhutrungChanging(value);
+this.SendPropertyChanging();
+this._khutrung = value;
+this.SendPropertyChanged("khutrung");
+this.OnkhutrungChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngayCutOff", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngayCutOff
+{
+get
+{
+return this._ngayCutOff;
+}
+set
+{
+if ((this._ngayCutOff != value))
+{
+this.OnngayCutOffChanging(value);
+this.SendPropertyChanging();
+this._ngayCutOff = value;
+this.SendPropertyChanged("ngayCutOff");
+this.OnngayCutOffChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_checkBL", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @checkBL
+{
+get
+{
+return this._checkBL;
+}
+set
+{
+if ((this._checkBL != value))
+{
+this.OncheckBLChanging(value);
+this.SendPropertyChanging();
+this._checkBL = value;
+this.SendPropertyChanged("checkBL");
+this.OncheckBLChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LocalCharge", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @LocalCharge
+{
+get
+{
+return this._LocalCharge;
+}
+set
+{
+if ((this._LocalCharge != value))
+{
+this.OnLocalChargeChanging(value);
+this.SendPropertyChanging();
+this._LocalCharge = value;
+this.SendPropertyChanged("LocalCharge");
+this.OnLocalChargeChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_co", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @co
+{
+get
+{
+return this._co;
+}
+set
+{
+if ((this._co != value))
+{
+this.OncoChanging(value);
+this.SendPropertyChanging();
+this._co = value;
+this.SendPropertyChanged("co");
+this.OncoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngayPayMent", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngayPayMent
+{
+get
+{
+return this._ngayPayMent;
+}
+set
+{
+if ((this._ngayPayMent != value))
+{
+this.OnngayPayMentChanging(value);
+this.SendPropertyChanging();
+this._ngayPayMent = value;
+this.SendPropertyChanged("ngayPayMent");
+this.OnngayPayMentChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngayTelLex", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngayTelLex
+{
+get
+{
+return this._ngayTelLex;
+}
+set
+{
+if ((this._ngayTelLex != value))
+{
+this.OnngayTelLexChanging(value);
+this.SendPropertyChanging();
+this._ngayTelLex = value;
+this.SendPropertyChanged("ngayTelLex");
+this.OnngayTelLexChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ghichuCT", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @ghichuCT
+{
+get
+{
+return this._ghichuCT;
+}
+set
+{
+if ((this._ghichuCT != value))
+{
+this.OnghichuCTChanging(value);
+this.SendPropertyChanging();
+this._ghichuCT = value;
+this.SendPropertyChanged("ghichuCT");
+this.OnghichuCTChanged();
 }
 }
 }
@@ -48927,6 +49355,7 @@ private System.Nullable<bool> _hieuLucDH;
 private System.Nullable<bool> _themPhiSauHL;
 private System.Nullable<bool> _canOTP;
 private string _smtp;
+private string _vaitro2_id;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -48985,6 +49414,8 @@ partial void OncanOTPChanging(System.Nullable<bool> value);
 partial void OncanOTPChanged();
 partial void OnsmtpChanging(string value);
 partial void OnsmtpChanged();
+partial void Onvaitro2_idChanging(string value);
+partial void Onvaitro2_idChanged();
 #endregion
 public nhanvien()
 {
@@ -49500,6 +49931,25 @@ this.SendPropertyChanging();
 this._smtp = value;
 this.SendPropertyChanged("smtp");
 this.OnsmtpChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_vaitro2_id", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @vaitro2_id
+{
+get
+{
+return this._vaitro2_id;
+}
+set
+{
+if ((this._vaitro2_id != value))
+{
+this.Onvaitro2_idChanging(value);
+this.SendPropertyChanging();
+this._vaitro2_id = value;
+this.SendPropertyChanged("vaitro2_id");
+this.Onvaitro2_idChanged();
 }
 }
 }
@@ -52682,6 +53132,456 @@ this.OnnguoicapnhatChanged();
 }
 }
 [global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota", DbType="Nvarchar(2000)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @mota
+{
+get
+{
+return this._mota;
+}
+set
+{
+if ((this._mota != value))
+{
+this.OnmotaChanging(value);
+this.SendPropertyChanging();
+this._mota = value;
+this.SendPropertyChanged("mota");
+this.OnmotaChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_hoatdong", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @hoatdong
+{
+get
+{
+return this._hoatdong;
+}
+set
+{
+if ((this._hoatdong != value))
+{
+this.OnhoatdongChanging(value);
+this.SendPropertyChanging();
+this._hoatdong = value;
+this.SendPropertyChanged("hoatdong");
+this.OnhoatdongChanged();
+}
+}
+}
+public event PropertyChangingEventHandler PropertyChanging;
+public event PropertyChangedEventHandler PropertyChanged;
+protected virtual void SendPropertyChanging()
+{
+if ((this.PropertyChanging != null))
+{
+this.PropertyChanging(this, emptyChangingEventArgs);
+}
+}
+protected virtual void SendPropertyChanged(String propertyName)
+{
+if ((this.PropertyChanged != null))
+{
+this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+}
+}
+}
+
+
+[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.vaitro2")]
+public partial class vaitro2 : INotifyPropertyChanging, INotifyPropertyChanged
+{
+private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+private string _vaitro2_id;
+private string _ma_vt2;
+private string _ten_vt2;
+private string _nguoitao;
+private string _vaitrotao;
+private string _bophantao;
+private string _nguoicapnhat;
+private string _vaitrocapnhat;
+private string _bophancapnhat;
+private string _value_nguoitao;
+private string _value_vaitrotao;
+private string _value_bophantao;
+private string _value_nguoicapnhat;
+private string _value_vaitrocapnhat;
+private string _value_bophancapnhat;
+private System.Nullable<System.DateTime> _ngaytao;
+private System.Nullable<System.DateTime> _ngaycapnhat;
+private string _mota;
+private System.Nullable<bool> _hoatdong;
+#region Extensibility Method Definitions
+partial void OnLoaded();
+partial void OnValidate(System.Data.Linq.ChangeAction action);
+partial void OnCreated();
+partial void Onvaitro2_idChanging(string value);
+partial void Onvaitro2_idChanged();
+partial void Onma_vt2Changing(string value);
+partial void Onma_vt2Changed();
+partial void Onten_vt2Changing(string value);
+partial void Onten_vt2Changed();
+partial void OnnguoitaoChanging(string value);
+partial void OnnguoitaoChanged();
+partial void OnvaitrotaoChanging(string value);
+partial void OnvaitrotaoChanged();
+partial void OnbophantaoChanging(string value);
+partial void OnbophantaoChanged();
+partial void OnnguoicapnhatChanging(string value);
+partial void OnnguoicapnhatChanged();
+partial void OnvaitrocapnhatChanging(string value);
+partial void OnvaitrocapnhatChanged();
+partial void OnbophancapnhatChanging(string value);
+partial void OnbophancapnhatChanged();
+partial void Onvalue_nguoitaoChanging(string value);
+partial void Onvalue_nguoitaoChanged();
+partial void Onvalue_vaitrotaoChanging(string value);
+partial void Onvalue_vaitrotaoChanged();
+partial void Onvalue_bophantaoChanging(string value);
+partial void Onvalue_bophantaoChanged();
+partial void Onvalue_nguoicapnhatChanging(string value);
+partial void Onvalue_nguoicapnhatChanged();
+partial void Onvalue_vaitrocapnhatChanging(string value);
+partial void Onvalue_vaitrocapnhatChanged();
+partial void Onvalue_bophancapnhatChanging(string value);
+partial void Onvalue_bophancapnhatChanged();
+partial void OnngaytaoChanging(System.Nullable<System.DateTime> value);
+partial void OnngaytaoChanged();
+partial void OnngaycapnhatChanging(System.Nullable<System.DateTime> value);
+partial void OnngaycapnhatChanged();
+partial void OnmotaChanging(string value);
+partial void OnmotaChanged();
+partial void OnhoatdongChanging(System.Nullable<bool> value);
+partial void OnhoatdongChanged();
+#endregion
+public vaitro2()
+{
+OnCreated();
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_vaitro2_id", DbType="Varchar(32) NOT NULL", CanBeNull=false, IsPrimaryKey=true , UpdateCheck=UpdateCheck.Never)]
+public string @vaitro2_id
+{
+get
+{
+return this._vaitro2_id;
+}
+set
+{
+if ((this._vaitro2_id != value))
+{
+this.Onvaitro2_idChanging(value);
+this.SendPropertyChanging();
+this._vaitro2_id = value;
+this.SendPropertyChanged("vaitro2_id");
+this.Onvaitro2_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ma_vt2", DbType="Varchar(32) NOT NULL", CanBeNull=false , UpdateCheck=UpdateCheck.Never)]
+public string @ma_vt2
+{
+get
+{
+return this._ma_vt2;
+}
+set
+{
+if ((this._ma_vt2 != value))
+{
+this.Onma_vt2Changing(value);
+this.SendPropertyChanging();
+this._ma_vt2 = value;
+this.SendPropertyChanged("ma_vt2");
+this.Onma_vt2Changed();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ten_vt2", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @ten_vt2
+{
+get
+{
+return this._ten_vt2;
+}
+set
+{
+if ((this._ten_vt2 != value))
+{
+this.Onten_vt2Changing(value);
+this.SendPropertyChanging();
+this._ten_vt2 = value;
+this.SendPropertyChanged("ten_vt2");
+this.Onten_vt2Changed();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nguoitao", DbType="Varchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @nguoitao
+{
+get
+{
+return this._nguoitao;
+}
+set
+{
+if ((this._nguoitao != value))
+{
+this.OnnguoitaoChanging(value);
+this.SendPropertyChanging();
+this._nguoitao = value;
+this.SendPropertyChanged("nguoitao");
+this.OnnguoitaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_vaitrotao", DbType="Varchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @vaitrotao
+{
+get
+{
+return this._vaitrotao;
+}
+set
+{
+if ((this._vaitrotao != value))
+{
+this.OnvaitrotaoChanging(value);
+this.SendPropertyChanging();
+this._vaitrotao = value;
+this.SendPropertyChanged("vaitrotao");
+this.OnvaitrotaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_bophantao", DbType="Varchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @bophantao
+{
+get
+{
+return this._bophantao;
+}
+set
+{
+if ((this._bophantao != value))
+{
+this.OnbophantaoChanging(value);
+this.SendPropertyChanging();
+this._bophantao = value;
+this.SendPropertyChanged("bophantao");
+this.OnbophantaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nguoicapnhat", DbType="Varchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @nguoicapnhat
+{
+get
+{
+return this._nguoicapnhat;
+}
+set
+{
+if ((this._nguoicapnhat != value))
+{
+this.OnnguoicapnhatChanging(value);
+this.SendPropertyChanging();
+this._nguoicapnhat = value;
+this.SendPropertyChanged("nguoicapnhat");
+this.OnnguoicapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_vaitrocapnhat", DbType="Varchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @vaitrocapnhat
+{
+get
+{
+return this._vaitrocapnhat;
+}
+set
+{
+if ((this._vaitrocapnhat != value))
+{
+this.OnvaitrocapnhatChanging(value);
+this.SendPropertyChanging();
+this._vaitrocapnhat = value;
+this.SendPropertyChanged("vaitrocapnhat");
+this.OnvaitrocapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_bophancapnhat", DbType="Varchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @bophancapnhat
+{
+get
+{
+return this._bophancapnhat;
+}
+set
+{
+if ((this._bophancapnhat != value))
+{
+this.OnbophancapnhatChanging(value);
+this.SendPropertyChanging();
+this._bophancapnhat = value;
+this.SendPropertyChanged("bophancapnhat");
+this.OnbophancapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_value_nguoitao", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @value_nguoitao
+{
+get
+{
+return this._value_nguoitao;
+}
+set
+{
+if ((this._value_nguoitao != value))
+{
+this.Onvalue_nguoitaoChanging(value);
+this.SendPropertyChanging();
+this._value_nguoitao = value;
+this.SendPropertyChanged("value_nguoitao");
+this.Onvalue_nguoitaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_value_vaitrotao", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @value_vaitrotao
+{
+get
+{
+return this._value_vaitrotao;
+}
+set
+{
+if ((this._value_vaitrotao != value))
+{
+this.Onvalue_vaitrotaoChanging(value);
+this.SendPropertyChanging();
+this._value_vaitrotao = value;
+this.SendPropertyChanged("value_vaitrotao");
+this.Onvalue_vaitrotaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_value_bophantao", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @value_bophantao
+{
+get
+{
+return this._value_bophantao;
+}
+set
+{
+if ((this._value_bophantao != value))
+{
+this.Onvalue_bophantaoChanging(value);
+this.SendPropertyChanging();
+this._value_bophantao = value;
+this.SendPropertyChanged("value_bophantao");
+this.Onvalue_bophantaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_value_nguoicapnhat", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @value_nguoicapnhat
+{
+get
+{
+return this._value_nguoicapnhat;
+}
+set
+{
+if ((this._value_nguoicapnhat != value))
+{
+this.Onvalue_nguoicapnhatChanging(value);
+this.SendPropertyChanging();
+this._value_nguoicapnhat = value;
+this.SendPropertyChanged("value_nguoicapnhat");
+this.Onvalue_nguoicapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_value_vaitrocapnhat", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @value_vaitrocapnhat
+{
+get
+{
+return this._value_vaitrocapnhat;
+}
+set
+{
+if ((this._value_vaitrocapnhat != value))
+{
+this.Onvalue_vaitrocapnhatChanging(value);
+this.SendPropertyChanging();
+this._value_vaitrocapnhat = value;
+this.SendPropertyChanged("value_vaitrocapnhat");
+this.Onvalue_vaitrocapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_value_bophancapnhat", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @value_bophancapnhat
+{
+get
+{
+return this._value_bophancapnhat;
+}
+set
+{
+if ((this._value_bophancapnhat != value))
+{
+this.Onvalue_bophancapnhatChanging(value);
+this.SendPropertyChanging();
+this._value_bophancapnhat = value;
+this.SendPropertyChanged("value_bophancapnhat");
+this.Onvalue_bophancapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaytao", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaytao
+{
+get
+{
+return this._ngaytao;
+}
+set
+{
+if ((this._ngaytao != value))
+{
+this.OnngaytaoChanging(value);
+this.SendPropertyChanging();
+this._ngaytao = value;
+this.SendPropertyChanged("ngaytao");
+this.OnngaytaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaycapnhat", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaycapnhat
+{
+get
+{
+return this._ngaycapnhat;
+}
+set
+{
+if ((this._ngaycapnhat != value))
+{
+this.OnngaycapnhatChanging(value);
+this.SendPropertyChanging();
+this._ngaycapnhat = value;
+this.SendPropertyChanged("ngaycapnhat");
+this.OnngaycapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
 public string @mota
 {
 get

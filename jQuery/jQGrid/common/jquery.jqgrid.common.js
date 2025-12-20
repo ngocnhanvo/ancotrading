@@ -38,6 +38,12 @@ jQuery.extend($.fn.fmatter, {
         else if (cellvalue == 'DAKEOC') {
             return '<span title="DACOLT">Đã kéo cont/xuất hàng</span>';
         }
+        else if (cellvalue == 'Moi') {
+            return '<span title="Moi">-</span>';
+        }
+        else if (cellvalue == 'Bosung') {
+            return '<span title="Bosung">Bổ sung</span>';
+        }
 		else {
             return '<span title="CHUAGUI">Chưa Gửi</span>';
         }

@@ -4,6 +4,7 @@
 <%@ Register Src="~/Views/po/cacdongpo.ascx" TagName="ddh" TagPrefix="detail" %>
 <script>
     var id_inc_po = '';
+    var nvcts_po = <%=nvctsStr%>;
     $(function () {
         $('#lay-center-po').parent().layout({
             south: {
@@ -922,7 +923,7 @@
             {
                  name: 'md_trangthai_id'
                  , label: 'TT'
-                 , index: 'md_trangthai_id'
+                 , index: 'dh.md_trangthai_id'
                  , editable: false
                  , fixed:true , width: 100
                  , edittype: 'text'
@@ -935,7 +936,7 @@
             {
                  name: 'trangthaict'
                  , label: 'TT Chứng từ'
-                 , index: 'trangthaict'
+                 , index: 'dh.trangthaict'
                  , editable: false
                  , fixed:true , width: 100
                  , edittype: 'text'
@@ -962,7 +963,7 @@
             {
                  name: 'sochungtu'
                  , label: 'Số chứng từ'
-                 , index: 'sochungtu'
+                 , index: 'dh.sochungtu'
                  , editable: true
                  , fixed:true 
                  , width: 130
@@ -972,7 +973,7 @@
             {
                  name: 'customer_order_no'
                  , label: 'Customer Order No'
-                 , index: 'customer_order_no'
+                 , index: 'dh.customer_order_no'
                  , editable: true
                  , fixed:true 
                  , width: 50
@@ -992,7 +993,7 @@
 			{
                  name: 'shipmenttime'
                  , label: 'Shipment Time'
-                 , index: 'shipmenttime'
+                 , index: 'dh.shipmenttime'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'text'
@@ -1027,7 +1028,7 @@
 			{
                  name: 'totalcbm'
                  , label: 'Total CBM'
-                 , index: 'totalcbm'
+                 , index: 'dh.totalcbm'
                  , editable: false
                  , fixed:true , width: 50
                  , edittype: 'text'
@@ -1036,7 +1037,7 @@
 			{
                  name: 'amount'
                  , label: 'Amount'
-                 , index: 'amount'
+                 , index: 'dh.amount'
                  , editable: false
                  , fixed:true , width: 50
                  , edittype: 'text'
@@ -1048,7 +1049,7 @@
                  name: 'discount'
                  , hidden: true
                  , label: 'Discount(%)'
-                 , index: 'discount'
+                 , index: 'dh.discount'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'text'
@@ -1091,7 +1092,7 @@
             {
                  name: 'md_nguoilienhe_id'
                  , label: 'Người hưởng HH'
-                 , index: 'md_nguoilienhe_id'
+                 , index: 'dh.md_nguoilienhe_id'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'select'
@@ -1103,7 +1104,7 @@
             {
                  name: 'ngaylap'
                  , label: 'Ngày lập'
-                 , index: 'ngaylap'
+                 , index: 'dh.ngaylap'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'text'
@@ -1146,7 +1147,7 @@
             {
                  name: 'shipmentdate'
                  , label: 'Shipment Date'
-                 , index: 'shipmentdate'
+                 , index: 'dh.shipmentdate'
                  , editable: true
                  , hidden: true
                  , fixed:true , width: 50
@@ -1182,7 +1183,7 @@
             {
                  name: 'ngaydieuchinh'
                  , label: 'Ngày điều chỉnh'
-                 , index: 'ngaydieuchinh'
+                 , index: 'dh.ngaydieuchinh'
                  , editable: true
                  , hidden:true
                  , fixed:true , width: 50
@@ -1194,7 +1195,7 @@
 			{
                  name: 'donhang_mau'
                  , label: 'ĐH Mẫu SR'
-                 , index: 'donhang_mau'
+                 , index: 'dh.donhang_mau'
                  , editable: true
                  , fixed:true 
                  , width: 50
@@ -1208,7 +1209,7 @@
                  name: 'isdonhangtmp'   
                  , label: 'ĐH Mẫu TI'
                  , align: 'center'
-                 , index: 'isdonhangtmp'
+                 , index: 'dh.isdonhangtmp'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'checkbox'
@@ -1259,7 +1260,7 @@
             {
                  name: 'payer'
                  , label: 'Payer'
-                 , index: 'payer'
+                 , index: 'dh.payer'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'text'
@@ -1270,7 +1271,7 @@
             {
                  name: 'portdischarge'
                  , label: 'PortDischarge'
-                 , index: 'portdischarge'
+                 , index: 'dh.portdischarge'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'text'
@@ -1281,7 +1282,7 @@
             {
                  name: 'totalcbf'
                  , label: 'Total CBF'
-                 , index: 'totalcbf'
+                 , index: 'dh.totalcbf'
                  , editable: false
                  , fixed:true , width: 50
                  , edittype: 'text'
@@ -1292,7 +1293,7 @@
                  fixed:true
                  , name: 'cont20'
                  , label: 'Cont 20'
-                 , index: 'cont20'
+                 , index: 'dh.cont20'
                  , editable: true
                  , width: 50
                  , edittype: 'text'
@@ -1307,7 +1308,7 @@
                  fixed:true
                  , name: 'cont40'
                  , label: 'Cont 40'
-                 , index: 'cont40'
+                 , index: 'dh.cont40'
                  , editable: true
                  , width: 50
                  , edittype: 'text'
@@ -1322,7 +1323,7 @@
                  fixed:true
                  , name: 'cont40hc'
                  , label: 'Cont 40HC'
-                 , index: 'cont40hc'
+                 , index: 'dh.cont40hc'
                  , editable: true
                  , width: 50
                  , edittype: 'text'
@@ -1337,7 +1338,7 @@
                  fixed:true
                  , name: 'cont45'
                  , label: 'Cont 45'
-                 , index: 'cont45'
+                 , index: 'dh.cont45'
                  , editable: true
                  , width: 50
                  , edittype: 'text'
@@ -1352,7 +1353,7 @@
                  fixed:true
                  , name: 'contle'
                  , label: 'Cont lẻ'
-                 , index: 'contle'
+                 , index: 'dh.contle'
                  , editable: true
                  , width: 50
                  , edittype: 'text'
@@ -1366,7 +1367,7 @@
             {
                  name: 'dagui_mail'   
                  , label: 'Đã Gửi Mail'
-                 , index: 'dagui_mail'
+                 , index: 'dh.dagui_mail'
                  , align: 'center'
                  , editable: true
                  , fixed:true , width: 50
@@ -1381,7 +1382,7 @@
                  name: 'ismakepi'   
                  , label: 'Make PI'
                  , align: 'center'
-                 , index: 'ismakepi'
+                 , index: 'dh.ismakepi'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'checkbox'
@@ -1394,7 +1395,7 @@
                  name: 'loai'   
                  , label: 'Loại ĐH'
                  , align: 'center'
-                 , index: 'loai'
+                 , index: 'dh.loai'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'select'
@@ -1407,7 +1408,7 @@
             {
                 name: 'ngaytao'
                 , label: 'Ngày tạo'
-                , index: 'ngaytao'
+                , index: 'dh.ngaytao'
                 , fixed:true , width: 50
                 , editable:false
                 , edittype: 'text'
@@ -1417,7 +1418,7 @@
             {
                 name: 'nguoitao'
                 , label: 'Người tạo'
-                , index: 'nguoitao'
+                , index: 'dh.nguoitao'
                 , fixed:true , width: 50
                 , editable:false
                 , edittype: 'text'
@@ -1426,7 +1427,7 @@
             {
                 name: 'ngaycapnhat'
                 , label: 'Ngày cập nhật'
-                , index: 'ngaycapnhat'
+                , index: 'dh.ngaycapnhat'
                 , fixed:true , width: 50
                 , editable:false
                 , edittype: 'text'
@@ -1435,7 +1436,7 @@
             {
                 name: 'nguoicapnhat'
                 , label: 'Người cập nhật'
-                , index: 'nguoicapnhat'
+                , index: 'dh.nguoicapnhat'
                 , fixed:true , width: 50
                 , editable:false
                 , edittype: 'text'
@@ -1444,7 +1445,7 @@
             {
                 name: 'mota'
                 , label: 'Mô tả'
-                , index: 'mota'
+                , index: 'dh.mota'
                 , fixed:true , width: 50
                 , editable:true
                 , edittype: 'text'
@@ -1456,7 +1457,7 @@
                 name: 'hoatdong'
                 , label: 'Hoạt động'
                 , hidden: true
-                , index: 'hoatdong'
+                , index: 'dh.hoatdong'
                 , width: 30
                 , editable:true
                 , edittype: 'checkbox'
@@ -1469,7 +1470,7 @@
                  name: 'tanggia'
                  , hidden: true
                  , label: 'Tăng giá (%)'
-                 , index: 'tanggia'
+                 , index: 'dh.tanggia'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'text'
@@ -1508,7 +1509,7 @@
                  name: 'gia_db'   
                  , label: 'Giá ĐB'
                  , align: 'center'
-                 , index: 'gia_db'
+                 , index: 'dh.gia_db'
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'checkbox'
@@ -1520,7 +1521,7 @@
                 fixed: true
                 , name: 'phienbangiadacbiet'
                 , label: 'PBG đặc biệt'
-                , index: 'phienbangiadacbiet'
+                , index: 'dh.phienbangiadacbiet'
                 , width: 100
                 , editable: true
                 , edittype: 'text'
@@ -1564,7 +1565,7 @@
 			{
                 fixed: true, name: 'ghichu'
                 , label: 'Ghi chú'
-                , index: 'ghichu'
+                , index: 'dh.ghichu'
                 , width: 100
                 , editable:true
                 , edittype: 'textarea'
@@ -1637,12 +1638,25 @@
             {
                 fixed: true, name: 'ngayBHXN'
                 , label: 'Ngày BHXNXH'
+                , index: 'dh.ngayBHXN'
                 , width: 110
                 , hidden: false
                 , editable: false
                 , align: 'center'
                 , formoptions: { colpos: 1, rowpos: 32 }
                 , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); if (currentTime) {  currentTime.setDate(currentTime.getDate() + 7) }; var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+            },
+            {
+                fixed: true, name: 'nhanvienCT'
+                , index: 'dh.nhanvienCT'
+                , label: 'Nhân viên CT'
+                , width: 110
+                , hidden: false
+                , editable: true
+                , align: 'center'
+                , edittype: 'select'
+                , formoptions: { colpos: 1, rowpos: 33 }
+                , editoptions: { value: nvcts_po }
             }
             ]"
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
@@ -1898,7 +1912,6 @@
                                 let slcont40hc = Number($('#slcont40hc_po').val());
                                 let slcont45 = Number($('#slcont45_po').val());
                                 let slcontLCL = Number($('#slcontLCL_po').val());
-                                let slcontLCL = Number($('#slcontLCL_po').val());
 
                                 let $wait = $('#waitChuyenChungTu');
                                 $wait.css('display', '');
@@ -1914,6 +1927,7 @@
                                 data.append('slcontLCL', slcontLCL);
                                 data.append('nxhdc_po', $('#nxhdc_po').val());
                                 data.append('ghichu_po', $('#ghichu_po').val());
+                                data.append('loaichuyen_po', $('#loaichuyen_po').val());
                                 let fileList = $('#ttdk1_po')[0].files;
                                 for (let i = 0; i < fileList.length; i++) {
                                     data.append('ttdk1_po', fileList[i]);

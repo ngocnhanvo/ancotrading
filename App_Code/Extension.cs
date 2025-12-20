@@ -379,4 +379,12 @@ public static class Extension
         else
             return null;
     }
+
+    public static bool? ToNullableBool(this string s)
+    {
+        if (s != null)
+            return (s.ToLower() == "true" | s.ToLower() == "on");
+        else
+            return null;
+    }
 }
