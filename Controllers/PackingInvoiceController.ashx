@@ -532,93 +532,74 @@ public class PackingInvoiceController : IHttpHandler
 
     public void edit(HttpContext context)
     {
-        String h = context.Request.Form["hoatdong"].ToLower();
-        bool hd = false; int loi = 0;
-        if (h.Equals("on") || h.Equals("true"))
-        { hd = true; }
-
-        String discount, giatricong, giatritru, handling_fee, giatritru_po, giatricong_po;
-        discount = context.Request.Form["discount"];
-        giatricong = context.Request.Form["giatri_cong"];
-        giatritru = context.Request.Form["giatri_tru"];
-        giatritru_po = context.Request.Form["giatritru_po"];
-        giatricong_po = context.Request.Form["giatricong_po"];
-        handling_fee = context.Request.Form["handling_fee"];
-        //--
-        c_packinginvoice m = db.c_packinginvoices.Single(p => p.c_packinginvoice_id == context.Request.Form["id"]);
-        /*//--
-        decimal? giatritru_po_old = m.giatritru_po;
-        decimal? giatricong_po_old = m.giatricong_po;
-        if(decimal.Parse(giatricong_po) > giatricong_po_old )
+        string msg = "";
+        try
         {
-            loi = 1;
-            jqGridHelper.Utils.writeResult(0,"Giá Trị Cộng PO không thể lớn hơn giá trị cũ!");
-        }
-        else if(decimal.Parse(giatritru_po) > giatritru_po_old)
-        {
-            loi = 1;
-            jqGridHelper.Utils.writeResult(0,"Giá Trị Trừ PO không thể lớn hơn giá trị cũ!!");
-        }*/
-        string ngayMTK = context.Request.Form["ngay_motokhai"];
-        DateTime? dateNMTK = null;
-        md_tygiamua tgm = null;
-        if (!string.IsNullOrEmpty(ngayMTK))
-        {
-            dateNMTK = DateTime.ParseExact(ngayMTK, "dd/MM/yyyy", null);
-            tgm = db.md_tygiamuas.Where(s => s.ngayapdung <= dateNMTK & s.ngayketthuc >= dateNMTK & s.trangthai == "HIEULUC").FirstOrDefault();
-        }
-        //if (tgm == null)
-        //{
-        //    loi = 1;
-        //    jqGridHelper.Utils.writeResult(0, "Không có tỷ giá áp dụng cho ngày mở tờ khai đã chọn");
-        //}
-        //else 
-        if (!m.md_trangthai_id.Equals("SOANTHAO"))
-        {
-            loi = 1;
-            jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi Packing List Invoice đã hiệu lực!");
-        }
-
-        if (loi == 0)
-        {
-            m.so_pkl = context.Request.Form["so_inv"];
-            m.so_inv = context.Request.Form["so_inv"];
-            //m.c_donhang_id = context.Request.Form["c_donhang_id"];
-            //m.md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
-            //m.md_trangthai_id = context.Request.Form["md_trangthai_id"];
-            m.ngaylap = DateTime.ParseExact(context.Request.Form["ngaylap"], "dd/MM/yyyy", null);
-            m.nguoilap = context.Request.Form["nguoilap"];
-            m.consignee = context.Request.Form["consignee"];
-            m.notifparty = context.Request.Form["notifparty"];
-            m.alsonotifyparty = context.Request.Form["alsonotifyparty"];
-            m.mv = context.Request.Form["mv"];
-            m.etd = DateTime.ParseExact(context.Request.Form["etd"], "dd/MM/yyyy", null);
-            m.noidi = context.Request.Form["noidi"];
-            m.noiden = context.Request.Form["noiden"];
-            m.blno = context.Request.Form["blno"];
-            m.commodity = context.Request.Form["commodity"];
-            m.tygiaUSD_VND = tgm != null ? tgm.nhan_voi : 1;
-            m.handling_fee = handling_fee.Equals("") ? 0 : decimal.Parse(handling_fee);
-            m.discount = discount.Equals("") ? 0 : decimal.Parse(discount);
+            var hd = context.Request.Form["hoatdong"].removeAllSpaceOrTrimText(false).ToNullableBool();
+            String discount, giatricong, giatritru, handling_fee, giatritru_po, giatricong_po;
+            discount = context.Request.Form["discount"];
+            giatricong = context.Request.Form["giatri_cong"];
+            giatritru = context.Request.Form["giatri_tru"];
+            giatritru_po = context.Request.Form["giatritru_po"];
+            giatricong_po = context.Request.Form["giatricong_po"];
+            handling_fee = context.Request.Form["handling_fee"];
             //--
+            c_packinginvoice m = db.c_packinginvoices.Single(p => p.c_packinginvoice_id == context.Request.Form["id"]);
+            string ngayMTK = context.Request.Form["ngay_motokhai"];
+            DateTime? dateNMTK = null;
+            md_tygiamua tgm = null;
+            if (!string.IsNullOrEmpty(ngayMTK))
+            {
+                dateNMTK = DateTime.ParseExact(ngayMTK, "dd/MM/yyyy", null);
+                tgm = db.md_tygiamuas.Where(s => s.ngayapdung <= dateNMTK & s.ngayketthuc >= dateNMTK & s.trangthai == "HIEULUC").FirstOrDefault();
+            }
+
+            if (!m.md_trangthai_id.Equals(Helper.SOANTHAO))
+            {
+                msg = "Không thể chỉnh sửa khi Packing List Invoice đã hiệu lực!";
+                goto EndEventHandler;
+            }
+
+            //Cot 1
+            m.ngaylap = context.Request.Form["ngaylap"].removeAllSpaceOrTrimText(true).ToNullableDate();
+            m.mv = context.Request.Form["mv"].removeAllSpaceOrTrimText(true);
+            m.etd = context.Request.Form["etd"].removeAllSpaceOrTrimText(true).ToNullableDate();
+            m.etd2 = context.Request.Form["etd2"].removeAllSpaceOrTrimText(true).ToNullableDate();
+            m.importCountry = context.Request.Form["importCountry"].removeAllSpaceOrTrimText(true);
+            m.blno = context.Request.Form["blno"].removeAllSpaceOrTrimText(true);
+            m.khutrung = context.Request.Form["khutrung"].removeAllSpaceOrTrimText(true);
+            m.ngayCutOff = context.Request.Form["ngayCutOff"].removeAllSpaceOrTrimText(true).ToNullableDate();
+            m.checkBL = context.Request.Form["checkBL"].removeAllSpaceOrTrimText(true).ToNullableDate();
+            m.LocalCharge = context.Request.Form["LocalCharge"].removeAllSpaceOrTrimText(true);
+            m.co = context.Request.Form["co"].removeAllSpaceOrTrimText(true).ToNullableDate();
+            m.ngayPayMent = context.Request.Form["ngayPayMent"].removeAllSpaceOrTrimText(true).ToNullableDate();
+            m.ngayTelLex = context.Request.Form["ngayTelLex"].removeAllSpaceOrTrimText(true).ToNullableDate();
+            m.noidi = context.Request.Form["noidi"].removeAllSpaceOrTrimText(true);
+            m.noiden = context.Request.Form["noiden"].removeAllSpaceOrTrimText(true);
+            m.ghichuCT = context.Request.Form["ghichuCT"].removeAllSpaceOrTrimText(true);
+            m.hoatdong = hd;
+            //Cot 2
+            m.commodity = context.Request.Form["commodity"];
+            m.handling_fee = handling_fee.Equals("") ? 0 : decimal.Parse(handling_fee);
             m.diengiai_cong = context.Request.Form["diengiai_cong"];
             m.giatri_cong = giatricong.Equals("") ? 0 : decimal.Parse(giatricong);
             m.diengiai_tru = context.Request.Form["diengiai_tru"];
             m.giatri_tru = giatritru.Equals("") ? 0 : decimal.Parse(giatritru);
-            //--
-            m.giatritru_po = giatritru_po.Equals("") ? 0 : decimal.Parse(giatritru_po);
-            m.giatricong_po = giatricong_po.Equals("") ? 0 : decimal.Parse(giatricong_po);
             m.commodityvn = context.Request.Form["commodityvn"];
             m.ngay_motokhai = dateNMTK;
-
             decimal totalGross = (m.totalnet.Value - m.totaldis.Value) + m.giatri_cong.Value - m.giatri_tru.Value + m.giatricong_po.Value - m.giatritru_po.Value;
             m.totalgross = totalGross;
-
-            m.mota = context.Request.Form["mota"];
-            m.hoatdong = hd;
+            m.mota = context.Request.Form["mota"].removeAllSpaceOrTrimText(true);
+            m.consignee = context.Request.Form["consignee"];
+            m.notifparty = context.Request.Form["notifparty"];
+            m.alsonotifyparty = context.Request.Form["alsonotifyparty"];
+            m.tygiaUSD_VND = tgm != null ? tgm.nhan_voi : 1;
+            //Cột 3    
+            m.giatritru_po = giatritru_po.Equals("") ? 0 : decimal.Parse(giatritru_po);
+            m.giatricong_po = giatricong_po.Equals("") ? 0 : decimal.Parse(giatricong_po);
+            //Không có trên giao diện
             m.nguoicapnhat = UserUtils.getUser(context);
             m.ngaycapnhat = DateTime.Now;
-
             var hoadon = db.c_hoadons.Where(s => s.c_packinginvoice_id == m.c_packinginvoice_id).FirstOrDefault();
             if (hoadon != null)
             {
@@ -633,9 +614,19 @@ public class PackingInvoiceController : IHttpHandler
                 hoadon.ngaycapnhat = m.ngaycapnhat;
                 hoadon.nguoicapnhat = m.nguoicapnhat;
             }
-
             db.SubmitChanges();
         }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length > 0)
+            jqGridHelper.Utils.writeResult(0, msg);
+        else
+            jqGridHelper.Utils.writeResult(1, "Cập nhật thành công");
     }
 
     public void add(HttpContext context)

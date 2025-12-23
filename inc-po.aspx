@@ -919,6 +919,7 @@
                 , edittype: 'text'
                 , key: true
                 , formoptions: { colpos: 1, rowpos: 1 }
+                , viewable: false
             },
             {
                  name: 'md_trangthai_id'
@@ -932,6 +933,7 @@
                  , search : true
                  , stype : 'select'
                  , searchoptions:{sopt:['eq'], value:':[ALL];SOANTHAO:SOẠN THẢO;HIEULUC:HIỆU LỰC;KETTHUC:KẾT THÚC' }
+                 , viewable: false
             },
             {
                  name: 'trangthaict'
@@ -945,6 +947,7 @@
                  , search : true
                  , stype : 'select'
                  , searchoptions:{sopt:['eq'], value:':[ALL];CHUAGUI:Chưa gửi;DAGUI:Đã gửi;DAHIEULUC:Đã nhận;TUCHOI:Từ chối' }
+                 , viewable: false
             },
 			{
                  name: 'md_doitackinhdoanh_id'
@@ -1044,6 +1047,7 @@
                  , align: 'right'
 				 , formatter:'number'
                  , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+                 , viewable: false
             },
 			{
                  name: 'discount'
@@ -1143,6 +1147,7 @@
                  , editable: false
                  , fixed:true , width: 50
                  , edittype: 'text'
+                 , viewable: false
             },
             {
                  name: 'shipmentdate'
@@ -1504,6 +1509,7 @@
                 , editable: true
                 , align: 'center'
                 , formoptions: { colpos: 2, rowpos: 13 }
+                , viewable: false
             },
 			{
                  name: 'gia_db'   
@@ -1624,6 +1630,7 @@
                 , editable: true
                 , align: 'center'
                 , formoptions: { colpos: 2, rowpos: 18 }
+                , viewable: false
             },
             {
                 fixed: true, name: 'ngaypass'

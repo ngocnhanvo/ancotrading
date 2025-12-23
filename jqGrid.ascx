@@ -81,29 +81,49 @@
             pager: $('#<%=ID%>-pager')
         });
         //.gridResize()
-        $("#<%=ID%>").jqGrid('navGrid', '#<%=ID%>-pager'
-                          , { del: <%= _overrideDelete != ""? "false" : _showDel %>
-                              , add: <%= _overrideAdd != ""? "false" : _showAdd %>
-                              , edit: <%= _overrideEdit != ""? "false" : _showEdit %>
-                              , search: <%= _showSearch %> 
-                              , view : <%= _showView %> 
-                              , refresh:<%= _showRefresh %> 
-                              <%= _afterRefresh == ""? "" : ",afterRefresh :" + _afterRefresh %>
-                            }
-
-                            ,{  // edit
+        $("#<%=ID%>").jqGrid('navGrid', '#<%=ID%>-pager',
+                            {
+                                del: <%= _overrideDelete != ""? "false" : _showDel %>,
+                                add: <%= _overrideAdd != ""? "false" : _showAdd %>,
+                                edit: <%= _overrideEdit != ""? "false" : _showEdit %>,
+                                search: <%= _showSearch %>,
+                                view: <%= _showView %> ,
+                                refresh:<%= _showRefresh %> <%= _afterRefresh == ""? "" : ", afterRefresh :" + _afterRefresh %>
+                            },
+                            {
+                                // edit
+                                recreateForm: true,
+                                afterclickPgButtons: function (whichbutton, formid, rowid) {
+                                    // 1. Bỏ chọn tất cả các dòng đang được chọn trên lưới
+                                    $(this).jqGrid('resetSelection');
+        
+                                    // 2. Chọn duy nhất dòng đang hiển thị trên form
+                                    $(this).jqGrid('setSelection', rowid, false);
+                                },
                                 <%= _editFormOptions != "" ? _editFormOptions : "" %> 
-                            }
-                            ,{ // add
+                            },
+                            {
+                                // add
                                 <%= _addFormOptions != "" ? _addFormOptions : "" %> 
-                            }
-                            ,{ // del
+                            },
+                            {
+                                // del
                                 <%= _delFormOptions != "" ? _delFormOptions : "" %> 
-                             }
-                            ,{ // search
+                            },
+                            {
+                                // search
                             
-                             }
-                            ,{ // view
+                            },
+                            {
+                                // view
+                                recreateForm: true,
+                                afterclickPgButtons: function (whichbutton, formid, rowid) {
+                                    // 1. Bỏ chọn tất cả các dòng đang được chọn trên lưới
+                                    $(this).jqGrid('resetSelection');
+        
+                                    // 2. Chọn duy nhất dòng đang hiển thị trên form
+                                    $(this).jqGrid('setSelection', rowid, false);
+                                },
                                 <%= _viewFormOptions != "" ? _viewFormOptions : "" %> 
                              }
                          );

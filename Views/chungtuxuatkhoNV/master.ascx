@@ -268,7 +268,7 @@
             , index: 'c_packinginvoice_id'
             , width: 100
             , hidden: true 
-            , editable:true
+            , editable:false
             , edittype: 'text'
             , key: true
         },
@@ -281,6 +281,8 @@
             , edittype: 'text'
             , align: 'center'
             , formatter: 'imagestatus'
+            , editrules: { edithidden: false }
+            , viewable: false
         },
         {
             fixed: true, name: 'ma_khachhang'
@@ -289,6 +291,8 @@
             , editable: false
             , width: 100
             , edittype: 'text'
+            , editrules: { edithidden: false }
+            , viewable: false
         },
         {
             fixed: true, name: 'so_inv'
@@ -297,6 +301,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
+            , editoptions: { disabled: true }
             , formoptions: { colpos: 1, rowpos: 1 }
         },
         {
@@ -306,6 +311,7 @@
             , editable: false
             , width: 100
             , edittype: 'text'
+            , viewable: false
         },
 		{
             fixed: true, name: 'nguoitao', hidden: false
@@ -315,7 +321,7 @@
             , editable:true
             , edittype: 'text'
             , editrules:{ edithidden : true }
-			, editoptions: { readonly: 'readonly' }
+			, editoptions: { disabled: true }
 			, formoptions: { colpos: 1, rowpos: 2 }
         },
         {
@@ -327,6 +333,7 @@
             , edittype: 'text'
             , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
             , formoptions: { colpos: 1, rowpos: 3 }
+            , align: 'center'
         },
         {
             fixed: true, name: 'mv', hidden: false
@@ -335,7 +342,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 1, rowpos: 5 }
+            , formoptions: { colpos: 1, rowpos: 4 }
         },
         {
             fixed: true, name: 'etd'
@@ -345,35 +352,39 @@
             , width: 100
             , edittype: 'text'
             , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-            , formoptions: { colpos: 1, rowpos: 10 }
+            , formoptions: { colpos: 1, rowpos: 5 }
+            , align: 'center'
         },
         {
             fixed: true, name: 'etd2'
             , label: 'Ngày ETD'
             , index: 'etd2'
-            , editable: false
+            , editable: true
             , width: 100
             , edittype: 'text'
             , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-            , formoptions: { colpos: 1, rowpos: 10 }
+            , formoptions: { colpos: 1, rowpos: 6 }
+            , align: 'center'
         },
         {
             fixed: true, name: 'POL'
             , label: 'Port of loading'
             , index: 'POL'
-            , editable: false
+            , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 1, rowpos: 6 }
+            , formoptions: { colpos: 1, rowpos: 7 }
+            , editoptions: { disabled: true }
         },
         {
             fixed: true, name: 'POD', hidden: false
             , label: 'Port of discharge'
             , index: 'POD'
-            , editable: false
+            , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 1, rowpos: 6 }
+            , formoptions: { colpos: 1, rowpos: 8 }
+            , editoptions: { disabled: true }
         },
         {
             fixed: true, name: 'importCountry', hidden: false
@@ -382,7 +393,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 1, rowpos: 6 }
+            , formoptions: { colpos: 1, rowpos: 9 }
         },
         {
             fixed: true, name: 'blno'
@@ -391,16 +402,17 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 2, rowpos: 1 }
+            , formoptions: { colpos: 1, rowpos: 10 }
         },
         {
             fixed: true, name: 'Forwarder'
             , label: 'Forwarder'
             , index: 'Forwarder'
-            , editable: false
+            , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 2, rowpos: 1 }
+            , formoptions: { colpos: 1, rowpos: 11 }
+            , editoptions: { disabled: true }
         },
         {
             fixed: true, name: 'ngay_motokhai'
@@ -410,7 +422,8 @@
             , width: 100
             , edittype: 'text'
             , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-            , formoptions: { colpos: 2, rowpos: 10 }
+            , formoptions: { colpos: 2, rowpos: 9 }
+            , align: 'center'
         },
         {
             fixed: true, name: 'totalgross'
@@ -420,7 +433,8 @@
             , width: 100
             , edittype: 'text'
             , editoptions:{ readonly: 'readonly' }
-            , formoptions: { colpos: 2, rowpos: 14 }
+            , formoptions: { colpos: 2, rowpos: 13 }
+            , align: 'right'
         },
 		{
             fixed: true, name: 'tiendatcoc'
@@ -430,7 +444,8 @@
             , width: 100
             , edittype: 'text'
             , editoptions:{ readonly: 'readonly' }
-            , formoptions: { colpos: 2, rowpos: 15 }
+            , formoptions: { colpos: 2, rowpos: 14 }
+            , align: 'right'
         },
 		{
             fixed: true, name: 'tiendatra'
@@ -440,7 +455,8 @@
             , width: 100
             , edittype: 'text'
             , editoptions:{ readonly: 'readonly' }
-            , formoptions: { colpos: 2, rowpos: 16 }
+            , formoptions: { colpos: 2, rowpos: 15 }
+            , align: 'right'
         },
 		{
             fixed: true, name: 'tienconlai'
@@ -450,17 +466,19 @@
             , width: 100
             , edittype: 'text'
             , editoptions:{ readonly: 'readonly' }
-            , formoptions: { colpos: 2, rowpos: 17 }
+            , formoptions: { colpos: 2, rowpos: 16 }
+            , align: 'right'
         },
         {
             fixed: true, name: 'ngay_phaitt'
             , index: 'ngay_phaitt'
             , label: 'Ngày Phải TT'
-            , editable: false
+            , editable: true
             , width: 100
             , edittype: 'text'
-            , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-            , formoptions: { colpos: 2, rowpos: 11 }
+            , editoptions: { disabled: true, dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
+            , formoptions: { colpos: 2, rowpos: 10 }
+            , align: 'center'
         },
         {
             fixed: true, name: 'khutrung', hidden: false
@@ -469,7 +487,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 1, rowpos: 6 }
+            , formoptions: { colpos: 1, rowpos: 12 }
         },
         {
             fixed: true, name: 'ngayCutOff', hidden: false
@@ -479,7 +497,8 @@
             , width: 100
             , edittype: 'text'
             , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-            , formoptions: { colpos: 2, rowpos: 11 }
+            , formoptions: { colpos: 1, rowpos: 13 }
+            , align: 'center'
         },
         {
             fixed: true, name: 'checkBL', hidden: false
@@ -489,7 +508,8 @@
             , width: 100
             , edittype: 'text'
             , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-            , formoptions: { colpos: 2, rowpos: 11 }
+            , formoptions: { colpos: 1, rowpos: 14 }
+            , align: 'center'
         },
         {
             fixed: true, name: 'LocalCharge', hidden: false
@@ -498,6 +518,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
+            , formoptions: { colpos: 1, rowpos: 15 }
         },
         {
             fixed: true, name: 'co', hidden: false
@@ -507,7 +528,8 @@
             , width: 100
             , edittype: 'text'
             , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-            , formoptions: { colpos: 2, rowpos: 11 }
+            , formoptions: { colpos: 1, rowpos: 16 }
+            , align: 'center'
         },
         {
             fixed: true, name: 'ngayPayMent', hidden: false
@@ -517,7 +539,8 @@
             , width: 100
             , edittype: 'text'
             , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-            , formoptions: { colpos: 2, rowpos: 11 }
+            , formoptions: { colpos: 1, rowpos: 17 }
+            , align: 'center'
         },
         {
             fixed: true, name: 'ngayTelLex', hidden: false
@@ -527,7 +550,8 @@
             , width: 100
             , edittype: 'text'
             , editoptions: { dataInit : function (elem) { $(elem).datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' }); }, defaultValue: function(){ var currentTime = new Date(); var month = parseInt(currentTime.getMonth() + 1);     month = month &lt;= 9 ? '0' + month : month; var day = currentTime.getDate(); day = day &lt;= 9 ? '0'+ day : day; var year = currentTime.getFullYear(); return day + '/' + month + '/' + year; } }
-            , formoptions: { colpos: 2, rowpos: 11 }
+            , formoptions: { colpos: 1, rowpos: 18 }
+            , align: 'center'
         },
         {
             fixed: true, name: 'ghichuCT', hidden: false
@@ -541,10 +565,9 @@
             fixed: true, name: 'so_pkl'
             , label: 'Số Packing List'
             , index: 'so_pkl'
-            , editable: true
+            , editable: false
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 1, rowpos: 1 }
         },
         {
             fixed: true, name: 'nguoilap', hidden: true
@@ -562,7 +585,8 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 1, rowpos: 6 }
+            , formoptions: { colpos: 1, rowpos: 19 }
+            , editrules:{ edithidden : true }
         },
         {
             fixed: true, name: 'notifparty', hidden: true
@@ -571,7 +595,8 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 1, rowpos: 7 }
+            , formoptions: { colpos: 1, rowpos: 20 }
+            , editrules:{ edithidden : true }
         },
         {
             fixed: true, name: 'alsonotifyparty', hidden: true
@@ -580,7 +605,8 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 1, rowpos: 8 }
+            , formoptions: { colpos: 1, rowpos: 21 }
+            , editrules:{ edithidden : true }
         },
         {
             fixed: true, name: 'noidi'
@@ -590,7 +616,7 @@
             , width: 100
             , edittype: 'select'
             , editoptions: { dataUrl: 'Controllers/PortController.ashx?action=getoptionAll' }
-            , formoptions: { colpos: 1, rowpos: 11 }
+            , formoptions: { colpos: 1, rowpos: 22 }
         },
         {
             fixed: true, name: 'noiden'
@@ -599,7 +625,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 1, rowpos: 12 }
+            , formoptions: { colpos: 1, rowpos: 23 }
         },
         {
             fixed: true, name: 'commodity'
@@ -608,7 +634,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 2, rowpos: 2 }
+            , formoptions: { colpos: 2, rowpos: 1 }
         },
         {
             fixed: true, name: 'discount'
@@ -619,7 +645,8 @@
             , edittype: 'text'
             , editrules: { number:true, minValue:0 }
             , editoptions:{ defaultValue:'0', readonly: 'readonly' }
-            , formoptions: { colpos: 2, rowpos: 3 }
+            , formoptions: { colpos: 2, rowpos: 2 }
+            , align: 'right'
         },
         {
             fixed: true, name: 'handling_fee'
@@ -630,7 +657,8 @@
             , edittype: 'text'
             , editrules: { number:true, minValue:0 }
             , editoptions:{ defaultValue:'0' }
-            , formoptions: { colpos: 2, rowpos: 4 }
+            , formoptions: { colpos: 2, rowpos: 3 }
+            , align: 'right'
         },
         {
             fixed: true, name: 'diengiai_cong'
@@ -639,7 +667,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 2, rowpos: 5 }
+            , formoptions: { colpos: 2, rowpos: 4 }
         },
         {
             fixed: true, name: 'giatri_cong'
@@ -650,7 +678,8 @@
             , edittype: 'text'
             , editrules: { number:true, minValue:0 }
             , editoptions:{ defaultValue:'0' }
-            , formoptions: { colpos: 2, rowpos: 6 }
+            , formoptions: { colpos: 2, rowpos: 5 }
+            , align: 'right'
         },
         {
             fixed: true, name: 'diengiai_tru'
@@ -659,7 +688,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 2, rowpos: 7 }
+            , formoptions: { colpos: 2, rowpos: 6 }
         },
         {
             fixed: true, name: 'giatri_tru'
@@ -670,7 +699,8 @@
             , edittype: 'text'
             , editrules: { number:true, minValue:0 }
             , editoptions:{ defaultValue:'0' }
-            , formoptions: { colpos: 2, rowpos: 8 }
+            , formoptions: { colpos: 2, rowpos: 7 }
+            , align: 'right'
         },
         {
             fixed: true, name: 'diengiaicong_po'
@@ -679,7 +709,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 3, rowpos: 5 }
+            , formoptions: { colpos: 3, rowpos: 4 }
             , editoptions:{ readonly: 'readonly' }
         },
         {
@@ -691,7 +721,8 @@
             , edittype: 'text'
             , editrules: { number:true, minValue:0 }
             , editoptions:{ defaultValue:'0' }
-            , formoptions: { colpos: 3, rowpos: 6 }
+            , formoptions: { colpos: 3, rowpos: 5 }
+            , align: 'right'
         },
         {
             fixed: true, name: 'diengiaitru_po'
@@ -701,7 +732,7 @@
             , width: 100
             , edittype: 'text'
             , editoptions:{ readonly: 'readonly' }
-            , formoptions: { colpos: 3, rowpos: 7 }
+            , formoptions: { colpos: 3, rowpos: 6 }
         },
         {
             fixed: true, name: 'giatritru_po'
@@ -712,7 +743,8 @@
             , edittype: 'text'
             , editrules: { number:true, minValue:0 }
             , editoptions:{ defaultValue:'0' }
-            , formoptions: { colpos:3, rowpos: 8 }
+            , formoptions: { colpos:3, rowpos: 7 }
+            , align: 'right'
         },
         {
             fixed: true, name: 'totaldis'
@@ -722,7 +754,8 @@
             , width: 100
             , edittype: 'text'
             , editoptions:{ readonly: 'readonly' }
-            , formoptions: { colpos: 2, rowpos: 12 }
+            , formoptions: { colpos: 2, rowpos: 11 }
+            , align: 'right'
         },
         {
             fixed: true, name: 'totalnet'
@@ -732,7 +765,8 @@
             , width: 100
             , edittype: 'text'
             , editoptions:{ readonly: 'readonly' }
-            , formoptions: { colpos: 2, rowpos: 13 }
+            , formoptions: { colpos: 2, rowpos: 12 }
+            , align: 'right'
         }, 
         {
             fixed: true, name: 'commodityvn'
@@ -741,7 +775,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , formoptions: { colpos: 2, rowpos: 9 }
+            , formoptions: { colpos: 2, rowpos: 8 }
         },
         {
             fixed: true, name: 'ngaytao'
@@ -752,6 +786,7 @@
             , edittype: 'text'
             , hidden: true 
             , editrules:{ edithidden : true }
+            , align: 'center'
         },
         {
             fixed: true, name: 'nguoitao'
@@ -772,6 +807,7 @@
             , edittype: 'text'
             , hidden: true 
             , editrules:{ edithidden : true }
+            , align: 'center'
         },
         {
             fixed: true, name: 'nguoicapnhat'
@@ -781,7 +817,6 @@
             , editable:false
             , edittype: 'text'
             , hidden: true 
-            , editrules:{ edithidden : true }
         },
         {
             fixed: true, name: 'mota'
@@ -790,7 +825,7 @@
             , width: 100
             , editable:true
             , edittype: 'textarea'
-            , formoptions: { colpos: 2, rowpos: 18 }
+            , formoptions: { colpos: 2, rowpos: 17 }
         },
         {
             fixed: true, name: 'hoatdong', hidden: true
@@ -813,6 +848,7 @@
     EditFormOptions=" 
             width:900
             , beforeShowForm: function (formid) {
+                formid.css('height', window.innerHeight/2 + window.innerHeight/3); 
                 formid.closest('div.ui-jqdialog').dialogCenter(); 
             },
             errorTextFormat:function(data) { 

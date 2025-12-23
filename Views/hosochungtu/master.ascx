@@ -977,7 +977,10 @@
         } 
     "
     ViewFormOptions="
+        width:350,
 	    beforeShowForm: function (formid) {
+            formid.css('height', window.innerHeight/2 + window.innerHeight/3); 
+            formid.find('table.EditTable').css('table-layout', 'auto');
             formid.closest('div.ui-jqdialog').dialogCenter(); 
         },
 	    errorTextFormat:function(data) { 

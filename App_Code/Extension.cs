@@ -348,7 +348,7 @@ public static class Extension
             return list[indexOf + 1];
     }
 
-    public static string removeAllSpaceOrTrimText(this string a, bool onlyTrim)
+    public static string removeAllSpaceOrTrimText(this string a, bool onlyTrim = true)
     {
         if (a == null)
             a = "";

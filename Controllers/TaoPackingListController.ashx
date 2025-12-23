@@ -41,11 +41,41 @@ public class TaoPackingListController : IHttpHandler {
             String md_cangbien_id = donhangM.md_cangbien_id;
             String md_doitackinhdoanh_id = donhangM.md_doitackinhdoanh_id;
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == md_doitackinhdoanh_id).FirstOrDefault();
-
             String txtSoInvoice = jqGridHelper.Utils.taoChungTuXuatKho(dtkd, db);
 
+            var cangbien = db.md_cangbiens.Where(s => s.md_cangbien_id == md_cangbien_id).FirstOrDefault();
+            c_donhang_spd spd = null;
             var p = new c_packinginvoice();
+            var hsct = db.c_donhangchungtus.Where(s => s.c_donhang_id == donhangM.c_donhang_id).FirstOrDefault();
+            if(hsct != null)
+            {
+                if(string.IsNullOrWhiteSpace(hsct.dongghep))
+                {
+                    p.etd2 = hsct.ngayETD;
+                    spd = db.c_donhang_spds.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
+                }
+                else
+                {
+                    var dhut = db.c_donhangs.Where(s => s.sochungtu == hsct.dongghep).FirstOrDefault();
+                    if (dhut != null)
+                    {
+                        hsct = db.c_donhangchungtus.Where(s => s.c_donhang_id == dhut.c_donhang_id).FirstOrDefault();
+                        if (hsct != null)
+                        {
+                            p.etd2 = hsct.ngayETD;
+                            spd = db.c_donhang_spds.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
+                        }
+                    }
+                }
+            }
+
             p.c_packinginvoice_id = Helper.getNewId();
+            if(spd != null)
+            {
+                p.POD = spd.POD;
+                p.Forwarder = spd.Forwarder;
+            }
+            p.POL = cangbien == null ? "" : cangbien.ten_cangbien;
             p.so_pkl = txtSoInvoice;
             p.so_inv = p.so_pkl;
             p.ngaylap = txtNgayLap.ToNullableDate();
@@ -96,7 +126,7 @@ public class TaoPackingListController : IHttpHandler {
             hoadon.ngaycapnhat = DateTime.Now;
             hoadon.hoatdong = true;
             hoadon.md_trangthai_id = Helper.SOANTHAO;
-                
+
             var lstHH = new List<Dictionary<string, object>>();
             foreach (DataRow item in dt.Rows)
             {
