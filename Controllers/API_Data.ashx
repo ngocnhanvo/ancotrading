@@ -58,6 +58,12 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         string oper = context.Request.Params["oper"];
         switch (oper)
         {
+            case "logs":
+                this.logs(context);
+                break;
+            case "logs_detail":
+                this.logs_detail(context);
+                break;
             case "sanphams":
                 this.sanphams(context);
                 break;
@@ -137,6 +143,75 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 this.getListDSDH(context);
                 break;
         }
+    }
+
+    public void logs(HttpContext context)
+    {
+        string ncc = context.Request.Params["ncc"].removeAllSpaceOrTrimText(true).ToLower();
+        var logs = new List<ad_log>();
+        bool ok = true;
+        var result = new List<ad_log>();
+        string msg = "";
+        try
+        {
+            if (ncc == "nexxdecor")
+            {
+                logs = db.ad_logs.Where(s => (s.nexxdecor_check ?? false) == false).ToList();
+                result = logs.Select(s => new ad_log{
+                    ad_log_id = s.ad_log_id,
+                    table = s.table,
+                    id_lienket = s.id_lienket,
+                    hanhdong = s.hanhdong,
+                    nexxdecor_check = s.nexxdecor_check
+                }).ToList();
+                foreach (var log in logs)
+                {
+                    log.nexxdecor_check = true;
+                }
+                db.SubmitChanges();
+                msg = "Lấy logs thành công";
+            }
+        }
+        catch(Exception ex)
+        {
+            ok = false;
+            msg = ex.Message;
+        }
+
+        var rs = new { ok, result, msg };
+        context.Response.Write(JsonConvert.SerializeObject(rs));
+    }
+
+    public void logs_detail(HttpContext context)
+    {
+        string logid = context.Request.Params["logid"].removeAllSpaceOrTrimText(true).ToLower();
+        var logs = new List<ad_log>();
+        bool ok = true;
+        var result = new System.Data.DataTable();
+        string msg = "";
+        try
+        {
+            var log = db.ad_logs.Where(s => s.ad_log_id == logid).FirstOrDefault();
+            if(log == null)
+            {
+                ok = false;
+                msg = "Không tìm thấy log bạn gửi";
+                goto EndEventHandler;
+            }
+
+            result = VoNgocNhan.API_Data.layThongTinChiTiet(log.table, log.id_lienket);
+            msg = "Lấy logs chi tiết thành công";
+        }
+        catch(Exception ex)
+        {
+            ok = false;
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        var rs = new { ok, result, msg };
+        context.Response.Write(JsonConvert.SerializeObject(rs));
     }
 
     public void sanphams(HttpContext context)
@@ -583,10 +658,19 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     {
         var msg = "";
         var chungloais = context.Request.Form["chungloais"];
+        var layhet = context.Request.QueryString["layhet"] == "1";
         try
         {
-            var lstMSP = chungloais.Split(',');
-            var sps = db.md_chungloais.Where(s => lstMSP.Contains(s.md_chungloai_id)).ToList();
+            var sps = new List<md_chungloai>();
+            if (layhet)
+            {
+                sps = db.md_chungloais.Where(s => s.hoatdong == true).ToList();
+            }
+            else
+            {
+                var lstMSP = chungloais.Split(',');
+                sps = db.md_chungloais.Where(s => lstMSP.Contains(s.md_chungloai_id)).ToList();
+            }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)

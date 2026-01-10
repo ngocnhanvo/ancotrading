@@ -1,4 +1,4 @@
-//Update at 20/12/2025 14:09:37
+//Update at 10/01/2026 09:07:00
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -29,6 +29,9 @@ partial void Deletea_namtaichinh(a_namtaichinh instance);
 partial void Insera_tonghopcongno(a_tonghopcongno instance);
 partial void Updatea_tonghopcongno(a_tonghopcongno instance);
 partial void Deletea_tonghopcongno(a_tonghopcongno instance);
+partial void Inserad_log(ad_log instance);
+partial void Updatead_log(ad_log instance);
+partial void Deletead_log(ad_log instance);
 partial void Inserad_logmssql(ad_logmssql instance);
 partial void Updatead_logmssql(ad_logmssql instance);
 partial void Deletead_logmssql(ad_logmssql instance);
@@ -424,6 +427,13 @@ public System.Data.Linq.Table<a_tonghopcongno> a_tonghopcongnos
 get
 {
 return this.GetTable<a_tonghopcongno>();
+}
+}
+public System.Data.Linq.Table<ad_log> ad_logs
+{
+get
+{
+return this.GetTable<ad_log>();
 }
 }
 public System.Data.Linq.Table<ad_logmssql> ad_logmssqls
@@ -2698,6 +2708,390 @@ this.SendPropertyChanging();
 this._nguoicapnhap = value;
 this.SendPropertyChanged("nguoicapnhap");
 this.OnnguoicapnhapChanged();
+}
+}
+}
+public event PropertyChangingEventHandler PropertyChanging;
+public event PropertyChangedEventHandler PropertyChanged;
+protected virtual void SendPropertyChanging()
+{
+if ((this.PropertyChanging != null))
+{
+this.PropertyChanging(this, emptyChangingEventArgs);
+}
+}
+protected virtual void SendPropertyChanged(String propertyName)
+{
+if ((this.PropertyChanged != null))
+{
+this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+}
+}
+}
+
+
+[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.ad_log")]
+public partial class ad_log : INotifyPropertyChanging, INotifyPropertyChanged
+{
+private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+private string _ad_log_id;
+private string _taikhoan;
+private string _table;
+private string _id_lienket;
+private string _hanhdong;
+private string _chitiet;
+private System.Nullable<System.DateTime> _ngaytao;
+private string _nguoitao;
+private System.Nullable<System.DateTime> _ngaycapnhat;
+private string _nguoicapnhat;
+private string _mota;
+private System.Nullable<bool> _hoatdong;
+private System.Nullable<bool> _anco1_check;
+private System.Nullable<bool> _anhiepluc_check;
+private System.Nullable<bool> _anbinh_check;
+private System.Nullable<bool> _nexxdecor_check;
+#region Extensibility Method Definitions
+partial void OnLoaded();
+partial void OnValidate(System.Data.Linq.ChangeAction action);
+partial void OnCreated();
+partial void Onad_log_idChanging(string value);
+partial void Onad_log_idChanged();
+partial void OntaikhoanChanging(string value);
+partial void OntaikhoanChanged();
+partial void OntableChanging(string value);
+partial void OntableChanged();
+partial void Onid_lienketChanging(string value);
+partial void Onid_lienketChanged();
+partial void OnhanhdongChanging(string value);
+partial void OnhanhdongChanged();
+partial void OnchitietChanging(string value);
+partial void OnchitietChanged();
+partial void OnngaytaoChanging(System.Nullable<System.DateTime> value);
+partial void OnngaytaoChanged();
+partial void OnnguoitaoChanging(string value);
+partial void OnnguoitaoChanged();
+partial void OnngaycapnhatChanging(System.Nullable<System.DateTime> value);
+partial void OnngaycapnhatChanged();
+partial void OnnguoicapnhatChanging(string value);
+partial void OnnguoicapnhatChanged();
+partial void OnmotaChanging(string value);
+partial void OnmotaChanged();
+partial void OnhoatdongChanging(System.Nullable<bool> value);
+partial void OnhoatdongChanged();
+partial void Onanco1_checkChanging(System.Nullable<bool> value);
+partial void Onanco1_checkChanged();
+partial void Onanhiepluc_checkChanging(System.Nullable<bool> value);
+partial void Onanhiepluc_checkChanged();
+partial void Onanbinh_checkChanging(System.Nullable<bool> value);
+partial void Onanbinh_checkChanged();
+partial void Onnexxdecor_checkChanging(System.Nullable<bool> value);
+partial void Onnexxdecor_checkChanged();
+#endregion
+public ad_log()
+{
+OnCreated();
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ad_log_id", DbType="Varchar(32) NOT NULL", CanBeNull=false, IsPrimaryKey=true , UpdateCheck=UpdateCheck.Never)]
+public string @ad_log_id
+{
+get
+{
+return this._ad_log_id;
+}
+set
+{
+if ((this._ad_log_id != value))
+{
+this.Onad_log_idChanging(value);
+this.SendPropertyChanging();
+this._ad_log_id = value;
+this.SendPropertyChanged("ad_log_id");
+this.Onad_log_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_taikhoan", DbType="Nvarchar(50)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @taikhoan
+{
+get
+{
+return this._taikhoan;
+}
+set
+{
+if ((this._taikhoan != value))
+{
+this.OntaikhoanChanging(value);
+this.SendPropertyChanging();
+this._taikhoan = value;
+this.SendPropertyChanged("taikhoan");
+this.OntaikhoanChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_table", DbType="Nvarchar(50)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @table
+{
+get
+{
+return this._table;
+}
+set
+{
+if ((this._table != value))
+{
+this.OntableChanging(value);
+this.SendPropertyChanging();
+this._table = value;
+this.SendPropertyChanged("table");
+this.OntableChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id_lienket", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @id_lienket
+{
+get
+{
+return this._id_lienket;
+}
+set
+{
+if ((this._id_lienket != value))
+{
+this.Onid_lienketChanging(value);
+this.SendPropertyChanging();
+this._id_lienket = value;
+this.SendPropertyChanged("id_lienket");
+this.Onid_lienketChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_hanhdong", DbType="Nvarchar(4)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @hanhdong
+{
+get
+{
+return this._hanhdong;
+}
+set
+{
+if ((this._hanhdong != value))
+{
+this.OnhanhdongChanging(value);
+this.SendPropertyChanging();
+this._hanhdong = value;
+this.SendPropertyChanged("hanhdong");
+this.OnhanhdongChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_chitiet", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @chitiet
+{
+get
+{
+return this._chitiet;
+}
+set
+{
+if ((this._chitiet != value))
+{
+this.OnchitietChanging(value);
+this.SendPropertyChanging();
+this._chitiet = value;
+this.SendPropertyChanged("chitiet");
+this.OnchitietChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaytao", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaytao
+{
+get
+{
+return this._ngaytao;
+}
+set
+{
+if ((this._ngaytao != value))
+{
+this.OnngaytaoChanging(value);
+this.SendPropertyChanging();
+this._ngaytao = value;
+this.SendPropertyChanged("ngaytao");
+this.OnngaytaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nguoitao", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @nguoitao
+{
+get
+{
+return this._nguoitao;
+}
+set
+{
+if ((this._nguoitao != value))
+{
+this.OnnguoitaoChanging(value);
+this.SendPropertyChanging();
+this._nguoitao = value;
+this.SendPropertyChanged("nguoitao");
+this.OnnguoitaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaycapnhat", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaycapnhat
+{
+get
+{
+return this._ngaycapnhat;
+}
+set
+{
+if ((this._ngaycapnhat != value))
+{
+this.OnngaycapnhatChanging(value);
+this.SendPropertyChanging();
+this._ngaycapnhat = value;
+this.SendPropertyChanged("ngaycapnhat");
+this.OnngaycapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nguoicapnhat", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @nguoicapnhat
+{
+get
+{
+return this._nguoicapnhat;
+}
+set
+{
+if ((this._nguoicapnhat != value))
+{
+this.OnnguoicapnhatChanging(value);
+this.SendPropertyChanging();
+this._nguoicapnhat = value;
+this.SendPropertyChanged("nguoicapnhat");
+this.OnnguoicapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota", DbType="Nvarchar(2000)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @mota
+{
+get
+{
+return this._mota;
+}
+set
+{
+if ((this._mota != value))
+{
+this.OnmotaChanging(value);
+this.SendPropertyChanging();
+this._mota = value;
+this.SendPropertyChanged("mota");
+this.OnmotaChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_hoatdong", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @hoatdong
+{
+get
+{
+return this._hoatdong;
+}
+set
+{
+if ((this._hoatdong != value))
+{
+this.OnhoatdongChanging(value);
+this.SendPropertyChanging();
+this._hoatdong = value;
+this.SendPropertyChanged("hoatdong");
+this.OnhoatdongChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_anco1_check", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @anco1_check
+{
+get
+{
+return this._anco1_check;
+}
+set
+{
+if ((this._anco1_check != value))
+{
+this.Onanco1_checkChanging(value);
+this.SendPropertyChanging();
+this._anco1_check = value;
+this.SendPropertyChanged("anco1_check");
+this.Onanco1_checkChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_anhiepluc_check", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @anhiepluc_check
+{
+get
+{
+return this._anhiepluc_check;
+}
+set
+{
+if ((this._anhiepluc_check != value))
+{
+this.Onanhiepluc_checkChanging(value);
+this.SendPropertyChanging();
+this._anhiepluc_check = value;
+this.SendPropertyChanged("anhiepluc_check");
+this.Onanhiepluc_checkChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_anbinh_check", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @anbinh_check
+{
+get
+{
+return this._anbinh_check;
+}
+set
+{
+if ((this._anbinh_check != value))
+{
+this.Onanbinh_checkChanging(value);
+this.SendPropertyChanging();
+this._anbinh_check = value;
+this.SendPropertyChanged("anbinh_check");
+this.Onanbinh_checkChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nexxdecor_check", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @nexxdecor_check
+{
+get
+{
+return this._nexxdecor_check;
+}
+set
+{
+if ((this._nexxdecor_check != value))
+{
+this.Onnexxdecor_checkChanging(value);
+this.SendPropertyChanging();
+this._nexxdecor_check = value;
+this.SendPropertyChanged("nexxdecor_check");
+this.Onnexxdecor_checkChanged();
 }
 }
 }
