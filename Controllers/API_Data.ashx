@@ -156,7 +156,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         {
             if (ncc == "nexxdecor")
             {
-                logs = db.ad_logs.Where(s => (s.nexxdecor_check ?? false) == false).ToList();
+                logs = db.ad_logs.Where(s => s.nexxdecor_check == false).ToList();
                 result = logs.Select(s => new ad_log{
                     ad_log_id = s.ad_log_id,
                     table = s.table,
@@ -184,7 +184,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
     public void logs_detail(HttpContext context)
     {
-        string logid = context.Request.Params["logid"].removeAllSpaceOrTrimText(true).ToLower();
+        string logid = context.Request.Params["logid"].removeAllSpaceOrTrimText(true);
         var logs = new List<ad_log>();
         bool ok = true;
         var result = new System.Data.DataTable();
