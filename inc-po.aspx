@@ -766,7 +766,7 @@
                 <tr>
                     <td style="color: blue">${row['hehang']}</td>
                     <td style="width:20px"></td>
-                    <td><input type="number" ${type == 1 ? "disabled" : ""} value="${row['giatri']}"></td>
+                    <td><input type="number" ${type == 1 ? "disabled" : ""} value="${row['giatri']}" min="0" onkeypress="return event.charCode >= 48" /></td>
                 </tr>`;
             }
             table = `
@@ -990,7 +990,7 @@
                  , editable: true
                  , fixed:true , width: 50
                  , edittype: 'select'
-                 , editoptions: { style: 'max-width:160px', dataUrl: 'Controllers/QuotationController.ashx?action=getSelectOption_cb' }
+                 , editoptions: { style: 'max-width:160px', defaultValue: 'a0daf3be92a13090c6dae1e43b7a8675', dataUrl: 'Controllers/QuotationController.ashx?action=getSelectOption_cb' }
                  , formoptions: { label:'Cảng Biển ' + ip_fd(), colpos: 1, rowpos: 6 }
             },
 			{

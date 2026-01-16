@@ -758,7 +758,7 @@ function ShowPBGCu_grid_ds_quotation(frmID, action) {
                  , editable: true
                  , width: 100
                  , edittype: 'select'
-                 , editoptions: { dataUrl: 'Controllers/QuotationController.ashx?action=getSelectOption_cb' }
+                 , editoptions: { defaultValue: 'a0daf3be92a13090c6dae1e43b7a8675', dataUrl: 'Controllers/QuotationController.ashx?action=getSelectOption_cb' }
 				 , editrules: { required:true }
 				 , formoptions:{label:'Cảng Biển ' + ip_fd()} 
             },

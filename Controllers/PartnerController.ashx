@@ -375,7 +375,15 @@ public class PartnerController : IHttpHandler
                 ngaytao = DateTime.Now,
                 ngaycapnhat = DateTime.Now
             };
-
+            
+            var qg = db.md_quocgias.Where(s => s.md_quocgia_id == mnu.md_quocgia_id).FirstOrDefault();
+            if(qg != null)
+            {
+                if(!mnu.diachi.Contains($", {qg.ten_quocgia}"))
+                {
+                    mnu.diachi += $", {qg.ten_quocgia}";
+                }
+            }
             db.md_doitackinhdoanhs.InsertOnSubmit(mnu);
             db.SubmitChanges();
         }

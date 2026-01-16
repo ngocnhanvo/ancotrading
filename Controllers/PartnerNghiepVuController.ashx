@@ -45,7 +45,7 @@ public class PartnerNghiepVuController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -89,6 +89,14 @@ public class PartnerNghiepVuController : IHttpHandler
             m.nguoicapnhat = UserUtils.getUser(context);
             m.ngaycapnhat = DateTime.Now;
 
+            //var qg = db.md_quocgias.Where(s => s.md_quocgia_id == m.md_quocgia_id).FirstOrDefault();
+            //if(qg != null)
+            //{
+            //    if(!m.diachi.EndsWith(qg.ten_quocgia))
+            //    {
+            //        m.diachi += $", {qg.ten_quocgia}";
+            //    }
+            //}
             db.SubmitChanges();
         }
         else
@@ -115,7 +123,7 @@ public class PartnerNghiepVuController : IHttpHandler
         {
             md_doitackinhdoanh mnu = new md_doitackinhdoanh
             {
-                md_doitackinhdoanh_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                md_doitackinhdoanh_id = Helper.getNewId(),
                 md_loaidtkd_id = context.Request.Form["tenloai"],
                 md_quocgia_id = context.Request.Form["tenqg"],
                 md_khuvuc_id = context.Request.Form["tenkv"],
@@ -147,8 +155,19 @@ public class PartnerNghiepVuController : IHttpHandler
                 ngaycapnhat = DateTime.Now
             };
 
+            var qg = db.md_quocgias.Where(s => s.md_quocgia_id == mnu.md_quocgia_id).FirstOrDefault();
+            if(qg != null)
+            {
+                if(!mnu.diachi.Contains($", {qg.ten_quocgia}"))
+                {
+                    mnu.diachi += $", {qg.ten_quocgia}";
+                }
+            }
+
             db.md_doitackinhdoanhs.InsertOnSubmit(mnu);
             db.SubmitChanges();
+
+
         }
         else
         {
@@ -161,7 +180,7 @@ public class PartnerNghiepVuController : IHttpHandler
     {
         string msg = "";
         String id = context.Request.Form["id"];
-        
+
         // Kiem tra NCC da dc su dung
         string sqlCount = @"DECLARE @SearchStr nvarchar(MAX) = '" + id + @"'
 							DECLARE @Results TABLE (ColumnName nvarchar(370), ColumnValue nvarchar(3630))
@@ -249,7 +268,7 @@ public class PartnerNghiepVuController : IHttpHandler
     {
         String isncc = context.Request.QueryString["isncc"];
         String productId = context.Request.QueryString["productId"];
-        
+
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
 
@@ -262,7 +281,7 @@ public class PartnerNghiepVuController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
         String sqlCount = @"SELECT COUNT(1) AS count 
         FROM md_doitackinhdoanh dtkd 
         LEFT JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id
@@ -278,7 +297,7 @@ public class PartnerNghiepVuController : IHttpHandler
         else {
             sqlCount = String.Format(sqlCount, "");
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -322,7 +341,7 @@ public class PartnerNghiepVuController : IHttpHandler
 			LEFT JOIN md_nguondtkd ndt ON dtkd.md_nguondtkd_id = ndt.md_nguondtkd_id
             WHERE 1=1 and dtkd.hoatdong = 1 {0} and ldt.ma_loaidtkd in ('NHH','KH') " + filter +
             ")P WHERE RowNum > @start AND RowNum < @end";
-        
+
         if (isncc != null)
         {
             strsql = String.Format(strsql, " AND isncc = " + isncc);
@@ -331,7 +350,7 @@ public class PartnerNghiepVuController : IHttpHandler
         {
             strsql = String.Format(strsql, "");
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
@@ -362,7 +381,7 @@ public class PartnerNghiepVuController : IHttpHandler
             xml += "<cell><![CDATA[" + CultureInfoUtil.currencyUSD(row["tong_congno"]) + "]]></cell>";
             xml += "<cell><![CDATA[" + row["isncc"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["cangbien"] + "]]></cell>";
-			xml += "<cell><![CDATA[" + row["md_nguondtkd_id"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["md_nguondtkd_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";

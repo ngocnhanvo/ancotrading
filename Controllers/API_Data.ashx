@@ -3,7 +3,7 @@
 using System;
 using System.Linq;
 using System.Web;
-using System.Web.Script.Serialization;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -264,18 +264,25 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 var item = dequyTTSP(sp, sps, true, true, true, result.dateStr, db, kds);
                 var mabo = sp.ma_sanpham.Substring(9, 2).ToString();
                 var mabo_0 = mabo.Substring(0, 1).ToString();
-
+                bool isNexx = Regex.IsMatch(mabo, @"^[a-zA-Z]{2}$");
                 var ma09 = sp.ma_sanpham.Substring(0, 9);
                 var ma113 = sp.ma_sanpham.Substring(11, 3);
-                var mas = new List<string>();
                 var bientaus1 = new string[] { "0" };
                 var bientaus2 = new string[] { "B", "L", "X", "S" };
                 var bientaus = bientaus1.Concat(bientaus2).ToArray();
-                foreach(var bientau in bientaus)
+                var mas = new List<string>();
+                if (isNexx)
                 {
-                    for (var i = 0; i < 10; i++)
+                    mas.Add(sp.ma_sanpham);
+                }
+                else
+                {
+                    foreach (var bientau in bientaus)
                     {
-                        mas.Add($"{ma09}{bientau}{i}{ma113}");
+                        for (var i = 0; i < 10; i++)
+                        {
+                            mas.Add($"{ma09}{bientau}{i}{ma113}");
+                        }
                     }
                 }
 
@@ -286,20 +293,24 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 foreach (var spCai in spsCai)
                 {
                     var itemCai = dequyTTSP(spCai, sps, false, true, false, result.dateStr, db, kds);
-                    var maBT = spCai.ma_sanpham.Substring(9, 2);
-                    if (bientaus2.Contains(maBT.Substring(0,1)))
+                    if (!isNexx)
                     {
-                        var boId = db.md_bos.Where(s => s.ma_bo_cha == boS & s.ma_bo == maBT).Select(s => s.md_bo_id).FirstOrDefault();
-                        var boCTs = db.md_bo_chitiets.Where(s => s.md_bo_id == boId).OrderBy(s => s.md_bo_detail).ToList();
-                        foreach(var boCT in boCTs)
+                        var maBT = spCai.ma_sanpham.Substring(9, 2);
+                        if (bientaus2.Contains(maBT.Substring(0, 1)))
                         {
-                            var caiCT = spsCai.Where(s => s.ma_sanpham.Substring(9, 2) == boCT.md_bo_detail).Select(s => s.ma_sanpham).FirstOrDefault();
-                            if (!string.IsNullOrWhiteSpace(caiCT))
+                            var boId = db.md_bos.Where(s => s.ma_bo_cha == boS & s.ma_bo == maBT).Select(s => s.md_bo_id).FirstOrDefault();
+                            var boCTs = db.md_bo_chitiets.Where(s => s.md_bo_id == boId).OrderBy(s => s.md_bo_detail).ToList();
+                            foreach (var boCT in boCTs)
                             {
-                                itemCai.sizes.Add(new ThongTinSP() {
-                                    dateStr = dateStr,
-                                    itemNo = caiCT
-                                });
+                                var caiCT = spsCai.Where(s => s.ma_sanpham.Substring(9, 2) == boCT.md_bo_detail).Select(s => s.ma_sanpham).FirstOrDefault();
+                                if (!string.IsNullOrWhiteSpace(caiCT))
+                                {
+                                    itemCai.sizes.Add(new ThongTinSP()
+                                    {
+                                        dateStr = dateStr,
+                                        itemNo = caiCT
+                                    });
+                                }
                             }
                         }
                     }
