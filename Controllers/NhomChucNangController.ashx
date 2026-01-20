@@ -60,8 +60,25 @@ public class NhomChucNangController : IHttpHandler
         else
         {
             md_nhomchungloai m = db.md_nhomchungloais.Where(p => p.md_nhomchungloai_id.Equals(nhomchungloai_id)).FirstOrDefault();
+            var mnu = new md_nhomchungloai();
+            m.CopyPropertiesTo(mnu);
             m.code_ncl = code_ncl;
             m.sapxep = context.Request.Form["sapxep"];
+            var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+            if (diffs.Count > 0)
+            {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    context,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = m.GetType().Name,
+                        id_lienket = m.md_nhomchungloai_id
+                    }
+                );
+            }
             db.SubmitChanges();
         }
     }
@@ -78,12 +95,22 @@ public class NhomChucNangController : IHttpHandler
         {
             md_nhomchungloai mnu = new md_nhomchungloai
             {
-                md_nhomchungloai_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                md_nhomchungloai_id = Helper.getNewId(),
                 code_ncl = code_ncl,
                 sapxep = context.Request.Form["sapxep"]
             };
 
             db.md_nhomchungloais.InsertOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.add,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_nhomchungloai_id
+                }
+            );
             db.SubmitChanges();
         }
     }
@@ -91,12 +118,45 @@ public class NhomChucNangController : IHttpHandler
 
     public void del(HttpContext context)
     {
-        String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-        String sql = "delete md_nhomchungloai where md_nhomchungloai_id IN (" + id + ")";
-        mdbc.ExcuteNonQuery(sql);
+        string msg = "";
+        string id = context.Request.Form["id"];
+        try
+        {
+            var mnu = db.md_nhomchungloais.Where(s => s.md_nhomchungloai_id == id).FirstOrDefault();
+            if (mnu == null)
+            {
+                msg = "Không tìm thấy nhóm chức năng đã chọn";
+                goto EndEventHandler;
+            }
+
+            db.md_nhomchungloais.DeleteOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_nhomchungloai_id
+                }
+            );
+            db.SubmitChanges();
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if(msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa nhóm chức năng thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void load(HttpContext context)

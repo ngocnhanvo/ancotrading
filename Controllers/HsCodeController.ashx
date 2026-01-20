@@ -45,8 +45,8 @@ public class HsCodeController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -55,18 +55,34 @@ public class HsCodeController : IHttpHandler
         { hd = true; }
 
         md_hscode m = db.md_hscodes.Single(p => p.md_hscode_id == context.Request.Form["id"]);
+        var mnu = new md_hscode();
+        m.CopyPropertiesTo(mnu);
         m.ma_hscode = context.Request.Form["ma_hscode"];
         m.hscode = context.Request.Form["hscode"];
         m.hehang = context.Request.Form["hehang"];
-		m.tenhang_tv = context.Request.Form["tenhang_tv"];
-		m.tenhang_ta = context.Request.Form["tenhang_ta"];
-		m.thanhphan = context.Request.Form["thanhphan"];
-		m.nhacungung = context.Request.Form["nhacungung"];
+        m.tenhang_tv = context.Request.Form["tenhang_tv"];
+        m.tenhang_ta = context.Request.Form["tenhang_ta"];
+        m.thanhphan = context.Request.Form["thanhphan"];
+        m.nhacungung = context.Request.Form["nhacungung"];
         m.mota = context.Request.Form["mota"];
         m.hoatdong = hd;
         m.nguoicapnhat = UserUtils.getUser(context);
         m.ngaycapnhat = DateTime.Now;
-        
+        var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = m.GetType().Name,
+                    id_lienket = m.md_hscode_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 
@@ -76,18 +92,18 @@ public class HsCodeController : IHttpHandler
         bool hd = false;
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-        
+
         md_hscode mnu = new md_hscode
         {
-            md_hscode_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+            md_hscode_id = Helper.getNewId(),
             ma_hscode = context.Request.Form["ma_hscode"],
             hscode = context.Request.Form["hscode"],
-			hehang = context.Request.Form["hehang"],
-			tenhang_tv = context.Request.Form["tenhang_tv"],
+            hehang = context.Request.Form["hehang"],
+            tenhang_tv = context.Request.Form["tenhang_tv"],
             tenhang_ta = context.Request.Form["tenhang_ta"],
-			thanhphan = context.Request.Form["thanhphan"],
-			nhacungung = context.Request.Form["nhacungung"],
-		
+            thanhphan = context.Request.Form["thanhphan"],
+            nhacungung = context.Request.Form["nhacungung"],
+
             mota = context.Request.Form["mota"],
             hoatdong = hd,
             nguoitao = UserUtils.getUser(context),
@@ -97,18 +113,63 @@ public class HsCodeController : IHttpHandler
         };
 
         db.md_hscodes.InsertOnSubmit(mnu);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+               db,
+               context,
+               new ad_log
+               {
+                   nexxdecor_check = false,
+                   hanhdong = VoNgocNhan.API_Data.add,
+                   table = mnu.GetType().Name,
+                   id_lienket = mnu.md_hscode_id
+               }
+           );
         db.SubmitChanges();
     }
 
 
     public void del(HttpContext context)
     {
-        String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-        String sql = "delete md_hscode where md_hscode_id IN (" + id + ")";
-        mdbc.ExcuteNonQuery(sql);
+        string msg = "";
+        string id = context.Request.Form["id"];
+        try
+        {
+            var mnu = db.md_hscodes.Where(s => s.md_hscode_id == id).FirstOrDefault();
+            if (mnu == null)
+            {
+                msg = "Không tìm thấy hscode đã chọn";
+                goto EndEventHandler;
+            }
+
+            db.md_hscodes.DeleteOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_hscode_id
+                }
+            );
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa hscode thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void load(HttpContext context)
@@ -153,13 +214,14 @@ public class HsCodeController : IHttpHandler
         {
             sidx = "hehang asc, ma_hscode asc, hscode asc";
         }
-		else {
-			sidx = sidx + " " + sord;
-		}
+        else
+        {
+            sidx = sidx + " " + sord;
+        }
 
         string strsql = "select * from( " +
             " select md_hscode_id, ma_hscode, hscode, hehang, tenhang_tv, tenhang_ta, thanhphan, nhacungung, ngaytao, nguoitao, ngaycapnhat, nguoicapnhat, mota, hoatdong" +
-            ",  ROW_NUMBER() OVER (ORDER BY " + sidx + ") as RowNum "+
+            ",  ROW_NUMBER() OVER (ORDER BY " + sidx + ") as RowNum " +
             " from md_hscode where 1=1 {0}" +
             ")P where RowNum > @start AND RowNum < @end";
         strsql = string.Format(strsql, filter);

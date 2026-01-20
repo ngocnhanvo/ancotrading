@@ -122,34 +122,50 @@ public class MauSacImport : ImportOriginal
 
     public void Import()
     {
-        String insert = "insert into md_mausac(md_mausac_id, md_detai_id, md_chungloai_id, code_mau, code_dt, code_cl, tv_ngan, ta_ngan, tv_dai, ta_dai, hinhthucban, hemau, ngaytao, nguoitao, ngaycapnhat, nguoicapnhat, hoatdong, trangthai, mota) values( " +
-            " (select RIGHT(sys.fn_sqlvarbasetostr(HashBytes('MD5', CAST(GETDATE() as nvarchar(32)) + CAST(NEWID() as nvarchar(255)) )),32)) " +
-            " , @md_detai_id, @md_chungloai_id, @code_mau, @code_dt, @code_cl, @tv_ngan, @ta_ngan, @tv_dai, @ta_dai, @hinhthucban, @hemau, @ngaytao, @nguoitao, @ngaycapnhat, @nguoicapnhat, @hoatdong, @trangthai, @mota)";
-        mdbc.ExcuteNonQuery(insert
-            , "@md_detai_id", md_detai_id
-            , "@md_chungloai_id", md_chungloai_id
-            , "@code_mau", code_mau
-            , "@code_dt", code_dt
-            , "@code_cl", code_cl
-            , "@tv_ngan", tv_ngan
-            , "@ta_ngan", ta_ngan
-            , "@tv_dai", ""
-            , "@ta_dai", ""
-            , "@hinhthucban", hinhthucban
-            , "@hemau", hemau
-            , "@ngaytao", ngayTao
-            , "@nguoitao", nguoiTao
-            , "@ngaycapnhat", ngayCapNhat
-            , "@nguoicapnhat", nguoiCapNhat
-            , "@hoatdong", hoatDong
-            , "@trangthai", "SOANTHAO"
-            , "@mota", ghichu);
+        md_mausac mnu = new md_mausac
+        {
+            md_mausac_id = Helper.getNewId(),
+            md_chungloai_id = md_chungloai_id,
+            md_detai_id = md_detai_id,
+            code_mau = code_mau,
+            code_cl = code_cl,
+            code_dt = code_dt,
+            tv_ngan = tv_ngan,
+            ta_ngan = ta_ngan,
+            tv_dai = "",
+            ta_dai = "",
+            hinhthucban = hinhthucban,
+            hemau = hemau,
+            trangthai = Helper.SOANTHAO,
+            mota = ghichu,
+            hoatdong = hoatDong,
+            nguoitao = nguoiTao,
+            nguoicapnhat = nguoiCapNhat,
+            ngaytao = ngayTao,
+            ngaycapnhat = ngayCapNhat
+        };
+
+        db.md_mausacs.InsertOnSubmit(mnu);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.add,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_mausac_id
+                }
+            );
+        db.SubmitChanges();
     }
 
     LinqDBDataContext db = new LinqDBDataContext();
     public void Update()
     {
         md_mausac o = db.md_mausacs.FirstOrDefault(p => p.code_mau.Equals(code_mau) && p.code_cl.Equals(code_cl) && p.code_dt.Equals(code_dt));
+        var mnu = new md_mausac();
+        o.CopyPropertiesTo(mnu);
         o.code_dt = code_dt;
         o.code_cl = code_cl;
         o.tv_ngan = tv_ngan;
@@ -161,7 +177,21 @@ public class MauSacImport : ImportOriginal
         o.mota = ghichu;
 		o.ngaycapnhat = ngayCapNhat;
         o.nguoicapnhat = nguoiCapNhat;
-
+        var diffs = VoNgocNhan.API_Data.GetDifferences(o, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = o.GetType().Name,
+                    id_lienket = o.md_mausac_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 }

@@ -65,28 +65,42 @@ public class KieuDangImport : ImportOriginal
 
     public void Import()
     {
-        String insert = "insert into md_kieudang(md_kieudang_id, ma_kieudang, ten_tv, ten_ta, ten_tv_dai, ten_ta_dai, ngaytao, nguoitao, ngaycapnhat, nguoicapnhat, mota, hoatdong, trangthai) values( " +
-            " (select RIGHT(sys.fn_sqlvarbasetostr(HashBytes('MD5', CAST(GETDATE() as nvarchar(32)) + CAST(NEWID() as nvarchar(255)) )),32)) " +
-            " , @ma_kieudang, @ten_tv, @ten_ta, @ten_tv_dai, @ten_ta_dai, @ngaytao, @nguoitao, @ngaycapnhat, @nguoicapnhat, @mota, @hoatdong, @trangthai)";
-        mdbc.ExcuteNonQuery(insert
-            , "@ma_kieudang", maKieuDang
-            , "@ten_tv", tv_ngan
-            , "@ten_ta", ta_ngan
-            , "@ten_tv_dai", ""
-            , "@ten_ta_dai", ""
-            , "@ngaytao", ngayTao
-            , "@nguoitao", nguoiTao
-            , "@ngaycapnhat", ngayCapNhat
-            , "@nguoicapnhat", nguoiCapNhat
-			, "@mota", ghichu
-            , "@hoatdong", hoatDong
-            , "@trangthai", "SOANTHAO");
+        var mnu = new md_kieudang
+        {
+            md_kieudang_id = Helper.getNewId(),
+            ma_kieudang = maKieuDang,
+            ten_tv = tv_ngan,
+            ten_ta = ta_ngan,
+            trangthai = Helper.SOANTHAO,
+            mota = ghichu,
+            hoatdong = hoatDong,
+            nguoitao = nguoiTao,
+            nguoicapnhat = nguoiCapNhat,
+            ngaytao = ngayTao,
+            ngaycapnhat = ngayCapNhat
+        };
+
+        db.md_kieudangs.InsertOnSubmit(mnu);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+            db,
+            HttpContext.Current,
+            new ad_log
+            {
+                nexxdecor_check = false,
+                hanhdong = VoNgocNhan.API_Data.add,
+                table = mnu.GetType().Name,
+                id_lienket = mnu.md_kieudang_id
+            }
+        );
+        db.SubmitChanges();
     }
 
     LinqDBDataContext db = new LinqDBDataContext();
     public void Update()
     {
         md_kieudang o = db.md_kieudangs.FirstOrDefault(p => p.ma_kieudang.Equals(maKieuDang));
+        var mnu = new md_kieudang();
+        o.CopyPropertiesTo(mnu);
         o.ten_tv = tv_ngan;
         o.ten_ta = ta_ngan;
 		o.ten_tv_dai = "";
@@ -94,6 +108,22 @@ public class KieuDangImport : ImportOriginal
         o.ngaycapnhat = ngayCapNhat;
         o.nguoicapnhat = nguoiCapNhat;
 		o.mota = ghichu;
+
+        var diffs = VoNgocNhan.API_Data.GetDifferences(o, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = o.GetType().Name,
+                    id_lienket = o.md_kieudang_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 }

@@ -81,12 +81,38 @@ public class PackingController : IHttpHandler
                 {
                     if (trangthai.Equals("TOACTIVE"))
                     {
-                        String update = "update md_donggoi set trangthai = 'HIEULUC' where trangthai='SOANTHAO'";
-                        mdbc.ExcuteNonQuery(update);
+                        var spsHieuLuc = db.md_donggois.Where(s => s.trangthai == Helper.HIEULUC).ToList();
+                        foreach (var spst in spsHieuLuc)
+                        {
+                            spst.trangthai = Helper.SOANTHAO;
+                            VoNgocNhan.API_Data.themLichSuHoatDong(
+                                db,
+                                HttpContext.Current,
+                                new ad_log
+                                {
+                                    nexxdecor_check = false,
+                                    hanhdong = VoNgocNhan.API_Data.edit,
+                                    table = spst.GetType().Name,
+                                    id_lienket = spst.md_donggoi_id
+                                }
+                            );
+                        }
+                        db.SubmitChanges();
                     }
                     else
                     {
                         sp.trangthai = trangthai;
+                        VoNgocNhan.API_Data.themLichSuHoatDong(
+                                db,
+                                HttpContext.Current,
+                                new ad_log
+                                {
+                                    nexxdecor_check = false,
+                                    hanhdong = VoNgocNhan.API_Data.edit,
+                                    table = sp.GetType().Name,
+                                    id_lienket = sp.md_donggoi_id
+                                }
+                            );
                         db.SubmitChanges();
                     }
                 }
@@ -250,6 +276,8 @@ public class PackingController : IHttpHandler
 
 
             md_donggoi m = db.md_donggois.Single(p => p.md_donggoi_id == context.Request.Form["id"]);
+            var mnu = new md_donggoi();
+            m.CopyPropertiesTo(mnu);
             m.ten_donggoi = sl_outer + dvtouter;
             m.ma_donggoi = ma_donggoi;
             m.sl_inner = decimal.Parse(context.Request.Form["sl_inner"]);
@@ -285,7 +313,21 @@ public class PackingController : IHttpHandler
             m.hoatdong = hd;
             m.nguoicapnhat = UserUtils.getUser(context);
             m.ngaycapnhat = DateTime.Now;
-
+            var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+            if (diffs.Count > 0)
+            {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    context,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = m.GetType().Name,
+                        id_lienket = m.md_donggoi_id
+                    }
+                );
+            }
             db.SubmitChanges();
         }
     }
@@ -369,6 +411,17 @@ public class PackingController : IHttpHandler
             };
 
             db.md_donggois.InsertOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+               db,
+               context,
+               new ad_log
+               {
+                   nexxdecor_check = false,
+                   hanhdong = VoNgocNhan.API_Data.add,
+                   table = mnu.GetType().Name,
+                   id_lienket = mnu.md_donggoi_id
+               }
+            );
             db.SubmitChanges();
         }
     }
@@ -377,11 +430,51 @@ public class PackingController : IHttpHandler
     public void del(HttpContext context)
     {
         String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-        String sql = "update md_donggoi set hoatdong = 0 where md_donggoi_id IN (" + id + ")";
-        mdbc.ExcuteNonQuery(sql);
+        string msg = "";
+        try
+        {
+            var mnu = db.md_donggois.Where(s => s.md_donggoi_id == id).FirstOrDefault();
+            if (mnu == null)
+            {
+                msg = "Không tìm thấy đóng gói đã chọn";
+                goto EndEventHandler;
+            }
+
+            if (mnu.trangthai == Helper.SOANTHAO)
+            {
+                msg = "Đóng gói không thể ở trạng thái Soạn Thảo";
+                goto EndEventHandler;
+            }
+
+            mnu.hoatdong = false;
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_donggoi_id
+                }
+            );
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Tắt hoạt động của đóng gói thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void load(HttpContext context)

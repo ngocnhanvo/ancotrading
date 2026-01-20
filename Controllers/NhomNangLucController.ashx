@@ -57,19 +57,21 @@ public class NhomNangLucController : IHttpHandler
 
         md_chungloai cl = db.md_chungloais.Single(p => p.md_chungloai_id.Equals(context.Request.Form["md_chungloai_id"]));
         string nhom = context.Request.Form["nhom"];
-        var nl = db.md_nhomnanglucs.Where(p => 
-            p.md_chungloai_id.Equals(context.Request.Form["md_chungloai_id"]) & 
-            p.hehang.Equals(cl.code_cl) & 
+        var nl = db.md_nhomnanglucs.Where(p =>
+            p.md_chungloai_id.Equals(context.Request.Form["md_chungloai_id"]) &
+            p.hehang.Equals(cl.code_cl) &
             p.nhom == nhom &
             p.md_nhomnangluc_id != context.Request.Form["id"]
             );
-        if(nl.Count() > 0)
+        if (nl.Count() > 0)
         {
             msg = "Nhóm Năng Lực đã tồn tại!";
         }
         else
         {
             md_nhomnangluc m = db.md_nhomnanglucs.Single(p => p.md_nhomnangluc_id == context.Request.Form["id"]);
+            var mnu = new md_nhomnangluc();
+            m.CopyPropertiesTo(mnu);
             m.hehang = cl.code_cl;
             m.nhom = context.Request.Form["nhom"];
             m.md_chungloai_id = context.Request.Form["md_chungloai_id"];
@@ -81,7 +83,21 @@ public class NhomNangLucController : IHttpHandler
             m.hoatdong = hd;
             m.nguoicapnhat = UserUtils.getUser(context);
             m.ngaycapnhat = DateTime.Now;
-
+            var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+            if (diffs.Count > 0)
+            {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    context,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = m.GetType().Name,
+                        id_lienket = m.md_nhomnangluc_id
+                    }
+                );
+            }
             db.SubmitChanges();
             msg = "Cập nhật thành công.";
         }
@@ -99,7 +115,7 @@ public class NhomNangLucController : IHttpHandler
         md_chungloai cl = db.md_chungloais.Single(p => p.md_chungloai_id.Equals(context.Request.Form["md_chungloai_id"]));
 
         var nl = db.md_nhomnanglucs.Where(p => p.md_chungloai_id.Equals(context.Request.Form["md_chungloai_id"]) & p.hehang.Equals(cl.code_cl));
-        if(nl.Count() > 0)
+        if (nl.Count() > 0)
         {
             msg = "Nhóm Năng Lực đã tồn tại!";
         }
@@ -107,22 +123,13 @@ public class NhomNangLucController : IHttpHandler
         {
             md_nhomnangluc mnu = new md_nhomnangluc
             {
-                md_nhomnangluc_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                md_nhomnangluc_id = Helper.getNewId(),
                 hehang = cl.code_cl,
                 nhom = context.Request.Form["nhom"],
                 md_chungloai_id = context.Request.Form["md_chungloai_id"],
                 mota_tiengviet = context.Request.Form["mota_tiengviet"],
                 hscode = context.Request.Form["hscode"],
                 thoigianlamhang = int.Parse(context.Request.Form["thoigianlamhang"]),
-	
-										
-				  
-										  
-											  
-						   
-							  
-	 
-
                 mota = context.Request.Form["mota"],
                 hoatdong = hd,
                 nguoitao = UserUtils.getUser(context),
@@ -132,6 +139,16 @@ public class NhomNangLucController : IHttpHandler
             };
 
             db.md_nhomnanglucs.InsertOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.add,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_nhomnangluc_id
+                }
+            );
             db.SubmitChanges();
             msg = "Thêm Nhóm Năng Lực thành công.";
         }
@@ -142,30 +159,61 @@ public class NhomNangLucController : IHttpHandler
     public void del(HttpContext context)
     {
         String id = context.Request.Form["id"], msg = "";
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-
-        int count_sp_bk = db.ad_sanpham_backups.Where(s => s.md_nhomnangluc_id == context.Request.Form["id"]).Count();
-
-        int count_ct = db.c_chitietnanglucs.Where(s => s.md_nhomnangluc_id == context.Request.Form["id"]).Count();
-
-        int count_ls = db.c_lichsubooknanglucs.Where(s => s.md_nhomnangluc_id == context.Request.Form["id"]).Count();
-
-        int countsp = db.md_sanphams.Where(s => s.md_nhomnangluc_id == context.Request.Form["id"]).Count();
-
-        int total = count_sp_bk + count_ct + count_ls + countsp;
-
-        if(total <= 0)
+        try
         {
-            String sql = "delete md_nhomnangluc where md_nhomnangluc_id IN (" + id + ")";
-            mdbc.ExcuteNonQuery(sql);
+            var mnu = db.md_nhomnanglucs.Where(s => s.md_nhomnangluc_id == id).FirstOrDefault();
+            if (mnu == null)
+            {
+                msg = "Không tìm thấy nhóm năng lực đã chọn";
+                goto EndEventHandler;
+            }
+
+            int count_sp_bk = db.ad_sanpham_backups.Where(s => s.md_nhomnangluc_id == id).Count();
+
+            int count_ct = db.c_chitietnanglucs.Where(s => s.md_nhomnangluc_id == id).Count();
+
+            int count_ls = db.c_lichsubooknanglucs.Where(s => s.md_nhomnangluc_id == id).Count();
+
+            int countsp = db.md_sanphams.Where(s => s.md_nhomnangluc_id == id).Count();
+
+            int total = count_sp_bk + count_ct + count_ls + countsp;
+
+            if (total > 0)
+            {
+                msg = "Lỗi: Không thể xóa.";
+                goto EndEventHandler;
+            }
+
+
+            db.md_nhomnanglucs.DeleteOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_nhomnangluc_id
+                }
+            );
+            db.SubmitChanges();
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if(msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa nhóm năng lực thành công");
         }
         else
         {
-            msg = "Lỗi: Không thể xóa.";
+            jqGridHelper.Utils.writeResult(0, msg);
         }
-        context.Response.Write(msg);
     }
 
     public void load(HttpContext context)

@@ -105,6 +105,17 @@ public class NhomNangLucImport : ImportOriginal
         nnl.hoatdong = hoatDong;
 
         db.md_nhomnanglucs.InsertOnSubmit(nnl);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+            db,
+            HttpContext.Current,
+            new ad_log
+            {
+                nexxdecor_check = false,
+                hanhdong = VoNgocNhan.API_Data.add,
+                table = nnl.GetType().Name,
+                id_lienket = nnl.md_nhomnangluc_id
+            }
+        );
         db.SubmitChanges();
     }
 
@@ -113,6 +124,8 @@ public class NhomNangLucImport : ImportOriginal
     public void Update()
     {
         md_nhomnangluc o = db.md_nhomnanglucs.FirstOrDefault(p => p.nhom.Equals(maNhom) && p.hehang.Equals(heHang));
+        var mnu = new md_nhomnangluc();
+        o.CopyPropertiesTo(mnu);
         o.md_chungloai_id = md_chungloai_id;
 		o.hehang = heHang;
         o.mota_tiengviet = moTaTiengViet;
@@ -121,6 +134,21 @@ public class NhomNangLucImport : ImportOriginal
 		o.mota = moTa;
         o.ngaycapnhat = ngayCapNhat;
         o.nguoicapnhat = nguoiCapNhat;
+        var diffs = VoNgocNhan.API_Data.GetDifferences(o, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = o.GetType().Name,
+                    id_lienket = o.md_nhomnangluc_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 }

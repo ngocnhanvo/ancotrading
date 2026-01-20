@@ -62,6 +62,8 @@ public class UnitProductController : IHttpHandler {
         { hd = true; }
 
         md_donvitinhsanpham obj = db.md_donvitinhsanphams.Single(p => p.md_donvitinhsanpham_id == context.Request.Form["id"]);
+        var mnu = new md_donvitinhsanpham();
+        obj.CopyPropertiesTo(mnu);
         obj.ma_edi = context.Request.Form["ma_edi"];
         obj.ten_dvt = context.Request.Form["ten_dvt"];
         obj.mota = context.Request.Form["mota"];
@@ -69,7 +71,21 @@ public class UnitProductController : IHttpHandler {
         
         obj.nguoicapnhat = UserUtils.getUser(context);
         obj.ngaycapnhat = DateTime.Now;
-        
+        var diffs = VoNgocNhan.API_Data.GetDifferences(obj, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = obj.GetType().Name,
+                    id_lienket = obj.md_donvitinhsanpham_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 
@@ -82,7 +98,7 @@ public class UnitProductController : IHttpHandler {
 
         md_donvitinhsanpham obj = new md_donvitinhsanpham
         {
-            md_donvitinhsanpham_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+            md_donvitinhsanpham_id = Helper.getNewId(),
             ma_edi = context.Request.Form["ma_edi"],
             ten_dvt = context.Request.Form["ten_dvt"],
             mota = context.Request.Form["mota"],
@@ -94,18 +110,63 @@ public class UnitProductController : IHttpHandler {
         };
 
         db.md_donvitinhsanphams.InsertOnSubmit(obj);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+               db,
+               context,
+               new ad_log
+               {
+                   nexxdecor_check = false,
+                   hanhdong = VoNgocNhan.API_Data.add,
+                   table = obj.GetType().Name,
+                   id_lienket = obj.md_donvitinhsanpham_id
+               }
+           );
         db.SubmitChanges();
     }
 
 
     public void del(HttpContext context)
     {
-        String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-        String sql = "delete md_donvitinhsanpham where md_donvitinhsanpham_id IN (" + id + ")";
-        mdbc.ExcuteNonQuery(sql);
+        string msg = "";
+        string id = context.Request.Form["id"];
+        try
+        {
+            var mnu = db.md_donvitinhsanphams.Where(s => s.md_donvitinhsanpham_id == id).FirstOrDefault();
+            if (mnu == null)
+            {
+                msg = "Không tìm thấy đvt sản phẩm đã chọn";
+                goto EndEventHandler;
+            }
+
+            db.md_donvitinhsanphams.DeleteOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_donvitinhsanpham_id
+                }
+            );
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa dvt sản phẩm thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void load(HttpContext context)

@@ -75,6 +75,8 @@ public class PackingProductController : IHttpHandler
         }
 
         md_donggoisanpham m = db.md_donggoisanphams.Single(p => p.md_donggoisanpham_id.Equals(context.Request.Form["id"]));
+        var mnu = new md_donggoisanpham();
+        m.CopyPropertiesTo(mnu);
         m.md_donggoi_id = ten_donggoi;
         m.md_sanpham_id = sanpham_id;
         m.soluong = soluong;
@@ -84,7 +86,21 @@ public class PackingProductController : IHttpHandler
         m.hoatdong = hd;
         m.nguoicapnhat = UserUtils.getUser(context);
         m.ngaycapnhat = DateTime.Now;
-
+        var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = m.GetType().Name,
+                    id_lienket = m.md_donggoisanpham_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 
@@ -118,7 +134,7 @@ public class PackingProductController : IHttpHandler
 
                 md_donggoisanpham mnu = new md_donggoisanpham
                 {
-                    md_donggoisanpham_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                    md_donggoisanpham_id = Helper.getNewId(),
                     md_donggoi_id = md_donggoi_id,
                     md_sanpham_id = sanpham_id,
                     soluong = soluong,
@@ -133,10 +149,23 @@ public class PackingProductController : IHttpHandler
                 };
 
                 db.md_donggoisanphams.InsertOnSubmit(mnu);
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                   db,
+                   context,
+                   new ad_log
+                   {
+                       nexxdecor_check = false,
+                       hanhdong = VoNgocNhan.API_Data.add,
+                       table = mnu.GetType().Name,
+                       id_lienket = mnu.md_donggoisanpham_id
+                   }
+                );
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Thêm mới thành công!");
             }
-        }catch(Exception ex){
+        }
+        catch (Exception ex)
+        {
             jqGridHelper.Utils.writeResult(0, ex.Message);
         }
     }
@@ -145,11 +174,45 @@ public class PackingProductController : IHttpHandler
     public void del(HttpContext context)
     {
         String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-        String sql = "delete md_donggoisanpham where md_donggoisanpham_id IN (" + id + ")";
-        mdbc.ExcuteNonQuery(sql);
+        string msg = "";
+        try
+        {
+            var mnu = db.md_donggoisanphams.Where(s => s.md_donggoisanpham_id == id).FirstOrDefault();
+            if (mnu == null)
+            {
+                msg = "Không tìm thấy đóng gói sản phẩm đã chọn";
+                goto EndEventHandler;
+            }
+
+            db.md_donggoisanphams.DeleteOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_donggoisanpham_id
+                }
+            );
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa đóng gói sản phẩm thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void load(HttpContext context)
@@ -179,7 +242,7 @@ public class PackingProductController : IHttpHandler
         {
             sqlCount = string.Format(sqlCount, 0);
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -206,7 +269,7 @@ public class PackingProductController : IHttpHandler
             sidx = "md_donggoisanpham_id";
         }
 
-        string strsql = "select * from( " + 
+        string strsql = "select * from( " +
             " select  dgsp.md_donggoisanpham_id, dg.md_donggoi_id, sp.md_sanpham_id, " +
             " sp.ma_sanpham, dgsp.soluong, dgsp.macdinh, dgsp.ngaytao, dgsp.nguoitao, " +
             " dgsp.ngaycapnhat, dgsp.nguoicapnhat, dgsp.mota, dgsp.hoatdong, " +
@@ -224,7 +287,7 @@ public class PackingProductController : IHttpHandler
         {
             strsql = string.Format(strsql, 0);
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";

@@ -21,14 +21,15 @@ public class HsCodeImport : ImportOriginal
 
     LinqDBDataContext db = new LinqDBDataContext();
 
-	public HsCodeImport(){
-    
+    public HsCodeImport()
+    {
+
     }
 
     public HsCodeImport(String ma_hscode, String hscode, String hehang, String diengiai, String diengiaiTA, String thanhphan, String nhacungung, String ghichu)
         : this(ma_hscode, hscode, hehang, diengiai, diengiaiTA, thanhphan, nhacungung, ghichu, DateTime.Now, "admin", DateTime.Now, "admin", true)
-    { 
-    
+    {
+
     }
 
     public HsCodeImport(String ma_hscode, String hscode, String hehang, String diengiai, String diengiaiTA, String thanhphan, String nhacungung, String ghichu
@@ -57,36 +58,64 @@ public class HsCodeImport : ImportOriginal
         hs.hscode = _hscode;
         hs.hehang = _hehang;
         hs.tenhang_tv = _diengiai;
-		hs.tenhang_ta = _diengiaiTA;
-		hs.thanhphan = _thanhphan;
-		hs.nhacungung = _nhacungung;
+        hs.tenhang_ta = _diengiaiTA;
+        hs.thanhphan = _thanhphan;
+        hs.nhacungung = _nhacungung;
         hs.mota = _ghichu;
         hs.ngaytao = ngayTao;
         hs.nguoitao = nguoiTao;
         hs.ngaycapnhat = ngayCapNhat;
         hs.nguoicapnhat = nguoiCapNhat;
         hs.hoatdong = hoatDong;
-        
+
         db.md_hscodes.InsertOnSubmit(hs);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+               db,
+               HttpContext.Current,
+               new ad_log
+               {
+                   nexxdecor_check = false,
+                   hanhdong = VoNgocNhan.API_Data.add,
+                   table = hs.GetType().Name,
+                   id_lienket = hs.md_hscode_id
+               }
+           );
         db.SubmitChanges();
     }
 
     public void Update()
     {
         md_hscode hs = db.md_hscodes.FirstOrDefault(p => p.ma_hscode.Equals(_ma_hscode) & p.hehang.Equals(_hehang));
-		if(hs != null) {
-			hs.hscode = _hscode;
-			hs.hehang = _hehang;
-			hs.tenhang_tv = _diengiai;
-			hs.tenhang_ta = _diengiaiTA;
-			hs.thanhphan = _thanhphan;
-			hs.nhacungung = _nhacungung;
-			hs.mota = _ghichu;
-			hs.ngaycapnhat = ngayCapNhat;
-			hs.nguoicapnhat = nguoiCapNhat;
-			hs.hoatdong = hoatDong;
-
-			db.SubmitChanges();
-		}
+        if (hs != null)
+        {
+            var mnu = new md_hscode();
+            hs.CopyPropertiesTo(mnu);
+            hs.hscode = _hscode;
+            hs.hehang = _hehang;
+            hs.tenhang_tv = _diengiai;
+            hs.tenhang_ta = _diengiaiTA;
+            hs.thanhphan = _thanhphan;
+            hs.nhacungung = _nhacungung;
+            hs.mota = _ghichu;
+            hs.ngaycapnhat = ngayCapNhat;
+            hs.nguoicapnhat = nguoiCapNhat;
+            hs.hoatdong = hoatDong;
+            var diffs = VoNgocNhan.API_Data.GetDifferences(hs, mnu);
+            if (diffs.Count > 0)
+            {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    HttpContext.Current,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = hs.GetType().Name,
+                        id_lienket = hs.md_hscode_id
+                    }
+                );
+            }
+            db.SubmitChanges();
+        }
     }
 }

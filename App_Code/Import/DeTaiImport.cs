@@ -101,26 +101,41 @@ public class DeTaiImport : ImportOriginal
 
     public void Import()
     {
-        String insert = "insert into md_detai(md_detai_id, md_chungloai_id, code_dt, code_cl, tv_ngan, ta_ngan, tv_dai, ta_dai, hinhthucban, ngaytao, nguoitao, ngaycapnhat, nguoicapnhat, hoatdong, trangthai, mota) values( " +
-            " (select RIGHT(sys.fn_sqlvarbasetostr(HashBytes('MD5', CAST(GETDATE() as nvarchar(32)) + CAST(NEWID() as nvarchar(255)) )),32)) " +
-            " , @md_chungloai_id ,@code_dt, @code_cl, @tv_ngan, @ta_ngan, @tv_dai, @ta_dai, @hinhthucban, @ngaytao, @nguoitao, @ngaycapnhat, @nguoicapnhat, @hoatdong, @trangthai, @mota)";
-        mdbc.ExcuteNonQuery(insert
-            , "@md_chungloai_id", code_cl_id
-            , "@code_dt", code_dt
-            , "@code_cl", code_cl
-            , "@tv_ngan", tv_ngan
-            , "@ta_ngan", ta_ngan
-            , "@tv_dai", ""
-            , "@ta_dai", ""
-			, "@hinhthucban", hinhthucban
-            , "@ngaytao", ngayTao
-            , "@nguoitao", nguoiTao
-            , "@ngaycapnhat", ngayCapNhat
-            , "@nguoicapnhat", nguoiCapNhat
-            , "@hoatdong", hoatDong
-            , "@trangthai", "SOANTHAO"
-            , "@mota", ghichu
-			);
+        var mnu = new md_detai
+        {
+            md_detai_id = Helper.getNewId(),
+            md_chungloai_id = code_cl_id,
+            code_cl = code_cl,
+            code_dt = code_dt,
+            tv_ngan = tv_ngan,
+            ta_ngan = ta_ngan,
+            tv_dai = "",
+            ta_dai = "",
+            ta_nganWeb = "",
+            hinhthucban = hinhthucban,
+            trangthai = Helper.SOANTHAO,
+
+            mota = ghichu,
+            hoatdong = hoatDong,
+            nguoitao = nguoiTao,
+            nguoicapnhat = nguoiCapNhat,
+            ngaytao = ngayTao,
+            ngaycapnhat = ngayCapNhat
+        };
+
+        db.md_detais.InsertOnSubmit(mnu);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.add,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_detai_id
+                }
+            );
+        db.SubmitChanges();
     }
 
     LinqDBDataContext db = new LinqDBDataContext();
@@ -128,7 +143,9 @@ public class DeTaiImport : ImportOriginal
     public void Update()
     {
         md_detai o = db.md_detais.FirstOrDefault(p =>p.code_dt.Equals(code_dt) && p.code_cl.Equals(code_cl));
-		o.md_chungloai_id = code_cl_id;
+        var mnu = new md_detai();
+        o.CopyPropertiesTo(mnu);
+        o.md_chungloai_id = code_cl_id;
         o.tv_ngan = tv_ngan;
         //o.tv_dai = tv_dai;
         o.ta_ngan = ta_ngan;
@@ -138,6 +155,21 @@ public class DeTaiImport : ImportOriginal
         o.nguoicapnhat = nguoiCapNhat;
         o.hoatdong = hoatDong;
         o.mota = ghichu;
-		db.SubmitChanges();
+        var diffs = VoNgocNhan.API_Data.GetDifferences(o, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = o.GetType().Name,
+                    id_lienket = o.md_detai_id
+                }
+            );
+        }
+        db.SubmitChanges();
     }
 }

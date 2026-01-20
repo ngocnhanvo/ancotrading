@@ -262,7 +262,7 @@ using ExcelLibrary.SpreadSheet;
 public class DongGoiImport : ImportOriginal
 {
     public void Import(string maDongGoi, string tenDongGoi, decimal sl_inner, string dvt_inner, decimal l1, decimal w1, decimal h1, decimal sl_outer, string dvt_outer, decimal l2_mix, decimal w2_mix, decimal h2_mix,
-	decimal slcont40, decimal slcont20, decimal slcont40hc, String nxn, string ghichu, bool dgdg, decimal? tldg, decimal? cpdg)
+    decimal slcont40, decimal slcont20, decimal slcont40hc, String nxn, string ghichu, bool dgdg, decimal? tldg, decimal? cpdg)
     {
         md_donggoi o = new md_donggoi();
         o.md_donggoi_id = ImportUtils.getNEWID();
@@ -284,8 +284,8 @@ public class DongGoiImport : ImportOriginal
         o.soluonggoi_ctn_40hc = slcont40hc;
         o.tldg = tldg;
         o.cpdg = cpdg;
-        
-		//o.vd = vd;
+
+        //o.vd = vd;
         //o.vn = vn;
         //o.vl = vl;
         //o.ghichu_vachngan = ghichu_vachngan;
@@ -294,54 +294,83 @@ public class DongGoiImport : ImportOriginal
         o.ngaycapnhat = DateTime.Now;
         o.nguoicapnhat = "admin";
         o.hoatdong = true;
-		if(string.IsNullOrEmpty(nxn))
-			o.ngayxacnhan = null;
-		else
-			o.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
+        if (string.IsNullOrEmpty(nxn))
+            o.ngayxacnhan = null;
+        else
+            o.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
         //o.ngayxacnhan = nxn;
-		o.mota = ghichu;
-		o.doigia_donggoi = dgdg;
-		o.trangthai = "SOANTHAO";
+        o.mota = ghichu;
+        o.doigia_donggoi = dgdg;
+        o.trangthai = Helper.SOANTHAO;
         db.md_donggois.InsertOnSubmit(o);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+               db,
+               HttpContext.Current,
+               new ad_log
+               {
+                   nexxdecor_check = false,
+                   hanhdong = VoNgocNhan.API_Data.add,
+                   table = o.GetType().Name,
+                   id_lienket = o.md_donggoi_id
+               }
+            );
         db.SubmitChanges();
     }
 
     LinqDBDataContext db = new LinqDBDataContext();
 
     public void Update(string maDongGoi, string tenDongGoi, decimal sl_inner, string dvt_inner, decimal l1, decimal w1, decimal h1, decimal sl_outer, string dvt_outer, decimal l2_mix, decimal w2_mix, decimal h2_mix,
-	decimal slcont40, decimal slcont20, decimal slcont40hc, String nxn, string ghichu, bool dgdg, decimal? tldg, decimal? cpdg)
+    decimal slcont40, decimal slcont20, decimal slcont40hc, String nxn, string ghichu, bool dgdg, decimal? tldg, decimal? cpdg)
     {
         md_donggoi o = db.md_donggois.FirstOrDefault(p => p.ma_donggoi.Equals(maDongGoi));
-        if(o != null) {
-			o.ten_donggoi = tenDongGoi;
-			o.sl_inner = sl_inner;
-			o.dvt_inner = dvt_inner;
-			o.l1 = l1;
-			o.w1 = w1;
-			o.h1 = h1;
-			o.sl_outer = sl_outer;
-			o.dvt_outer = dvt_outer;
-			o.l2_mix = l2_mix;
-			o.w2_mix = w2_mix;
-			o.h2_mix = h2_mix;
-			o.v2 = l2_mix * w2_mix * h2_mix / 1000000;
-			o.soluonggoi_ctn_20 = slcont20;
-			o.soluonggoi_ctn = slcont40;
-			o.soluonggoi_ctn_40hc = slcont40hc;
+        if (o != null)
+        {
+            var mnu = new md_donggoi();
+            o.CopyPropertiesTo(mnu);
+            o.ten_donggoi = tenDongGoi;
+            o.sl_inner = sl_inner;
+            o.dvt_inner = dvt_inner;
+            o.l1 = l1;
+            o.w1 = w1;
+            o.h1 = h1;
+            o.sl_outer = sl_outer;
+            o.dvt_outer = dvt_outer;
+            o.l2_mix = l2_mix;
+            o.w2_mix = w2_mix;
+            o.h2_mix = h2_mix;
+            o.v2 = l2_mix * w2_mix * h2_mix / 1000000;
+            o.soluonggoi_ctn_20 = slcont20;
+            o.soluonggoi_ctn = slcont40;
+            o.soluonggoi_ctn_40hc = slcont40hc;
             o.tldg = tldg;
             o.cpdg = cpdg;
 
             o.ngaycapnhat = DateTime.Now;
-			o.nguoicapnhat = "admin";
-			o.hoatdong = true;
-			if(string.IsNullOrEmpty(nxn))
-				o.ngayxacnhan = null;
-			else
-				o.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
-			//o.ngayxacnhan = nxn;
-			o.mota = ghichu;
-			o.doigia_donggoi = dgdg;
-			db.SubmitChanges();
-		}
+            o.nguoicapnhat = "admin";
+            o.hoatdong = true;
+            if (string.IsNullOrEmpty(nxn))
+                o.ngayxacnhan = null;
+            else
+                o.ngayxacnhan = DateTime.ParseExact(nxn, "dd/MM/yyyy", null);
+            //o.ngayxacnhan = nxn;
+            o.mota = ghichu;
+            o.doigia_donggoi = dgdg;
+            var diffs = VoNgocNhan.API_Data.GetDifferences(o, mnu);
+            if (diffs.Count > 0)
+            {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    HttpContext.Current,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = o.GetType().Name,
+                        id_lienket = o.md_donggoi_id
+                    }
+                );
+            }
+            db.SubmitChanges();
+        }
     }
 }

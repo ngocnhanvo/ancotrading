@@ -2,7 +2,7 @@
 
 using System;
 using System.Web;
-using System.Data.Linq;
+using System.Data;
 using System.Linq;
 using jqGridHelper;
 
@@ -46,7 +46,8 @@ public class DeTaiMainController : IHttpHandler
         }
     }
 
-    public void HinhAnh(HttpContext context){
+    public void HinhAnh(HttpContext context)
+    {
         string msg = "";
         if (context.Request.Files.Count != 0)
         {
@@ -57,34 +58,56 @@ public class DeTaiMainController : IHttpHandler
                 int mimeI = fileName.LastIndexOf(".");
                 string mime = fileName.Substring(mimeI);
                 string name = fileName.Substring(0, mimeI);
-                if(mime.ToLower() == ".jpg") {
-                    try {
+                if (mime.ToLower() == ".jpg")
+                {
+                    try
+                    {
                         string[] arrN = name.Split('-');
-                        if(arrN.Length == 2) {
+                        if (arrN.Length == 2)
+                        {
                             string cl = arrN[0], dt = arrN[1];
                             int countDT = db.md_detais.Where(p => p.code_cl.Equals(cl) & p.code_dt.Equals(dt)).Count();
-                            if(countDT > 0) {
-                                files[i - 1].SaveAs(context.Server.MapPath("../images/products/detai/" + files[i - 1].FileName));
+                            if (countDT > 0)
+                            {
+                                var link = $"images/products/detai/{files[i - 1].FileName}";
+                                files[i - 1].SaveAs(context.Server.MapPath($"../{link}"));
                                 msg += "<div style='color:blue'>" + fileName + ": upload thành công.</div>";
+                                VoNgocNhan.API_Data.themLichSuHoatDong(
+                                    db,
+                                    HttpContext.Current,
+                                    new ad_log
+                                    {
+                                        nexxdecor_check = false,
+                                        hanhdong = VoNgocNhan.API_Data.img,
+                                        table = typeof(md_detai).Name,
+                                        id_lienket = $"{cl}-{dt}",
+                                        chitiet = link
+                                    }
+                                );
                             }
-                            else {
+                            else
+                            {
                                 msg += "<div style='color:red'>" + fileName + ": không tồn tại đề tài này</div>";
                             }
                         }
-                        else {
+                        else
+                        {
                             msg += "<div style='color:red'>" + fileName + ": không đúng quy cách đặt tên (CL-DT)</div>";
                         }
                     }
-                    catch(Exception ex) {
+                    catch (Exception ex)
+                    {
                         msg += "<div style='color:red'>" + fileName + ":" + ex.Message + "</div>";
                     }
                 }
-                else {
+                else
+                {
                     msg += "<div style='color:red'>" + fileName + ": không đúng định dạng jpg</div>";
                 }
             }
         }
-        else {
+        else
+        {
             msg += "<div style='color:red'>Hãy chọn hình ảnh</div>";
         }
         context.Response.Write(msg);
@@ -152,18 +175,63 @@ public class DeTaiMainController : IHttpHandler
                     if (trangthai.Equals("TOACTIVE"))
                     {
                         sqlGetProductId = String.Format(sqlGetProductId, filter, "AND dt.trangthai = 'SOANTHAO'");
-                        String sqlUpdateToHIEULUC = "update md_detai set trangthai = 'HIEULUC' where md_detai_id IN(" + sqlGetProductId + ")";
-                        mdbc.ExcuteNonQuery(sqlUpdateToHIEULUC);
+                        var dt = mdbc.GetData(sqlGetProductId);
+                        var ids = dt.AsEnumerable().Select(row => row[0].ToString()).ToList();
+                        var spsSoanThao = db.md_detais.Where(s => ids.Contains(s.md_detai_id)).ToList();
+                        foreach (var spst in spsSoanThao)
+                        {
+                            spst.trangthai = Helper.HIEULUC;
+                            VoNgocNhan.API_Data.themLichSuHoatDong(
+                                db,
+                                HttpContext.Current,
+                                new ad_log
+                                {
+                                    nexxdecor_check = false,
+                                    hanhdong = VoNgocNhan.API_Data.edit,
+                                    table = spst.GetType().Name,
+                                    id_lienket = spst.md_detai_id
+                                }
+                            );
+                        }
+                        db.SubmitChanges();
                     }
                     else if (trangthai.Equals("TOACTIVENHD"))
                     {
                         sqlGetProductId = String.Format(sqlGetProductId, filter, "AND dt.trangthai = 'NHD'");
-                        String sqlUpdateToHIEULUC = "update md_detai set trangthai = 'HIEULUC' where md_detai_id IN(" + sqlGetProductId + ")";
-                        mdbc.ExcuteNonQuery(sqlUpdateToHIEULUC);
+                        var dt = mdbc.GetData(sqlGetProductId);
+                        var ids = dt.AsEnumerable().Select(row => row[0].ToString()).ToList();
+                        var spsNHD = db.md_detais.Where(s => ids.Contains(s.md_detai_id)).ToList();
+                        foreach (var spst in spsNHD)
+                        {
+                            spst.trangthai = Helper.HIEULUC;
+                            VoNgocNhan.API_Data.themLichSuHoatDong(
+                                db,
+                                HttpContext.Current,
+                                new ad_log
+                                {
+                                    nexxdecor_check = false,
+                                    hanhdong = VoNgocNhan.API_Data.edit,
+                                    table = spst.GetType().Name,
+                                    id_lienket = spst.md_detai_id
+                                }
+                            );
+                        }
+                        db.SubmitChanges();
                     }
                     else
                     {
                         sp.trangthai = trangthai;
+                        VoNgocNhan.API_Data.themLichSuHoatDong(
+                                db,
+                                HttpContext.Current,
+                                new ad_log
+                                {
+                                    nexxdecor_check = false,
+                                    hanhdong = VoNgocNhan.API_Data.edit,
+                                    table = sp.GetType().Name,
+                                    id_lienket = sp.md_detai_id
+                                }
+                            );
                         db.SubmitChanges();
                     }
                 }
@@ -200,6 +268,8 @@ public class DeTaiMainController : IHttpHandler
         String code_cl = db.md_chungloais.Where(cl => cl.md_chungloai_id.Equals(parChungLoai_Id)).FirstOrDefault().code_cl;
 
         md_detai m = db.md_detais.Where(p => p.md_detai_id == context.Request.Form["id"]).FirstOrDefault();
+        var mnu = new md_detai();
+        m.CopyPropertiesTo(mnu);
         m.md_chungloai_id = parChungLoai_Id;
         m.code_cl = code_cl;
         m.code_dt = context.Request.Form["code_dt"];
@@ -214,6 +284,21 @@ public class DeTaiMainController : IHttpHandler
         m.nguoicapnhat = UserUtils.getUser(context);
         m.ngaycapnhat = DateTime.Now;
 
+        var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = m.GetType().Name,
+                    id_lienket = m.md_detai_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 
@@ -229,7 +314,7 @@ public class DeTaiMainController : IHttpHandler
 
         md_detai mnu = new md_detai
         {
-            md_detai_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+            md_detai_id = Helper.getNewId(),
             md_chungloai_id = parChungLoai_Id,
             code_cl = code_cl,
             code_dt = context.Request.Form["code_dt"],
@@ -239,7 +324,7 @@ public class DeTaiMainController : IHttpHandler
             ta_dai = context.Request.Form["ta_dai"],
             ta_nganWeb = context.Request.Form["ta_nganWeb"],
             hinhthucban = context.Request.Form["hinhthucban"],
-            trangthai = "SOANTHAO",
+            trangthai = Helper.SOANTHAO,
 
             mota = context.Request.Form["mota"],
             hoatdong = hd,
@@ -250,18 +335,63 @@ public class DeTaiMainController : IHttpHandler
         };
 
         db.md_detais.InsertOnSubmit(mnu);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.add,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_detai_id
+                }
+            );
         db.SubmitChanges();
     }
 
 
     public void del(HttpContext context)
     {
-        String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-        String sql = "delete md_detai where md_detai_id IN (" + id + ")";
-        mdbc.ExcuteNonQuery(sql);
+        string msg = "";
+        string id = context.Request.Form["id"];
+        try
+        {
+            var mnu = db.md_detais.Where(s => s.md_detai_id == id).FirstOrDefault();
+            if (mnu == null)
+            {
+                msg = "Không tìm thấy đề tài đã chọn";
+                goto EndEventHandler;
+            }
+
+            db.md_detais.DeleteOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_detai_id
+                }
+            );
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa đề tài thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void load(HttpContext context)
@@ -310,7 +440,8 @@ public class DeTaiMainController : IHttpHandler
         {
             sidx = "cl.code_cl, dt.code_dt";
         }
-        else {
+        else
+        {
             sidx = sidx + " " + sord;
         }
 

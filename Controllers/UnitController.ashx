@@ -4,7 +4,8 @@ using System;
 using System.Web;
 using System.Linq;
 
-public class UnitController : IHttpHandler {
+public class UnitController : IHttpHandler
+{
     private LinqDBDataContext db = new LinqDBDataContext();
 
     public void ProcessRequest(HttpContext context)
@@ -36,14 +37,14 @@ public class UnitController : IHttpHandler {
                 break;
         }
     }
-    
+
     public void getSelectOption(HttpContext context)
     {
         String sql = "select md_donvitinh_id, ten_dvt from md_donvitinh where hoatdong = 1";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -52,13 +53,29 @@ public class UnitController : IHttpHandler {
         { hd = true; }
 
         md_donvitinh obj = db.md_donvitinhs.Single(p => p.md_donvitinh_id == context.Request.Form["id"]);
+        var mnu = new md_donvitinh();
+        obj.CopyPropertiesTo(mnu);
         obj.ma_edi = context.Request.Form["ma_edi"];
         obj.ten_dvt = context.Request.Form["ten_dvt"];
         obj.mota = context.Request.Form["mota"];
         obj.hoatdong = hd;
         obj.nguoicapnhat = UserUtils.getUser(context);
         obj.ngaycapnhat = DateTime.Now;
-        
+        var diffs = VoNgocNhan.API_Data.GetDifferences(obj, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = obj.GetType().Name,
+                    id_lienket = obj.md_donvitinh_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 
@@ -71,7 +88,7 @@ public class UnitController : IHttpHandler {
 
         md_donvitinh obj = new md_donvitinh
         {
-            md_donvitinh_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+            md_donvitinh_id = Helper.getNewId(),
             ma_edi = context.Request.Form["ma_edi"],
             ten_dvt = context.Request.Form["ten_dvt"],
             mota = context.Request.Form["mota"],
@@ -83,18 +100,63 @@ public class UnitController : IHttpHandler {
         };
 
         db.md_donvitinhs.InsertOnSubmit(obj);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+           db,
+           context,
+           new ad_log
+           {
+               nexxdecor_check = false,
+               hanhdong = VoNgocNhan.API_Data.add,
+               table = obj.GetType().Name,
+               id_lienket = obj.md_donvitinh_id
+           }
+       );
         db.SubmitChanges();
     }
 
 
     public void del(HttpContext context)
     {
-        String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-        String sql = "update md_donvitinh set hoatdong = 0 where md_donvitinh_id IN (" + id + ")";
-        mdbc.ExcuteNonQuery(sql);
+        string msg = "";
+        string id = context.Request.Form["id"];
+        try
+        {
+            var mnu = db.md_donvitinhs.Where(s => s.md_donvitinh_id == id).FirstOrDefault();
+            if (mnu == null)
+            {
+                msg = "Không tìm thấy đvt đóng gói đã chọn";
+                goto EndEventHandler;
+            }
+
+            db.md_donvitinhs.DeleteOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_donvitinh_id
+                }
+            );
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa dvt đóng gói thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void load(HttpContext context)
@@ -139,7 +201,7 @@ public class UnitController : IHttpHandler {
             sidx = "dvt.ten_dvt";
         }
 
-        string strsql = "select * from( select dvt.*, ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum from md_donvitinh dvt where 1=1 " + filter +" )P where RowNum > @start AND RowNum < @end";
+        string strsql = "select * from( select dvt.*, ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum from md_donvitinh dvt where 1=1 " + filter + " )P where RowNum > @start AND RowNum < @end";
 
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";

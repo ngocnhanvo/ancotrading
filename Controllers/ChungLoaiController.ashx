@@ -9,7 +9,6 @@ using System.Data;
 public class ChungLoaiController : IHttpHandler
 {
     private LinqDBDataContext db = new LinqDBDataContext();
-
     public void ProcessRequest(HttpContext context)
     {
         String action, oper;
@@ -82,12 +81,38 @@ public class ChungLoaiController : IHttpHandler
                 {
                     if (trangthai.Equals("TOACTIVE"))
                     {
-                        String update = "update md_chungloai set trangthai = 'HIEULUC' where trangthai='SOANTHAO'";
-                        mdbc.ExcuteNonQuery(update);
+                        var spsSoanThao = db.md_chungloais.Where(s => s.trangthai == Helper.SOANTHAO).ToList();
+                        foreach(var spst in spsSoanThao)
+                        {
+                            spst.trangthai = Helper.HIEULUC;
+                            VoNgocNhan.API_Data.themLichSuHoatDong(
+                                db,
+                                HttpContext.Current,
+                                new ad_log
+                                {
+                                    nexxdecor_check = false,
+                                    hanhdong = VoNgocNhan.API_Data.edit,
+                                    table = spst.GetType().Name,
+                                    id_lienket = spst.md_chungloai_id
+                                }
+                            );
+                        }
+                        db.SubmitChanges();
                     }
                     else
                     {
                         sp.trangthai = trangthai;
+                        VoNgocNhan.API_Data.themLichSuHoatDong(
+                                db,
+                                HttpContext.Current,
+                                new ad_log
+                                {
+                                    nexxdecor_check = false,
+                                    hanhdong = VoNgocNhan.API_Data.edit,
+                                    table = sp.GetType().Name,
+                                    id_lienket = sp.md_chungloai_id
+                                }
+                            );
                         db.SubmitChanges();
                     }
                 }
@@ -164,20 +189,32 @@ public class ChungLoaiController : IHttpHandler
         else
         {
             md_chungloai m = db.md_chungloais.Single(p => p.md_chungloai_id.Equals(chungloai_id));
+            var mnu = new md_chungloai();
+            m.CopyPropertiesTo(mnu);
             m.code_cl = context.Request.Form["code_cl"];
             m.tv_ngan = context.Request.Form["tv_ngan"];
             m.ta_ngan = context.Request.Form["ta_ngan"];
-            //m.titleWeb = context.Request.Form["titleWeb"];
-            //m.titleSubWeb = context.Request.Form["titleSubWeb"];
-            //m.dacTinhCL = context.Request.Form["dacTinhCL"];
             m.nhomchungloai = context.Request.Form["nhomchungloai"];
-            //m.tv_dai = context.Request.Form["tv_dai"];
-            //m.ta_dai = context.Request.Form["ta_dai"];
-
             m.mota = context.Request.Form["mota"];
             m.hoatdong = hd;
             m.nguoicapnhat = UserUtils.getUser(context);
             m.ngaycapnhat = DateTime.Now;
+
+            var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+            if (diffs.Count > 0)
+            {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    context,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = m.GetType().Name,
+                        id_lienket = m.md_chungloai_id
+                    }
+                );
+            }
             db.SubmitChanges();
         }
     }
@@ -220,6 +257,16 @@ public class ChungLoaiController : IHttpHandler
             };
 
             db.md_chungloais.InsertOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.add,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_chungloai_id
+                }
+            );
             db.SubmitChanges();
         }
     }
@@ -227,12 +274,45 @@ public class ChungLoaiController : IHttpHandler
 
     public void del(HttpContext context)
     {
-        String id = context.Request.Form["id"];
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
-        String sql = "delete md_chungloai where md_chungloai_id IN (" + id + ")";
-        mdbc.ExcuteNonQuery(sql);
+        string msg = "";
+        string id = context.Request.Form["id"];
+        try
+        {
+            var mnu = db.md_chungloais.Where(s => s.md_chungloai_id == id).FirstOrDefault();
+            if (mnu == null)
+            {
+                msg = "Không tìm thấy loại hàng hóa đã chọn";
+                goto EndEventHandler;
+            }
+
+            db.md_chungloais.DeleteOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_chungloai_id
+                }
+            );
+            db.SubmitChanges();
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if(msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa loại hàng hóa thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void load(HttpContext context)

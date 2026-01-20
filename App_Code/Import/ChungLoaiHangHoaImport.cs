@@ -69,22 +69,34 @@ public class ChungLoaiHangHoaImport : ImportOriginal
 
     public void Import()
     {
-        String insert = "insert into md_chungloai(md_chungloai_id, code_cl, tv_ngan, ta_ngan, tv_dai, ta_dai, ngaytao, nguoitao, ngaycapnhat, nguoicapnhat, hoatdong, trangthai, mota) values( " +
-            " (select RIGHT(sys.fn_sqlvarbasetostr(HashBytes('MD5', CAST(GETDATE() as nvarchar(32)) + CAST(NEWID() as nvarchar(255)) )),32)) " +
-            " , @code_cl, @tv_ngan, @ta_ngan, @tv_dai, @ta_dai, @ngaytao, @nguoitao, @ngaycapnhat, @nguoicapnhat, @hoatdong, @trangthai, @mota)";
-        mdbc.ExcuteNonQuery(insert
-            , "@code_cl", code_cl
-            , "@tv_ngan", tv_ngan
-            , "@ta_ngan", ta_ngan
-            , "@tv_dai", ""
-            , "@ta_dai", ""
-            , "@ngaytao", ngayTao
-            , "@nguoitao", nguoiTao
-            , "@ngaycapnhat", ngayCapNhat
-            , "@nguoicapnhat", nguoiCapNhat
-            , "@hoatdong", hoatDong
-            , "@trangthai", "SOANTHAO"
-			, "@mota", mota);
+        var mnu = new md_chungloai
+        {
+            md_chungloai_id = Helper.getNewId(),
+            code_cl = code_cl,
+            tv_ngan = tv_ngan,
+            ta_ngan = ta_ngan,
+            trangthai = Helper.SOANTHAO,
+            mota = mota,
+            hoatdong = hoatDong,
+            nguoitao = nguoiTao,
+            nguoicapnhat = nguoiCapNhat,
+            ngaytao = ngayTao,
+            ngaycapnhat = ngayCapNhat
+        };
+
+        db.md_chungloais.InsertOnSubmit(mnu);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+            db,
+            HttpContext.Current,
+            new ad_log
+            {
+                nexxdecor_check = false,
+                hanhdong = VoNgocNhan.API_Data.add,
+                table = mnu.GetType().Name,
+                id_lienket = mnu.md_chungloai_id
+            }
+        );
+        db.SubmitChanges();
     }
 
     LinqDBDataContext db = new LinqDBDataContext();
@@ -92,6 +104,8 @@ public class ChungLoaiHangHoaImport : ImportOriginal
     public void Update()
     {
         md_chungloai o = db.md_chungloais.FirstOrDefault(p => p.code_cl.Equals(code_cl));
+        var mnu = new md_chungloai();
+        o.CopyPropertiesTo(mnu);
         o.tv_ngan = tv_ngan;
         //o.tv_dai = tv_dai;
         o.ta_ngan = ta_ngan;
@@ -100,6 +114,21 @@ public class ChungLoaiHangHoaImport : ImportOriginal
         o.nguoicapnhat = nguoiCapNhat;
         o.hoatdong = hoatDong;
 		o.mota = mota;
+        var diffs = VoNgocNhan.API_Data.GetDifferences(o, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = o.GetType().Name,
+                    id_lienket = o.md_chungloai_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 }

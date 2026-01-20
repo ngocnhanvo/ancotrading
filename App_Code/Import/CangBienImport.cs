@@ -52,15 +52,31 @@ public class CangBienImport : ImportOriginal
 
     public void Import()
     {
-        String insert = "insert into md_cangbien(md_cangbien_id, ma_cangbien, ten_cangbien, ngaytao, nguoitao, ngaycapnhat, nguoicapnhat, hoatdong) values( " +
-            " (select RIGHT(sys.fn_sqlvarbasetostr(HashBytes('MD5', CAST(GETDATE() as nvarchar(32)) + CAST(NEWID() as nvarchar(255)) )),32)) " +
-            " ,@ma_cangbien, @ten_cangbien, @ngaytao, @nguoitao, @ngaycapnhat, @nguoicapnhat, @hoatdong)";
-        mdbc.ExcuteNonQuery(insert, "@ma_cangbien", maCangBien, "@ten_cangbien", tenCangBien
-            , "@ngaytao", ngayTao
-            , "@nguoitao", nguoiTao
-            , "@ngaycapnhat", ngayCapNhat
-            , "@nguoicapnhat", nguoiCapNhat
-            , "@hoatdong", hoatDong);
+        md_cangbien obj = new md_cangbien
+        {
+            md_cangbien_id = Helper.getNewId(),
+            ma_cangbien = maCangBien,
+            ten_cangbien = tenCangBien,
+            hoatdong = hoatDong,
+            nguoitao = nguoiTao,
+            nguoicapnhat = nguoiCapNhat,
+            ngaytao = ngayTao,
+            ngaycapnhat = ngayCapNhat
+        };
+
+        db.md_cangbiens.InsertOnSubmit(obj);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+           db,
+           HttpContext.Current,
+           new ad_log
+           {
+               nexxdecor_check = false,
+               hanhdong = VoNgocNhan.API_Data.add,
+               table = obj.GetType().Name,
+               id_lienket = obj.md_cangbien_id
+           }
+        );
+        db.SubmitChanges();
     }
 
     LinqDBDataContext db = new LinqDBDataContext();
@@ -68,10 +84,27 @@ public class CangBienImport : ImportOriginal
     public void Update()
     {
         md_cangbien bc = db.md_cangbiens.FirstOrDefault(p => p.ma_cangbien.Equals(maCangBien));
+        var mnu = new md_cangbien();
+        bc.CopyPropertiesTo(mnu);
         bc.ten_cangbien = tenCangBien;
         bc.ngaycapnhat = ngayCapNhat;
         bc.nguoicapnhat = nguoiCapNhat;
         bc.hoatdong = hoatDong;
+        var diffs = VoNgocNhan.API_Data.GetDifferences(bc, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = bc.GetType().Name,
+                    id_lienket = bc.md_cangbien_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 }

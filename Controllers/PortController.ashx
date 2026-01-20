@@ -65,8 +65,8 @@ public class PortController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToOptionSearch());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -75,7 +75,7 @@ public class PortController : IHttpHandler
         { hd = true; }
 
         String ma_cangbien = context.Request.Form["ma_cangbien"];
-        String md_cangbien_id = context.Request.Form["id"]; 
+        String md_cangbien_id = context.Request.Form["id"];
         String selCount = "select COUNT(*) as count from md_cangbien where ma_cangbien = @ma_cangbien AND md_cangbien_id != @md_cangbien_id";
         int count = (int)mdbc.ExecuteScalar(selCount, "@ma_cangbien", ma_cangbien, "@md_cangbien_id", md_cangbien_id);
 
@@ -86,13 +86,29 @@ public class PortController : IHttpHandler
         else
         {
             md_cangbien m = db.md_cangbiens.Single(p => p.md_cangbien_id == md_cangbien_id);
+            var mnu = new md_cangbien();
+            m.CopyPropertiesTo(mnu);
             m.ma_cangbien = context.Request.Form["ma_cangbien"];
             m.ten_cangbien = context.Request.Form["ten_cangbien"];
             m.mota = context.Request.Form["mota"];
             m.hoatdong = hd;
             m.nguoicapnhat = UserUtils.getUser(context);
             m.ngaycapnhat = DateTime.Now;
-
+            var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+            if (diffs.Count > 0)
+            {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    context,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = m.GetType().Name,
+                        id_lienket = m.md_cangbien_id
+                    }
+                );
+            }
             db.SubmitChanges();
         }
     }
@@ -105,18 +121,19 @@ public class PortController : IHttpHandler
         { hd = true; }
 
         String ma_cangbien = context.Request.Form["ma_cangbien"];
-        int c = (from cb in db.md_cangbiens where cb.ma_cangbien.Equals(ma_cangbien) select new { cb.ma_cangbien}).Count();
+        int c = (from cb in db.md_cangbiens where cb.ma_cangbien.Equals(ma_cangbien) select new { cb.ma_cangbien }).Count();
         String selCount = "select COUNT(*) as count from md_cangbien where ma_cangbien = @ma_cangbien";
         int count = (int)mdbc.ExecuteScalar(selCount, "@ma_cangbien", ma_cangbien);
 
         if (count != 0)
         {
-             jqGridHelper.Utils.writeResult(0, "Mã cảng biển đã tồn tại!");
+            jqGridHelper.Utils.writeResult(0, "Mã cảng biển đã tồn tại!");
         }
-        else {
-           md_cangbien obj = new md_cangbien
+        else
+        {
+            md_cangbien obj = new md_cangbien
             {
-                md_cangbien_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                md_cangbien_id = Helper.getNewId(),
                 ma_cangbien = ma_cangbien,
                 ten_cangbien = context.Request.Form["ten_cangbien"],
                 mota = context.Request.Form["mota"],
@@ -127,8 +144,19 @@ public class PortController : IHttpHandler
                 ngaycapnhat = DateTime.Now
             };
 
-           db.md_cangbiens.InsertOnSubmit(obj);
-           db.SubmitChanges();
+            db.md_cangbiens.InsertOnSubmit(obj);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+               db,
+               context,
+               new ad_log
+               {
+                   nexxdecor_check = false,
+                   hanhdong = VoNgocNhan.API_Data.add,
+                   table = obj.GetType().Name,
+                   id_lienket = obj.md_cangbien_id
+               }
+           );
+            db.SubmitChanges();
             jqGridHelper.Utils.writeResult(1, "Đã tạo cảng biển thành công!");
         }
     }
@@ -137,17 +165,52 @@ public class PortController : IHttpHandler
     public void del(HttpContext context)
     {
         String id = context.Request.Form["id"];
-        String sel = "select count(*) as count from md_sanpham where md_cangbien_id = @md_cangbien_id";
-        int count = (int)mdbc.ExecuteScalar(sel, "@md_cangbien_id", id);
-        if (count > 0)
+        string msg = "";
+        try
         {
-            jqGridHelper.Utils.writeResult(0, "Cảng biển có chứa sản phẩm");
+            var mnu = db.md_cangbiens.Where(s => s.md_cangbien_id == id).FirstOrDefault();
+            if (mnu == null)
+            {
+                msg = "Không tìm thấy cảng biển đã chọn";
+                goto EndEventHandler;
+            }
+
+            var cosp = db.md_sanphams.Where(s => s.md_cangbien_id == mnu.md_cangbien_id).Take(1).Count();
+            if (cosp > 0)
+            {
+                msg = "Cảng biển có chứa sản phẩm";
+                goto EndEventHandler;
+            }
+
+            db.md_cangbiens.DeleteOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = mnu.GetType().Name,
+                    id_lienket = mnu.md_cangbien_id
+                }
+            );
+            db.SubmitChanges();
         }
-        else {
-            String sql = String.Format("delete md_cangbien where md_cangbien_id = '{0}'", id);
-            mdbc.ExcuteNonQuery(sql);
+        catch (Exception ex)
+        {
+            msg = ex.Message;
         }
-        
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa cảng biển thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void load(HttpContext context)
