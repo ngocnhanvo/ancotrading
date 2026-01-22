@@ -565,7 +565,7 @@ public class ProductController : IHttpHandler
                 md_cangbien_id = context.Request.Form["md_cangbien_id"],
                 nhacungung = context.Request.Form["tenncc"],
                 ghichu = context.Request.Form["ghichu"],
-                trangthai = "SOANTHAO",
+                trangthai = Helper.SOANTHAO,
                 vattu = false,
                 ban_thanhpham = false,
                 sanpham = true,
@@ -583,6 +583,17 @@ public class ProductController : IHttpHandler
             if (check == 0)
             {
                 db.md_sanphams.InsertOnSubmit(mnu);
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    HttpContext.Current,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.add,
+                        table = mnu.GetType().Name,
+                        id_lienket = mnu.md_sanpham_id
+                    }
+                );
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Thêm mới thành công!");
             }

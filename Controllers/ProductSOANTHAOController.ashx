@@ -530,6 +530,17 @@ public class ProductSOANTHAOController : IHttpHandler
             if (check == 0)
             {
                 db.md_sanphams.InsertOnSubmit(mnu);
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    HttpContext.Current,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.add,
+                        table = mnu.GetType().Name,
+                        id_lienket = mnu.md_sanpham_id
+                    }
+                );
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Thêm mới thành công!");
             }
