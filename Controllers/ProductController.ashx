@@ -138,12 +138,28 @@ public class ProductController : IHttpHandler
                    " AND sp.hoatdong = 1 AND sp.trangthai not in ('NHD', 'HHT')";
 
                 sqlGetProductId = String.Format(sqlGetProductId, filter);
-
-                String sqlUpdateToStop = "update md_sanpham set trangthai = 'NHD', ngayngunghd = getdate() where md_sanpham_id IN(" + sqlGetProductId + ")";
-
-                int s = mdbc.ExcuteNonQuery(sqlUpdateToStop);
-                msg = "Đã chuyển {0} sản phẩm trên lưới sang ngưng hoạt động!";
-                msg = String.Format(msg, s);
+                var ids = mdbc.GetData(sqlGetProductId).AsEnumerable().Select(row => row[0].ToString()).ToList();
+                var sp2s = db.md_sanphams.Where(p => ids.Contains(p.md_sanpham_id)).ToList();
+                foreach(var sp2 in sp2s)
+                {
+                    sp2.trangthai = "NHD";
+                    sp2.ngayngunghd = DateTime.Now;
+                    VoNgocNhan.API_Data.themLichSuHoatDong(
+                        db,
+                        HttpContext.Current,
+                        new ad_log
+                        {
+                            nexxdecor_check = false,
+                            anco1_check = false,
+                            anhiepluc_check = false,
+                            hanhdong = VoNgocNhan.API_Data.edit,
+                            table = sp2.GetType().Name,
+                            id_lienket = sp2.md_sanpham_id
+                        }
+                    );
+                }
+                db.SubmitChanges();
+                msg = $"Đã chuyển {sp2s.Count} sản phẩm trên lưới sang ngưng hoạt động!";
             }
             else
             {
@@ -179,8 +195,25 @@ public class ProductController : IHttpHandler
                     {
                         if (trangthai.Equals("TOACTIVE"))
                         {
-                            String update = "update md_sanpham set trangthai = 'DHD' where trangthai='SOANTHAO'";
-                            mdbc.ExcuteNonQuery(update);
+                            var sp2s = db.md_sanphams.Where(s => s.trangthai == "DHD").ToList();
+                            foreach(var sp2 in sp2s)
+                            {
+                                sp2.trangthai = Helper.SOANTHAO;
+                                VoNgocNhan.API_Data.themLichSuHoatDong(
+                                    db,
+                                    HttpContext.Current,
+                                    new ad_log
+                                    {
+                                        nexxdecor_check = false,
+                                        anco1_check = false,
+                                        anhiepluc_check = false,
+                                        hanhdong = VoNgocNhan.API_Data.edit,
+                                        table = sp2.GetType().Name,
+                                        id_lienket = sp2.md_sanpham_id
+                                    }
+                                );
+                            }
+                            
                         }
                         else
                         {
@@ -191,6 +224,19 @@ public class ProductController : IHttpHandler
                                 Extension.createQRCodeFromProduct(sp.ma_sanpham, qrGenerator);
                             }
                             sp.trangthai = trangthai;
+                            VoNgocNhan.API_Data.themLichSuHoatDong(
+                                db,
+                                HttpContext.Current,
+                                new ad_log
+                                {
+                                    nexxdecor_check = false,
+                                    anco1_check = false,
+                                    anhiepluc_check = false,
+                                    hanhdong = VoNgocNhan.API_Data.edit,
+                                    table = sp.GetType().Name,
+                                    id_lienket = sp.md_sanpham_id
+                                }
+                            );
                             db.SubmitChanges();
                         }
                     }
@@ -452,6 +498,19 @@ public class ProductController : IHttpHandler
                          select new { sp.ma_sanpham }).Count();
             if (check == 0)
             {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    HttpContext.Current,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        anco1_check = false,
+                        anhiepluc_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = m.GetType().Name,
+                        id_lienket = m.md_sanpham_id
+                    }
+                );
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Cập nhật thành công!");
             }
@@ -545,6 +604,19 @@ public class ProductController : IHttpHandler
             if (sp.trangthai.Equals("SOANTHAO"))
             {
                 db.md_sanphams.DeleteOnSubmit(sp);
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    HttpContext.Current,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        anco1_check = false,
+                        anhiepluc_check = false,
+                        hanhdong = VoNgocNhan.API_Data.del,
+                        table = sp.GetType().Name,
+                        id_lienket = sp.md_sanpham_id
+                    }
+                );
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Đã xóa sản phẩm!");
             }

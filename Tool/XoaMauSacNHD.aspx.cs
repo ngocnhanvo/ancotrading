@@ -137,7 +137,20 @@ public partial class Tool_XoaMauSacNHD : System.Web.UI.Page
 									{
 										sp.trangthai = "NHD";
 										sp.ngayngunghd = DateTime.Now;
-									}
+                                        VoNgocNhan.API_Data.themLichSuHoatDong(
+                                            db,
+                                            HttpContext.Current,
+                                            new ad_log
+                                            {
+                                                nexxdecor_check = false,
+                                                anco1_check = false,
+                                                anhiepluc_check = false,
+                                                hanhdong = VoNgocNhan.API_Data.edit,
+                                                table = sp.GetType().Name,
+                                                id_lienket = sp.md_sanpham_id
+                                            }
+                                        );
+                                    }
 									db.SubmitChanges();
 									msgDT += string.Format("<div style='color: blue'>{0}-{1}-{2} (CL-DT-MS) đã ngưng hoạt động các sản phẩm liên quan.</div>", ms.code_cl, ms.code_dt, ms.code_mau);
 								}
@@ -150,7 +163,18 @@ public partial class Tool_XoaMauSacNHD : System.Web.UI.Page
 								if (!msgDT.Contains("'color: red'"))
 								{
 									ms.trangthai = "NHD";
-									db.SubmitChanges();
+                                    VoNgocNhan.API_Data.themLichSuHoatDong(
+                                        db,
+                                        HttpContext.Current,
+                                        new ad_log
+                                        {
+                                            nexxdecor_check = false,
+                                            hanhdong = VoNgocNhan.API_Data.edit,
+                                            table = ms.GetType().Name,
+                                            id_lienket = ms.md_mausac_id
+                                        }
+                                    );
+                                    db.SubmitChanges();
 									msgDT += string.Format("<div style='color: blue'>{0}-{1}-{2} (CL-DT-MS) đã chuyển sang ngưng hoạt động.</div>", ms.code_cl, ms.code_dt, ms.code_mau);
 								}
 
@@ -175,7 +199,18 @@ public partial class Tool_XoaMauSacNHD : System.Web.UI.Page
 								if (!msgDT.Contains("'color: red'"))
 								{
 									db.md_mausacs.DeleteOnSubmit(ms);
-									db.SubmitChanges();
+                                    VoNgocNhan.API_Data.themLichSuHoatDong(
+                                        db,
+                                        HttpContext.Current,
+                                        new ad_log
+                                        {
+                                            nexxdecor_check = false,
+                                            hanhdong = VoNgocNhan.API_Data.del,
+                                            table = ms.GetType().Name,
+                                            id_lienket = ms.md_mausac_id
+                                        }
+                                    );
+                                    db.SubmitChanges();
 									msgDT += string.Format("<div style='color: blue'>{0}-{1}-{2} (CL-DT-MS) đã được xóa.</div>", ms.code_cl, ms.code_dt, ms.code_mau);
 								}
 

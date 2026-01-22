@@ -61,18 +61,32 @@ public class BangGiaImport : ImportOriginal
 
     public void Import()
     {
-        String insert = "insert into md_banggia(md_banggia_id, ten_banggia, md_dongtien_id, banggiaban, ngaytao, nguoitao, ngaycapnhat, nguoicapnhat, hoatdong) values( " +
-            " (select RIGHT(sys.fn_sqlvarbasetostr(HashBytes('MD5', CAST(GETDATE() as nvarchar(32)) + CAST(NEWID() as nvarchar(255)) )),32)) " +
-            " , @ten_banggia, @md_dongtien_id, @banggiaban, @ngaytao, @nguoitao, @ngaycapnhat, @nguoicapnhat, @hoatdong)";
-        mdbc.ExcuteNonQuery(insert
-            , "@ten_banggia", tenBangGia
-            , "@md_dongtien_id", md_dongtien_id
-            , "@banggiaban", bangGiaBan
-            , "@ngaytao", ngayTao
-            , "@nguoitao", nguoiTao
-            , "@ngaycapnhat", ngayCapNhat
-            , "@nguoicapnhat", nguoiCapNhat
-            , "@hoatdong", hoatDong);
+        md_banggia mnu = new md_banggia
+        {
+            md_banggia_id = Helper.getNewId(),
+            ten_banggia = tenBangGia,
+            md_dongtien_id = md_dongtien_id,
+            banggiaban = bangGiaBan,
+            hoatdong = hoatDong,
+            nguoitao = nguoiTao,
+            nguoicapnhat = nguoiCapNhat,
+            ngaytao = ngayTao,
+            ngaycapnhat = ngayCapNhat
+        };
+
+        db.md_banggias.InsertOnSubmit(mnu);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+            db,
+            HttpContext.Current,
+            new ad_log
+            {
+                nexxdecor_check = false,
+                hanhdong = VoNgocNhan.API_Data.add,
+                table = mnu.GetType().Name,
+                id_lienket = mnu.md_banggia_id
+            }
+        );
+        db.SubmitChanges();
     }
 
     LinqDBDataContext db = new LinqDBDataContext();
@@ -80,11 +94,28 @@ public class BangGiaImport : ImportOriginal
     public void Update()
     {
         md_banggia bg = db.md_banggias.FirstOrDefault(p => p.ten_banggia.Equals(tenBangGia));
+        var mnu = new md_banggia();
+        bg.CopyPropertiesTo(mnu);
         bg.md_dongtien_id = md_dongtien_id;
         bg.banggiaban = bangGiaBan;
         bg.ngaycapnhat = ngayCapNhat;
         bg.nguoicapnhat = nguoiCapNhat;
         bg.hoatdong = hoatDong;
+        var diffs = VoNgocNhan.API_Data.GetDifferences(bg, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = bg.GetType().Name,
+                    id_lienket = bg.md_banggia_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 }

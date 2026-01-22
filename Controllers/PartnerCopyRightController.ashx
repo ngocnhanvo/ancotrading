@@ -55,6 +55,17 @@ public class PartnerCopyRightController : IHttpHandler
         else
         {
             dtkd.isdocquyen = true;
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = dtkd.GetType().Name,
+                    id_lienket = dtkd.md_doitackinhdoanh_id
+                }
+            );
             db.SubmitChanges();
         }
     }
@@ -65,6 +76,17 @@ public class PartnerCopyRightController : IHttpHandler
         String md_doitackinhdoanh_id = context.Request.Form["id"];
         md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(p => p.md_doitackinhdoanh_id.Equals(md_doitackinhdoanh_id));
         dtkd.isdocquyen = false;
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = dtkd.GetType().Name,
+                    id_lienket = dtkd.md_doitackinhdoanh_id
+                }
+            );
         db.SubmitChanges();
     }
 
@@ -72,7 +94,7 @@ public class PartnerCopyRightController : IHttpHandler
     {
         String isncc = context.Request.QueryString["isncc"];
         String productId = context.Request.QueryString["productId"];
-        
+
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
 
@@ -85,7 +107,7 @@ public class PartnerCopyRightController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
         String sqlCount = "SELECT COUNT(*) AS count " +
             " FROM md_doitackinhdoanh dtkd " +
             " left JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id " +
@@ -97,10 +119,11 @@ public class PartnerCopyRightController : IHttpHandler
         {
             sqlCount = String.Format(sqlCount, " AND isncc = " + isncc);
         }
-        else {
+        else
+        {
             sqlCount = String.Format(sqlCount, "");
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -135,7 +158,7 @@ public class PartnerCopyRightController : IHttpHandler
             left JOIN md_khuvuc kv ON dtkd.md_khuvuc_id = kv.md_khuvuc_id 
             left JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id 
             WHERE  dtkd.isdocquyen = 1 {0} " + filter + " )P WHERE RowNum > @start AND RowNum < @end";
-        
+
         if (isncc != null)
         {
             strsql = String.Format(strsql, " AND isncc = " + isncc);
@@ -144,7 +167,7 @@ public class PartnerCopyRightController : IHttpHandler
         {
             strsql = String.Format(strsql, "");
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";
@@ -173,7 +196,7 @@ public class PartnerCopyRightController : IHttpHandler
             xml += "<cell><![CDATA[" + row["masothue"] + "]]></cell>";
             xml += "<cell><![CDATA[" + CultureInfoUtil.currencyUSD(row["tong_congno"]) + "]]></cell>";
             xml += "<cell><![CDATA[" + row["isncc"] + "]]></cell>";
-            
+
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";

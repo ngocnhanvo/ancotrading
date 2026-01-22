@@ -58,7 +58,18 @@ public class ProductPriceController : IHttpHandler
         }
         else
         {
-            pbg.md_trangthai_id = "HIEULUC";
+            pbg.md_trangthai_id = Helper.HIEULUC;
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = pbg.GetType().Name,
+                    id_lienket = pbg.md_phienbangia_id
+                }
+            );
             db.SubmitChanges();
             context.Response.Write(String.Format("Đã hiệu lực phiên bản giá {0} thành công!", pbg.ten_phienbangia));
         }
@@ -82,6 +93,8 @@ public class ProductPriceController : IHttpHandler
             { hd = true; }
             String id = context.Request.Form["id"];
             md_giasanpham gsp = db.md_giasanphams.FirstOrDefault(p => p.md_giasanpham_id.Equals(id));
+            var mnu = new md_giasanpham();
+            gsp.CopyPropertiesTo(mnu);
             md_phienbangia pbg = db.md_phienbangias.FirstOrDefault(p => p.md_phienbangia_id.Equals(gsp.md_phienbangia_id));
 
             if (pbg.md_trangthai_id.Equals("HIEULUC"))
@@ -100,7 +113,21 @@ public class ProductPriceController : IHttpHandler
                 gsp.hoatdong = hd;
                 gsp.ngaycapnhat = DateTime.Now;
                 gsp.nguoicapnhat = UserUtils.getUser(context);
-
+                var diffs = VoNgocNhan.API_Data.GetDifferences(gsp, mnu);
+                if (diffs.Count > 0)
+                {
+                    VoNgocNhan.API_Data.themLichSuHoatDong(
+                        db,
+                        HttpContext.Current,
+                        new ad_log
+                        {
+                            nexxdecor_check = false,
+                            hanhdong = VoNgocNhan.API_Data.edit,
+                            table = gsp.GetType().Name,
+                            id_lienket = gsp.md_giasanpham_id
+                        }
+                    );
+                }
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Cập nhập thành công!");
             }
@@ -158,6 +185,17 @@ public class ProductPriceController : IHttpHandler
                     };
 
                     db.md_giasanphams.InsertOnSubmit(mnu);
+                    VoNgocNhan.API_Data.themLichSuHoatDong(
+                        db,
+                        HttpContext.Current,
+                        new ad_log
+                        {
+                            nexxdecor_check = false,
+                            hanhdong = VoNgocNhan.API_Data.add,
+                            table = mnu.GetType().Name,
+                            id_lienket = mnu.md_giasanpham_id
+                        }
+                    );
                     db.SubmitChanges();
                     jqGridHelper.Utils.writeResult(1, "Đã thêm mới thành công!");
                 }
@@ -173,17 +211,51 @@ public class ProductPriceController : IHttpHandler
 
     public void del(HttpContext context)
     {
-        String id = context.Request.Form["id"];
-        md_giasanpham gsp = db.md_giasanphams.FirstOrDefault(p => p.md_giasanpham_id.Equals(id));
-        md_phienbangia pbg = db.md_phienbangias.FirstOrDefault(p => p.md_phienbangia_id.Equals(gsp.md_phienbangia_id));
-        if (pbg.md_trangthai_id.Equals("HIEULUC"))
+        String id = context.Request.Form["id"], msg = "";
+        try
         {
-            jqGridHelper.Utils.writeResult(0, "Không thể xóa giá, vì sản phẩm thuộc phiên bản giá đã hiện lực!");
-        }
-        else if (pbg.md_trangthai_id.Equals("SOANTHAO"))
-        {
+            md_giasanpham gsp = db.md_giasanphams.FirstOrDefault(p => p.md_giasanpham_id.Equals(id));
+            if(gsp == null)
+            {
+                msg = "Không tìm thấy giá sản phẩm đã chọn";
+                goto EndEventHandler;
+            }
+
+            md_phienbangia pbg = db.md_phienbangias.FirstOrDefault(p => p.md_phienbangia_id.Equals(gsp.md_phienbangia_id));
+            if (pbg.md_trangthai_id.Equals(Helper.HIEULUC))
+            {
+                msg = "Không thể xóa giá, vì sản phẩm thuộc phiên bản giá đã hiện lực!";
+                goto EndEventHandler;
+            }
+
             db.md_giasanphams.DeleteOnSubmit(gsp);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = gsp.GetType().Name,
+                    id_lienket = gsp.md_giasanpham_id
+                }
+            );
             db.SubmitChanges();
+        }
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa giá sản phẩm thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
         }
     }
 

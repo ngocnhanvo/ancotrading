@@ -144,7 +144,20 @@ public partial class Tool_XoaChungLoaiNHD : System.Web.UI.Page
 										{
 											sp.trangthai = "NHD";
 											sp.ngayngunghd = DateTime.Now;
-										}
+                                            VoNgocNhan.API_Data.themLichSuHoatDong(
+                                                db,
+                                                HttpContext.Current,
+                                                new ad_log
+                                                {
+                                                    nexxdecor_check = false,
+                                                    anco1_check = false,
+                                                    anhiepluc_check = false,
+                                                    hanhdong = VoNgocNhan.API_Data.edit,
+                                                    table = sp.GetType().Name,
+                                                    id_lienket = sp.md_sanpham_id
+                                                }
+                                            );
+                                        }
 										db.SubmitChanges();
 										msgDT += string.Format("<div style='color: blue'>Chủng loại {0} đã ngưng hoạt động các sản phẩm liên quan.</div>", cl.code_cl);
 									}
@@ -158,7 +171,18 @@ public partial class Tool_XoaChungLoaiNHD : System.Web.UI.Page
 								if (!msgDT.Contains("'color: red'"))
 								{
 									cl.trangthai = "NHD";
-									db.SubmitChanges();
+                                    VoNgocNhan.API_Data.themLichSuHoatDong(
+                                        db,
+                                        HttpContext.Current,
+                                        new ad_log
+                                        {
+                                            nexxdecor_check = false,
+                                            hanhdong = VoNgocNhan.API_Data.edit,
+                                            table = cl.GetType().Name,
+                                            id_lienket = cl.md_chungloai_id
+                                        }
+                                    );
+                                    db.SubmitChanges();
 									msgDT += string.Format("<div style='color: blue'>Chủng loại {0} đã chuyển sang ngưng hoạt động.</div>", cl.code_cl);
 								}
 
@@ -192,10 +216,32 @@ public partial class Tool_XoaChungLoaiNHD : System.Web.UI.Page
 								{
 									foreach(md_nhomnangluc nnl in db.md_nhomnanglucs.Where(s=>s.md_chungloai_id == cl.md_chungloai_id)) {
 										db.md_nhomnanglucs.DeleteOnSubmit(nnl);
-										msgDT += string.Format("<div style='color: blue'>Chủng loại {0} đã xóa NNL {1}.</div>", cl.code_cl, nnl.nhom);
+                                        VoNgocNhan.API_Data.themLichSuHoatDong(
+                                            db,
+                                            HttpContext.Current,
+                                            new ad_log
+                                            {
+                                                nexxdecor_check = false,
+                                                hanhdong = VoNgocNhan.API_Data.del,
+                                                table = nnl.GetType().Name,
+                                                id_lienket = nnl.md_nhomnangluc_id
+                                            }
+                                        );
+                                        msgDT += string.Format("<div style='color: blue'>Chủng loại {0} đã xóa NNL {1}.</div>", cl.code_cl, nnl.nhom);
 									}
 									db.md_chungloais.DeleteOnSubmit(cl);
-									db.SubmitChanges();
+                                    VoNgocNhan.API_Data.themLichSuHoatDong(
+                                        db,
+                                        HttpContext.Current,
+                                        new ad_log
+                                        {
+                                            nexxdecor_check = false,
+                                            hanhdong = VoNgocNhan.API_Data.del,
+                                            table = cl.GetType().Name,
+                                            id_lienket = cl.md_chungloai_id
+                                        }
+                                    );
+                                    db.SubmitChanges();
 									msgDT += string.Format("<div style='color: blue'>Chủng loại {0} đã được xóa.</div>", cl.code_cl);
 								}
 

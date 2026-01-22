@@ -98,7 +98,19 @@ public class ProductSOANTHAOController : IHttpHandler
                     {
                         Extension.createQRCodeFromProduct(sp.ma_sanpham, qrGenerator);
                     }
-
+                    VoNgocNhan.API_Data.themLichSuHoatDong(
+                        db,
+                        HttpContext.Current,
+                        new ad_log
+                        {
+                            nexxdecor_check = false,
+                            anco1_check = false,
+                            anhiepluc_check = false,
+                            hanhdong = VoNgocNhan.API_Data.edit,
+                            table = sp.GetType().Name,
+                            id_lienket = sp.md_sanpham_id
+                        }
+                    );
                     db.SubmitChanges();
                 }
             }
@@ -127,60 +139,93 @@ public class ProductSOANTHAOController : IHttpHandler
                 filters = f.ToScript();
             }
 
-            string from_sql = string.Format(@"
+            string from_sql = $@"
 				from md_sanpham sp 
-				left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id 
-				left join md_doitackinhdoanh ncc on sp.nhacungung = ncc.md_doitackinhdoanh_id 
-				left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id 
-				left join md_nhomnangluc nnl on sp.md_nhomnangluc_id = nnl.md_nhomnangluc_id 
-				left join md_cangbien cb on sp.md_cangbien_id = cb.md_cangbien_id 
-				left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id 
-				left join md_kieudang kd on sp.md_kieudang_id = kd.md_kieudang_id 
-				left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id 
-				where sp.hoatdong = 1 and sp.trangthai = N'SOANTHAO' {0} 
-			", filters);
-            string ngayngunghd = "";
-            string sql = "";
-            int count = 0;
-            if(trangthai != "DHD")
-            {
-                ngayngunghd = "sp.ngayngunghd = getDate()";
-                sql = string.Format(@"update sp 
-				set sp.trangthai = N'{0}' ,{2}
-				{1}
-				", trangthai, from_sql, ngayngunghd );
+				    left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id 
+				    left join md_doitackinhdoanh ncc on sp.nhacungung = ncc.md_doitackinhdoanh_id 
+				    left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id 
+				    left join md_nhomnangluc nnl on sp.md_nhomnangluc_id = nnl.md_nhomnangluc_id 
+				    left join md_cangbien cb on sp.md_cangbien_id = cb.md_cangbien_id 
+				    left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id 
+				    left join md_kieudang kd on sp.md_kieudang_id = kd.md_kieudang_id 
+				    left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id 
+				where sp.hoatdong = 1 and sp.trangthai = N'{Helper.SOANTHAO}' {filters} 
+			";
 
-                string sql_count = string.Format(@"
-				select count(1) as count
-				{0}
-				", from_sql);
-                count = (int)mdbc.ExecuteScalar(sql_count);
-                mdbc.ExcuteNonQuery(sql);
-                msg = count +" dòng đã cập nhật thành công!";
-            }
-            else
+            string sql = sql = $@"select md_sanpham_id {from_sql}";
+            var dt = mdbc.GetData(sql);
+
+            if (trangthai != "DHD")
             {
-                sql = string.Format(@"
-					select md_sanpham_id
-					{0}
-				", from_sql);
-                System.Data.DataTable dt = mdbc.GetData(sql);
+                var msgDTs = new List<string>();
                 foreach (System.Data.DataRow row in dt.Rows)
                 {
                     string spId = row["md_sanpham_id"] + "";
                     var sp = db.md_sanphams.Where(s=>s.md_sanpham_id == spId).FirstOrDefault();
                     string msgDT = "";
-                    msg = UserUtils.checkHieuLucProduct(context, sp, db);
+                    if(string.IsNullOrEmpty(msgDT)) {
+                        sp.trangthai = "NHD";
+                        sp.ngayngunghd = DateTime.Now;
+                        VoNgocNhan.API_Data.themLichSuHoatDong(
+                            db,
+                            HttpContext.Current,
+                            new ad_log
+                            {
+                                nexxdecor_check = false,
+                                anco1_check = false,
+                                anhiepluc_check = false,
+                                hanhdong = VoNgocNhan.API_Data.edit,
+                                table = sp.GetType().Name,
+                                id_lienket = sp.md_sanpham_id
+                            }
+                        );
+                        msg += string.Format(@"<div style='color: blue'>mã SP:{0} đã chuyển sang ngưng hoạt động</div>", sp.ma_sanpham);
+                    }
+                    else {
+                        msgDTs.Add($@"<div>mã SP: {sp.ma_sanpham} {msgDT}</div>");
+                    }
+                }
+
+                if (msgDTs.Count <= 0)
+                    db.SubmitChanges();
+                else
+                    msg = string.Join("", msgDTs);
+            }
+            else
+            {
+                var msgDTs = new List<string>();
+                foreach (System.Data.DataRow row in dt.Rows)
+                {
+                    string spId = row["md_sanpham_id"] + "";
+                    var sp = db.md_sanphams.Where(s=>s.md_sanpham_id == spId).FirstOrDefault();
+                    string msgDT = "";
+                    msgDT = UserUtils.checkHieuLucProduct(context, sp, db);
                     if(string.IsNullOrEmpty(msgDT)) {
                         Extension.createQRCodeFromProduct(sp.ma_sanpham, qrGenerator);
                         sp.trangthai = "DHD";
+                        VoNgocNhan.API_Data.themLichSuHoatDong(
+                            db,
+                            HttpContext.Current,
+                            new ad_log
+                            {
+                                nexxdecor_check = false,
+                                anco1_check = false,
+                                anhiepluc_check = false,
+                                hanhdong = VoNgocNhan.API_Data.edit,
+                                table = sp.GetType().Name,
+                                id_lienket = sp.md_sanpham_id
+                            }
+                        );
                         msg += string.Format(@"<div style='color: blue'>mã SP:{0} đã chuyển sang Đang hoạt động</div>", sp.ma_sanpham);
                     }
                     else {
-                        msg += string.Format(@"<div>mã SP:{0} {1}</div>", sp.ma_sanpham, msgDT);
+                        msgDTs.Add($@"<div>mã SP: {sp.ma_sanpham} {msgDT}</div>");
                     }
                 }
-                db.SubmitChanges();
+                if (msgDTs.Count <= 0)
+                    db.SubmitChanges();
+                else
+                    msg = string.Join("", msgDTs);
             }
         }
         //catch (Exception ex)
@@ -399,6 +444,19 @@ public class ProductSOANTHAOController : IHttpHandler
                          select new { sp.ma_sanpham }).Count();
             if (check == 0)
             {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    HttpContext.Current,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        anco1_check = false,
+                        anhiepluc_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = m.GetType().Name,
+                        id_lienket = m.md_sanpham_id
+                    }
+                );
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Cập nhật thành công!");
             }
@@ -430,7 +488,7 @@ public class ProductSOANTHAOController : IHttpHandler
             string nxn = context.Request.Form["ngayxacnhan"];
             md_sanpham mnu = new md_sanpham
             {
-                md_sanpham_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                md_sanpham_id = Helper.getNewId(),
                 ma_sanpham = context.Request.Form["ma_sanpham"],
                 //ma_sanphamcu = context.Request.Form["ma_sanphamcu"],
                 //mota_tiengviet = context.Request.Form["mota_tiengviet"],
@@ -453,7 +511,7 @@ public class ProductSOANTHAOController : IHttpHandler
                 md_cangbien_id = context.Request.Form["md_cangbien_id"],
                 nhacungung = context.Request.Form["tenncc"],
                 ghichu = context.Request.Form["ghichu"],
-                trangthai = "SOANTHAO",
+                trangthai = Helper.SOANTHAO,
                 hinhthucban = context.Request.Form["hinhthucban"],
                 vattu = false,
                 ban_thanhpham = false,
@@ -493,6 +551,19 @@ public class ProductSOANTHAOController : IHttpHandler
             if (sp.trangthai.Equals("HHT") | sp.trangthai.Equals("SOANTHAO"))
             {
                 db.md_sanphams.DeleteOnSubmit(sp);
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    HttpContext.Current,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        anco1_check = false,
+                        anhiepluc_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = sp.GetType().Name,
+                        id_lienket = sp.md_sanpham_id
+                    }
+                );
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Đã xóa sản phẩm!");
             }

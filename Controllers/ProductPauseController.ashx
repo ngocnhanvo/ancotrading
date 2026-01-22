@@ -23,7 +23,7 @@ public class ProductPauseController : IHttpHandler
             case "updatestatus":
                 this.UpdateStatus(context);
                 break;
-			case "updatestatusALL_NHD":
+            case "updatestatusALL_NHD":
                 this.updatestatusALL_NHD(context);
                 break;
             case "getSinglePicture":
@@ -57,10 +57,11 @@ public class ProductPauseController : IHttpHandler
                 break;
         }
     }
-	
-	public string check_state(string id) { 
-		string msg = "";
-		/*DateTime namtruoc = DateTime.Now.AddYears(-1);
+
+    public string check_state(string id)
+    {
+        string msg = "";
+        /*DateTime namtruoc = DateTime.Now.AddYears(-1);
 		string check_donggoi = db.md_donggoisanphams.Where(s=>s.ngaycapnhat >= namtruoc & s.md_sanpham_id == id).Select(s=>s.md_sanpham_id).Take(1).FirstOrDefault();
 		string check_gia = db.md_giasanphams.Where(s=>s.ngaycapnhat >= namtruoc & s.md_sanpham_id == id).Select(s=>s.md_sanpham_id).Take(1).FirstOrDefault();
 		string check_ctbg = db.c_chitietbaogias.Where(s=>s.ngaycapnhat >= namtruoc & s.md_sanpham_id == id).Select(s=>s.md_sanpham_id).Take(1).FirstOrDefault();
@@ -89,23 +90,24 @@ public class ProductPauseController : IHttpHandler
 		
 		if(msg.Length > 0)
 			msg = msg.Substring(0, msg.Length - 1);*/
-		msg = (string)mdbc.ExecuteScalar("exec [dbo].[admin_del_sanpham] '" + id + "'");
-		return msg;
-	}
-	public void updatestatusALL_NHD(HttpContext context)
+        msg = (string)mdbc.ExecuteScalar("exec [dbo].[admin_del_sanpham] '" + id + "'");
+        return msg;
+    }
+    public void updatestatusALL_NHD(HttpContext context)
     {
         String msg = "";
         try
-        {   
+        {
             string trangthai = context.Request.QueryString["trangthai"];
-			string trangthai_ht = context.Request.Form["trangthai_ht"];
-			string filters = context.Request.Form["filters"];
-			if(filters != null) {
-				Filter f = Filter.CreateFilter(filters);
-				filters = f.ToScript();
-			}
-			
-			string from_sql = string.Format(@"
+            string trangthai_ht = context.Request.Form["trangthai_ht"];
+            string filters = context.Request.Form["filters"];
+            if (filters != null)
+            {
+                Filter f = Filter.CreateFilter(filters);
+                filters = f.ToScript();
+            }
+
+            string from_sql = string.Format(@"
 				from md_sanpham sp 
 				left join md_chungloai cl on sp.md_chungloai_id = cl.md_chungloai_id 
 				left join md_doitackinhdoanh ncc on sp.nhacungung = ncc.md_doitackinhdoanh_id 
@@ -117,79 +119,168 @@ public class ProductPauseController : IHttpHandler
 				left join md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id 
 				where sp.hoatdong = 1 AND sp.trangthai = '{0}' {1} 
 			", trangthai_ht, filters);
-			string sql = string.Format(@"update sp 
+            string sql = string.Format(@"update sp 
 			set sp.trangthai = N'{0}' 
 			{1}
 			", trangthai, from_sql);
-			
-			string sql_count = string.Format(@"
+
+            string sql_count = string.Format(@"
 			select count(1) as count
 			{0}
 			", from_sql);
-			if(trangthai != "HHH") {
-				int count = (int)mdbc.ExecuteScalar(sql_count);
-				mdbc.ExcuteNonQuery(sql);
-				msg = count +" dòng đã cập nhật thành công!";
-			}
-			else {
-				from_sql = "select sp.md_sanpham_id " + from_sql;
-				System.Data.DataTable dt = mdbc.GetData(from_sql, "@start", 0, "@end", 999999999);
-				sql = "";
-				
-				if(trangthai_ht == "HHH") {
-					foreach (System.Data.DataRow row in dt.Rows)
-					{
-						sql += "\ndelete from c_chitietbaogia where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from c_chitietphieuhanngach where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from c_dongdonhang where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from c_dongdsdh where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from c_dongnhapxuat where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from c_dongpklinv where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from c_dongxacnhan_xuatkho where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from md_bientau where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from md_cangxuathang where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from md_donggoisanpham where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from md_giasanpham where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from md_hanghoadocquyen where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from md_nhacungungmacdinh where md_sanpham_id = N'" + row[0] + "'";
-						sql += "\ndelete from md_sanpham where md_sanpham_id = N'" + row[0] + "'";
-					}
-				}
-				else {
-					foreach (System.Data.DataRow row in dt.Rows)
-					{
-						string sql_check = check_state(row[0].ToString());
-						if(sql_check != "") {
-							sql += "\nupdate md_sanpham set trangthai = N'HHT', ghichu = N'"+ sql_check +"' where md_sanpham_id = N'" + row[0] + "'";
-						}
-						else {
-							sql += "\nupdate md_sanpham set trangthai = N'HHH' where md_sanpham_id = N'" + row[0] + "'";
-						}
-					}
-				}
-				
-				if(sql.Length > 0) {
-					mdbc.ExcuteNonQuery(sql);
-					msg = "Hủy hàng thành công.";
-				}
-				else {
-					msg = "Hủy hàng thất bại." + from_sql;
-				}
-			}
-		}
+            if (trangthai != "HHH")
+            {
+                int count = (int)mdbc.ExecuteScalar(sql_count);
+                mdbc.ExcuteNonQuery(sql);
+                msg = count + " dòng đã cập nhật thành công!";
+            }
+            else
+            {
+                from_sql = "select sp.md_sanpham_id " + from_sql;
+                System.Data.DataTable dt = mdbc.GetData(from_sql, "@start", 0, "@end", 999999999);
+                if (trangthai_ht == "HHH")
+                {
+                    foreach (System.Data.DataRow row in dt.Rows)
+                    {
+                        var spid = row[0].ToString();
+                        var ctbgs = db.c_chitietbaogias.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var ctbg in ctbgs)
+                        {
+                            db.c_chitietbaogias.DeleteOnSubmit(ctbg);
+                        }
+
+                        var cthns = db.c_chitietphieuhanngaches.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var cthn in cthns)
+                        {
+                            db.c_chitietphieuhanngaches.DeleteOnSubmit(cthn);
+                        }
+
+                        var ddhs = db.c_dongdonhangs.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var ddh in ddhs)
+                        {
+                            db.c_dongdonhangs.DeleteOnSubmit(ddh);
+                        }
+
+                        var ddsdhs = db.c_dongdsdhs.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var ddsdh in ddsdhs)
+                        {
+                            db.c_dongdsdhs.DeleteOnSubmit(ddsdh);
+                        }
+
+                        var dnxs = db.c_dongnhapxuats.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var dnx in dnxs)
+                        {
+                            db.c_dongnhapxuats.DeleteOnSubmit(dnx);
+                        }
+
+                        var dpkls = db.c_dongpklinvs.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var dpkl in dpkls)
+                        {
+                            db.c_dongpklinvs.DeleteOnSubmit(dpkl);
+                        }
+
+                        var dxns = db.c_dongxacnhan_xuatkhos.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var dxn in dxns)
+                        {
+                            db.c_dongxacnhan_xuatkhos.DeleteOnSubmit(dxn);
+                        }
+
+                        var bts = db.md_bientaus.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var bt in bts)
+                        {
+                            db.md_bientaus.DeleteOnSubmit(bt);
+                        }
+
+                        var cxhs = db.md_cangxuathangs.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var cxh in cxhs)
+                        {
+                            db.md_cangxuathangs.DeleteOnSubmit(cxh);
+                        }
+
+                        var dgsps = db.md_donggoisanphams.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var dgsp in dgsps)
+                        {
+                            db.md_donggoisanphams.DeleteOnSubmit(dgsp);
+                        }
+
+                        var gsps = db.md_giasanphams.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var gsp in gsps)
+                        {
+                            db.md_giasanphams.DeleteOnSubmit(gsp);
+                        }
+
+                        var hhdqs = db.md_hanghoadocquyens.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var hhdq in hhdqs)
+                        {
+                            db.md_hanghoadocquyens.DeleteOnSubmit(hhdq);
+                        }
+
+                        var ncumds = db.md_nhacungungmacdinhs.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var ncumd in ncumds)
+                        {
+                            db.md_nhacungungmacdinhs.DeleteOnSubmit(ncumd);
+                        }
+
+                        var sps = db.md_sanphams.Where(s => s.md_sanpham_id == spid).ToList();
+                        foreach (var sp in sps)
+                        {
+                            db.md_sanphams.DeleteOnSubmit(sp);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (System.Data.DataRow row in dt.Rows)
+                    {
+                        var spid = row[0].ToString();
+                        string sql_check = check_state(row[0].ToString());
+                        var sp = db.md_sanphams.Where(s => s.md_sanpham_id == spid).FirstOrDefault();
+                        if (sp != null)
+                        {
+                            if (sql_check != "")
+                            {
+
+                                sp.trangthai = "HHT";
+                                sp.ghichu = sql_check;
+                            }
+                            else
+                            {
+                                sp.trangthai = "HHH";
+                            }
+                            VoNgocNhan.API_Data.themLichSuHoatDong(
+                                db,
+                                HttpContext.Current,
+                                new ad_log
+                                {
+                                    nexxdecor_check = false,
+                                    anco1_check = false,
+                                    anhiepluc_check = false,
+                                    hanhdong = VoNgocNhan.API_Data.edit,
+                                    table = sp.GetType().Name,
+                                    id_lienket = sp.md_sanpham_id
+                                }
+                            );
+                        }
+                    }
+                }
+
+                db.SubmitChanges();
+                msg = "Hủy hàng thành công.";
+            }
+        }
         catch (Exception ex)
         {
-			msg = ex.Message;
+            msg = ex.Message;
         }
 
         context.Response.Write(msg);
     }
-	
+
     public void UpdateStatus(HttpContext context)
     {
         String msg = "";
         try
-        {   
+        {
             String id = context.Request.QueryString["md_sanpham_id"];
             String trangthai = context.Request.QueryString["trangthai"];
             md_sanpham sp = db.md_sanphams.FirstOrDefault(p => p.md_sanpham_id.Equals(id));
@@ -216,12 +307,25 @@ public class ProductPauseController : IHttpHandler
                 if (next)
                 {
                     sp.trangthai = trangthai;
+                    VoNgocNhan.API_Data.themLichSuHoatDong(
+                        db,
+                        HttpContext.Current,
+                        new ad_log
+                        {
+                            nexxdecor_check = false,
+                            anco1_check = false,
+                            anhiepluc_check = false,
+                            hanhdong = VoNgocNhan.API_Data.edit,
+                            table = sp.GetType().Name,
+                            id_lienket = sp.md_sanpham_id
+                        }
+                    );
                     db.SubmitChanges();
                 }
             }
             else
             {
-               msg = "Mã hàng không tồn tại!";
+                msg = "Mã hàng không tồn tại!";
             }
         }
         catch (Exception ex)
@@ -242,7 +346,8 @@ public class ProductPauseController : IHttpHandler
         {
             context.Response.Write("images/products/fullsize/" + img);
         }
-        else {
+        else
+        {
             context.Response.Write("images/products/fullsize/default.jpg");
         }
     }
@@ -255,7 +360,7 @@ public class ProductPauseController : IHttpHandler
 
         String getMaSP = "select ma_sanpham from md_sanpham where md_sanpham_id = @md_sanpham_id  ";
         ma_sanpham = (String)mdbc.ExecuteScalar(getMaSP, "@md_sanpham_id", md_sanpham_id);
-        
+
         String result = "";
 
         String getImage = String.Format("select url from md_anhsanpham where filter LIKE N'{0}%' ", ma_sanpham.Substring(0, 8));
@@ -271,20 +376,21 @@ public class ProductPauseController : IHttpHandler
                 if (i > 0)
                 {
                     result += ",{";
-                    result += String.Format("\"{0}\" : \"images/products/fullsize/{1}\", \"{2}\" : \"{3}\"", "href", img.Replace(" ", ""), "title", img.Substring(0,img.LastIndexOf(".")));
+                    result += String.Format("\"{0}\" : \"images/products/fullsize/{1}\", \"{2}\" : \"{3}\"", "href", img.Replace(" ", ""), "title", img.Substring(0, img.LastIndexOf(".")));
                     result += "}";
                 }
                 else
                 {
                     result += "{";
-                    result += String.Format("\"{0}\" : \"images/products/fullsize/{1}\", \"{2}\" : \"{3}\"", "href", img.Replace(" ", ""), "title", img.Substring(0,img.LastIndexOf(".")));
+                    result += String.Format("\"{0}\" : \"images/products/fullsize/{1}\", \"{2}\" : \"{3}\"", "href", img.Replace(" ", ""), "title", img.Substring(0, img.LastIndexOf(".")));
                     result += "}";
                 }
                 i++;
             }
             result += "]";
         }
-        else {
+        else
+        {
             result += "[{\"href\":\"\", \"title\":\"\"}]";
         }
         rd.Close();
@@ -371,14 +477,14 @@ public class ProductPauseController : IHttpHandler
 
         context.Response.Write(json);
     }
-    
+
     public void getSelectOption(HttpContext context)
     {
         String sql = "select md_sanpham_id, mota_tiengviet from md_sanpham where hoatdong = 1 and trangthai != 'NHD' ";
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
+
     public void edit(HttpContext context)
     {
         try
@@ -425,22 +531,25 @@ public class ProductPauseController : IHttpHandler
             m.md_chungloai_id = context.Request.Form["md_chungloai_id"];
             m.ghichu = context.Request.Form["ghichu"];
             m.nhacungung = context.Request.Form["tenncc"];
-			m.mota = context.Request.Form["mota"];
+            m.mota = context.Request.Form["mota"];
 
             m.hoatdong = hd;
             m.ngaycapnhat = DateTime.Now;
             int check = (from sp in db.md_sanphams
                          where sp.ma_sanpham.Equals(context.Request.Form["ma_sanpham"]) && !sp.md_sanpham_id.Equals(context.Request.Form["id"])
-                        select new { sp.ma_sanpham }).Count();
+                         select new { sp.ma_sanpham }).Count();
             if (check == 0)
             {
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Cập nhật thành công!");
             }
-            else {
+            else
+            {
                 jqGridHelper.Utils.writeResult(0, "Mã hàng đã tồn tại!");
             }
-        }catch(Exception ex){
+        }
+        catch (Exception ex)
+        {
             jqGridHelper.Utils.writeResult(0, ex.Message);
         }
     }
@@ -470,7 +579,7 @@ public class ProductPauseController : IHttpHandler
                 //ma_sanphamcu = context.Request.Form["ma_sanphamcu"],
                 //mota_tiengviet = context.Request.Form["mota_tiengviet"],
                 //mota_tienganh = context.Request.Form["mota_tienganh"],
-                
+
                 //ma_vach = context.Request.Form["ma_vach"],
                 md_donvitinhsanpham_id = context.Request.Form["tendvt"],
                 l_inch = l_ == 0 ? 0 : decimal.Multiply(l_, Convert.ToDecimal(0.393700787)),
@@ -489,7 +598,7 @@ public class ProductPauseController : IHttpHandler
                 nhacungung = context.Request.Form["tenncc"],
                 ghichu = context.Request.Form["ghichu"],
                 trangthai = "MOI",
-                
+
                 vattu = false,
                 ban_thanhpham = false,
                 sanpham = true,
@@ -500,19 +609,22 @@ public class ProductPauseController : IHttpHandler
                 ngaycapnhat = DateTime.Now
             };
             int check = (from sp in db.md_sanphams
-                        where sp.ma_sanpham.Equals(context.Request.Form["ma_sanpham"])
-                        select new { sp.ma_sanpham}).Count();
+                         where sp.ma_sanpham.Equals(context.Request.Form["ma_sanpham"])
+                         select new { sp.ma_sanpham }).Count();
             if (check == 0)
             {
                 db.md_sanphams.InsertOnSubmit(mnu);
                 db.SubmitChanges();
                 jqGridHelper.Utils.writeResult(1, "Thêm mới thành công!");
             }
-            else {
+            else
+            {
                 jqGridHelper.Utils.writeResult(0, "Đã tồn tại mã hàng này!");
             }
-            
-        }catch(Exception ex){
+
+        }
+        catch (Exception ex)
+        {
             jqGridHelper.Utils.writeResult(0, ex.Message);
         }
     }
@@ -531,7 +643,7 @@ public class ProductPauseController : IHttpHandler
     {
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
-        
+
         //// filter
         String filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
@@ -541,8 +653,8 @@ public class ProductPauseController : IHttpHandler
             Filter f = Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
-        
+
+
         string sqlCount = string.Format(@"
             SELECT COUNT(1) AS count 
             FROM 
@@ -560,7 +672,7 @@ public class ProductPauseController : IHttpHandler
                 {0}
                 AND sp.hoatdong = 1 AND sp.trangthai = 'NHD'"
         , filter);
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -586,7 +698,7 @@ public class ProductPauseController : IHttpHandler
         {
             sidx = "sp.ma_sanpham";
         }
-        
+
         string strsql = string.Format(@"
             select * from( 
                 SELECT
@@ -659,10 +771,10 @@ public class ProductPauseController : IHttpHandler
             xml += "<cell><![CDATA[" + row["ma_hscode"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hscode"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["chucnangsp"] + "]]></cell>";
-            
+
             var nxn = row["ngayxacnhan"] + "";
             xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", string.IsNullOrEmpty(nxn) ? "" : DateTime.Parse(nxn).ToString("dd/MM/yyyy"));
-            
+
             xml += "<cell><![CDATA[" + row["hinhthucban"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ghichu"] + "]]></cell>";
 

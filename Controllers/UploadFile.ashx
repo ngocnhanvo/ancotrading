@@ -35,19 +35,34 @@ public class UploadFile : IHttpHandler
                     context.Response.Write(Public.imgPatterns + files[i - 1].FileName);
                 }
                 else if (
-                    rgxMauSac.IsMatch(filterName) | 
-                    rgxMauSac2.IsMatch(filterName) | 
-                    rgxMauSac3.IsMatch(filterName) | 
+                    rgxMauSac.IsMatch(filterName) |
+                    rgxMauSac2.IsMatch(filterName) |
+                    rgxMauSac3.IsMatch(filterName) |
                     rgxMauSac4.IsMatch(filterName) |
                     rgxMauSac5.IsMatch(filterName)
                     )
                 {
-                    files[i - 1].SaveAs(Public.imgColors + files[i - 1].FileName);
-                    context.Response.Write(Public.imgColors + files[i - 1].FileName);
+                    string link = Public.imgColors + fileName;
+                    files[i - 1].SaveAs(link);
+                    context.Response.Write(link);
+                    VoNgocNhan.API_Data.themLichSuHoatDong(db, context, new ad_log() {
+                        nexxdecor_check = true,
+                        hanhdong = VoNgocNhan.API_Data.img,
+                        table = "md_sanpham",
+                        id_lienket = filterName,
+                        chitiet = $"{Public.imgColor}{fileName}"
+                    });
                 }
                 else if (rgxSanPham.IsMatch(filterName) | rgxSanPhamF.IsMatch(filterName))
                 {
                     files[i - 1].SaveAs(Public.imgProducts + filterName + jpg);
+                    VoNgocNhan.API_Data.themLichSuHoatDong(db, context, new ad_log() {
+                        nexxdecor_check = true,
+                        hanhdong = VoNgocNhan.API_Data.img,
+                        table = "md_sanpham",
+                        id_lienket = filterName,
+                        chitiet = $"{Public.imgProduct}{fileName}"
+                    });
                     md_anhsanpham asp = db.md_anhsanphams.FirstOrDefault(p => p.url.Equals(filterName) && p.filter.Equals(filterName));
 
                     if (asp == null)

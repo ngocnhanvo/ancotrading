@@ -55,8 +55,8 @@ public class PriceListController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToOptionNullFirst());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -76,6 +76,8 @@ public class PriceListController : IHttpHandler
         else { isstandar = "false"; }
 
         md_banggia m = db.md_banggias.Single(p => p.md_banggia_id == context.Request.Form["id"]);
+        var mnu = new md_banggia();
+        m.CopyPropertiesTo(mnu);
         m.ten_banggia = context.Request.Form["ten_banggia"];
         m.md_dongtien_id = context.Request.Form["tendt"];
         m.banggiaban = bgb;
@@ -84,7 +86,21 @@ public class PriceListController : IHttpHandler
         m.isstandar = bool.Parse(isstandar);
         m.nguoicapnhat = UserUtils.getUser(context);
         m.ngaycapnhat = DateTime.Now;
-        
+        var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = m.GetType().Name,
+                    id_lienket = m.md_banggia_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 
@@ -93,23 +109,23 @@ public class PriceListController : IHttpHandler
         String h = context.Request.Form["hoatdong"].ToLower();
         String b = context.Request.Form["banggiaban"].ToLower();
         String isstandar = context.Request.Form["isstandar"].ToLower();
-        
+
         bool hd, bgb;
         hd = bgb = false;
-        
+
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-        
+
         if (b.Equals("on") || b.Equals("true"))
         { bgb = true; }
 
         if (isstandar.Equals("on") || isstandar.Equals("true"))
         { isstandar = "true"; }
         else { isstandar = "false"; }
-        
+
         md_banggia mnu = new md_banggia
         {
-            md_banggia_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+            md_banggia_id = Helper.getNewId(),
             ten_banggia = context.Request.Form["ten_banggia"],
             md_dongtien_id = context.Request.Form["tendt"],
             banggiaban = bgb,
@@ -123,22 +139,57 @@ public class PriceListController : IHttpHandler
         };
 
         db.md_banggias.InsertOnSubmit(mnu);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+            db,
+            context,
+            new ad_log
+            {
+                nexxdecor_check = false,
+                hanhdong = VoNgocNhan.API_Data.add,
+                table = mnu.GetType().Name,
+                id_lienket = mnu.md_banggia_id
+            }
+        );
         db.SubmitChanges();
     }
 
 
     public void del(HttpContext context)
     {
-        String id = context.Request.Form["id"];
-        String sel = "select count(*) as count from md_phienbangia where md_banggia_id = @md_banggia_id";
-        int count = (int)mdbc.ExecuteScalar(sel, "@md_banggia_id", id);
-        if (count > 0)
+        String id = context.Request.Form["id"], msg = "";
+        try
         {
-            jqGridHelper.Utils.writeResult(0, "Bảng giá có chứa phiên bản giá!");
+            var bg = db.md_banggias.Where(s => s.md_banggia_id == id).FirstOrDefault();
+            if(bg == null)
+            {
+                msg = "Không tìm thấy bảng giá đã chọn";
+                goto EndEventHandler;
+            }
+
+            var pbgs = db.md_phienbangias.Where(s => s.md_banggia_id == id).ToList();
+            if(pbgs.Count > 0)
+            {
+                msg = "Bảng giá có chứa phiên bản giá!";
+                goto EndEventHandler;
+            }
+
+            db.md_banggias.DeleteOnSubmit(bg);
+            db.SubmitChanges();
         }
-        else {
-            String sql = String.Format("delete md_banggia where md_banggia_id = '{0}'", id);
-            mdbc.ExcuteNonQuery(sql);
+        catch(Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa bảng giá thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
         }
     }
 
@@ -187,8 +238,8 @@ public class PriceListController : IHttpHandler
         string strsql = "select * from( " +
             " select bg.*, dt.ma_iso as tendt, " +
             "  ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            " from md_banggia bg JOIN md_dongtien dt ON bg.md_dongtien_id = dt.md_dongtien_id where 1=1 " + 
-            filter + 
+            " from md_banggia bg JOIN md_dongtien dt ON bg.md_dongtien_id = dt.md_dongtien_id where 1=1 " +
+            filter +
             ")P where RowNum > @start AND RowNum < @end";
 
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);

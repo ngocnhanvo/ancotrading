@@ -96,13 +96,26 @@ public class GiaSanPhamImport : ImportOriginal
         gsp.hoatdong = hoatDong;
 
         db.md_giasanphams.InsertOnSubmit(gsp);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+            db,
+            HttpContext.Current,
+            new ad_log
+            {
+                nexxdecor_check = false,
+                hanhdong = VoNgocNhan.API_Data.add,
+                table = gsp.GetType().Name,
+                id_lienket = gsp.md_giasanpham_id
+            }
+        );
         db.SubmitChanges();
     }
 
-   
+
     public void Update()
     {
         md_giasanpham o = db.md_giasanphams.FirstOrDefault(p => p.md_sanpham_id.Equals(maSanPham) && p.md_phienbangia_id.Equals(tenPhienBanGia));
+        var mnu = new md_giasanpham();
+        o.CopyPropertiesTo(mnu);
         o.gia = gia;
         o.phi = phi;
         o.mota = moTa;
@@ -110,6 +123,21 @@ public class GiaSanPhamImport : ImportOriginal
         o.ngaycapnhat = ngayCapNhat;
         o.nguoicapnhat = nguoiCapNhat;
         o.hoatdong = hoatDong;
+        var diffs = VoNgocNhan.API_Data.GetDifferences(o, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = o.GetType().Name,
+                    id_lienket = o.md_giasanpham_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 }

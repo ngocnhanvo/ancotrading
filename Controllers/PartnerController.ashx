@@ -291,6 +291,8 @@ public class PartnerController : IHttpHandler
         if (dtkd == null)
         {
             md_doitackinhdoanh m = db.md_doitackinhdoanhs.Where(p => p.md_doitackinhdoanh_id == context.Request.Form["id"]).FirstOrDefault();
+            var mnu = new md_doitackinhdoanh();
+            m.CopyPropertiesTo(mnu);
             m.md_loaidtkd_id = context.Request.Form["tenloai"];
             m.md_quocgia_id = context.Request.Form["tenqg"];
             m.md_khuvuc_id = context.Request.Form["tenkv"];
@@ -318,6 +320,21 @@ public class PartnerController : IHttpHandler
             m.nguoicapnhat = UserUtils.getUser(context);
             m.ngaycapnhat = DateTime.Now;
 
+            var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+            if (diffs.Count > 0)
+            {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    HttpContext.Current,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = m.GetType().Name,
+                        id_lienket = m.md_doitackinhdoanh_id
+                    }
+                );
+            }
             db.SubmitChanges();
         }
         else
@@ -385,6 +402,17 @@ public class PartnerController : IHttpHandler
                 }
             }
             db.md_doitackinhdoanhs.InsertOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.add,
+                    table = dtkd.GetType().Name,
+                    id_lienket = dtkd.md_doitackinhdoanh_id
+                }
+            );
             db.SubmitChanges();
         }
         else
@@ -466,6 +494,17 @@ public class PartnerController : IHttpHandler
             db.md_doitackinhdoanh_spds.DeleteAllOnSubmit(spds);
 
             db.md_doitackinhdoanhs.DeleteOnSubmit(dtkd);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = dtkd.GetType().Name,
+                    id_lienket = dtkd.md_doitackinhdoanh_id
+                }
+            );
             db.SubmitChanges();
         }
 

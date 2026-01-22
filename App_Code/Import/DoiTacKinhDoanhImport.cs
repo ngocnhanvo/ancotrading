@@ -176,6 +176,17 @@ public class DoiTacKinhDoanhImport : ImportOriginal
         dtkd.hoatdong = true;
 
         db.md_doitackinhdoanhs.InsertOnSubmit(dtkd);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+            db,
+            HttpContext.Current,
+            new ad_log
+            {
+                nexxdecor_check = false,
+                hanhdong = VoNgocNhan.API_Data.add,
+                table = dtkd.GetType().Name,
+                id_lienket = dtkd.md_doitackinhdoanh_id
+            }
+        );
         db.SubmitChanges();
     }
 
@@ -183,6 +194,8 @@ public class DoiTacKinhDoanhImport : ImportOriginal
         , String soTK, String tenNH, String maST, String NguoiDD, String Chucvu)
     {
         md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(p => p.ma_dtkd.Equals(maDoiTac));
+        var mnu = new md_doitackinhdoanh();
+        dtkd.CopyPropertiesTo(mnu);
         dtkd.md_loaidtkd_id = maLoai;
         dtkd.ten_dtkd = tenDoiTac;
         dtkd.tel = dienThoai;
@@ -200,6 +213,21 @@ public class DoiTacKinhDoanhImport : ImportOriginal
         dtkd.ngaycapnhat = DateTime.Now;
         dtkd.nguoicapnhat = "admin";
         dtkd.hoatdong = true;
-		db.SubmitChanges();
+        var diffs = VoNgocNhan.API_Data.GetDifferences(dtkd, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = dtkd.GetType().Name,
+                    id_lienket = dtkd.md_doitackinhdoanh_id
+                }
+            );
+        }
+        db.SubmitChanges();
     }
 }

@@ -50,7 +50,7 @@ public class PriceVersionController : IHttpHandler
         String id = context.Request.QueryString["filter"];
         String sql = "select md_phienbangia_id, ten_phienbangia from md_phienbangia where hoatdong = 1 AND md_phienbangia_id != @md_phienbangia_id";
         System.Data.SqlClient.SqlDataReader rd = mdbc.ExecuteReader(sql, "@md_phienbangia_id", id);
-        String wr ="";
+        String wr = "";
         if (rd.HasRows)
         {
             while (rd.Read())
@@ -62,13 +62,17 @@ public class PriceVersionController : IHttpHandler
         context.Response.Write(wr);
     }
 
-    public void copyPriceListVersion(HttpContext context) {
-        try{
+    public void copyPriceListVersion(HttpContext context)
+    {
+        try
+        {
             string p_id = context.Request.Form["price_version"].ToString();
             string id = context.Request.Form["id"].ToString();
             mdbc.ExcuteNonProcedure("copyPhienBanGia", "@phienban_cp", p_id, "@phienban", id);
             context.Response.Write("Copy phiên bản giá thành công!");
-        }catch(Exception ex){
+        }
+        catch (Exception ex)
+        {
             context.Response.Write(ex.Message);
         }
     }
@@ -79,8 +83,8 @@ public class PriceVersionController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -94,12 +98,14 @@ public class PriceVersionController : IHttpHandler
         { hd = true; }
 
         md_phienbangia m = db.md_phienbangias.FirstOrDefault(p => p.md_phienbangia_id == context.Request.Form["id"]);
-        if (m.md_trangthai_id.Equals("HIEULUC"))
+        var mnu = new md_phienbangia();
+        m.CopyPropertiesTo(mnu);
+        if (m.md_trangthai_id.Equals(Helper.HIEULUC))
         {
             m.hoatdong = hd;
-            db.SubmitChanges();
         }
-        else if(m.md_trangthai_id.Equals("SOANTHAO")) {
+        else if (m.md_trangthai_id.Equals(Helper.SOANTHAO))
+        {
             m.ten_phienbangia = ten_phienbangia;
             m.md_banggia_id = md_banggia_id;
             m.ngay_hieuluc = DateTime.ParseExact(ngay_hieuluc, "dd/MM/yyyy", null);
@@ -108,9 +114,24 @@ public class PriceVersionController : IHttpHandler
             m.hoatdong = hd;
             m.ngaycapnhat = DateTime.Now;
             m.nguoicapnhat = UserUtils.getUser(context);
-
-            db.SubmitChanges();
         }
+
+        var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = m.GetType().Name,
+                    id_lienket = m.md_phienbangia_id
+                }
+            );
+        }
+        db.SubmitChanges();
     }
 
     public void add(HttpContext context)
@@ -119,14 +140,14 @@ public class PriceVersionController : IHttpHandler
         bool hd = false;
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-        
+
         md_phienbangia mnu = new md_phienbangia
         {
-            md_phienbangia_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+            md_phienbangia_id = Helper.getNewId(),
             ten_phienbangia = context.Request.Form["ten_phienbangia"],
             md_banggia_id = context.Request.Form["md_banggia_id"],
             ngay_hieuluc = DateTime.ParseExact(context.Request.Form["ngay_hieuluc"], "dd/MM/yyyy", null),
-            md_trangthai_id = "SOANTHAO",
+            md_trangthai_id = Helper.SOANTHAO,
             mota = context.Request.Form["mota"],
             hoatdong = hd,
             nguoitao = UserUtils.getUser(context),
@@ -136,26 +157,84 @@ public class PriceVersionController : IHttpHandler
         };
 
         db.md_phienbangias.InsertOnSubmit(mnu);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+            db,
+            HttpContext.Current,
+            new ad_log
+            {
+                nexxdecor_check = false,
+                hanhdong = VoNgocNhan.API_Data.add,
+                table = mnu.GetType().Name,
+                id_lienket = mnu.md_phienbangia_id
+            }
+        );
         db.SubmitChanges();
     }
 
 
     public void del(HttpContext context)
     {
-        String id = context.Request.Form["id"];
-        
-        md_phienbangia pbg = db.md_phienbangias.FirstOrDefault(p => p.md_phienbangia_id.Equals(id));
-        if (pbg.md_trangthai_id.Equals("HIEULUC"))
+        String id = context.Request.Form["id"], msg = "";
+        try
         {
-            jqGridHelper.Utils.writeResult(0, "Không thể xóa khi phiên bản giá đã hiệu lực");
-        }
-        else if (pbg.md_trangthai_id.Equals("SOANTHAO"))
-        {
-            String delDetails = "delete md_giasanpham where md_phienbangia_id = @md_phienbangia_id";
-            String delMaster = String.Format("delete md_phienbangia where md_phienbangia_id = @md_phienbangia_id");
+            md_phienbangia pbg = db.md_phienbangias.FirstOrDefault(p => p.md_phienbangia_id.Equals(id));
+            if (pbg == null)
+            {
+                msg = "Không tìm thấy phiên bản giá đã chọn";
+                goto EndEventHandler;
+            }
 
-            mdbc.ExcuteNonQuery(delDetails, "@md_phienbangia_id", id);
-            mdbc.ExcuteNonQuery(delMaster, "@md_phienbangia_id", id);
+            if (pbg.md_trangthai_id.Equals(Helper.HIEULUC))
+            {
+                msg = "Không thể xóa khi phiên bản giá đã hiệu lực";
+                goto EndEventHandler;
+            }
+
+            var gias = db.md_giasanphams.Where(s => s.md_phienbangia_id == pbg.md_phienbangia_id).ToList();
+            foreach (var gia in gias)
+            {
+                db.md_giasanphams.DeleteOnSubmit(gia);
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    HttpContext.Current,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.del,
+                        table = gia.GetType().Name,
+                        id_lienket = gia.md_giasanpham_id
+                    }
+                );
+            }
+
+            db.md_phienbangias.DeleteOnSubmit(pbg);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = pbg.GetType().Name,
+                    id_lienket = pbg.md_phienbangia_id
+                }
+            );
+            db.SubmitChanges();
+        }
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa phiên bản giá thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
         }
     }
 
@@ -173,11 +252,11 @@ public class PriceVersionController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
 
         String cateId = context.Request.QueryString["cateId"];
         String sqlCount = "SELECT COUNT(*) AS count FROM md_phienbangia pbg JOIN md_banggia bg ON pbg.md_banggia_id = bg.md_banggia_id WHERE pbg.md_banggia_id = N'{0}' " + filter;
-        
+
         if (cateId != null)
         {
             sqlCount = string.Format(sqlCount, cateId);
@@ -186,7 +265,7 @@ public class PriceVersionController : IHttpHandler
         {
             sqlCount = string.Format(sqlCount, 0);
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -218,7 +297,7 @@ public class PriceVersionController : IHttpHandler
             " pbg.ngaytao, pbg.nguoitao, pbg.ngaycapnhat, pbg.nguoicapnhat, pbg.mota, pbg.hoatdong " +
             " , ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
             " FROM md_phienbangia pbg JOIN md_banggia bg ON pbg.md_banggia_id = bg.md_banggia_id " +
-            " WHERE pbg.md_banggia_id = N'{0}' " + filter + 
+            " WHERE pbg.md_banggia_id = N'{0}' " + filter +
             " )P where RowNum > @start AND RowNum < @end";
 
         if (cateId != null)
@@ -229,7 +308,7 @@ public class PriceVersionController : IHttpHandler
         {
             strsql = string.Format(strsql, 0);
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";

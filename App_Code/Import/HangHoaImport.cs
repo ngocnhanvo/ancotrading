@@ -222,7 +222,7 @@ public class HangHoaImport : ImportOriginal
         sp.nhacungung = maNhaCungUng;
         sp.md_cangbien_id = maCangBien;
         sp.md_hscode_id = maHSCode;
-        sp.trangthai = "SOANTHAO";
+        sp.trangthai = Helper.SOANTHAO;
         sp.chucnangsp = chucNangSP;
         if(string.IsNullOrEmpty(ngayXacNhan))
 			sp.ngayxacnhan = null;
@@ -237,6 +237,19 @@ public class HangHoaImport : ImportOriginal
         sp.hoatdong = hoatDong;
 
         db.md_sanphams.InsertOnSubmit(sp);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+            db,
+            HttpContext.Current,
+            new ad_log
+            {
+                nexxdecor_check = false,
+                anco1_check = false,
+                anhiepluc_check = false,
+                hanhdong = VoNgocNhan.API_Data.add,
+                table = sp.GetType().Name,
+                id_lienket = sp.md_sanpham_id
+            }
+        );
         db.SubmitChanges();
     }
 
@@ -246,6 +259,8 @@ public class HangHoaImport : ImportOriginal
     public void Update()
     {
         md_sanpham o = db.md_sanphams.FirstOrDefault(p => p.ma_sanpham.Equals(maHangHoa));
+        var mnu = new md_sanpham();
+        o.CopyPropertiesTo(mnu);
         o.md_kieudang_id = maKieuDang;
         o.md_chucnang_id = maChucNang;
         o.md_phukien_id = pkid;
@@ -276,6 +291,23 @@ public class HangHoaImport : ImportOriginal
         o.nguoicapnhat = nguoiCapNhat;
         o.hoatdong = hoatDong;
 
+        var diffs = VoNgocNhan.API_Data.GetDifferences(o, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    anco1_check = false,
+                    anhiepluc_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = o.GetType().Name,
+                    id_lienket = o.md_sanpham_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 }

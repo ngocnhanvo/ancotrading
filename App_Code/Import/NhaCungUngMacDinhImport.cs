@@ -62,6 +62,17 @@ public class NhaCungUngMacDinhImport : ImportOriginal
             n.hoatdong = hoatDong;
 
             db.md_nhacungungmacdinhs.InsertOnSubmit(n);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+               db,
+               HttpContext.Current,
+               new ad_log
+               {
+                   nexxdecor_check = false,
+                   hanhdong = VoNgocNhan.API_Data.add,
+                   table = n.GetType().Name,
+                   id_lienket = n.md_nhacungungmacdinh_id
+               }
+            );
             db.SubmitChanges();
         }catch (Exception ex)
         {
@@ -74,11 +85,27 @@ public class NhaCungUngMacDinhImport : ImportOriginal
         try
         {
             md_nhacungungmacdinh n = db.md_nhacungungmacdinhs.Single(p => p.md_sanpham_id.Equals(_md_sanpham_id) && p.md_doitackinhdoanh_id.Equals(_md_doitackinhdoanh_id));
+            var mnu = new md_nhacungungmacdinh();
+            n.CopyPropertiesTo(mnu);
             n.macdinh = _macdinh;
             n.ngaycapnhat = ngayCapNhat;
             n.nguoicapnhat = nguoiCapNhat;
             n.hoatdong = hoatDong;
-
+            var diffs = VoNgocNhan.API_Data.GetDifferences(n, mnu);
+            if (diffs.Count > 0)
+            {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    HttpContext.Current,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = n.GetType().Name,
+                        id_lienket = n.md_nhacungungmacdinh_id
+                    }
+                );
+            }
             db.SubmitChanges();
         }
         catch (Exception ex)

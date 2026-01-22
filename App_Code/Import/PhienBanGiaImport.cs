@@ -71,9 +71,20 @@ public class PhienBanGiaImport : ImportOriginal
         pbg.ngaycapnhat = ngayCapNhat;
         pbg.nguoicapnhat = nguoiCapNhat;
         pbg.hoatdong = hoatDong;
-        pbg.md_trangthai_id = "SOANTHAO";
+        pbg.md_trangthai_id = Helper.SOANTHAO;
 
         db.md_phienbangias.InsertOnSubmit(pbg);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+            db,
+            HttpContext.Current,
+            new ad_log
+            {
+                nexxdecor_check = false,
+                hanhdong = VoNgocNhan.API_Data.add,
+                table = pbg.GetType().Name,
+                id_lienket = pbg.md_phienbangia_id
+            }
+        );
         db.SubmitChanges();
     }
 
@@ -82,12 +93,28 @@ public class PhienBanGiaImport : ImportOriginal
     public void Update()
     {
         md_phienbangia o = db.md_phienbangias.FirstOrDefault(p => p.ten_phienbangia.Equals(tenPhienBan) && p.md_banggia_id.Equals(tenBangGia));
+        var mnu = new md_phienbangia();
+        o.CopyPropertiesTo(mnu);
         o.ngay_hieuluc = ngayHieuLuc;
-        o.md_trangthai_id = "HIEULUC";
+        o.md_trangthai_id = Helper.HIEULUC;
         o.ngaycapnhat = ngayCapNhat;
         o.nguoicapnhat = nguoiCapNhat;
         o.hoatdong = hoatDong;
-
+        var diffs = VoNgocNhan.API_Data.GetDifferences(o, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = o.GetType().Name,
+                    id_lienket = o.md_phienbangia_id
+                }
+            );
+        }
         db.SubmitChanges();
     }
 }

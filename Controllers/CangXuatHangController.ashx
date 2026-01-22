@@ -45,15 +45,15 @@ public class CangXuatHangController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
         String md = context.Request.Form["macdinh"].ToLower();
-        
+
         bool hd, macdinh;
         hd = macdinh = false;
-        
+
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
 
@@ -61,7 +61,7 @@ public class CangXuatHangController : IHttpHandler
         { macdinh = true; }
 
         String id = context.Request.Form["id"];
-        String md_sanpham_id =context.Request.Form["md_sanpham_id"];
+        String md_sanpham_id = context.Request.Form["md_sanpham_id"];
         String md_cangbien_id = context.Request.Form["md_cangbien_id"];
         String sel = "select COUNT(*) as count from md_cangxuathang where md_sanpham_id = @md_sanpham_id AND md_cangbien_id = @md_cangbien_id AND md_cangxuathang_id != @md_cangxuathang_id";
         int colCount = (int)mdbc.ExecuteScalar(sel, "@md_sanpham_id", md_sanpham_id, "@md_cangbien_id", md_cangbien_id, "@md_cangxuathang_id", id);
@@ -73,6 +73,8 @@ public class CangXuatHangController : IHttpHandler
         else
         {
             md_cangxuathang m = db.md_cangxuathangs.Single(p => p.md_cangxuathang_id.Equals(id));
+            var mnu = new md_cangxuathang();
+            m.CopyPropertiesTo(mnu);
             m.md_sanpham_id = md_sanpham_id;
             m.md_cangbien_id = md_cangbien_id;
             m.macdinh = macdinh;
@@ -81,6 +83,21 @@ public class CangXuatHangController : IHttpHandler
             m.hoatdong = hd;
             m.ngaycapnhat = DateTime.Now;
             m.nguoicapnhat = UserUtils.getUser(context);
+            var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
+            if (diffs.Count > 0)
+            {
+                VoNgocNhan.API_Data.themLichSuHoatDong(
+                    db,
+                    context,
+                    new ad_log
+                    {
+                        nexxdecor_check = false,
+                        hanhdong = VoNgocNhan.API_Data.edit,
+                        table = m.GetType().Name,
+                        id_lienket = m.md_cangxuathang_id
+                    }
+                );
+            }
             db.SubmitChanges();
             jqGridHelper.Utils.writeResult(1, "Đã thay đổi thông tin cảng biển.!");
         }
@@ -99,12 +116,12 @@ public class CangXuatHangController : IHttpHandler
 
         if (md.Equals("on") || md.Equals("true"))
         { macdinh = true; }
-        
-        String md_sanpham_id =context.Request.Form["md_sanpham_id"];
+
+        String md_sanpham_id = context.Request.Form["md_sanpham_id"];
         String md_cangbien_id = context.Request.Form["md_cangbien_id"];
         String sel = "select COUNT(*) as count from md_cangxuathang where md_sanpham_id = @md_sanpham_id AND md_cangbien_id = @md_cangbien_id";
         int colCount = (int)mdbc.ExecuteScalar(sel, "@md_sanpham_id", md_sanpham_id, "@md_cangbien_id", md_cangbien_id);
-        
+
         if (colCount != 0)
         {
             jqGridHelper.Utils.writeResult(0, "Đã tồn tại cảng biển.!");
@@ -113,7 +130,7 @@ public class CangXuatHangController : IHttpHandler
         {
             md_cangxuathang mnu = new md_cangxuathang
             {
-                md_cangxuathang_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                md_cangxuathang_id = Helper.getNewId(),
                 md_sanpham_id = md_sanpham_id,
                 md_cangbien_id = md_cangbien_id,
                 macdinh = macdinh,
@@ -127,6 +144,17 @@ public class CangXuatHangController : IHttpHandler
             };
 
             db.md_cangxuathangs.InsertOnSubmit(mnu);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+               db,
+               HttpContext.Current,
+               new ad_log
+               {
+                   nexxdecor_check = false,
+                   hanhdong = VoNgocNhan.API_Data.add,
+                   table = mnu.GetType().Name,
+                   id_lienket = mnu.md_cangxuathang_id
+               }
+            );
             db.SubmitChanges();
             jqGridHelper.Utils.writeResult(1, "Đã tạo cảng biển cho sản phẩm.!");
         }
@@ -135,40 +163,79 @@ public class CangXuatHangController : IHttpHandler
 
     public void del(HttpContext context)
     {
-        String id = context.Request.Form["id"];
-        var cxhang = db.md_cangxuathangs.Single(cx=>cx.md_cangxuathang_id.Equals(id));
-        int cout_cx = (from lcx in db.md_cangxuathangs
-                      where lcx.md_sanpham_id.Equals(cxhang.md_sanpham_id)
-                      select new {lcx.md_sanpham_id}).Count();
-        id = id.Insert(0, "'");
-        id = id.Insert(id.Length, "'");
-        id = id.Replace(",", "','");
+        string id = context.Request.Form["id"], msg = "";
 
-        if (cout_cx >1)
+        try
         {
-            String sql = "delete md_cangxuathang where md_cangxuathang_id IN (" + id + ")";
-            mdbc.ExcuteNonQuery(sql);
-            jqGridHelper.Utils.writeResult(1, "Xóa dòng thành công!");
+            var cxhang = db.md_cangxuathangs.Single(cx => cx.md_cangxuathang_id.Equals(id));
+            int cout_cx = (from lcx in db.md_cangxuathangs
+                           where lcx.md_sanpham_id.Equals(cxhang.md_sanpham_id)
+                           select new { lcx.md_sanpham_id }).Count();
 
-            string select = "select top 1 md_cangxuathang_id from md_cangxuathang where md_sanpham_id='" + cxhang.md_sanpham_id + "'";
-            string mcx_id = (string)mdbc.ExecuteScalar(select);
-            string update_cx = "update md_cangxuathang set macdinh=1 where md_cangxuathang_id ='"+mcx_id+"'";
-            mdbc.ExcuteNonQuery(update_cx);
+            if (cout_cx == 1)
+            {
+                msg = "Cần phải tồn tại ít nhất một cảng mặc định cho sản phẩm!";
+                goto EndEventHandler;
+            }
+
+            if (cxhang.macdinh.GetValueOrDefault(false))
+            {
+                var cxhmd = db.md_cangxuathangs.Where(s => s.md_sanpham_id == cxhang.md_sanpham_id & s.md_cangxuathang_id != cxhang.md_cangxuathang_id & s.hoatdong == true).OrderByDescending(s => s.ngaytao).Take(1).FirstOrDefault();
+                if (cxhmd != null)
+                {
+                    cxhmd.macdinh = true;
+                    VoNgocNhan.API_Data.themLichSuHoatDong(
+                       db,
+                       HttpContext.Current,
+                       new ad_log
+                       {
+                           nexxdecor_check = false,
+                           hanhdong = VoNgocNhan.API_Data.edit,
+                           table = cxhmd.GetType().Name,
+                           id_lienket = cxhmd.md_cangxuathang_id
+                       }
+                    );
+                }
+            }
+            db.md_cangxuathangs.DeleteOnSubmit(cxhang);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+               db,
+               context,
+               new ad_log
+               {
+                   nexxdecor_check = false,
+                   hanhdong = VoNgocNhan.API_Data.del,
+                   table = cxhang.GetType().Name,
+                   id_lienket = cxhang.md_cangxuathang_id
+               }
+            );
+            db.SubmitChanges();
+
         }
-        if (cout_cx == 1)
+        catch(Exception ex)
         {
-            jqGridHelper.Utils.writeResult(0, "Cần phải tồn tại ít nhất một cảng mặc định cho sản phẩm!");
+            msg = ex.Message;
         }
-        
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+        {
+            jqGridHelper.Utils.writeResult(1, "Xóa cảng biển trong hàng hóa thành công");
+        }
+        else
+        {
+            jqGridHelper.Utils.writeResult(0, msg);
+        }
     }
 
     public void load(HttpContext context)
     {
         String productId = context.Request.QueryString["productId"];
-        
+
         context.Response.ContentType = "text/xml";
         context.Response.Charset = "UTF-8";
-        
+
         //// filter
         String filter = "";
         bool _search = bool.Parse(context.Request.QueryString["_search"]);
@@ -178,7 +245,7 @@ public class CangXuatHangController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
         String sqlCount = "SELECT COUNT(*) AS count " +
             " FROM md_cangxuathang cxh, md_sanpham sp, md_cangbien cb " +
             " WHERE cxh.md_sanpham_id = sp.md_sanpham_id " +
@@ -189,10 +256,11 @@ public class CangXuatHangController : IHttpHandler
         {
             sqlCount = String.Format(sqlCount, productId, filter);
         }
-        else {
+        else
+        {
             sqlCount = String.Format(sqlCount, 0, filter);
         }
-        
+
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
         String sidx = context.Request.QueryString["sidx"];
@@ -237,7 +305,7 @@ public class CangXuatHangController : IHttpHandler
         {
             strsql = String.Format(strsql, 0, filter);
         }
-        
+
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";

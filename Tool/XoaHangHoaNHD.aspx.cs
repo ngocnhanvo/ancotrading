@@ -153,6 +153,19 @@ public partial class Tool_XoaHangHoaNHD : System.Web.UI.Page
                             {
                                 sp.trangthai = "NHD";
                                 sp.ngayngunghd = DateTime.Now;
+                                VoNgocNhan.API_Data.themLichSuHoatDong(
+                                    db,
+                                    HttpContext.Current,
+                                    new ad_log
+                                    {
+                                        nexxdecor_check = false,
+                                        anco1_check = false,
+                                        anhiepluc_check = false,
+                                        hanhdong = VoNgocNhan.API_Data.edit,
+                                        table = sp.GetType().Name,
+                                        id_lienket = sp.md_sanpham_id
+                                    }
+                                );
                                 db.SubmitChanges();
                                 msgDT += string.Format("<div style='color: blue'>{0} đã chuyển sang ngưng hoạt động.</div>", sp.ma_sanpham);
                             }
@@ -329,6 +342,17 @@ public partial class Tool_XoaHangHoaNHD : System.Web.UI.Page
                                     foreach (md_giasanpham gsp in db.md_giasanphams.Where(s => s.md_sanpham_id == sp.md_sanpham_id))
                                     {
                                         db.md_giasanphams.DeleteOnSubmit(gsp);
+                                        VoNgocNhan.API_Data.themLichSuHoatDong(
+                                            db,
+                                            HttpContext.Current,
+                                            new ad_log
+                                            {
+                                                nexxdecor_check = false,
+                                                hanhdong = VoNgocNhan.API_Data.del,
+                                                table = gsp.GetType().Name,
+                                                id_lienket = gsp.md_giasanpham_id
+                                            }
+                                        );
                                     }
                                     db.SubmitChanges();
                                     msgDT += string.Format("<div style='color: blue'>{0} đã xóa giá.</div>", sp.ma_sanpham);
@@ -345,6 +369,17 @@ public partial class Tool_XoaHangHoaNHD : System.Web.UI.Page
                                     foreach (md_hanghoadocquyen hhdq in db.md_hanghoadocquyens.Where(s => s.md_sanpham_id == sp.md_sanpham_id))
                                     {
                                         db.md_hanghoadocquyens.DeleteOnSubmit(hhdq);
+                                        VoNgocNhan.API_Data.themLichSuHoatDong(
+                                            db,
+                                            HttpContext.Current,
+                                            new ad_log
+                                            {
+                                                nexxdecor_check = false,
+                                                hanhdong = VoNgocNhan.API_Data.del,
+                                                table = hhdq.GetType().Name,
+                                                id_lienket = hhdq.md_hanghoadocquyen_id
+                                            }
+                                        );
                                     }
                                     db.SubmitChanges();
                                     msgDT += string.Format("<div style='color: blue'>{0} đã hàng hóa độc quyền.</div>", sp.ma_sanpham);
@@ -358,6 +393,19 @@ public partial class Tool_XoaHangHoaNHD : System.Web.UI.Page
                                 if (!msgDT.Contains("'color: red'"))
                                 {
                                     db.md_sanphams.DeleteOnSubmit(sp);
+                                    VoNgocNhan.API_Data.themLichSuHoatDong(
+                                        db,
+                                        HttpContext.Current,
+                                        new ad_log
+                                        {
+                                            nexxdecor_check = false,
+                                            anco1_check = false,
+                                            anhiepluc_check = false,
+                                            hanhdong = VoNgocNhan.API_Data.del,
+                                            table = sp.GetType().Name,
+                                            id_lienket = sp.md_sanpham_id
+                                        }
+                                    );
                                     db.SubmitChanges();
                                     msgDT += string.Format("<div style='color: blue'>{0} đã được xóa.</div>", sp.ma_sanpham);
                                 }   

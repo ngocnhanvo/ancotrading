@@ -75,26 +75,49 @@ public class HangHoaDocQuyenImport : ImportOriginal
 
     public void Import()
     {
-        String insert = "insert into md_hanghoadocquyen(md_hanghoadocquyen_id, md_doitackinhdoanh_id, md_sanpham_id, ngaybatdau, ngayketthuc, ngaytao, nguoitao, ngaycapnhat, nguoicapnhat, mota, hoatdong, ghichu) values( " +
-            " (select RIGHT(sys.fn_sqlvarbasetostr(HashBytes('MD5', CAST(GETDATE() as nvarchar(32)) + CAST(NEWID() as nvarchar(255)) )),32)) " +
-            " , @md_doitackinhdoanh_id, @md_sanpham_id, getdate(), convert(datetime, @ngayketthuc, 103), @ngaytao, @nguoitao, @ngaycapnhat, @nguoicapnhat, @mota, @hoatdong, @ghichu)";
-        mdbc.ExcuteNonQuery(insert
-            , "@md_doitackinhdoanh_id", maKhachHang
-            , "@md_sanpham_id", maSanPham
-			, "@ngayketthuc", ngayKetThuc
-            , "@ngaytao", ngayTao
-            , "@nguoitao", nguoiTao
-            , "@ngaycapnhat", ngayCapNhat
-            , "@nguoicapnhat", nguoiCapNhat
-            , "@mota", moTa
-            , "@hoatdong", hoatDong
-			, "@ghiChu", ghiChu
-			);
+        var mnu = new md_hanghoadocquyen
+        {
+            md_hanghoadocquyen_id = Helper.getNewId(),
+            md_doitackinhdoanh_id = maKhachHang,
+            md_sanpham_id = maSanPham,
+            mota = moTa,
+            hoatdong = hoatDong,
+            nguoitao = nguoiTao,
+            nguoicapnhat = nguoiCapNhat,
+            ngaytao = ngayTao,
+            ngaycapnhat = ngayCapNhat,
+            ghichu = ghiChu,
+            ngayketthuc = ngayKetThuc.ToNullableDate()
+        };
+        db.md_hanghoadocquyens.InsertOnSubmit(mnu);
+        VoNgocNhan.API_Data.themLichSuHoatDong(
+            db,
+            HttpContext.Current,
+            new ad_log
+            {
+                nexxdecor_check = false,
+                hanhdong = VoNgocNhan.API_Data.add,
+                table = mnu.GetType().Name,
+                id_lienket = mnu.md_hanghoadocquyen_id
+            }
+        );
+        db.SubmitChanges();
 
         md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(p => p.md_doitackinhdoanh_id.Equals(maKhachHang));
         if (dtkd != null)
         {
             dtkd.isdocquyen = true;
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = dtkd.GetType().Name,
+                    id_lienket = dtkd.md_doitackinhdoanh_id
+                }
+            );
             db.SubmitChanges();
         }
     }
@@ -103,6 +126,8 @@ public class HangHoaDocQuyenImport : ImportOriginal
     public void Update()
     {
         md_hanghoadocquyen o = db.md_hanghoadocquyens.FirstOrDefault(p => p.md_doitackinhdoanh_id.Equals(maKhachHang) && p.md_sanpham_id.Equals(maSanPham));
+        var mnu = new md_hanghoadocquyen();
+        o.CopyPropertiesTo(mnu);
         if(string.IsNullOrEmpty(ngayKetThuc))
 			o.ngayketthuc = null;
 		else
@@ -112,12 +137,38 @@ public class HangHoaDocQuyenImport : ImportOriginal
 		o.mota = moTa;
         o.hoatdong = hoatDong;
 		o.ghichu = ghiChu;
+        var diffs = VoNgocNhan.API_Data.GetDifferences(o, mnu);
+        if (diffs.Count > 0)
+        {
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = o.GetType().Name,
+                    id_lienket = o.md_hanghoadocquyen_id
+                }
+            );
+        }
         db.SubmitChanges();
 
         md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(p => p.md_doitackinhdoanh_id.Equals(maKhachHang));
         if (dtkd != null)
         {
             dtkd.isdocquyen = true;
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                HttpContext.Current,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.edit,
+                    table = dtkd.GetType().Name,
+                    id_lienket = dtkd.md_doitackinhdoanh_id
+                }
+            );
             db.SubmitChanges();
         }
     }
