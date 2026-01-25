@@ -250,6 +250,10 @@
                     <div style="margin-top:5px;">
                         Bạn muốn chuyển shipping detail đến chứng từ?
                     </div>
+                    <div style="margin-top:5px;">
+                        <label>Ghi chú</label>
+                        <textarea id="po_spdt_ghichusau"></textarea>
+                    </div>
                 </div>`);
 
                 // create new dialog
@@ -267,7 +271,7 @@
                             let data = new FormData();
                             data.append('action', 'guispd');
                             data.append('id', id.toString());
-                            
+                            data.apeend('ghichu', $('#po_spdt_ghichusau').val());
                             $.ajax({
                                 url: 'Views/po/Controller_PO_SPDT.ashx',
                                 data: data,

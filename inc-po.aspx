@@ -1859,6 +1859,7 @@
                                         <select id="loaichuyen_po">
                                             <option value="Moi">Mới</option>
                                             <option value="Bosung">Bổ sung</option>
+                                            <option value="Dacbiet">Gửi không cần điền thông tin</option>
                                         </select>
                                     </td>
                                 </tr>
@@ -1866,35 +1867,35 @@
                                     <td>Đơn hàng ưu tiên</td>
                                     <td><select id="dhut_po">${options}</select></td>
                                 </tr>
-                                <tr>
+                                <tr class="tr_ct">
                                     <td>Cont 20</td>
                                     <td><input id="slcont20_po" type="number"/></td>
                                 </tr>
-                                <tr>
+                                <tr class="tr_ct">
                                     <td>Cont 40DC</td>
                                     <td><input id="slcont40_po" type="number"/></td>
                                 </tr>
-                                <tr>
+                                <tr class="tr_ct">
                                     <td>Cont 40HC</td>
                                     <td><input id="slcont40hc_po" type="number"/></td>
                                 </tr>
-                                <tr>
+                                <tr class="tr_ct">
                                     <td>Cont 45</td>
                                     <td><input id="slcont45_po" type="number"/></td>
                                 </tr>
-                                <tr>
+                                <tr class="tr_ct">
                                     <td>Cont LCL</td>
                                     <td><input id="slcontLCL_po" type="number"/></td>
                                 </tr>
-                                <tr>
+                                <tr class="tr_ct">
                                     <td>NXH điều chỉnh</td>
                                     <td><input id="nxhdc_po" style="width:100px" type="text"/></td>
                                 </tr>
-                                <tr>
+                                <tr class="tr_ct">
                                     <td>Ghi chú</td>
                                     <td><textarea id="ghichu_po"></textarea></td>
                                 </tr>
-                                <tr>
+                                <tr class="tr_ct">
                                     <td colspan="2">
                                         <label>Tập tin đính kèm</label><br>
                                         <input style="margin-top: 7px;" type="file" multiple id="ttdk1_po" accept=".xls,.xlsx,.doc,.docx,.pdf" />
@@ -1911,6 +1912,13 @@
                             //hide close button.
                             $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
                             $('#nxhdc_po').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
+                            $('#loaichuyen_po').change(function () {
+                                let val = $(this).val();
+                                if(val == 'Dacbiet')
+                                    $(`#${iddlg} table tr.tr_ct`).hide();
+                                else
+                                    $(`#${iddlg} table tr.tr_ct`).show();
+                            });
                         }
                         , buttons: {
                             'Đồng ý': function () {

@@ -46,6 +46,7 @@ public class Controller_PO_SPDT : IHttpHandler
     {
         string msg = "";
         string id = context.Request.Form["id"];
+        string ghichu = context.Request.Form["ghichu"].removeAllSpaceOrTrimText(true);
         try
         {
             var spd = db.c_donhang_spds.Where(s => s.c_donhang_spd_id == id).FirstOrDefault();
@@ -74,7 +75,27 @@ public class Controller_PO_SPDT : IHttpHandler
                 goto EndEventHandler;
             }
 
+            if (string.IsNullOrWhiteSpace(ghichu))
+            {
+                msg = "Không thể bỏ trống nội dụng của trường ghi chú";
+                goto EndEventHandler;
+            }
+
+            var tbps = Public.layTruongBoPhan(db, Helper.TENBP_NGHIEPVU).Select(s => s.email).ToList();
+            if (tbps.Count <= 0)
+            {
+                msg = $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_NGHIEPVU}";
+                goto EndEventHandler;
+            }
+            string emailTBPs = string.Join(";", tbps);
+            string nvct = db.nhanviens.Where(s => s.manv == donhang.nhanvienCT).Select(s => s.email).FirstOrDefault();
+
             spd.trangthai = Helper.DAGUI;
+            var hsct = db.c_donhangchungtus.Where(s => s.c_donhang_id == donhang.c_donhang_id).FirstOrDefault();
+            if (hsct != null)
+            {
+                hsct.ghichusau += $"\n{ghichu}";
+            }
             string manv = UserUtils.getUser(context);
             var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
             var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
@@ -88,14 +109,15 @@ public class Controller_PO_SPDT : IHttpHandler
             mail.Smtp = smtp.smtpserver;
             mail.Port = smtp.port.Value;
             mail.Ssl = smtp.use_ssl.GetValueOrDefault(false);
-                
-            string title = $@"Thay đổi Shipping Detail cho đơn hàng ""{donhang.sochungtu}""", body = $@"đơn hàng ""{donhang.sochungtu}"" có thay dổi shipping detal";
+
+            string title = $@"Gửi bổ sung / điều chinh shipping detail ({donhang.sochungtu})", body = $@"Nội dung: {ghichu}";
             var attachments = new List<System.Net.Mail.Attachment>();
 
+            string cc = $"{nv.email},{emailTBPs}";
             mail.Send(
                 nv.email
-                , Helper.nhanvienchungtu
-                , nv.email_cc
+                , nvct
+                , cc
                 , ""
                 , title
                 , body
@@ -110,7 +132,7 @@ public class Controller_PO_SPDT : IHttpHandler
 
         EndEventHandler:;
 
-       context.Response.Write(msg);
+        context.Response.Write(msg);
     }
 
     public void edit(HttpContext context)

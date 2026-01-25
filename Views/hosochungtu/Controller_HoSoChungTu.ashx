@@ -464,20 +464,6 @@ public class Controller_HoSoChungTu : IHttpHandler
                 goto EndEventHandler;
             }
             hsct.ngayKeoCont = date_ngayKeoCont;
-
-            foreach (var hsctk in db.c_donhangchungtus.Where(s => s.dongghep == donhang.sochungtu & s.c_donhangchungtu_id != hsct.c_donhangchungtu_id))
-            {
-                var donhangk = db.c_donhangs.Where(s => s.c_donhang_id == hsctk.c_donhang_id & s.trangthaict != Helper.DAHIEULUC).FirstOrDefault();
-                if (donhangk != null)
-                {
-                    if (hsctk.trangthai != Helper.SOANTHAO)
-                    {
-                        donhangk.trangthaict = Helper.DAHIEULUC;
-                    }
-                }
-                hsctk.trangthai = hsct.trangthai;
-            }
-
             hsct.trangthai2 = trangthai2;
             hsct.ngaydieuchinh = ngaydieuchinh.ToNullableDate();
             hsct.ngaypass = ngaypass.ToNullableDate();
@@ -498,6 +484,33 @@ public class Controller_HoSoChungTu : IHttpHandler
             hsct.ghichusau = ghichusau;
             hsct.ngaycapnhat = DateTime.Now;
             hsct.nguoicapnhat = UserUtils.getUser(context);
+
+            foreach (var hsctk in db.c_donhangchungtus.Where(s => s.dongghep == donhang.sochungtu & s.c_donhangchungtu_id != hsct.c_donhangchungtu_id))
+            {
+                var donhangk = db.c_donhangs.Where(s => s.c_donhang_id == hsctk.c_donhang_id & s.trangthaict != Helper.DAHIEULUC).FirstOrDefault();
+                if (donhangk != null)
+                {
+                    if (hsctk.trangthai != Helper.SOANTHAO)
+                    {
+                        donhangk.trangthaict = Helper.DAHIEULUC;
+                    }
+                }
+                hsctk.trangthai = hsct.trangthai;
+                hsctk.ngayBookCont = hsct.ngayBookCont;
+                hsctk.bookingNo = hsct.bookingNo;
+                hsctk.ngayKeoCont = hsct.ngayKeoCont;
+                hsctk.trangthai2 = hsct.trangthai2;
+                hsctk.ngaydieuchinh = hsct.ngaydieuchinh;
+                hsctk.ngaypass = hsct.ngaypass;
+                hsctk.ngaychuyenhoso = hsct.ngaychuyenhoso;
+                hsctk.nhanvienCT = hsct.nhanvienCT;
+                hsctk.ngayETA = hsct.ngayETA;
+                hsctk.ngayETD = hsct.ngayETD;
+                hsctk.ngayBHXN = hsct.ngayBHXN;
+                hsctk.ngayCutOff = hsct.ngayCutOff;
+                hsctk.ngayXuong = hsct.ngayXuong;
+                hsctk.mota = hsct.mota;
+            }
             db.SubmitChanges();
         }
         catch (Exception ex)

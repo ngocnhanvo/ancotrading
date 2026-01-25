@@ -102,6 +102,7 @@ public class DonHangController : IHttpHandler
         var ghichu_po = context.Request.Form["ghichu_po"].removeAllSpaceOrTrimText(true);
         var loaichuyen_po = context.Request.Form["loaichuyen_po"].removeAllSpaceOrTrimText(true);
         var laBoSung = loaichuyen_po == Helper.Bosung;
+        var laDacBiet = loaichuyen_po == Helper.Dacbiet;
         var files = context.Request.Files;
         var lengthF = files.Count;
 
@@ -200,25 +201,43 @@ public class DonHangController : IHttpHandler
                     hsct.trangthai = Helper.SOANTHAO;
                     hsct.c_donhang_id = dh.c_donhang_id;
                     hsct.trangthai2 = Helper.Moi;
-                    if (dh.c_donhang_id == dhut_po)
+                    if (laDacBiet)
                     {
-                        hsct.cont20 = slcont20_po;
-                        hsct.cont40 = slcont40_po;
-                        hsct.cont40hc = slcont40hc_po;
-                        hsct.cont45 = slcont45_po;
-                        hsct.contLCL = slcontLCL_po;
-                        hsct.mota = ghichu_po;
-                        hsct.ngaydieuchinh = nxhdc_po.ToNullableDate();
+                        hsct.cont20 = dh.cont20;
+                        hsct.cont40 = dh.cont40;
+                        hsct.cont40hc = dh.cont40hc;
+                        hsct.cont45 = dh.cont45;
+                        hsct.contLCL = dh.contle;
                         hsct.ngaychuyenhoso = DateTime.Now;
-                        idut = hsct.c_donhangchungtu_id;
-                        sctut = dh.sochungtu;
-                        nvctut = db.nhanviens.Where(s => s.manv == dh.nhanvienCT).Select(s => s.email).FirstOrDefault();
+                        if (dh.c_donhang_id == dhut_po)
+                        {
+                            idut = hsct.c_donhangchungtu_id;
+                            sctut = dh.sochungtu;
+                            nvctut = db.nhanviens.Where(s => s.manv == dh.nhanvienCT).Select(s => s.email).FirstOrDefault();
+                        }
                     }
                     else
                     {
-                        hsct.dongghep = sctut;
+                        if (dh.c_donhang_id == dhut_po)
+                        {
+                            hsct.cont20 = slcont20_po;
+                            hsct.cont40 = slcont40_po;
+                            hsct.cont40hc = slcont40hc_po;
+                            hsct.cont45 = slcont45_po;
+                            hsct.contLCL = slcontLCL_po;
+                            hsct.mota = ghichu_po;
+                            hsct.ngaydieuchinh = nxhdc_po.ToNullableDate();
+                            hsct.ngaychuyenhoso = DateTime.Now;
+                            idut = hsct.c_donhangchungtu_id;
+                            sctut = dh.sochungtu;
+                            nvctut = db.nhanviens.Where(s => s.manv == dh.nhanvienCT).Select(s => s.email).FirstOrDefault();
+                        }
+                        else
+                        {
+                            hsct.dongghep = sctut;
+                        }
                     }
-                    
+
                     hsct.nhanvienCT = dh.nhanvienCT;
                     hsct.ngaytao = DateTime.Now;
                     hsct.ngaycapnhat = DateTime.Now;
@@ -1308,19 +1327,60 @@ public class DonHangController : IHttpHandler
 
             if (m.md_trangthai_id.Equals(Helper.HIEULUC))
             {
+                var tbps = Public.layTruongBoPhan(db, Helper.TENBP_NGHIEPVU).Select(s => s.email).ToList();
+                if (tbps.Count <= 0)
+                {
+                    msg = $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_NGHIEPVU}";
+                    goto EndEventHandler;
+                }
+                string emailTBPs = string.Join(";", tbps);
+
                 m.portdischarge = context.Request.Form["portdischarge"];
                 m.mota = context.Request.Form["mota"];
                 m.ghichu = context.Request.Form["ghichu"];
                 m.nhanvienCT = nvct;
 
+                var codoingaypass = false;
                 if (m.ngaypass == null)
+                {
                     m.ngaypass = ngaypass;
+                    codoingaypass = true;
+                }
                 else if (m.ngaypass != ngaypass)
                 {
                     jqGridHelper.Utils.writeResult(0, "Không thể đổi ngày pass kiểm hóa khi đơn hàng đã hiệu lực và trường đã có giá trị trước đó.");
                     goto EndEventHandler;
                 }
                 db.SubmitChanges();
+
+                if(codoingaypass)
+                {
+                    string manv = UserUtils.getUser(context);
+                    var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
+                    var smtp = db.md_smtps.Where(p => p.macdinh.Equals(true)).FirstOrDefault();
+                    if (!string.IsNullOrWhiteSpace(nv.smtp))
+                    {
+                        smtp = db.md_smtps.Where(s => s.md_smtp_id == nv.smtp).FirstOrDefault();
+                    }
+                    var mail = new GoogleMail();
+                    mail.Email = nv.email;
+                    mail.Password = nv.email_pass;
+                    mail.Smtp = smtp.smtpserver;
+                    mail.Port = smtp.port.Value;
+                    mail.Ssl = smtp.use_ssl.GetValueOrDefault(false);
+                    string title = $@"Bán hàng gửi ngày pass kiểm hóa cho đơn hàng ({m.sochungtu})", body = $@"Ngày pass kiểm hóa: {m.ngaypass.Value.ToString(Extension.fmtDate)}";
+                    string cc = $"{nv.email},{emailTBPs}";
+                    var attachments = new List<System.Net.Mail.Attachment>();
+                    mail.Send(
+                        nv.email
+                        , m.nhanvienCT
+                        , cc
+                        , ""
+                        , title
+                        , body
+                        , attachments
+                    );
+                }
             }
             else if (m.md_doitackinhdoanh_id != dtkd.md_doitackinhdoanh_id)
             {
