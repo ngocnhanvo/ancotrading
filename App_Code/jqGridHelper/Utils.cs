@@ -196,10 +196,12 @@ namespace jqGridHelper
 
             var chungtu = db.md_sochungtus.Where(ct => ct.ten_sochungtu.Equals("Invoice")).FirstOrDefault();
             string tiento = chungtu.tiento;
-            string kihieuKH = "[MaKH]";
+            string kihieuKH = "[MaKH]", sodcgan = chungtu.so_duocgan.Value.ToString();
             if (chungtu.tiento.Contains(kihieuKH))
                 tiento = tiento.Replace(kihieuKH, makhachhang);
-            result = $"{tiento} {chungtu.so_duocgan}-{chungtu.hauto}";
+            if (sodcgan.Substring(0, 1) != "0")
+                sodcgan = sodcgan.Substring(1);
+            result = $"{tiento} {sodcgan}-{chungtu.hauto}";
             chungtu.so_duocgan = chungtu.so_duocgan + 1;
 
             return result;
