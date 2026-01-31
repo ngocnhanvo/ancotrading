@@ -301,7 +301,7 @@
             , editable: true
             , width: 100
             , edittype: 'text'
-            , editoptions: { disabled: true }
+            , editoptions: { disabled: false }
             , formoptions: { colpos: 1, rowpos: 1 }
         },
         {
@@ -839,7 +839,7 @@
             , formatter: 'checkbox'
         }
         ]"
-    GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 90);"
+    GridComplete="var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height() - 90);"
     FilterToolbar="true"
     Height="420"
     MultiSelect="false"
@@ -907,5 +907,223 @@
     runat="server" />
 
 <script type="text/javascript">
-    
+    $("#grid_ds_ctxkNV").jqGrid('navButtonAdd', '#grid_ds_ctxkNV-pager', {
+        caption: "",
+        buttonicon: "ui-icon-lightbulb",
+        title: "Giữ chỗ số chứng từ",
+        onClickButton: function () {
+            $('body').append(`
+            <div id="dlg_gridSmal_2"
+                style="margin: 4px 0 0 0; background-color: rgba(165, 121, 255, 0.07);"
+                title="Danh sách số chứng từ INV đang giữ chỗ"
+            >
+                <table style="width:100%;">
+                <tr>
+                    <td>
+                        <table id="gridMaster"></table>
+                        <div id="papergridMaster"></div>
+                    </td>
+                </tr>
+                </table>
+            </div>
+        `);
+
+            let gridMaster = $('#gridMaster');
+            let widthDialog = 800;
+            $('#dlg_gridSmal_2').dialog({
+                modal: true,
+                dialogClass: "dialog_index",
+                width: widthDialog,
+                height: window.innerHeight - 10,
+                open: function (event, ui) {
+                    gridMaster.jqGrid({
+                        height: window.innerHeight - 200,
+                        url: `Views/chungtuxuatkhoNV/Controller_INV_GiuchoSCT.ashx`,
+                        editurl: `Views/chungtuxuatkhoNV/Controller_INV_GiuchoSCT.ashx`,
+                        mtype: 'POST',
+                        autowidth: true,
+                        shrinkToFit: true,
+                        rownumbers: true,
+                        viewrecords: true,
+                        scroll: false,
+                        rowNum: 500,
+                        multiselect: false,
+                        multiboxonly: false,
+                        rowList: [500],
+                        pager: '#papergridMaster',
+                        jsonReader: {
+                            repeatitems: false,
+                            id: "md_phienbangia_id"
+                        },
+                        colModel: [
+                            {
+                                fixed: true, name: 'md_sochungtugiucho_id'
+                                , index: 'spd.md_sochungtugiucho_id'
+                                , width: 100
+                                , hidden: true
+                                , editable: false
+                                , edittype: 'text'
+                                , key: true
+                            },
+                            {
+                                fixed: true, name: 'socangiu'
+                                , label: 'Số cần giữ'
+                                , index: 'spd.socangiu'
+                                , editable: true
+                                , width: 100
+                                , edittype: 'text'
+                                , align: 'center'
+                            },
+                            {
+                                fixed: true, name: 'ngaytao'
+                                , label: 'Ngày tạo'
+                                , index: 'cl.ngaytao'
+                                , width: 110
+                                , editable: false
+                                , edittype: 'text'
+                                , align: ' center'
+                            },
+                            {
+                                fixed: true, name: 'nguoitao'
+                                , label: 'Người tạo'
+                                , index: 'cl.nguoitao'
+                                , width: 100
+                                , editable: false
+                                , edittype: 'text'
+                                , hidden: false
+                                , align: 'center'
+                            },
+                            {
+                                fixed: true, name: 'mota'
+                                , label: 'Mô tả'
+                                , index: 'cl.mota'
+                                , width: 100
+                                , editable: true
+                                , edittype: 'textarea'
+                            }
+                        ],
+                        ondblClickRow: function (rowid) {
+
+                        },
+                        onSelectRow: function (ids) {
+
+                        },
+                        gridComplete: function () {
+
+                        },
+                        loadComplete: function (data) {
+
+                        },
+                        beforeRequest: function () {
+
+                        },
+                        beforeProcessing: function (data) {
+
+                        },
+                        caption: ' '
+                    });
+
+                    let centerDG = function (formid, idg) {
+                        let $dlg = formid.closest('div.ui-jqdialog');
+                        let $gridWrapper = $("#gview_" + idg);
+                        // Lấy thông số kích thước và vị trí của Grid
+                        let gridPos = $gridWrapper.offset();
+                        let gridW = $gridWrapper.outerWidth();
+                        let gridH = $gridWrapper.outerHeight();
+
+                        // Lấy kích thước của Dialog
+                        let dlgW = $dlg.outerWidth();
+                        let dlgH = $dlg.outerHeight();
+
+                        // Công thức: Vị trí Grid + (Một nửa kích thước Grid - Một nửa kích thước Dialog)
+                        let left = gridPos.left + (gridW - dlgW) / 2;
+                        let top = gridPos.top + (gridH - dlgH) / 2;
+
+                        // Đảm bảo không bị trôi lên trên quá màn hình (nếu grid dài)
+                        if (top < 0) top = 10; 
+
+                        $dlg.css({ 
+                            "left": left + "px", 
+                            "top": top + "px" 
+                        });
+                    };
+                    gridMaster.jqGrid('filterToolbar', { searchOnEnter: false, stringResult: true });
+                    gridMaster.jqGrid('navGrid', `#papergridMaster`,
+                        {
+                            del: false,
+                            add: true,
+                            edit: true,
+                            search: false,
+                            view: false,
+                            refresh: false
+                        },
+                        {
+                            beforeShowForm: function (formid) {
+                                centerDG(formid, this.id);
+                            },
+                            afterSubmit: function(rs, postdata) {
+                                return showMsgDialog(rs);
+                            }
+                        },
+                        {
+                            beforeShowForm: function (formid) {
+                                centerDG(formid, this.id);
+                            },
+                            afterSubmit: function(rs, postdata) {
+                                return showMsgDialog(rs);
+                            }
+                        },
+                        {
+                            
+                        },
+                        {
+
+                        },
+                        {
+
+                        }
+                    );
+
+                    gridMaster.jqGrid('navButtonAdd', '#papergridMaster', {
+                        caption: "",
+                        buttonicon: "ui-icon-trash",
+                        title: "Xóa dòng này",
+                        onClickButton: function () {
+                            var rowid = gridMaster.jqGrid('getGridParam', 'selrow');
+        
+                            if (!rowid) {
+                                // Ở đây bạn có thể để trống để nó "im lặng" hoàn toàn
+                                // Hoặc log ra console để kiểm tra
+                                alert("Người dùng chưa chọn dòng cần xóa");
+                                return;
+                            }
+
+                            // Nếu có chọn dòng, thì mới gọi lệnh xóa của jqGrid
+                            gridMaster.jqGrid('delGridRow', rowid, {
+                                // Cấu hình các tùy chọn xóa ở đây nếu cần
+                                reloadAfterSubmit: true,
+                                beforeShowForm: function (formid) {
+                                    centerDG(formid, gridMaster.attr('id'));
+                                },
+                                afterSubmit: function(rs, postdata) {
+                                    return showMsgDialog(rs);
+                                }
+                            });
+                        }
+                    });
+                },
+                close: function () {
+                    $(this).dialog('destroy').remove();
+                },
+                buttons:
+                    [{
+                        id: 'btn-close_',
+                        text: 'Thoát',
+                        click: function () {
+                            $(this).dialog("destroy").remove();
+                        }
+                    }]
+            });
+        }
+    });
 </script>

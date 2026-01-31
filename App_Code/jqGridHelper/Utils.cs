@@ -167,7 +167,7 @@ namespace jqGridHelper
             return result;
         }
 
-        public static string taoChungTuXuatKho(md_doitackinhdoanh dtkd, LinqDBDataContext db = null)
+        public static string taoChungTuXuatKho(md_doitackinhdoanh dtkd, LinqDBDataContext db = null, string sct_giucho = "")
         {
             if (db == null)
                 db = new LinqDBDataContext();
@@ -199,10 +199,65 @@ namespace jqGridHelper
             string kihieuKH = "[MaKH]", sodcgan = chungtu.so_duocgan.Value.ToString();
             if (chungtu.tiento.Contains(kihieuKH))
                 tiento = tiento.Replace(kihieuKH, makhachhang);
-            if (sodcgan.Substring(0, 1) != "0")
-                sodcgan = sodcgan.Substring(1);
-            result = $"{tiento} {sodcgan}-{chungtu.hauto}";
-            chungtu.so_duocgan = chungtu.so_duocgan + 1;
+
+            if (string.IsNullOrWhiteSpace(sct_giucho))
+            {
+                if (sodcgan.Substring(0, 1) != "0")
+                    sodcgan = sodcgan.Substring(1);
+                result = $"{tiento} {sodcgan}-{chungtu.hauto}";
+                var sdg = chungtu.so_duocgan.GetValueOrDefault(0);
+                while (kiemtratrungSCT(db, "Invoice", result) || kiemtratrungSCT_GiuCho(db, "Invoice", sodcgan))
+                {
+                    chungtu.so_duocgan = chungtu.so_duocgan + 1;
+                    sodcgan = chungtu.so_duocgan.Value.ToString();
+                    if (sodcgan.Substring(0, 1) != "0")
+                        sodcgan = sodcgan.Substring(1);
+                    result = $"{tiento} {sodcgan}-{chungtu.hauto}";
+                }
+                chungtu.so_duocgan = chungtu.so_duocgan + 1;
+            }
+            else
+            {
+                result = $"{tiento} {sct_giucho}-{chungtu.hauto}";
+                if (kiemtratrungSCT(db, "Invoice", result))
+                {
+                    throw new Exception($@"SCT ""{sct_giucho}"" đã được lập Invoice trước đó");
+                }
+
+                var sct = db.md_sochungtugiuchos.Where(s => s.socangiu == sct_giucho).FirstOrDefault();
+                if(sct == null)
+                {
+                    throw new Exception($@"Không tìm thấy SCT ""{sct_giucho}"" trong danh sách giữ chỗ, hãy làm mới và thử lại");
+                }
+
+                db.md_sochungtugiuchos.DeleteOnSubmit(sct);
+            }
+            return result;
+        }
+
+        public static bool kiemtratrungSCT(LinqDBDataContext db, string loai, string sct)
+        {
+            bool result = false;
+            if(loai == "Invoice")
+            {
+                var ctxk = db.c_packinginvoices.Where(s => s.so_inv == sct).FirstOrDefault();
+                if (ctxk != null)
+                {
+                    result = true;
+                }
+            }
+
+            return result;
+        }
+
+        public static bool kiemtratrungSCT_GiuCho(LinqDBDataContext db, string loai, string sct)
+        {
+            bool result = false;
+            var ctxk = db.md_sochungtugiuchos.Where(s => s.socangiu == sct & s.loai == loai).FirstOrDefault();
+            if (ctxk != null)
+            {
+                result = true;
+            }
 
             return result;
         }
@@ -290,14 +345,15 @@ namespace jqGridHelper
             return result;
         }
 
-        public static string genericNumberDoc(string doc, int number_length = 3)
+        public static string genericNumberDoc(string doc, int number_length = 3, bool kocongthem = false)
         {
             try
             {
                 int sr = int.Parse(doc);
-                sr = sr + 1;
-                string result = sr.ToString();
+                if(!kocongthem)
+                    sr = sr + 1;
 
+                string result = sr.ToString();
                 while (result.Length < number_length)
                 {
                     result = "0" + result;

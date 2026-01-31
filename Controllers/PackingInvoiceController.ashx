@@ -536,13 +536,14 @@ public class PackingInvoiceController : IHttpHandler
         try
         {
             var hd = context.Request.Form["hoatdong"].removeAllSpaceOrTrimText(false).ToNullableBool();
-            String discount, giatricong, giatritru, handling_fee, giatritru_po, giatricong_po;
+            String discount, giatricong, giatritru, handling_fee, giatritru_po, giatricong_po, so_inv;
             discount = context.Request.Form["discount"];
             giatricong = context.Request.Form["giatri_cong"];
             giatritru = context.Request.Form["giatri_tru"];
             giatritru_po = context.Request.Form["giatritru_po"];
             giatricong_po = context.Request.Form["giatricong_po"];
             handling_fee = context.Request.Form["handling_fee"];
+            so_inv = context.Request.Form["so_inv"];
             //--
             c_packinginvoice m = db.c_packinginvoices.Single(p => p.c_packinginvoice_id == context.Request.Form["id"]);
             string ngayMTK = context.Request.Form["ngay_motokhai"];
@@ -560,7 +561,14 @@ public class PackingInvoiceController : IHttpHandler
                 goto EndEventHandler;
             }
 
+            if(jqGridHelper.Utils.kiemtratrungSCT(db, "INV", so_inv))
+            {
+                msg = $@"Số INV ""{so_inv}"" đã tồn tại trong chương trình";
+                goto EndEventHandler;
+            }
+
             //Cot 1
+            m.so_inv = so_inv;
             m.ngaylap = context.Request.Form["ngaylap"].removeAllSpaceOrTrimText(true).ToNullableDate();
             m.mv = context.Request.Form["mv"].removeAllSpaceOrTrimText(true);
             m.etd = context.Request.Form["etd"].removeAllSpaceOrTrimText(true).ToNullableDate();

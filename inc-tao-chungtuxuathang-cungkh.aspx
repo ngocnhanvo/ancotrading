@@ -550,7 +550,7 @@
 								data["txtSoInvoice"] = $(form + " #txtKHSoInvoice").val();
 								data["txtNgayLap"] = $(form + " #txtKHNgayLap").val();
 								data["txtSoTau"] = $(form + " #txtKHSoTau").val();
-								//data["selNoiDi"] = $(form + " #selKHNoiDi").val();
+								data["txtSCT_giucho"] = $(form + " #selSCT_giucho").val();
 								data["txtNoiDen"] = $(form + " #txtKHNoiDen").val();
 								data["txtSoVanDon"] = $(form + " #txtKHSoVanDon").val();
 								data["txtNgayVanDon"] = $(form + " #txtKHNgayVanDon").val();
@@ -613,25 +613,15 @@
                 </tr>
                 
                 <tr>
-                    <td><%--Nơi Đi(From)--%></td>
+                    <td style="user-select: none">
+                        <span>SCT đã giữ chỗ</span>
+                        <i title="Tải lại danh sách số chứng từ giữ chỗ" onclick="ctxk_cungpo_loadsctgiucho(this)" style="cursor:pointer; margin-left:10px; color:#7c7cfe;" class="fas fa-sync"></i>
+                    </td>
                     <td></td>
                     <td>
-                        <%--<% 
-                            String selFrom = "select md_cangbien_id, ten_cangbien from md_cangbien order by ten_cangbien asc";
-                            System.Data.SqlClient.SqlDataReader rdFrom = mdbc.ExecuteReader(selFrom);
-                        %>
-                        <select id="selKHNoiDi" name="selKHNoiDi">
-                           <% if (rdFrom.HasRows)
-                              {
-                                  while (rdFrom.Read())
-                                  {
-                           %>     
-                                <option value="<%= rdFrom[0] %>"><%= rdFrom[1]%></option>
-                           <%     }
-                              }
-                              rdFrom.Close();
-                           %>
-                        </select>--%>
+                        <select id="selSCT_giucho" name="selSCT_giucho" style="min-width: 100px">
+                           <option>Đang tải...</option>
+                        </select>
                     </td>
                     <td>Nơi Đến(To)<b style="color:red">(*)</b></td>
                     <td>:</td>
@@ -694,6 +684,22 @@
             </table>
     </div>
 </div>
+<script>
+    var ctxk_cungpo_loadsctgiucho = function ($this) {
+        if ($this)
+            $($this).addClass('fa-spin');
+        $.get(`Views/chungtuxuatkhoNV/Controller_INV_GiuchoSCT.ashx`, { action: 'options'}, function (rs) {
+            $('#selSCT_giucho').html(rs);
+           
+            if ($this) {
+                setTimeout(function () {
+                    $($this).removeClass('fa-spin');
+                }, 1000);
+            }
+        });
+    };
+    ctxk_cungpo_loadsctgiucho();
+</script>
 <!-- Level 1 Center -->
 
 

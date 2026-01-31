@@ -24,6 +24,7 @@ public class TaoPackingListController : IHttpHandler {
             String txtNgayVanDon = context.Request.Form["p[txtNgayVanDon]"];
             String phieuxuatkho = "'" + arrayPhieuXuat.Replace(",", "','").Replace(" ", "") + "'";
             String txtSoTau = context.Request.Form["p[txtSoTau]"];
+            String txtSCT_giucho = context.Request.Form["p[txtSCT_giucho]"];
             decimal totaldiscount = 0;
             decimal totalnet = 0;
 
@@ -41,7 +42,7 @@ public class TaoPackingListController : IHttpHandler {
             String md_cangbien_id = donhangM.md_cangbien_id;
             String md_doitackinhdoanh_id = donhangM.md_doitackinhdoanh_id;
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == md_doitackinhdoanh_id).FirstOrDefault();
-            String txtSoInvoice = jqGridHelper.Utils.taoChungTuXuatKho(dtkd, db);
+            String txtSoInvoice = jqGridHelper.Utils.taoChungTuXuatKho(dtkd, db, txtSCT_giucho);
 
             var cangbien = db.md_cangbiens.Where(s => s.md_cangbien_id == md_cangbien_id).FirstOrDefault();
             c_donhang_spd spd = null;
