@@ -5,6 +5,7 @@ using System.IO;
 using System.Web;
 using System.Linq;
 using System.Web.Script.Serialization;
+using ICSharpCode.SharpZipLib.Zip;
 
 public class API_System : IHttpHandler
 {
@@ -66,16 +67,64 @@ public class API_System : IHttpHandler
 
         if (File.Exists(path))
         {
+            long fileSize = new FileInfo(path).Length;
+            long limit = 75 * 1024 * 1024; // 75MB tính bằng bytes
+            string finalPath = path;
+            string downloadName = name;
+
+            bool isZipped = false;
+            string zipPath = path + ".zip";
+
+            if (fileSize > limit)
+            {
+                // Sử dụng FastZip của SharpZipLib để nén nhanh
+                FastZip fz = new FastZip();
+
+                // Tạo một thư mục tạm vì FastZip thường nén theo thư mục
+                // Hoặc dùng ZipOutputStream để nén đúng 1 file duy nhất:
+                using (ZipOutputStream s = new ZipOutputStream(File.Create(zipPath)))
+                {
+                    s.SetLevel(5); // Mức nén từ 0-9
+                    byte[] buffer = new byte[4096];
+                    ZipEntry entry = new ZipEntry(name); // Tên file bên trong file zip
+                    entry.DateTime = DateTime.Now;
+                    s.PutNextEntry(entry);
+
+                    using (FileStream fs = File.OpenRead(path))
+                    {
+                        int sourceBytes;
+                        do
+                        {
+                            sourceBytes = fs.Read(buffer, 0, buffer.Length);
+                            s.Write(buffer, 0, sourceBytes);
+                        } while (sourceBytes > 0);
+                    }
+                    s.Finish();
+                    s.Close();
+                }
+
+                finalPath = zipPath;
+                downloadName = name + ".zip";
+                isZipped = true;
+            }
+
             string encodedFileName = Uri.EscapeDataString(name);
             context.Response.Clear();
             context.Response.Buffer = true;
             context.Response.AddHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFileName);
+            context.Response.ContentType = isZipped ? "application/zip" : "application/octet-stream";
             context.Response.Charset = "";
             context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
-            context.Response.WriteFile(path);
+            context.Response.WriteFile(finalPath);
             context.Response.Flush();
-            if (remove)
+            
+            // Dọn dẹp file
+            if (isZipped && File.Exists(zipPath))
+                File.Delete(zipPath);
+
+            if (remove && File.Exists(path))
                 File.Delete(path);
+
             context.Response.End();
         }
         else
@@ -204,7 +253,7 @@ public class API_System : IHttpHandler
         try
         {
             var msp = context.Request.QueryString["msp"];
-			var notimg = context.Request.QueryString["notimg"] == "true";
+            var notimg = context.Request.QueryString["notimg"] == "true";
             var showlink = context.Request.QueryString["showlink"] == "true";
             var path = ExcuteSignalRStatic.getImageProduct(msp, notimg);
             var url = ExcuteSignalRStatic.mapPathSignalR("~/" + path);
