@@ -77,7 +77,7 @@
                         id: "btn-print-ok",
                         text: "In",
                         click: function () {
-                            var printType = $('input[name=rdoPrintType]:checked', '#dialog-print-pkli').val();
+                            var printType = $('input[name=rdoPrintType]:checked', `#${name}`).val();
 
                             var printURL = "PrintControllers/";
                             var windowSize = "width=700,height=700,scrollbars=yes";
