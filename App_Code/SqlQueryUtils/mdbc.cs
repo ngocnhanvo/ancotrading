@@ -166,20 +166,26 @@ public static class mdbc
 
     public static DataTable Fill(DataTable dt, String sql, params object[] nameValue)
     {
-        SqlCommand cmd = mdbc.CreateCommand(sql, nameValue);
-        cmd.CommandTimeout = 50000;
-        SqlDataAdapter da = new SqlDataAdapter(cmd);
-        da.Fill(dt);
-        return dt;
+        using (SqlCommand cmd = mdbc.CreateCommand(sql, nameValue))
+        {
+            cmd.CommandTimeout = 50000;
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            da.Fill(dt);
+            da.Dispose();
+            return dt;
+        }
     }
 
     public static DataTable Fill(DataTable dt, String sql, bool procdure, params object[] nameValue)
     {
-        SqlCommand cmd = mdbc.CreateCommand(sql, true, nameValue);
-        cmd.CommandTimeout = 50000;
-        SqlDataAdapter da = new SqlDataAdapter(cmd);
-        da.Fill(dt);
-        return dt;
+        using (SqlCommand cmd = mdbc.CreateCommand(sql, true, nameValue))
+        {
+            cmd.CommandTimeout = 50000;
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            da.Fill(dt);
+            da.Dispose();
+            return dt;
+        }
     }
 
     public static DataTable GetData(String sql, params object[] nameValue)
@@ -194,64 +200,75 @@ public static class mdbc
 
     public static int ExcuteNonQuery(String sql, params object[] nameValue)
     {
-        SqlCommand cmd = mdbc.CreateCommand(sql,  nameValue);
-        cmd.CommandTimeout = 50000;
-                cmd.Connection.Open();
-                int rows = cmd.ExecuteNonQuery();
-                cmd.Connection.Close();
-        return rows;    
+        using (SqlCommand cmd = mdbc.CreateCommand(sql, nameValue))
+        {
+            cmd.CommandTimeout = 50000;
+            cmd.Connection.Open();
+            int rows = cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+            return rows;
+        }
     }
 
     public static int ExcuteNonProcedure(String sql, params object[] nameValue)
-    { 
-        SqlCommand cmd = mdbc.CreateCommand(sql, true, nameValue);
-        cmd.CommandTimeout = 50000;
-        cmd.Connection.Open();
-        int rows = cmd.ExecuteNonQuery();
-        cmd.Connection.Close();
-        return rows;
+    {
+        using (SqlCommand cmd = mdbc.CreateCommand(sql, true, nameValue))
+        {
+            cmd.CommandTimeout = 50000;
+            cmd.Connection.Open();
+            int rows = cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+            return rows;
+        }
     }
 
     public static SqlDataReader ExecuteReader(String sql, params object[] nameValue)
     {
-        SqlCommand cmd = CreateCommand(sql,nameValue);
-        cmd.CommandTimeout = 50000;
-        cmd.Connection.Open();
-        SqlDataReader rd = cmd.ExecuteReader();
-        
-        return rd;
+        using (SqlCommand cmd = CreateCommand(sql, nameValue))
+        {
+            cmd.CommandTimeout = 50000;
+            cmd.Connection.Open();
+            SqlDataReader rd = cmd.ExecuteReader();
+            return rd;
+        }
     }
 
     // Lấy một giá trị đơn dựa vào câu lệnh sql và danh sách tham số
     public static object ExecuteScalar(String sql, params object[] parameters)
     {
-        SqlCommand cmd = CreateCommand(sql, parameters);
-        cmd.CommandTimeout = 50000;
-        cmd.Connection.Open();
-        object value = cmd.ExecuteScalar();
-        cmd.Connection.Close();
-        return value;
+        using (SqlCommand cmd = CreateCommand(sql, parameters))
+        {
+            cmd.CommandTimeout = 50000;
+            cmd.Connection.Open();
+            object value = cmd.ExecuteScalar();
+            cmd.Connection.Close();
+            return value;
+        }
     }
 	
 	public static object ExecuteScalar2(String sql, params object[] parameters)
     {
-        SqlCommand cmd = CreateCommand2(sql, parameters);
-        cmd.CommandTimeout = 50000;
-        cmd.Connection.Open();
-        object value = cmd.ExecuteScalar();
-        cmd.Connection.Close();
-        return value;
+        using (SqlCommand cmd = CreateCommand2(sql, parameters))
+        {
+            cmd.CommandTimeout = 50000;
+            cmd.Connection.Open();
+            object value = cmd.ExecuteScalar();
+            cmd.Connection.Close();
+            return value;
+        }
     }
 
     // Lấy một giá trị đơn dựa vào câu lệnh sql và danh sách tham số
     public static object ExecuteScalarProcedure(String sql, params object[] parameters)
     {
-        SqlCommand cmd = CreateCommand(sql, true, parameters);
-        cmd.CommandTimeout = 50000;
-        cmd.Connection.Open();
-        object value = cmd.ExecuteScalar();
-        cmd.Connection.Close();
-        return value;
+        using (SqlCommand cmd = CreateCommand(sql, true, parameters))
+        {
+            cmd.CommandTimeout = 50000;
+            cmd.Connection.Open();
+            object value = cmd.ExecuteScalar();
+            cmd.Connection.Close();
+            return value;
+        }
     }
 	
 	private static SqlCommand createParramsSQL(SqlCommand cmd, string parram, string type, object valueP)

@@ -399,8 +399,10 @@ declare @str nvarchar(MAX) = @folder + @file
 BACKUP DATABASE <%=tenDB%>
 TO DISK = @str
    WITH FORMAT,
+      COMPRESSION,
       MEDIANAME = 'SQLServerBackups',
-      NAME = 'Full Backup of <%=tenDB%>';`);
+      NAME = 'Full Backup of <%=tenDB%>',
+      STATS = 10;`);
                         break;
                     case "REFRESH MENU":
                         let item = $('#jqxTree').jqxTree('getSelectedItem');

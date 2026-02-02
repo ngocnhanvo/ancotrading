@@ -168,7 +168,7 @@
 
     function activePackingListInvoieNV() {
         var msg = "";
-        var id = $('#grid_ds_plivn').jqGrid('getGridParam', 'selrow');
+        var id = $('#grid_ds_ctxkNV').jqGrid('getGridParam', 'selrow');
 
         if (id == null) {
             msg = "Bạn hãy chọn 1 Packing List - Invoice mà bạn muốn hiệu lực.!";
@@ -224,7 +224,7 @@
                                 $.get("Controllers/PackingInvoiceController.ashx?action=activepacking&pakId=" + id, function (result) {
                                     //$('#dialog-caution').css({ 'color': 'green' });
                                     $('#dialog-active-packinglist').find('#dialog-caution').html(result);
-                                    $('#grid_ds_plivn').jqGrid().trigger('reloadGrid');
+                                    $('#grid_ds_ctxkNV').jqGrid().trigger('reloadGrid');
                                 });
                             }
                         },
@@ -241,7 +241,7 @@
     }
 
     function sendMailPKLINV() {
-        var pklId = $('#grid_ds_plivn').jqGrid('getGridParam', 'selrow');
+        var pklId = $('#grid_ds_ctxkNV').jqGrid('getGridParam', 'selrow');
         if (pklId == null) {
             alert('Hãy chọn một Packing List - Invoice mà bạn muốn gửi email!');
         } else {

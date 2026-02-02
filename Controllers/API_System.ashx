@@ -6,6 +6,7 @@ using System.Web;
 using System.Linq;
 using System.Web.Script.Serialization;
 using ICSharpCode.SharpZipLib.Zip;
+using System.Collections.Generic;
 
 public class API_System : IHttpHandler
 {
@@ -98,6 +99,7 @@ public class API_System : IHttpHandler
                             sourceBytes = fs.Read(buffer, 0, buffer.Length);
                             s.Write(buffer, 0, sourceBytes);
                         } while (sourceBytes > 0);
+                        fs.Close();
                     }
                     s.Finish();
                     s.Close();
@@ -108,24 +110,37 @@ public class API_System : IHttpHandler
                 isZipped = true;
             }
 
-            string encodedFileName = Uri.EscapeDataString(name);
+            string encodedFileName = Uri.EscapeDataString(downloadName);
             context.Response.Clear();
-            context.Response.Buffer = true;
+            context.Response.Buffer = false;
             context.Response.AddHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFileName);
             context.Response.ContentType = isZipped ? "application/zip" : "application/octet-stream";
             context.Response.Charset = "";
             context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
-            context.Response.WriteFile(finalPath);
+            context.Response.TransmitFile(finalPath);
             context.Response.Flush();
-            
-            // Dọn dẹp file
-            if (isZipped && File.Exists(zipPath))
-                File.Delete(zipPath);
 
-            if (remove && File.Exists(path))
-                File.Delete(path);
+            // Lưu danh sách file cần xóa vào Items (tạm thời)
+            var filesToDelete = new List<string> { finalPath };
+            if (remove) filesToDelete.Add(path); // Xóa cả file gốc nếu cần
 
-            context.Response.End();
+            context.Items["FilesToDelete"] = filesToDelete;
+            context.ApplicationInstance.EndRequest += (s, e) => {
+                var httpContext = ((HttpApplication)s).Context;
+                var toDelete = httpContext.Items["FilesToDelete"] as List<string>;
+                if (toDelete != null)
+                {
+                    foreach (var filePath in toDelete)
+                    {
+                        try {
+                            if (File.Exists(filePath))
+                                File.Delete(filePath);
+                        } catch { /* Có thể log lại nếu file vẫn bị lock */ }
+                    }
+                }
+            };
+
+            context.ApplicationInstance.CompleteRequest();
         }
         else
         {
