@@ -611,6 +611,7 @@ public class PackingInvoiceController : IHttpHandler
             var hoadon = db.c_hoadons.Where(s => s.c_packinginvoice_id == m.c_packinginvoice_id).FirstOrDefault();
             if (hoadon != null)
             {
+                hoadon.so_inv = m.so_inv;
                 hoadon.ngayhoadon = m.ngay_motokhai;
                 hoadon.ngayphathanh = m.ngay_motokhai;
                 hoadon.tuongduongUSD = m.totalgross;
