@@ -569,6 +569,7 @@ public class PackingInvoiceController : IHttpHandler
 
             //Cot 1
             m.so_inv = so_inv;
+            m.so_pkl = m.so_inv;
             m.ngaylap = context.Request.Form["ngaylap"].removeAllSpaceOrTrimText(true).ToNullableDate();
             m.mv = context.Request.Form["mv"].removeAllSpaceOrTrimText(true);
             m.etd = context.Request.Form["etd"].removeAllSpaceOrTrimText(true).ToNullableDate();
