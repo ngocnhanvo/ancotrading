@@ -7,62 +7,60 @@
             var pId = $('#grid_ds_ctxkNV').jqGrid('getGridParam', 'selrow');
             var name = 'dialog-print-pkli-ctxk';
             var title = 'Trích xuất dữ liệu';
-            var content = '<table style="width:100%">' +
-                '<tr>' +
-                '<td>' +
-                '<input id="printPkliList" type="radio" name="rdoPrintType" value="printPkliList" />' +
-                '<label for="printPkliList">In Sale Contract</label>' +
-                '</td>' +
-
-                '<td>' +
-                '<input id="printPackingList" type="radio" name="rdoPrintType" value="printPackingList" checked="checked" />' +
-                '<label for="printPackingList">In Packing List</label>' +
-                '</td>' +
-                '</tr>' +
-                '<tr>' +
-                '<td>' +
-                '<input id="printInvoice" type="radio" name="rdoPrintType" value="printInvoice" />' +
-                '<label for="printInvoice">In Invoice</label>' +
-                '</td>' +
-
-                '<td>' +
-                '<input id="printHQ" type="radio" name="rdoPrintType" value="printHQ" />' +
-                '<label for="printHQ">In Tờ Khai Hải Quan</label>' +
-                '</td>' +
-                '</tr>' +
-                '<tr>' +
-                '<td>' +
-                '<input id="printKhaiHQ" type="radio" name="rdoPrintType" value="printKhaiHQ" />' +
-                '<label for="printKhaiHQ">In Danh Mục Khai Hải Quan (Mẫu 1)</label>' +
-                '</td>' +
-                '<td>' +
-                '<input id="printPaymentRequest" type="radio" name="rdoPrintType" value="printPaymentRequest" />' +
-                '<label for="printPaymentRequest">In mẫu payment request</label>' +
-                '</td>' +
-                '</tr>' +
-
-                '<tr>' +
-                '<td>' +
-                '<input id="printKhaiHQ02" type="radio" name="rdoPrintType" value="printKhaiHQ02" />' +
-                '<label for="printKhaiHQ02">In Danh Mục Khai Hải Quan (Mẫu 2)</label>' +
-                '</td>' +
-                '<td>' +
-                '<input id="printBL" type="radio" name="rdoPrintType" value="printBL" />' +
-                '<label for="printBL">In Mẫu BL</label>' +
-                '<div id="md_ncu_id" style="display:none">' + result + '</div>' +
-                '</td>' +
-                '</tr>' +
-
-                '<tr>' +
-                '<td>' +
-                '<input id="printKhaiHQ03" type="radio" name="rdoPrintType" value="printKhaiHQ03" />' +
-                '<label for="printKhaiHQ03">In Danh Mục Khai Hải Quan (HScode)</label>' +
-                '</td>' +
-                '<td>' +
-
-                '</td>' +
-                '</tr>' +
-                '</table>' + '<script>$(function(){ $("[name=\'rdoPrintType\']").bind("click", function () { if($(this).attr("value") == "printBL"){ $("#md_ncu_id").css("display","block");  }else{  $("#md_ncu_id").css("display","none");  }  }); });<\/script>';
+            var content = `
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td>
+                        <input id="printPkliList" type="radio" name="rdoPrintType" value="printPkliList" />
+                        <label for="printPkliList">In Sale Contract</label>
+                    </td>
+                    <td>
+                        <input id="printPackingList" type="radio" name="rdoPrintType" value="printPackingList" checked="checked" />
+                        <label for="printPackingList">In Packing List</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="printInvoice" type="radio" name="rdoPrintType" value="printInvoice" />
+                        <label for="printInvoice">In Invoice</label>
+                    </td>
+                    <td>
+                        <input id="printHQ" type="radio" name="rdoPrintType" value="printHQ" />
+                        <label for="printHQ">In Tờ Khai Hải Quan</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="printKhaiHQ" type="radio" name="rdoPrintType" value="printKhaiHQ" />
+                        <label for="printKhaiHQ">In Danh Mục Khai Hải Quan (Mẫu 1)</label>
+                    </td>
+                    <td>
+                        <input id="printPaymentRequest" type="radio" name="rdoPrintType" value="printPaymentRequest" />
+                        <label for="printPaymentRequest">In mẫu payment request</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="printKhaiHQ02" type="radio" name="rdoPrintType" value="printKhaiHQ02" />
+                        <label for="printKhaiHQ02">In Danh Mục Khai Hải Quan (Mẫu 2)</label>
+                    </td>
+                    <td>
+                        <input id="printBL" type="radio" name="rdoPrintType" value="printBL" />
+                        <label for="printBL">In Mẫu BL</label>
+                        <div id="md_ncu_id" style="display:none">${result}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="printKhaiHQ03" type="radio" name="rdoPrintType" value="printKhaiHQ03" />
+                        <label for="printKhaiHQ03">In Danh Mục Khai Hải Quan (HScode)</label>
+                    </td>
+                    <td>
+                        <input id="printSPDT" type="radio" name="rdoPrintType" value="printSPDT" />
+                        <label for="printSPDT">In Shipping Details</label>
+                    </td>
+                </tr>
+            </table>`;
 
             $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
             $('#' + name).dialog({
@@ -71,6 +69,14 @@
                 , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                    $("[name='rdoPrintType']").bind("click", function () {
+                        if ($(this).attr("value") == "printBL") {
+                            $("#md_ncu_id").css("display", "block");
+                        }
+                        else {
+                            $("#md_ncu_id").css("display", "none");
+                        }
+                    });
                 }
                 , buttons: [
                     {
@@ -81,76 +87,58 @@
 
                             var printURL = "PrintControllers/";
                             var windowSize = "width=700,height=700,scrollbars=yes";
-                            if (typeof printType != 'undefined') {
-                                if (printType == "printPackingList") {
-                                    if (pId != null) {
-                                        printURL += "InPackingList/";
-                                        window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Packing List", windowSize);
-                                    } else {
-                                        alert('Bạn chưa chọn packing lsit - invoice cần in phiếu packing list');
-                                    }
-                                } else if (printType == 'printInvoice') {
-                                    if (pId != null) {
-                                        printURL += "InInvoice/";
-                                        window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Invoice", windowSize);
-                                    } else {
-                                        alert('Bạn chưa chọn packing lsit - invoice cần in phiếu invoice');
-                                    }
-                                } else if (printType == 'printHQ') {
-                                    if (pId != null) {
-                                        printURL += "InToKhaiHQ/";
-                                        window.open(printURL + "?c_packinglist_id=" + pId, "In Tờ Khai Hải Quan", windowSize);
-                                    } else {
-                                        alert('Bạn chưa chọn packing lsit - invoice cần in phiếu tờ khai hải quan');
-                                    }
-                                } else if (printType == 'printKhaiHQ') {
-                                    if (pId != null) {
-                                        printURL += "InDanhMucKhaiHQ/";
-                                        window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);
-                                    } else {
-                                        alert('Bạn chưa chọn packing lsit - invoice cần in phiếu tờ khai hải quan');
-                                    }
-                                } else if (printType == 'printKhaiHQ02') {
-                                    if (pId != null) {
-                                        printURL += "InDanhMucKhaiHQ02/";
-                                        window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);
-                                    } else {
-                                        alert('Bạn chưa chọn packing lsit - invoice cần in phiếu tờ khai hải quan');
-                                    }
-                                } else if (printType == 'printBL') {
-                                    if (pId != null) {
-                                        printURL += "InBL/";
-                                        window.open(printURL + "?c_packinglist_id=" + pId + "&md_doitackinhdoanh_id=" + $('#md_ncu_id').find('select').val(), "In Mẫu BL", windowSize);
-                                    } else {
-                                        alert('Bạn chưa chọn packing lsit - invoice cần in phiếu book container');
-                                    }
-                                } else if (printType == 'printPaymentRequest') {
-                                    if (pId != null) {
-                                        printURL += "InPaymentRequest/";
-                                        window.open("SendMail/PaymentRequest.aspx?pklId=" + pId, "In Mẫu PaymentRequest", windowSize);
-                                        //window.open(printURL + "?c_packinglist_id=" + pId, "In Mẫu PaymentRequest", windowSize);
-                                    } else {
-                                        alert('Bạn chưa chọn packing lsit - invoice cần in phiếu payment request');
-                                    }
-                                } else if (printType == 'printKhaiHQ03') {
-                                    if (pId != null) {
-                                        printURL += "InDanhMucKhaiHQ03/";
-                                        window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan (HScode)", windowSize);
-                                        //window.open(printURL + "?c_packinglist_id=" + pId, "In Mẫu PaymentRequest", windowSize);
-                                    } else {
-                                        alert('Bạn chưa chọn packing lsit - invoice cần in phiếu tờ khai hải quan');
-                                    }
-                                }
-                                else {
-                                    if (pId != null) {
-                                        printURL += "InSaleContact/";
-                                        window.open(printURL + "?c_packinglist_id=" + pId, "In Sale Contract", windowSize);
-                                    } else {
-                                        alert('Bạn chưa chọn packing lsit - invoice cần in phiếu tờ khai hải quan');
-                                    }
-                                }
-                            } else {
+                            if (typeof printType == 'undefined') {
                                 alert('Hãy chọn cách in.!');
+                                return;
+                            }
+
+                            let kiemtra_packingINVDaChon = function () {
+                                if (!pId) {
+                                    alert('Bạn chưa chọn packing lsit - invoice cần in phiếu packing list');
+                                    throw new Error("Chưa chọn packing list");
+                                }
+                            };
+                            kiemtra_packingINVDaChon();
+
+                            if (printType == "printPackingList") {
+                                printURL += "InPackingList/";
+                                window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Packing List", windowSize);    
+                            }
+                            else if (printType == 'printInvoice') {
+                                printURL += "InInvoice/";
+                                window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Invoice", windowSize);
+                            }
+                            else if (printType == 'printHQ') {
+                                printURL += "InToKhaiHQ/";
+                                window.open(printURL + "?c_packinglist_id=" + pId, "In Tờ Khai Hải Quan", windowSize);
+                            }
+                            else if (printType == 'printKhaiHQ') {
+                                printURL += "InDanhMucKhaiHQ/";
+                                window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);   
+                            }
+                            else if (printType == 'printKhaiHQ02') {
+                                printURL += "InDanhMucKhaiHQ02/";
+                                window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);
+                            }
+                            else if (printType == 'printBL') {
+                                printURL += "InBL/";
+                                window.open(printURL + "?c_packinglist_id=" + pId + "&md_doitackinhdoanh_id=" + $('#md_ncu_id').find('select').val(), "In Mẫu BL", windowSize);
+                            }
+                            else if (printType == 'printPaymentRequest') {
+                                printURL += "InPaymentRequest/";
+                                window.open("SendMail/PaymentRequest.aspx?pklId=" + pId, "In Mẫu PaymentRequest", windowSize);
+                            }
+                            else if (printType == 'printKhaiHQ03') {
+                                printURL += "InDanhMucKhaiHQ03/";
+                                window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan (HScode)", windowSize);
+                            }
+                            else if (printType == 'printSPDT') {
+                                printURL += "InInvoice/InSPDT.aspx";
+                                window.open(printURL + "?c_packinglist_id=" + pId, "In Shipping Details", windowSize);
+                            }
+                            else {
+                                printURL += "InSaleContact/";
+                                window.open(printURL + "?c_packinglist_id=" + pId, "In Sale Contract", windowSize);
                             }
                         }
                     }

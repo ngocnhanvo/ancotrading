@@ -166,7 +166,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 }).ToList();
                 foreach (var log in logs)
                 {
-                    //log.nexxdecor_check = true;
+                    log.nexxdecor_check = true;
                 }
                 db.SubmitChanges();
                 msg = "Lấy logs thành công";
