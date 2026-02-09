@@ -287,10 +287,10 @@ public class PartnerController : IHttpHandler
 
         if (incc.Equals("on") || incc.Equals("true"))
         { ncc = true; }
-        md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(p => p.ma_dtkd.Equals(context.Request.Form["ma_dtkd"]) && !p.md_doitackinhdoanh_id.Equals(context.Request.Form["md_doitackinhdoanh_id"]));
-        if (dtkd == null)
+        md_doitackinhdoanh m = db.md_doitackinhdoanhs.FirstOrDefault(p => p.ma_dtkd.Equals(context.Request.Form["ma_dtkd"]) && !p.md_doitackinhdoanh_id.Equals(context.Request.Form["md_doitackinhdoanh_id"]));
+        if (m == null)
         {
-            md_doitackinhdoanh m = db.md_doitackinhdoanhs.Where(p => p.md_doitackinhdoanh_id == context.Request.Form["id"]).FirstOrDefault();
+            m = db.md_doitackinhdoanhs.Where(p => p.md_doitackinhdoanh_id == context.Request.Form["id"]).FirstOrDefault();
             var mnu = new md_doitackinhdoanh();
             m.CopyPropertiesTo(mnu);
             m.md_loaidtkd_id = context.Request.Form["tenloai"];
@@ -359,9 +359,9 @@ public class PartnerController : IHttpHandler
         md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(p => p.ma_dtkd.Equals(context.Request.Form["ma_dtkd"]));
         if (dtkd == null)
         {
-            md_doitackinhdoanh mnu = new md_doitackinhdoanh
+            dtkd = new md_doitackinhdoanh
             {
-                md_doitackinhdoanh_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                md_doitackinhdoanh_id = Helper.getNewId(),
                 md_loaidtkd_id = context.Request.Form["tenloai"],
                 md_quocgia_id = context.Request.Form["tenqg"],
                 md_khuvuc_id = context.Request.Form["tenkv"],
@@ -393,15 +393,15 @@ public class PartnerController : IHttpHandler
                 ngaycapnhat = DateTime.Now
             };
             
-            var qg = db.md_quocgias.Where(s => s.md_quocgia_id == mnu.md_quocgia_id).FirstOrDefault();
+            var qg = db.md_quocgias.Where(s => s.md_quocgia_id == dtkd.md_quocgia_id).FirstOrDefault();
             if(qg != null)
             {
-                if(!mnu.diachi.Contains($", {qg.ten_quocgia}"))
+                if(!dtkd.diachi.Contains($", {qg.ten_quocgia}"))
                 {
-                    mnu.diachi += $", {qg.ten_quocgia}";
+                    dtkd.diachi += $", {qg.ten_quocgia}";
                 }
             }
-            db.md_doitackinhdoanhs.InsertOnSubmit(mnu);
+            db.md_doitackinhdoanhs.InsertOnSubmit(dtkd);
             VoNgocNhan.API_Data.themLichSuHoatDong(
                 db,
                 HttpContext.Current,
