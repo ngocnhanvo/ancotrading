@@ -88,7 +88,7 @@ public partial class SendMail_PaymentRequest : System.Web.UI.Page
         info.pkl.tienconlai = info.pkl.tienconlai.GetValueOrDefault(0);
         string sql = $@"
             select 
-                N'155/POTTERYPOT-21, 203/POTTERYPOT-21, 205/POTTERYPOT-21, 208/POTTERYPOT-21, 231/POTTERYPOT-21, 311/POTTERYPOT-21, 312/POTTERYPOT-21, 313/POTTERYPOT-21, 315/POTTERYPOT-21, 348/POTTERYPOT-21, 348A/POTTERYPOT-21, 351/POTTERYPOT-21, 491/POTTERYPOT-21, 511/POTTERYPOT-21' as sopo, 
+                N'{dhStr}' as sopo, 
                 N'{DateTime.Now.ToString("dd/MMM/yyyy")}' as ngayguimail, 
                 N'{dtkd.ten_dtkd.Replace("'", "''")}' as tenkh, 
                 N'{info.pkl.commodity}' as chungloai, 
