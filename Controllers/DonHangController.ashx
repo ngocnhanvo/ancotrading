@@ -1341,15 +1341,18 @@ public class DonHangController : IHttpHandler
                 m.nhanvienCT = nvct;
 
                 var codoingaypass = false;
-                if (m.ngaypass == null)
+                if (ngaypass != null)
                 {
-                    m.ngaypass = ngaypass;
-                    codoingaypass = true;
-                }
-                else if (m.ngaypass != ngaypass)
-                {
-                    jqGridHelper.Utils.writeResult(0, "Không thể đổi ngày pass kiểm hóa khi đơn hàng đã hiệu lực và trường đã có giá trị trước đó.");
-                    goto EndEventHandler;
+                    if (m.ngaypass == null)
+                    {
+                        m.ngaypass = ngaypass;
+                        codoingaypass = true;
+                    }
+                    else if (m.ngaypass != ngaypass)
+                    {
+                        jqGridHelper.Utils.writeResult(0, "Không thể đổi ngày pass kiểm hóa khi đơn hàng đã hiệu lực và trường đã có giá trị trước đó.");
+                        goto EndEventHandler;
+                    }
                 }
                 db.SubmitChanges();
 

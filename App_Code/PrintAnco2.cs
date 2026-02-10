@@ -111,7 +111,7 @@ public class PrintAnco2
         return msg;
     }
 
-    public static string exportDataWithType(Task task, string sql, string type, string nameTemp, string rptDisplayName, DevExpress.XtraReports.Web.ReportViewer viewer, bool showMsg)
+    public static string exportDataWithType(Task task, string sql, string type, string nameTemp, string rptDisplayName, DevExpress.XtraReports.Web.ReportViewer viewer, bool showMsg, bool compineF = false)
     {
         sqlsWord = null;
         tblsWord = null;
@@ -128,6 +128,7 @@ public class PrintAnco2
         string msg = "";
         var export = new OfficeToPDF.ExportData();
         export.viewer = viewer;
+        export.compineF = compineF;
         type = string.IsNullOrEmpty(type) ? "0" : type;
         if (type == "0")
         {

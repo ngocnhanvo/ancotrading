@@ -107,6 +107,8 @@ namespace OfficeToPDF
                                                 }
 
                                                 oRangeWrap.ColumnWidth = columnWidth;
+                                                oRangeWrap.Font.Name = oRange.Font.Name;
+                                                oRangeWrap.Font.Size = oRange.Font.Size;
                                                 oRange.Copy(oRangeWrap);
                                                 oRange.Rows.AutoFit();
                                                 var heightATF = double.Parse(oRange.Rows.Height.ToString());

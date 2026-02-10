@@ -21,7 +21,7 @@ namespace OfficeToPDF
         public string fileNameTemp { get; set; }
         public string DisplayName { get; set; }
         public string sqlRun { get; set; }
-
+        public bool? compineF { get; set; }
         public DataTable dt { get; set; }
         public DevExpress.XtraReports.Web.ReportViewer viewer { get; set; }
 
@@ -659,18 +659,34 @@ namespace OfficeToPDF
                         }
                         else
                         {
-                            var xfileRead = new FileStream(urlExcel, FileMode.Open, FileAccess.ReadWrite);
-                            var memoryStream = new MemoryStream();
-                            xfileRead.CopyTo(memoryStream);
-                            xfileRead.Close();
-                            xfileRead.Dispose();
-                            File.Delete(urlExcel);
+                            if (compineF.GetValueOrDefault(false))
+                            {
+                                var link = ExcuteSignalRStatic.mapPathSignalR(string.Format("~/FileUpload/Compine/{0}.xls", Guid.NewGuid().ToString()));
+                                File.Move(urlExcel, link);
+                                var dic = new Dictionary<string, string>();
+                                dic["link"] = link;
+                                dic["name"] = DisplayName;
+                                context.Response.Clear();
+                                context.Response.Write(Newtonsoft.Json.JsonConvert.SerializeObject(dic));
+                                context.Response.Flush();
+                                context.Response.SuppressContent = true;
+                                context.ApplicationInstance.CompleteRequest();
+                            }
+                            else
+                            {
+                                var xfileRead = new FileStream(urlExcel, FileMode.Open, FileAccess.ReadWrite);
+                                var memoryStream = new MemoryStream();
+                                xfileRead.CopyTo(memoryStream);
+                                xfileRead.Close();
+                                xfileRead.Dispose();
+                                File.Delete(urlExcel);
 
-                            context.Response.ContentType = "application/vnd.ms-excel";
-                            context.Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}.xls", DisplayName));
-                            context.Response.Clear();
-                            context.Response.BinaryWrite(memoryStream.ToArray());
-                            context.Response.End();
+                                context.Response.ContentType = "application/vnd.ms-excel";
+                                context.Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}.xls", DisplayName));
+                                context.Response.Clear();
+                                context.Response.BinaryWrite(memoryStream.ToArray());
+                                context.Response.End();
+                            }
                         }
                     }
                 }

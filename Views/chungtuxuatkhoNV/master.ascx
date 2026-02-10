@@ -3,7 +3,7 @@
 
 <script type="text/javascript">
     function funcPrintPKLI_CTXKNV() {
-        $.get('Controllers/PartnerController.ashx?action=getoption&isncc=1', function (result) {
+        
             var pId = $('#grid_ds_ctxkNV').jqGrid('getGridParam', 'selrow');
             var name = 'dialog-print-pkli-ctxk';
             var title = 'Trích xuất dữ liệu';
@@ -47,7 +47,7 @@
                     <td>
                         <input id="printBL" type="radio" name="rdoPrintType" value="printBL" />
                         <label for="printBL">In Mẫu BL</label>
-                        <div id="md_ncu_id" style="display:none">${result}</div>
+                        <div id="md_ncu_id" style="display:none">Đang tải...</div>
                     </td>
                 </tr>
                 <tr>
@@ -69,14 +69,18 @@
                 , open: function (event, ui) {
                     //hide close button.
                     $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
-                    $("[name='rdoPrintType']").bind("click", function () {
-                        if ($(this).attr("value") == "printBL") {
-                            $("#md_ncu_id").css("display", "block");
-                        }
-                        else {
-                            $("#md_ncu_id").css("display", "none");
-                        }
+                    $.get('Controllers/PartnerController.ashx?action=getoption&isncc=1', function (result) {
+                        $('#md_ncu_id').html(result);
                     });
+
+                    $("[name='rdoPrintType']").bind("click", function () {
+                            if ($(this).attr("value") == "printBL") {
+                                $("#md_ncu_id").css("display", "block");
+                            }
+                            else {
+                                $("#md_ncu_id").css("display", "none");
+                            }
+                        });
                 }
                 , buttons: [
                     {
@@ -151,7 +155,6 @@
                     }
                 ]
             });
-        });
     }
 
     function activePackingListInvoieNV() {

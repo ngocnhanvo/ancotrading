@@ -146,6 +146,35 @@ public partial class PrintControllers_InDanhMucKhaiHQ03_Default : System.Web.UI.
         styleBorder12Bold.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
         styleBorder12Bold.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
 
+        ICellStyle styleBorder12Bold_nowrap = hssfworkbook.CreateCellStyle();
+        styleBorder12Bold_nowrap.SetFont(font12Bold);
+        styleBorder12Bold_nowrap.VerticalAlignment = VerticalAlignment.Top;
+        styleBorder12Bold_nowrap.WrapText = false;
+        styleBorder12Bold_nowrap.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_nowrap.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_nowrap.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_nowrap.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+        ICellStyle styleBorder12Bold_nowrap_left = hssfworkbook.CreateCellStyle();
+        styleBorder12Bold_nowrap_left.SetFont(font12Bold);
+        styleBorder12Bold_nowrap_left.VerticalAlignment = VerticalAlignment.Top;
+        styleBorder12Bold_nowrap_left.WrapText = false;
+        styleBorder12Bold_nowrap_left.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_nowrap_left.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_nowrap_left.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+        ICellStyle styleBorder12Bold_nowrap_right = hssfworkbook.CreateCellStyle();
+        styleBorder12Bold_nowrap_right.SetFont(font12Bold);
+        styleBorder12Bold_nowrap_right.VerticalAlignment = VerticalAlignment.Top;
+        styleBorder12Bold_nowrap_right.WrapText = false;
+        styleBorder12Bold_nowrap_right.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_nowrap_right.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_nowrap_right.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        ICellStyle styleBorder12Bold_nowrap_none = hssfworkbook.CreateCellStyle();
+        styleBorder12Bold_nowrap_none.SetFont(font12Bold);
+        styleBorder12Bold_nowrap_none.VerticalAlignment = VerticalAlignment.Top;
+        styleBorder12Bold_nowrap_none.WrapText = false;
+        styleBorder12Bold_nowrap_none.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_nowrap_none.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+
         ICellStyle styleCenterBorderBottom12 = hssfworkbook.CreateCellStyle();
         styleCenterBorderBottom12.SetFont(font12);
         styleCenterBorderBottom12.VerticalAlignment = VerticalAlignment.Top;
@@ -415,15 +444,15 @@ public partial class PrintControllers_InDanhMucKhaiHQ03_Default : System.Web.UI.
             //r++;
             s1.CreateRow(r).CreateCell(0).SetCellValue("P/I No.: " + g_it["sodh"].ToString());
 
-            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(3).CellStyle = styleBorder12;
-            s1.GetRow(r).CreateCell(4).CellStyle = styleBorder12;
+            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold_nowrap_left;
+            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold_nowrap_none;
+            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold_nowrap_none;
+            s1.GetRow(r).CreateCell(3).CellStyle = styleBorder12Bold_nowrap_none;
+            s1.GetRow(r).CreateCell(4).CellStyle = styleBorder12Bold_nowrap_right;
             //  s1.GetRow(r).CreateCell(5).CellStyle = styleBorder12;
             //  s1.GetRow(r).CreateCell(6).CellStyle = styleBorder12;
             // s1.GetRow(r).CreateCell(7).CellStyle = styleBorder12;
-            s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 4));
+            //s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 4));
             s1.GetRow(r).HeightInPoints = 22;
 
             string sql_de = @"select  hscode,ma_sanpham,SUM(soluong) as soluong,SUM(gia) as gia,SUM(thanhtien) as thanhtien,

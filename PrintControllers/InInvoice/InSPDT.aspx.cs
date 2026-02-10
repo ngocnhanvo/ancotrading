@@ -54,16 +54,19 @@ public partial class PrintControllers_InInvoice_InSPDT : System.Web.UI.Page
 	            N'{Public.tenTaiKhoanNoTA}' as cp_name,
 	            N'{Public.diaChiNoTA}' as cp_add,
                 N'{Public.tenTaiKhoanNo}' as cp_name_vn,
+                N'{Public.diaChiNo}' as cp_add_vn,
 	            N'{Public.masothueNo}' as mst,
-	            dh.amount as trigia,
-	            pay.ten_paymentterm as hinhthucthanhtoan
-            from c_packinginvoice dh
-	            left join md_paymentterm pay on pay.md_paymentterm_id = dh.md_paymentterm_id 
+                null as so_cont,
+                null as so_kien,
+                null as dvt_kien,
+                null as so_kg,
+                null as so_cbm,
+                null as hscode_cont,
+                dinv.c_dongpklinv_id
+            from c_packinginvoice inv
+                left join c_dongpklinv dinv on dinv.c_packinginvoice_id = inv.c_packinginvoice_id
             where
-	            dh.shipmenttime between @tungay and @denngay
-                and dh.md_trangthai_id != 'SOANTHAO'
-            order by
-	            dh.shipmenttime, dh.sochungtu
+	            inv.c_packinginvoice_id in ('{id}')
 		";
 
         return sql;
