@@ -29,12 +29,13 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
 
         String selChungTuDH = $@"
             select top (1) 
-                dh.sochungtu, dh.ngaylap, dh.customer_order_no, ngh.thongtin, pmt.ma_paymentterm, pmt.ten_paymentterm
+                dh.sochungtu, dh.ngaylap, dh.customer_order_no, ngh.thongtin, pmt.ma_paymentterm, pmt.ten_paymentterm, spd.Consignee, dh.payer
             from 
                 c_donhang dh
                 left join c_dongpklinv dpkl on dh.c_donhang_id = dpkl.c_donhang_id
                 left join md_paymentterm pmt on pmt.md_paymentterm_id = dh.md_paymentterm_id
                 left join md_nganhang ngh on ngh.md_nganhang_id = dh.md_nganhang_id
+                outer apply (select top 1 Consignee, Forwarder from c_donhang_spd where c_donhang_id = dh.c_donhang_id and trangthai = 'DAGUI' order by ngaytao desc) spd
             where 
                 1=1
                 AND dpkl.c_packinginvoice_id = N'{c_pkivn_id}'
@@ -50,12 +51,14 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         string nganhang = dtChungTuDH.Rows[0][3].ToString();
         string ma_paymentterm = dtChungTuDH.Rows[0][4].ToString();
         string paymentterm = dtChungTuDH.Rows[0][5].ToString();
+        string Consignee = dtChungTuDH.Rows[0][6].ToString();
+        string payer = dtChungTuDH.Rows[0][7].ToString();
 
         DataTable dt = mdbc.GetData(select);
 
         if (dt.Rows.Count != 0)
         {
-            HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt, chungTuDH, paymentterm, nganhang, ngayLapDH, customerNo, ma_paymentterm);
+            HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt, chungTuDH, paymentterm, nganhang, ngayLapDH, customerNo, ma_paymentterm, Consignee, payer);
             String saveAsFileName = String.Format("SaleContact-{0}.xls", DateTime.Now);
             this.SaveFile(hssfworkbook, saveAsFileName);
         }
@@ -70,7 +73,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         //}
     }
 
-    public HSSFWorkbook CreateWorkBookPO(DataTable dt, String chungTuDH, String paymentterm, String nganhang, DateTime ngayLapDH, string customerNo, string ma_paymentterm)
+    public HSSFWorkbook CreateWorkBookPO(DataTable dt, String chungTuDH, String paymentterm, String nganhang, DateTime ngayLapDH, string customerNo, string ma_paymentterm, string Consignee, string payer)
     {
         LinqDBDataContext db = new LinqDBDataContext();
         String c_pkivn_id = Request.QueryString["c_packinglist_id"];
@@ -417,8 +420,8 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         s1.CreateRow(rowH).CreateCell(0).SetCellValue("The Buyer:");
         s1.GetRow(rowH).GetCell(0).CellStyle = style12TopBold;
         s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 1));
-        string dc_kh = "";
-        dc_kh = dt.Rows[0]["ten_dtkd"].ToString() + "\n" + dt.Rows[0]["diachi"].ToString() + "\nTel:" + dt.Rows[0]["tel"].ToString() + "\nFax:" + dt.Rows[0]["fax"].ToString();
+        string dc_kh = "", tendtkd = dt.Rows[0]["ten_dtkd"].ToString();
+        dc_kh = tendtkd + "\n" + dt.Rows[0]["diachi"].ToString() + "\nTel:" + dt.Rows[0]["tel"].ToString() + "\nFax:" + dt.Rows[0]["fax"].ToString();
         HSSFRichTextString rich = new HSSFRichTextString(dc_kh);
         s1.GetRow(rowH).CreateCell(2).SetCellValue(rich);
         s1.GetRow(rowH).GetCell(2).CellStyle = style12TopBold;
@@ -428,12 +431,16 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         s1.CreateRow(rowH).CreateCell(0).SetCellValue("The Payer:");
         s1.GetRow(rowH).GetCell(0).CellStyle = style12TopBold;
         s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 1));
+        s1.GetRow(rowH).CreateCell(2).SetCellValue(payer);
+        s1.GetRow(rowH).GetCell(2).CellStyle = style12TopBold;
         s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 2, 7));
         s1.GetRow(rowH).HeightInPoints = 21;
         rowH++;
         s1.CreateRow(rowH).CreateCell(0).SetCellValue("The consignee:");
         s1.GetRow(rowH).GetCell(0).CellStyle = style12TopBold;
         s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 1));
+        s1.GetRow(rowH).CreateCell(2).SetCellValue(tendtkd != Consignee ? Consignee : "");
+        s1.GetRow(rowH).GetCell(2).CellStyle = style12TopBold;
         s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 2, 7));
         s1.GetRow(rowH).HeightInPoints = 21;
         rowH++;

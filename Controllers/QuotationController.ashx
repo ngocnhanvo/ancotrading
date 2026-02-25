@@ -510,9 +510,9 @@ public class QuotationController : IHttpHandler
         {
             msg = ex.Message;
         }
-            
-    EndEventHandler:;
-        if(msg.Length <= 0)
+
+        EndEventHandler:;
+        if (msg.Length <= 0)
         {
             sct = sct.Remove(sct.Length - 1);
             msg = $@"Ðã tạo PO thành công với số chứng từ {sct}.";
@@ -599,6 +599,7 @@ public class QuotationController : IHttpHandler
     #region AddEditDel
     public void add(HttpContext context)
     {
+        string msg = "";
         try
         {
             String h = context.Request.Form["hoatdong"].ToLower();
@@ -608,9 +609,7 @@ public class QuotationController : IHttpHandler
             string phienbangiacu = context.Request.Form["phienbangiacu"];
 
             bool hd = false, gia_db = false, chkPBGCu = false;
-            int check = 0; // validate form on server
             int qo_mau = 0;
-            string msg = "";
 
             if (h.Equals("on") || h.Equals("true"))
             { hd = true; }
@@ -627,14 +626,19 @@ public class QuotationController : IHttpHandler
 
             if (isform.Equals("on") || isform.Equals("true"))
             { qo_mau = 1; }
-
-            String sochungtu = jqGridHelper.Utils.taoChungTuQO(context.Request.Form["md_doitackinhdoanh_id"], qo_mau, DateTime.ParseExact(context.Request.Form["ngaybaogia"], "dd/MM/yyyy", null).Year.ToString());
+            md_doitackinhdoanh doitac = db.md_doitackinhdoanhs.Where(p => p.md_doitackinhdoanh_id == context.Request.Form["md_doitackinhdoanh_id"].removeAllSpaceOrTrimText(true)).FirstOrDefault();
+            if (doitac == null)
+            {
+                msg = "Không tìm thấy khách hàng";
+                goto EndEventHandler;
+            }
+            String sochungtu = jqGridHelper.Utils.taoChungTuQO(doitac.md_doitackinhdoanh_id, qo_mau, DateTime.ParseExact(context.Request.Form["ngaybaogia"], "dd/MM/yyyy", null).Year.ToString());
 
             c_baogia mnu = new c_baogia
             {
-                c_baogia_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
+                c_baogia_id = Helper.getNewId(),
                 sobaogia = sochungtu,
-                md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"],
+                md_doitackinhdoanh_id = doitac.md_doitackinhdoanh_id,
                 //md_paymentterm_id = context.Request.Form["md_paymentterm_id"],
                 shipmenttime = int.Parse(context.Request.Form["shipmenttime"]),
                 //md_banggia_id = context.Request.Form["md_banggia_id"],
@@ -649,7 +653,7 @@ public class QuotationController : IHttpHandler
                 totalquo = 0,
                 isform = ((qo_mau == 1) ? true : false),
                 moq_item_color = context.Request.Form["moq_item_color"],
-                md_trangthai_id = "SOANTHAO",
+                md_trangthai_id = Helper.SOANTHAO,
                 chkPBGCu = chkPBGCu,
                 phienbangiacu = phienbangiacu,
 
@@ -665,43 +669,40 @@ public class QuotationController : IHttpHandler
             if (mnu.ngaybaogia >= mnu.ngayhethan)
             {
                 msg = "Ngày báo giá không đuợc lớn hơn ngày hết hạn!";
-                check++;
+                goto EndEventHandler;
             }
             else if (mnu.md_doitackinhdoanh_id == "c010dd297f3ee5797e426176e8685b2c")
             {
                 msg = "Khách Hàng: Không được bỏ trống!";
-                check++;
+                goto EndEventHandler;
             }
             else if (chkPBGCu == true & String.IsNullOrEmpty(phienbangiacu))
             {
-                msg = "\"Phiên bảng giá cũ\" không thể bỏ trống.";
-                check++;
+                msg = $@"""Phiên bảng giá cũ"" không thể bỏ trống.";
+                goto EndEventHandler;
             }
-
-            md_doitackinhdoanh doitac = db.md_doitackinhdoanhs.FirstOrDefault(p => p.md_doitackinhdoanh_id.Equals(mnu.md_doitackinhdoanh_id));
-            md_banggia bga = db.md_banggias.Where(s => s.ten_banggia.Contains(doitac.ma_dtkd + "-FOB")).FirstOrDefault();
-
+            
+            var bga = db.md_banggias.Where(s => s.ten_banggia.Contains($"{doitac.ma_dtkd}-FOB")).FirstOrDefault();
             if (bga == null & gia == "True")
             {
                 msg = "Khách hàng " + doitac.ma_dtkd + " không có bảng giá đặc biệt";
-                check++;
+                goto EndEventHandler;
             }
 
-            if (check == 0)
-            {
-                db.c_baogias.InsertOnSubmit(mnu);
-                db.SubmitChanges();
-                jqGridHelper.Utils.writeResult(1, "Thêm mới thành công!");
-            }
-            else
-            {
-                jqGridHelper.Utils.writeResult(0, msg);
-            }
+            db.c_baogias.InsertOnSubmit(mnu);
+            db.SubmitChanges();
         }
         catch (Exception ex)
         {
             jqGridHelper.Utils.writeResult(0, ex.Message);
         }
+
+        EndEventHandler:;
+
+        if (msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Thêm mới thành công!");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     public void edit(HttpContext context)

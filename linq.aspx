@@ -16,7 +16,7 @@
         }
 
         #result {
-            display: table;
+            display: flex;
             width: 50%;
             max-width: 570px;
             margin: 30px auto;
