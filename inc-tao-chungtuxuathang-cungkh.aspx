@@ -547,7 +547,8 @@
 								var data = new Object();
 								
 								data["txtSoPackingList"] = $(form + " #txtKHSoPackingList").val();
-								data["txtSoInvoice"] = $(form + " #txtKHSoInvoice").val();
+								data["txtSoInvoice"] = $(form + " #txtSoInvoice").val();
+								data["selTheoSCT"] = $(form + " #sel_theoSCT").val();
 								data["txtNgayLap"] = $(form + " #txtKHNgayLap").val();
 								data["txtSoTau"] = $(form + " #txtKHSoTau").val();
 								data["txtSCT_giucho"] = $(form + " #selSCT_giucho").val();
@@ -586,6 +587,21 @@
 				});
 			}
         });
+
+        $('#sel_theoSCT').change(function () {
+            let val = $(this).val();
+            if (val == 1) {
+                $('#txtSoInvoice').val('');
+                $('#txtSoInvoice').prop('disabled', true);
+                $('#selSCT_giucho').prop('disabled', false);
+            }
+            else {
+                $('#txtSoInvoice').prop('disabled', false);
+                $('#selSCT_giucho').prop('disabled', true);
+            }
+        });
+
+        $('#sel_theoSCT').change();
     });
 </script>
     <div style="width:990px; margin:auto">
@@ -599,6 +615,20 @@
                     <td><input id="txtKHSoInvoice" name="txtKHtxtSoInvoice" type="hidden" /></td>
                 </tr>
                 
+                <tr>
+                    <td>Theo số chứng từ</td>
+                    <td>:</td>
+                    <td>
+                        <select id="sel_theoSCT" name="sel_theoSCT" style="min-width: 100px">
+                           <option value="1">Có</option>
+                           <option value="0">Không</option>
+                        </select>
+                    </td>
+                    <td>Số Invoice</td>
+                    <td>:</td>
+                    <td><input id="txtSoInvoice" name="txtSoInvoice" type="text" /></td>
+                </tr>
+
                 <tr>
                     <td>Ngày Lập</td>
                     <td>:</td>
@@ -642,15 +672,6 @@
                         </div>
                     </td>
                 </tr>
-                
-                <%--<tr>
-                    <td>Hàng Hóa(Commondity)</td>
-                    <td>:</td>
-                    <td><input id="txtHangHoa" name="txtHangHoa" type="text" /></td>
-                    <td>Hàng Hóa VN</td>
-                    <td>:</td>
-                    <td><input id="txtHangHoaVn" name="txtHangHoaVn" type="text" /></td>
-                </tr>--%>
                 
                 <tr>
                     <td>Diễn Giải Cộng Thêm</td>

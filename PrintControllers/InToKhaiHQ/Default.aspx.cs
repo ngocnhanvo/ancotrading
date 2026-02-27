@@ -19,12 +19,33 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         //try
         //{
         String c_pkivn_id = Request.QueryString["c_packinglist_id"];
-        String select = String.Format(@"select cpk.so_pkl, cpk.ngaylap, dt.ten_dtkd, dt.diachi, dt.tel, dt.fax,
-		                                            cpk.mv, cb.ten_cangbien, cpk.noiden, cpk.blno, cpk.commodity, cpk.etd, cpk.commodityvn,  diengiaicong_po, giatricong_po, diengiaitru_po, giatritru_po
-                                            from c_packinginvoice cpk, md_doitackinhdoanh dt, md_cangbien cb
-                                            where cpk.noidi = cb.md_cangbien_id
-	                                            and cpk.md_doitackinhdoanh_id = dt.md_doitackinhdoanh_id
-	                                            and cpk.c_packinginvoice_id ='" + c_pkivn_id + "'"); //c_pkivn_id
+        String select = $@"
+            select 
+                cpk.so_pkl, 
+                cpk.ngaylap, 
+                dt.ten_dtkd, 
+                dt.diachi, 
+                dt.tel, 
+                dt.fax,
+	            cpk.mv, 
+                cb.ten_cangbien, 
+                cpk.noiden, 
+                cpk.blno, 
+                cpk.commodity, 
+                cpk.etd, 
+                cpk.commodityvn,  
+                diengiaicong_po, 
+                giatricong_po, 
+                diengiaitru_po, 
+                giatritru_po
+            from 
+                c_packinginvoice cpk
+                left join md_doitackinhdoanh dt on cpk.md_doitackinhdoanh_id = dt.md_doitackinhdoanh_id 
+                left join md_cangbien cb cpk.noidi = cb.md_cangbien_id
+            where 
+                1=1
+	            and cpk.c_packinginvoice_id ='{c_pkivn_id}'
+        ";
 
         DataTable dt = mdbc.GetData(select);
 

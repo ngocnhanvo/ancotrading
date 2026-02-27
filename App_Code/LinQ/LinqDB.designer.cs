@@ -1,4 +1,4 @@
-//Update at 31/01/2026 00:59:47
+//Update at 27/02/2026 14:31:25
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -23960,6 +23960,7 @@ private System.Nullable<System.DateTime> _co;
 private System.Nullable<System.DateTime> _ngayPayMent;
 private System.Nullable<System.DateTime> _ngayTelLex;
 private string _ghichuCT;
+private System.Nullable<bool> _soinv_theochuan;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -24088,6 +24089,8 @@ partial void OnngayTelLexChanging(System.Nullable<System.DateTime> value);
 partial void OnngayTelLexChanged();
 partial void OnghichuCTChanging(string value);
 partial void OnghichuCTChanged();
+partial void Onsoinv_theochuanChanging(System.Nullable<bool> value);
+partial void Onsoinv_theochuanChanged();
 #endregion
 public c_packinginvoice()
 {
@@ -25268,6 +25271,25 @@ this.SendPropertyChanging();
 this._ghichuCT = value;
 this.SendPropertyChanged("ghichuCT");
 this.OnghichuCTChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_soinv_theochuan", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @soinv_theochuan
+{
+get
+{
+return this._soinv_theochuan;
+}
+set
+{
+if ((this._soinv_theochuan != value))
+{
+this.Onsoinv_theochuanChanging(value);
+this.SendPropertyChanging();
+this._soinv_theochuan = value;
+this.SendPropertyChanged("soinv_theochuan");
+this.Onsoinv_theochuanChanged();
 }
 }
 }

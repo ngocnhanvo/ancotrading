@@ -547,6 +547,7 @@
 								let data = new Object();
 								data["txtSoPackingList"] = $(form + " #txtSoPackingList").val();
 								data["txtSoInvoice"] = $(form + " #txtSoInvoice").val();
+								data["selTheoSCT"] = $(form + " #sel_theoSCT").val();
 								data["txtNgayLap"] = $(form + " #txtNgayLap").val();
 								data["txtSoTau"] = $(form + " #txtSoTau").val();
 								data["txtSCT_giucho"] = $(form + " #selSCT_giucho").val();
@@ -594,10 +595,39 @@
 				});
 			}
         });
+
+        $('#sel_theoSCT').change(function () {
+            let val = $(this).val();
+            if (val == 1) {
+                $('#txtSoInvoice').val('');
+                $('#txtSoInvoice').prop('disabled', true);
+                $('#selSCT_giucho').prop('disabled', false);
+            }
+            else {
+                $('#txtSoInvoice').prop('disabled', false);
+                $('#selSCT_giucho').prop('disabled', true);
+            }
+        });
+
+        $('#sel_theoSCT').change();
     });
 </script>
     <div style="width:990px; margin:auto">
             <table id="frmFromPO" class="frm-packinglist" style="width:100%; text-align:left">
+                <tr>
+                    <td>Theo số chứng từ</td>
+                    <td>:</td>
+                    <td>
+                        <select id="sel_theoSCT" name="sel_theoSCT" style="min-width: 100px">
+                           <option value="1">Có</option>
+                           <option value="0">Không</option>
+                        </select>
+                    </td>
+                    <td>Số Invoice</td>
+                    <td>:</td>
+                    <td><input id="txtSoInvoice" name="txtSoInvoice" type="text" /></td>
+                </tr>
+
                 <tr>
                     <td>Ngày Lập</td>
                     <td>:</td>
@@ -606,7 +636,7 @@
                             <input id="txtNgayLap" name="txtNgayLap" type="text"/>
                         </div>
                     </td>
-                    <td>Số Tàu(M/V)<b style="color:red">(*)</b></td>
+                    <td>Số Tàu(M/V) <b style="color:red">(*)</b></td>
                     <td>:</td>
                     <td><input id="txtSoTau" name="txtSoTau" type="text" required /></td>
                 </tr>
@@ -622,7 +652,7 @@
                            <option>Đang tải...</option>
                         </select>
                     </td>
-                    <td>Nơi Đến(To)<b style="color:red">(*)</b></td>
+                    <td>Nơi Đến(To) <b style="color:red">(*)</b></td>
                     <td>:</td>
                     <td>
                          <input id="txtNoiDen" name="txtNoiDen" required />
@@ -641,15 +671,6 @@
                         </div>
                     </td>
                 </tr>
-                
-                <%--<tr>
-                    <td>Hàng Hóa(Commondity)</td>
-                    <td>:</td>
-                    <td><input id="txtHangHoa" name="txtHangHoa" type="text" /></td>
-                    <td>Hàng Hóa VN</td>
-                    <td>:</td>
-                    <td><input id="txtHangHoaVn" name="txtHangHoaVn" type="text" /></td>
-                </tr>--%>
                 
                 <tr>
                     <td>Diễn Giải Cộng Thêm</td>

@@ -15,7 +15,7 @@ public class TaoPackingListController : IHttpHandler {
         {
             String arrayPhieuXuat = context.Request.Form["p[arrayPhieuXuat]"].ToString();
             String txtNgayLap = context.Request.Form["p[txtNgayLap]"];
-            //String selNoiDi = context.Request.Form["p[selNoiDi]"];
+            var selTheoSCT = context.Request.Form["p[selTheoSCT]"] == "1";
             String selNoiDen = context.Request.Form["p[txtNoiDen]"];
             String txtDienGiaiCongThem = context.Request.Form["p[txtDienGiaiCongThem]"];
             String txtGiaTriCongThem = context.Request.Form["p[txtGiaTriCongThem]"];
@@ -42,7 +42,24 @@ public class TaoPackingListController : IHttpHandler {
             String md_cangbien_id = donhangM.md_cangbien_id;
             String md_doitackinhdoanh_id = donhangM.md_doitackinhdoanh_id;
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == md_doitackinhdoanh_id).FirstOrDefault();
-            String txtSoInvoice = jqGridHelper.Utils.taoChungTuXuatKho(dtkd, db, txtSCT_giucho);
+
+            String txtSoInvoice = "";
+            if(selTheoSCT)
+                jqGridHelper.Utils.taoChungTuXuatKho(dtkd, db, txtSCT_giucho);
+            else
+            {
+                txtSoInvoice = context.Request.Form["p[txtSoInvoice]"].removeAllSpaceOrTrimText(true);
+                if(txtSoInvoice.Length <= 0)
+                {
+                    throw new Exception("Phải điền số Invoice");
+                }
+
+                var inv = db.c_packinginvoices.Where(s => s.so_inv == txtSoInvoice).FirstOrDefault();
+                if(inv != null)
+                {
+                    throw new Exception("Số Invoice đã được sử dụng trước đó");
+                }
+            }
 
             var cangbien = db.md_cangbiens.Where(s => s.md_cangbien_id == md_cangbien_id).FirstOrDefault();
             c_donhang_spd spd = null;
@@ -79,6 +96,7 @@ public class TaoPackingListController : IHttpHandler {
             p.POL = cangbien == null ? "" : cangbien.ten_cangbien;
             p.so_pkl = txtSoInvoice;
             p.so_inv = p.so_pkl;
+            p.soinv_theochuan = selTheoSCT;
             p.ngaylap = txtNgayLap.ToNullableDate();
             p.etd = txtNgayVanDon.ToNullableDate();
             p.noiden = selNoiDen;
