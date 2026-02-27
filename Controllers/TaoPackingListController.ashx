@@ -45,7 +45,7 @@ public class TaoPackingListController : IHttpHandler {
 
             String txtSoInvoice = "";
             if(selTheoSCT)
-                jqGridHelper.Utils.taoChungTuXuatKho(dtkd, db, txtSCT_giucho);
+                txtSoInvoice = jqGridHelper.Utils.taoChungTuXuatKho(dtkd, db, txtSCT_giucho);
             else
             {
                 txtSoInvoice = context.Request.Form["p[txtSoInvoice]"].removeAllSpaceOrTrimText(true);
