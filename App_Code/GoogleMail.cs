@@ -1,14 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Xml.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
@@ -199,7 +191,6 @@ public class GoogleMail
 
     public void Send2(String from, String to, String cc, String bcc, String subject, String body, String attachments, params object[] args)
     {
-
         if (Regex.IsMatch(body, "^([cCdDeEfFgGhHiIjI]:).+"))
         {
             body = File.ReadAllText(body);
@@ -220,7 +211,7 @@ public class GoogleMail
         {
             System.Net.Mail.Attachment attachment;
             attachment = new System.Net.Mail.Attachment(attachments.Split('#')[i]);
-            mail.Attachments.Add(attachment);
+            Attachments.Add(attachment);
         }
 
         foreach (var attachment in Attachments)
@@ -249,13 +240,33 @@ public class GoogleMail
             mail.Bcc.Add(bcc);
         }
 
-        //ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
-        SmtpClient client = new SmtpClient(_smtp, _port);
-        //client.Timeout = 1000;
-        client.EnableSsl = Ssl;
-        client.UseDefaultCredentials = true;
-        client.Credentials = new NetworkCredential(_email, _password);
-        client.Send(mail);
+        if (_smtp.Contains("smtp.office365.com"))
+        {
+            var m365 = new M365Mail();
+            m365.email = _email;
+            m365.pass = _password;
+            m365.to = to;
+            m365.cc = cc;
+            m365.bcc = bcc;
+            m365.subject = subject;
+            m365.attachments = Attachments;
+            m365.body = body;
+            m365.SendEmailOAuth2Sync();
+        }
+        else
+        {
+            //ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
+            if(Ssl)
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            SmtpClient client = new SmtpClient(_smtp, _port);
+            //client.Timeout = 1000;
+            client.EnableSsl = Ssl;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential(_email, _password);
+            client.Send(mail);
+            client.Dispose();
+        }
 
         foreach (var attachment in Attachments)
         {
@@ -263,6 +274,5 @@ public class GoogleMail
         }
 
         mail.Dispose();
-        client.Dispose();
     }
 }
