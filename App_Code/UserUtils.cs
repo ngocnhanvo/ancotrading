@@ -371,7 +371,7 @@ public static class UserUtils
         dondathang.nguoi_phutrach = "";
         dondathang.nguoi_dathang = "";
         dondathang.diachigiaohang = md_doitackinhdoanh_id;
-        dondathang.md_trangthai_id = "SOANTHAO";
+        dondathang.md_trangthai_id = Helper.SOANTHAO;
         dondathang.ngaytao = DateTime.Now;
         dondathang.ngaycapnhat = DateTime.Now;
         dondathang.nguoitao = getUser(context);
@@ -414,7 +414,7 @@ public static class UserUtils
             var giaNhap2BD = gianhap2;
             decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2, db);
             decimal tylePT = get_gianhap(context, ma_dtkd_select, -1, -1, -1, db);
-
+            //Chi phí từng dòng hàng
             var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
             if (!donhang.chuyenphiDSDH.GetValueOrDefault(false))
                 phiDiscount = 0;
@@ -422,6 +422,10 @@ public static class UserUtils
             {
                 phiDiscount = ddonhang.phi.GetValueOrDefault(0);
             }
+            var phiDiscount_VND = jqGridHelper.Utils.Round5(phiDiscount * tygia, -2);
+            //Chi phí đóng gói từng dòng hàng
+            var phiDongGoi = ddonhang.apdung_cpdg.GetValueOrDefault(false) ? ddonhang.cpdg.GetValueOrDefault(0) : 0;
+            var phiDongGoi_VND = jqGridHelper.Utils.Round5(phiDongGoi * tygia, -2);
 
             var msps = new string[] { "36", "42", "49", "98" };
             if (msps.Contains(sp.ma_sanpham.Substring(0, 2)))
@@ -447,18 +451,22 @@ public static class UserUtils
                 {    
                     gianhap = gianhap2;
                     giachuan = jqGridHelper.Utils.Round5(gianhap, -2);
-                    gianhap = giachuan + jqGridHelper.Utils.Round5(phiDiscount * tygia, -2);
+                    phiDiscount = phiDiscount_VND;
+                    phiDongGoi = phiDongGoi_VND;
+                    gianhap = giachuan + phiDiscount + phiDongGoi;
                 }
                 else
                 {
 					gianhap = ddonhang.discount.GetValueOrDefault(0) > 0 ? gianhap2 : giaNhap2BD;
                     giachuan = gianhap;
-                    gianhap = gianhap + phiDiscount;
+                    gianhap = gianhap + phiDiscount + phiDongGoi;
                 }
             }
             else
             {
-                gianhap = jqGridHelper.Utils.Round5(gianhap + phiDiscount * tygia, -2);
+                phiDiscount = phiDiscount_VND;
+                phiDongGoi = phiDongGoi_VND;
+                gianhap = phiDiscount + phiDongGoi;
             }
 
             //if(ma_dtkd_select == "ANBINH" & sp.ma_sanpham.StartsWith("88-"))
@@ -486,7 +494,6 @@ public static class UserUtils
             ddsdh.sl_dathang = item.soluong_dadat;
             ddsdh.sl_dagiao = 0;
             ddsdh.sl_conlai = item.soluong_dadat;
-            ddsdh.gianhap = gianhap;
             ddsdh.ma_sanpham_khach = item.ma_sanpham_khach;
             ddsdh.md_donggoi_id = ddonhang.md_donggoi_id;
             ddsdh.sl_inner = ddonhang.sl_inner;
@@ -509,7 +516,9 @@ public static class UserUtils
             ddsdh.nguoicapnhat = getUser(context);
             ddsdh.hoatdong = true;
             ddsdh.giachuan = giachuan;
-
+            ddsdh.phi = phiDiscount;
+            ddsdh.phidg = phiDongGoi;
+            ddsdh.gianhap = gianhap;
             lstDongDonDatHang.Add(ddsdh);
         }
 

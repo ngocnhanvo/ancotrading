@@ -224,7 +224,8 @@ public class DongDanhSachDatHangController : IHttpHandler
                    , tem_dan
                    , ddsdh.sl_dathang
                    , ddsdh.giachuan
-                   , ddsdh.gianhap - isnull(ddsdh.giachuan, ddsdh.gianhap) as phi
+                   , ddsdh.phi
+                   , ddsdh.phidg
                    , ddsdh.gianhap
                    , ddsdh.sl_dagiao
                    , ddsdh.sl_conlai 
@@ -265,17 +266,18 @@ public class DongDanhSachDatHangController : IHttpHandler
             xml += "<cell><![CDATA[" + row["mota_tiengviet"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["huongdan_dathang"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row["han_giaohang"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row["han_giaohang"].ToString()).ToString(Extension.fmtDate) + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tem_dan"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sl_dathang"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["giachuan"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["phidg"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["gianhap"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sl_dagiao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sl_conlai"] + "]]></cell>";        
-            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString(Extension.fmtDate) + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString(Extension.fmtDate) + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoicapnhat"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hoatdong"] + "]]></cell>";

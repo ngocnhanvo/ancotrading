@@ -70,7 +70,8 @@ public class DanhSachDatHangReport
                             , ddsdh.sl_dathang as soLuong
 							, ddsdh.gianhap as tongDonGiaMua
                             , isnull(ddsdh.giachuan, ddsdh.gianhap) as giaMua
-                            , (ddsdh.gianhap - isnull(ddsdh.giachuan, ddsdh.gianhap)) as phi
+                            , ddsdh.phi
+                            , ddsdh.phidg
 							, dsdh.huongdanlamhang
 							, dsdh.huongdanlamhangchung
 							, ddsdh.huongdan_dathang
@@ -443,6 +444,15 @@ public class DanhSachDatHangReport
         columnHeaders.Add(new columnHeader()
         {
             columnAt = 9,
+            text = "CPĐG",
+            value = "phidg",
+            width = guiNCC ? 0 : (int)(fontSizeRpt * 260),
+            autoSize = guiNCC ? false : true
+        });
+
+        columnHeaders.Add(new columnHeader()
+        {
+            columnAt = 10,
             text = "Tổng đơn\ngiá mua",
             value = "tongDonGiaMua",
             width = guiNCC ? 0 : (int)(fontSizeRpt * 260),
@@ -451,7 +461,7 @@ public class DanhSachDatHangReport
 
         columnHeaders.Add(new columnHeader()
         {
-            columnAt = 10,
+            columnAt = 11,
             text = "Thành tiền",
             value = "thanhTien",
             width = guiNCC ? 0 : (int)(fontSizeRpt * 380)
@@ -460,7 +470,7 @@ public class DanhSachDatHangReport
 
         columnHeaders.Add(new columnHeader()
         {
-            columnAt = 11,
+            columnAt = 12,
             text = "Đóng gói Inner",
             value = "dginner",
             width = 4000
@@ -468,7 +478,7 @@ public class DanhSachDatHangReport
 
         columnHeaders.Add(new columnHeader()
         {
-            columnAt = 12,
+            columnAt = 13,
             text = "Đóng gói Outer",
             value = "dgouter",
             width = 4000
@@ -476,7 +486,7 @@ public class DanhSachDatHangReport
 
         columnHeaders.Add(new columnHeader()
         {
-            columnAt = 13,
+            columnAt = 14,
             text = "Số kiện Inner",
             value = "soKienInner",
             width = 3400
@@ -484,7 +494,7 @@ public class DanhSachDatHangReport
 
         columnHeaders.Add(new columnHeader()
         {
-            columnAt = 14,
+            columnAt = 15,
             text = "Số kiện Outer",
             value = "soKienOuter",
             width = 3400
@@ -492,7 +502,7 @@ public class DanhSachDatHangReport
 
         columnHeaders.Add(new columnHeader()
         {
-            columnAt = 15,
+            columnAt = 16,
             text = "Cbm",
             value = "cbm",
             width = 3000
@@ -500,7 +510,7 @@ public class DanhSachDatHangReport
 
         columnHeaders.Add(new columnHeader()
         {
-            columnAt = 16,
+            columnAt = 17,
             text = "Hướng dẫn làm hàng",
             value = "huongdan_dathang",
             width = 0
@@ -508,7 +518,7 @@ public class DanhSachDatHangReport
 
         columnHeaders.Add(new columnHeader()
         {
-            columnAt = 17,
+            columnAt = 18,
             text = "Trọng lượng",
             value = "trongluong",
             width = 0
@@ -516,7 +526,7 @@ public class DanhSachDatHangReport
 
         columnHeaders.Add(new columnHeader()
         {
-            columnAt = 18,
+            columnAt = 19,
             text = "Xác nhận kích thước",
             value = "ghichu",
             width = 0
@@ -524,7 +534,7 @@ public class DanhSachDatHangReport
 
         columnHeaders.Add(new columnHeader()
         {
-            columnAt = 19,
+            columnAt = 20,
             text = "Giá gốc",
             value = "giaMua",
             width = 0
@@ -532,7 +542,7 @@ public class DanhSachDatHangReport
 
         columnHeaders.Add(new columnHeader()
         {
-            columnAt = 20,
+            columnAt = 21,
             text = "Phí",
             value = "phi",
             width = 0
@@ -612,7 +622,7 @@ public class DanhSachDatHangReport
 					cel_row_t.SetCellValue(double.Parse(dt.Rows[i][colHeader.value].ToString()));
 					cel_row_t.CellStyle = cellSoLuong;
 				}
-				else if (new string[] { "giaMua", "tongDonGiaMua", "phi" }.Contains(colHeader.value))
+				else if (new string[] { "giaMua", "tongDonGiaMua", "phi", "phidg" }.Contains(colHeader.value))
                 {
                     var val = double.Parse(dt.Rows[i][colHeader.value].ToString());
                     if (guiNCC == false)

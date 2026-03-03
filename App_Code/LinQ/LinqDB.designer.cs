@@ -1,4 +1,4 @@
-//Update at 27/02/2026 14:31:25
+//Update at 03/03/2026 12:22:17
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -12437,6 +12437,8 @@ private System.Nullable<decimal> _vl;
 private string _ghichu_vachngan;
 private System.Nullable<decimal> _sl_huy;
 private System.Nullable<decimal> _giachuan;
+private System.Nullable<decimal> _phi;
+private System.Nullable<decimal> _phidg;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -12519,6 +12521,10 @@ partial void Onsl_huyChanging(System.Nullable<decimal> value);
 partial void Onsl_huyChanged();
 partial void OngiachuanChanging(System.Nullable<decimal> value);
 partial void OngiachuanChanged();
+partial void OnphiChanging(System.Nullable<decimal> value);
+partial void OnphiChanged();
+partial void OnphidgChanging(System.Nullable<decimal> value);
+partial void OnphidgChanged();
 #endregion
 public c_dongdsdh()
 {
@@ -13262,6 +13268,44 @@ this.SendPropertyChanging();
 this._giachuan = value;
 this.SendPropertyChanged("giachuan");
 this.OngiachuanChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_phi", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @phi
+{
+get
+{
+return this._phi;
+}
+set
+{
+if ((this._phi != value))
+{
+this.OnphiChanging(value);
+this.SendPropertyChanging();
+this._phi = value;
+this.SendPropertyChanged("phi");
+this.OnphiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_phidg", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @phidg
+{
+get
+{
+return this._phidg;
+}
+set
+{
+if ((this._phidg != value))
+{
+this.OnphidgChanging(value);
+this.SendPropertyChanging();
+this._phidg = value;
+this.SendPropertyChanged("phidg");
+this.OnphidgChanged();
 }
 }
 }
