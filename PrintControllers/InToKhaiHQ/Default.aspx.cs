@@ -41,7 +41,7 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
             from 
                 c_packinginvoice cpk
                 left join md_doitackinhdoanh dt on cpk.md_doitackinhdoanh_id = dt.md_doitackinhdoanh_id 
-                left join md_cangbien cb cpk.noidi = cb.md_cangbien_id
+                left join md_cangbien cb on cpk.noidi = cb.md_cangbien_id
             where 
                 1=1
 	            and cpk.c_packinginvoice_id ='{c_pkivn_id}'
