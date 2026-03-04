@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data;
 
-public class DongDonHangController : IHttpHandler
+public class DongDonHangController : IHttpHandler, IDisposable
 {
     private LinqDBDataContext db = new LinqDBDataContext();
 
     public void ProcessRequest(HttpContext context)
     {
+        context.DisposeOnPipelineCompleted(this);
         String action, oper;
         action = context.Request.QueryString["action"];
         oper = context.Request.Form["oper"];
@@ -188,7 +189,7 @@ public class DongDonHangController : IHttpHandler
                 c_dongdonhang m = db.c_dongdonhangs.Single(p => p.c_dongdonhang_id == context.Request.Form["id"]);
 
                 var donhang = db.c_donhangs.Single(d => d.c_donhang_id.Equals(m.c_donhang_id));
-                if (donhang.md_trangthai_id.Equals("SOANTHAO"))
+                if (donhang.md_trangthai_id.Equals(Helper.SOANTHAO))
                 {
                     m.c_donhang_id = context.Request.Form["c_donhang_id"];
                     //m.md_sanpham_id = context.Request.Form["sanpham_id"];
@@ -280,6 +281,7 @@ public class DongDonHangController : IHttpHandler
                     if (check == 0)
                     {
                         db.SubmitChanges();
+                        trg_c_dongdonhang.load(db, new List<c_dongdonhang> { m }, true);
                         Public.triggerDonHang(db, donhang, null, true);
                         jqGridHelper.Utils.writeResult(1, "Cập nhật thành công!");
                     }
@@ -288,11 +290,11 @@ public class DongDonHangController : IHttpHandler
                         jqGridHelper.Utils.writeResult(0, msg);
                     }
                 }
-                else if (donhang.md_trangthai_id.Equals("HIEULUC"))
+                else if (donhang.md_trangthai_id.Equals(Helper.HIEULUC))
                 {
                     jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi đơn hàng đã hiệu lực!");
                 }
-                else if (donhang.md_trangthai_id.Equals("KETTHUC"))
+                else if (donhang.md_trangthai_id.Equals(Helper.KETTHUC))
                 {
                     jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi đơn hàng đã kết thúc!");
                 }
@@ -387,13 +389,13 @@ public class DongDonHangController : IHttpHandler
         // jqGridHelper.Utils.writeResult(0,"Mã hàng này đang được bán độc quyền cho 1 khách hàng khác!");
         // }
 
-        if (donhang.md_trangthai_id.Equals("HIEULUC"))
+        if (donhang.md_trangthai_id.Equals(Helper.HIEULUC))
         {
             next = false;
             jqGridHelper.Utils.writeResult(0, "Không thể thêm mới dòng hàng khi PO đã hiệu lực!");
         }
 
-        if (donhang.md_trangthai_id.Equals("KETTHUC"))
+        if (donhang.md_trangthai_id.Equals(Helper.KETTHUC))
         {
             next = false;
             jqGridHelper.Utils.writeResult(0, "Không thể thêm mới dòng hàng khi PO đã kết thúc!");
@@ -534,6 +536,7 @@ public class DongDonHangController : IHttpHandler
             db.c_dongdonhangs.InsertOnSubmit(mnu);
             db.SubmitChanges();
 
+            trg_c_dongdonhang.load(db, new List<c_dongdonhang> { mnu }, true);
             Public.triggerDonHang(db, donhang, null, true);
         }
         //}
@@ -550,7 +553,7 @@ public class DongDonHangController : IHttpHandler
         c_dongdonhang ddh = db.c_dongdonhangs.FirstOrDefault(p => p.c_dongdonhang_id.Equals(id));
         c_donhang dh = db.c_donhangs.FirstOrDefault(c => c.c_donhang_id.Equals(ddh.c_donhang_id));
 
-        if (dh.md_trangthai_id.Equals("HIEULUC"))
+        if (dh.md_trangthai_id.Equals(Helper.HIEULUC))
         {
             jqGridHelper.Utils.writeResult(0, "Không thể xóa dòng trong PO đã hiệu lực!");
         }
@@ -754,6 +757,15 @@ public class DongDonHangController : IHttpHandler
     // }
     // return msg;
     // }
+
+    public void Dispose()
+    {
+        if (db != null)
+        {
+            db.Dispose();
+            db = null;
+        }
+    }
 
     public bool IsReusable
     {

@@ -8,12 +8,13 @@ using System.IO;
 using System.Data;
 using System.Data.SqlClient;
 
-public class QuotationController : IHttpHandler
+public class QuotationController : IHttpHandler, IDisposable
 {
     private LinqDBDataContext db = new LinqDBDataContext();
 
     public void ProcessRequest(HttpContext context)
     {
+        context.DisposeOnPipelineCompleted(this);
         String action, oper;
         action = context.Request.QueryString["action"];
         oper = context.Request.Form["oper"];
@@ -681,7 +682,7 @@ public class QuotationController : IHttpHandler
                 msg = $@"""Phiên bảng giá cũ"" không thể bỏ trống.";
                 goto EndEventHandler;
             }
-            
+
             var bga = db.md_banggias.Where(s => s.ten_banggia.Contains($"{doitac.ma_dtkd}-FOB")).FirstOrDefault();
             if (bga == null & gia == "True")
             {
@@ -691,6 +692,7 @@ public class QuotationController : IHttpHandler
 
             db.c_baogias.InsertOnSubmit(mnu);
             db.SubmitChanges();
+            trg_c_baogia.load(db, new System.Collections.Generic.List<c_baogia> { mnu }, true);
         }
         catch (Exception ex)
         {
@@ -724,7 +726,7 @@ public class QuotationController : IHttpHandler
 
             String checkQO = "select md_trangthai_id from c_baogia where c_baogia_id = @c_baogia_id";
             String trangthai = (String)mdbc.ExecuteScalar(checkQO, "@c_baogia_id", c_baogia_id);
-            if (trangthai.Equals("HIEULUC"))
+            if (trangthai.Equals(Helper.HIEULUC))
             {
                 jqGridHelper.Utils.writeResult(0, "Không thể chỉnh sửa khi quotation đã hiệu lực!");
             }
@@ -758,6 +760,7 @@ public class QuotationController : IHttpHandler
                 if (check == 0)
                 {
                     db.SubmitChanges();
+                    trg_c_baogia.load(db, new System.Collections.Generic.List<c_baogia> { m }, true);
                     jqGridHelper.Utils.writeResult(1, "Cập nhật thành công!");
                 }
                 else
@@ -922,6 +925,15 @@ public class QuotationController : IHttpHandler
     #endregion
 
     #endregion
+
+    public void Dispose()
+    {
+        if (db != null)
+        {
+            db.Dispose();
+            db = null;
+        }
+    }
 
     public bool IsReusable
     {

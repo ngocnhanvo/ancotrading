@@ -8,9 +8,18 @@ using System.Data;
 using ExcelLibrary.SpreadSheet;
 using System.Collections.Generic;
 using System.IO;
-public class Controller_TienVe : IHttpHandler
+public class Controller_TienVe : IHttpHandler, IDisposable
 {
     private LinqDBDataContext db = new LinqDBDataContext();
+
+    public void Dispose()
+    {
+        if (db != null)
+        {
+            db.Dispose();
+            db = null;
+        }
+    }
 
     public string upload(HttpContext context)
     {
@@ -152,6 +161,7 @@ public class Controller_TienVe : IHttpHandler
 
     public void ProcessRequest(HttpContext context)
     {
+        context.DisposeOnPipelineCompleted(this);
         String action, oper;
         action = context.Request.QueryString["action"];
         oper = context.Request.Form["oper"];

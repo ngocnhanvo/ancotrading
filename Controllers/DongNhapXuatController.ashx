@@ -6,12 +6,22 @@ using System.Web;
 using System.Data.Linq;
 using System.Linq;
 
-public class DongNhapXuatController : IHttpHandler
+public class DongNhapXuatController : IHttpHandler, IDisposable
 {
     private LinqDBDataContext db = new LinqDBDataContext();
 
+    public void Dispose()
+    {
+        if (db != null)
+        {
+            db.Dispose();
+            db = null;
+        }
+    }
+
     public void ProcessRequest(HttpContext context)
     {
+        context.DisposeOnPipelineCompleted(this);
         String action, oper;
         action = context.Request.QueryString["action"];
         oper = context.Request.Form["oper"];

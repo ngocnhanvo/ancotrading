@@ -8,12 +8,22 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Collections.Generic;
 
-public class HoaDonChiTietController : IHttpHandler
+public class HoaDonChiTietController : IHttpHandler, IDisposable
 {
     private LinqDBDataContext db = new LinqDBDataContext();
 
+    public void Dispose()
+    {
+        if (db != null)
+        {
+            db.Dispose();
+            db = null;
+        }
+    }
+
     public void ProcessRequest(HttpContext context)
     {
+        context.DisposeOnPipelineCompleted(this);
         String action, oper;
         action = context.Request.QueryString["action"];
         oper = context.Request.Form["oper"];

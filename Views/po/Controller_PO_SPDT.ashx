@@ -8,12 +8,13 @@ using System.Data;
 using ExcelLibrary.SpreadSheet;
 using System.Collections.Generic;
 using System.IO;
-public class Controller_PO_SPDT : IHttpHandler
+public class Controller_PO_SPDT : IHttpHandler, IDisposable
 {
     private LinqDBDataContext db = new LinqDBDataContext();
 
     public void ProcessRequest(HttpContext context)
     {
+        context.DisposeOnPipelineCompleted(this);
         String action, oper;
         action = context.Request.Params["action"];
         oper = context.Request.Form["oper"];
@@ -401,6 +402,15 @@ public class Controller_PO_SPDT : IHttpHandler
         }
         xml += "</rows>";
         context.Response.Write(xml);
+    }
+
+    public void Dispose()
+    {
+        if (db != null)
+        {
+            db.Dispose();
+            db = null;
+        }
     }
 
     public bool IsReusable

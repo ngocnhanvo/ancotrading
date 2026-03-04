@@ -8,11 +8,12 @@ using System.Data;
 using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-public class DonHangController : IHttpHandler
+public class DonHangController : IHttpHandler, IDisposable
 {
     private LinqDBDataContext db = new LinqDBDataContext();
     public void ProcessRequest(HttpContext context)
     {
+        context.DisposeOnPipelineCompleted(this);
         String action, oper;
         action = context.Request.Params["action"];
         oper = context.Request.Form["oper"];
@@ -254,7 +255,7 @@ public class DonHangController : IHttpHandler
                 }
             }
 
-            if(string.IsNullOrWhiteSpace(nvctut))
+            if (string.IsNullOrWhiteSpace(nvctut))
             {
                 msg = $@"Đơn hàng ""{sctut}"" chưa chọn nhân viên chứng từ";
                 goto EndEventHandler;
@@ -1253,6 +1254,7 @@ public class DonHangController : IHttpHandler
                         //    db.c_donhang_spds.InsertOnSubmit(spd2);
                         //}
                         db.SubmitChanges();
+                        trg_c_donhang.load(db, new List<c_donhang>() { mnu }, true);
                         jqGridHelper.Utils.writeResult(1, "Thêm mới thành công!");
                     }
                     else
@@ -1356,7 +1358,7 @@ public class DonHangController : IHttpHandler
                 }
                 db.SubmitChanges();
 
-                if(codoingaypass)
+                if (codoingaypass)
                 {
                     string manv = UserUtils.getUser(context);
                     var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
@@ -1473,7 +1475,7 @@ public class DonHangController : IHttpHandler
                         check++;
                     }
 
-                    if (m.md_trangthai_id.Equals("KETTHUC"))
+                    if (m.md_trangthai_id.Equals(Helper.KETTHUC))
                     {
                         msg = "Không thể sửa PO đã kết thúc!";
                         check++;
@@ -1508,6 +1510,7 @@ public class DonHangController : IHttpHandler
 
                         db.SubmitChanges();
                         Public.triggerDonHang(db, m, null, true);
+                        trg_c_donhang.load(db, new List<c_donhang>() { m }, true);
                         jqGridHelper.Utils.writeResult(1, "Cập nhật thành công!");
                     }
                     else
@@ -1820,11 +1823,21 @@ public class DonHangController : IHttpHandler
 
         context.Response.Write(json);
     }
-
     #endregion
+
+    public void Dispose()
+    {
+        if (db != null)
+        {
+            db.Dispose();
+            db = null;
+        }
+    }
 
     public bool IsReusable
     {
-        get { return false; }
+        get {
+            return false;
+        }
     }
 }

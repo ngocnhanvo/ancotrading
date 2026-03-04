@@ -5,12 +5,13 @@ using System.Web;
 using System.Data.Linq;
 using System.Linq;
 
-public class QuotationDetailController : IHttpHandler
+public class QuotationDetailController : IHttpHandler, IDisposable
 {
     private LinqDBDataContext db = new LinqDBDataContext();
 
     public void ProcessRequest(HttpContext context)
     {
+        context.DisposeOnPipelineCompleted(this);
         String action, oper;
         action = context.Request.QueryString["action"];
         oper = context.Request.Form["oper"];
@@ -575,6 +576,15 @@ public class QuotationDetailController : IHttpHandler
         }
         xml += "</rows>";
         context.Response.Write(xml);
+    }
+
+    public void Dispose()
+    {
+        if (db != null)
+        {
+            db.Dispose();
+            db = null;
+        }
     }
 
     public bool IsReusable

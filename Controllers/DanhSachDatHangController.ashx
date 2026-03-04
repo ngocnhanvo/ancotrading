@@ -11,7 +11,7 @@ using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-public class DanhSachDatHangController : IHttpHandler
+public class DanhSachDatHangController : IHttpHandler, IDisposable
 {
     private LinqDBDataContext db = new LinqDBDataContext();
     public String path = HttpContext.Current.Server.MapPath("~/FileSendMail/");
@@ -29,8 +29,18 @@ public class DanhSachDatHangController : IHttpHandler
         }
     };
 
+    public void Dispose()
+    {
+        if (db != null)
+        {
+            db.Dispose();
+            db = null;
+        }
+    }
+
     public void ProcessRequest(HttpContext context)
     {
+        context.DisposeOnPipelineCompleted(this);
         String action, oper;
         action = context.Request.QueryString["action"];
         oper = context.Request.Form["oper"];
@@ -423,6 +433,8 @@ public class DanhSachDatHangController : IHttpHandler
                             x.h1,
                             x.gianhap,
                             x.giachuan,
+                            x.phi,
+                            x.phidg,
                             ghichu_vachngan = EncodeHTML_DSDH(x.ghichu_vachngan),
                             x.c_dongdsdh_id,
                             x.c_dongdonhang_id,
