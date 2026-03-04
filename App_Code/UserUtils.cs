@@ -459,14 +459,14 @@ public static class UserUtils
                 {
 					gianhap = ddonhang.discount.GetValueOrDefault(0) > 0 ? gianhap2 : giaNhap2BD;
                     giachuan = gianhap;
-                    gianhap = gianhap + phiDiscount + phiDongGoi;
+                    gianhap = giachuan + phiDiscount + phiDongGoi;
                 }
             }
             else
             {
                 phiDiscount = phiDiscount_VND;
                 phiDongGoi = phiDongGoi_VND;
-                gianhap = phiDiscount + phiDongGoi;
+                gianhap = giachuan + phiDiscount + phiDongGoi;
             }
 
             //if(ma_dtkd_select == "ANBINH" & sp.ma_sanpham.StartsWith("88-"))
