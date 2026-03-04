@@ -608,7 +608,7 @@ public class DanhSachDatHangReport
                 else if(colHeader.value == "thanhTien")
                 {
                     if (guiNCC == false)
-                        cel_row_t.CellFormula = String.Format("J{0}*F{0}",row + 1);
+                        cel_row_t.CellFormula = String.Format("K{0}*F{0}",row + 1);
 
                     cel_row_t.CellStyle = cellAmount;
                 }
@@ -670,10 +670,10 @@ public class DanhSachDatHangReport
         if (guiNCC == true)
             s1.GetRow(row).CreateCell(10).SetCellValue("");
         else
-            s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("SUM(K{0}:K{1})", m, row));
+            s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("SUM(L{0}:L{1})", m, row));
 
         s1.GetRow(row).GetCell(10).CellStyle = cellBoldAmount;
-        s1.GetRow(row).CreateCell(15).SetCellFormula(String.Format("SUM(P{0}:P{1})", m, row));
+        s1.GetRow(row).CreateCell(15).SetCellFormula(String.Format("SUM(Q{0}:Q{1})", m, row));
         s1.GetRow(row).GetCell(15).CellStyle = cellBoldCBM;
 
 		row++;
@@ -763,7 +763,7 @@ public class DanhSachDatHangReport
         var tongCongDaTru = sumThanhTien + phiTangVal - phiGiamVal - discount;
         if (guiNCC == false)
         {
-            cellR10.SetCellFormula(String.Format("K{0} + K{1} - K{2} - K{3}", sub, cong, tru, dis));
+            cellR10.SetCellFormula(String.Format("L{0} + L{1} - L{2} - L{3}", sub, cong, tru, dis));
             cellR10.CellStyle = cellBoldAmount;
         }
 		row++;
