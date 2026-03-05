@@ -767,7 +767,7 @@ public class DanhSachDatHangReport
             var tongCongDaTru = sumThanhTien + phiTangVal - phiGiamVal - discount;
             if (guiNCC == false)
             {
-                cellR10.SetCellFormula(String.Format("L{0} + L{1} - L{2} - L{3}", sub, cong, tru, dis));
+                cellR10.SetCellFormula(String.Format("K{0} + K{1} - K{2} - K{3}", sub, cong, tru, dis));
                 cellR10.CellStyle = cellBoldAmount;
             }
             row++;
