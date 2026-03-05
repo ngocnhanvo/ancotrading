@@ -25,7 +25,8 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
             lstText = rptDSDH.LstText;
             HSSFWorkbook wb = rptDSDH.CreateWBPI();
 
-            this.SaveFile(wb, "Danh-Sach-Dat-Hang-" + DateTime.Now.ToString() + ".xls", rptDSDH.ConfigExcel);
+            if(wb != null)
+                this.SaveFile(wb, "Danh-Sach-Dat-Hang-" + DateTime.Now.ToString() + ".xls", rptDSDH.ConfigExcel);
         }
         catch (Exception ex)
         {

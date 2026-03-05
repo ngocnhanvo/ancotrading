@@ -387,9 +387,12 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
             if (dt.Rows.Count != 0)
             {
-                HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt);
-                String saveAsFileName = String.Format("DonHang-{0}.xls", DateTime.Now);
-                this.SaveFile(hssfworkbook, saveAsFileName);
+                var hssfworkbook = this.CreateWorkBookPO(dt);
+                if (hssfworkbook != null)
+                {
+                    String saveAsFileName = String.Format("DonHang-{0}.xls", DateTime.Now);
+                    this.SaveFile(hssfworkbook, saveAsFileName);
+                }
             }
             else
             {
@@ -409,402 +412,407 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
     public HSSFWorkbook CreateWorkBookPO(DataTable dt)
     {
-        string discount_hehang_value = dt.Rows[0]["discount_hehang_value"] + "";
-        string tenKT = dt.Rows[0]["ten_kichthuoc"] + "";
-        string tenTL = dt.Rows[0]["ten_trongluong"] + "";
-        var nnl = string.IsNullOrEmpty(discount_hehang_value) ? null : JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(discount_hehang_value);
-        
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
-        ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
-        HSSFSheet hssfsheet = (HSSFSheet)s1;
-
-        var config = new ExportExcel(hssfworkbook, 0, type == "pdf" ? 12 : 16);
-        config.NameTypePrint = "InPO";
-        config.isPDF = type == "pdf";
-        config.endHeader = 12;
-
-        Excel_Format ex_fm = new Excel_Format(hssfworkbook);
-
-        #region Style Cell
-        var fontSizeRpt = double.Parse(config.layKichThuocChuChoRpt());
-        var fontSizeRptShort = (short)fontSizeRpt;
-        ICellStyle cellBold = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "T");
-        ICellStyle cellBoldTop = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "B");
-        ICellStyle cellBoldJustify = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "J");
-        var cellBoldBG = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "T");
-        cellBoldBG.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
-        cellBoldBG.FillPattern = FillPattern.SolidForeground;
-        //-- 
-        ICellStyle cellHeader = ex_fm.getcell((short)(fontSizeRptShort + 6), true, true, "", "C", "T");
-        //-- 
-        ICellStyle cellHeader_n = ex_fm.getcell(fontSizeRptShort, false, true, "", "C", "T");
-        //--
-        ICellStyle celltext = ex_fm.getcell(fontSizeRptShort, false, true, "", "L", "T");
-        //--
-        ICellStyle rightBold = ex_fm.getcell(fontSizeRptShort, true, false, "", "R", "T");
-        var bottomLeftBold = ex_fm.getcell(fontSizeRptShort, true, false, "B", "L", "T");
-
-        ICellStyle rightBold0 = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", fmt0);
-        ICellStyle rightBold3 = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", fmt0i000);
-        //--
-        ICellStyle rightBold4 = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", "#,##0.0000");
-        //--
-        ICellStyle right = ex_fm.getcell(fontSizeRptShort, false, false, "", "R", "T");
-        //--
-        ICellStyle leftBold = ex_fm.getcell(fontSizeRptShort, true, false, "", "L", "T");
-        //--
-        ICellStyle left = ex_fm.getcell(fontSizeRptShort, false, false, "", "L", "T");
-        //--
-        ICellStyle border_number0 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##");
-        ICellStyle border_number1 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0");
-        ICellStyle border_number2 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.00");
-        ICellStyle border_number3 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.000");
-        ICellStyle border_number4 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0000");
-        ICellStyle border = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "L", "T");
-        ICellStyle border_center = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "C", "T");
-        //--
-        ICellStyle borderright = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "L", "T");
-        //--
-        ICellStyle borderonlyleft = ex_fm.getcell(fontSizeRptShort, false, true, "L", "T", "T");
-        //--
-        ICellStyle borderWrap = ex_fm.getcell(fontSizeRptShort, true, true, "LRBT", "C", "T");
-        //--
-        ICellStyle signBold = ex_fm.getcell(fontSizeRptShort, true, true, "", "C", "C");
-
-        config.cellHeader = cellHeader;
-        config.cellHeader_n = cellHeader_n;
-        var cellCBM = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "cbm"));
-        var cellSoLuong = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "soluong"));
-        var fmtDiscount = config.laySoThapPhanChoRpt("", "discount");
-        var cellAmount = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "amount"));
-        var cellBoldCBM = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "cbm"));
-        var cellBoldSoLuong = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "soluong"));
-        var cellBoldAmount = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "amount"));
-        #endregion Style Cell
-
-        int row = 0;
-        //
-        var columnHeaders = new List<columnHeader>();
-        int width = 4500;
-        int height = 22;
-
-        #region columnHeaders
-        columnHeaders.Add(new columnHeader()
+        ISheet s1 = null;
+        HSSFSheet hssfsheet = null;
+        try
         {
-            text = "No.",
-            value = "no",
-            columnAt = 0,
-            width = 2000
-        });
+            string discount_hehang_value = dt.Rows[0]["discount_hehang_value"] + "";
+            string tenKT = dt.Rows[0]["ten_kichthuoc"] + "";
+            string tenTL = dt.Rows[0]["ten_trongluong"] + "";
+            var nnl = string.IsNullOrEmpty(discount_hehang_value) ? null : JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(discount_hehang_value);
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "ANCO Item No.",
-            value = "ma_sanpham",
-            columnAt = 1,
-            width = 6000
-        });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Picture - Only for shape ref.",
-            value = "",
-            columnAt = 2,
-            width = width
-        });
+            s1 = hssfworkbook.CreateSheet("Sheet1");
+            hssfsheet = (HSSFSheet)s1;
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Customer Item No.",
-            value = "ma_sanpham_khach",
-            columnAt = 3,
-            width = width
-        });
+            var config = new ExportExcel(hssfworkbook, 0, type == "pdf" ? 12 : 16);
+            config.NameTypePrint = "InPO";
+            config.isPDF = type == "pdf";
+            config.endHeader = 12;
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Description",
-            value = "mota_tienganh",
-            columnAt = 4,
-            width = type == "pdf" ? 12000 : 10000
-        });
+            Excel_Format ex_fm = new Excel_Format(hssfworkbook);
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Packing inner/master",
-            value = "ten_donggoi_inner",
-            columnAt = 5,
-            width = 3000
-        });
+            #region Style Cell
+            var fontSizeRpt = double.Parse(config.layKichThuocChuChoRpt());
+            var fontSizeRptShort = (short)fontSizeRpt;
+            ICellStyle cellBold = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "T");
+            ICellStyle cellBoldTop = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "B");
+            ICellStyle cellBoldJustify = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "J");
+            var cellBoldBG = ex_fm.getcell(fontSizeRptShort, true, true, "", "L", "T");
+            cellBoldBG.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
+            cellBoldBG.FillPattern = FillPattern.SolidForeground;
+            //-- 
+            ICellStyle cellHeader = ex_fm.getcell((short)(fontSizeRptShort + 6), true, true, "", "C", "T");
+            //-- 
+            ICellStyle cellHeader_n = ex_fm.getcell(fontSizeRptShort, false, true, "", "C", "T");
+            //--
+            ICellStyle celltext = ex_fm.getcell(fontSizeRptShort, false, true, "", "L", "T");
+            //--
+            ICellStyle rightBold = ex_fm.getcell(fontSizeRptShort, true, false, "", "R", "T");
+            var bottomLeftBold = ex_fm.getcell(fontSizeRptShort, true, false, "B", "L", "T");
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "ten_donggoi_outer",
-            columnAt = 6,
-            width = 3000
-        });
+            ICellStyle rightBold0 = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", fmt0);
+            ICellStyle rightBold3 = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", fmt0i000);
+            //--
+            ICellStyle rightBold4 = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", "#,##0.0000");
+            //--
+            ICellStyle right = ex_fm.getcell(fontSizeRptShort, false, false, "", "R", "T");
+            //--
+            ICellStyle leftBold = ex_fm.getcell(fontSizeRptShort, true, false, "", "L", "T");
+            //--
+            ICellStyle left = ex_fm.getcell(fontSizeRptShort, false, false, "", "L", "T");
+            //--
+            ICellStyle border_number0 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##");
+            ICellStyle border_number1 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0");
+            ICellStyle border_number2 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.00");
+            ICellStyle border_number3 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.000");
+            ICellStyle border_number4 = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", "#,##0.0000");
+            ICellStyle border = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "L", "T");
+            ICellStyle border_center = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "C", "T");
+            //--
+            ICellStyle borderright = ex_fm.getcell(fontSizeRptShort, false, true, "LRBT", "L", "T");
+            //--
+            ICellStyle borderonlyleft = ex_fm.getcell(fontSizeRptShort, false, true, "L", "T", "T");
+            //--
+            ICellStyle borderWrap = ex_fm.getcell(fontSizeRptShort, true, true, "LRBT", "C", "T");
+            //--
+            ICellStyle signBold = ex_fm.getcell(fontSizeRptShort, true, true, "", "C", "C");
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Nbr of Packs",
-            value = "ofpack",
-            columnAt = 7,
-            width = width
-        });
+            config.cellHeader = cellHeader;
+            config.cellHeader_n = cellHeader_n;
+            var cellCBM = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "cbm"));
+            var cellSoLuong = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "soluong"));
+            var fmtDiscount = config.laySoThapPhanChoRpt("", "discount");
+            var cellAmount = ex_fm.getcell2(fontSizeRptShort, false, true, "LRBT", "R", "T", config.laySoThapPhanChoRpt("", "amount"));
+            var cellBoldCBM = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "cbm"));
+            var cellBoldSoLuong = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "soluong"));
+            var cellBoldAmount = ex_fm.getcell2(fontSizeRptShort, true, false, "", "R", "T", config.laySoThapPhanChoRpt("", "amount"));
+            #endregion Style Cell
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Quantity (sets/pcs)",
-            value = "soluong",
-            columnAt = 8,
-            width = 3000
-        });
+            int row = 0;
+            //
+            var columnHeaders = new List<columnHeader>();
+            int width = 4500;
+            int height = 22;
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "dvt_sp",
-            columnAt = 9,
-            width = 3000
-        });
+            #region columnHeaders
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "No.",
+                value = "no",
+                columnAt = 0,
+                width = 2000
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "FOB price (USD)",
-            value = "giafob",
-            columnAt = 10,
-            width = width
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "ANCO Item No.",
+                value = "ma_sanpham",
+                columnAt = 1,
+                width = 6000
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "CBM",
-            value = "cbm",
-            columnAt = 11,
-            width = width
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Picture - Only for shape ref.",
+                value = "",
+                columnAt = 2,
+                width = width
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Amount (USD)",
-            value = "amount",
-            columnAt = 12,
-            width = width
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Customer Item No.",
+                value = "ma_sanpham_khach",
+                columnAt = 3,
+                width = width
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = string.Format(@"Master Packing size (LxWxH){0}", tenKT),
-            value = "l2",
-            columnAt = 13,
-            width = type == "pdf" ? 0 : 3000
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Description",
+                value = "mota_tienganh",
+                columnAt = 4,
+                width = type == "pdf" ? 12000 : 10000
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "w2",
-            columnAt = 14,
-            width = type == "pdf" ? 0 : 3000
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Packing inner/master",
+                value = "ten_donggoi_inner",
+                columnAt = 5,
+                width = 3000
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "h2",
-            columnAt = 15,
-            width = type == "pdf" ? 0 : 3000
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "",
+                value = "ten_donggoi_outer",
+                columnAt = 6,
+                width = 3000
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "HS CODE",
-            value = "ma_hscode",
-            columnAt = 16,
-            width = type == "pdf" ? 0 : width
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Nbr of Packs",
+                value = "ofpack",
+                columnAt = 7,
+                width = width
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = string.Format(@"Weight({0}s)", tenTL),
-            value = "trongluong",
-            columnAt = 17,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Quantity (sets/pcs)",
+                value = "soluong",
+                columnAt = 8,
+                width = 3000
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = string.Format(@"N.W/master ({0}s)", tenTL),
-            value = "n_w_master",
-            columnAt = 18,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "",
+                value = "dvt_sp",
+                columnAt = 9,
+                width = 3000
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = string.Format(@"G.W/master ({0}s)", tenTL),
-            value = "g_w_master",
-            columnAt = 19,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "FOB price (USD)",
+                value = "giafob",
+                columnAt = 10,
+                width = width
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Master packing",
-            value = "sl_outer",
-            columnAt = 20,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "CBM",
+                value = "cbm",
+                columnAt = 11,
+                width = width
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Inner packing",
-            value = "sl_inner",
-            columnAt = 21,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Amount (USD)",
+                value = "amount",
+                columnAt = 12,
+                width = width
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Inner Packing size (LxWxH)",
-            value = "l1",
-            columnAt = 22,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = string.Format(@"Master Packing size (LxWxH){0}", tenKT),
+                value = "l2",
+                columnAt = 13,
+                width = type == "pdf" ? 0 : 3000
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "w1",
-            columnAt = 23,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "",
+                value = "w2",
+                columnAt = 14,
+                width = type == "pdf" ? 0 : 3000
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "h1",
-            columnAt = 24,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "",
+                value = "h2",
+                columnAt = 15,
+                width = type == "pdf" ? 0 : 3000
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Product size (LxWxH) cm",
-            value = "l_cm",
-            columnAt = 25,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "HS CODE",
+                value = "ma_hscode",
+                columnAt = 16,
+                width = type == "pdf" ? 0 : width
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "w_cm",
-            columnAt = 26,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = string.Format(@"Weight({0}s)", tenTL),
+                value = "trongluong",
+                columnAt = 17,
+                width = 0
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "h_cm",
-            columnAt = 27,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = string.Format(@"N.W/master ({0}s)", tenTL),
+                value = "n_w_master",
+                columnAt = 18,
+                width = 0
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Product size (LxWxH) inch",
-            value = "l_inch",
-            columnAt = 28,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = string.Format(@"G.W/master ({0}s)", tenTL),
+                value = "g_w_master",
+                columnAt = 19,
+                width = 0
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "w_inch",
-            columnAt = 29,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Master packing",
+                value = "sl_outer",
+                columnAt = 20,
+                width = 0
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "",
-            value = "h_inch",
-            columnAt = 30,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Inner packing",
+                value = "sl_inner",
+                columnAt = 21,
+                width = 0
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Barcode",
-            value = "barcode",
-            columnAt = 31,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Inner Packing size (LxWxH)",
+                value = "l1",
+                columnAt = 22,
+                width = 0
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Giá gốc",
-            value = "giachuan",
-            columnAt = 32,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "",
+                value = "w1",
+                columnAt = 23,
+                width = 0
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Phí",
-            value = "phi",
-            columnAt = 33,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "",
+                value = "h1",
+                columnAt = 24,
+                width = 0
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "CPĐG",
-            value = "cpdg",
-            columnAt = 34,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Product size (LxWxH) cm",
+                value = "l_cm",
+                columnAt = 25,
+                width = 0
+            });
 
-        columnHeaders.Add(new columnHeader()
-        {
-            text = "Discount (%)",
-            value = "discountHH",
-            columnAt = 35,
-            width = 0
-        });
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "",
+                value = "w_cm",
+                columnAt = 26,
+                width = 0
+            });
 
-        var width02to12 = columnHeaders.Where(s => s.columnAt >= 2 & s.columnAt <= 12).Select(s => s.width).Sum();
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "",
+                value = "h_cm",
+                columnAt = 27,
+                width = 0
+            });
 
-        #endregion columnHeaders
-        //
-        //set A1 - A4
-        row = config.createHeader(NameHeaderReport.ANCO, s1, row, height);
-        //--
-        //set J4 - F8
-        string[] b = { "Date:", "No.:" };
-        string[] b_value = { "ngaylap", "sochungtu" };
-        for (int i = 0; i < b.Count(); i++)
-        {
-            s1.CreateRow(row).CreateCell(9).SetCellValue(b[i]);
-            s1.GetRow(row).GetCell(9).CellStyle = cellBold;
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 10, 12));
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Product size (LxWxH) inch",
+                value = "l_inch",
+                columnAt = 28,
+                width = 0
+            });
 
-            if (i == 0)
-                s1.GetRow(row).CreateCell(10).SetCellValue(DateTime.Parse(dt.Rows[0][b_value[i]].ToString()).ToString("dd/MMM/yyyy"));
-            else if (b_value[i] != "")
-                s1.GetRow(row).CreateCell(10).SetCellValue(dt.Rows[0][b_value[i]].ToString());
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "",
+                value = "w_inch",
+                columnAt = 29,
+                width = 0
+            });
 
-            s1.GetRow(row).GetCell(9).CellStyle = cellBold;
-            s1.GetRow(row).GetCell(10).CellStyle = cellBold;
-            s1.GetRow(row).HeightInPoints = height;
-            row++;
-        }
-        //set A7 - A11
-        string[] c = {
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "",
+                value = "h_inch",
+                columnAt = 30,
+                width = 0
+            });
+
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Barcode",
+                value = "barcode",
+                columnAt = 31,
+                width = 0
+            });
+
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Giá gốc",
+                value = "giachuan",
+                columnAt = 32,
+                width = 0
+            });
+
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Phí",
+                value = "phi",
+                columnAt = 33,
+                width = 0
+            });
+
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "CPĐG",
+                value = "cpdg",
+                columnAt = 34,
+                width = 0
+            });
+
+            columnHeaders.Add(new columnHeader()
+            {
+                text = "Discount (%)",
+                value = "discountHH",
+                columnAt = 35,
+                width = 0
+            });
+
+            var width02to12 = columnHeaders.Where(s => s.columnAt >= 2 & s.columnAt <= 12).Select(s => s.width).Sum();
+
+            #endregion columnHeaders
+            //
+            //set A1 - A4
+            row = config.createHeader(NameHeaderReport.ANCO, s1, row, height);
+            //--
+            //set J4 - F8
+            string[] b = { "Date:", "No.:" };
+            string[] b_value = { "ngaylap", "sochungtu" };
+            for (int i = 0; i < b.Count(); i++)
+            {
+                s1.CreateRow(row).CreateCell(9).SetCellValue(b[i]);
+                s1.GetRow(row).GetCell(9).CellStyle = cellBold;
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 10, 12));
+
+                if (i == 0)
+                    s1.GetRow(row).CreateCell(10).SetCellValue(DateTime.Parse(dt.Rows[0][b_value[i]].ToString()).ToString("dd/MMM/yyyy"));
+                else if (b_value[i] != "")
+                    s1.GetRow(row).CreateCell(10).SetCellValue(dt.Rows[0][b_value[i]].ToString());
+
+                s1.GetRow(row).GetCell(9).CellStyle = cellBold;
+                s1.GetRow(row).GetCell(10).CellStyle = cellBold;
+                s1.GetRow(row).HeightInPoints = height;
+                row++;
+            }
+            //set A7 - A11
+            string[] c = {
             "The Buyer:"
             , ""
             , ""
@@ -814,7 +822,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , "Commodity:"
             , "Item nos., description, packing, quantity, unit price and amount:"
         };
-        string[] c_value = {
+            string[] c_value = {
             "ten_dtkd"
             , "diachi"
             , ""
@@ -825,538 +833,545 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             , ""
         };
 
-        for (int i = 0; i < c.Length; i++)
-        {
-            var rich_text = "";
-            rich_text = i == 0 ? "{0}" : (i == 1 ? "Address: {1}" : (i == 2 ? "Tel: {2}                          Fax: {3}" : "{4}"));
-            rich_text = string.Format(rich_text, dt.Rows[0]["ten_dtkd"], dt.Rows[0]["diachi"], dt.Rows[0]["tel"], dt.Rows[0]["fax"], c_value[i] == "" ? "" : dt.Rows[0][c_value[i]]);
-
-            IRow rowCreate = null;
-            if (!config.isPDF.GetValueOrDefault(false))
+            for (int i = 0; i < c.Length; i++)
             {
-                if (!new int[] { 1, 2 }.Contains(i))
+                var rich_text = "";
+                rich_text = i == 0 ? "{0}" : (i == 1 ? "Address: {1}" : (i == 2 ? "Tel: {2}                          Fax: {3}" : "{4}"));
+                rich_text = string.Format(rich_text, dt.Rows[0]["ten_dtkd"], dt.Rows[0]["diachi"], dt.Rows[0]["tel"], dt.Rows[0]["fax"], c_value[i] == "" ? "" : dt.Rows[0][c_value[i]]);
+
+                IRow rowCreate = null;
+                if (!config.isPDF.GetValueOrDefault(false))
+                {
+                    if (!new int[] { 1, 2 }.Contains(i))
+                    {
+                        rowCreate = s1.CreateRow(row);
+                        rowCreate.CreateCell(1).SetCellValue(c[i]);
+                        rowCreate.GetCell(1).SetCellValue(c[i]);
+                        rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
+                        rowCreate.CreateCell(2).SetCellValue(rich_text);
+                        height = 22;
+                    }
+                    else
+                    {
+                        row = row - 1;
+                        rowCreate = s1.GetRow(row);
+                        rowCreate.GetCell(2).SetCellValue(rowCreate.GetCell(2).StringCellValue + "\n" + rich_text);
+                        height = 50;
+                    }
+                }
+                else
                 {
                     rowCreate = s1.CreateRow(row);
                     rowCreate.CreateCell(1).SetCellValue(c[i]);
-                    rowCreate.GetCell(1).SetCellValue(c[i]);
                     rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
                     rowCreate.CreateCell(2).SetCellValue(rich_text);
                     height = 22;
                 }
+
+                rowCreate.GetCell(2).CellStyle = i > 2 ? celltext : cellBold;
+
+                if (new int[] { 0, 1, 2, 3, 5, 6 }.Contains(i))
+                {
+                    var int012 = new int[] { 0, 1, 2 }.Contains(i);
+                    var int3 = new int[] { 3 }.Contains(i);
+                    var int5 = new int[] { 5 }.Contains(i);
+                    var int6 = new int[] { 6 }.Contains(i);
+
+                    lstText.Add(new AvariablePrj.lstText()
+                    {
+                        columnFPrev = 1,
+                        columnTPrev = 1,
+                        columnF = 2,
+                        columnT = 12,
+                        left = int012 ? 60 : (int3 ? 60 : (int5 ? 15 : (int6 ? 60 : 0))),
+                        top = (float)-0.5,
+                        row = row,
+                        bold = int012 ? true : false
+                    });
+                    s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
+                }
                 else
                 {
-                    row = row - 1;
-                    rowCreate = s1.GetRow(row);
-                    rowCreate.GetCell(2).SetCellValue(rowCreate.GetCell(2).StringCellValue + "\n" + rich_text);
-                    height = 50;
+                    s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 12));
+                    height = 22;
+                    rowCreate.GetCell(1).CellStyle = celltext;
                 }
-            }
-            else
-            {
-                rowCreate = s1.CreateRow(row);
-                rowCreate.CreateCell(1).SetCellValue(c[i]);
-                rowCreate.GetCell(1).CellStyle = i > 0 ? celltext : cellBold;
-                rowCreate.CreateCell(2).SetCellValue(rich_text);
-                height = 22;
-            }
-            
-            rowCreate.GetCell(2).CellStyle = i > 2 ? celltext : cellBold;
 
-            if (new int[] { 0, 1, 2, 3, 5, 6 }.Contains(i))
-            {
-                var int012 = new int[] { 0, 1, 2 }.Contains(i);
-                var int3 = new int[] { 3 }.Contains(i);
-                var int5 = new int[] { 5 }.Contains(i);
-                var int6 = new int[] { 6 }.Contains(i);
-
-                lstText.Add(new AvariablePrj.lstText() {
-                    columnFPrev = 1,
-                    columnTPrev = 1,
-                    columnF = 2,
-                    columnT = 12,
-                    left = int012 ? 60 : (int3 ? 60 : (int5 ? 15 : (int6 ? 60 : 0))),
-                    top = (float)-0.5,
-                    row = row,
-                    bold = int012 ? true : false
-                });
-                s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
-            }
-            else
-            {
-                s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 12));
-                height = 22;
-                rowCreate.GetCell(1).CellStyle = celltext;
+                rowCreate.HeightInPoints = height;
+                row++;
             }
 
-            rowCreate.HeightInPoints = height;
-            row++;
-        }
-
-        // set A13 - All
-        // -- Header
-        IRow rowColumnHeader = s1.CreateRow(row);
-        rowColumnHeader.Height = -1;
-        foreach(var columnHeader in columnHeaders.OrderBy(s=>s.columnAt))
-        {
-            rowColumnHeader.CreateCell(columnHeader.columnAt).SetCellValue(columnHeader.text);
-            rowColumnHeader.GetCell(columnHeader.columnAt).CellStyle = borderWrap;
-
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 6));
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 13, 15));
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 22, 24));
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 25, 27));
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 28, 30));
-            s1.SetColumnWidth(columnHeader.columnAt, columnHeader.width);
-        }
-        row++;
-        // -- Details
-        int count_row = 1;
-        //
-        double discount = 0, discount1 = 0, startRowHH = -1;
-        var lstHH = new List<int>();
-        var lstAmountHH = new List<int>();
-        // create detail row
-        for (int i = 0; i < dt.Rows.Count; i++)
-        {
-            var msp = dt.Rows[i]["ma_sanpham"].ToString();
-            var mota = dt.Rows[i]["mota_tienganh"] + "";
-            var masterSize = new List<string>();
-            masterSize.Add(dt.Rows[i]["l2"] + "");
-            masterSize.Add(dt.Rows[i]["w2"] + "");
-            masterSize.Add(dt.Rows[i]["h2"] + "");
-
-            var cmInch = Public.convertCmToInch(mota, masterSize, tenKT);
-            dt.Rows[i]["mota_tienganh"] = cmInch["mota"];
-            masterSize = cmInch["masterSize"] as List<string>;
-            dt.Rows[i]["l2"] = masterSize[0];
-            dt.Rows[i]["w2"] = masterSize[1];
-            dt.Rows[i]["h2"] = masterSize[2];
-
-            var kgPound = Public.convertKgToPound(
-                dt.Rows[i]["trongluong"] + ""
-                , dt.Rows[i]["n_w_master"] + ""
-                , dt.Rows[i]["g_w_master"] + ""
-                , tenTL
-                );
-            dt.Rows[i]["trongluong"] = kgPound["weight"];
-            dt.Rows[i]["n_w_master"] = kgPound["NWmaster"];
-            dt.Rows[i]["g_w_master"] = kgPound["GWmaster"];
-
-            var chungloai = msp.Substring(0, 2);
-            var chungloaiTT = i == dt.Rows.Count - 1 ? chungloai : dt.Rows[i + 1]["ma_sanpham"].ToString().Substring(0, 2);
-
-            if (startRowHH == -1)
-                startRowHH = row;
-
-            var valDis = dt.Rows[i]["dis"].ToString();
-            discount = double.Parse(string.IsNullOrWhiteSpace(valDis) ? "0" : valDis);
-
-            var valDis1 = dt.Rows[i]["dis1"].ToString();
-            discount1 = double.Parse(string.IsNullOrWhiteSpace(valDis1) ? "0" : valDis1);
-
-            IRow row_t = s1.CreateRow(row);
-            float heightMAX = config.MeasureTextHeight(mota, 10000, "Arial", fontSizeRptShort);
-            row_t.HeightInPoints = heightMAX < 60 ? 60 : heightMAX;
-
-            //
-            try
-            {
-                var imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImageProduct(msp));
-
-                lstimage.Add(new AvariablePrj.lstImage
-                {
-                    row = row,
-                    column = 3,
-                    link = imgPath,
-                    heightCell = 60
-                });
-            }
-            catch { }
-            //
-
+            // set A13 - All
+            // -- Header
+            IRow rowColumnHeader = s1.CreateRow(row);
+            rowColumnHeader.Height = -1;
             foreach (var columnHeader in columnHeaders.OrderBy(s => s.columnAt))
             {
-                var cel_row_t = row_t.CreateCell(columnHeader.columnAt);
-                if (new string[] { "no" }.Contains(columnHeader.value))
-                {
-                    cel_row_t.SetCellValue(count_row);
-                    cel_row_t.CellStyle = border_center;
-                }
-                else if (new string[] { "ofpack" }.Contains(columnHeader.value))
-                {
-                    cel_row_t.CellFormula = String.Format("I{0}/U{0}", row + 1);
-                    cel_row_t.CellStyle = border_number2;
-                }
-                else if (new string[] { "cbm" }.Contains(columnHeader.value))
-                {
-                    cel_row_t.CellFormula = String.Format("((N{0}*O{0}*P{0})*H{0})/1000000", row + 1);
-                    cel_row_t.CellStyle = cellCBM;
-                }
-                else if (new string[] { "amount" }.Contains(columnHeader.value))
-                {
-                    cel_row_t.CellFormula = String.Format("IF(K{0}*I{0}<>0,K{0}*I{0},0)", row + 1);
-                    cel_row_t.CellStyle = cellAmount;
-                }
-                else if (new string[] { "soluong" }.Contains(columnHeader.value))
-                {
-                    var val = dt.Rows[i][columnHeader.value].ToString();
-                    cel_row_t.SetCellValue(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val));
-                    cel_row_t.CellStyle = cellSoLuong;
-                }
-                else if (new string[] { "giafob", "giachuan", "phi", "cpdg" }.Contains(columnHeader.value))
-                {
-                    var val = dt.Rows[i][columnHeader.value].ToString();
-                    cel_row_t.SetCellValue(Math.Round(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val), 2));
-                    cel_row_t.CellStyle = cellAmount;
-                }
-                else if (new string[] { "l2", "w2", "h2" }.Contains(columnHeader.value))
-                {
-                    var val = dt.Rows[i][columnHeader.value].ToString();
-                    cel_row_t.SetCellValue(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val));
-                    cel_row_t.CellStyle = border_number2;
-                }
-                else if (new string[] { "ma_hscode", "ma_sanpham" }.Contains(columnHeader.value))
-                {
-                    cel_row_t.SetCellValue(dt.Rows[i][columnHeader.value].ToString());
-                    cel_row_t.CellStyle = border_center;
-                }
-                else if (new string[] { "discountHH" }.Contains(columnHeader.value))
-                {
-                    cel_row_t.SetCellValue(dt.Rows[i][columnHeader.value].ToString());
-                    cel_row_t.CellStyle = border_number4;
-                }
-                // else if( e_value[j] == "ten_donggoi_inner") {
-                // cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString().Replace(" ","\n"));
-                // cel_row_t.CellStyle = border_center;
-                // }
-                else if (columnHeader.value == "")
-                {
-                    cel_row_t.SetCellValue("");
-                    cel_row_t.CellStyle = border;
-                }
-                else
-                {
-                    cel_row_t.SetCellValue(dt.Rows[i][columnHeader.value].ToString());
-                    cel_row_t.CellStyle = border;
-                }
-                //  table style
+                rowColumnHeader.CreateCell(columnHeader.columnAt).SetCellValue(columnHeader.text);
+                rowColumnHeader.GetCell(columnHeader.columnAt).CellStyle = borderWrap;
 
-
-                // else if(j == 8)
-                // s1.GetRow(row).GetCell(j).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##");
-                // else
-                // s1.GetRow(row).GetCell(j).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 6));
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 8, 9));
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 13, 15));
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 22, 24));
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 25, 27));
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 28, 30));
+                s1.SetColumnWidth(columnHeader.columnAt, columnHeader.width);
             }
             row++;
-            count_row++;
-
-            if (nnl != null)
+            // -- Details
+            int count_row = 1;
+            //
+            double discount = 0, discount1 = 0, startRowHH = -1;
+            var lstHH = new List<int>();
+            var lstAmountHH = new List<int>();
+            // create detail row
+            for (int i = 0; i < dt.Rows.Count; i++)
             {
-                if (chungloai != chungloaiTT | i == dt.Rows.Count - 1)
-                {
-                    string gthh = nnl == null ? "0" : nnl.Where(s => s["hehang"].ToString() == chungloai).Select(s => s["giatri"].ToString()).FirstOrDefault();
-                    gthh = string.IsNullOrWhiteSpace(gthh) ? "0" : gthh;
-                    var rowToTalHeHang = s1.CreateRow(row);
-                    rowToTalHeHang.HeightInPoints = height;
-                    rowToTalHeHang.CreateCell(4).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
-                    var range1_3 = new CellRangeAddress(row, row, 1, 3);
-                    var range4_6 = new CellRangeAddress(row, row, 4, 6);
-                    s1.AddMergedRegion(range1_3);
-                    s1.AddMergedRegion(range4_6);
-                    rowToTalHeHang.GetCell(4).CellStyle = leftBold;
+                var msp = dt.Rows[i]["ma_sanpham"].ToString();
+                var mota = dt.Rows[i]["mota_tienganh"] + "";
+                var masterSize = new List<string>();
+                masterSize.Add(dt.Rows[i]["l2"] + "");
+                masterSize.Add(dt.Rows[i]["w2"] + "");
+                masterSize.Add(dt.Rows[i]["h2"] + "");
 
-                    string fmlSum = string.Format(@"SUM(I{0}:I{1})", startRowHH + 1, row);
-                    rowToTalHeHang.CreateCell(8).CellFormula = string.Format("{0}", fmlSum, row + 1);
-                    rowToTalHeHang.GetCell(8).CellStyle = cellBoldSoLuong;
-                    
-                    fmlSum = string.Format(@"SUM(L{0}:L{1})", startRowHH + 1, row);
-                    rowToTalHeHang.CreateCell(11).CellFormula = string.Format("{0}", fmlSum, row + 1);
-                    rowToTalHeHang.GetCell(11).CellStyle = cellBoldCBM;
-                    
-                    fmlSum = string.Format(@"SUM(M{0}:M{1})", startRowHH + 1, row);
-                    rowToTalHeHang.CreateCell(12).CellFormula = string.Format("{0}", fmlSum, row + 1);
-                    rowToTalHeHang.GetCell(12).CellStyle = cellBoldAmount;
-                    row++;
-                    
-                    var rowDisHeHang = s1.CreateRow(row);
-                    rowDisHeHang.HeightInPoints = height;
-                    rowDisHeHang.CreateCell(4).SetCellValue(string.Format(@"Discount ({0}%):", double.Parse(gthh).ToString(fmtDiscount)));
-                    rowDisHeHang.GetCell(4).CellStyle = leftBold;
-                    s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
-                    rowDisHeHang.CreateCell(12).CellFormula = string.Format("M{0}*{1}/100", row, gthh);
-                    rowDisHeHang.GetCell(12).CellStyle = cellBoldAmount;
-                    row++;
+                var cmInch = Public.convertCmToInch(mota, masterSize, tenKT);
+                dt.Rows[i]["mota_tienganh"] = cmInch["mota"];
+                masterSize = cmInch["masterSize"] as List<string>;
+                dt.Rows[i]["l2"] = masterSize[0];
+                dt.Rows[i]["w2"] = masterSize[1];
+                dt.Rows[i]["h2"] = masterSize[2];
 
-                    var rowTotalHeHang = s1.CreateRow(row);
-                    rowTotalHeHang.HeightInPoints = height;
-                    rowTotalHeHang.CreateCell(4).SetCellValue(string.Format("Total ({0}):", lstHH.Count + 1));
-                    rowTotalHeHang.GetCell(4).CellStyle = leftBold;
-                    s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
-                    rowTotalHeHang.CreateCell(12).CellFormula = string.Format("M{0} - M{1}", row - 1, row);
-                    rowTotalHeHang.GetCell(12).CellStyle = cellBoldAmount;
+                var kgPound = Public.convertKgToPound(
+                    dt.Rows[i]["trongluong"] + ""
+                    , dt.Rows[i]["n_w_master"] + ""
+                    , dt.Rows[i]["g_w_master"] + ""
+                    , tenTL
+                    );
+                dt.Rows[i]["trongluong"] = kgPound["weight"];
+                dt.Rows[i]["n_w_master"] = kgPound["NWmaster"];
+                dt.Rows[i]["g_w_master"] = kgPound["GWmaster"];
 
-                    lstAmountHH.Add(row);
+                var chungloai = msp.Substring(0, 2);
+                var chungloaiTT = i == dt.Rows.Count - 1 ? chungloai : dt.Rows[i + 1]["ma_sanpham"].ToString().Substring(0, 2);
 
-                    row++;
-                    count_row++;
+                if (startRowHH == -1)
                     startRowHH = row;
-                    lstHH.Add(row);
+
+                var valDis = dt.Rows[i]["dis"].ToString();
+                discount = double.Parse(string.IsNullOrWhiteSpace(valDis) ? "0" : valDis);
+
+                var valDis1 = dt.Rows[i]["dis1"].ToString();
+                discount1 = double.Parse(string.IsNullOrWhiteSpace(valDis1) ? "0" : valDis1);
+
+                IRow row_t = s1.CreateRow(row);
+                float heightMAX = config.MeasureTextHeight(mota, 10000, "Arial", fontSizeRptShort);
+                row_t.HeightInPoints = heightMAX < 60 ? 60 : heightMAX;
+
+                //
+                try
+                {
+                    var imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImageProduct(msp));
+
+                    lstimage.Add(new AvariablePrj.lstImage
+                    {
+                        row = row,
+                        column = 3,
+                        link = imgPath,
+                        heightCell = 60
+                    });
+                }
+                catch { }
+                //
+
+                foreach (var columnHeader in columnHeaders.OrderBy(s => s.columnAt))
+                {
+                    var cel_row_t = row_t.CreateCell(columnHeader.columnAt);
+                    if (new string[] { "no" }.Contains(columnHeader.value))
+                    {
+                        cel_row_t.SetCellValue(count_row);
+                        cel_row_t.CellStyle = border_center;
+                    }
+                    else if (new string[] { "ofpack" }.Contains(columnHeader.value))
+                    {
+                        cel_row_t.CellFormula = String.Format("I{0}/U{0}", row + 1);
+                        cel_row_t.CellStyle = border_number2;
+                    }
+                    else if (new string[] { "cbm" }.Contains(columnHeader.value))
+                    {
+                        cel_row_t.CellFormula = String.Format("((N{0}*O{0}*P{0})*H{0})/1000000", row + 1);
+                        cel_row_t.CellStyle = cellCBM;
+                    }
+                    else if (new string[] { "amount" }.Contains(columnHeader.value))
+                    {
+                        cel_row_t.CellFormula = String.Format("IF(K{0}*I{0}<>0,K{0}*I{0},0)", row + 1);
+                        cel_row_t.CellStyle = cellAmount;
+                    }
+                    else if (new string[] { "soluong" }.Contains(columnHeader.value))
+                    {
+                        var val = dt.Rows[i][columnHeader.value].ToString();
+                        cel_row_t.SetCellValue(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val));
+                        cel_row_t.CellStyle = cellSoLuong;
+                    }
+                    else if (new string[] { "giafob", "giachuan", "phi", "cpdg" }.Contains(columnHeader.value))
+                    {
+                        var val = dt.Rows[i][columnHeader.value].ToString();
+                        cel_row_t.SetCellValue(Math.Round(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val), 2));
+                        cel_row_t.CellStyle = cellAmount;
+                    }
+                    else if (new string[] { "l2", "w2", "h2" }.Contains(columnHeader.value))
+                    {
+                        var val = dt.Rows[i][columnHeader.value].ToString();
+                        cel_row_t.SetCellValue(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val));
+                        cel_row_t.CellStyle = border_number2;
+                    }
+                    else if (new string[] { "ma_hscode", "ma_sanpham" }.Contains(columnHeader.value))
+                    {
+                        cel_row_t.SetCellValue(dt.Rows[i][columnHeader.value].ToString());
+                        cel_row_t.CellStyle = border_center;
+                    }
+                    else if (new string[] { "discountHH" }.Contains(columnHeader.value))
+                    {
+                        cel_row_t.SetCellValue(dt.Rows[i][columnHeader.value].ToString());
+                        cel_row_t.CellStyle = border_number4;
+                    }
+                    // else if( e_value[j] == "ten_donggoi_inner") {
+                    // cel_row_t.SetCellValue(dt.Rows[i][e_value[j]].ToString().Replace(" ","\n"));
+                    // cel_row_t.CellStyle = border_center;
+                    // }
+                    else if (columnHeader.value == "")
+                    {
+                        cel_row_t.SetCellValue("");
+                        cel_row_t.CellStyle = border;
+                    }
+                    else
+                    {
+                        cel_row_t.SetCellValue(dt.Rows[i][columnHeader.value].ToString());
+                        cel_row_t.CellStyle = border;
+                    }
+                    //  table style
+
+
+                    // else if(j == 8)
+                    // s1.GetRow(row).GetCell(j).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##");
+                    // else
+                    // s1.GetRow(row).GetCell(j).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+                }
+                row++;
+                count_row++;
+
+                if (nnl != null)
+                {
+                    if (chungloai != chungloaiTT | i == dt.Rows.Count - 1)
+                    {
+                        string gthh = nnl == null ? "0" : nnl.Where(s => s["hehang"].ToString() == chungloai).Select(s => s["giatri"].ToString()).FirstOrDefault();
+                        gthh = string.IsNullOrWhiteSpace(gthh) ? "0" : gthh;
+                        var rowToTalHeHang = s1.CreateRow(row);
+                        rowToTalHeHang.HeightInPoints = height;
+                        rowToTalHeHang.CreateCell(4).SetCellValue(string.Format("Sub Total ({0}):", lstHH.Count + 1));
+                        var range1_3 = new CellRangeAddress(row, row, 1, 3);
+                        var range4_6 = new CellRangeAddress(row, row, 4, 6);
+                        s1.AddMergedRegion(range1_3);
+                        s1.AddMergedRegion(range4_6);
+                        rowToTalHeHang.GetCell(4).CellStyle = leftBold;
+
+                        string fmlSum = string.Format(@"SUM(I{0}:I{1})", startRowHH + 1, row);
+                        rowToTalHeHang.CreateCell(8).CellFormula = string.Format("{0}", fmlSum, row + 1);
+                        rowToTalHeHang.GetCell(8).CellStyle = cellBoldSoLuong;
+
+                        fmlSum = string.Format(@"SUM(L{0}:L{1})", startRowHH + 1, row);
+                        rowToTalHeHang.CreateCell(11).CellFormula = string.Format("{0}", fmlSum, row + 1);
+                        rowToTalHeHang.GetCell(11).CellStyle = cellBoldCBM;
+
+                        fmlSum = string.Format(@"SUM(M{0}:M{1})", startRowHH + 1, row);
+                        rowToTalHeHang.CreateCell(12).CellFormula = string.Format("{0}", fmlSum, row + 1);
+                        rowToTalHeHang.GetCell(12).CellStyle = cellBoldAmount;
+                        row++;
+
+                        var rowDisHeHang = s1.CreateRow(row);
+                        rowDisHeHang.HeightInPoints = height;
+                        rowDisHeHang.CreateCell(4).SetCellValue(string.Format(@"Discount ({0}%):", double.Parse(gthh).ToString(fmtDiscount)));
+                        rowDisHeHang.GetCell(4).CellStyle = leftBold;
+                        s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
+                        rowDisHeHang.CreateCell(12).CellFormula = string.Format("M{0}*{1}/100", row, gthh);
+                        rowDisHeHang.GetCell(12).CellStyle = cellBoldAmount;
+                        row++;
+
+                        var rowTotalHeHang = s1.CreateRow(row);
+                        rowTotalHeHang.HeightInPoints = height;
+                        rowTotalHeHang.CreateCell(4).SetCellValue(string.Format("Total ({0}):", lstHH.Count + 1));
+                        rowTotalHeHang.GetCell(4).CellStyle = leftBold;
+                        s1.AddMergedRegion(new CellRangeAddress(row, row, 4, 10));
+                        rowTotalHeHang.CreateCell(12).CellFormula = string.Format("M{0} - M{1}", row - 1, row);
+                        rowTotalHeHang.GetCell(12).CellStyle = cellBoldAmount;
+
+                        lstAmountHH.Add(row);
+
+                        row++;
+                        count_row++;
+                        startRowHH = row;
+                        lstHH.Add(row);
+                    }
                 }
             }
-        }
 
-        //vi tri row dau tien
-        int m = row - count_row;
-        int sub = row + 1;
+            //vi tri row dau tien
+            int m = row - count_row;
+            int sub = row + 1;
 
-        string sumQuantify = "",
-            sumCBM = "",
-            sumAmount = "", 
-            sumTotalAmount = "";
-        if (nnl != null)
-        {   
-            s1.CreateRow(row).CreateCell(4).SetCellValue("Sub Total:");
-            s1.GetRow(row).HeightInPoints = height;
-            foreach (var i in lstAmountHH)
+            string sumQuantify = "",
+                sumCBM = "",
+                sumAmount = "",
+                sumTotalAmount = "";
+            if (nnl != null)
             {
-                sumQuantify += string.Format("I{0}+", i - 1);
-                sumCBM += string.Format("L{0}+", i - 1);
-                sumAmount += string.Format("M{0}+", i - 1);
-                sumTotalAmount += string.Format("M{0}+", i + 1);
-            }
-            sumQuantify += "0";
-            sumCBM += "0";
-            sumAmount += "0";
-            sumTotalAmount += "0";
-
-            s1.GetRow(row).CreateCell(7).CellFormula = string.Format("SUM(H{0}:H{1})", m, row - 3);
-            s1.GetRow(row).CreateCell(8).CellFormula = string.Format("{0}", sumQuantify);
-            s1.GetRow(row).CreateCell(11).CellFormula = string.Format("{0}", sumCBM);
-            s1.GetRow(row).CreateCell(12).CellFormula = string.Format("{0}", sumAmount);
-        }
-        else
-        {
-            s1.CreateRow(row).CreateCell(4).SetCellValue("Sub Total:");
-            s1.GetRow(row).HeightInPoints = height;
-            s1.GetRow(row).CreateCell(7).CellFormula = String.Format("SUM(H{0}:H{1})", m, row);
-            s1.GetRow(row).CreateCell(8).CellFormula = String.Format("SUM(I{0}:I{1})", m, row);
-            s1.GetRow(row).CreateCell(11).CellFormula = String.Format("SUM(L{0}:L{1})", m, row);
-            s1.GetRow(row).CreateCell(12).CellFormula = String.Format("SUM(M{0}:M{1})", m, row);
-        }
-
-        //s1.GetRow(13).GetCell(0).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
-
-        //tru so dong du
-        //start tong cong total
-        
-        //start tong cong 1
-        
-        s1.GetRow(row).CreateCell(20).SetCellValue(discount);
-        // style
-        s1.GetRow(row).GetCell(4).CellStyle = leftBold;
-        s1.GetRow(row).GetCell(7).CellStyle = rightBold;
-        s1.GetRow(row).GetCell(8).CellStyle = cellBoldSoLuong;
-        s1.GetRow(row).GetCell(11).CellStyle = cellBoldCBM;
-        s1.GetRow(row).GetCell(12).CellStyle = cellBoldAmount;
-
-
-        // for(int nht = 7; nht <= 7; nht++)
-        // {
-        // s1.GetRow(row).GetCell(nht).CellStyle = rightBold;
-        // s1.GetRow(row).GetCell(nht).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
-        // }						
-        row++;
-        //end
-        //start giam gia
-
-        int dis = row + 1;
-        if (nnl == null)
-        {
-            s1.CreateRow(row).CreateCell(4).SetCellValue("Discount (" + discount1.ToString(fmtDiscount) + "%):");
-
-            string str_dsc1 = discount.ToString();
-            string funcDiscount = "";
-            if (str_dsc1.Contains("."))
-            {
-                string dot1 = str_dsc1.Split('.')[1];
-                if (dot1.Length > 2)
+                s1.CreateRow(row).CreateCell(4).SetCellValue("Sub Total:");
+                s1.GetRow(row).HeightInPoints = height;
+                foreach (var i in lstAmountHH)
                 {
-                    funcDiscount = "M{0}*U{0}/100";
+                    sumQuantify += string.Format("I{0}+", i - 1);
+                    sumCBM += string.Format("L{0}+", i - 1);
+                    sumAmount += string.Format("M{0}+", i - 1);
+                    sumTotalAmount += string.Format("M{0}+", i + 1);
+                }
+                sumQuantify += "0";
+                sumCBM += "0";
+                sumAmount += "0";
+                sumTotalAmount += "0";
+
+                s1.GetRow(row).CreateCell(7).CellFormula = string.Format("SUM(H{0}:H{1})", m, row - 3);
+                s1.GetRow(row).CreateCell(8).CellFormula = string.Format("{0}", sumQuantify);
+                s1.GetRow(row).CreateCell(11).CellFormula = string.Format("{0}", sumCBM);
+                s1.GetRow(row).CreateCell(12).CellFormula = string.Format("{0}", sumAmount);
+            }
+            else
+            {
+                s1.CreateRow(row).CreateCell(4).SetCellValue("Sub Total:");
+                s1.GetRow(row).HeightInPoints = height;
+                s1.GetRow(row).CreateCell(7).CellFormula = String.Format("SUM(H{0}:H{1})", m, row);
+                s1.GetRow(row).CreateCell(8).CellFormula = String.Format("SUM(I{0}:I{1})", m, row);
+                s1.GetRow(row).CreateCell(11).CellFormula = String.Format("SUM(L{0}:L{1})", m, row);
+                s1.GetRow(row).CreateCell(12).CellFormula = String.Format("SUM(M{0}:M{1})", m, row);
+            }
+
+            //s1.GetRow(13).GetCell(0).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+
+            //tru so dong du
+            //start tong cong total
+
+            //start tong cong 1
+
+            s1.GetRow(row).CreateCell(20).SetCellValue(discount);
+            // style
+            s1.GetRow(row).GetCell(4).CellStyle = leftBold;
+            s1.GetRow(row).GetCell(7).CellStyle = rightBold;
+            s1.GetRow(row).GetCell(8).CellStyle = cellBoldSoLuong;
+            s1.GetRow(row).GetCell(11).CellStyle = cellBoldCBM;
+            s1.GetRow(row).GetCell(12).CellStyle = cellBoldAmount;
+
+
+            // for(int nht = 7; nht <= 7; nht++)
+            // {
+            // s1.GetRow(row).GetCell(nht).CellStyle = rightBold;
+            // s1.GetRow(row).GetCell(nht).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+            // }						
+            row++;
+            //end
+            //start giam gia
+
+            int dis = row + 1;
+            if (nnl == null)
+            {
+                s1.CreateRow(row).CreateCell(4).SetCellValue("Discount (" + discount1.ToString(fmtDiscount) + "%):");
+
+                string str_dsc1 = discount.ToString();
+                string funcDiscount = "";
+                if (str_dsc1.Contains("."))
+                {
+                    string dot1 = str_dsc1.Split('.')[1];
+                    if (dot1.Length > 2)
+                    {
+                        funcDiscount = "M{0}*U{0}/100";
+                    }
+                    else
+                    {
+                        funcDiscount = "ROUND(M{0}*U{0}/100,2)";
+                    }
                 }
                 else
                 {
                     funcDiscount = "ROUND(M{0}*U{0}/100,2)";
                 }
+                s1.GetRow(row).CreateCell(12).CellFormula = String.Format(funcDiscount, row, row);
+                s1.GetRow(row).GetCell(4).CellStyle = leftBold;
+                s1.GetRow(row).GetCell(12).CellStyle = cellBoldAmount;
+                if (discount1 <= 0)
+                {
+                    s1.GetRow(row).HeightInPoints = 0;
+                    s1.GetRow(row).ZeroHeight = true;
+                    if (type == "pdf")
+                    {
+                        s1.GetRow(row).RemoveCell(s1.GetRow(row).GetCell(4));
+                        s1.GetRow(row).RemoveCell(s1.GetRow(row).GetCell(12));
+                    }
+                }
+                else
+                    s1.GetRow(row).HeightInPoints = height;
+                row++;
             }
-            else
-            {
-                funcDiscount = "ROUND(M{0}*U{0}/100,2)";
-            }
-            s1.GetRow(row).CreateCell(12).CellFormula = String.Format(funcDiscount, row, row);
+
+            //end
+            int cong = row + 1;
+            s1.CreateRow(row).CreateCell(4).SetCellValue("(+) " + dt.Rows[0]["diengiaicong"].ToString());
+            s1.GetRow(row).HeightInPoints = height;
+            s1.GetRow(row).CreateCell(12).CellFormula = String.Format("Value(\"{0}\")", dt.Rows[0]["phicong"].ToString());
+            // style
             s1.GetRow(row).GetCell(4).CellStyle = leftBold;
             s1.GetRow(row).GetCell(12).CellStyle = cellBoldAmount;
-            if (discount1 <= 0)
-            {
-                s1.GetRow(row).HeightInPoints = 0;
-                s1.GetRow(row).ZeroHeight = true;
-                if (type == "pdf")
-                {
-                    s1.GetRow(row).RemoveCell(s1.GetRow(row).GetCell(4));
-                    s1.GetRow(row).RemoveCell(s1.GetRow(row).GetCell(12));
-                }
-            }
-            else
+            row++;
+            //
+            int tru = row + 1;
+            s1.CreateRow(row).CreateCell(4).SetCellValue("(-) " + dt.Rows[0]["diengiaitru"].ToString());
+            s1.GetRow(row).HeightInPoints = height;
+            s1.GetRow(row).CreateCell(12).CellFormula = String.Format("Value(\"{0}\")", dt.Rows[0]["phitru"].ToString());
+            // style
+            s1.GetRow(row).GetCell(4).CellStyle = leftBold;
+            s1.GetRow(row).GetCell(12).CellStyle = cellBoldAmount;
+            row++;
+            //
+            string totalTxt = "";
+            for (var i = 0; i < lstAmountHH.Count; i++)
+                totalTxt += string.Format("({0})+", i + 1);
+            totalTxt = totalTxt.Length > 0 ? totalTxt.Substring(0, totalTxt.Length - 1) : "";
+            string txtTotal = nnl == null ? "Total:" : string.Format("Total {0}:", totalTxt);
+            s1.CreateRow(row).CreateCell(4).SetCellValue(txtTotal);
+            s1.GetRow(row).HeightInPoints = height;
+            s1.GetRow(row).CreateCell(12).CellFormula = String.Format("{0} - {1} + M{2} - M{3}"
+                , nnl == null ? "M" + sub : sumTotalAmount
+                , nnl == null ? "M" + dis : "0"
+                , cong
+                , tru);
+            s1.GetRow(row).GetCell(4).CellStyle = leftBold;
+            s1.GetRow(row).GetCell(12).CellStyle = rightBold;
+            s1.GetRow(row).GetCell(12).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+            row++;
+            //
+            var hoaHongVal = double.Parse(dt.Rows[0]["hoahong"].ToString());
+            var hoaHongRow = string.Format(@"Hoa hồng: {0}%          Người nhận: {1}", hoaHongVal.ToString("#,#0.00"), dt.Rows[0]["nguoinhan"].ToString());
+            s1.CreateRow(row).CreateCell(0).SetCellValue(hoaHongRow);
+            if (hoaHongVal > 0)
                 s1.GetRow(row).HeightInPoints = height;
+            else
+                s1.GetRow(row).ZeroHeight = true;
+
+            s1.GetRow(row).GetCell(0).CellStyle = rightBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
             row++;
-        }
-
-        //end
-        int cong = row + 1;
-        s1.CreateRow(row).CreateCell(4).SetCellValue("(+) " + dt.Rows[0]["diengiaicong"].ToString());
-        s1.GetRow(row).HeightInPoints = height;
-        s1.GetRow(row).CreateCell(12).CellFormula = String.Format("Value(\"{0}\")", dt.Rows[0]["phicong"].ToString());
-        // style
-        s1.GetRow(row).GetCell(4).CellStyle = leftBold;
-        s1.GetRow(row).GetCell(12).CellStyle = cellBoldAmount;
-        row++;
-        //
-        int tru = row + 1;
-        s1.CreateRow(row).CreateCell(4).SetCellValue("(-) " + dt.Rows[0]["diengiaitru"].ToString());
-        s1.GetRow(row).HeightInPoints = height;
-        s1.GetRow(row).CreateCell(12).CellFormula = String.Format("Value(\"{0}\")", dt.Rows[0]["phitru"].ToString());
-        // style
-        s1.GetRow(row).GetCell(4).CellStyle = leftBold;
-        s1.GetRow(row).GetCell(12).CellStyle = cellBoldAmount;
-        row++;
-        //
-        string totalTxt = "";
-        for (var i = 0; i < lstAmountHH.Count; i++)
-            totalTxt += string.Format("({0})+", i+1);
-        totalTxt = totalTxt.Length > 0 ? totalTxt.Substring(0, totalTxt.Length - 1) : "";
-        string txtTotal = nnl == null ? "Total:" : string.Format("Total {0}:", totalTxt);
-        s1.CreateRow(row).CreateCell(4).SetCellValue(txtTotal);
-        s1.GetRow(row).HeightInPoints = height;
-        s1.GetRow(row).CreateCell(12).CellFormula = String.Format("{0} - {1} + M{2} - M{3}"
-            , nnl == null ? "M" + sub : sumTotalAmount
-            , nnl == null ? "M" + dis : "0"
-            , cong
-            , tru);
-        s1.GetRow(row).GetCell(4).CellStyle = leftBold;
-        s1.GetRow(row).GetCell(12).CellStyle = rightBold;
-        s1.GetRow(row).GetCell(12).CellStyle.DataFormat = CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
-        row++;
-        //
-        var hoaHongVal = double.Parse(dt.Rows[0]["hoahong"].ToString());
-        var hoaHongRow = string.Format(@"Hoa hồng: {0}%          Người nhận: {1}", hoaHongVal.ToString("#,#0.00"), dt.Rows[0]["nguoinhan"].ToString());
-        s1.CreateRow(row).CreateCell(0).SetCellValue(hoaHongRow);
-        if (hoaHongVal > 0)
+            //
+            s1.CreateRow(row).CreateCell(0).SetCellValue("Say: " + dt.Rows[0]["money"].ToString());
             s1.GetRow(row).HeightInPoints = height;
-        else
-            s1.GetRow(row).ZeroHeight = true;
-
-        s1.GetRow(row).GetCell(0).CellStyle = rightBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
-        row++;
-        //
-        s1.CreateRow(row).CreateCell(0).SetCellValue("Say: " + dt.Rows[0]["money"].ToString());
-        s1.GetRow(row).HeightInPoints = height;
-        s1.GetRow(row).GetCell(0).CellStyle = rightBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
-        row++;
-        //
-        s1.CreateRow(row).CreateCell(0).SetCellValue("(10% more or less in quantity and amount are acceptable).");
-        s1.GetRow(row).HeightInPoints = height;
-        s1.GetRow(row).GetCell(0).CellStyle = rightBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
-        row++;
-        //set A6 - A12
-        string[] f = { "Note:", "No. of Container(s):", "Port of loading:", "Port of discharge:", "Shipment Time:", "Payment term:", "Bank Details:" };
-        string[] f_value = { "ghichu", "no_cont", "ten_cangbien", "portdischarge", "shipmenttime", "ten_paymentterm", "mota" };
-        for (int i = 0; i < f.Count(); i++)
-        {
-            var text = dt.Rows[0][f_value[i]].ToString().Trim();
-            s1.CreateRow(row).CreateCell(1).SetCellValue(f[i]);
-            s1.GetRow(row).CreateCell(2).SetCellValue(text);
-            height = 22;
-            if (f_value[i] == "mota")
+            s1.GetRow(row).GetCell(0).CellStyle = rightBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
+            row++;
+            //
+            s1.CreateRow(row).CreateCell(0).SetCellValue("(10% more or less in quantity and amount are acceptable).");
+            s1.GetRow(row).HeightInPoints = height;
+            s1.GetRow(row).GetCell(0).CellStyle = rightBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 12));
+            row++;
+            //set A6 - A12
+            string[] f = { "Note:", "No. of Container(s):", "Port of loading:", "Port of discharge:", "Shipment Time:", "Payment term:", "Bank Details:" };
+            string[] f_value = { "ghichu", "no_cont", "ten_cangbien", "portdischarge", "shipmenttime", "ten_paymentterm", "mota" };
+            for (int i = 0; i < f.Count(); i++)
             {
-                float maxHeight = config.MeasureTextHeight(text, width02to12, "Arial", fontSizeRptShort);
-                height = maxHeight < height ? height : (int)maxHeight;
+                var text = dt.Rows[0][f_value[i]].ToString().Trim();
+                s1.CreateRow(row).CreateCell(1).SetCellValue(f[i]);
+                s1.GetRow(row).CreateCell(2).SetCellValue(text);
+                height = 22;
+                if (f_value[i] == "mota")
+                {
+                    float maxHeight = config.MeasureTextHeight(text, width02to12, "Arial", fontSizeRptShort);
+                    height = maxHeight < height ? height : (int)maxHeight;
+                }
+
+                if (f_value[i] == "no_cont")
+                {
+                    s1.GetRow(row).GetCell(1).CellStyle = cellBoldBG;
+                    s1.GetRow(row).GetCell(2).CellStyle = cellBoldBG;
+                }
+                else
+                {
+                    s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+                    s1.GetRow(row).GetCell(2).CellStyle = cellBold;
+                }
+
+
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 1));
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
+                s1.GetRow(row).HeightInPoints = height;
+                lstText.Add(new AvariablePrj.lstText()
+                {
+                    columnF = 2,
+                    columnT = 12,
+                    columnFPrev = 1,
+                    columnTPrev = 1,
+                    row = row,
+                    minWidth = 140
+                });
+
+                row++;
             }
+            height = 22;
+            //
+            s1.CreateRow(row).CreateCell(1).SetCellValue("This agreement comes into effect from the signing date.:");
+            s1.GetRow(row).HeightInPoints = height;
+            s1.GetRow(row).GetCell(1).CellStyle = left;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 12));
+            row++;
+            row++;
+            //
+            s1.CreateRow(row).CreateCell(0).SetCellValue("CONFIRMED BY THE BUYER");
+            s1.GetRow(row).HeightInPoints = height;
+            s1.GetRow(row).GetCell(0).CellStyle = signBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 4));
+            //
+            s1.GetRow(row).CreateCell(5).SetCellValue("ANCO COMPANY LTD.");
+            s1.GetRow(row).HeightInPoints = height;
+            s1.GetRow(row).GetCell(5).CellStyle = signBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 12));
+            row++;
+            //
+            s1.CreateRow(row).CreateCell(5).SetCellValue("(Signed)");
+            s1.GetRow(row).HeightInPoints = height;
+            s1.GetRow(row).GetCell(5).CellStyle = signBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 12));
+            row++;
 
-            if (f_value[i] == "no_cont")
+            ICellStyle cellUn = hssfworkbook.CreateCellStyle();
+            IFont funderline = hssfworkbook.CreateFont();
+            funderline.Underline = FontUnderlineType.Single;
+            funderline.FontHeightInPoints = fontSizeRptShort;
+            cellUn.SetFont(funderline);
+            cellUn.Alignment = HorizontalAlignment.Center;
+            cellUn.VerticalAlignment = VerticalAlignment.Top;
+            s1.GetRow(3).GetCell(0).CellStyle = cellUn;
+
+            s1 = config.PrintExcel((HSSFSheet)s1, row);
+
+            if (type == "pdf")
             {
-                s1.GetRow(row).GetCell(1).CellStyle = cellBoldBG;
-                s1.GetRow(row).GetCell(2).CellStyle = cellBoldBG;
+                s1.PrintSetup.Landscape = false;
+                s1.PrintSetup.PaperSize = (short)PaperSize.A4;
             }
             else
-            {
-                s1.GetRow(row).GetCell(1).CellStyle = cellBold;
-                s1.GetRow(row).GetCell(2).CellStyle = cellBold;
-            }
-            
-            
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 1));
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 12));
-            s1.GetRow(row).HeightInPoints = height;
-            lstText.Add(new AvariablePrj.lstText()
-            {
-                columnF = 2,
-                columnT = 12,
-                columnFPrev = 1,
-                columnTPrev = 1,
-                row = row,
-                minWidth = 140
-            });
-
-            row++;
+                s1.PrintSetup.Landscape = true;
         }
-        height = 22;
-        //
-        s1.CreateRow(row).CreateCell(1).SetCellValue("This agreement comes into effect from the signing date.:");
-        s1.GetRow(row).HeightInPoints = height;
-        s1.GetRow(row).GetCell(1).CellStyle = left;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 12));
-        row++;
-        row++;
-        //
-        s1.CreateRow(row).CreateCell(0).SetCellValue("CONFIRMED BY THE BUYER");
-        s1.GetRow(row).HeightInPoints = height;
-        s1.GetRow(row).GetCell(0).CellStyle = signBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 4));
-        //
-        s1.GetRow(row).CreateCell(5).SetCellValue("ANCO COMPANY LTD.");
-        s1.GetRow(row).HeightInPoints = height;
-        s1.GetRow(row).GetCell(5).CellStyle = signBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 12));
-        row++;
-        //
-        s1.CreateRow(row).CreateCell(5).SetCellValue("(Signed)");
-        s1.GetRow(row).HeightInPoints = height;
-        s1.GetRow(row).GetCell(5).CellStyle = signBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 5, 12));
-        row++;
-
-        ICellStyle cellUn = hssfworkbook.CreateCellStyle();
-        IFont funderline = hssfworkbook.CreateFont();
-        funderline.Underline = FontUnderlineType.Single;
-        funderline.FontHeightInPoints = fontSizeRptShort;
-        cellUn.SetFont(funderline);
-        cellUn.Alignment = HorizontalAlignment.Center;
-        cellUn.VerticalAlignment = VerticalAlignment.Top;
-        s1.GetRow(3).GetCell(0).CellStyle = cellUn;
-
-        s1 = config.PrintExcel((HSSFSheet)s1, row);
-
-        if (type == "pdf")
+        catch(Exception ex)
         {
-            s1.PrintSetup.Landscape = false;
-            s1.PrintSetup.PaperSize = (short)PaperSize.A4;
+            hssfworkbook.Clear();
+            hssfworkbook = null;
+            throw new Exception(ex.ToString());
         }
-        else
-            s1.PrintSetup.Landscape = true;
-
         return hssfworkbook;
     }
 

@@ -204,632 +204,642 @@ public class BaoGiaReport
 
     private HSSFWorkbook CreateHSSFWorkbook(DataTable dtDetails, DataTable dtDistinct, DataTable dtReferences)
     {
-        var inCoGia = new string[] { "true", "on", "1" }.Contains(dtDetails.Rows[0]["inCoGia"].ToString().ToLower());
-        String tenkt = dtDetails.Rows[0]["ten_kichthuoc"].ToString().ToLower();
-        String tentl = dtDetails.Rows[0]["ten_trongluong"].ToString().ToLower();
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
-        ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
-
-        var config = new ExportExcel(hssfworkbook, 0, 32);
-        var info = new PrintAnco2.InfoExcel();
-        var ex_fm = new Excel_Format(hssfworkbook);
-        var celltext = ex_fm.getcell(10, false, true, "", "L", "T");
-        var cellTextCenterBoderAll = ex_fm.getcell(10, false, true, "LRTB", "C", "T");
-
-        config.title = "QUOTATION";
-
-        ICellStyle cellStyleRight = hssfworkbook.CreateCellStyle();
-        cellStyleRight.Alignment = HorizontalAlignment.Right;
-        cellStyleRight.VerticalAlignment = VerticalAlignment.Top;
-        cellStyleRight.BorderBottom = cellStyleRight.BorderLeft
-            = cellStyleRight.BorderRight
-            = cellStyleRight.BorderTop
-            = NPOI.SS.UserModel.BorderStyle.Thin;
-        cellStyleRight.WrapText = true;
-
-
-        IFont fontBold = hssfworkbook.CreateFont();
-        fontBold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
-
-        ICellStyle cellBold = hssfworkbook.CreateCellStyle();
-        cellBold.SetFont(fontBold);
-
-        ICellStyle cellBoldCenter = hssfworkbook.CreateCellStyle();
-        cellBoldCenter.Alignment = HorizontalAlignment.Center;
-        cellBoldCenter.VerticalAlignment = VerticalAlignment.Top;
-        cellBoldCenter.SetFont(fontBold);
-
-        int row = 0;
-        config.endHeader = 20;
-        config.LogoRpt = new ExportExcel.Logoreport()
+        try
         {
-            cell1 = 5,
-            cell2 = 5,
-            dx1 = 450,
-            dx2 = 1000
-        };
-        row = config.createHeader(NameHeaderReport.ANCO, s1, row, config.endHeader);
-        // set A4
-        s1.CreateRow(row).CreateCell(0).SetCellValue(dtDetails.Rows[0]["ten_cangbien"].ToString());
-        ICellStyle cel = hssfworkbook.CreateCellStyle();
-        cel.Alignment = HorizontalAlignment.Center;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 0, config.endHeader.GetValueOrDefault(0)));
+            var inCoGia = new string[] { "true", "on", "1" }.Contains(dtDetails.Rows[0]["inCoGia"].ToString().ToLower());
+            String tenkt = dtDetails.Rows[0]["ten_kichthuoc"].ToString().ToLower();
+            String tentl = dtDetails.Rows[0]["ten_trongluong"].ToString().ToLower();
 
-        IFont f = hssfworkbook.CreateFont();
-        f.FontHeightInPoints = 13;
-        cel.SetFont(f);
-        s1.GetRow(row).GetCell(0).CellStyle = cel;
+            ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
 
-        row++;
-        s1.CreateRow(row).CreateCell(1).SetCellValue("CUSTOMER NAME:");
-        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
+            var config = new ExportExcel(hssfworkbook, 0, 32);
+            var info = new PrintAnco2.InfoExcel();
+            var ex_fm = new Excel_Format(hssfworkbook);
+            var celltext = ex_fm.getcell(10, false, true, "", "L", "T");
+            var cellTextCenterBoderAll = ex_fm.getcell(10, false, true, "LRTB", "C", "T");
 
-        s1.GetRow(row).CreateCell(3).SetCellValue(dtDetails.Rows[0]["ten_dtkd"].ToString());
-        s1.GetRow(row).GetCell(3).CellStyle = cellBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 3, 11));
+            config.title = "QUOTATION";
 
-        row++;
-        s1.CreateRow(row).CreateCell(1).SetCellValue("ADDRESS:");
-        s1.GetRow(row).GetCell(1).CellStyle = cellBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
-
-        s1.GetRow(row).CreateCell(3).SetCellValue(dtDetails.Rows[0]["diachi"].ToString() + " Tel:" + dtDetails.Rows[0]["tel"].ToString() + " Fax:" + dtDetails.Rows[0]["fax"].ToString());
-        s1.GetRow(row).GetCell(3).CellStyle = cellBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 3, 11));
-
-        s1.GetRow(row).CreateCell(12).SetCellValue("Date:");
-        s1.GetRow(row).GetCell(12).CellStyle = cellBold;
-
-        s1.GetRow(row).CreateCell(13).SetCellValue(DateTime.Parse(dtDetails.Rows[0]["ngaybaogia"].ToString()).ToString("dd/MMM/yyyy"));
-        s1.GetRow(row).GetCell(13).CellStyle = cellBold;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 13, 15));
-
-        row++;
-        IRow headerColumn = s1.CreateRow(row);
-        row++;
-        IRow headerColumn2 = s1.CreateRow(row);
-
-        headerColumn.HeightInPoints = 40;
-        headerColumn2.HeightInPoints = 40;
-        ICellStyle hStyle = hssfworkbook.CreateCellStyle();
-        hStyle.WrapText = true;
-        hStyle.SetFont(fontBold);
-        hStyle.Alignment = HorizontalAlignment.Center;
-        hStyle.VerticalAlignment = VerticalAlignment.Top;
-        hStyle.BorderBottom = hStyle.BorderLeft
-            = hStyle.BorderRight
-            = hStyle.BorderTop
-            = NPOI.SS.UserModel.BorderStyle.Thin;
-        //--
-        for (int i = 0; i <= 33; i++)
-        {
-            headerColumn.CreateCell(i).CellStyle = hStyle;
-            headerColumn2.CreateCell(i).CellStyle = hStyle;
-        }
-        //--
-        headerColumn.GetCell(0).SetCellValue("Item No");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 0, 0));
-
-        headerColumn.GetCell(1).SetCellValue("Picture - Only for shape ref.");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 1, 1));
-
-        headerColumn.GetCell(2).SetCellValue("Customer's Code");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 2, 2));
-
-        headerColumn.GetCell(3).SetCellValue("Description");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 3, 3));
-
-        headerColumn.GetCell(4).SetCellValue("Weight(" + tentl + ")");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 4, 4));
-
-        headerColumn.GetCell(5).SetCellValue("Packing");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row - 1, 5, 6));
-
-        headerColumn2.GetCell(5).SetCellValue("Inner");
-        headerColumn2.GetCell(6).SetCellValue("Master");
-
-        headerColumn.GetCell(7).SetCellValue(String.Format("Inner Packing size ({0})", tenkt.Equals("cm") ? "cm" : "inch"));
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row - 1, 7, 9));
-        headerColumn2.GetCell(7).SetCellValue("L");
-        headerColumn2.GetCell(8).SetCellValue("W");
-        headerColumn2.GetCell(9).SetCellValue("H");
+            ICellStyle cellStyleRight = hssfworkbook.CreateCellStyle();
+            cellStyleRight.Alignment = HorizontalAlignment.Right;
+            cellStyleRight.VerticalAlignment = VerticalAlignment.Top;
+            cellStyleRight.BorderBottom = cellStyleRight.BorderLeft
+                = cellStyleRight.BorderRight
+                = cellStyleRight.BorderTop
+                = NPOI.SS.UserModel.BorderStyle.Thin;
+            cellStyleRight.WrapText = true;
 
 
-        headerColumn.GetCell(10).SetCellValue(String.Format("Master Packing size ({0})", tenkt.Equals("cm") ? "cm" : "inch"));
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row - 1, 10, 12));
+            IFont fontBold = hssfworkbook.CreateFont();
+            fontBold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
 
-        headerColumn2.GetCell(10).SetCellValue("L");
-        headerColumn2.GetCell(11).SetCellValue("W");
-        headerColumn2.GetCell(12).SetCellValue("H");
+            ICellStyle cellBold = hssfworkbook.CreateCellStyle();
+            cellBold.SetFont(fontBold);
 
+            ICellStyle cellBoldCenter = hssfworkbook.CreateCellStyle();
+            cellBoldCenter.Alignment = HorizontalAlignment.Center;
+            cellBoldCenter.VerticalAlignment = VerticalAlignment.Top;
+            cellBoldCenter.SetFont(fontBold);
 
-        headerColumn.GetCell(13).SetCellValue(String.Format("PACK {0}", tenkt.Equals("cm") ? "CBM" : "CBF"));
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 13, 13));
-
-        headerColumn.GetCell(14).SetCellValue("No. of master packages");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row - 1, 14, 16));
-
-        headerColumn2.GetCell(14).SetCellValue("per 20'");
-        headerColumn2.GetCell(15).SetCellValue("per 40'");
-        headerColumn2.GetCell(16).SetCellValue("per 40'HC");
-
-        headerColumn.GetCell(17).SetCellValue("N.W/inner (" + tentl + ")");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 17, 17));
-
-        headerColumn.GetCell(18).SetCellValue("G.W/inner (" + tentl + ")");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 18, 18));
-
-        headerColumn.GetCell(19).SetCellValue("N.W/master (" + tentl + ")");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 19, 19));
-
-        headerColumn.GetCell(20).SetCellValue("G.W/master (" + tentl + ")");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 20, 20));
-
-        headerColumn.GetCell(21).SetCellValue("FOB PRICE (USD)");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 21, 21));
-
-        headerColumn.GetCell(22).SetCellValue("port of loading");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 22, 22));
-
-        headerColumn.GetCell(23).SetCellValue("HS Code");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 23, 23));
-
-        headerColumn.GetCell(24).SetCellValue(String.Format("Size Product ({0})", tenkt.Equals("cm") ? "cm" : "inch"));
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 24, 26));
-
-        headerColumn.GetCell(27).SetCellValue("M2");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 27, 27));
-
-        headerColumn2.GetCell(24).SetCellValue("L");
-        headerColumn2.GetCell(25).SetCellValue("W");
-        headerColumn2.GetCell(26).SetCellValue("H");
-
-        headerColumn.GetCell(28).SetCellValue("Packing");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row - 1, 28, 29));
-
-        headerColumn2.GetCell(28).SetCellValue("Inner");
-        headerColumn2.GetCell(29).SetCellValue("Master");
-
-        headerColumn.GetCell(30).SetCellValue("Material");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 30, 30));
-
-        headerColumn.GetCell(31).SetCellValue("Quantity");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 31, 31));
-
-        headerColumn.GetCell(32).SetCellValue("Amount");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 32, 32));
-
-        headerColumn.GetCell(33).SetCellValue("CPĐG");
-        s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 33, 33));
-
-        ICellStyle border = hssfworkbook.CreateCellStyle();
-        border.BorderBottom = border.BorderLeft
-            = border.BorderRight
-            = border.BorderTop
-            = NPOI.SS.UserModel.BorderStyle.Thin;
-        border.WrapText = true;
-        border.VerticalAlignment = VerticalAlignment.Top;
-
-        s1.SetColumnWidth(0, 5000);
-        s1.SetColumnWidth(1, 4000);
-        s1.SetColumnWidth(3, 9000);
-        s1.SetColumnWidth(4, 3000);
-
-        s1.SetColumnWidth(17, 3000);
-        s1.SetColumnWidth(18, 3000);
-        s1.SetColumnWidth(19, 3000);
-        s1.SetColumnWidth(20, 3000);
-        s1.SetColumnWidth(21, 4000);
-
-        s1.SetColumnWidth(24, 2000);
-        s1.SetColumnHidden(24, true);
-        s1.SetColumnWidth(25, 2000);
-        s1.SetColumnHidden(25, true);
-        s1.SetColumnWidth(26, 2000);
-        s1.SetColumnHidden(26, true);
-        s1.SetColumnWidth(27, 2000);
-        s1.SetColumnHidden(27, true);
-        s1.SetColumnWidth(28, 2000);
-        s1.SetColumnHidden(28, true);
-        s1.SetColumnWidth(29, 2000);
-        s1.SetColumnHidden(29, true);
-        s1.SetColumnWidth(30, 2000);
-        s1.SetColumnHidden(30, true);
-
-        s1.SetColumnWidth(31, 3000);
-        s1.SetColumnWidth(32, 4000);
-        if(!inCoGia)
-        {
-            s1.SetColumnHidden(31, true);
-            s1.SetColumnHidden(32, true);
-        }
-
-        s1.SetColumnWidth(33, 2000);
-        s1.SetColumnHidden(33, true);
-
-        //SO
-        ICellStyle cellNumBorder = hssfworkbook.CreateCellStyle();
-        cellNumBorder.Alignment = HorizontalAlignment.Right;
-        cellNumBorder.VerticalAlignment = VerticalAlignment.Top;
-        cellNumBorder.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
-        cellNumBorder.BorderBottom = cellNumBorder.BorderRight = cellNumBorder.BorderLeft = cellNumBorder.BorderTop = BorderStyle.Thin;
-
-        ICellStyle cellNumBorderCBM = hssfworkbook.CreateCellStyle();
-        cellNumBorderCBM.Alignment = HorizontalAlignment.Right;
-        cellNumBorderCBM.VerticalAlignment = VerticalAlignment.Top;
-        cellNumBorderCBM.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.000");
-        cellNumBorderCBM.BorderBottom = cellNumBorderCBM.BorderRight = cellNumBorderCBM.BorderLeft = cellNumBorderCBM.BorderTop = BorderStyle.Thin;
-
-        ICellStyle cellNumBorderKT = hssfworkbook.CreateCellStyle();
-        cellNumBorderKT.Alignment = HorizontalAlignment.Right;
-        cellNumBorderKT.VerticalAlignment = VerticalAlignment.Top;
-        cellNumBorderKT.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
-        cellNumBorderKT.BorderBottom = cellNumBorderKT.BorderRight = cellNumBorderKT.BorderLeft = cellNumBorderKT.BorderTop = BorderStyle.Thin;
-        //SO
-
-        int detailsCount = dtDetails.Rows.Count;
-        var rowDt = row;
-        for (int i = 0; i < detailsCount; i++)
-        {
-            rowDt++;
-            var imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImageProduct(dtDetails.Rows[i]["msp"].ToString()));
-            //var image = System.Drawing.Image.FromFile(imgPath);
-            lstimage.Add(new AvariablePrj.lstImage()
+            int row = 0;
+            config.endHeader = 20;
+            config.LogoRpt = new ExportExcel.Logoreport()
             {
-                row = rowDt,
-                column = 2,
-                link = imgPath
-            });
+                cell1 = 5,
+                cell2 = 5,
+                dx1 = 450,
+                dx2 = 1000
+            };
+            row = config.createHeader(NameHeaderReport.ANCO, s1, row, config.endHeader);
+            // set A4
+            s1.CreateRow(row).CreateCell(0).SetCellValue(dtDetails.Rows[0]["ten_cangbien"].ToString());
+            ICellStyle cel = hssfworkbook.CreateCellStyle();
+            cel.Alignment = HorizontalAlignment.Center;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 0, config.endHeader.GetValueOrDefault(0)));
 
-            //try
-            //{
-            //    String imgPath = System.IO.Path.Combine(productImagePath, dtDetails.Rows[i]["pic"].ToString() + ".jpg");
-            //    System.Drawing.Image image = System.Drawing.Image.FromFile(imgPath);
-            //    MemoryStream ms = new MemoryStream();
-            //    image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            IFont f = hssfworkbook.CreateFont();
+            f.FontHeightInPoints = 13;
+            cel.SetFont(f);
+            s1.GetRow(row).GetCell(0).CellStyle = cel;
 
-            //    IDrawing patriarch = s1.CreateDrawingPatriarch();
-            //    HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, 1, rowDt, 2, rowDt + 1);
-            //    anchor.AnchorType = 2;
+            row++;
+            s1.CreateRow(row).CreateCell(1).SetCellValue("CUSTOMER NAME:");
+            s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 
-            //    int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
-            //    IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
-            //}
-            //catch
-            //{ }
+            s1.GetRow(row).CreateCell(3).SetCellValue(dtDetails.Rows[0]["ten_dtkd"].ToString());
+            s1.GetRow(row).GetCell(3).CellStyle = cellBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 3, 11));
 
-            s1.CreateRow(rowDt).CreateCell(0).SetCellValue(dtDetails.Rows[i]["msp"].ToString());
-            s1.GetRow(rowDt).HeightInPoints = 50;
-            s1.GetRow(rowDt).CreateCell(1).SetCellValue("");
-            s1.GetRow(rowDt).CreateCell(2).SetCellValue(dtDetails.Rows[i]["ma_sanpham_khach"].ToString());
-            s1.GetRow(rowDt).CreateCell(3).SetCellValue(dtDetails.Rows[i]["mota_tienganh"].ToString());
-            s1.GetRow(rowDt).CreateCell(4).SetCellValue(double.Parse(dtDetails.Rows[i]["trongluong"].ToString()));
-            // s1.GetRow(9 + i).CreateCell(4).SetCellType(CellType.FORMULA);
-            // s1.GetRow(9 + i).GetCell(4).SetCellFormula("1 + H" + (10 + i));
-            s1.GetRow(rowDt).GetCell(4).CellStyle = cellStyleRight;
+            row++;
+            s1.CreateRow(row).CreateCell(1).SetCellValue("ADDRESS:");
+            s1.GetRow(row).GetCell(1).CellStyle = cellBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 2));
 
-            s1.GetRow(rowDt).CreateCell(5).SetCellValue(dtDetails.Rows[i]["sl_inner"].ToString());
+            s1.GetRow(row).CreateCell(3).SetCellValue(dtDetails.Rows[0]["diachi"].ToString() + " Tel:" + dtDetails.Rows[0]["tel"].ToString() + " Fax:" + dtDetails.Rows[0]["fax"].ToString());
+            s1.GetRow(row).GetCell(3).CellStyle = cellBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 3, 11));
 
-            s1.GetRow(rowDt).CreateCell(6).SetCellValue(dtDetails.Rows[i]["master"].ToString());
+            s1.GetRow(row).CreateCell(12).SetCellValue("Date:");
+            s1.GetRow(row).GetCell(12).CellStyle = cellBold;
 
-            s1.GetRow(rowDt).CreateCell(7).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["l1"].ToString()) : double.Parse(dtDetails.Rows[i]["l1"].ToString()) / (double)2.54).ToString("#.0")));
-            s1.GetRow(rowDt).GetCell(7).SetCellType(CellType.Numeric);
+            s1.GetRow(row).CreateCell(13).SetCellValue(DateTime.Parse(dtDetails.Rows[0]["ngaybaogia"].ToString()).ToString("dd/MMM/yyyy"));
+            s1.GetRow(row).GetCell(13).CellStyle = cellBold;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 13, 15));
 
-            s1.GetRow(rowDt).CreateCell(8).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["w1"].ToString()) : double.Parse(dtDetails.Rows[i]["w1"].ToString()) / (double)2.54).ToString("#.0")));
-            s1.GetRow(rowDt).GetCell(8).SetCellType(CellType.Numeric);
+            row++;
+            IRow headerColumn = s1.CreateRow(row);
+            row++;
+            IRow headerColumn2 = s1.CreateRow(row);
 
-            s1.GetRow(rowDt).CreateCell(9).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["h1"].ToString()) : double.Parse(dtDetails.Rows[i]["h1"].ToString()) / (double)2.54).ToString("#.0")));
-            s1.GetRow(rowDt).GetCell(9).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(10).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["l2"].ToString()) : double.Parse(dtDetails.Rows[i]["l2"].ToString()) / (double)2.54).ToString("#.0")));
-            s1.GetRow(rowDt).GetCell(10).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(11).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["w2"].ToString()) : double.Parse(dtDetails.Rows[i]["w2"].ToString()) / (double)2.54).ToString("#.0")));
-            s1.GetRow(rowDt).GetCell(11).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(12).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["h2"].ToString()) : double.Parse(dtDetails.Rows[i]["h2"].ToString()) / (double)2.54).ToString("#.0")));
-            s1.GetRow(rowDt).GetCell(12).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(13).SetCellValue(tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["v2"].ToString()) : double.Parse(dtDetails.Rows[i]["cbf"].ToString()));
-            s1.GetRow(rowDt).GetCell(13).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(14).SetCellValue(double.Parse(dtDetails.Rows[i]["nopack_20"].ToString()));
-            s1.GetRow(rowDt).GetCell(14).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(15).SetCellValue(double.Parse(dtDetails.Rows[i]["nopack"].ToString()));
-            s1.GetRow(rowDt).GetCell(15).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(16).SetCellValue(double.Parse(dtDetails.Rows[i]["nopack_40hc"].ToString()));
-            s1.GetRow(rowDt).GetCell(16).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(17).SetCellValue(double.Parse(dtDetails.Rows[i]["n_w_inner"].ToString()));
-            s1.GetRow(rowDt).GetCell(17).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(18).SetCellValue(double.Parse(dtDetails.Rows[i]["g_w_inner"].ToString()));
-            s1.GetRow(rowDt).GetCell(18).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(19).SetCellValue(double.Parse(dtDetails.Rows[i]["n_w_outer"].ToString()));
-            s1.GetRow(rowDt).GetCell(19).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(20).SetCellValue(double.Parse(dtDetails.Rows[i]["g_w_outer"].ToString()));
-            s1.GetRow(rowDt).GetCell(20).SetCellType(CellType.Numeric);
-
-            s1.GetRow(rowDt).CreateCell(21).SetCellValue(double.Parse(dtDetails.Rows[i]["giafob"].ToString()));
-            s1.GetRow(rowDt).GetCell(21).SetCellType(CellType.Numeric);
-            s1.GetRow(rowDt).GetCell(21).CellStyle = cellNumBorder;
-
-            s1.GetRow(rowDt).CreateCell(22).SetCellValue(dtDetails.Rows[i]["ten_cangbien"].ToString());
-            s1.GetRow(rowDt).CreateCell(23).SetCellValue(double.Parse(dtDetails.Rows[i]["hscode"].ToString()));
-
-            s1.GetRow(rowDt).CreateCell(24).SetCellValue(tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["l_cm"].ToString()) : double.Parse(dtDetails.Rows[i]["l_inch"].ToString()));
-            s1.GetRow(rowDt).CreateCell(25).SetCellValue(tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["w_cm"].ToString()) : double.Parse(dtDetails.Rows[i]["w_inch"].ToString()));
-            s1.GetRow(rowDt).CreateCell(26).SetCellValue(tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["h_cm"].ToString()) : double.Parse(dtDetails.Rows[i]["h_inch"].ToString()));
-            s1.GetRow(rowDt).CreateCell(27).SetCellValue(double.Parse(dtDetails.Rows[i]["dientich"].ToString()));
-            s1.GetRow(rowDt).CreateCell(28).SetCellValue(double.Parse(dtDetails.Rows[i]["inner_"].ToString()));
-            s1.GetRow(rowDt).CreateCell(29).SetCellValue(double.Parse(dtDetails.Rows[i]["sl_outer"].ToString()));
-            s1.GetRow(rowDt).CreateCell(30).SetCellValue(dtDetails.Rows[i]["thanhphan"].ToString());
-            s1.GetRow(rowDt).CreateCell(31).SetCellValue(double.Parse(dtDetails.Rows[i]["qty"].ToString()));
-            s1.GetRow(rowDt).CreateCell(32).SetCellValue(double.Parse(dtDetails.Rows[i]["amount"].ToString()));
-            s1.GetRow(rowDt).CreateCell(33).SetCellValue(double.Parse(dtDetails.Rows[i]["cpdg"].ToString()));
-        }
-
-        rowDt = row;
-        for (int i = 0; i < dtDetails.Rows.Count; i++)
-        {
-            rowDt++;
-            for (int j = 0; j <= 33; j++)
+            headerColumn.HeightInPoints = 40;
+            headerColumn2.HeightInPoints = 40;
+            ICellStyle hStyle = hssfworkbook.CreateCellStyle();
+            hStyle.WrapText = true;
+            hStyle.SetFont(fontBold);
+            hStyle.Alignment = HorizontalAlignment.Center;
+            hStyle.VerticalAlignment = VerticalAlignment.Top;
+            hStyle.BorderBottom = hStyle.BorderLeft
+                = hStyle.BorderRight
+                = hStyle.BorderTop
+                = NPOI.SS.UserModel.BorderStyle.Thin;
+            //--
+            for (int i = 0; i <= 33; i++)
             {
-                if (j == 0)
-                    s1.GetRow(rowDt).GetCell(j).CellStyle = cellTextCenterBoderAll;
-                else if (new int[] { 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 27, 31, 32, 33 }.Contains(j))
-                {
-                    s1.GetRow(rowDt).GetCell(j).CellStyle = cellStyleRight;
-                }
-                else
-                {
-                    s1.GetRow(rowDt).GetCell(j).CellStyle = border;
-                    for (int nht = 7; nht <= 12; nht++)
-                    {
-                        s1.GetRow(rowDt).GetCell(nht).CellStyle = cellNumBorderKT;
-                    }
-                    s1.GetRow(rowDt).GetCell(13).CellStyle = cellNumBorderCBM;
-                    s1.GetRow(rowDt).GetCell(18).CellStyle = cellNumBorder;
-                    s1.GetRow(rowDt).GetCell(20).CellStyle = cellNumBorder;
-                    s1.GetRow(rowDt).GetCell(21).CellStyle = cellNumBorder;
-                    //--Size Product
-                    s1.GetRow(rowDt).GetCell(24).CellStyle = cellNumBorderKT;
-                    s1.GetRow(rowDt).GetCell(25).CellStyle = cellNumBorderKT;
-                    s1.GetRow(rowDt).GetCell(26).CellStyle = cellNumBorderKT;
-                }
+                headerColumn.CreateCell(i).CellStyle = hStyle;
+                headerColumn2.CreateCell(i).CellStyle = hStyle;
             }
-        }
+            //--
+            headerColumn.GetCell(0).SetCellValue("Item No");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 0, 0));
 
-        row = rowDt + 1;
+            headerColumn.GetCell(1).SetCellValue("Picture - Only for shape ref.");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 1, 1));
 
-        s1.CreateRow(row).CreateCell(0).SetCellValue("Color References:");
-        string col31 = info.Alphabet[31], col32 = info.Alphabet[32];
-        s1.GetRow(row).CreateCell(31).SetCellFormula($@"SUM({col31}1:{col31}{row})");
-        s1.GetRow(row).GetCell(31).CellStyle = cellBold;
-        s1.GetRow(row).CreateCell(32).SetCellFormula($@"SUM({col32}1:{col32}{row})");
-        s1.GetRow(row).GetCell(32).CellStyle = cellBold;
-        int lineNum = 2;
-        for (int i = 0; i < dtDistinct.Rows.Count; i++)
-        {
-            var rowChungLoai = dtDistinct.Rows[i];
-            var items = dtReferences.AsEnumerable().Where(s => s.Field<string>("chungloai") == rowChungLoai["chungloai"].ToString()).ToList();
+            headerColumn.GetCell(2).SetCellValue("Customer's Code");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 2, 2));
 
-            row++;
-            s1.CreateRow(row);
-            s1.GetRow(row).CreateCell(1).SetCellValue(rowChungLoai["chungloai"].ToString() + " - " + rowChungLoai["ta_ngan"].ToString());
-            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 3));
-            row++;
-            s1.CreateRow(row);
+            headerColumn.GetCell(3).SetCellValue("Description");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 3, 3));
 
-            var rowMS = row;
-            int cell = 0;
-            for (int j = 0; j < items.Count; j++)
+            headerColumn.GetCell(4).SetCellValue("Weight(" + tentl + ")");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 4, 4));
+
+            headerColumn.GetCell(5).SetCellValue("Packing");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row - 1, 5, 6));
+
+            headerColumn2.GetCell(5).SetCellValue("Inner");
+            headerColumn2.GetCell(6).SetCellValue("Master");
+
+            headerColumn.GetCell(7).SetCellValue(String.Format("Inner Packing size ({0})", tenkt.Equals("cm") ? "cm" : "inch"));
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row - 1, 7, 9));
+            headerColumn2.GetCell(7).SetCellValue("L");
+            headerColumn2.GetCell(8).SetCellValue("W");
+            headerColumn2.GetCell(9).SetCellValue("H");
+
+
+            headerColumn.GetCell(10).SetCellValue(String.Format("Master Packing size ({0})", tenkt.Equals("cm") ? "cm" : "inch"));
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row - 1, 10, 12));
+
+            headerColumn2.GetCell(10).SetCellValue("L");
+            headerColumn2.GetCell(11).SetCellValue("W");
+            headerColumn2.GetCell(12).SetCellValue("H");
+
+
+            headerColumn.GetCell(13).SetCellValue(String.Format("PACK {0}", tenkt.Equals("cm") ? "CBM" : "CBF"));
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 13, 13));
+
+            headerColumn.GetCell(14).SetCellValue("No. of master packages");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row - 1, 14, 16));
+
+            headerColumn2.GetCell(14).SetCellValue("per 20'");
+            headerColumn2.GetCell(15).SetCellValue("per 40'");
+            headerColumn2.GetCell(16).SetCellValue("per 40'HC");
+
+            headerColumn.GetCell(17).SetCellValue("N.W/inner (" + tentl + ")");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 17, 17));
+
+            headerColumn.GetCell(18).SetCellValue("G.W/inner (" + tentl + ")");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 18, 18));
+
+            headerColumn.GetCell(19).SetCellValue("N.W/master (" + tentl + ")");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 19, 19));
+
+            headerColumn.GetCell(20).SetCellValue("G.W/master (" + tentl + ")");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 20, 20));
+
+            headerColumn.GetCell(21).SetCellValue("FOB PRICE (USD)");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 21, 21));
+
+            headerColumn.GetCell(22).SetCellValue("port of loading");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 22, 22));
+
+            headerColumn.GetCell(23).SetCellValue("HS Code");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 23, 23));
+
+            headerColumn.GetCell(24).SetCellValue(String.Format("Size Product ({0})", tenkt.Equals("cm") ? "cm" : "inch"));
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 24, 26));
+
+            headerColumn.GetCell(27).SetCellValue("M2");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 27, 27));
+
+            headerColumn2.GetCell(24).SetCellValue("L");
+            headerColumn2.GetCell(25).SetCellValue("W");
+            headerColumn2.GetCell(26).SetCellValue("H");
+
+            headerColumn.GetCell(28).SetCellValue("Packing");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row - 1, 28, 29));
+
+            headerColumn2.GetCell(28).SetCellValue("Inner");
+            headerColumn2.GetCell(29).SetCellValue("Master");
+
+            headerColumn.GetCell(30).SetCellValue("Material");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 30, 30));
+
+            headerColumn.GetCell(31).SetCellValue("Quantity");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 31, 31));
+
+            headerColumn.GetCell(32).SetCellValue("Amount");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 32, 32));
+
+            headerColumn.GetCell(33).SetCellValue("CPĐG");
+            s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 33, 33));
+
+            ICellStyle border = hssfworkbook.CreateCellStyle();
+            border.BorderBottom = border.BorderLeft
+                = border.BorderRight
+                = border.BorderTop
+                = NPOI.SS.UserModel.BorderStyle.Thin;
+            border.WrapText = true;
+            border.VerticalAlignment = VerticalAlignment.Top;
+
+            s1.SetColumnWidth(0, 5000);
+            s1.SetColumnWidth(1, 4000);
+            s1.SetColumnWidth(3, 9000);
+            s1.SetColumnWidth(4, 3000);
+
+            s1.SetColumnWidth(17, 3000);
+            s1.SetColumnWidth(18, 3000);
+            s1.SetColumnWidth(19, 3000);
+            s1.SetColumnWidth(20, 3000);
+            s1.SetColumnWidth(21, 4000);
+
+            s1.SetColumnWidth(24, 2000);
+            s1.SetColumnHidden(24, true);
+            s1.SetColumnWidth(25, 2000);
+            s1.SetColumnHidden(25, true);
+            s1.SetColumnWidth(26, 2000);
+            s1.SetColumnHidden(26, true);
+            s1.SetColumnWidth(27, 2000);
+            s1.SetColumnHidden(27, true);
+            s1.SetColumnWidth(28, 2000);
+            s1.SetColumnHidden(28, true);
+            s1.SetColumnWidth(29, 2000);
+            s1.SetColumnHidden(29, true);
+            s1.SetColumnWidth(30, 2000);
+            s1.SetColumnHidden(30, true);
+
+            s1.SetColumnWidth(31, 3000);
+            s1.SetColumnWidth(32, 4000);
+            if (!inCoGia)
             {
-                int sodu = j;
-                var chiaHet = sodu % 4 == 0;
-                if (chiaHet | j == 0)
-                {
-                    cell = 0;
-                    rowMS = row;
-                    for (var iR = 0; iR < lineNum; iR++)
-                    {
-                        row++;
-                        s1.CreateRow(row);
-                        if (iR == lineNum - 2)
-                            s1.GetRow(row).HeightInPoints = 70;
-                    }
-                }
-                else
-                {
-                    cell++;
-                }
+                s1.SetColumnHidden(31, true);
+                s1.SetColumnHidden(32, true);
+            }
 
-                s1.GetRow(rowMS - 1).CreateCell(5 + cell * 3).SetCellValue("Color " + items[j]["codemau"].ToString());
-                s1.GetRow(rowMS).CreateCell(5 + cell * 3).SetCellValue(items[j]["mau"].ToString());
-                try
+            s1.SetColumnWidth(33, 2000);
+            s1.SetColumnHidden(33, true);
+
+            //SO
+            ICellStyle cellNumBorder = hssfworkbook.CreateCellStyle();
+            cellNumBorder.Alignment = HorizontalAlignment.Right;
+            cellNumBorder.VerticalAlignment = VerticalAlignment.Top;
+            cellNumBorder.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.00");
+            cellNumBorder.BorderBottom = cellNumBorder.BorderRight = cellNumBorder.BorderLeft = cellNumBorder.BorderTop = BorderStyle.Thin;
+
+            ICellStyle cellNumBorderCBM = hssfworkbook.CreateCellStyle();
+            cellNumBorderCBM.Alignment = HorizontalAlignment.Right;
+            cellNumBorderCBM.VerticalAlignment = VerticalAlignment.Top;
+            cellNumBorderCBM.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.000");
+            cellNumBorderCBM.BorderBottom = cellNumBorderCBM.BorderRight = cellNumBorderCBM.BorderLeft = cellNumBorderCBM.BorderTop = BorderStyle.Thin;
+
+            ICellStyle cellNumBorderKT = hssfworkbook.CreateCellStyle();
+            cellNumBorderKT.Alignment = HorizontalAlignment.Right;
+            cellNumBorderKT.VerticalAlignment = VerticalAlignment.Top;
+            cellNumBorderKT.DataFormat = HSSFUtils.CellDataFormat.GetDataFormat(hssfworkbook, "#,##0.0");
+            cellNumBorderKT.BorderBottom = cellNumBorderKT.BorderRight = cellNumBorderKT.BorderLeft = cellNumBorderKT.BorderTop = BorderStyle.Thin;
+            //SO
+
+            int detailsCount = dtDetails.Rows.Count;
+            var rowDt = row;
+            for (int i = 0; i < detailsCount; i++)
+            {
+                rowDt++;
+                var imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + ExcuteSignalRStatic.getImageProduct(dtDetails.Rows[i]["msp"].ToString()));
+                //var image = System.Drawing.Image.FromFile(imgPath);
+                lstimage.Add(new AvariablePrj.lstImage()
                 {
-                    var imgPath = ExcuteSignalRStatic.getImageColor(items[j]["url"].ToString());
-                    if (imgPath.StartsWith("Error"))
+                    row = rowDt,
+                    column = 2,
+                    link = imgPath
+                });
+
+                //try
+                //{
+                //    String imgPath = System.IO.Path.Combine(productImagePath, dtDetails.Rows[i]["pic"].ToString() + ".jpg");
+                //    System.Drawing.Image image = System.Drawing.Image.FromFile(imgPath);
+                //    MemoryStream ms = new MemoryStream();
+                //    image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                //    IDrawing patriarch = s1.CreateDrawingPatriarch();
+                //    HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, 1, rowDt, 2, rowDt + 1);
+                //    anchor.AnchorType = 2;
+
+                //    int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
+                //    IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+                //}
+                //catch
+                //{ }
+
+                s1.CreateRow(rowDt).CreateCell(0).SetCellValue(dtDetails.Rows[i]["msp"].ToString());
+                s1.GetRow(rowDt).HeightInPoints = 50;
+                s1.GetRow(rowDt).CreateCell(1).SetCellValue("");
+                s1.GetRow(rowDt).CreateCell(2).SetCellValue(dtDetails.Rows[i]["ma_sanpham_khach"].ToString());
+                s1.GetRow(rowDt).CreateCell(3).SetCellValue(dtDetails.Rows[i]["mota_tienganh"].ToString());
+                s1.GetRow(rowDt).CreateCell(4).SetCellValue(double.Parse(dtDetails.Rows[i]["trongluong"].ToString()));
+                // s1.GetRow(9 + i).CreateCell(4).SetCellType(CellType.FORMULA);
+                // s1.GetRow(9 + i).GetCell(4).SetCellFormula("1 + H" + (10 + i));
+                s1.GetRow(rowDt).GetCell(4).CellStyle = cellStyleRight;
+
+                s1.GetRow(rowDt).CreateCell(5).SetCellValue(dtDetails.Rows[i]["sl_inner"].ToString());
+
+                s1.GetRow(rowDt).CreateCell(6).SetCellValue(dtDetails.Rows[i]["master"].ToString());
+
+                s1.GetRow(rowDt).CreateCell(7).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["l1"].ToString()) : double.Parse(dtDetails.Rows[i]["l1"].ToString()) / (double)2.54).ToString("#.0")));
+                s1.GetRow(rowDt).GetCell(7).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(8).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["w1"].ToString()) : double.Parse(dtDetails.Rows[i]["w1"].ToString()) / (double)2.54).ToString("#.0")));
+                s1.GetRow(rowDt).GetCell(8).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(9).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["h1"].ToString()) : double.Parse(dtDetails.Rows[i]["h1"].ToString()) / (double)2.54).ToString("#.0")));
+                s1.GetRow(rowDt).GetCell(9).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(10).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["l2"].ToString()) : double.Parse(dtDetails.Rows[i]["l2"].ToString()) / (double)2.54).ToString("#.0")));
+                s1.GetRow(rowDt).GetCell(10).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(11).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["w2"].ToString()) : double.Parse(dtDetails.Rows[i]["w2"].ToString()) / (double)2.54).ToString("#.0")));
+                s1.GetRow(rowDt).GetCell(11).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(12).SetCellValue(double.Parse((tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["h2"].ToString()) : double.Parse(dtDetails.Rows[i]["h2"].ToString()) / (double)2.54).ToString("#.0")));
+                s1.GetRow(rowDt).GetCell(12).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(13).SetCellValue(tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["v2"].ToString()) : double.Parse(dtDetails.Rows[i]["cbf"].ToString()));
+                s1.GetRow(rowDt).GetCell(13).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(14).SetCellValue(double.Parse(dtDetails.Rows[i]["nopack_20"].ToString()));
+                s1.GetRow(rowDt).GetCell(14).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(15).SetCellValue(double.Parse(dtDetails.Rows[i]["nopack"].ToString()));
+                s1.GetRow(rowDt).GetCell(15).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(16).SetCellValue(double.Parse(dtDetails.Rows[i]["nopack_40hc"].ToString()));
+                s1.GetRow(rowDt).GetCell(16).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(17).SetCellValue(double.Parse(dtDetails.Rows[i]["n_w_inner"].ToString()));
+                s1.GetRow(rowDt).GetCell(17).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(18).SetCellValue(double.Parse(dtDetails.Rows[i]["g_w_inner"].ToString()));
+                s1.GetRow(rowDt).GetCell(18).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(19).SetCellValue(double.Parse(dtDetails.Rows[i]["n_w_outer"].ToString()));
+                s1.GetRow(rowDt).GetCell(19).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(20).SetCellValue(double.Parse(dtDetails.Rows[i]["g_w_outer"].ToString()));
+                s1.GetRow(rowDt).GetCell(20).SetCellType(CellType.Numeric);
+
+                s1.GetRow(rowDt).CreateCell(21).SetCellValue(double.Parse(dtDetails.Rows[i]["giafob"].ToString()));
+                s1.GetRow(rowDt).GetCell(21).SetCellType(CellType.Numeric);
+                s1.GetRow(rowDt).GetCell(21).CellStyle = cellNumBorder;
+
+                s1.GetRow(rowDt).CreateCell(22).SetCellValue(dtDetails.Rows[i]["ten_cangbien"].ToString());
+                s1.GetRow(rowDt).CreateCell(23).SetCellValue(double.Parse(dtDetails.Rows[i]["hscode"].ToString()));
+
+                s1.GetRow(rowDt).CreateCell(24).SetCellValue(tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["l_cm"].ToString()) : double.Parse(dtDetails.Rows[i]["l_inch"].ToString()));
+                s1.GetRow(rowDt).CreateCell(25).SetCellValue(tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["w_cm"].ToString()) : double.Parse(dtDetails.Rows[i]["w_inch"].ToString()));
+                s1.GetRow(rowDt).CreateCell(26).SetCellValue(tenkt.Equals("cm") ? double.Parse(dtDetails.Rows[i]["h_cm"].ToString()) : double.Parse(dtDetails.Rows[i]["h_inch"].ToString()));
+                s1.GetRow(rowDt).CreateCell(27).SetCellValue(double.Parse(dtDetails.Rows[i]["dientich"].ToString()));
+                s1.GetRow(rowDt).CreateCell(28).SetCellValue(double.Parse(dtDetails.Rows[i]["inner_"].ToString()));
+                s1.GetRow(rowDt).CreateCell(29).SetCellValue(double.Parse(dtDetails.Rows[i]["sl_outer"].ToString()));
+                s1.GetRow(rowDt).CreateCell(30).SetCellValue(dtDetails.Rows[i]["thanhphan"].ToString());
+                s1.GetRow(rowDt).CreateCell(31).SetCellValue(double.Parse(dtDetails.Rows[i]["qty"].ToString()));
+                s1.GetRow(rowDt).CreateCell(32).SetCellValue(double.Parse(dtDetails.Rows[i]["amount"].ToString()));
+                s1.GetRow(rowDt).CreateCell(33).SetCellValue(double.Parse(dtDetails.Rows[i]["cpdg"].ToString()));
+            }
+
+            rowDt = row;
+            for (int i = 0; i < dtDetails.Rows.Count; i++)
+            {
+                rowDt++;
+                for (int j = 0; j <= 33; j++)
+                {
+                    if (j == 0)
+                        s1.GetRow(rowDt).GetCell(j).CellStyle = cellTextCenterBoderAll;
+                    else if (new int[] { 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 27, 31, 32, 33 }.Contains(j))
                     {
-                        s1.GetRow(rowMS + 1).CreateCell(5 + cell * 3).SetCellValue(imgPath);
+                        s1.GetRow(rowDt).GetCell(j).CellStyle = cellStyleRight;
                     }
                     else
                     {
-                        imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + imgPath);
-
-                        var image = System.Drawing.Image.FromFile(imgPath);
-                        var ms = new MemoryStream();
-                        image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                        var patriarch = s1.CreateDrawingPatriarch();
-                        var anchor = new HSSFClientAnchor(0, 0, 0, 0
-                            , 5 + cell * 3
-                            , rowMS + 1
-                            , 7 + cell * 3
-                            , rowMS + 2
-                        );
-                        anchor.AnchorType = 2;
-
-                        int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
-                        IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+                        s1.GetRow(rowDt).GetCell(j).CellStyle = border;
+                        for (int nht = 7; nht <= 12; nht++)
+                        {
+                            s1.GetRow(rowDt).GetCell(nht).CellStyle = cellNumBorderKT;
+                        }
+                        s1.GetRow(rowDt).GetCell(13).CellStyle = cellNumBorderCBM;
+                        s1.GetRow(rowDt).GetCell(18).CellStyle = cellNumBorder;
+                        s1.GetRow(rowDt).GetCell(20).CellStyle = cellNumBorder;
+                        s1.GetRow(rowDt).GetCell(21).CellStyle = cellNumBorder;
+                        //--Size Product
+                        s1.GetRow(rowDt).GetCell(24).CellStyle = cellNumBorderKT;
+                        s1.GetRow(rowDt).GetCell(25).CellStyle = cellNumBorderKT;
+                        s1.GetRow(rowDt).GetCell(26).CellStyle = cellNumBorderKT;
                     }
                 }
-                catch
-                { }
             }
+
+            row = rowDt + 1;
+
+            s1.CreateRow(row).CreateCell(0).SetCellValue("Color References:");
+            string col31 = info.Alphabet[31], col32 = info.Alphabet[32];
+            s1.GetRow(row).CreateCell(31).SetCellFormula($@"SUM({col31}1:{col31}{row})");
+            s1.GetRow(row).GetCell(31).CellStyle = cellBold;
+            s1.GetRow(row).CreateCell(32).SetCellFormula($@"SUM({col32}1:{col32}{row})");
+            s1.GetRow(row).GetCell(32).CellStyle = cellBold;
+            int lineNum = 2;
+            for (int i = 0; i < dtDistinct.Rows.Count; i++)
+            {
+                var rowChungLoai = dtDistinct.Rows[i];
+                var items = dtReferences.AsEnumerable().Where(s => s.Field<string>("chungloai") == rowChungLoai["chungloai"].ToString()).ToList();
+
+                row++;
+                s1.CreateRow(row);
+                s1.GetRow(row).CreateCell(1).SetCellValue(rowChungLoai["chungloai"].ToString() + " - " + rowChungLoai["ta_ngan"].ToString());
+                s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 3));
+                row++;
+                s1.CreateRow(row);
+
+                var rowMS = row;
+                int cell = 0;
+                for (int j = 0; j < items.Count; j++)
+                {
+                    int sodu = j;
+                    var chiaHet = sodu % 4 == 0;
+                    if (chiaHet | j == 0)
+                    {
+                        cell = 0;
+                        rowMS = row;
+                        for (var iR = 0; iR < lineNum; iR++)
+                        {
+                            row++;
+                            s1.CreateRow(row);
+                            if (iR == lineNum - 2)
+                                s1.GetRow(row).HeightInPoints = 70;
+                        }
+                    }
+                    else
+                    {
+                        cell++;
+                    }
+
+                    s1.GetRow(rowMS - 1).CreateCell(5 + cell * 3).SetCellValue("Color " + items[j]["codemau"].ToString());
+                    s1.GetRow(rowMS).CreateCell(5 + cell * 3).SetCellValue(items[j]["mau"].ToString());
+                    try
+                    {
+                        var imgPath = ExcuteSignalRStatic.getImageColor(items[j]["url"].ToString());
+                        if (imgPath.StartsWith("Error"))
+                        {
+                            s1.GetRow(rowMS + 1).CreateCell(5 + cell * 3).SetCellValue(imgPath);
+                        }
+                        else
+                        {
+                            imgPath = ExcuteSignalRStatic.mapPathSignalR("~/" + imgPath);
+
+                            var image = System.Drawing.Image.FromFile(imgPath);
+                            var ms = new MemoryStream();
+                            image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                            var patriarch = s1.CreateDrawingPatriarch();
+                            var anchor = new HSSFClientAnchor(0, 0, 0, 0
+                                , 5 + cell * 3
+                                , rowMS + 1
+                                , 7 + cell * 3
+                                , rowMS + 2
+                            );
+                            anchor.AnchorType = 2;
+
+                            int index = hssfworkbook.AddPicture(ms.ToArray(), PictureType.JPEG);
+                            IPicture signaturePicture = patriarch.CreatePicture(anchor, index);
+                        }
+                    }
+                    catch
+                    { }
+                }
+            }
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("Remark:");
+            s1.GetRow(row).HeightInPoints = 30;
+            s1.GetRow(row).GetCell(0).CellStyle = celltext;
+            s1.GetRow(row).CreateCell(1).SetCellValue("All offered FOB prices are requested for FCL container - including packing as our above-mentioned  standard; Labeling in black & white color ( if required); Bill of lading & seal fee, THC, ENS charges from the shipping line/forwarder and normal container fumigation & ventilation fees with Methyl Bromide (if any).");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("");
+            s1.GetRow(row).CreateCell(1).SetCellValue(
+               @"The fee of Fumigation and Ventilation under AFAS standard for all containers imported to Australia (if required) will be charged to customers: 250 USD/20"" container; 350 USD/40"", 40”HC, 45” container."
+            );
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("");
+            s1.GetRow(row).CreateCell(1).SetCellValue("Other arising costs (if any) will be charged to customers.");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("");
+            s1.GetRow(row).CreateCell(1).SetCellValue("All information of weight, loadability are estimated only.");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("Minimum order:");
+            s1.GetRow(row).GetCell(0).CellStyle = celltext;
+            s1.GetRow(row).CreateCell(1).SetCellValue("1x40” container ( a full container)");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("");
+            s1.GetRow(row).CreateCell(1).SetCellValue(@"Order of 1x20"" can be accepted, but the extra charge of 250 USD will be added into the proforma invoice / commercial invoice");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("Number of items for:");
+            s1.GetRow(row).GetCell(0).CellStyle = celltext;
+            s1.GetRow(row).CreateCell(1).SetCellValue("20' cont.");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.GetRow(row).CreateCell(2).SetCellValue("12 different items (max.) which is offered under the same delivery terms/port of loading.");
+            s1.GetRow(row).GetCell(2).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 15));
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("");
+            s1.GetRow(row).CreateCell(1).SetCellValue("40' cont.");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.GetRow(row).CreateCell(2).SetCellValue("24 different items (max.) which is offered under the same delivery terms/port of loading.");
+            s1.GetRow(row).GetCell(2).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("");
+            s1.GetRow(row).CreateCell(1).SetCellValue("The extra charge of 5%-10% will be added into the prices if the number of items in a container is over the above-mentioned requirement.");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("MOQ/item/color:");
+            s1.GetRow(row).GetCell(0).CellStyle = celltext;
+            s1.GetRow(row).CreateCell(1).SetCellValue(dtDetails.Rows[0]["moq_item_color"].ToString());
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("Shipment time:");
+            s1.GetRow(row).GetCell(0).CellStyle = celltext;
+            s1.GetRow(row).CreateCell(1).SetCellValue(String.Format("Normally, {0} - {1} days after receipt of original L/C or 30% deposit", dtDetails.Rows[0]["shipmenttime"].ToString(), dtDetails.Rows[0]["shipmenttime2"].ToString()));
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("");
+            s1.GetRow(row).CreateCell(1).SetCellValue(String.Format("In peak season, the shipment time can be longer and is quoted under rules of FIRST IN FIRST OUT ( FIFO) "));
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("Port of loading:");
+            s1.GetRow(row).GetCell(0).CellStyle = celltext;
+            s1.GetRow(row).CreateCell(1).SetCellValue(String.Format("{0}", LaBaoGiaMau.GetValueOrDefault(false) ? " As above-mentioned" : dtDetails.Rows[0]["ten_cangbien"].ToString()));
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("Payment terms:");
+            s1.GetRow(row).GetCell(0).CellStyle = celltext;
+            s1.GetRow(row).CreateCell(1).SetCellValue("TTR 30% deposit, 70% after shipment, or L/C at sight ( value over USD 20,000)");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("Bank Details:");
+            s1.GetRow(row).GetCell(0).CellStyle = celltext;
+            s1.GetRow(row).CreateCell(1).SetCellValue("In  favor ANCO COMPANY LTD.");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(1).SetCellValue("Account no. : 007.137.0321634");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(1).SetCellValue("At bank: Joint Stock Commercial Bank For Foreign Trade of Vietnam (VIETCOMBANK),");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(1).SetCellValue("10 Vo Van Kiet St., Dist. 1, Hochiminh City, Vietnam.");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(1).SetCellValue("Tel.: (84-028) 38297245,");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(1).SetCellValue("Fax: (84-028) 38297228,");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(1).SetCellValue("Swift code: BFTVVNVX007.");
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            row++;
+            s1.CreateRow(row).CreateCell(0).SetCellValue("Validity  until:");
+            s1.GetRow(row).GetCell(0).CellStyle = celltext;
+            s1.GetRow(row).CreateCell(1).SetCellValue(DateTime.Parse(dtDetails.Rows[0]["ngayhethan"].ToString()).ToString("dd/MMM/yyyy"));
+            s1.GetRow(row).GetCell(1).CellStyle = celltext;
+            s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
+
+            s1 = config.PrintExcel((HSSFSheet)s1, row);
+            s1.PrintSetup.Landscape = true;
+
+            if (typeReport == "pdf")
+                s1.PrintSetup.PaperSize = (short)PaperSize.A4;
         }
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("Remark:");
-        s1.GetRow(row).HeightInPoints = 30;
-        s1.GetRow(row).GetCell(0).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(1).SetCellValue("All offered FOB prices are requested for FCL container - including packing as our above-mentioned  standard; Labeling in black & white color ( if required); Bill of lading & seal fee, THC, ENS charges from the shipping line/forwarder and normal container fumigation & ventilation fees with Methyl Bromide (if any).");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("");
-        s1.GetRow(row).CreateCell(1).SetCellValue(
-           @"The fee of Fumigation and Ventilation under AFAS standard for all containers imported to Australia (if required) will be charged to customers: 250 USD/20"" container; 350 USD/40"", 40”HC, 45” container."
-        );
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("");
-        s1.GetRow(row).CreateCell(1).SetCellValue("Other arising costs (if any) will be charged to customers.");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("");
-        s1.GetRow(row).CreateCell(1).SetCellValue("All information of weight, loadability are estimated only.");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("Minimum order:");
-        s1.GetRow(row).GetCell(0).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(1).SetCellValue("1x40” container ( a full container)");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("");
-        s1.GetRow(row).CreateCell(1).SetCellValue(@"Order of 1x20"" can be accepted, but the extra charge of 250 USD will be added into the proforma invoice / commercial invoice");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("Number of items for:");
-        s1.GetRow(row).GetCell(0).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(1).SetCellValue("20' cont.");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(2).SetCellValue("12 different items (max.) which is offered under the same delivery terms/port of loading.");
-        s1.GetRow(row).GetCell(2).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 15));
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("");
-        s1.GetRow(row).CreateCell(1).SetCellValue("40' cont.");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(2).SetCellValue("24 different items (max.) which is offered under the same delivery terms/port of loading.");
-        s1.GetRow(row).GetCell(2).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 2, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("");
-        s1.GetRow(row).CreateCell(1).SetCellValue("The extra charge of 5%-10% will be added into the prices if the number of items in a container is over the above-mentioned requirement.");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("MOQ/item/color:");
-        s1.GetRow(row).GetCell(0).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(1).SetCellValue(dtDetails.Rows[0]["moq_item_color"].ToString());
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("Shipment time:");
-        s1.GetRow(row).GetCell(0).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(1).SetCellValue(String.Format("Normally, {0} - {1} days after receipt of original L/C or 30% deposit", dtDetails.Rows[0]["shipmenttime"].ToString(), dtDetails.Rows[0]["shipmenttime2"].ToString()));
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("");
-        s1.GetRow(row).CreateCell(1).SetCellValue(String.Format("In peak season, the shipment time can be longer and is quoted under rules of FIRST IN FIRST OUT ( FIFO) "));
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("Port of loading:");
-        s1.GetRow(row).GetCell(0).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(1).SetCellValue(String.Format("{0}", LaBaoGiaMau.GetValueOrDefault(false) ? " As above-mentioned" : dtDetails.Rows[0]["ten_cangbien"].ToString()));
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("Payment terms:");
-        s1.GetRow(row).GetCell(0).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(1).SetCellValue("TTR 30% deposit, 70% after shipment, or L/C at sight ( value over USD 20,000)");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("Bank Details:");
-        s1.GetRow(row).GetCell(0).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(1).SetCellValue("In  favor ANCO COMPANY LTD.");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(1).SetCellValue("Account no. : 007.137.0321634");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(1).SetCellValue("At bank: Joint Stock Commercial Bank For Foreign Trade of Vietnam (VIETCOMBANK),");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(1).SetCellValue("10 Vo Van Kiet St., Dist. 1, Hochiminh City, Vietnam.");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(1).SetCellValue("Tel.: (84-028) 38297245,");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(1).SetCellValue("Fax: (84-028) 38297228,");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(1).SetCellValue("Swift code: BFTVVNVX007.");
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        row++;
-        s1.CreateRow(row).CreateCell(0).SetCellValue("Validity  until:");
-        s1.GetRow(row).GetCell(0).CellStyle = celltext;
-        s1.GetRow(row).CreateCell(1).SetCellValue(DateTime.Parse(dtDetails.Rows[0]["ngayhethan"].ToString()).ToString("dd/MMM/yyyy"));
-        s1.GetRow(row).GetCell(1).CellStyle = celltext;
-        s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 15));
-
-        s1 = config.PrintExcel((HSSFSheet)s1, row);
-        s1.PrintSetup.Landscape = true;
-
-        if (typeReport == "pdf")
-            s1.PrintSetup.PaperSize = (short)PaperSize.A4;
+        catch(Exception ex)
+        {
+            hssfworkbook.Clear();
+            hssfworkbook = null;
+            throw new Exception(ex.ToString());
+        }
 
         return hssfworkbook;
     }
@@ -860,7 +870,10 @@ public class BaoGiaReport
         if (string.IsNullOrWhiteSpace(saveAsFileName))
             saveAsFileName = bg == null ? "AncoQuotationQR_R.xls" : bg.isform.GetValueOrDefault(false) ? "AncoQuotation_R.xls" : "AncoQuotation.xls";
 
-        return this.luuBaoGia(dblc, context, wb, saveAsFileName, type, mail, url, fileName);
+        if (wb == null)
+            return "";
+        else
+            return this.luuBaoGia(dblc, context, wb, saveAsFileName, type, mail, url, fileName);
     }
 
     public string luuBaoGia(LinqDBDataContext dblc, HttpContext context, HSSFWorkbook hsswb, string saveAsFileName, string type, bool mail, string url, string fileName)
