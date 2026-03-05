@@ -672,11 +672,11 @@ public class DanhSachDatHangReport
             s1.GetRow(row).GetCell(5).CellStyle = cellBoldSoLuong;
 
             if (guiNCC == true)
-                s1.GetRow(row).CreateCell(10).SetCellValue("");
+                s1.GetRow(row).CreateCell(11).SetCellValue("");
             else
-                s1.GetRow(row).CreateCell(10).SetCellFormula(String.Format("SUM(L{0}:L{1})", m, row));
+                s1.GetRow(row).CreateCell(11).SetCellFormula(String.Format("SUM(L{0}:L{1})", m, row));
 
-            s1.GetRow(row).GetCell(10).CellStyle = cellBoldAmount;
+            s1.GetRow(row).GetCell(11).CellStyle = cellBoldAmount;
             s1.GetRow(row).CreateCell(15).SetCellFormula(String.Format("SUM(Q{0}:Q{1})", m, row));
             s1.GetRow(row).GetCell(15).CellStyle = cellBoldCBM;
 
@@ -687,15 +687,15 @@ public class DanhSachDatHangReport
             var cellR01 = s1.CreateRow(row).CreateCell(1);
             cellR01.SetCellValue("(+):" + dt.Rows[0]["mota_cong"].ToString());
             cellR01.CellStyle = cellBold;
-            var cellRange1to5v1 = new CellRangeAddress(row, row, 1, 9);
+            var cellRange1to5v1 = new CellRangeAddress(row, row, 1, 10);
             s1.AddMergedRegion(cellRange1to5v1);
 
-            var cellR10 = s1.GetRow(row).CreateCell(10);
+            var cellR11 = s1.GetRow(row).CreateCell(11);
             var phiTangVal = double.Parse(phitang == null ? "0" : phitang.Value.ToString());
             if (guiNCC == false)
             {
-                cellR10.SetCellValue(phiTangVal);
-                cellR10.CellStyle = cellBoldAmount;
+                cellR11.SetCellValue(phiTangVal);
+                cellR11.CellStyle = cellBoldAmount;
             }
 
             if (phitang == null)
@@ -705,7 +705,7 @@ public class DanhSachDatHangReport
                 if (type == "pdf")
                 {
                     s1.GetRow(row).RemoveCell(cellR01);
-                    s1.GetRow(row).RemoveCell(cellR10);
+                    s1.GetRow(row).RemoveCell(cellR11);
                 }
             }
             else
@@ -718,15 +718,15 @@ public class DanhSachDatHangReport
             cellR01 = s1.CreateRow(row).CreateCell(1);
             cellR01.SetCellValue("(-):" + dt.Rows[0]["mota_tru"].ToString());
             cellR01.CellStyle = cellBold;
-            var cellRange1to5v2 = new CellRangeAddress(row, row, 1, 9);
+            var cellRange1to5v2 = new CellRangeAddress(row, row, 1, 10);
             s1.AddMergedRegion(cellRange1to5v2);
 
-            cellR10 = s1.GetRow(row).CreateCell(10);
+            cellR11 = s1.GetRow(row).CreateCell(11);
             var phiGiamVal = double.Parse(phigiam == null ? "0" : phigiam.Value.ToString());
             if (guiNCC == false)
             {
-                cellR10.SetCellValue(phiGiamVal);
-                cellR10.CellStyle = cellBoldAmount;
+                cellR11.SetCellValue(phiGiamVal);
+                cellR11.CellStyle = cellBoldAmount;
             }
 
             if (phigiam == null)
@@ -736,7 +736,7 @@ public class DanhSachDatHangReport
                 if (type == "pdf")
                 {
                     s1.GetRow(row).RemoveCell(cellR01);
-                    s1.GetRow(row).RemoveCell(cellR10);
+                    s1.GetRow(row).RemoveCell(cellR11);
                 }
             }
             else
@@ -751,11 +751,11 @@ public class DanhSachDatHangReport
             s1.GetRow(row).GetCell(1).CellStyle = cellBold;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 4));
 
-            cellR10 = s1.GetRow(row).CreateCell(10);
+            cellR11 = s1.GetRow(row).CreateCell(11);
             if (guiNCC == false)
             {
-                cellR10.SetCellValue(discount);
-                cellR10.CellStyle = cellBoldAmount;
+                cellR11.SetCellValue(discount);
+                cellR11.CellStyle = cellBoldAmount;
             }
             row++;
             // start tổng cộng đã trừ
@@ -763,12 +763,12 @@ public class DanhSachDatHangReport
             s1.GetRow(row).HeightInPoints = 30;
             s1.GetRow(row).GetCell(1).CellStyle = cellBold;
             s1.AddMergedRegion(new CellRangeAddress(row, row, 1, 4));
-            cellR10 = s1.GetRow(row).CreateCell(10);
+            cellR11 = s1.GetRow(row).CreateCell(11);
             var tongCongDaTru = sumThanhTien + phiTangVal - phiGiamVal - discount;
             if (guiNCC == false)
             {
-                cellR10.SetCellFormula(String.Format("K{0} + K{1} - K{2} - K{3}", sub, cong, tru, dis));
-                cellR10.CellStyle = cellBoldAmount;
+                cellR11.SetCellFormula(String.Format("L{0} + L{1} - L{2} - L{3}", sub, cong, tru, dis));
+                cellR11.CellStyle = cellBoldAmount;
             }
             row++;
             // start viet bang chu
