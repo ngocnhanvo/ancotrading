@@ -239,7 +239,7 @@ namespace OfficeToPDF
 
                                     if (commentCol.StartsWith("wrap"))
                                     {
-                                        var itemRP = lstTextReplace.Where(s => s.oldT == cell.StringCellValue).FirstOrDefault();
+                                        var itemRP = lstTextReplace.Where(s => s.oldT == cell.StringCellValue.removeAllSpaceOrTrimText(true)).FirstOrDefault();
                                         if (itemRP != null)
                                         {
                                             itemRP.wrap_Mer = true;

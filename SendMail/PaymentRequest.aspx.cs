@@ -103,7 +103,7 @@ public partial class SendMail_PaymentRequest : System.Web.UI.Page
                 N'{info.pkl.so_inv}' as soinvoice, 
                 {info.pkl.tiendatcoc.Value} as datcoc, 
                 {info.pkl.tienconlai.Value} as giatriconlai, 
-                N'{nganhang.thongtin.Replace("'", "''")}' as nganhang,
+                N'Account No.: {nganhang.thongtin.Replace("'", "''")}' as nganhang,
                 N'{Public.tenTaiKhoanNoTA}' as cp_name,
                 N'{Public.diaChiNoTA}' as cp_add
         ";

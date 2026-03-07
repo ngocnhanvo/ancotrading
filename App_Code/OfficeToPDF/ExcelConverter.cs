@@ -97,23 +97,29 @@ namespace OfficeToPDF
                                         {
                                             if (textReplace.wrap_Mer.GetValueOrDefault(false))
                                             {
-                                                oRange.Value = textReplace.newT;
-                                                var oRangeWrap = (Range)worksheet.Cells[oRange.Row, oRange.Column + 50];
-                                                double columnWidth = 0;
-                                                for (var i = oRange.Column; i < textReplace.column_Mer + oRange.Column; i++)
+                                                try
                                                 {
-                                                    var oRangeWrap2 = (Range)worksheet.Cells[oRange.Row, i];
-                                                    columnWidth += double.Parse(oRangeWrap2.ColumnWidth.ToString());
-                                                }
+                                                    oRange.Value = textReplace.newT;
+                                                    var oRangeWrap = (Range)worksheet.Cells[oRange.Row, oRange.Column + 50];
+                                                    double columnWidth = 0;
+                                                    for (var i = oRange.Column; i < textReplace.column_Mer + oRange.Column; i++)
+                                                    {
+                                                        var oRangeWrap2 = (Range)worksheet.Cells[oRange.Row, i];
+                                                        columnWidth += double.Parse(oRangeWrap2.ColumnWidth.ToString());
+                                                    }
 
-                                                oRangeWrap.ColumnWidth = columnWidth;
-                                                oRangeWrap.Font.Name = oRange.Font.Name;
-                                                oRangeWrap.Font.Size = oRange.Font.Size;
-                                                oRange.Copy(oRangeWrap);
-                                                oRange.Rows.AutoFit();
-                                                var heightATF = double.Parse(oRange.Rows.Height.ToString());
-                                                oRange.RowHeight = heightATF + (heightATF * 5 / 100);
-                                                oRangeWrap.Delete(XlDeleteShiftDirection.xlShiftUp);
+                                                    oRangeWrap.ColumnWidth = columnWidth;
+                                                    oRangeWrap.Font.Name = oRange.Font.Name;
+                                                    oRangeWrap.Font.Size = oRange.Font.Size;
+                                                    oRange.Copy(oRangeWrap);
+                                                    oRange.Rows.AutoFit();
+                                                    var heightATF = double.Parse(oRange.Rows.Height.ToString());
+                                                    oRange.RowHeight = heightATF + (heightATF * 5 / 100);
+                                                    oRangeWrap.Delete(XlDeleteShiftDirection.xlShiftUp);
+                                                }
+                                                catch(Exception ex) {
+                                                    oRange.Value = $"error1: {ex.Message}";
+                                                }
                                             }
                                             else
                                             {
@@ -123,7 +129,7 @@ namespace OfficeToPDF
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    oRange.Characters[phStart + 1, phEnd].Insert(ex.Message);
+                                                    oRange.Characters[phStart + 1, phEnd].Insert($"error2: {ex.Message}");
                                                 }
                                             }
                                         }
