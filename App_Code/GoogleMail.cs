@@ -84,6 +84,22 @@ public class GoogleMail
 
     public void Send(String from, String to, String cc, String bcc, String subject, String body, String attachments, params object[] args)
     {
+        Send2(from, to, cc, bcc, subject, body, attachments);
+    }
+
+    public void Send(String from, String to, String cc, String bcc, String subject, String body, List<Attachment> attachments, params object[] args)
+    {
+        if (Attachments == null)
+            Attachments = new List<Attachment>();
+        Attachments.AddRange(attachments);
+        this.Send2(from, to, cc, bcc, subject, body, "");
+    }
+
+    public void Send2(String from, String to, String cc, String bcc, String subject, String body, String attachments, params object[] args)
+    {
+        if (Attachments == null)
+            Attachments = new List<Attachment>();
+
         if (Regex.IsMatch(body, "^([cCdDeEfFgGhHiIjI]:).+"))
         {
             body = File.ReadAllText(body);
@@ -92,26 +108,7 @@ public class GoogleMail
 
         MailMessage mail = new MailMessage();
         mail.From = new MailAddress(from);
-        mail.ReplyTo = new MailAddress(from);
-        
-        to = to.Replace(" ", "");
-        string[] tos = to.Split(";,".ToArray());
-        foreach (string item in tos)
-        {
-            mail.To.Add(new MailAddress(item));    
-        }
-        mail.Subject = subject;
-        mail.Body = body;
-        mail.IsBodyHtml = true;
 
-        if (!String.IsNullOrEmpty(cc))
-        {
-            mail.CC.Add(cc);
-        }
-        if (!String.IsNullOrEmpty(bcc))
-        {
-            mail.Bcc.Add(bcc);
-        }
         if (!String.IsNullOrEmpty(attachments))
         {
             String[] fileNames = attachments.Split(";,".ToCharArray());
@@ -119,99 +116,9 @@ public class GoogleMail
             {
                 if (fileName.Trim().Length > 0)
                 {
-                    mail.Attachments.Add(new Attachment(fileName.Trim()));
+                    Attachments.Add(new Attachment(fileName.Trim()));
                 }
             }
-        }
-
-        ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
-        SmtpClient client = new SmtpClient(_smtp, _port);
-        client.EnableSsl = _ssl;
-        client.UseDefaultCredentials = false;
-        client.Credentials = new NetworkCredential(_email, _password);
-        client.Send(mail);
-    }
-
-    public void Send(String from, String to, String cc, String bcc, String subject, String body, List<Attachment> attachments, params object[] args)
-    {
-        if (Regex.IsMatch(body, "^([cCdDeEfFgGhHiIjI]:).+"))
-        {
-            body = File.ReadAllText(body);
-        }
-        body = String.Format(body, args);
-
-        MailMessage mail = new MailMessage();
-        mail.From = new MailAddress(from);
-        mail.ReplyTo = new MailAddress(from);
-
-        to = to.Replace(" ", "");
-        string[] tos = to.Split(";,".ToArray());
-        foreach (string item in tos)
-        {
-            mail.To.Add(new MailAddress(item));
-        }
-        mail.Subject = subject;
-        mail.Body = body;
-        mail.IsBodyHtml = true;
-
-        if (!String.IsNullOrEmpty(cc))
-        {
-            mail.CC.Add(cc);
-        }
-        if (!String.IsNullOrEmpty(bcc))
-        {
-            mail.Bcc.Add(bcc);
-        }
-
-        if (attachments.Count > 0)
-        {
-            foreach (var attachment in attachments)
-            {
-                mail.Attachments.Add(attachment);
-            }
-        }
-
-        ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
-        SmtpClient client = new SmtpClient(_smtp, _port);
-        client.EnableSsl = _ssl;
-        client.UseDefaultCredentials = false;
-        client.Credentials = new NetworkCredential(_email, _password);
-        client.SendCompleted += new SendCompletedEventHandler((object sender, System.ComponentModel.AsyncCompletedEventArgs e) => {
-
-        });
-        client.Send(mail);
-        foreach (var ata in mail.Attachments)
-        {
-            ata.Dispose();
-        }
-
-        mail.Dispose();
-        client.Dispose();
-    }
-
-    public void Send2(String from, String to, String cc, String bcc, String subject, String body, String attachments, params object[] args)
-    {
-        if (Regex.IsMatch(body, "^([cCdDeEfFgGhHiIjI]:).+"))
-        {
-            body = File.ReadAllText(body);
-        }
-        body = String.Format(body, args);
-
-        MailMessage mail = new MailMessage();
-        mail.From = new MailAddress(from);
-        //mail.ReplyTo = new MailAddress(from);
-
-
-        int dem = 0;
-        if (attachments != "" & attachments != null)
-        {
-            dem = attachments.Split('#').Count();
-        }
-        for (int i = 0; i < dem - 1; i++)
-        {
-            System.Net.Mail.Attachment attachment;
-            attachment = new System.Net.Mail.Attachment(attachments.Split('#')[i]);
-            Attachments.Add(attachment);
         }
 
         foreach (var attachment in Attachments)

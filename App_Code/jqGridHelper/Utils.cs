@@ -36,10 +36,12 @@ namespace jqGridHelper
 
         public static decimal Round5(decimal d, int decimals)
         {
+            // Nếu decimals >= 0 (ví dụ làm tròn 2 chữ số thập phân) thì dùng hàm chuẩn
             if (decimals >= 0) return decimal.Round(d, decimals);
-
-            decimal n = (decimal)Math.Pow(10, -decimals);
-            return decimal.Ceiling(d / n) * n;
+            // decimals < 0: Làm tròn hàng chục, hàng trăm...
+            // Ví dụ: decimals = -2 nghĩa là làm tròn hàng trăm (10^2 = 100)
+            decimal n = (decimal)Math.Pow(10, Math.Abs(decimals));
+            return Math.Round(d / n, MidpointRounding.AwayFromZero) * n;
         }
 
         public static void writeResult(int type, string message)
