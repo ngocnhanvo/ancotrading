@@ -774,7 +774,17 @@ public class PackingInvoiceController : IHttpHandler, IDisposable
 
 
         string whereEX = isadmin == true ? "" : $" AND pi.nguoitao IN({strAccount})";
-        String sqlCount = $"SELECT COUNT(1) AS count FROM c_packinginvoice pi where 1=1 {whereEX} {filter}";
+        String sqlCount = $@"
+            SELECT 
+                COUNT(1) AS count 
+            FROM 
+                c_packinginvoice pi
+                left join md_doitackinhdoanh dtkd on dtkd.md_doitackinhdoanh_id = pi.md_doitackinhdoanh_id
+                left join md_cangbien cbdi on cbdi.md_cangbien_id = pi.noidi
+                OUTER APPLY dbo.LayChungTuDonHang_table(pi.c_packinginvoice_id) dh
+            where 1=1 
+                {whereEX} {filter}
+        ";
 
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
@@ -811,7 +821,7 @@ public class PackingInvoiceController : IHttpHandler, IDisposable
                     pi.md_trangthai_id,
                     dtkd.ma_dtkd,
                     pi.so_inv, 
-                    dbo.LayChungTuDonHang(pi.c_packinginvoice_id) as sodh, 
+                    dh.sodh, 
                     pi.nguoitao as nguoitao1,
                     pi.ngaylap,
                     pi.mv,
@@ -841,7 +851,7 @@ public class PackingInvoiceController : IHttpHandler, IDisposable
                     pi.consignee, 
                     pi.notifparty, 
                     pi.alsonotifyparty,
-                    (select ten_cangbien from md_cangbien cb where cb.md_cangbien_id = pi.noidi) as cbdi,
+                    cbdi.ten_cangbien cbdi,
                     pi.noiden,
                     pi.commodity, 
                     pi.discount, 
@@ -867,6 +877,8 @@ public class PackingInvoiceController : IHttpHandler, IDisposable
                 FROM 
                     c_packinginvoice pi
                     left join md_doitackinhdoanh dtkd on dtkd.md_doitackinhdoanh_id = pi.md_doitackinhdoanh_id
+                    left join md_cangbien cbdi on cbdi.md_cangbien_id = pi.noidi
+                    OUTER APPLY dbo.LayChungTuDonHang_table(pi.c_packinginvoice_id) dh
                 WHERE 
                     1=1 
                     {whereEX} 
@@ -874,7 +886,7 @@ public class PackingInvoiceController : IHttpHandler, IDisposable
             ) P 
             WHERE 
                 RowNum > @start AND RowNum < @end";
-
+        
         var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
         xml += "<rows>";

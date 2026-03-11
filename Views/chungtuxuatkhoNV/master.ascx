@@ -298,7 +298,7 @@
         {
             fixed: true, name: 'sodh'
             , label: 'Đơn Hàng'
-            , index: 'dbo.LayChungTuDonHang(pi.c_packinginvoice_id)'
+            , index: 'dh.sodh'
             , editable: false
             , width: 100
             , edittype: 'text'
