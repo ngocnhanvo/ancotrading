@@ -100,15 +100,23 @@ public partial class PrintControllers_InHSCODE_Default : System.Web.UI.Page
 				int iCol = 0;
 				foreach (DataColumn col in dt.Columns)
 				{
-					if(col.ColumnName != "HSCode")
+					var cell = rowDetails.CreateCell(iCol);
+					if (cell != null)
 					{
-						rowDetails.CreateCell(iCol).SetCellValue(row[col.ColumnName].ToString());
+						if (col.ColumnName != "HSCode")
+						{
+                            cell.SetCellValue(row[col.ColumnName].ToString());
+						}
+						else
+						{
+							var val = row[col.ColumnName].ToString().ToNullableDecimal();
+							if (val == null)
+								cell.SetCellType(CellType.Blank);
+							else
+								cell.SetCellValue((double)val.GetValueOrDefault(0));
+						}
+                        cell.CellStyle = cellTop;
 					}
-					else
-					{
-						rowDetails.CreateCell(iCol).SetCellValue(double.Parse(row[col.ColumnName].ToString()));
-					}
-					rowDetails.GetCell(iCol).CellStyle = cellTop;					
 					iCol++;
 				}
 				iRow++;
