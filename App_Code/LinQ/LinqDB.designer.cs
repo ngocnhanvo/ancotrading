@@ -1,4 +1,4 @@
-//Update at 03/03/2026 12:22:17
+//Update at 28/03/2026 13:58:15
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -10364,7 +10364,6 @@ private string _md_donggoi_id;
 private System.Nullable<int> _sothutu;
 private System.Nullable<decimal> _giafob;
 private System.Nullable<decimal> _giafobGoc;
-private System.Nullable<decimal> _giahopdong;
 private System.Nullable<decimal> _soluong;
 private System.Nullable<decimal> _soluong_dathang;
 private System.Nullable<decimal> _soluong_conlai;
@@ -10401,6 +10400,7 @@ private System.Nullable<bool> _editphi;
 private string _code_cl;
 private string _md_chungloai_id;
 private System.Nullable<decimal> _tanggia;
+private System.Nullable<decimal> _giahopdong;
 private System.Nullable<decimal> _cpdg;
 private System.Nullable<bool> _apdung_cpdg;
 #region Extensibility Method Definitions
@@ -10427,8 +10427,6 @@ partial void OngiafobChanging(System.Nullable<decimal> value);
 partial void OngiafobChanged();
 partial void OngiafobGocChanging(System.Nullable<decimal> value);
 partial void OngiafobGocChanged();
-partial void OngiahopdongChanging(System.Nullable<decimal> value);
-partial void OngiahopdongChanged();
 partial void OnsoluongChanging(System.Nullable<decimal> value);
 partial void OnsoluongChanged();
 partial void Onsoluong_dathangChanging(System.Nullable<decimal> value);
@@ -10501,6 +10499,8 @@ partial void Onmd_chungloai_idChanging(string value);
 partial void Onmd_chungloai_idChanged();
 partial void OntanggiaChanging(System.Nullable<decimal> value);
 partial void OntanggiaChanged();
+partial void OngiahopdongChanging(System.Nullable<decimal> value);
+partial void OngiahopdongChanged();
 partial void OncpdgChanging(System.Nullable<decimal> value);
 partial void OncpdgChanged();
 partial void Onapdung_cpdgChanging(System.Nullable<bool> value);
@@ -10697,25 +10697,6 @@ this.SendPropertyChanging();
 this._giafobGoc = value;
 this.SendPropertyChanged("giafobGoc");
 this.OngiafobGocChanged();
-}
-}
-}
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_giahopdong", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
-public System.Nullable<decimal> @giahopdong
-{
-get
-{
-return this._giahopdong;
-}
-set
-{
-if ((this._giahopdong != value))
-{
-this.OngiahopdongChanging(value);
-this.SendPropertyChanging();
-this._giahopdong = value;
-this.SendPropertyChanged("giahopdong");
-this.OngiahopdongChanged();
 }
 }
 }
@@ -11400,6 +11381,25 @@ this.SendPropertyChanging();
 this._tanggia = value;
 this.SendPropertyChanged("tanggia");
 this.OntanggiaChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_giahopdong", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @giahopdong
+{
+get
+{
+return this._giahopdong;
+}
+set
+{
+if ((this._giahopdong != value))
+{
+this.OngiahopdongChanging(value);
+this.SendPropertyChanging();
+this._giahopdong = value;
+this.SendPropertyChanged("giahopdong");
+this.OngiahopdongChanged();
 }
 }
 }
@@ -15861,10 +15861,10 @@ private string _c_danhsachdathang_id;
 private string _sct_dsdh;
 private System.Nullable<bool> _chuyenphiDSDH;
 private string _loai;
-private string _phienbangiadacbiet;
 private System.Nullable<bool> _tanggiahehang;
 private System.Nullable<decimal> _tanggia;
 private string _tanggiahehang_value;
+private string _phienbangiadacbiet;
 private System.Nullable<decimal> _datcoc;
 private string _trangthaict;
 private System.Nullable<System.DateTime> _ngaypass;
@@ -15992,14 +15992,14 @@ partial void OnchuyenphiDSDHChanging(System.Nullable<bool> value);
 partial void OnchuyenphiDSDHChanged();
 partial void OnloaiChanging(string value);
 partial void OnloaiChanged();
-partial void OnphienbangiadacbietChanging(string value);
-partial void OnphienbangiadacbietChanged();
 partial void OntanggiahehangChanging(System.Nullable<bool> value);
 partial void OntanggiahehangChanged();
 partial void OntanggiaChanging(System.Nullable<decimal> value);
 partial void OntanggiaChanged();
 partial void Ontanggiahehang_valueChanging(string value);
 partial void Ontanggiahehang_valueChanged();
+partial void OnphienbangiadacbietChanging(string value);
+partial void OnphienbangiadacbietChanged();
 partial void OndatcocChanging(System.Nullable<decimal> value);
 partial void OndatcocChanged();
 partial void OntrangthaictChanging(string value);
@@ -17136,25 +17136,6 @@ this.OnloaiChanged();
 }
 }
 }
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_phienbangiadacbiet", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
-public string @phienbangiadacbiet
-{
-get
-{
-return this._phienbangiadacbiet;
-}
-set
-{
-if ((this._phienbangiadacbiet != value))
-{
-this.OnphienbangiadacbietChanging(value);
-this.SendPropertyChanging();
-this._phienbangiadacbiet = value;
-this.SendPropertyChanged("phienbangiadacbiet");
-this.OnphienbangiadacbietChanged();
-}
-}
-}
 [global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tanggiahehang", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
 public System.Nullable<bool> @tanggiahehang
 {
@@ -17209,6 +17190,25 @@ this.SendPropertyChanging();
 this._tanggiahehang_value = value;
 this.SendPropertyChanged("tanggiahehang_value");
 this.Ontanggiahehang_valueChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_phienbangiadacbiet", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @phienbangiadacbiet
+{
+get
+{
+return this._phienbangiadacbiet;
+}
+set
+{
+if ((this._phienbangiadacbiet != value))
+{
+this.OnphienbangiadacbietChanging(value);
+this.SendPropertyChanging();
+this._phienbangiadacbiet = value;
+this.SendPropertyChanged("phienbangiadacbiet");
+this.OnphienbangiadacbietChanged();
 }
 }
 }
@@ -18048,7 +18048,6 @@ private string _c_donhangchungtu_id;
 private string _c_danhsachdathang_id;
 private string _c_donhang_id;
 private string _trangthai;
-private string _trangthai2;
 private System.Nullable<System.DateTime> _ngaydieuchinh;
 private System.Nullable<System.DateTime> _ngaypass;
 private System.Nullable<System.DateTime> _ngaychuyenhoso;
@@ -18059,23 +18058,24 @@ private System.Nullable<System.DateTime> _ngayETD;
 private System.Nullable<System.DateTime> _ngayETA;
 private System.Nullable<System.DateTime> _ngayXuong;
 private System.Nullable<System.DateTime> _ngayCutOff;
-private System.Nullable<System.DateTime> _ngayBHXN;
 private System.Nullable<System.DateTime> _ngaytao;
 private string _nguoitao;
 private System.Nullable<System.DateTime> _ngaycapnhat;
 private string _nguoicapnhat;
 private string _mota;
 private System.Nullable<bool> _hoatdong;
-private System.Nullable<decimal> _slcont;
-private string _loaicont;
-private string _dongghep;
+private System.Nullable<System.DateTime> _ngayBHXN;
 private System.Nullable<decimal> _cont20;
 private System.Nullable<decimal> _cont40;
 private System.Nullable<decimal> _cont40hc;
 private System.Nullable<decimal> _cont45;
 private System.Nullable<decimal> _contLCL;
+private string _trangthai2;
 private System.Nullable<System.DateTime> _ngayKeoCont;
 private string _ghichusau;
+private string _dongghep;
+private string _loaicont;
+private System.Nullable<decimal> _slcont;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -18088,8 +18088,6 @@ partial void Onc_donhang_idChanging(string value);
 partial void Onc_donhang_idChanged();
 partial void OntrangthaiChanging(string value);
 partial void OntrangthaiChanged();
-partial void Ontrangthai2Changing(string value);
-partial void Ontrangthai2Changed();
 partial void OnngaydieuchinhChanging(System.Nullable<System.DateTime> value);
 partial void OnngaydieuchinhChanged();
 partial void OnngaypassChanging(System.Nullable<System.DateTime> value);
@@ -18110,8 +18108,6 @@ partial void OnngayXuongChanging(System.Nullable<System.DateTime> value);
 partial void OnngayXuongChanged();
 partial void OnngayCutOffChanging(System.Nullable<System.DateTime> value);
 partial void OnngayCutOffChanged();
-partial void OnngayBHXNChanging(System.Nullable<System.DateTime> value);
-partial void OnngayBHXNChanged();
 partial void OnngaytaoChanging(System.Nullable<System.DateTime> value);
 partial void OnngaytaoChanged();
 partial void OnnguoitaoChanging(string value);
@@ -18124,12 +18120,8 @@ partial void OnmotaChanging(string value);
 partial void OnmotaChanged();
 partial void OnhoatdongChanging(System.Nullable<bool> value);
 partial void OnhoatdongChanged();
-partial void OnslcontChanging(System.Nullable<decimal> value);
-partial void OnslcontChanged();
-partial void OnloaicontChanging(string value);
-partial void OnloaicontChanged();
-partial void OndongghepChanging(string value);
-partial void OndongghepChanged();
+partial void OnngayBHXNChanging(System.Nullable<System.DateTime> value);
+partial void OnngayBHXNChanged();
 partial void Oncont20Changing(System.Nullable<decimal> value);
 partial void Oncont20Changed();
 partial void Oncont40Changing(System.Nullable<decimal> value);
@@ -18140,10 +18132,18 @@ partial void Oncont45Changing(System.Nullable<decimal> value);
 partial void Oncont45Changed();
 partial void OncontLCLChanging(System.Nullable<decimal> value);
 partial void OncontLCLChanged();
+partial void Ontrangthai2Changing(string value);
+partial void Ontrangthai2Changed();
 partial void OnngayKeoContChanging(System.Nullable<System.DateTime> value);
 partial void OnngayKeoContChanged();
 partial void OnghichusauChanging(string value);
 partial void OnghichusauChanged();
+partial void OndongghepChanging(string value);
+partial void OndongghepChanged();
+partial void OnloaicontChanging(string value);
+partial void OnloaicontChanged();
+partial void OnslcontChanging(System.Nullable<decimal> value);
+partial void OnslcontChanged();
 #endregion
 public c_donhangchungtu()
 {
@@ -18222,25 +18222,6 @@ this.SendPropertyChanging();
 this._trangthai = value;
 this.SendPropertyChanged("trangthai");
 this.OntrangthaiChanged();
-}
-}
-}
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_trangthai2", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
-public string @trangthai2
-{
-get
-{
-return this._trangthai2;
-}
-set
-{
-if ((this._trangthai2 != value))
-{
-this.Ontrangthai2Changing(value);
-this.SendPropertyChanging();
-this._trangthai2 = value;
-this.SendPropertyChanged("trangthai2");
-this.Ontrangthai2Changed();
 }
 }
 }
@@ -18434,25 +18415,6 @@ this.OnngayCutOffChanged();
 }
 }
 }
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngayBHXN", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
-public System.Nullable<System.DateTime> @ngayBHXN
-{
-get
-{
-return this._ngayBHXN;
-}
-set
-{
-if ((this._ngayBHXN != value))
-{
-this.OnngayBHXNChanging(value);
-this.SendPropertyChanging();
-this._ngayBHXN = value;
-this.SendPropertyChanged("ngayBHXN");
-this.OnngayBHXNChanged();
-}
-}
-}
 [global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaytao", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
 public System.Nullable<System.DateTime> @ngaytao
 {
@@ -18567,60 +18529,22 @@ this.OnhoatdongChanged();
 }
 }
 }
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_slcont", DbType="Decimal(18,0)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
-public System.Nullable<decimal> @slcont
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngayBHXN", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngayBHXN
 {
 get
 {
-return this._slcont;
+return this._ngayBHXN;
 }
 set
 {
-if ((this._slcont != value))
+if ((this._ngayBHXN != value))
 {
-this.OnslcontChanging(value);
+this.OnngayBHXNChanging(value);
 this.SendPropertyChanging();
-this._slcont = value;
-this.SendPropertyChanged("slcont");
-this.OnslcontChanged();
-}
-}
-}
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_loaicont", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
-public string @loaicont
-{
-get
-{
-return this._loaicont;
-}
-set
-{
-if ((this._loaicont != value))
-{
-this.OnloaicontChanging(value);
-this.SendPropertyChanging();
-this._loaicont = value;
-this.SendPropertyChanged("loaicont");
-this.OnloaicontChanged();
-}
-}
-}
-[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_dongghep", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
-public string @dongghep
-{
-get
-{
-return this._dongghep;
-}
-set
-{
-if ((this._dongghep != value))
-{
-this.OndongghepChanging(value);
-this.SendPropertyChanging();
-this._dongghep = value;
-this.SendPropertyChanged("dongghep");
-this.OndongghepChanged();
+this._ngayBHXN = value;
+this.SendPropertyChanged("ngayBHXN");
+this.OnngayBHXNChanged();
 }
 }
 }
@@ -18719,6 +18643,25 @@ this.OncontLCLChanged();
 }
 }
 }
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_trangthai2", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @trangthai2
+{
+get
+{
+return this._trangthai2;
+}
+set
+{
+if ((this._trangthai2 != value))
+{
+this.Ontrangthai2Changing(value);
+this.SendPropertyChanging();
+this._trangthai2 = value;
+this.SendPropertyChanged("trangthai2");
+this.Ontrangthai2Changed();
+}
+}
+}
 [global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngayKeoCont", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
 public System.Nullable<System.DateTime> @ngayKeoCont
 {
@@ -18754,6 +18697,63 @@ this.SendPropertyChanging();
 this._ghichusau = value;
 this.SendPropertyChanged("ghichusau");
 this.OnghichusauChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_dongghep", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @dongghep
+{
+get
+{
+return this._dongghep;
+}
+set
+{
+if ((this._dongghep != value))
+{
+this.OndongghepChanging(value);
+this.SendPropertyChanging();
+this._dongghep = value;
+this.SendPropertyChanged("dongghep");
+this.OndongghepChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_loaicont", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @loaicont
+{
+get
+{
+return this._loaicont;
+}
+set
+{
+if ((this._loaicont != value))
+{
+this.OnloaicontChanging(value);
+this.SendPropertyChanging();
+this._loaicont = value;
+this.SendPropertyChanged("loaicont");
+this.OnloaicontChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_slcont", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @slcont
+{
+get
+{
+return this._slcont;
+}
+set
+{
+if ((this._slcont != value))
+{
+this.OnslcontChanging(value);
+this.SendPropertyChanging();
+this._slcont = value;
+this.SendPropertyChanged("slcont");
+this.OnslcontChanged();
 }
 }
 }
@@ -23977,6 +23977,7 @@ private string _mota;
 private System.Nullable<bool> _hoatdong;
 private string _md_doitackinhdoanh_id;
 private System.Nullable<decimal> _tiendatcoc;
+private System.Nullable<decimal> _tiendatcocPO;
 private System.Nullable<decimal> _tiendatra;
 private System.Nullable<decimal> _tienconlai;
 private System.Nullable<bool> _thanhtoanxong;
@@ -24079,6 +24080,8 @@ partial void Onmd_doitackinhdoanh_idChanging(string value);
 partial void Onmd_doitackinhdoanh_idChanged();
 partial void OntiendatcocChanging(System.Nullable<decimal> value);
 partial void OntiendatcocChanged();
+partial void OntiendatcocPOChanging(System.Nullable<decimal> value);
+partial void OntiendatcocPOChanged();
 partial void OntiendatraChanging(System.Nullable<decimal> value);
 partial void OntiendatraChanged();
 partial void OntienconlaiChanging(System.Nullable<decimal> value);
@@ -24802,6 +24805,25 @@ this.SendPropertyChanging();
 this._tiendatcoc = value;
 this.SendPropertyChanged("tiendatcoc");
 this.OntiendatcocChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tiendatcocPO", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @tiendatcocPO
+{
+get
+{
+return this._tiendatcocPO;
+}
+set
+{
+if ((this._tiendatcocPO != value))
+{
+this.OntiendatcocPOChanging(value);
+this.SendPropertyChanging();
+this._tiendatcocPO = value;
+this.SendPropertyChanged("tiendatcocPO");
+this.OntiendatcocPOChanged();
 }
 }
 }

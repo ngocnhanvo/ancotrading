@@ -147,9 +147,9 @@ public class TaoPackingListController : IHttpHandler {
             hoadon.md_trangthai_id = Helper.SOANTHAO;
 
             var lstHH = new List<Dictionary<string, object>>();
+            var lstDHs = new List<c_donhang>();
             foreach (DataRow item in dt.Rows)
             {
-
                 String c_dongnhapxuat_id = item["c_dongnhapxuat_id"].ToString();
                 c_dongpklinv line = new c_dongpklinv();
                 c_dongnhapxuat dongnx = db.c_dongnhapxuats.Single(dnx => dnx.c_dongnhapxuat_id.Equals(c_dongnhapxuat_id));
@@ -157,7 +157,8 @@ public class TaoPackingListController : IHttpHandler {
                 var dongdonhang = db.c_dongdonhangs.Single(ddh => ddh.c_dongdonhang_id.Equals(item["c_dongdonhang_id"]));
                 var donhang = db.c_donhangs.Single(dh => dh.c_donhang_id.Equals(dongdonhang.c_donhang_id));
                 string c_danhsachdathang_id = db.c_dongdsdhs.Where(s => s.c_dongdsdh_id == dongnx.c_dongdsdh_id).Select(s => s.c_danhsachdathang_id).FirstOrDefault();
-
+                if(lstDHs.Where(s=>s.c_donhang_id != donhang.c_donhang_id).Count() <= 0)
+                    lstDHs.Add(donhang);
                 line.c_dongpklinv_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddhhmmss") + item["c_dongnhapxuat_id"].ToString());
                 line.c_packinginvoice_id = p.c_packinginvoice_id;
                 line.c_donhang_id = dongdonhang.c_donhang_id;
@@ -233,6 +234,11 @@ public class TaoPackingListController : IHttpHandler {
                 lstHD.Add(dongHoaDon);
 
                 sothutu += 10;
+            }
+
+            if(lstDHs.Count > 1)
+            {
+                p.tiendatcocPO = lstDHs.Select(s => s.datcoc.GetValueOrDefault(0)).Sum();
             }
 
             //tao comudity tren packing-list/invoice
