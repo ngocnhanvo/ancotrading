@@ -236,7 +236,7 @@ public class TaoPackingListController : IHttpHandler {
                 sothutu += 10;
             }
 
-            if(lstDHs.Count > 1)
+            if(lstDHs.Count > 0)
             {
                 p.tiendatcocPO = lstDHs.Select(s => s.datcoc.GetValueOrDefault(0)).Sum();
             }
