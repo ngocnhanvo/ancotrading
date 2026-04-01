@@ -404,6 +404,8 @@
             case 20:
                 $('#lblReportNameKH').html("BÁO CÁO TÌNH HÌNH TT KHÁCH HÀNG ĐẾN HÔM NAY");
                 $("#tr_dtkd", frmID).css({ "display": "none" });
+                $("#tungay", frmID).css({ "display": "none" });
+                $("#denngay", frmID).css({ "display": "none" });
                 break;
             default:
                 $('#lblReportNameKH').html("Không xác định report");
