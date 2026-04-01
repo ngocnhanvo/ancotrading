@@ -157,7 +157,7 @@ public class TaoPackingListController : IHttpHandler {
                 var dongdonhang = db.c_dongdonhangs.Single(ddh => ddh.c_dongdonhang_id.Equals(item["c_dongdonhang_id"]));
                 var donhang = db.c_donhangs.Single(dh => dh.c_donhang_id.Equals(dongdonhang.c_donhang_id));
                 string c_danhsachdathang_id = db.c_dongdsdhs.Where(s => s.c_dongdsdh_id == dongnx.c_dongdsdh_id).Select(s => s.c_danhsachdathang_id).FirstOrDefault();
-                if(lstDHs.Where(s=>s.c_donhang_id != donhang.c_donhang_id).Count() <= 0)
+                if(lstDHs.Where(s=>s.c_donhang_id == donhang.c_donhang_id).Count() <= 0)
                     lstDHs.Add(donhang);
                 line.c_dongpklinv_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddhhmmss") + item["c_dongnhapxuat_id"].ToString());
                 line.c_packinginvoice_id = p.c_packinginvoice_id;
