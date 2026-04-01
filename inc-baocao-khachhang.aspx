@@ -235,6 +235,9 @@
             case 18:
                 window.open("PrintControllers/0BaoCaoKH/rpt_XuatHangTheoPO.aspx?startdate=" + startdate + "&enddate=" + enddate);
                 break;
+            case 20:
+                window.open("PrintControllers/More/print_TinhHinhINV.aspx?startdate=" + startdate + "&enddate=" + enddate);
+                break;
             default:
                 alert('Không tìm thấy hàm!');
                 break;
@@ -396,6 +399,10 @@
 
             case 18:
                 $('#lblReportNameKH').html("Xuất hàng theo P/O");
+                $("#tr_dtkd", frmID).css({ "display": "none" });
+                break;
+            case 20:
+                $('#lblReportNameKH').html("BÁO CÁO TÌNH HÌNH TT KHÁCH HÀNG ĐẾN HÔM NAY");
                 $("#tr_dtkd", frmID).css({ "display": "none" });
                 break;
             default:

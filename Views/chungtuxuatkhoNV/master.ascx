@@ -60,14 +60,6 @@
                         <label for="printSPDT">In Shipping Details</label>
                     </td>
                 </tr>
-                <tr>
-                    <td>
-                        <input id="printTinhHinhINV" type="radio" name="rdoPrintType" value="printTinhHinhINV" />
-                        <label for="printTinhHinhINV">In Tình hình thanh toán của INV</label>
-                    </td>
-                    <td>
-                    </td>
-                </tr>
             </table>`;
 
             $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
@@ -155,10 +147,6 @@
                                 kiemtra_packingINVDaChon();
                                 printURL += "InInvoice/InSPDT.aspx";
                                 window.open(printURL + "?c_packinglist_id=" + pId, "In Shipping Details", windowSize);
-                            }
-                            else if (printType == 'printTinhHinhINV') {
-                                printURL += "More/print_TinhHinhINV.aspx";
-                                window.open(printURL, "In Tình hình thanh toán của INV", windowSize);
                             }
                             else {
                                 kiemtra_packingINVDaChon();
