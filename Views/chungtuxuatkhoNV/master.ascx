@@ -60,6 +60,14 @@
                         <label for="printSPDT">In Shipping Details</label>
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <input id="printTinhHinhINV" type="radio" name="rdoPrintType" value="printTinhHinhINV" />
+                        <label for="printTinhHinhINV">In Tình hình thanh toán của INV</label>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
             </table>`;
 
             $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
@@ -102,45 +110,58 @@
                                     throw new Error("Chưa chọn packing list");
                                 }
                             };
-                            kiemtra_packingINVDaChon();
 
                             if (printType == "printPackingList") {
+                                kiemtra_packingINVDaChon();
                                 printURL += "InPackingList/";
                                 window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Packing List", windowSize);    
                             }
                             else if (printType == 'printInvoice') {
+                                kiemtra_packingINVDaChon();
                                 printURL += "InInvoice/";
                                 window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Invoice", windowSize);
                             }
                             else if (printType == 'printHQ') {
+                                kiemtra_packingINVDaChon();
                                 printURL += "InToKhaiHQ/";
                                 window.open(printURL + "?c_packinglist_id=" + pId, "In Tờ Khai Hải Quan", windowSize);
                             }
                             else if (printType == 'printKhaiHQ') {
+                                kiemtra_packingINVDaChon();
                                 printURL += "InDanhMucKhaiHQ/";
                                 window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);   
                             }
                             else if (printType == 'printKhaiHQ02') {
+                                kiemtra_packingINVDaChon();
                                 printURL += "InDanhMucKhaiHQ02/";
                                 window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);
                             }
                             else if (printType == 'printBL') {
+                                kiemtra_packingINVDaChon();
                                 printURL += "InBL/";
                                 window.open(printURL + "?c_packinglist_id=" + pId + "&md_doitackinhdoanh_id=" + $('#md_ncu_id').find('select').val(), "In Mẫu BL", windowSize);
                             }
                             else if (printType == 'printPaymentRequest') {
+                                kiemtra_packingINVDaChon();
                                 printURL += "InPaymentRequest/";
                                 window.open("SendMail/PaymentRequest.aspx?pklId=" + pId, "In Mẫu PaymentRequest", windowSize);
                             }
                             else if (printType == 'printKhaiHQ03') {
+                                kiemtra_packingINVDaChon();
                                 printURL += "InDanhMucKhaiHQ03/";
                                 window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan (HScode)", windowSize);
                             }
                             else if (printType == 'printSPDT') {
+                                kiemtra_packingINVDaChon();
                                 printURL += "InInvoice/InSPDT.aspx";
                                 window.open(printURL + "?c_packinglist_id=" + pId, "In Shipping Details", windowSize);
                             }
+                            else if (printType == 'printTinhHinhINV') {
+                                printURL += "More/print_TinhHinhINV.aspx";
+                                window.open(printURL, "In Tình hình thanh toán của INV", windowSize);
+                            }
                             else {
+                                kiemtra_packingINVDaChon();
                                 printURL += "InSaleContact/";
                                 window.open(printURL + "?c_packinglist_id=" + pId, "In Sale Contract", windowSize);
                             }
