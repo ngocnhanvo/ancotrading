@@ -99,7 +99,7 @@ public partial class PrintControllers_InInvoice_InSPDT : System.Web.UI.Page
             var groupheaders = chitiet_conts.GroupBy(s => new { s.container, s.soseal, s.loaicont, s.dvt_outer }).Select(s => new
             {
                 so_cont = $"{s.Key.container}/{s.Key.soseal} {Public.getLoaiCont(s.Key.loaicont, true)}",
-                so_kien = s.Sum(t => t.sl_outer_dg > 0 ? t.soluong / t.sl_outer_dg : 0),
+                so_kien = Math.Round(s.Sum(t => t.sl_outer_dg > 0 ? t.soluong / t.sl_outer_dg : 0), 2, MidpointRounding.AwayFromZero),
                 dvt_kien = s.Key.dvt_outer,
                 gkg = Math.Round(s.Sum(t => t.sl_inner > 1 ? ((t.l1 + t.w1) * (t.w1 + t.h1) / 5400 * t.sl_outer / t.sl_inner) * t.noofpack + t.nkg : (t.l2 + t.w2) * (t.w2 + t.h2) / 5400 * t.noofpack + t.nkg), 2, MidpointRounding.AwayFromZero),
                 cbm = Math.Round(s.Sum(t => t.sl_outer == 0 ? 0 : t.l2 * t.h2 * t.w2 / 1000000 * t.soluong / t.sl_outer), 3, MidpointRounding.AwayFromZero),
@@ -174,10 +174,10 @@ public partial class PrintControllers_InInvoice_InSPDT : System.Web.UI.Page
                     N'{PI}' as PI,
                     N'{HSCode}' as HSCode,
                     N'{item.so_cont}' as so_cont,
-                    N'{item.so_kien}' as so_kien,
+                    cast(N'{item.so_kien}' as numeric(18, 0)) as so_kien,
                     N'{item.dvt_kien}' as dvt_kien,
-                    N'{item.gkg}' as so_kg,
-                    N'{item.cbm}' as so_cbm,
+                    cast(N'{item.gkg}' as numeric(18, 2)) as so_kg,
+                    cast(N'{item.cbm}' as numeric(18, 3)) as so_cbm,
                     N'{item.hscode}' as hscode_cont
 		        ");
             }
