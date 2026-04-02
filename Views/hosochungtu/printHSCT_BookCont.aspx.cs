@@ -74,16 +74,21 @@ public partial class Views_hosochungtu_printHSCT_BookCont : System.Web.UI.Page
 
         string sql = $@"
             select
-                spd.Consignee
+                N'{Public.tenTaiKhoanNo}' as ten_ct_tv
+                , N'{Public.tenTaiKhoanNoTA}' as ten_ct_ta
+                , N'{Public.diaChiNo}' as dc_ct_tv
+                , N'{Public.diaChiNoTA}' as dc_ct_ta
+                , N'{Public.masothueNo}' as mst
+                , spd.Consignee
                 , spd.Notify
                 , spd.AlsoNotify
-                , null as POL
+                , cb.ten_cangbien as POL
                 , spd.POD
-                , null as Goods
-                , null as [Order]
+                , dbo.get_commodity(dh2.c_donhang_id) as Goods
+                , dh2.customer_order_no as [Order]
                 , dh2.sochungtu as PI
-                , null as HSCode
-                , null as GW
+                , hs.hscode as HSCode
+                , gw.gw as GW
                 , CONVERT(VARCHAR(10), isnull(dh.ngaydieuchinh, DATEADD(day, -7, dh2.shipmenttime)), 103) as NXH
                 , '' loaiCont
                 , dh.cont20
@@ -94,7 +99,27 @@ public partial class Views_hosochungtu_printHSCT_BookCont : System.Web.UI.Page
             FROM c_donhangchungtu dh
                 left join c_donhang dh2 on dh2.c_donhang_id = dh.c_donhang_id
                 left join md_doitackinhdoanh kh on kh.md_doitackinhdoanh_id = dh2.md_doitackinhdoanh_id
+                left join md_cangbien cb on cb.md_cangbien_id = dh2.md_cangbien_id
                 outer apply (select top 1 Consignee, Notify, AlsoNotify, POD from c_donhang_spd where c_donhang_id = dh2.c_donhang_id and trangthai = 'DAGUI' order by ngaytao desc) spd
+                outer apply (
+                    SELECT STUFF((
+                        SELECT ', ' + COALESCE(t.hscode, '')
+                        FROM (
+                            SELECT DISTINCT hsc.hscode
+                            FROM c_dongdonhang ddh
+                                LEFT JOIN md_sanpham sp ON sp.md_sanpham_id = ddh.md_sanpham_id
+                                LEFT JOIN md_hscode hsc ON hsc.md_hscode_id = sp.md_hscode_id
+                            WHERE ddh.c_donhang_id = dh2.c_donhang_id
+                        ) t
+                        ORDER BY t.hscode
+                        FOR XML PATH(''), TYPE
+                    ).value('.', 'nvarchar(max)'), 1, 2, '') AS hscode
+                ) hs
+                outer apply (
+                    SELECT sum(ddh.g_w_master) as gw
+                    FROM c_dongdonhang ddh
+                    WHERE ddh.c_donhang_id = dh2.c_donhang_id  
+                ) gw
             WHERE
                 dh.c_donhangchungtu_id = '{id}'
 		";

@@ -60,6 +60,15 @@
                         <label for="printSPDT">In Shipping Details</label>
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <input id="printBookINV" type="radio" name="rdoPrintType" value="printBookINV" />
+                        <label for="printBookINV">In BOOK CONTAINER</label>
+                    </td>
+                    <td>
+                        
+                    </td>
+                </tr>
             </table>`;
 
             $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
@@ -147,6 +156,11 @@
                                 kiemtra_packingINVDaChon();
                                 printURL += "InInvoice/InSPDT.aspx";
                                 window.open(printURL + "?c_packinglist_id=" + pId, "In Shipping Details", windowSize);
+                            }
+                            else if (printType == 'printBookINV') {
+                                kiemtra_packingINVDaChon();
+                                printURL += "InInvoice/InBookINV.aspx";
+                                window.open(printURL + "?c_packinglist_id=" + pId, "In Book Container", windowSize);
                             }
                             else {
                                 kiemtra_packingINVDaChon();

@@ -271,7 +271,7 @@
                             let data = new FormData();
                             data.append('action', 'guispd');
                             data.append('id', id.toString());
-                            data.apeend('ghichu', $('#po_spdt_ghichusau').val());
+                            data.append('ghichu', $('#po_spdt_ghichusau').val());
                             $.ajax({
                                 url: 'Views/po/Controller_PO_SPDT.ashx',
                                 data: data,
