@@ -370,7 +370,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         s1.SetColumnWidth(0, 2000);
         s1.SetColumnWidth(1, 5000);
         s1.SetColumnWidth(2, 3500);
-        s1.SetColumnWidth(3, 7500);
+        s1.SetColumnWidth(3, 10000);
         s1.SetColumnWidth(5, 3000);
         s1.SetColumnWidth(7, 3500);
         s1.SetColumnWidth(11, 0);

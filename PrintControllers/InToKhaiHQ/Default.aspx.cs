@@ -11,9 +11,17 @@ using NPOI.POIFS.FileSystem;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System.Data;
+using NPOI.HSSF.Record.Chart;
 
 public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
 {
+    public string doiDVT(string dvt)
+    {
+        if (dvt == "pc")
+            return "CAI";
+        else
+            return "BO";
+    }
     protected void Page_Load(object sender, EventArgs e)
     {
         //try
@@ -32,7 +40,7 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                 cpk.noiden, 
                 cpk.blno, 
                 cpk.commodity, 
-                cpk.etd, 
+                cpk.etd2, 
                 cpk.commodityvn,  
                 diengiaicong_po, 
                 giatricong_po, 
@@ -46,12 +54,49 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                 1=1
 	            and cpk.c_packinginvoice_id ='{c_pkivn_id}'
         ";
-
         DataTable dt = mdbc.GetData(select);
+
+        String selChungTuDH = $@"
+            select top (1) 
+                dh.sochungtu, 
+                dh.ngaylap, 
+                dh.customer_order_no, 
+                ngh.thongtin, 
+                pmt.ma_paymentterm, 
+                pmt.ten_paymentterm, 
+                spd.Consignee, 
+                dh.payer,
+                cb.ten_cangbien,
+                spd.POD
+            from 
+                c_donhang dh
+                left join c_dongpklinv dpkl on dh.c_donhang_id = dpkl.c_donhang_id
+                left join md_paymentterm pmt on pmt.md_paymentterm_id = dh.md_paymentterm_id
+                left join md_nganhang ngh on ngh.md_nganhang_id = dh.md_nganhang_id
+                left join md_cangbien cb on cb.md_cangbien_id = dh.md_cangbien_id
+                outer apply (select top 1 Consignee, Forwarder, POD from c_donhang_spd where c_donhang_id = dh.c_donhang_id and trangthai = 'DAGUI' order by ngaytao desc) spd
+            where 
+                1=1
+                AND dpkl.c_packinginvoice_id = N'{c_pkivn_id}'
+            order by 
+                dh.ngaytao asc
+        ";
+
+        DataTable dtChungTuDH = mdbc.GetData(selChungTuDH);
+        string chungTuDH = dtChungTuDH.Rows[0][0].ToString();
+        var ngayLapDH = (dtChungTuDH.Rows[0][1] as DateTime?).Value;
+        string customerNo = dtChungTuDH.Rows[0][2].ToString();
+        string nganhang = dtChungTuDH.Rows[0][3].ToString();
+        string ma_paymentterm = dtChungTuDH.Rows[0][4].ToString();
+        string paymentterm = dtChungTuDH.Rows[0][5].ToString();
+        string Consignee = dtChungTuDH.Rows[0][6].ToString();
+        string payer = dtChungTuDH.Rows[0][7].ToString();
+        string from = dtChungTuDH.Rows[0][8].ToString();
+        string to = dtChungTuDH.Rows[0][9].ToString();
 
         if (dt.Rows.Count != 0)
         {
-            HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt);
+            HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt, from, to);
             String saveAsFileName = String.Format("ToKhaiHaiQuan-{0}.xls", DateTime.Now);
             this.SaveFile(hssfworkbook, saveAsFileName);
         }
@@ -66,7 +111,7 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         //}
     }
 
-    public HSSFWorkbook CreateWorkBookPO(DataTable dt)
+    public HSSFWorkbook CreateWorkBookPO(DataTable dt, string from, string to)
     {
         LinqDBDataContext db = new LinqDBDataContext();
         String c_pkivn_id = Request.QueryString["c_packinglist_id"];
@@ -163,6 +208,15 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         styleBorder12Bold.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
         styleBorder12Bold.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
 
+        ICellStyle styleBorder12Bold_noWrap = hssfworkbook.CreateCellStyle();
+        styleBorder12Bold_noWrap.SetFont(font12Bold);
+        styleBorder12Bold_noWrap.VerticalAlignment = VerticalAlignment.Top;
+        styleBorder12Bold_noWrap.WrapText = false;
+        styleBorder12Bold_noWrap.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_noWrap.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_noWrap.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_noWrap.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+
         ICellStyle styleCenterBorderBottom12 = hssfworkbook.CreateCellStyle();
         styleCenterBorderBottom12.SetFont(font12);
         styleCenterBorderBottom12.VerticalAlignment = VerticalAlignment.Top;
@@ -185,6 +239,11 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         style12.SetFont(font12);
         style12.VerticalAlignment = VerticalAlignment.Top;
         style12.WrapText = true;
+
+        ICellStyle style12_noWrap = hssfworkbook.CreateCellStyle();
+        style12_noWrap.SetFont(font12);
+        style12_noWrap.VerticalAlignment = VerticalAlignment.Top;
+        style12_noWrap.WrapText = false;
 
         ICellStyle style12Bold = hssfworkbook.CreateCellStyle();
         style12Bold.SetFont(font12Bold);
@@ -335,12 +394,16 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         s1.SetColumnWidth(0, 5000);
         s1.SetColumnWidth(1, 3500);
         s1.SetColumnWidth(2, 6500);
+        s1.SetColumnWidth(3, 3500);
+        s1.SetColumnWidth(4, 3500);
 
         s1.SetColumnWidth(8, 4000);
-        s1.SetColumnWidth(9, 0);
-        s1.SetColumnWidth(10, 0);
-        s1.SetColumnWidth(11, 0);
-        s1.SetColumnWidth(14, 0);
+        s1.SetColumnWidth(9, 4000);
+        s1.SetColumnHidden(10, true);
+        s1.SetColumnHidden(11, true);
+        s1.SetColumnHidden(12, true);
+        s1.SetColumnHidden(13, true);
+        s1.SetColumnHidden(14, true);
 
 
         s1.SetMargin(MarginType.RightMargin, (double)0.5);
@@ -355,122 +418,126 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         print.FitWidth = (short)1;
         print.FitHeight = (short)0;
 
+        int rowVNN = 0;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("HẢI QUAN VIỆT NAM");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style22Bold;
+        s1.GetRow(rowVNN).HeightInPoints = 45;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 8));
+        rowVNN++;
 
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("DANH MỤC KÈM THEO TỜ KHAI HÀNG HOÁ XUẤT KHẨU");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 11));
+        rowVNN++;
 
-        s1.CreateRow(0).CreateCell(0).SetCellValue("HẢI QUAN VIỆT NAM");
-        s1.GetRow(0).GetCell(0).CellStyle = style22Bold;
-        s1.GetRow(0).HeightInPoints = 45;
-        s1.AddMergedRegion(new CellRangeAddress(0, 0, 0, 8));
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("TKHQ SỐ:………………………/KV………………………….NGÀY……..THÁNG……….NĂM………….");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 8));
+        rowVNN++;
 
-        s1.CreateRow(1).CreateCell(0).SetCellValue("DANH MỤC KÈM THEO TỜ KHAI HÀNG HOÁ XUẤT KHẨU");
-        s1.GetRow(1).GetCell(0).CellStyle = style12;
-        s1.GetRow(1).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(1, 1, 0, 11));
+        s1.CreateRow(rowVNN).CreateCell(5).SetCellValue("No.:");
+        s1.GetRow(rowVNN).GetCell(5).CellStyle = style12Bold;
+        s1.GetRow(rowVNN).CreateCell(6).SetCellValue(dt.Rows[0]["so_pkl"].ToString());
+        s1.GetRow(rowVNN).GetCell(6).CellStyle = style12Bold;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 6, 8));
+        rowVNN++;
 
-        s1.CreateRow(2).CreateCell(0).SetCellValue("TKHQ SỐ:………………………/KV………………………….NGÀY……..THÁNG……….NĂM………….");
-        s1.GetRow(2).GetCell(0).CellStyle = style12;
-        s1.GetRow(2).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(2, 2, 0, 8));
+        s1.CreateRow(rowVNN).CreateCell(5).SetCellValue("Date");
+        s1.GetRow(rowVNN).GetCell(5).CellStyle = style12Bold;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        s1.GetRow(rowVNN).CreateCell(6).SetCellValue(DateTime.Now.ToString("dd-MMM-yyyy"));
+        s1.GetRow(rowVNN).GetCell(6).CellStyle = style12Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 6, 8));
+        rowVNN++;
 
-        s1.CreateRow(3).CreateCell(5).SetCellValue("No.:");
-        s1.GetRow(3).GetCell(5).CellStyle = style12Bold;
-
-        s1.GetRow(3).CreateCell(6).SetCellValue(dt.Rows[0]["so_pkl"].ToString());
-        s1.GetRow(3).GetCell(6).CellStyle = style12Bold;
-        s1.GetRow(3).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(3, 3, 6, 8));
-
-        s1.CreateRow(4).CreateCell(5).SetCellValue("Date");
-        s1.GetRow(4).GetCell(5).CellStyle = style12Bold;
-        s1.GetRow(4).HeightInPoints = 22;
-
-        s1.GetRow(4).CreateCell(6).SetCellValue(DateTime.Now.ToString("dd-MMM-yyyy"));
-        s1.GetRow(4).GetCell(6).CellStyle = style12Bold;
-        s1.AddMergedRegion(new CellRangeAddress(4, 4, 6, 8));
-
-        s1.CreateRow(5).CreateCell(0).SetCellValue("Người mua:");
-        s1.GetRow(5).GetCell(0).CellStyle = style12TopBold;
-
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Người mua:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12TopBold;
         string dc_kh = "";
         dc_kh = dt.Rows[0]["ten_dtkd"].ToString() + "\nAddress:" + dt.Rows[0]["diachi"].ToString() + "\nTel:" + dt.Rows[0]["tel"].ToString() + "\nFax:" + dt.Rows[0]["fax"].ToString();
         HSSFRichTextString rich = new HSSFRichTextString(dc_kh);
-        s1.GetRow(5).CreateCell(2).SetCellValue(rich);
-        s1.GetRow(5).GetCell(2).CellStyle = style12TopBold;
-        s1.GetRow(5).HeightInPoints = 95;
-        s1.AddMergedRegion(new CellRangeAddress(5, 5, 2, 8));
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(rich);
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12TopBold;
+        s1.GetRow(rowVNN).HeightInPoints = 95;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 8));
+        rowVNN++;
 
-        s1.CreateRow(7).CreateCell(0).SetCellValue("Tên tàu:");
-        s1.GetRow(7).GetCell(0).CellStyle = style12;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Tên tàu:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["mv"].ToString());
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 8));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
 
-        s1.GetRow(7).CreateCell(2).SetCellValue(dt.Rows[0]["mv"].ToString());
-        s1.GetRow(7).GetCell(2).CellStyle = style12;
-        s1.AddMergedRegion(new CellRangeAddress(7, 7, 2, 8));
-        s1.GetRow(7).HeightInPoints = 22;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Ngày tàu chạy:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        var date_etd2 = dt.Rows[0]["etd2"].ToString().ToNullableDate();
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(date_etd2 == null ? "" : date_etd2.Value.ToString(Extension.fmtDate));
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 8));
+        rowVNN++;
 
-        s1.CreateRow(8).CreateCell(0).SetCellValue("Ngày tàu chạy:");
-        s1.GetRow(8).GetCell(0).CellStyle = style12;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Cảng đi:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(from);
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 8));
+        rowVNN++;
 
-        s1.GetRow(8).CreateCell(2).SetCellValue(DateTime.Parse(dt.Rows[0]["etd"].ToString()).ToString("dd/MM/yyyy"));
-        s1.GetRow(8).GetCell(2).CellStyle = style12;
-        s1.GetRow(8).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(8, 8, 2, 8));
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Cảng đến:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(to);
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 8));
+        rowVNN++;
 
-
-        s1.CreateRow(9).CreateCell(0).SetCellValue("Cảng đi:");
-        s1.GetRow(9).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(9).CreateCell(2).SetCellValue(dt.Rows[0]["ten_cangbien"].ToString());
-        s1.GetRow(9).GetCell(2).CellStyle = style12;
-        s1.GetRow(9).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(9, 9, 2, 8));
-
-        s1.CreateRow(10).CreateCell(0).SetCellValue("Cảng đến:");
-        s1.GetRow(10).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(10).CreateCell(2).SetCellValue(dt.Rows[0]["noiden"].ToString());
-        s1.GetRow(10).GetCell(2).CellStyle = style12;
-        s1.GetRow(10).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(10, 10, 2, 8));
-
-        s1.CreateRow(11).CreateCell(0).SetCellValue("Hàng hóa:");
-        s1.GetRow(11).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(11).CreateCell(2).SetCellValue(dt.Rows[0]["commodityvn"].ToString());
-        s1.GetRow(11).GetCell(2).CellStyle = style12;
-        s1.GetRow(11).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(11, 11, 2, 8));
+        //s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Hàng hóa:");
+        //s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        //s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["commodityvn"].ToString());
+        //s1.GetRow(rowVNN).GetCell(2).CellStyle = style12;
+        //s1.GetRow(rowVNN).HeightInPoints = 22;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 8));
+        //rowVNN++;
 
         //table
-        s1.CreateRow(12).CreateCell(0).SetCellValue("Mã số");
-        s1.GetRow(12).CreateCell(1).SetCellValue("Mã số khách");
-        s1.GetRow(12).CreateCell(2).SetCellValue("Diễn giải");
-        s1.GetRow(12).CreateCell(3).SetCellValue("Đóng gói");
-        s1.GetRow(12).CreateCell(4).SetCellValue("");
-        s1.GetRow(12).CreateCell(5).SetCellValue("Số kiện");
-        s1.GetRow(12).CreateCell(6).SetCellValue("Số lượng(cái/bộ)");
-        s1.GetRow(12).CreateCell(7).SetCellValue("Đơn giá");
-        s1.GetRow(12).CreateCell(8).SetCellValue("Thành tiền");
-        s1.GetRow(12).CreateCell(9).SetCellValue("NW");
-        s1.GetRow(12).CreateCell(10).SetCellValue("GW");
-        s1.GetRow(12).CreateCell(11).SetCellValue("CBM");
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Mã số");
+        s1.GetRow(rowVNN).CreateCell(1).SetCellValue("Mã số khách");
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue("Diễn giải");
+        s1.GetRow(rowVNN).CreateCell(3).SetCellValue("Mã HS 8 số");
+        s1.GetRow(rowVNN).CreateCell(4).SetCellValue("Xuất sứ");
+        s1.GetRow(rowVNN).CreateCell(5).SetCellValue("Số lượng(cái/bộ)");
+        s1.GetRow(rowVNN).CreateCell(6).SetCellValue("Đơn vị tính");
+        s1.GetRow(rowVNN).CreateCell(7).SetCellValue("Đơn giá");
+        s1.GetRow(rowVNN).CreateCell(8).SetCellValue("Thành tiền");
+        s1.GetRow(rowVNN).CreateCell(9).SetCellValue("SL cái cho từng mã hàng");
+        s1.GetRow(rowVNN).CreateCell(10).SetCellValue("NW");
+        s1.GetRow(rowVNN).CreateCell(11).SetCellValue("GW");
+        s1.GetRow(rowVNN).CreateCell(12).SetCellValue("CBM");
+        s1.GetRow(rowVNN).CreateCell(13).SetCellValue("Số kiện");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(1).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(3).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(4).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(5).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(6).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(7).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(8).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(9).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(10).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(11).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(12).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(13).CellStyle = styleCenterBorder12Bold;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 3, 4));
+        rowVNN++;
 
-        s1.GetRow(12).GetCell(0).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(12).GetCell(1).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(12).GetCell(2).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(12).GetCell(3).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(12).GetCell(4).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(12).GetCell(5).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(12).GetCell(6).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(12).GetCell(7).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(12).GetCell(8).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(12).GetCell(9).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(12).GetCell(10).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(12).GetCell(11).CellStyle = styleCenterBorder12Bold;
-
-        s1.AddMergedRegion(new CellRangeAddress(12, 12, 3, 4));
-
-
-        string sql_group = string.Format(@"
+        string sql_group = $@"
             select distinct 
                 dpk.c_donhang_id, 
                 dh.sochungtu as sodh, 
@@ -487,20 +554,20 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                 c_dongnhapxuat dnx, 
                 c_nhapxuat cnx, 
                 md_cangbien cb
-            where dpk.c_packinginvoice_id = '{0}'
+            where dpk.c_packinginvoice_id = '{c_pkivn_id}'
                 and dpk.c_donhang_id = dh.c_donhang_id
 		        and dpk.c_dongnhapxuat_id = dnx.c_dongnhapxuat_id
 		        and dnx.c_nhapxuat_id = cnx.c_nhapxuat_id
                 and dpk.c_packinginvoice_id = cpk.c_packinginvoice_id
-		        and cpk.noidi = cb.md_cangbien_id"
-        , c_pkivn_id);
+		        and cpk.noidi = cb.md_cangbien_id
+        ";
         DataTable dt_g = mdbc.GetData(sql_group);
 
         string dh_ = @"select distinct c_donhang_id, sodh, container, soseal , discount, discount1, discount_hehang_value, c_nhapxuat_id, ten_cangbien from (" + sql_group + ") as tmp order by container asc, sodh asc";
         DataTable data_dh = mdbc.GetData(dh_);
 
         int g_line = 0;
-        int r = 13;
+        int r = rowVNN;
         int countDonHang = data_dh.Rows.Count;
         int count = 1;
         double sumDiscount = 0;
@@ -509,10 +576,10 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         List<int> lstTotalSalary = new List<int>();
         List<int> lstDiscount = new List<int>();
         List<int> lstNW = new List<int>();
-		List<int> lstGW = new List<int>();
+        List<int> lstGW = new List<int>();
         List<int> lstCBM = new List<int>();
-		String funcDiscount = "";
-		
+        String funcDiscount = "";
+
         foreach (DataRow g_it in data_dh.Rows)
         {
             string discount_hehang_value = g_it["discount_hehang_value"].ToString();
@@ -530,45 +597,54 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
             }
             g_line++;
 
-            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(3).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(4).CellStyle = styleBorder12Bold;
+            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(3).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(4).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).GetCell(5).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(6).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(7).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(8).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(9).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(10).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(11).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(12).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(13).CellStyle = styleBorder12Bold_noWrap;
 
-            s1.GetRow(r).GetCell(5).CellStyle = styleBorderCenter12;
-            s1.GetRow(r).CreateCell(6).CellStyle = styleBorderCenter12;
-            s1.GetRow(r).CreateCell(7).CellStyle = styleBorderCenter12;
-            s1.GetRow(r).CreateCell(8).CellStyle = styleBorderCenter12;
-            s1.GetRow(r).CreateCell(9).CellStyle = styleBorderCenter12;
-            s1.GetRow(r).CreateCell(10).CellStyle = styleBorderCenter12;
-            s1.GetRow(r).CreateCell(11).CellStyle = styleBorderCenter12;
+            //s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 4));
+            //s1.AddMergedRegion(new CellRangeAddress(r, r, 5, 8));
 
-            s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 4));
-            s1.AddMergedRegion(new CellRangeAddress(r, r, 5, 8));
-
-            string sql_de = string.Format(@"select ma_sanpham, ma_sanpham_khach, noofpack, soluong, gia, thanhtien, l1, w1, h1, l2, w2, h2,
-								mota_tiengviet, ten_dvt, sl_outer, sl_outer_dg, dvt_outer, cbm, nkg, sl_inner, sl_outer,
-								case when sl_inner > 1 then  round((((l1+w1)*(w1 + h1) / 5400 ) * sl_outer / sl_inner ) * noofpack + nkg, 2)
-									else round(( ((l2+w2)*(w2+h2)) / 5400) * noofpack + nkg, 2)
-									end as gkg
-							from
-							(select sp.ma_sanpham, cdd.ma_sanpham_khach, case when cdd.sl_outer = 0 then 0 else round(dpk.soluong/cdd.sl_outer, 1) end as noofpack ,
-								dpk.soluong, dpk.gia, dpk.thanhtien, cdd.l2, cdd.w2, cdd.h2, cdd.l1, cdd.w1, cdd.h1,
-								sp.mota_tiengviet, dvt.ten_dvt, mdg.sl_outer as sl_outer_dg, 
-								(select ten_dvt from md_donvitinh where md_donvitinh_id = mdg.dvt_outer) as dvt_outer,
-								
-								case when cdd.sl_outer = 0 then 0 else (round((cdd.l2 * cdd.h2 * cdd.w2/1000000 * dpk.soluong/cdd.sl_outer), 3)) end as cbm,
-								(sp.trongluong*dpk.soluong) as nkg, cdd.sl_inner, cdd.sl_outer
-							from c_dongpklinv dpk left join md_sanpham sp on dpk.md_sanpham_id = sp.md_sanpham_id
-								left join c_dongnhapxuat cdnx on dpk.c_dongnhapxuat_id = cdnx.c_dongnhapxuat_id
-								left join c_dongdonhang cdd on cdnx.c_dongdonhang_id = cdd.c_dongdonhang_id
-								left join md_donvitinhsanpham dvt on dvt.md_donvitinhsanpham_id = sp.md_sanpham_id
-								left join md_donggoi mdg on cdd.md_donggoi_id = mdg.md_donggoi_id
-							where dpk.c_donhang_id = '{0}'
-								and c_packinginvoice_id = '{1}'
-								and cdnx.c_nhapxuat_id = '{2}'
-								) as tmp order by ma_sanpham asc ", g_it["c_donhang_id"], c_pkivn_id, g_it["c_nhapxuat_id"]);
+            string sql_de = $@"
+                select 
+                    ma_sanpham, ma_sanpham_khach, noofpack, soluong, gia, thanhtien, l1, w1, h1, l2, w2, h2,
+					mota_tiengviet, ten_dvt, sl_outer, sl_outer_dg, dvt_outer, cbm, nkg, sl_inner, sl_outer, hscode,
+				    case 
+                        when sl_inner > 1 then round((((l1+w1)*(w1 + h1) / 5400 ) * sl_outer / sl_inner ) * noofpack + nkg, 2)
+						else round(( ((l2+w2)*(w2+h2)) / 5400) * noofpack + nkg, 2)
+					end as gkg
+				from (
+                    select 
+                        sp.ma_sanpham, cdd.ma_sanpham_khach, case when cdd.sl_outer = 0 then 0 else round(dpk.soluong/cdd.sl_outer, 1) end as noofpack ,
+					    dpk.soluong, dpk.gia, dpk.thanhtien, cdd.l2, cdd.w2, cdd.h2, cdd.l1, cdd.w1, cdd.h1,
+					    sp.mota_tiengviet, dvt.ten_dvt, mdg.sl_outer as sl_outer_dg, 
+					    (select ten_dvt from md_donvitinh where md_donvitinh_id = mdg.dvt_outer) as dvt_outer,		
+					    case when cdd.sl_outer = 0 then 0 else (round((cdd.l2 * cdd.h2 * cdd.w2/1000000 * dpk.soluong/cdd.sl_outer), 3)) end as cbm,
+					    (sp.trongluong*dpk.soluong) as nkg, cdd.sl_inner, cdd.sl_outer, hsc.hscode
+					from c_dongpklinv dpk 
+                        left join md_sanpham sp on dpk.md_sanpham_id = sp.md_sanpham_id
+						left join c_dongnhapxuat cdnx on dpk.c_dongnhapxuat_id = cdnx.c_dongnhapxuat_id
+						left join c_dongdonhang cdd on cdnx.c_dongdonhang_id = cdd.c_dongdonhang_id
+						left join md_donvitinhsanpham dvt on dvt.md_donvitinhsanpham_id = sp.md_donvitinhsanpham_id
+						left join md_donggoi mdg on cdd.md_donggoi_id = mdg.md_donggoi_id
+                        left join md_hscode hsc on hsc.md_hscode_id = sp.md_hscode_id
+					where dpk.c_donhang_id = '{g_it["c_donhang_id"]}'
+						and c_packinginvoice_id = '{c_pkivn_id}'
+						and cdnx.c_nhapxuat_id = '{g_it["c_nhapxuat_id"]}'
+				) as tmp 
+                order by 
+                    tmp.ma_sanpham asc
+            ";
 
             DataTable dt_d = mdbc.GetData(sql_de);
 
@@ -581,12 +657,13 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                 DataRow g_dt = dt_d.Rows[i];
                 var msp = g_dt["ma_sanpham"].ToString();
                 var chungloai = msp.Substring(0, 2);
+                var bocai = msp.Substring(9, 2);
                 var chungloaiTT = i == dt_d.Rows.Count - 1 ? chungloai : dt_d.Rows[i + 1]["ma_sanpham"].ToString().Substring(0, 2);
                 if (startRowHH == -1)
                     startRowHH = r;
 
                 IRow ir = s1.CreateRow(r);
-                ir.CreateCell(0).SetCellValue(g_dt["ma_sanpham"].ToString());
+                ir.CreateCell(0).SetCellValue(msp);
                 ir.GetCell(0).CellStyle = styleBorder12;
 
                 ir.CreateCell(1).SetCellValue(g_dt["ma_sanpham_khach"].ToString());
@@ -595,33 +672,40 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                 ir.CreateCell(2).SetCellValue(g_dt["mota_tiengviet"].ToString());
                 ir.GetCell(2).CellStyle = styleBorder12;
 
-                ir.CreateCell(3).SetCellValue(double.Parse(g_dt["sl_outer"].ToString()));
-                ir.GetCell(3).CellStyle = styleNumber0Border12;
+                ir.CreateCell(3).SetCellValue(g_dt["hscode"].ToString());
+                ir.GetCell(3).CellStyle = styleBorder12;
 
-                ir.CreateCell(4).SetCellValue(g_dt["dvt_outer"].ToString());
+                ir.CreateCell(4).SetCellValue("VIETNAM");
                 ir.GetCell(4).CellStyle = styleBorder12;
 
-                ir.CreateCell(5).SetCellValue(double.Parse(g_dt["noofpack"].ToString()));
+                ir.CreateCell(5).SetCellValue(double.Parse(g_dt["soluong"].ToString()));
                 ir.GetCell(5).CellStyle = styleNumber0Border12;
 
-                ir.CreateCell(6).SetCellValue(double.Parse(g_dt["soluong"].ToString()));
-                ir.GetCell(6).CellStyle = styleNumber0Border12;
+                ir.CreateCell(6).SetCellValue(doiDVT(g_dt["ten_dvt"].ToString()));
+                ir.GetCell(6).CellStyle = styleBorder12;
 
                 ir.CreateCell(7).SetCellValue(double.Parse(g_dt["gia"].ToString()));
                 ir.GetCell(7).CellStyle = styleNumber0i00Border12;
 
-				ir.CreateCell(8).CellFormula = String.Format("G{0}*H{0}", r + 1);
+                ir.CreateCell(8).CellFormula = String.Format("F{0}*H{0}", r + 1);
                 //ir.CreateCell(8).SetCellValue(double.Parse(g_dt["thanhtien"].ToString()));
                 ir.GetCell(8).CellStyle = styleNumber0i00Border12;
+                int result;
+                bool isNumber = int.TryParse(bocai, out result);
+                ir.CreateCell(9).SetCellValue(isNumber ? bocai.ToNullableInt().Value : 1);
+                ir.GetCell(9).CellStyle = styleNumber0Border12;
 
-                ir.CreateCell(9).SetCellValue(double.Parse(g_dt["nkg"].ToString()));
-                ir.GetCell(9).CellStyle = styleNumber0i00Border12;
-
-                ir.CreateCell(10).SetCellValue(double.Parse(g_dt["gkg"].ToString()));
+                ir.CreateCell(10).SetCellValue(double.Parse(g_dt["nkg"].ToString()));
                 ir.GetCell(10).CellStyle = styleNumber0i00Border12;
 
-                ir.CreateCell(11).SetCellValue(double.Parse(g_dt["cbm"].ToString()));
+                ir.CreateCell(11).SetCellValue(double.Parse(g_dt["gkg"].ToString()));
                 ir.GetCell(11).CellStyle = styleNumber0i00Border12;
+
+                ir.CreateCell(12).SetCellValue(double.Parse(g_dt["cbm"].ToString()));
+                ir.GetCell(12).CellStyle = styleNumber0i00Border12;
+
+                ir.CreateCell(13).SetCellValue(double.Parse(g_dt["noofpack"].ToString()));
+                ir.GetCell(13).CellStyle = styleNumber0i00Border12;
 
                 if ((chungloai != chungloaiTT & i < dt_d.Rows.Count - 1) | i == dt_d.Rows.Count - 1)
                 {
@@ -638,8 +722,8 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                         string fmlSum = string.Format(@"SUM(VNN{0}:VNN{1})", startRowHH + 1, r);
                         rowToTalHeHang.CreateCell(5).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "F"));
                         rowToTalHeHang.GetCell(5).CellStyle = styleNumber012Bold;
-                        rowToTalHeHang.CreateCell(6).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "G"));
-                        rowToTalHeHang.GetCell(6).CellStyle = styleNumber012Bold;
+                        //rowToTalHeHang.CreateCell(6).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "G"));
+                        //rowToTalHeHang.GetCell(6).CellStyle = styleNumber012Bold;
                         rowToTalHeHang.CreateCell(8).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "I"));
                         rowToTalHeHang.GetCell(8).CellStyle = styleNumber0i0012Bold;
                         rowToTalHeHang.CreateCell(9).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "J"));
@@ -648,6 +732,10 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                         rowToTalHeHang.GetCell(10).CellStyle = styleNumber0i0012Bold;
                         rowToTalHeHang.CreateCell(11).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "L"));
                         rowToTalHeHang.GetCell(11).CellStyle = styleNumber0i0012Bold;
+                        rowToTalHeHang.CreateCell(12).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "M"));
+                        rowToTalHeHang.GetCell(12).CellStyle = styleNumber0i0012Bold;
+                        rowToTalHeHang.CreateCell(13).CellFormula = string.Format("{0}", fmlSum.Replace("VNN", "N"));
+                        rowToTalHeHang.GetCell(13).CellStyle = styleNumber0i0012Bold;
                         r++;
 
                         var rowDisHeHang = s1.CreateRow(r);
@@ -666,8 +754,6 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                         s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 1));
                         rowTotalHeHang.CreateCell(5).CellFormula = string.Format("F{0}", r - 1);
                         rowTotalHeHang.GetCell(5).CellStyle = styleNumber012Bold;
-                        rowTotalHeHang.CreateCell(6).CellFormula = string.Format("G{0}", r - 1);
-                        rowTotalHeHang.GetCell(6).CellStyle = styleNumber012Bold;
                         rowTotalHeHang.CreateCell(8).CellFormula = string.Format("I{0} - I{1}", r - 1, r);
                         rowTotalHeHang.GetCell(8).CellStyle = styleNumber0i0012Bold;
                         rowTotalHeHang.CreateCell(9).CellFormula = string.Format("J{0}", r - 1);
@@ -676,7 +762,10 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                         rowTotalHeHang.GetCell(10).CellStyle = styleNumber0i0012Bold;
                         rowTotalHeHang.CreateCell(11).CellFormula = string.Format("L{0}", r - 1);
                         rowTotalHeHang.GetCell(11).CellStyle = styleNumber0i0012Bold;
-
+                        rowTotalHeHang.CreateCell(12).CellFormula = string.Format("M{0}", r - 1);
+                        rowTotalHeHang.GetCell(12).CellStyle = styleNumber0i0012Bold;
+                        rowTotalHeHang.CreateCell(13).CellFormula = string.Format("N{0}", r - 1);
+                        rowTotalHeHang.GetCell(13).CellStyle = styleNumber012Bold;
                         lstHH.Add(r);
                         startRowHH = r + 1;
                     }
@@ -689,46 +778,41 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                 for (var iHH = 0; iHH < lstHH.Count; iHH++)
                 {
                     var rowHH = lstHH[iHH];
-                    sumNoOfPackPO += string.Format(@"F{0}+", rowHH + 1);
-                    sumQuantityPO += string.Format(@"G{0}+", rowHH + 1);
+                    sumQuantityPO += string.Format(@"F{0}+", rowHH + 1);
                     sumSubToTalPO += string.Format(@"I{0}+", rowHH + 1);
-                    sumNWPO += string.Format(@"J{0}+", rowHH + 1);
-                    sumGWPO += string.Format(@"K{0}+", rowHH + 1);
-                    sumCBMPO += string.Format(@"L{0}+", rowHH + 1);
+                    sumNWPO += string.Format(@"K{0}+", rowHH + 1);
+                    sumGWPO += string.Format(@"L{0}+", rowHH + 1);
+                    sumCBMPO += string.Format(@"M{0}+", rowHH + 1);
+                    sumNoOfPackPO += string.Format(@"N{0}+", rowHH + 1);
                 }
-                sumNoOfPackPO += "0";
                 sumQuantityPO += "0";
                 sumSubToTalPO += "0";
                 sumNWPO += "0";
                 sumGWPO += "0";
                 sumCBMPO += "0";
+                sumNoOfPackPO += "0";
             }
             else
             {
-                sumNoOfPackPO += string.Format(@"SUM(F{0}:F{1})", startRowHH + 1, r + 1);
-                sumQuantityPO += string.Format(@"SUM(G{0}:G{1})", startRowHH + 1, r + 1);
+                sumQuantityPO += string.Format(@"SUM(F{0}:F{1})", startRowHH + 1, r + 1);
                 sumSubToTalPO += string.Format(@"SUM(I{0}:I{1})", startRowHH + 1, r + 1);
-                sumNWPO += string.Format(@"SUM(J{0}:J{1})", startRowHH + 1, r + 1);
-                sumGWPO += string.Format(@"SUM(K{0}:K{1})", startRowHH + 1, r + 1);
-                sumCBMPO += string.Format(@"SUM(L{0}:L{1})", startRowHH + 1, r + 1);
+                sumNWPO += string.Format(@"SUM(K{0}:K{1})", startRowHH + 1, r + 1);
+                sumGWPO += string.Format(@"SUM(L{0}:L{1})", startRowHH + 1, r + 1);
+                sumCBMPO += string.Format(@"SUM(M{0}:M{1})", startRowHH + 1, r + 1);
+                sumNoOfPackPO += string.Format(@"SUM(N{0}:N{1})", startRowHH + 1, r + 1);
             }
 
             r++;
             s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Tổng cộng PO {0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
             s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
-			
-			double dsc1 = double.Parse(g_it["discount1"].ToString());
-            if (dsc1 == 0) 
-				s1.GetRow(r).HeightInPoints = 0;
 
-            // total NoOfPack
-            s1.GetRow(r).CreateCell(5).CellFormula = sumNoOfPackPO;
-            s1.GetRow(r).GetCell(5).CellStyle = styleNumber012Bold;
-            lstNoOfPack.Add(r + 1);
+            double dsc1 = double.Parse(g_it["discount1"].ToString());
+            if (dsc1 == 0)
+                s1.GetRow(r).HeightInPoints = 0;
 
             // total quantity
-            s1.GetRow(r).CreateCell(6).CellFormula = sumQuantityPO;
-            s1.GetRow(r).GetCell(6).CellStyle = styleNumber012Bold;
+            s1.GetRow(r).CreateCell(5).CellFormula = sumQuantityPO;
+            s1.GetRow(r).GetCell(5).CellStyle = styleNumber012Bold;
             lstQuantity.Add(r + 1);
 
 
@@ -736,21 +820,26 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
             s1.GetRow(r).CreateCell(8).CellFormula = sumSubToTalPO;
             s1.GetRow(r).GetCell(8).CellStyle = styleNumber0i0012Bold;
             lstTotalSalary.Add(r + 1);
-			
-			//total nw
-            s1.GetRow(r).CreateCell(9).CellFormula = sumNWPO;
-            s1.GetRow(r).GetCell(9).CellStyle = styleNumber0i0012Bold;
-            lstNW.Add(r + 1);
-			
-            //total gw
-            s1.GetRow(r).CreateCell(10).CellFormula = sumGWPO;
+
+            //total nw
+            s1.GetRow(r).CreateCell(10).CellFormula = sumNWPO;
             s1.GetRow(r).GetCell(10).CellStyle = styleNumber0i0012Bold;
+            lstNW.Add(r + 1);
+
+            //total gw
+            s1.GetRow(r).CreateCell(11).CellFormula = sumGWPO;
+            s1.GetRow(r).GetCell(11).CellStyle = styleNumber0i0012Bold;
             lstGW.Add(r + 1);
 
             //total cbm
-            s1.GetRow(r).CreateCell(11).CellFormula = sumCBMPO;
-            s1.GetRow(r).GetCell(11).CellStyle = styleNumber0i0012Bold;
+            s1.GetRow(r).CreateCell(12).CellFormula = sumCBMPO;
+            s1.GetRow(r).GetCell(12).CellStyle = styleNumber0i0012Bold;
             lstCBM.Add(r + 1);
+
+            //total NoOfPack
+            s1.GetRow(r).CreateCell(13).CellFormula = sumNoOfPackPO;
+            s1.GetRow(r).GetCell(13).CellStyle = styleNumber012Bold;
+            lstNoOfPack.Add(r + 1);
 
             // discount hidden
             s1.GetRow(r).CreateCell(14).SetCellValue(double.Parse(g_it["discount1"].ToString()));
@@ -758,25 +847,25 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
             // total discount
 
             r++;
-			
-			string str_dsc1 = dsc1.ToString();
-			
+
+            string str_dsc1 = dsc1.ToString();
+
             s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Giảm giá ({0}%):", g_it["discount"].ToString()));
             s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
-			
-			//if(str_dsc1.Contains(".")) {
-			//	string dot1 = str_dsc1.Split('.')[1];
-			//	if(dot1.Length > 2) {
-			//		funcDiscount = "I{0}*O{0}/100";
-			//	}
-			//	else {
-			//		funcDiscount = "ROUND(I{0}*O{0}/100,2)";
-			//	}
-			//}
-			//else {
-			funcDiscount = "ROUND(I{0}*O{0}/100,2)";
-			//}
-			
+
+            //if(str_dsc1.Contains(".")) {
+            //	string dot1 = str_dsc1.Split('.')[1];
+            //	if(dot1.Length > 2) {
+            //		funcDiscount = "I{0}*O{0}/100";
+            //	}
+            //	else {
+            //		funcDiscount = "ROUND(I{0}*O{0}/100,2)";
+            //	}
+            //}
+            //else {
+            funcDiscount = "ROUND(I{0}*O{0}/100,2)";
+            //}
+
             s1.GetRow(r).CreateCell(8).CellFormula = String.Format(funcDiscount, r);
             s1.GetRow(r).GetCell(8).CellStyle = styleNumber0i0012Bold;
 
@@ -791,25 +880,24 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
             s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Tổng cộng PO {0}:", countDonHang > 1 ? " (" + count.ToString() + ")" : ""));
             s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
 
-            // total NoOfPack
+            // total quantity
             s1.GetRow(r).CreateCell(5).CellFormula = String.Format("F{0}", r - 1);
             s1.GetRow(r).GetCell(5).CellStyle = styleNumber012Bold;
 
-            // total quantity
-            s1.GetRow(r).CreateCell(6).CellFormula = String.Format("G{0}", r - 1);
-            s1.GetRow(r).GetCell(6).CellStyle = styleNumber012Bold;
-
             s1.GetRow(r).CreateCell(8).CellFormula = String.Format("I{0}-I{1}", r - 1, r);
             s1.GetRow(r).GetCell(8).CellStyle = styleNumber0i0012Bold;
-
-            s1.GetRow(r).CreateCell(9).CellFormula = String.Format("J{0}", r - 1);
-            s1.GetRow(r).GetCell(9).CellStyle = styleNumber0i0012Bold;
 
             s1.GetRow(r).CreateCell(10).CellFormula = String.Format("K{0}", r - 1);
             s1.GetRow(r).GetCell(10).CellStyle = styleNumber0i0012Bold;
 
             s1.GetRow(r).CreateCell(11).CellFormula = String.Format("L{0}", r - 1);
             s1.GetRow(r).GetCell(11).CellStyle = styleNumber0i0012Bold;
+
+            s1.GetRow(r).CreateCell(12).CellFormula = String.Format("M{0}", r - 1);
+            s1.GetRow(r).GetCell(12).CellStyle = styleNumber0i0012Bold;
+
+            s1.GetRow(r).CreateCell(13).CellFormula = String.Format("N{0}", r - 1);
+            s1.GetRow(r).GetCell(13).CellStyle = styleNumber0i0012Bold;
 
             count++;
             r++;
@@ -854,41 +942,41 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         {
             strCount += " + " + i;
         }
-        strCount = strCount.Substring(2);
+        strCount = strCount.Substring(3);
 
         s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Tổng cộng{0}:", countDonHang > 1 ? " (" + strCount.ToString() + ")" : ""));
         s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
 
         // total quantity
-        string fQuantity = "", fSalary = "", fDiscount = "", fNoOfPack = "", fGW = "", fCBM = "", fNW="";
+        string fQuantity = "", fSalary = "", fDiscount = "", fNoOfPack = "", fGW = "", fCBM = "", fNW = "";
 
-        foreach (int item in lstGW)
+        foreach (int item in lstNW)
         {
-            fGW += String.Format("+ K{0} ", item);
-        }
-        fGW = fGW.Substring(1);
-		
-		foreach (int item in lstNW)
-        {
-            fNW += String.Format("+ J{0} ", item);
+            fNW += String.Format("+ K{0} ", item);
         }
         fNW = fNW.Substring(1);
 
+        foreach (int item in lstGW)
+        {
+            fGW += String.Format("+ L{0} ", item);
+        }
+        fGW = fGW.Substring(1);
+
         foreach (int item in lstCBM)
         {
-            fCBM += String.Format("+ L{0} ", item);
+            fCBM += String.Format("+ M{0} ", item);
         }
         fCBM = fCBM.Substring(1);
 
         foreach (int item in lstNoOfPack)
         {
-            fNoOfPack += String.Format("+ F{0} ", item);
+            fNoOfPack += String.Format("+ N{0} ", item);
         }
         fNoOfPack = fNoOfPack.Substring(1);
 
         foreach (int item in lstQuantity)
         {
-            fQuantity += String.Format("+ G{0} ", item);
+            fQuantity += String.Format("+ F{0} ", item);
         }
         fQuantity = fQuantity.Substring(1);
 
@@ -907,23 +995,23 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         }
         fSalary = fSalary.Substring(1);
 
-        s1.GetRow(r).CreateCell(5).SetCellFormula(fNoOfPack);
+        s1.GetRow(r).CreateCell(5).SetCellFormula(fQuantity);
         s1.GetRow(r).GetCell(5).CellStyle = styleNumber012Bold;
-
-        s1.GetRow(r).CreateCell(6).SetCellFormula(fQuantity);
-        s1.GetRow(r).GetCell(6).CellStyle = styleNumber012Bold;
 
         s1.GetRow(r).CreateCell(8).SetCellFormula(String.Format("({0}) - ({1}) + I{2} - I{3} + I{4} - I{5}", fSalary, fDiscount, r - 3, r - 2, r - 1, r));
         s1.GetRow(r).GetCell(8).CellStyle = styleNumber0i0012Bold;
 
-		s1.GetRow(r).CreateCell(9).SetCellFormula(fNW);
-        s1.GetRow(r).GetCell(9).CellStyle = styleNumber0i0012Bold;
-		
-        s1.GetRow(r).CreateCell(10).SetCellFormula(fGW);
+        s1.GetRow(r).CreateCell(10).SetCellFormula(fNW);
         s1.GetRow(r).GetCell(10).CellStyle = styleNumber0i0012Bold;
 
-        s1.GetRow(r).CreateCell(11).SetCellFormula(fCBM);
+        s1.GetRow(r).CreateCell(11).SetCellFormula(fGW);
         s1.GetRow(r).GetCell(11).CellStyle = styleNumber0i0012Bold;
+
+        s1.GetRow(r).CreateCell(12).SetCellFormula(fCBM);
+        s1.GetRow(r).GetCell(12).CellStyle = styleNumber0i0012Bold;
+
+        s1.GetRow(r).CreateCell(13).SetCellFormula(fNoOfPack);
+        s1.GetRow(r).GetCell(13).CellStyle = styleNumber0i0012Bold;
 
         s1.GetRow(r).HeightInPoints = 0;
 
@@ -936,38 +1024,38 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         s1.CreateRow(r + 1).CreateCell(0).SetCellValue("Số lượng:");
         s1.GetRow(r + 1).GetCell(0).CellStyle = style12;
 
-        s1.GetRow(r + 1).CreateCell(1).CellFormula = String.Format("G{0}", r + 1);
+        s1.GetRow(r + 1).CreateCell(1).CellFormula = String.Format("F{0}", r + 1);
         s1.GetRow(r + 1).GetCell(1).CellStyle = styleNumber012;
         s1.GetRow(r + 1).CreateCell(2).SetCellValue("cái, bộ");
         s1.GetRow(r + 1).GetCell(2).CellStyle = style12;
 
         s1.CreateRow(r + 2).CreateCell(0).SetCellValue("Đóng gói:");
         s1.GetRow(r + 2).GetCell(0).CellStyle = style12;
-        s1.GetRow(r + 2).CreateCell(1).CellFormula = String.Format("F{0}", r + 1);
-        s1.GetRow(r + 2).GetCell(1).CellStyle = styleNumber0i0012;
+        s1.GetRow(r + 2).CreateCell(1).CellFormula = String.Format("N{0}", r + 1);
+        s1.GetRow(r + 2).GetCell(1).CellStyle = styleNumber012;
         s1.GetRow(r + 2).CreateCell(2).SetCellValue("kiện");
         s1.GetRow(r + 2).GetCell(2).CellStyle = style12;
-		
-		s1.CreateRow(r + 3).CreateCell(0).SetCellValue("Trọng lượng tịnh:");
+
+        //s1.CreateRow(r + 3).CreateCell(0).SetCellValue("Trọng lượng tịnh:");
+        //      s1.GetRow(r + 3).GetCell(0).CellStyle = style12;
+        //      s1.GetRow(r + 3).CreateCell(1).CellFormula = String.Format("J{0}", r + 1);
+        //      s1.GetRow(r + 3).GetCell(1).CellStyle = styleNumber0i0012;
+        //      s1.GetRow(r + 3).CreateCell(2).SetCellValue("kg");
+        //      s1.GetRow(r + 3).GetCell(2).CellStyle = style12;
+
+        s1.CreateRow(r + 3).CreateCell(0).SetCellValue("Trọng lượng:");
         s1.GetRow(r + 3).GetCell(0).CellStyle = style12;
-        s1.GetRow(r + 3).CreateCell(1).CellFormula = String.Format("J{0}", r + 1);
+        s1.GetRow(r + 3).CreateCell(1).CellFormula = String.Format("L{0}", r + 1);
         s1.GetRow(r + 3).GetCell(1).CellStyle = styleNumber0i0012;
         s1.GetRow(r + 3).CreateCell(2).SetCellValue("kg");
         s1.GetRow(r + 3).GetCell(2).CellStyle = style12;
 
-        s1.CreateRow(r + 4).CreateCell(0).SetCellValue("Trọng lượng:");
+        s1.CreateRow(r + 4).CreateCell(0).SetCellValue("Khối lượng:");
         s1.GetRow(r + 4).GetCell(0).CellStyle = style12;
-        s1.GetRow(r + 4).CreateCell(1).CellFormula = String.Format("K{0}", r + 1);
+        s1.GetRow(r + 4).CreateCell(1).CellFormula = String.Format("M{0}", r + 1);
         s1.GetRow(r + 4).GetCell(1).CellStyle = styleNumber0i0012;
-        s1.GetRow(r + 4).CreateCell(2).SetCellValue("kg");
+        s1.GetRow(r + 4).CreateCell(2).SetCellValue("cbm");
         s1.GetRow(r + 4).GetCell(2).CellStyle = style12;
-
-        s1.CreateRow(r + 5).CreateCell(0).SetCellValue("Khối lượng:");
-        s1.GetRow(r + 5).GetCell(0).CellStyle = style12;
-        s1.GetRow(r + 5).CreateCell(1).CellFormula = String.Format("L{0}", r + 1);
-        s1.GetRow(r + 5).GetCell(1).CellStyle = styleNumber0i0012;
-        s1.GetRow(r + 5).CreateCell(2).SetCellValue("cbm");
-        s1.GetRow(r + 5).GetCell(2).CellStyle = style12;
 
 
         return hssfworkbook;

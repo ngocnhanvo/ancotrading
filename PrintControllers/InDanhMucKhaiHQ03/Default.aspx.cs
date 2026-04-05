@@ -343,13 +343,14 @@ public partial class PrintControllers_InDanhMucKhaiHQ03_Default : System.Web.UI.
         styleNumber0i00012Bold.WrapText = true;
 
         s1.SetColumnWidth(0, 5000);
-        s1.SetColumnWidth(1, 8500);
-        s1.SetColumnWidth(2, 3500);
-        s1.SetColumnWidth(3, 5000);
-        s1.SetColumnWidth(4, 3500);
-        s1.SetColumnWidth(5, 3500);
-        s1.SetColumnWidth(6, 3500);
-        s1.SetColumnWidth(7, 3500);
+        s1.SetColumnWidth(1, 5000);
+        s1.SetColumnWidth(2, 10000);
+        s1.SetColumnWidth(3, 4000);
+        s1.SetColumnWidth(4, 4000);
+        s1.SetColumnWidth(5, 4000);
+        s1.SetColumnWidth(6, 4000);
+        s1.SetColumnWidth(7, 4000);
+        s1.SetColumnWidth(8, 4000);
 
 
 
@@ -367,52 +368,49 @@ public partial class PrintControllers_InDanhMucKhaiHQ03_Default : System.Web.UI.
         print.FitWidth = (short)1;
         print.FitHeight = (short)0;
 
-
-        s1.CreateRow(0).HeightInPoints = 0;
-        s1.CreateRow(1).HeightInPoints = 0;
-        s1.CreateRow(2).HeightInPoints = 0;
-
-
-        s1.CreateRow(3).CreateCell(0).SetCellValue("DANH MỤC KHAI HẢI QUAN THEO HSCODE");
-        s1.GetRow(3).GetCell(0).CellStyle = styleCenter18Bold;
-        s1.AddMergedRegion(new CellRangeAddress(3, 3, 0, 7));
-        s1.GetRow(3).HeightInPoints = 30;
-
-        s1.CreateRow(4).HeightInPoints = 0;
-        s1.CreateRow(5).HeightInPoints = 0;
-        s1.CreateRow(6).HeightInPoints = 0;
-        s1.CreateRow(7).HeightInPoints = 0;
-        s1.CreateRow(8).HeightInPoints = 0;
-        s1.CreateRow(9).HeightInPoints = 0;
-        s1.CreateRow(10).HeightInPoints = 0;
-        s1.CreateRow(11).HeightInPoints = 0;
-        s1.CreateRow(12).HeightInPoints = 0;
-
+        int rowVNN = 0;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("DANH MỤC KHAI HẢI QUAN THEO HSCODE");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenter18Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 30;
+        rowVNN++;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
+        s1.CreateRow(rowVNN).HeightInPoints = 0;
+        rowVNN++;
         //Table
-        s1.CreateRow(13).CreateCell(0).SetCellValue("Mã HScode 8 số");
-        s1.GetRow(13).GetCell(0).CellStyle = styleCenterBorder12Bold;
-
-
-        //s1.GetRow(13).CreateCell(1).SetCellValue("Diễn giải");
-        //s1.GetRow(13).GetCell(1).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(1).SetCellValue("Hệ hàng");
-        s1.GetRow(13).GetCell(1).CellStyle = styleCenterBorder12Bold;
-
-        //s1.GetRow(13).CreateCell(3).SetCellValue("Xuất sứ");
-        //s1.GetRow(13).GetCell(3).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(2).SetCellValue("Số lượng");
-        s1.GetRow(13).GetCell(2).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(3).SetCellValue("Trọng lượng");
-        s1.GetRow(13).GetCell(3).CellStyle = styleCenterBorder12Bold;
-
-        //s1.GetRow(13).CreateCell(6).SetCellValue("Đơn giá");
-        //s1.GetRow(13).GetCell(6).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(4).SetCellValue("Thành tiền");
-        s1.GetRow(13).GetCell(4).CellStyle = styleCenterBorder12Bold;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Mã HScode 8 số");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(1).SetCellValue("Hệ hàng");
+        s1.GetRow(rowVNN).GetCell(1).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue("Mô tả");
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(3).SetCellValue("Số lượng");
+        s1.GetRow(rowVNN).GetCell(3).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(4).SetCellValue("Trọng lượng");
+        s1.GetRow(rowVNN).GetCell(4).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(5).SetCellValue("Thành tiền");
+        s1.GetRow(rowVNN).GetCell(5).CellStyle = styleCenterBorder12Bold;
 
         string sql_group = @"select distinct dpk.c_donhang_id, (select sochungtu from c_donhang dh where dh.c_donhang_id = dpk.c_donhang_id) as sodh,  cdh.discount, cnx.container, cnx.soseal, cb.ten_cangbien, cnx.c_nhapxuat_id,
                             isnull(cnx.loaicont, 0) as loaicont
@@ -446,41 +444,53 @@ public partial class PrintControllers_InDanhMucKhaiHQ03_Default : System.Web.UI.
 
             s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold_nowrap_left;
             s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold_nowrap_none;
-            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold_nowrap_none;
+            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold;
             s1.GetRow(r).CreateCell(3).CellStyle = styleBorder12Bold_nowrap_none;
-            s1.GetRow(r).CreateCell(4).CellStyle = styleBorder12Bold_nowrap_right;
+            s1.GetRow(r).CreateCell(4).CellStyle = styleBorder12Bold_nowrap_none;
+            s1.GetRow(r).CreateCell(5).CellStyle = styleBorder12Bold_nowrap_right;
             //  s1.GetRow(r).CreateCell(5).CellStyle = styleBorder12;
             //  s1.GetRow(r).CreateCell(6).CellStyle = styleBorder12;
             // s1.GetRow(r).CreateCell(7).CellStyle = styleBorder12;
             //s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 4));
             s1.GetRow(r).HeightInPoints = 22;
 
-            string sql_de = @"select  hscode,ma_sanpham,SUM(soluong) as soluong,SUM(gia) as gia,SUM(thanhtien) as thanhtien,
- SUM(trongluong) as trongluong from ( 
-select hscode,SUBSTRING(ma_sanpham,0,3) as ma_sanpham, soluong, gia, thanhtien, 'VIETNAM' as xuatxu,
-                                mota_tiengviet, ten_dvt , (trongluong * soluong) as trongluong
-                            from
-                            (select sp.ma_sanpham, cdnx.mota_tiengviet, hscode.hscode,
-	                            dpk.soluong, dpk.gia, dpk.thanhtien,
-	                            dpk.mota_tienganh, dvt.ten_dvt, sp.trongluong
-                            from c_dongpklinv dpk
-                                left join 
-                                    c_dongnhapxuat cdnx on dpk.c_dongnhapxuat_id = cdnx.c_dongnhapxuat_id
-                                left join 
-                                    c_dongdonhang cdd on cdnx.c_dongdonhang_id = cdd.c_dongdonhang_id
-                                left join 
-                                    md_sanpham sp on cdd.md_sanpham_id = sp.md_sanpham_id
-                                left join 
-                                    md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
-	                            left join 
-                                    md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id
-
-                            where dpk.c_donhang_id =  '" + g_it["c_donhang_id"] + "'" +
-                                @"and c_packinginvoice_id = '" + c_pkivn_id + "' " +
-                               @"and cdnx.c_nhapxuat_id =  '" + g_it["c_nhapxuat_id"] + "'" +
-                                @") as tmp ) as nhan
-                                group by hscode,ma_sanpham
-                                order by hscode asc";
+            string sql_de = $@"
+                select  
+                    hscode,ma_sanpham,SUM(soluong) as soluong,SUM(gia) as gia,SUM(thanhtien) as thanhtien,
+                    SUM(trongluong) as trongluong , mota
+                from ( 
+                    select 
+                        hscode,SUBSTRING(ma_sanpham,0,3) as ma_sanpham, soluong, gia, thanhtien, 'VIETNAM' as xuatxu,
+                        mota_tiengviet, ten_dvt , (trongluong * soluong) as trongluong, mota
+                    from (
+                        select 
+                            sp.ma_sanpham, cdnx.mota_tiengviet, hscode.hscode,
+	                        dpk.soluong, dpk.gia, dpk.thanhtien,
+	                        dpk.mota_tienganh, dvt.ten_dvt, sp.trongluong, cl.ta_ngan as mota
+                        from c_dongpklinv dpk
+                            left join 
+                                c_dongnhapxuat cdnx on dpk.c_dongnhapxuat_id = cdnx.c_dongnhapxuat_id
+                            left join 
+                                c_dongdonhang cdd on cdnx.c_dongdonhang_id = cdd.c_dongdonhang_id
+                            left join 
+                                md_sanpham sp on cdd.md_sanpham_id = sp.md_sanpham_id
+                            left join 
+                                md_chungloai cl on cl.md_chungloai_id = sp.md_chungloai_id
+                            left join 
+                                md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
+	                        left join 
+                                md_hscode hscode on sp.md_hscode_id = hscode.md_hscode_id
+                        where 
+                            dpk.c_donhang_id = '{g_it["c_donhang_id"]}'
+                            and c_packinginvoice_id = '{c_pkivn_id}'
+                            and cdnx.c_nhapxuat_id = '{g_it["c_nhapxuat_id"]}'
+                    ) as tmp 
+                ) as nhan
+                group by 
+                    hscode, ma_sanpham, mota
+                order by 
+                    hscode asc
+            ";
 
             DataTable dt_d = mdbc.GetData(sql_de);
             int total_row_d = dt_d.Rows.Count;
@@ -496,10 +506,11 @@ select hscode,SUBSTRING(ma_sanpham,0,3) as ma_sanpham, soluong, gia, thanhtien, 
                 // ir.CreateCell(3).SetCellValue(g_dt["xuatxu"].ToString());
 
                 //ir.CreateCell(3).SetCellValue(g_dt["ten_dvt"].ToString());
-                ir.CreateCell(2).SetCellValue(double.Parse(g_dt["soluong"].ToString()));
+                ir.CreateCell(2).SetCellValue($"{g_dt["mota"].ToString().ToUpper()} WARES");
                 //ir.CreateCell(6).SetCellValue(double.Parse(g_dt["gia"].ToString()));
-                ir.CreateCell(3).SetCellValue(double.Parse(g_dt["trongluong"].ToString()));
-                ir.CreateCell(4).SetCellValue(double.Parse(g_dt["thanhtien"].ToString()));
+                ir.CreateCell(3).SetCellValue(double.Parse(g_dt["soluong"].ToString()));
+                ir.CreateCell(4).SetCellValue(double.Parse(g_dt["trongluong"].ToString()));
+                ir.CreateCell(5).SetCellValue(double.Parse(g_dt["thanhtien"].ToString()));
                 
                 //ir.CreateCell(15).SetCellValue(double.Parse(g_dt["soluong"].ToString()));
 
@@ -507,7 +518,8 @@ select hscode,SUBSTRING(ma_sanpham,0,3) as ma_sanpham, soluong, gia, thanhtien, 
                 ir.GetCell(1).CellStyle = styleBorder12;
                 ir.GetCell(2).CellStyle = styleBorder12;
                 ir.GetCell(3).CellStyle = styleBorder12;
-                ir.GetCell(4).CellStyle = styleNumber0Border12;
+                ir.GetCell(4).CellStyle = styleBorder12;
+                ir.GetCell(5).CellStyle = styleNumber0Border12;
                // ir.GetCell(5).CellStyle = styleBorder12;
                // ir.GetCell(6).CellStyle = styleNumber0i00Border12;
                 //ir.GetCell(7).CellStyle = styleNumber0i00Border12;

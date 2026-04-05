@@ -24,26 +24,44 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
 
         DataTable dt = mdbc.GetData(select);
 
-        String selNganHang = String.Format(@"select 
-                                        distinct thongtin 
-                                   from 
-                                        md_nganhang ngh, c_donhang dh, c_dongpklinv dpkl
-                                   where
-                                        ngh.md_nganhang_id = dh.md_nganhang_id
-                                        AND dpkl.c_donhang_id = dh.c_donhang_id
-                                        AND dpkl.c_packinginvoice_id = N'{0}'", c_pkivn_id);
-        String nganhang = (String)mdbc.ExecuteScalar(selNganHang);
+        String selChungTuDH = $@"
+            select top (1) 
+                dh.sochungtu, 
+                dh.ngaylap, 
+                dh.customer_order_no, 
+                ngh.thongtin, 
+                pmt.ma_paymentterm, 
+                pmt.ten_paymentterm, 
+                spd.Consignee, 
+                dh.payer,
+                cb.ten_cangbien,
+                spd.POD
+            from 
+                c_donhang dh
+                left join c_dongpklinv dpkl on dh.c_donhang_id = dpkl.c_donhang_id
+                left join md_paymentterm pmt on pmt.md_paymentterm_id = dh.md_paymentterm_id
+                left join md_nganhang ngh on ngh.md_nganhang_id = dh.md_nganhang_id
+                left join md_cangbien cb on cb.md_cangbien_id = dh.md_cangbien_id
+                outer apply (select top 1 Consignee, Forwarder, POD from c_donhang_spd where c_donhang_id = dh.c_donhang_id and trangthai = 'DAGUI' order by ngaytao desc) spd
+            where 
+                1=1
+                AND dpkl.c_packinginvoice_id = N'{c_pkivn_id}'
+            order by 
+                dh.ngaytao asc
+        ";
 
-        String selPayment = String.Format(@"select 
-                                        distinct ten_paymentterm 
-                                   from 
-                                        md_paymentterm pmt, c_donhang dh, c_dongpklinv dpkl
-                                   where
-                                        pmt.md_paymentterm_id = dh.md_paymentterm_id
-                                        AND dpkl.c_donhang_id = dh.c_donhang_id
-                                        AND dpkl.c_packinginvoice_id = N'{0}'", c_pkivn_id);
+        DataTable dtChungTuDH = mdbc.GetData(selChungTuDH);
+        string chungTuDH = dtChungTuDH.Rows[0][0].ToString();
+        var ngayLapDH = (dtChungTuDH.Rows[0][1] as DateTime?).Value;
+        string customerNo = dtChungTuDH.Rows[0][2].ToString();
+        string nganhang = dtChungTuDH.Rows[0][3].ToString();
+        string ma_paymentterm = dtChungTuDH.Rows[0][4].ToString();
+        string paymentterm = dtChungTuDH.Rows[0][5].ToString();
+        string Consignee = dtChungTuDH.Rows[0][6].ToString();
+        string payer = dtChungTuDH.Rows[0][7].ToString();
+        string from = dtChungTuDH.Rows[0][8].ToString();
+        string to = dtChungTuDH.Rows[0][9].ToString();
 
-        String paymentterm = (String)mdbc.ExecuteScalar(selPayment);
 
         String selDonHang = String.Format(@"select 
                                         distinct dh.sochungtu 
@@ -64,7 +82,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
 
         if (dt.Rows.Count != 0)
         {
-            HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt, paymentterm, nganhang, chungTuDonHang);
+            HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt, paymentterm, nganhang, chungTuDonHang, from, to, customerNo);
             String saveAsFileName = String.Format("Invoice-{0}.xls", DateTime.Now);
             this.SaveFile(hssfworkbook, saveAsFileName);
         }
@@ -79,12 +97,13 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         //}
     }
 
-    public HSSFWorkbook CreateWorkBookPO(DataTable dt, String paymentterm, String nganhang, String chungtudonhang)
+    public HSSFWorkbook CreateWorkBookPO(DataTable dt, String paymentterm, String nganhang, String chungtudonhang, string from, string to, string customerNo)
     {
         LinqDBDataContext db = new LinqDBDataContext();
         String c_pkivn_id = Request.QueryString["c_packinglist_id"];
         var pdkInvoice = db.c_packinginvoices.Single(inv => inv.c_packinginvoice_id.Equals(c_pkivn_id));
         var lstPO = new List<int>();
+        var lstDVTs = new List<string>();
         HSSFWorkbook hssfworkbook = new HSSFWorkbook();
         ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
 
@@ -171,6 +190,15 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         styleBorder12Bold.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
         styleBorder12Bold.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
 
+        ICellStyle styleBorder12Bold_noWrap = hssfworkbook.CreateCellStyle();
+        styleBorder12Bold_noWrap.SetFont(font12Bold);
+        styleBorder12Bold_noWrap.VerticalAlignment = VerticalAlignment.Top;
+        styleBorder12Bold_noWrap.WrapText = false;
+        styleBorder12Bold_noWrap.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_noWrap.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_noWrap.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleBorder12Bold_noWrap.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+
         ICellStyle styleCenterBorderBottom12 = hssfworkbook.CreateCellStyle();
         styleCenterBorderBottom12.SetFont(font12);
         styleCenterBorderBottom12.VerticalAlignment = VerticalAlignment.Top;
@@ -193,6 +221,11 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         style12.SetFont(font12);
         style12.VerticalAlignment = VerticalAlignment.Top;
         style12.WrapText = true;
+
+        ICellStyle style12_nowrap = hssfworkbook.CreateCellStyle();
+        style12_nowrap.SetFont(font12);
+        style12_nowrap.VerticalAlignment = VerticalAlignment.Top;
+        style12_nowrap.WrapText = false;
 
         ICellStyle style12Bold = hssfworkbook.CreateCellStyle();
         style12Bold.SetFont(font12Bold);
@@ -353,7 +386,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
 
         s1.SetColumnWidth(0, 5000);
         s1.SetColumnWidth(1, 3500);
-        s1.SetColumnWidth(2, 6500);
+        s1.SetColumnWidth(2, 10000);
         s1.SetColumnWidth(3, 3000);
         s1.SetColumnWidth(4, 3000);
         s1.SetColumnWidth(5, 3800);
@@ -361,145 +394,136 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         s1.SetColumnWidth(8, 0);
         s1.SetColumnWidth(11, 0);
 
+        int rowVNN = 0;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("ANCO COMPANY LIMITED");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenter18Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 6));
+        s1.GetRow(rowVNN).HeightInPoints = 30;
+        rowVNN++;
 
-        s1.CreateRow(0).CreateCell(0).SetCellValue("ANCO COMPANY LIMITED");
-        s1.GetRow(0).GetCell(0).CellStyle = styleCenter18Bold;
-        s1.AddMergedRegion(new CellRangeAddress(0, 0, 0, 6));
-        s1.GetRow(0).HeightInPoints = 30;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue(Public.diaChiNoTA);
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenter12;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 6));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
 
-        s1.CreateRow(1).CreateCell(0).SetCellValue(Public.diaChiNoTA);
-        s1.GetRow(1).GetCell(0).CellStyle = styleCenter12;
-        s1.AddMergedRegion(new CellRangeAddress(1, 1, 0, 6));
-        s1.GetRow(1).HeightInPoints = 22;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(1).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(2).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(3).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(4).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(5).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(6).CellStyle = styleCenterBorderBottom12;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 6));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
 
-        s1.CreateRow(2).CreateCell(0).SetCellValue("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com");
-        s1.GetRow(2).GetCell(0).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(1).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(2).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(3).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(4).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(5).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(6).CellStyle = styleCenterBorderBottom12;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("COMMERCIAL INVOICE");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenter18Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 6));
+        s1.GetRow(rowVNN).HeightInPoints = 30;
+        rowVNN++;
 
-        s1.AddMergedRegion(new CellRangeAddress(2, 2, 0, 6));
-        s1.GetRow(2).HeightInPoints = 22;
+        s1.CreateRow(rowVNN).CreateCell(3).SetCellValue("No.:");
+        s1.GetRow(rowVNN).GetCell(3).CellStyle = style12Bold;
+        s1.GetRow(rowVNN).CreateCell(4).SetCellValue(dt.Rows[0]["so_pkl"].ToString());
+        s1.GetRow(rowVNN).GetCell(4).CellStyle = style12Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 4, 6));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
 
-        s1.CreateRow(3).CreateCell(0).SetCellValue("COMMERCIAL INVOICE");
-        s1.GetRow(3).GetCell(0).CellStyle = styleCenter18Bold;
-        s1.AddMergedRegion(new CellRangeAddress(3, 3, 0, 6));
-        s1.GetRow(3).HeightInPoints = 30;
+        s1.CreateRow(rowVNN).CreateCell(3).SetCellValue("Date:");
+        s1.GetRow(rowVNN).GetCell(3).CellStyle = style12Bold;
+        s1.GetRow(rowVNN).CreateCell(4).SetCellValue(DateTime.Parse(dt.Rows[0]["ngaytao"].ToString()).ToString("dd-MMM-yyyy"));
+        s1.GetRow(rowVNN).GetCell(4).CellStyle = style12Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 4, 6));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
 
-        s1.CreateRow(4).CreateCell(3).SetCellValue("No.:");
-        s1.GetRow(4).GetCell(3).CellStyle = style12Bold;
-
-        s1.GetRow(4).CreateCell(4).SetCellValue(dt.Rows[0]["so_pkl"].ToString());
-        s1.GetRow(4).GetCell(4).CellStyle = style12Bold;
-        s1.AddMergedRegion(new CellRangeAddress(4, 4, 4, 6));
-        s1.GetRow(4).HeightInPoints = 22;
-
-        s1.CreateRow(5).CreateCell(3).SetCellValue("Date:");
-        s1.GetRow(5).GetCell(3).CellStyle = style12Bold;
-
-        s1.GetRow(5).CreateCell(4).SetCellValue(DateTime.Parse(dt.Rows[0]["ngaytao"].ToString()).ToString("dd-MMM-yyyy"));
-        s1.GetRow(5).GetCell(4).CellStyle = style12Bold;
-        s1.AddMergedRegion(new CellRangeAddress(5, 5, 4, 6));
-        s1.GetRow(5).HeightInPoints = 22;
-
-
-        s1.CreateRow(6).CreateCell(0).SetCellValue("For the account & risk of the buyer:");
-        s1.GetRow(6).GetCell(0).CellStyle = style12;
-        s1.AddMergedRegion(new CellRangeAddress(6, 6, 0, 6));
-        s1.GetRow(6).HeightInPoints = 22;
-
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("For the account & risk of the buyer:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 6));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
+        rowVNN++;
         string dc_kh = "";
         dc_kh = dt.Rows[0]["ten_dtkd"].ToString() + " \nAddress:" + dt.Rows[0]["diachi"].ToString() + "\nTel:" + dt.Rows[0]["tel"].ToString() + "\nFax:" + dt.Rows[0]["fax"].ToString();
         HSSFRichTextString rich = new HSSFRichTextString(dc_kh);
-        s1.CreateRow(7).CreateCell(2).SetCellValue(rich);
+        s1.CreateRow(rowVNN).CreateCell(2).SetCellValue(rich);
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = styleTop14Bold;
+        s1.GetRow(rowVNN).HeightInPoints = 95;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 6));
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("M/V:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["mv"].ToString());
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_nowrap;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 6));
+        rowVNN++;
 
-        s1.GetRow(7).GetCell(2).CellStyle = styleTop14Bold;
-        s1.GetRow(7).HeightInPoints = 95;
-        s1.AddMergedRegion(new CellRangeAddress(7, 7, 2, 6));
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("From:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(from);
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_nowrap;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 6));
+        rowVNN++;
 
-        s1.CreateRow(9).CreateCell(0).SetCellValue("M/V:");
-        s1.GetRow(9).GetCell(0).CellStyle = style12;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("To:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(to);
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_nowrap;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 6));
+        rowVNN++;
 
-        s1.GetRow(9).CreateCell(2).SetCellValue(dt.Rows[0]["mv"].ToString());
-        s1.GetRow(9).GetCell(2).CellStyle = style12;
-        s1.GetRow(9).HeightInPoints = 22;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Order no.:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(customerNo);
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_nowrap;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 6));
+        rowVNN++;
 
-        s1.AddMergedRegion(new CellRangeAddress(9, 9, 2, 6));
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("B/L No.:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["blno"].ToString());
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_nowrap;
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
 
-        s1.CreateRow(10).CreateCell(0).SetCellValue("From:");
-        s1.GetRow(10).GetCell(0).CellStyle = style12;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Commodity:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue((dt.Rows[0]["commodity"].ToString() + " wares").ToUpper());
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12;
+        s1.GetRow(rowVNN).Height = -1;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 6));
+        rowVNN++;
 
-        s1.GetRow(10).CreateCell(2).SetCellValue(dt.Rows[0]["ten_cangbien"].ToString());
-        s1.GetRow(10).GetCell(2).CellStyle = style12;
-
-        s1.GetRow(10).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(10, 10, 2, 6));
-
-        s1.CreateRow(11).CreateCell(0).SetCellValue("To:");
-        s1.GetRow(11).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(11).CreateCell(2).SetCellValue(dt.Rows[0]["noiden"].ToString());
-        s1.GetRow(11).GetCell(2).CellStyle = style12;
-
-        s1.GetRow(11).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(11, 11, 2, 6));
-
-        s1.CreateRow(12).CreateCell(0).SetCellValue("B/L No.:");
-        s1.GetRow(12).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(12).CreateCell(2).SetCellValue(dt.Rows[0]["blno"].ToString());
-        s1.GetRow(12).GetCell(2).CellStyle = style12;
-
-        s1.GetRow(12).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(12, 12, 2, 6));
-
-        s1.CreateRow(13).CreateCell(0).SetCellValue("Commodity:");
-        s1.GetRow(13).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(13).CreateCell(2).SetCellValue((dt.Rows[0]["commodity"].ToString() + " wares").ToUpper());
-        s1.GetRow(13).GetCell(2).CellStyle = style12;
-
-        s1.GetRow(13).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(13, 13, 2, 6));
-
-
-        s1.CreateRow(14).CreateCell(2).SetCellValue(String.Format("AS PER PROFORMA INVOICE NO. : {0}", chungtudonhang));
-        s1.GetRow(14).GetCell(2).CellStyle = style12;
-        s1.GetRow(14).HeightInPoints = 22;
-        s1.AddMergedRegion(new CellRangeAddress(14, 14, 2, 6));
+        s1.CreateRow(rowVNN).CreateCell(2).SetCellValue(String.Format("AS PER PROFORMA INVOICE NO. : {0}", chungtudonhang));
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12;
+        s1.GetRow(rowVNN).Height = -1;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 6));
+        rowVNN++;
 
         // table
-        s1.CreateRow(15).CreateCell(0).SetCellValue("Seller's Article");
-        s1.GetRow(15).CreateCell(1).SetCellValue("Buyer's Article");
-        s1.GetRow(15).CreateCell(2).SetCellValue("Description of goods");
-        s1.GetRow(15).CreateCell(3).SetCellValue("Quantity (pcs,sets)");
-        s1.GetRow(15).CreateCell(4).SetCellValue("");
-        s1.GetRow(15).CreateCell(5).SetCellValue("Unit price (USD/pc,set)");
-        s1.GetRow(15).CreateCell(6).SetCellValue("Amount (USD)");
-
-        s1.GetRow(15).GetCell(0).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(15).GetCell(1).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(15).GetCell(2).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(15).GetCell(3).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(15).GetCell(4).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(15).GetCell(5).CellStyle = styleCenterBorder12Bold;
-        s1.GetRow(15).GetCell(6).CellStyle = styleCenterBorder12Bold;
-
-
-        s1.AddMergedRegion(new CellRangeAddress(15, 15, 3, 4));
-
-        /*string sql_group = @"select distinct dpk.c_donhang_id, (select sochungtu from c_donhang dh where dh.c_donhang_id = dpk.c_donhang_id) as sodh,  cdh.discount, cnx.container, cnx.soseal, cb.ten_cangbien, cnx.c_nhapxuat_id,
-                           isnull(cdh.cont20, 0) as cont20, isnull(cdh.cont40,0) as cont40, isnull(cdh.cont40hc, 0) as cont40hc, isnull(cdh.contle, 0 ) as contle, isnull(cdh.cont45, 0) as cont45
-                            from c_dongpklinv dpk, c_packinginvoice cpk, c_donhang cdh, c_dongnhapxuat dnx, c_nhapxuat cnx, md_cangbien cb
-                            where dpk.c_packinginvoice_id = '" + c_pkivn_id + "'" + //c_pkivn_id
-                                    @"and dpk.c_donhang_id = cdh.c_donhang_id
-		                            and dpk.c_dongnhapxuat_id = dnx.c_dongnhapxuat_id
-		                            and dnx.c_nhapxuat_id = cnx.c_nhapxuat_id
-                                    and dpk.c_packinginvoice_id = cpk.c_packinginvoice_id
-		                            and cpk.noidi = cb.md_cangbien_id";*/
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Seller's Article");
+        s1.GetRow(rowVNN).CreateCell(1).SetCellValue("Buyer's Article");
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue("Description of goods");
+        s1.GetRow(rowVNN).CreateCell(3).SetCellValue("Quantity (pcs,sets)");
+        s1.GetRow(rowVNN).CreateCell(4).SetCellValue("");
+        s1.GetRow(rowVNN).CreateCell(5).SetCellValue("Unit price (USD/pc,set)");
+        s1.GetRow(rowVNN).CreateCell(6).SetCellValue("Amount (USD)");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(1).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(3).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(4).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(5).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).GetCell(6).CellStyle = styleCenterBorder12Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 3, 4));
+        rowVNN++;
 
         string sql_group = string.Format(@"
             select distinct 
@@ -547,7 +571,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
             ", sql_group);
         DataTable data_dh = mdbc.GetData(dh_);
         int g_line = 0;
-        int r = 16;
+        int r = rowVNN;
 
         int countDonHang = data_dh.Rows.Count;
         List<int> lstQuantity = new List<int>();
@@ -585,7 +609,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
                     loaicont = "1x20'";
                     break;
                 case "CONT40":
-                    loaicont = "1x40'";
+                    loaicont = "1x40DC";
                     break;
                 case "40HC":
                     loaicont = "1x40hc'";
@@ -614,32 +638,32 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
             }
             g_line++;
 
-            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).GetCell(3).CellStyle = styleBorderCenter12;
-            s1.GetRow(r).CreateCell(4).CellStyle = styleBorderCenter12;
-            s1.GetRow(r).CreateCell(5).CellStyle = styleBorderCenter12;
-            s1.GetRow(r).CreateCell(6).CellStyle = styleBorderCenter12;
+            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).GetCell(3).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(4).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(5).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(6).CellStyle = styleBorder12Bold_noWrap;
             s1.GetRow(r).HeightInPoints = 22;
 
-            s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 2));
-            s1.AddMergedRegion(new CellRangeAddress(r, r, 3, 6));
+            //s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 2));
+            //s1.AddMergedRegion(new CellRangeAddress(r, r, 3, 6));
 
             r++;
             s1.CreateRow(r).CreateCell(0).SetCellValue("P/I No. " + g_it["sodh"].ToString());//
 
-            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(3).CellStyle = styleBorder12;
-            s1.GetRow(r).CreateCell(4).CellStyle = styleBorder12;
-            s1.GetRow(r).CreateCell(5).CellStyle = styleBorder12;
-            s1.GetRow(r).CreateCell(6).CellStyle = styleBorder12;
+            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(3).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(4).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(5).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(6).CellStyle = styleBorder12Bold_noWrap;
             s1.GetRow(r).HeightInPoints = 22;
 
-            s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 2));
-            s1.AddMergedRegion(new CellRangeAddress(r, r, 3, 6));
+            //s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 2));
+            //s1.AddMergedRegion(new CellRangeAddress(r, r, 3, 6));
 
             string sql_de = string.Format(@"
                             select sp.ma_sanpham
@@ -662,7 +686,6 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
             //create detail group
             var startRowHH = -1;
             var lstHH = new List<int>();
-
             for (var i = 0; i < dt_d.Rows.Count; i++)
             {
                 r++;
@@ -686,7 +709,9 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
                 ir.CreateCell(3).SetCellValue(double.Parse(g_dt["soluong"].ToString()));
                 ir.GetCell(3).CellStyle = styleNumber0Border12;
 
-                ir.CreateCell(4).SetCellValue(g_dt["ten_dvt"].ToString() + "s");
+                string tendvt = g_dt["ten_dvt"].ToString() + "s";
+                ir.CreateCell(4).SetCellValue(tendvt);
+                lstDVTs.Add(tendvt);
                 ir.GetCell(4).CellStyle = styleBorder12;
 
                 ir.CreateCell(5).SetCellValue(double.Parse(g_dt["gia"].ToString()));
@@ -876,7 +901,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         {
             strCount += " + " + i;
         }
-        strCount = strCount.Substring(2);
+        strCount = strCount.Substring(3);
 
         s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Total{0}:", countDonHang > 1 ? " (" + strCount + ")" : ""));
         s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
@@ -1005,6 +1030,10 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         s1.GetRow(r).GetCell(3).CellStyle = styleCenter16Bold;
         s1.GetRow(r).HeightInPoints = 22;
         s1.AddMergedRegion(new CellRangeAddress(r, r, 3, 6));
+
+        string dvts = string.Join(",", lstDVTs.Distinct().OrderBy(s => s));
+        s1.GetRow(rowVNN - 1).GetCell(3).SetCellValue($"Quantity {dvts}");
+        s1.GetRow(rowVNN - 1).GetCell(5).SetCellValue($"Unit price (USD/{dvts})");
 
         return hssfworkbook;
     }
