@@ -1,4 +1,4 @@
-//Update at 28/03/2026 13:58:15
+//Update at 06/04/2026 20:08:25
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -10403,6 +10403,13 @@ private System.Nullable<decimal> _tanggia;
 private System.Nullable<decimal> _giahopdong;
 private System.Nullable<decimal> _cpdg;
 private System.Nullable<bool> _apdung_cpdg;
+private System.Nullable<decimal> _t_thung_inner;
+private System.Nullable<decimal> _t_thung_outer;
+private System.Nullable<decimal> _n_w_inner;
+private System.Nullable<decimal> _n_w_master;
+private System.Nullable<decimal> _g_w_inner;
+private System.Nullable<decimal> _g_w_master;
+private System.Nullable<decimal> _ofpack;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -10505,6 +10512,20 @@ partial void OncpdgChanging(System.Nullable<decimal> value);
 partial void OncpdgChanged();
 partial void Onapdung_cpdgChanging(System.Nullable<bool> value);
 partial void Onapdung_cpdgChanged();
+partial void Ont_thung_innerChanging(System.Nullable<decimal> value);
+partial void Ont_thung_innerChanged();
+partial void Ont_thung_outerChanging(System.Nullable<decimal> value);
+partial void Ont_thung_outerChanged();
+partial void Onn_w_innerChanging(System.Nullable<decimal> value);
+partial void Onn_w_innerChanged();
+partial void Onn_w_masterChanging(System.Nullable<decimal> value);
+partial void Onn_w_masterChanged();
+partial void Ong_w_innerChanging(System.Nullable<decimal> value);
+partial void Ong_w_innerChanged();
+partial void Ong_w_masterChanging(System.Nullable<decimal> value);
+partial void Ong_w_masterChanged();
+partial void OnofpackChanging(System.Nullable<decimal> value);
+partial void OnofpackChanged();
 #endregion
 public c_dongdonhang()
 {
@@ -11438,6 +11459,139 @@ this.SendPropertyChanging();
 this._apdung_cpdg = value;
 this.SendPropertyChanged("apdung_cpdg");
 this.Onapdung_cpdgChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_t_thung_inner", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @t_thung_inner
+{
+get
+{
+return this._t_thung_inner;
+}
+set
+{
+if ((this._t_thung_inner != value))
+{
+this.Ont_thung_innerChanging(value);
+this.SendPropertyChanging();
+this._t_thung_inner = value;
+this.SendPropertyChanged("t_thung_inner");
+this.Ont_thung_innerChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_t_thung_outer", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @t_thung_outer
+{
+get
+{
+return this._t_thung_outer;
+}
+set
+{
+if ((this._t_thung_outer != value))
+{
+this.Ont_thung_outerChanging(value);
+this.SendPropertyChanging();
+this._t_thung_outer = value;
+this.SendPropertyChanged("t_thung_outer");
+this.Ont_thung_outerChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_n_w_inner", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @n_w_inner
+{
+get
+{
+return this._n_w_inner;
+}
+set
+{
+if ((this._n_w_inner != value))
+{
+this.Onn_w_innerChanging(value);
+this.SendPropertyChanging();
+this._n_w_inner = value;
+this.SendPropertyChanged("n_w_inner");
+this.Onn_w_innerChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_n_w_master", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @n_w_master
+{
+get
+{
+return this._n_w_master;
+}
+set
+{
+if ((this._n_w_master != value))
+{
+this.Onn_w_masterChanging(value);
+this.SendPropertyChanging();
+this._n_w_master = value;
+this.SendPropertyChanged("n_w_master");
+this.Onn_w_masterChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_g_w_inner", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @g_w_inner
+{
+get
+{
+return this._g_w_inner;
+}
+set
+{
+if ((this._g_w_inner != value))
+{
+this.Ong_w_innerChanging(value);
+this.SendPropertyChanging();
+this._g_w_inner = value;
+this.SendPropertyChanged("g_w_inner");
+this.Ong_w_innerChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_g_w_master", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @g_w_master
+{
+get
+{
+return this._g_w_master;
+}
+set
+{
+if ((this._g_w_master != value))
+{
+this.Ong_w_masterChanging(value);
+this.SendPropertyChanging();
+this._g_w_master = value;
+this.SendPropertyChanged("g_w_master");
+this.Ong_w_masterChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ofpack", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @ofpack
+{
+get
+{
+return this._ofpack;
+}
+set
+{
+if ((this._ofpack != value))
+{
+this.OnofpackChanging(value);
+this.SendPropertyChanging();
+this._ofpack = value;
+this.SendPropertyChanged("ofpack");
+this.OnofpackChanged();
 }
 }
 }
@@ -37185,6 +37339,8 @@ private System.Nullable<System.DateTime> _ngaycapnhat;
 private string _nguoicapnhat;
 private string _mota;
 private System.Nullable<bool> _hoatdong;
+private string _ten_dvt_tv;
+private string _ten_dvt_tv2;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -37207,6 +37363,10 @@ partial void OnmotaChanging(string value);
 partial void OnmotaChanged();
 partial void OnhoatdongChanging(System.Nullable<bool> value);
 partial void OnhoatdongChanged();
+partial void Onten_dvt_tvChanging(string value);
+partial void Onten_dvt_tvChanged();
+partial void Onten_dvt_tv2Changing(string value);
+partial void Onten_dvt_tv2Changed();
 #endregion
 public md_donvitinhsanpham()
 {
@@ -37380,6 +37540,44 @@ this.SendPropertyChanging();
 this._hoatdong = value;
 this.SendPropertyChanged("hoatdong");
 this.OnhoatdongChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ten_dvt_tv", DbType="Nvarchar(100)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @ten_dvt_tv
+{
+get
+{
+return this._ten_dvt_tv;
+}
+set
+{
+if ((this._ten_dvt_tv != value))
+{
+this.Onten_dvt_tvChanging(value);
+this.SendPropertyChanging();
+this._ten_dvt_tv = value;
+this.SendPropertyChanged("ten_dvt_tv");
+this.Onten_dvt_tvChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ten_dvt_tv2", DbType="Nvarchar(100)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @ten_dvt_tv2
+{
+get
+{
+return this._ten_dvt_tv2;
+}
+set
+{
+if ((this._ten_dvt_tv2 != value))
+{
+this.Onten_dvt_tv2Changing(value);
+this.SendPropertyChanging();
+this._ten_dvt_tv2 = value;
+this.SendPropertyChanged("ten_dvt_tv2");
+this.Onten_dvt_tv2Changed();
 }
 }
 }

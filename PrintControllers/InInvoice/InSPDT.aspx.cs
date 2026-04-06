@@ -50,7 +50,7 @@ public partial class PrintControllers_InInvoice_InSPDT : System.Web.UI.Page
         {
             var inv = db.c_packinginvoices.Where(s => s.c_packinginvoice_id == id).FirstOrDefault();
             var dhids = db.c_dongpklinvs.Where(s => s.c_packinginvoice_id == id).Select(s => s.c_donhang_id).ToList();
-            soPIs = db.c_donhangs.Where(s => dhids.Contains(s.c_donhang_id)).Select(s => s.sochungtu).OrderBy(s => s).ToList();
+            soPIs = db.c_donhangs.Where(s => dhids.Contains(s.c_donhang_id)).Select(s => s.sochungtu).Distinct().OrderBy(s => s).ToList();
 
             hscodes = (
                 from a in db.c_dongdonhangs
@@ -59,7 +59,7 @@ public partial class PrintControllers_InInvoice_InSPDT : System.Web.UI.Page
                 where dhids.Contains(a.c_donhang_id)
                 orderby c.hscode
                 select c.hscode
-            ).ToList();
+            ).Distinct().ToList();
 
 
             var chitiet_conts = (
@@ -91,7 +91,7 @@ public partial class PrintControllers_InInvoice_InSPDT : System.Web.UI.Page
                     c.loaicont,
                     dvt_outer = f.ten_dvt,
                     nkg = (h.trongluong ?? 0) * (a.soluong ?? 0),
-                    noofpack = Math.Round((d.sl_outer ?? 0) == 0 ? 0 : (a.soluong ?? 0) / (d.sl_outer ?? 0), 1, MidpointRounding.AwayFromZero),
+                    noofpack = d.ofpack ?? 0,
                     i.hscode
                 }
             ).ToList();

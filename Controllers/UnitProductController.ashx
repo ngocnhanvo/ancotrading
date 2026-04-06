@@ -66,6 +66,8 @@ public class UnitProductController : IHttpHandler {
         obj.CopyPropertiesTo(mnu);
         obj.ma_edi = context.Request.Form["ma_edi"];
         obj.ten_dvt = context.Request.Form["ten_dvt"];
+        obj.ten_dvt_tv = context.Request.Form["ten_dvt_tv"];
+        obj.ten_dvt_tv2 = context.Request.Form["ten_dvt_tv2"];
         obj.mota = context.Request.Form["mota"];
         obj.hoatdong = hd;
         
@@ -101,6 +103,8 @@ public class UnitProductController : IHttpHandler {
             md_donvitinhsanpham_id = Helper.getNewId(),
             ma_edi = context.Request.Form["ma_edi"],
             ten_dvt = context.Request.Form["ten_dvt"],
+            ten_dvt_tv = context.Request.Form["ten_dvt_tv"],
+            ten_dvt_tv2 = context.Request.Form["ten_dvt_tv2"],
             mota = context.Request.Form["mota"],
             hoatdong = hd,
             nguoitao = UserUtils.getUser(context),
@@ -201,7 +205,16 @@ public class UnitProductController : IHttpHandler {
             sidx = "dvt.ten_dvt";
         }
 
-        string strsql = "select * from( select dvt.*, ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum from md_donvitinhsanpham dvt)P where RowNum > @start AND RowNum < @end";
+        string strsql = $@"
+            select * 
+            from ( 
+                select 
+                    dvt.*, ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum 
+                from md_donvitinhsanpham dvt
+            )P 
+            where 
+                RowNum > @start AND RowNum < @end
+        ";
 
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
@@ -215,6 +228,8 @@ public class UnitProductController : IHttpHandler {
             xml += "<cell><![CDATA[" + row["md_donvitinhsanpham_id"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_edi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_dvt"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["ten_dvt_tv"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["ten_dvt_tv2"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";

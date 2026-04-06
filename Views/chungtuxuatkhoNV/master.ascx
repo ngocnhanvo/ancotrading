@@ -3,11 +3,11 @@
 
 <script type="text/javascript">
     function funcPrintPKLI_CTXKNV() {
-        
-            var pId = $('#grid_ds_ctxkNV').jqGrid('getGridParam', 'selrow');
-            var name = 'dialog-print-pkli-ctxk';
-            var title = 'Trích xuất dữ liệu';
-            var content = `
+
+        var pId = $('#grid_ds_ctxkNV').jqGrid('getGridParam', 'selrow');
+        var name = 'dialog-print-pkli-ctxk';
+        var title = 'Trích xuất dữ liệu';
+        var content = `
             <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                     <td>
@@ -66,118 +66,124 @@
                         <label for="printBookINV">In BOOK CONTAINER</label>
                     </td>
                     <td>
-                        
+                        <input id="printUyThacXKINV" type="radio" name="rdoPrintType" value="printUyThacXKINV" />
+                        <label for="printUyThacXKINV">In HỢP ĐỒNG ỦY THÁC XUẤT KHẨU</label>
                     </td>
                 </tr>
             </table>`;
 
-            $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
-            $('#' + name).dialog({
-                width: 500
-                , modal: true
-                , open: function (event, ui) {
-                    //hide close button.
-                    $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
-                    $.get('Controllers/PartnerController.ashx?action=getoption&isncc=1', function (result) {
-                        $('#md_ncu_id').html(result);
-                    });
+        $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
+        $('#' + name).dialog({
+            width: 500
+            , modal: true
+            , open: function (event, ui) {
+                //hide close button.
+                $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+                $.get('Controllers/PartnerController.ashx?action=getoption&isncc=1', function (result) {
+                    $('#md_ncu_id').html(result);
+                });
 
-                    $("[name='rdoPrintType']").bind("click", function () {
-                            if ($(this).attr("value") == "printBL") {
-                                $("#md_ncu_id").css("display", "block");
+                $("[name='rdoPrintType']").bind("click", function () {
+                    if ($(this).attr("value") == "printBL") {
+                        $("#md_ncu_id").css("display", "block");
+                    }
+                    else {
+                        $("#md_ncu_id").css("display", "none");
+                    }
+                });
+            }
+            , buttons: [
+                {
+                    id: "btn-print-ok",
+                    text: "In",
+                    click: function () {
+                        var printType = $('input[name=rdoPrintType]:checked', `#${name}`).val();
+
+                        var printURL = "PrintControllers/";
+                        var windowSize = "width=700,height=700,scrollbars=yes";
+                        if (typeof printType == 'undefined') {
+                            alert('Hãy chọn cách in.!');
+                            return;
+                        }
+
+                        let kiemtra_packingINVDaChon = function () {
+                            if (!pId) {
+                                alert('Bạn chưa chọn packing lsit - invoice cần in phiếu packing list');
+                                throw new Error("Chưa chọn packing list");
                             }
-                            else {
-                                $("#md_ncu_id").css("display", "none");
-                            }
-                        });
+                        };
+
+                        if (printType == "printPackingList") {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InPackingList/";
+                            window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Packing List", windowSize);
+                        }
+                        else if (printType == 'printInvoice') {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InInvoice/";
+                            window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Invoice", windowSize);
+                        }
+                        else if (printType == 'printHQ') {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InToKhaiHQ/";
+                            window.open(printURL + "?c_packinglist_id=" + pId, "In Tờ Khai Hải Quan", windowSize);
+                        }
+                        else if (printType == 'printKhaiHQ') {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InDanhMucKhaiHQ/";
+                            window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);
+                        }
+                        else if (printType == 'printKhaiHQ02') {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InDanhMucKhaiHQ02/";
+                            window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);
+                        }
+                        else if (printType == 'printBL') {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InBL/";
+                            window.open(printURL + "?c_packinglist_id=" + pId + "&md_doitackinhdoanh_id=" + $('#md_ncu_id').find('select').val(), "In Mẫu BL", windowSize);
+                        }
+                        else if (printType == 'printPaymentRequest') {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InPaymentRequest/";
+                            window.open("SendMail/PaymentRequest.aspx?pklId=" + pId, "In Mẫu PaymentRequest", windowSize);
+                        }
+                        else if (printType == 'printKhaiHQ03') {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InDanhMucKhaiHQ03/";
+                            window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan (HScode)", windowSize);
+                        }
+                        else if (printType == 'printSPDT') {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InInvoice/InSPDT.aspx";
+                            window.open(printURL + "?c_packinglist_id=" + pId, "In Shipping Details", windowSize);
+                        }
+                        else if (printType == 'printBookINV') {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InInvoice/InBookINV.aspx";
+                            window.open(printURL + "?c_packinglist_id=" + pId, "In Book Container", windowSize);
+                        }
+                        else if (printType == 'printUyThacXKINV') {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InInvoice/InUyThacXKINV.aspx";
+                            window.open(printURL + "?c_packinglist_id=" + pId, "HỢP ĐỒNG ỦY THÁC XUẤT KHẨU", windowSize);
+                        }
+                        else {
+                            kiemtra_packingINVDaChon();
+                            printURL += "InSaleContact/";
+                            window.open(printURL + "?c_packinglist_id=" + pId, "In Sale Contract", windowSize);
+                        }
+                    }
                 }
-                , buttons: [
-                    {
-                        id: "btn-print-ok",
-                        text: "In",
-                        click: function () {
-                            var printType = $('input[name=rdoPrintType]:checked', `#${name}`).val();
-
-                            var printURL = "PrintControllers/";
-                            var windowSize = "width=700,height=700,scrollbars=yes";
-                            if (typeof printType == 'undefined') {
-                                alert('Hãy chọn cách in.!');
-                                return;
-                            }
-
-                            let kiemtra_packingINVDaChon = function () {
-                                if (!pId) {
-                                    alert('Bạn chưa chọn packing lsit - invoice cần in phiếu packing list');
-                                    throw new Error("Chưa chọn packing list");
-                                }
-                            };
-
-                            if (printType == "printPackingList") {
-                                kiemtra_packingINVDaChon();
-                                printURL += "InPackingList/";
-                                window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Packing List", windowSize);    
-                            }
-                            else if (printType == 'printInvoice') {
-                                kiemtra_packingINVDaChon();
-                                printURL += "InInvoice/";
-                                window.open(printURL + "?c_packinglist_id=" + pId, "In Phiếu Invoice", windowSize);
-                            }
-                            else if (printType == 'printHQ') {
-                                kiemtra_packingINVDaChon();
-                                printURL += "InToKhaiHQ/";
-                                window.open(printURL + "?c_packinglist_id=" + pId, "In Tờ Khai Hải Quan", windowSize);
-                            }
-                            else if (printType == 'printKhaiHQ') {
-                                kiemtra_packingINVDaChon();
-                                printURL += "InDanhMucKhaiHQ/";
-                                window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);   
-                            }
-                            else if (printType == 'printKhaiHQ02') {
-                                kiemtra_packingINVDaChon();
-                                printURL += "InDanhMucKhaiHQ02/";
-                                window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan", windowSize);
-                            }
-                            else if (printType == 'printBL') {
-                                kiemtra_packingINVDaChon();
-                                printURL += "InBL/";
-                                window.open(printURL + "?c_packinglist_id=" + pId + "&md_doitackinhdoanh_id=" + $('#md_ncu_id').find('select').val(), "In Mẫu BL", windowSize);
-                            }
-                            else if (printType == 'printPaymentRequest') {
-                                kiemtra_packingINVDaChon();
-                                printURL += "InPaymentRequest/";
-                                window.open("SendMail/PaymentRequest.aspx?pklId=" + pId, "In Mẫu PaymentRequest", windowSize);
-                            }
-                            else if (printType == 'printKhaiHQ03') {
-                                kiemtra_packingINVDaChon();
-                                printURL += "InDanhMucKhaiHQ03/";
-                                window.open(printURL + "?c_packinglist_id=" + pId, "In Danh Mục Khai Hải Quan (HScode)", windowSize);
-                            }
-                            else if (printType == 'printSPDT') {
-                                kiemtra_packingINVDaChon();
-                                printURL += "InInvoice/InSPDT.aspx";
-                                window.open(printURL + "?c_packinglist_id=" + pId, "In Shipping Details", windowSize);
-                            }
-                            else if (printType == 'printBookINV') {
-                                kiemtra_packingINVDaChon();
-                                printURL += "InInvoice/InBookINV.aspx";
-                                window.open(printURL + "?c_packinglist_id=" + pId, "In Book Container", windowSize);
-                            }
-                            else {
-                                kiemtra_packingINVDaChon();
-                                printURL += "InSaleContact/";
-                                window.open(printURL + "?c_packinglist_id=" + pId, "In Sale Contract", windowSize);
-                            }
-                        }
+                , {
+                    id: "btn-print-close",
+                    text: "Thoát",
+                    click: function () {
+                        $(this).dialog("destroy").remove();
                     }
-                    , {
-                        id: "btn-print-close",
-                        text: "Thoát",
-                        click: function () {
-                            $(this).dialog("destroy").remove();
-                        }
-                    }
-                ]
-            });
+                }
+            ]
+        });
     }
 
     function activePackingListInvoieNV() {
@@ -1054,11 +1060,11 @@
                         let top = gridPos.top + (gridH - dlgH) / 2;
 
                         // Đảm bảo không bị trôi lên trên quá màn hình (nếu grid dài)
-                        if (top < 0) top = 10; 
+                        if (top < 0) top = 10;
 
-                        $dlg.css({ 
-                            "left": left + "px", 
-                            "top": top + "px" 
+                        $dlg.css({
+                            "left": left + "px",
+                            "top": top + "px"
                         });
                     };
                     gridMaster.jqGrid('filterToolbar', { searchOnEnter: false, stringResult: true });
@@ -1075,7 +1081,7 @@
                             beforeShowForm: function (formid) {
                                 centerDG(formid, this.id);
                             },
-                            afterSubmit: function(rs, postdata) {
+                            afterSubmit: function (rs, postdata) {
                                 return showMsgDialog(rs);
                             }
                         },
@@ -1083,12 +1089,12 @@
                             beforeShowForm: function (formid) {
                                 centerDG(formid, this.id);
                             },
-                            afterSubmit: function(rs, postdata) {
+                            afterSubmit: function (rs, postdata) {
                                 return showMsgDialog(rs);
                             }
                         },
                         {
-                            
+
                         },
                         {
 
@@ -1104,7 +1110,7 @@
                         title: "Xóa dòng này",
                         onClickButton: function () {
                             var rowid = gridMaster.jqGrid('getGridParam', 'selrow');
-        
+
                             if (!rowid) {
                                 // Ở đây bạn có thể để trống để nó "im lặng" hoàn toàn
                                 // Hoặc log ra console để kiểm tra
@@ -1119,7 +1125,7 @@
                                 beforeShowForm: function (formid) {
                                     centerDG(formid, gridMaster.attr('id'));
                                 },
-                                afterSubmit: function(rs, postdata) {
+                                afterSubmit: function (rs, postdata) {
                                     return showMsgDialog(rs);
                                 }
                             });

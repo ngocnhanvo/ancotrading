@@ -22,7 +22,7 @@
             } ); }"
             SortName="ten_dvt" 
             UrlFileAction="Controllers/UnitProductController.ashx" 
-            ColNames="['md_donvitinh_id', 'Mã Edi', 'Tên Đơn Vị Tính', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
+            ColNames="['md_donvitinh_id', 'Mã Edi', 'Tên TA', 'Tên TV', 'Tên TV không dấu', 'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt động']"
             ColModel = "[
             {
                 fixed: true, name: 'md_donvitinh_id'
@@ -44,6 +44,22 @@
             {
                 fixed: true, name: 'ten_dvt'
                 , index: 'ten_dvt'
+                , width: 100 
+                , editable:true
+                , edittype: 'text'
+                , editrules:{ required:true }
+            },
+            {
+                fixed: true, name: 'ten_dvt_tv'
+                , index: 'ten_dvt_tv'
+                , width: 100 
+                , editable:true
+                , edittype: 'text'
+                , editrules:{ required:true }
+            },
+            {
+                fixed: true, name: 'ten_dvt_tv2'
+                , index: 'ten_dvt_tv2'
                 , width: 100 
                 , editable:true
                 , edittype: 'text'

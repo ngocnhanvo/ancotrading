@@ -593,38 +593,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
             cont40hc = decimal.Parse(g_it["cont40hc"].ToString());
             contle = decimal.Parse(g_it["contle"].ToString());
             cont45 = decimal.Parse(g_it["cont45"].ToString());*/
-            string loaicont = g_it["loaicont"].ToString();
-
-            /*s1.CreateRow(r).CreateCell(0).SetCellValue("Container/Seal No.: " + g_it["container"].ToString() + "/" + g_it["soseal"].ToString() + " "
-                + (cont20 != 0 ? (", " + 1 + "x20'") : (""))
-                + (cont40 != 0 ? (", " + 1 + "x40'") : (""))
-                + (cont40hc != 0 ? (", " + 1 + "x40hc") : (""))
-                + (contle != 0 ? (", " + 1 + "xLCL'") : (""))
-                + (cont45 != 0 ? (", " + 1 + "x450'") : (""))
-                );*/
-
-            switch (loaicont)
-            {
-                case "CONT20":
-                    loaicont = "1x20'";
-                    break;
-                case "CONT40":
-                    loaicont = "1x40DC";
-                    break;
-                case "40HC":
-                    loaicont = "1x40hc'";
-                    break;
-                case "LE":
-                    loaicont = "1xLCL'";
-                    break;
-                case "CONT45":
-                    loaicont = "1x45'";
-                    break;
-                default:
-                    loaicont = "";
-                    break;
-            }
-
+            string loaicont = Public.getLoaiCont(g_it["loaicont"].ToString());
             s1.CreateRow(r).CreateCell(0).SetCellValue("Container/Seal No.: " + g_it["container"].ToString() + "/" + g_it["soseal"].ToString() + " " + loaicont);
 
 

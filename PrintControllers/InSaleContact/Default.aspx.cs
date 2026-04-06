@@ -189,6 +189,10 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         style12.VerticalAlignment = VerticalAlignment.Top;
         style12.WrapText = true;
 
+        ICellStyle style12_noWrap = hssfworkbook.CreateCellStyle();
+        style12_noWrap.CloneStyleFrom(style12);
+        style12_noWrap.WrapText = false;
+
         ICellStyle style12Bold = hssfworkbook.CreateCellStyle();
         style12Bold.SetFont(font12Bold);
         style12Bold.VerticalAlignment = VerticalAlignment.Top;
@@ -198,6 +202,10 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         style12TopBold.SetFont(font12Bold);
         style12TopBold.VerticalAlignment = VerticalAlignment.Top;
         style12TopBold.WrapText = true;
+
+        ICellStyle style12TopBold_noWrap = hssfworkbook.CreateCellStyle();
+        style12TopBold_noWrap.CloneStyleFrom(style12TopBold);
+        style12TopBold_noWrap.WrapText = false;
 
         ICellStyle style12Top = hssfworkbook.CreateCellStyle();
         style12Top.SetFont(font12);
@@ -429,37 +437,40 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         s1.GetRow(rowH).HeightInPoints = 95;
         rowH++;
         s1.CreateRow(rowH).CreateCell(0).SetCellValue("The Payer:");
-        s1.GetRow(rowH).GetCell(0).CellStyle = style12TopBold;
+        s1.GetRow(rowH).GetCell(0).CellStyle = style12TopBold_noWrap;
         s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 1));
         s1.GetRow(rowH).CreateCell(2).SetCellValue(payer);
-        s1.GetRow(rowH).GetCell(2).CellStyle = style12TopBold;
-        s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 2, 7));
+        s1.GetRow(rowH).GetCell(2).CellStyle = style12TopBold_noWrap;
+        //s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 2, 7));
         s1.GetRow(rowH).HeightInPoints = 21;
         rowH++;
-        s1.CreateRow(rowH).CreateCell(0).SetCellValue("The consignee:");
-        s1.GetRow(rowH).GetCell(0).CellStyle = style12TopBold;
-        s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 1));
-        s1.GetRow(rowH).CreateCell(2).SetCellValue(tendtkd != Consignee ? Consignee : "");
-        s1.GetRow(rowH).GetCell(2).CellStyle = style12TopBold;
-        s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 2, 7));
-        s1.GetRow(rowH).HeightInPoints = 21;
-        rowH++;
+        if (tendtkd != Consignee & !string.IsNullOrWhiteSpace(Consignee))
+        {
+            s1.CreateRow(rowH).CreateCell(0).SetCellValue("The consignee:");
+            s1.GetRow(rowH).GetCell(0).CellStyle = style12TopBold_noWrap;
+            s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 1));
+            s1.GetRow(rowH).CreateCell(2).SetCellValue(Consignee);
+            s1.GetRow(rowH).GetCell(2).CellStyle = style12TopBold_noWrap;
+            //s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 2, 7));
+            s1.GetRow(rowH).HeightInPoints = 21;
+            rowH++;
+        }
         s1.CreateRow(rowH).CreateCell(0).SetCellValue("ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:");
-        s1.GetRow(rowH).GetCell(0).CellStyle = style12;
-        s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 7));
+        s1.GetRow(rowH).GetCell(0).CellStyle = style12_noWrap;
+        //s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 7));
         s1.GetRow(rowH).HeightInPoints = 33;
         rowH++;
         s1.CreateRow(rowH).CreateCell(0).SetCellValue("Customer's order no.:");
-        s1.GetRow(rowH).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowH).GetCell(0).CellStyle = style12_noWrap;
         s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 1));
         s1.GetRow(rowH).CreateCell(2).SetCellValue(customerNo);
-        s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 2, 7));
-        s1.GetRow(rowH).GetCell(2).CellStyle = style12;
+        //s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 2, 7));
+        s1.GetRow(rowH).GetCell(2).CellStyle = style12_noWrap;
         s1.GetRow(rowH).HeightInPoints = 21;
         rowH++;
         s1.CreateRow(rowH).CreateCell(0).SetCellValue("Item nos., description, packing, quantity, unit price and amount:");
-        s1.GetRow(rowH).GetCell(0).CellStyle = style12;
-        s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 7));
+        s1.GetRow(rowH).GetCell(0).CellStyle = style12_noWrap;
+        //s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 7));
         s1.GetRow(rowH).HeightInPoints = 21;
         rowH++;
         //Table

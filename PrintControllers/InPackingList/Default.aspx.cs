@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.IO;
+﻿using NPOI.HPSF;
 using NPOI.HSSF.UserModel;
-using NPOI.HPSF;
 using NPOI.POIFS.FileSystem;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.IO;
+using System.Linq;
+using System.Web;
+using System.Web.Configuration;
+using System.Web.UI;
+using System.Web.UI.WebControls;
 
 public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
 {
@@ -23,28 +24,63 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
                                             where cpk.noidi = cb.md_cangbien_id
 	                                            and cpk.md_doitackinhdoanh_id = dt.md_doitackinhdoanh_id
 	                                            and cpk.c_packinginvoice_id ='" + c_pkivn_id + "'"); //c_pkivn_id
+        DataTable dt = mdbc.GetData(select);
 
-        String selChungTuDH = String.Format(@"select 
+        String selDonHang = String.Format(@"select 
                                                     distinct dh.sochungtu 
                                                 from 
                                                     c_donhang dh, c_dongpklinv dpkl
                                                 where dh.c_donhang_id = dpkl.c_donhang_id
                                                     AND dpkl.c_packinginvoice_id = N'{0}'", c_pkivn_id);
-        DataTable dtChungTuDH = mdbc.GetData(selChungTuDH);
-        String chungTuDH = "";
-
-        foreach (DataRow item in dtChungTuDH.Rows)
+        DataTable dtChungTuDonHang = mdbc.GetData(selDonHang);
+        String chungTuDonHang = "";
+        foreach (DataRow item in dtChungTuDonHang.Rows)
         {
-            chungTuDH += String.Format(", {0}", item[0]);
+            chungTuDonHang += String.Format(", {0}", item[0]);
         }
+        chungTuDonHang = chungTuDonHang.Substring(2);
 
-        chungTuDH = chungTuDH.Substring(2);
+        String selChungTuDH = $@"
+            select top (1) 
+                dh.sochungtu, 
+                dh.ngaylap, 
+                dh.customer_order_no, 
+                ngh.thongtin, 
+                pmt.ma_paymentterm, 
+                pmt.ten_paymentterm, 
+                spd.Consignee, 
+                dh.payer,
+                cb.ten_cangbien,
+                spd.POD
+            from 
+                c_donhang dh
+                left join c_dongpklinv dpkl on dh.c_donhang_id = dpkl.c_donhang_id
+                left join md_paymentterm pmt on pmt.md_paymentterm_id = dh.md_paymentterm_id
+                left join md_nganhang ngh on ngh.md_nganhang_id = dh.md_nganhang_id
+                left join md_cangbien cb on cb.md_cangbien_id = dh.md_cangbien_id
+                outer apply (select top 1 Consignee, Forwarder, POD from c_donhang_spd where c_donhang_id = dh.c_donhang_id and trangthai = 'DAGUI' order by ngaytao desc) spd
+            where 
+                1=1
+                AND dpkl.c_packinginvoice_id = N'{c_pkivn_id}'
+            order by 
+                dh.ngaytao asc
+        ";
 
-        DataTable dt = mdbc.GetData(select);
+        DataTable dtChungTuDH = mdbc.GetData(selChungTuDH);
+        string chungTuDH = dtChungTuDH.Rows[0][0].ToString();
+        var ngayLapDH = (dtChungTuDH.Rows[0][1] as DateTime?).Value;
+        string customerNo = dtChungTuDH.Rows[0][2].ToString();
+        string nganhang = dtChungTuDH.Rows[0][3].ToString();
+        string ma_paymentterm = dtChungTuDH.Rows[0][4].ToString();
+        string paymentterm = dtChungTuDH.Rows[0][5].ToString();
+        string Consignee = dtChungTuDH.Rows[0][6].ToString();
+        string payer = dtChungTuDH.Rows[0][7].ToString();
+        string from = dtChungTuDH.Rows[0][8].ToString();
+        string to = dtChungTuDH.Rows[0][9].ToString();
 
         if (dt.Rows.Count != 0)
         {
-            HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt, chungTuDH);
+            HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt, chungTuDonHang, Consignee, customerNo);
             String saveAsFileName = String.Format("PackingList-{0}.xls", DateTime.Now);
             this.SaveFile(hssfworkbook, saveAsFileName);
         }
@@ -54,7 +90,7 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
         }
     }
 
-    public HSSFWorkbook CreateWorkBookPO(DataTable dt, String chungTuDonHang)
+    public HSSFWorkbook CreateWorkBookPO(DataTable dt, string chungTuDonHang, string Consignee, string customerNo)
     {
         LinqDBDataContext db = new LinqDBDataContext();
         String c_pkivn_id = Request.QueryString["c_packinglist_id"];
@@ -146,6 +182,10 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
         styleBorder12Bold.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
         styleBorder12Bold.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
 
+        ICellStyle styleBorder12Bold_noWrap = hssfworkbook.CreateCellStyle();
+        styleBorder12Bold_noWrap.CloneStyleFrom(styleBorder12Bold);
+        styleBorder12Bold_noWrap.WrapText = false;
+
         ICellStyle styleCenterBorderBottom12 = hssfworkbook.CreateCellStyle();
         styleCenterBorderBottom12.SetFont(font12);
         styleCenterBorderBottom12.VerticalAlignment = VerticalAlignment.Top;
@@ -168,6 +208,11 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
         style12.SetFont(font12);
         style12.VerticalAlignment = VerticalAlignment.Top;
         style12.WrapText = true;
+
+        ICellStyle style12_noWrap = hssfworkbook.CreateCellStyle();
+        style12_noWrap.SetFont(font12);
+        style12_noWrap.VerticalAlignment = VerticalAlignment.Top;
+        style12_noWrap.WrapText = false;
 
         ICellStyle style12Bold = hssfworkbook.CreateCellStyle();
         style12Bold.SetFont(font12Bold);
@@ -325,11 +370,11 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
 
         s1.SetColumnWidth(0, 5000);
         s1.SetColumnWidth(1, 3500);
-        s1.SetColumnWidth(2, 6500);
+        s1.SetColumnWidth(2, 10000);
 
-        s1.SetColumnWidth(8, 0);
-        s1.SetColumnWidth(9, 0);
-        s1.SetColumnWidth(10, 0);
+        s1.SetColumnWidth(8, 3500);
+        s1.SetColumnWidth(9, 3500);
+        s1.SetColumnWidth(10, 3500);
         s1.SetColumnWidth(11, 0);
         s1.SetColumnWidth(12, 0);
         s1.SetColumnWidth(13, 0);
@@ -352,167 +397,149 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
         print.FitWidth = (short)1;
         print.FitHeight = (short)0;
 
-
-        s1.CreateRow(0).CreateCell(0).SetCellValue("ANCO COMPANY LIMITED");
-        s1.GetRow(0).GetCell(0).CellStyle = styleCenter18Bold;
-        s1.AddMergedRegion(new CellRangeAddress(0, 0, 0, 7));
-        s1.GetRow(0).HeightInPoints = 30;
-
-        s1.CreateRow(1).CreateCell(0).SetCellValue(Public.diaChiNoTA);
-        s1.GetRow(1).GetCell(0).CellStyle = styleCenter12;
-        s1.AddMergedRegion(new CellRangeAddress(1, 1, 0, 7));
-        s1.GetRow(1).HeightInPoints = 22;
-
-        s1.CreateRow(2).CreateCell(0).SetCellValue("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com");
-        s1.GetRow(2).GetCell(0).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(1).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(2).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(3).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(4).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(5).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(6).CellStyle = styleCenterBorderBottom12;
-        s1.GetRow(2).CreateCell(7).CellStyle = styleCenterBorderBottom12;
-
-        s1.AddMergedRegion(new CellRangeAddress(2, 2, 0, 7));
-        s1.GetRow(2).HeightInPoints = 22;
-
-        s1.CreateRow(3).CreateCell(0).SetCellValue("PACKING LIST");
-        s1.GetRow(3).GetCell(0).CellStyle = styleCenter18Bold;
-        s1.AddMergedRegion(new CellRangeAddress(3, 3, 0, 7));
-        s1.GetRow(3).HeightInPoints = 30;
-
-        s1.CreateRow(4).CreateCell(4).SetCellValue("No.:");
-        s1.GetRow(4).GetCell(4).CellStyle = style12Bold;
-
-        s1.GetRow(4).CreateCell(5).SetCellValue(dt.Rows[0]["so_pkl"].ToString());
-        s1.GetRow(4).GetCell(5).CellStyle = style12Bold;
-        s1.AddMergedRegion(new CellRangeAddress(4, 4, 5, 7));
-        s1.GetRow(4).HeightInPoints = 22;
-
-        s1.CreateRow(5).CreateCell(4).SetCellValue("Date:");
-        s1.GetRow(5).GetCell(4).CellStyle = style12Bold;
-
-        s1.GetRow(5).CreateCell(5).SetCellValue(DateTime.Parse(dt.Rows[0]["ngaytao"].ToString()).ToString("dd-MMM-yyyy"));
-        s1.GetRow(5).GetCell(5).CellStyle = style12Bold;
-        s1.AddMergedRegion(new CellRangeAddress(5, 5, 5, 7));
-        s1.GetRow(5).HeightInPoints = 22;
-
-        s1.CreateRow(6).CreateCell(0).SetCellValue("The Buyer:");
-        s1.GetRow(6).GetCell(0).CellStyle = style12TopBold;
-
-        String dc_kh = dt.Rows[0]["ten_dtkd"].ToString() + " \nAddress:" + dt.Rows[0]["diachi"].ToString() + "\nTel:" + dt.Rows[0]["tel"].ToString() + "\nFax:" + dt.Rows[0]["fax"].ToString();
+        int rowVNN = 0;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("ANCO COMPANY LIMITED");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenter18Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 30;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue(Public.diaChiNoTA);
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenter12;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Tel.: (84-274) 3740 973   Fax:  (84-274) 3740 621  Email: anco@ancopottery.com");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(1).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(2).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(3).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(4).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(5).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(6).CellStyle = styleCenterBorderBottom12;
+        s1.GetRow(rowVNN).CreateCell(7).CellStyle = styleCenterBorderBottom12;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("PACKING LIST");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenter18Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 30;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(4).SetCellValue("No.:");
+        s1.GetRow(rowVNN).GetCell(4).CellStyle = style12Bold;
+        s1.GetRow(rowVNN).CreateCell(5).SetCellValue(dt.Rows[0]["so_pkl"].ToString());
+        s1.GetRow(rowVNN).GetCell(5).CellStyle = style12Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 5, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(4).SetCellValue("Date:");
+        s1.GetRow(rowVNN).GetCell(4).CellStyle = style12Bold;
+        s1.GetRow(rowVNN).CreateCell(5).SetCellValue(DateTime.Parse(dt.Rows[0]["ngaytao"].ToString()).ToString("dd-MMM-yyyy"));
+        s1.GetRow(rowVNN).GetCell(5).CellStyle = style12Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 5, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("The Buyer:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12TopBold;
+        string tendtkd = dt.Rows[0]["ten_dtkd"].ToString();
+        String dc_kh = tendtkd + " \nAddress:" + dt.Rows[0]["diachi"].ToString() + "\nTel:" + dt.Rows[0]["tel"].ToString() + "\nFax:" + dt.Rows[0]["fax"].ToString();
         HSSFRichTextString rich = new HSSFRichTextString(dc_kh);
-        s1.GetRow(6).CreateCell(2).SetCellValue(rich);
-        s1.GetRow(6).GetCell(2).CellStyle = styleTop14Bold;
-        s1.AddMergedRegion(new CellRangeAddress(6, 6, 2, 7));
-
-        s1.GetRow(6).HeightInPoints = 90;
-
-
-        s1.CreateRow(7).CreateCell(0).SetCellValue("Mv:");
-        s1.GetRow(7).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(7).CreateCell(2).SetCellValue(dt.Rows[0]["mv"].ToString());
-        s1.GetRow(7).GetCell(2).CellStyle = style12;
-        s1.AddMergedRegion(new CellRangeAddress(7, 7, 2, 7));
-
-        s1.GetRow(7).HeightInPoints = 22;
-
-
-        s1.CreateRow(8).CreateCell(0).SetCellValue("From:");
-        s1.GetRow(8).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(8).CreateCell(2).SetCellValue(dt.Rows[0]["ten_cangbien"].ToString());
-        s1.GetRow(8).GetCell(2).CellStyle = style12;
-        s1.AddMergedRegion(new CellRangeAddress(8, 8, 2, 7));
-        s1.GetRow(8).HeightInPoints = 22;
-
-        s1.CreateRow(9).CreateCell(0).SetCellValue("To:");
-        s1.GetRow(9).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(9).CreateCell(2).SetCellValue(dt.Rows[0]["noiden"].ToString());
-        s1.GetRow(9).GetCell(2).CellStyle = style12;
-        s1.AddMergedRegion(new CellRangeAddress(9, 9, 2, 7));
-        s1.GetRow(9).HeightInPoints = 22;
-
-        s1.CreateRow(10).CreateCell(0).SetCellValue("BL no:");
-        s1.GetRow(10).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(10).CreateCell(2).SetCellValue(dt.Rows[0]["blno"].ToString());
-        s1.GetRow(10).GetCell(2).CellStyle = style12;
-        s1.AddMergedRegion(new CellRangeAddress(10, 10, 2, 7));
-        s1.GetRow(10).HeightInPoints = 22;
-
-        s1.CreateRow(11).CreateCell(0).SetCellValue("Commodity:");
-        s1.GetRow(11).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(11).CreateCell(2).SetCellValue((dt.Rows[0]["commodity"].ToString() + " wares").ToUpper());
-        s1.GetRow(11).GetCell(2).CellStyle = style12;
-        s1.AddMergedRegion(new CellRangeAddress(11, 11, 2, 7));
-        s1.GetRow(11).HeightInPoints = 22;
-
-        s1.CreateRow(12).CreateCell(2).SetCellValue(String.Format("As per proforma invoice No. : {0}", chungTuDonHang).ToUpper());
-        s1.GetRow(12).GetCell(2).CellStyle = style12;
-        s1.AddMergedRegion(new CellRangeAddress(12, 12, 2, 7));
-        s1.GetRow(12).HeightInPoints = 22;
-
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(rich);
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = styleTop14Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 90;
+        rowVNN++;
+        if (tendtkd != Consignee)
+        {
+            s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("The Consignee:");
+            s1.GetRow(rowVNN).GetCell(0).CellStyle = style12_noWrap;
+            s1.GetRow(rowVNN).CreateCell(2).SetCellValue(Consignee);
+            s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
+            s1.GetRow(rowVNN).HeightInPoints = 22;
+            rowVNN++;
+        }
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Mv:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12_noWrap;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["mv"].ToString());
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("From:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12_noWrap;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["ten_cangbien"].ToString());
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("To:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12_noWrap;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["noiden"].ToString());
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("BL no:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12_noWrap;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["blno"].ToString());
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Order no.:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12_noWrap;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(customerNo);
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 7));
+        s1.GetRow(rowVNN).HeightInPoints = 22;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Commodity:");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue((dt.Rows[0]["commodity"].ToString() + " wares").ToUpper());
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(3).SetCellValue(" ");
+        s1.GetRow(rowVNN).GetCell(3).CellStyle = styleCenter18Bold;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 7));
+        s1.GetRow(rowVNN).Height = -1;
+        rowVNN++;
+        s1.CreateRow(rowVNN).CreateCell(2).SetCellValue(String.Format("As per proforma invoice No. : {0}", chungTuDonHang).ToUpper());
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12;
+        s1.GetRow(rowVNN).CreateCell(3).SetCellValue(" ");
+        s1.GetRow(rowVNN).GetCell(3).CellStyle = styleCenter18Bold;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 7));
+        s1.GetRow(rowVNN).Height = -1;
+        rowVNN++;
         //Table
-        s1.CreateRow(13).CreateCell(0).SetCellValue("Seller's Article");
-        s1.GetRow(13).GetCell(0).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(1).SetCellValue("Buyer's Article");
-        s1.GetRow(13).GetCell(1).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(2).SetCellValue("Description of goods");
-        s1.GetRow(13).GetCell(2).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(3).SetCellValue("Packing");
-        s1.GetRow(13).GetCell(3).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(4).CellStyle = styleCenterBorder12Bold;
-
-        s1.AddMergedRegion(new CellRangeAddress(13, 13, 3, 4));
-
-        s1.GetRow(13).CreateCell(5).SetCellValue("No. of pkgs");
-        s1.GetRow(13).GetCell(5).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(6).SetCellValue("Quantity (pcs, sets)");
-        s1.GetRow(13).GetCell(6).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(7).CellStyle = styleCenterBorder12Bold;
-
-        s1.AddMergedRegion(new CellRangeAddress(13, 13, 6, 7));
-
-        s1.GetRow(13).CreateCell(8).SetCellValue("NW(kgs)");
-        s1.GetRow(13).GetCell(8).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(9).SetCellValue("GW(kgs)");
-        s1.GetRow(13).GetCell(9).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(10).SetCellValue("CBM");
-        s1.GetRow(13).GetCell(10).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(11).SetCellValue("L2");
-        s1.GetRow(13).GetCell(11).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(12).SetCellValue("W2");
-        s1.GetRow(13).GetCell(12).CellStyle = styleCenterBorder12Bold;
-
-        s1.GetRow(13).CreateCell(13).SetCellValue("H2");
-        s1.GetRow(13).GetCell(13).CellStyle = styleCenterBorder12Bold;
-
-
-        /*string sql_group = @"select distinct dpk.c_donhang_id, (select sochungtu from c_donhang dh where dh.c_donhang_id = dpk.c_donhang_id) as sodh,  cdh.discount, cnx.container, cnx.soseal, cb.ten_cangbien, cnx.c_nhapxuat_id,
-                            isnull(cdh.cont20, 0) as cont20, isnull(cdh.cont40,0) as cont40, isnull(cdh.cont40hc, 0) as cont40hc, isnull(cdh.contle, 0 ) as contle, isnull(cdh.cont45, 0) as cont45
-                            from c_dongpklinv dpk, c_packinginvoice cpk, c_donhang cdh, c_dongnhapxuat dnx, c_nhapxuat cnx, md_cangbien cb
-                            where dpk.c_packinginvoice_id = '" + c_pkivn_id + "'" + //c_pkivn_id
-                                    @"and dpk.c_donhang_id = cdh.c_donhang_id
-		                            and dpk.c_dongnhapxuat_id = dnx.c_dongnhapxuat_id
-		                            and dnx.c_nhapxuat_id = cnx.c_nhapxuat_id
-                                    and dpk.c_packinginvoice_id = cpk.c_packinginvoice_id
-		                            and cpk.noidi = cb.md_cangbien_id";*/
-									
-		string sql_group = @"select distinct dpk.c_donhang_id, (select sochungtu from c_donhang dh where dh.c_donhang_id = dpk.c_donhang_id) as sodh,  cdh.discount, cnx.container, cnx.soseal, cb.ten_cangbien, cnx.c_nhapxuat_id,
+        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Seller's Article");
+        s1.GetRow(rowVNN).GetCell(0).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(1).SetCellValue("Buyer's Article");
+        s1.GetRow(rowVNN).GetCell(1).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue("Description of goods");
+        s1.GetRow(rowVNN).GetCell(2).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(3).SetCellValue("Packing");
+        s1.GetRow(rowVNN).GetCell(3).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(4).CellStyle = styleCenterBorder12Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 3, 4));
+        s1.GetRow(rowVNN).CreateCell(5).SetCellValue("No. of pkgs");
+        s1.GetRow(rowVNN).GetCell(5).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(6).SetCellValue("Quantity (pcs, sets)");
+        s1.GetRow(rowVNN).GetCell(6).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(7).CellStyle = styleCenterBorder12Bold;
+        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 6, 7));
+        s1.GetRow(rowVNN).CreateCell(8).SetCellValue("NW(kgs)");
+        s1.GetRow(rowVNN).GetCell(8).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(9).SetCellValue("GW(kgs)");
+        s1.GetRow(rowVNN).GetCell(9).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(10).SetCellValue("CBM");
+        s1.GetRow(rowVNN).GetCell(10).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(11).SetCellValue("L2");
+        s1.GetRow(rowVNN).GetCell(11).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(12).SetCellValue("W2");
+        s1.GetRow(rowVNN).GetCell(12).CellStyle = styleCenterBorder12Bold;
+        s1.GetRow(rowVNN).CreateCell(13).SetCellValue("H2");
+        s1.GetRow(rowVNN).GetCell(13).CellStyle = styleCenterBorder12Bold;
+        rowVNN++;
+        string sql_group = @"select distinct dpk.c_donhang_id, (select sochungtu from c_donhang dh where dh.c_donhang_id = dpk.c_donhang_id) as sodh,  cdh.discount, cnx.container, cnx.soseal, cb.ten_cangbien, cnx.c_nhapxuat_id,
                             isnull(cnx.loaicont, 0) as loaicont
                             from c_dongpklinv dpk, c_packinginvoice cpk, c_donhang cdh, c_dongnhapxuat dnx, c_nhapxuat cnx, md_cangbien cb
                             where dpk.c_packinginvoice_id = '" + c_pkivn_id + "'" + //c_pkivn_id
@@ -530,32 +557,17 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
         int count_group = data_dh.Rows.Count;
         int count = 1;
         int g_line = 0;
-        int r = 14;
+        int r = rowVNN;
         List<int> lstNoOfPack = new List<int>();
         List<int> lstQuantity = new List<int>();
         List<int> lstNW = new List<int>();
         List<int> lstGW = new List<int>();
         List<int> lstCBM = new List<int>();
+        var lstDVTs = new List<string>();
 
         foreach (DataRow g_it in data_dh.Rows)
         {
-            /*decimal cont20, cont40, cont40hc, contle, cont45;
-            cont20 = decimal.Parse(g_it["cont20"].ToString());
-            cont40 = decimal.Parse(g_it["cont40"].ToString());
-            cont40hc = decimal.Parse(g_it["cont40hc"].ToString());
-            contle = decimal.Parse(g_it["contle"].ToString());
-            cont45 = decimal.Parse(g_it["cont45"].ToString());*/
-			
 			string loaicont = g_it["loaicont"].ToString();
-
-            /*s1.CreateRow(r).CreateCell(0).SetCellValue("Container/Seal No.: " + g_it["container"].ToString() + "/" + g_it["soseal"].ToString() + " "
-                + (cont20 != 0 ? (", " + 1 + "x20'") : (""))
-                + (cont40 != 0 ? (", " + 1 + "x40'") : (""))
-                + (cont40hc != 0 ? (", " + 1 + "x40hc") : (""))
-                + (contle != 0 ? (", " + 1 + "xLCL'") : (""))
-                + (cont45 != 0 ? (", " + 1 + "x450'") : (""))
-                );*/
-
             loaicont = Public.getLoaiCont(loaicont);
             
 			s1.CreateRow(r).CreateCell(0).SetCellValue("Container/Seal No.: " + g_it["container"].ToString() + "/" + g_it["soseal"].ToString() + " " + loaicont);
@@ -563,7 +575,6 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
             if (g_line == 0)
             {
                 s1.GetRow(r).CreateCell(3).SetCellValue("");
-                //s1.GetRow(r).CreateCell(3).SetCellValue("FOB " + g_it["ten_cangbien"].ToString());
             }
             else
             {
@@ -573,9 +584,9 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
 
 
 
-            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold;
+            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold_noWrap;
 
             s1.GetRow(r).GetCell(3).CellStyle = styleBorder12;
             s1.GetRow(r).CreateCell(4).CellStyle = styleBorder12;
@@ -589,15 +600,15 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
             s1.GetRow(r).CreateCell(12).CellStyle = styleBorder12;
             s1.GetRow(r).CreateCell(13).CellStyle = styleBorder12;
 
-            s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 7));
+           // s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 7));
             s1.GetRow(r).HeightInPoints = 22;
 
             r++;
             s1.CreateRow(r).CreateCell(0).SetCellValue("P/I No.: " + g_it["sodh"].ToString());
 
-            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold;
-            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold;
+            s1.GetRow(r).GetCell(0).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(1).CellStyle = styleBorder12Bold_noWrap;
+            s1.GetRow(r).CreateCell(2).CellStyle = styleBorder12Bold_noWrap;
             s1.GetRow(r).CreateCell(3).CellStyle = styleBorder12;
             s1.GetRow(r).CreateCell(4).CellStyle = styleBorder12;
             s1.GetRow(r).CreateCell(5).CellStyle = styleBorder12;
@@ -609,7 +620,7 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
             s1.GetRow(r).CreateCell(11).CellStyle = styleBorder12;
             s1.GetRow(r).CreateCell(12).CellStyle = styleBorder12;
             s1.GetRow(r).CreateCell(13).CellStyle = styleBorder12;
-            s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 7));
+            //s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 7));
             s1.GetRow(r).HeightInPoints = 22;
 
             string sql_de = string.Format(@"select ma_sanpham, ma_sanpham_khach, noofpack, soluong, gia, thanhtien, l1, w1, h1, l2, w2, h2,
@@ -648,7 +659,9 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
                 //ir.CreateCell(5).SetCellValue(double.Parse(g_dt["noofpack"].ToString()));
 				ir.CreateCell(5).CellFormula = String.Format("G{0}/D{0}",r+1);
                 ir.CreateCell(6).SetCellValue(double.Parse(g_dt["soluong"].ToString()));
-                ir.CreateCell(7).SetCellValue(g_dt["ten_dvt"].ToString() + "s");
+                string tendvt = g_dt["ten_dvt"].ToString() + "s";
+                ir.CreateCell(7).SetCellValue(tendvt);
+                lstDVTs.Add(tendvt);
                 ir.CreateCell(8).SetCellValue(double.Parse(g_dt["nkg"].ToString()));
                 ir.CreateCell(9).SetCellValue(double.Parse(g_dt["gkg"].ToString()));
                 ir.CreateCell(10).SetCellValue(double.Parse(g_dt["cbm"].ToString()));
@@ -720,15 +733,11 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
         }
         fNoOfPack = fNoOfPack.Substring(1);
 
-
-
         foreach (int item in lstQuantity)
         {
             fQuantity += String.Format("+ G{0} ", item);
         }
         fQuantity = fQuantity.Substring(1);
-
-
 
         foreach (int item in lstNW)
         {
@@ -755,63 +764,49 @@ public partial class PrintControllers_InPackingList_Default : System.Web.UI.Page
         }
         strCount = strCount.Substring(2);
 
-
-        s1.CreateRow(r).CreateCell(2).SetCellValue(String.Format("Total{0}:", count_group > 1 ? " (" + strCount + ")" : ""));
+        s1.CreateRow(r).CreateCell(1).SetCellValue(" ");
+        s1.GetRow(r).GetCell(1).CellStyle = styleCenter18Bold;
+        s1.GetRow(r).CreateCell(2).SetCellValue(String.Format("Total{0}:", count_group > 1 ? " (" + strCount + ")" : ""));
         s1.GetRow(r).GetCell(2).CellStyle = style12Bold;
-
         s1.GetRow(r).CreateCell(5).SetCellFormula(fNoOfPack);
         s1.GetRow(r).GetCell(5).CellStyle = styleNumber012Bold;
-
         s1.GetRow(r).CreateCell(6).SetCellFormula(fQuantity);
         s1.GetRow(r).GetCell(6).CellStyle = styleNumber012Bold;
-
         s1.GetRow(r).CreateCell(8).SetCellFormula(fNW);
         s1.GetRow(r).GetCell(8).CellStyle = styleNumber0i0012Bold;
-
         s1.GetRow(r).CreateCell(9).SetCellFormula(fGW);
         s1.GetRow(r).GetCell(9).CellStyle = styleNumber0i0012Bold;
-
         s1.GetRow(r).CreateCell(10).SetCellFormula(fCBM);
         s1.GetRow(r).GetCell(10).CellStyle = styleNumber0i0012Bold;
-        s1.GetRow(r).HeightInPoints = 22;
-
-
         s1.GetRow(r).HeightInPoints = 0;
-
         if (count_group > 1)
         {
-            s1.GetRow(r).HeightInPoints = 22;
+            s1.GetRow(r).Height = -1;
         }
-
         r++;
-        s1.CreateRow(r).CreateCell(0).SetCellValue("Gross weight:");
-        s1.GetRow(r).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(r).CreateCell(1).SetCellFormula(String.Format("J{0}", r));
-        s1.GetRow(r).GetCell(1).CellStyle = styleNumber0i0012;
-
-        s1.GetRow(r).CreateCell(2).SetCellValue("kgs");
-        s1.GetRow(r).GetCell(2).CellStyle = style12;
-
-        s1.GetRow(r).HeightInPoints = 22;
-
-        r++;
-        s1.CreateRow(r).CreateCell(0).SetCellValue("Measurement:");
-        s1.GetRow(r).GetCell(0).CellStyle = style12;
-
-        s1.GetRow(r).CreateCell(1).SetCellFormula(String.Format("K{0}", r - 1));
-        s1.GetRow(r).GetCell(1).CellStyle = styleNumber0i0012;
-
-        s1.GetRow(r).CreateCell(2).SetCellValue("cbm");
-        s1.GetRow(r).GetCell(2).CellStyle = style12;
-
-        s1.GetRow(r).HeightInPoints = 22;
-
-        r++;
+        //s1.CreateRow(r).CreateCell(0).SetCellValue("Gross weight:");
+        //s1.GetRow(r).GetCell(0).CellStyle = style12;
+        //s1.GetRow(r).CreateCell(1).SetCellFormula(String.Format("J{0}", r));
+        //s1.GetRow(r).GetCell(1).CellStyle = styleNumber0i0012;
+        //s1.GetRow(r).CreateCell(2).SetCellValue("kgs");
+        //s1.GetRow(r).GetCell(2).CellStyle = style12;
+        //s1.GetRow(r).HeightInPoints = 22;
+        //r++;
+        //s1.CreateRow(r).CreateCell(0).SetCellValue("Measurement:");
+        //s1.GetRow(r).GetCell(0).CellStyle = style12;
+        //s1.GetRow(r).CreateCell(1).SetCellFormula(String.Format("K{0}", r - 1));
+        //s1.GetRow(r).GetCell(1).CellStyle = styleNumber0i0012;
+        //s1.GetRow(r).CreateCell(2).SetCellValue("cbm");
+        //s1.GetRow(r).GetCell(2).CellStyle = style12;
+        //s1.GetRow(r).HeightInPoints = 22;
+        //r++;
         s1.CreateRow(r).CreateCell(3).SetCellValue("ANCO COMPANY LTD");
         s1.AddMergedRegion(new CellRangeAddress(r, r, 3, 7));
         s1.GetRow(r).GetCell(3).CellStyle = styleCenter16Bold;
         s1.GetRow(r).HeightInPoints = 22;
+
+        string dvts = string.Join(",", lstDVTs.Distinct().OrderBy(s => s));
+        s1.GetRow(rowVNN - 1).GetCell(6).SetCellValue($"Quantity {dvts}");
 
         return hssfworkbook;
     }

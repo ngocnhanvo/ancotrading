@@ -54,7 +54,7 @@ public partial class PrintControllers_InInvoice_InBookINV : System.Web.UI.Page
             var inv = db.c_packinginvoices.Where(s => s.c_packinginvoice_id == id).FirstOrDefault();
             var dhids = db.c_dongpklinvs.Where(s => s.c_packinginvoice_id == id).Select(s => s.c_donhang_id).ToList();
             var dhs = db.c_donhangs.Where(s => dhids.Contains(s.c_donhang_id)).OrderBy(s => s.sochungtu).ToList();
-            soPIs = dhs.Select(s => s.sochungtu).ToList();
+            soPIs = dhs.Select(s => s.sochungtu).Distinct().OrderBy(s => s).ToList();
 
             hscodes = (
                 from a in db.c_dongdonhangs
@@ -63,7 +63,7 @@ public partial class PrintControllers_InInvoice_InBookINV : System.Web.UI.Page
                 where dhids.Contains(a.c_donhang_id)
                 orderby c.hscode
                 select c.hscode
-            ).ToList();
+            ).Distinct().ToList();
 
             var dhcts = db.c_donhangchungtus.Where(s => dhids.Contains(s.c_donhang_id) & s.trangthai != Helper.SOANTHAO).ToList();
             var cont20 = dhcts.Select(s => s.cont20.GetValueOrDefault(0)).Sum();
@@ -145,6 +145,7 @@ public partial class PrintControllers_InInvoice_InBookINV : System.Web.UI.Page
 		    ";
         }
 
+        //throw new Exception(sql);
         return sql;
     }
 }
