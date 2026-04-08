@@ -196,6 +196,11 @@ public class DonHangController : IHttpHandler, IDisposable
                 dhs = dhs.OrderBy(s => s.c_donhang_id == dhut_po ? 0 : 1).ToList();
                 foreach (var dh in dhs)
                 {
+                    if (string.IsNullOrWhiteSpace(dh.nhanvienCT))
+                    {
+                        msg = $@"Đơn hàng ""{dh.sochungtu}"" chưa chọn nhân viên chứng từ";
+                        goto EndEventHandler;
+                    }
                     dh.trangthaict = Helper.DAGUI;
                     var hsct = new c_donhangchungtu();
                     hsct.c_donhangchungtu_id = Helper.getNewId();
@@ -375,7 +380,7 @@ public class DonHangController : IHttpHandler, IDisposable
             msg = e.Message;
         }
 
-        EndEventHandler:;
+    EndEventHandler:;
         context.Response.Write(msg);
     }
 
@@ -445,7 +450,7 @@ public class DonHangController : IHttpHandler, IDisposable
             msg = e.Message;
         }
 
-        EndEventHandler:;
+    EndEventHandler:;
         context.Response.Write(msg);
     }
 
@@ -1529,7 +1534,7 @@ public class DonHangController : IHttpHandler, IDisposable
             jqGridHelper.Utils.writeResult(0, ex + "");
         }
 
-        EndEventHandler:;
+    EndEventHandler:;
     }
 
     public void del(HttpContext context)
@@ -1836,7 +1841,8 @@ public class DonHangController : IHttpHandler, IDisposable
 
     public bool IsReusable
     {
-        get {
+        get
+        {
             return false;
         }
     }
