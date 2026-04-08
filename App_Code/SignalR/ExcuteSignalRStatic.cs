@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevExpress.XtraRichEdit.Fields;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -68,25 +69,25 @@ public static class ExcuteSignalRStatic
         return ttdg;
     }
 
-    public static DataTable getFOB(string md_sanpham_id)
+    public static DataTable getFOB(string md_sanpham_id, LinqDBDataContext db = null)
     {
-        string strsql =
-                @"
-				    select top 1 cb.ten_cangbien 
-                    from md_cangbien (nolock) cb 
-                    where cb.md_cangbien_id = (
-	                    select top 1
-		                    cxh.md_cangbien_id
-	                    FROM 
-		                    md_cangxuathang (nolock) cxh
-	                    WHERE 
-		                    cxh.md_sanpham_id = '{0}'
-		                    and cxh.macdinh = 1
-                    )
-                ";
+		string strsql =
+				@"
+				select top 1 cb.ten_cangbien 
+				from md_cangbien (nolock) cb 
+				where cb.md_cangbien_id = (
+					select top 1
+						cxh.md_cangbien_id
+					FROM 
+						md_cangxuathang (nolock) cxh
+					WHERE 
+						cxh.md_sanpham_id = '{0}'
+						and cxh.macdinh = 1
+				)
+			";
 
-        strsql = string.Format(strsql, md_sanpham_id);
-        return mdbc.GetData(strsql);
+		strsql = string.Format(strsql, md_sanpham_id);
+		return mdbc.GetData(strsql);
     }
 
     public static DataTable getPrice(string arrMSP)
@@ -280,6 +281,7 @@ public static class ExcuteSignalRStatic
     public static string getImageProduct(string msp, bool notimg = false)
     {
         string image = "";
+		bool haveImg = false;
         try
         {
             string msLink = "images/products/mausac/";
@@ -290,11 +292,30 @@ public static class ExcuteSignalRStatic
             image = mapPathSignalR("~/" + msLink);
             
             //Neu co hinh anh mau sac cua toan bo ma sp hoac F
-            if (File.Exists(image + msp + ".jpg"))
+            if (File.Exists(image + msp + ".jpg")) 
+			{
                 image = msLink + msp + ".jpg";
+				haveImg = true;
+			}
             //Neu co hinh anh mau sac cua S
             else if (File.Exists(image + kd + ms + ".jpg"))
+			{
                 image = msLink + kd + ms + ".jpg";
+				haveImg = true;
+			}
+			else if(ms == "__") 
+			{
+				for (var i = 1; i < 99; i++)
+				{
+					var msCP = i < 10 ? "0" + i : i.ToString();
+					if (File.Exists(image + kd + msCP + ".jpg"))
+					{
+						image = msLink + kd + msCP + ".jpg";
+						haveImg = true;
+						break;
+					}
+				}				
+			}
             //Neu khong co hinh anh mau sac cua S va F thi lay hinh anh mac dinh cua san pham
             else
             {
@@ -310,22 +331,23 @@ public static class ExcuteSignalRStatic
                     image = Public.imgProduct + image;
                 }
 
-                if (!File.Exists(mapPathSignalR("~/" + image))) 
+                if (File.Exists(mapPathSignalR("~/" + image))) 
 				{
-					if(notimg)
-						image = Public.imgNotFound_notimg;
-					else
-						image = Public.imgNotFound;
+					haveImg = true;
 				}
             }
         }
         catch
         {
+			
+        }
+		finally 
+		{
 			if(notimg)
 				image = Public.imgNotFound_notimg;
 			else
 				image = Public.imgNotFound;
-        }
+		}
 
         return image;
     }
