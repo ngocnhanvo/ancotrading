@@ -175,13 +175,13 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
                                         hdlhMain.trangthai = tt.trangthai;
                                         hdlhMain.ngayxacnhan = tt.ngayxacnhan;
                                         hdlhMain.nguoixacnhan = tt.value_nguoicapnhat;
-                                        if(tt.trangthai == TUCHOI)
+                                        if (tt.trangthai == TUCHOI)
                                             hdlhMain.lydotuchoi = tt.mota;
                                     }
                                 }
                             }
                         }
-                        else if(a.trangthai != DAHIEULUC)
+                        else if (a.trangthai != DAHIEULUC)
                         {
                             if (a.trangthai != CHUAGUI & !string.IsNullOrEmpty(a.trangthai))
                             {
@@ -273,17 +273,17 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
                 att.Name = name;
                 atts.Add(att);
 
-                if(File.Exists(fileHHCXN))
+                if (File.Exists(fileHHCXN))
                 {
-                    att =  new System.Net.Mail.Attachment(fileHHCXN);
+                    att = new System.Net.Mail.Attachment(fileHHCXN);
                     name = "Hàng hóa chưa xác nhận.xls";
                     att.Name = name;
                     atts.Add(att);
                 }
 
-                if(File.Exists(fileDGCXN))
+                if (File.Exists(fileDGCXN))
                 {
-                    att =  new System.Net.Mail.Attachment(fileDGCXN);
+                    att = new System.Net.Mail.Attachment(fileDGCXN);
                     name = "Đóng gói chưa xác nhận.xls";
                     att.Name = name;
                     atts.Add(att);
@@ -324,8 +324,10 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
         }
     }
 
-    public string EncodeHTML_DSDH(string a) {
-        if(a == null) {
+    public string EncodeHTML_DSDH(string a)
+    {
+        if (a == null)
+        {
             a = "";
         }
         a = a.Replace("&", "%26");
@@ -342,7 +344,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
         md_smtp smtp = db.md_smtps.FirstOrDefault(p => p.macdinh.Equals(true));
         if (nv != null)
         {
-            if(!string.IsNullOrWhiteSpace(nv.smtp))
+            if (!string.IsNullOrWhiteSpace(nv.smtp))
                 smtp = db.md_smtps.FirstOrDefault(p => p.md_smtp_id.Equals(nv.smtp));
         }
         var mail = new GoogleMail(nv.email, nv.email_pass, smtp.smtpserver, smtp.port.Value, smtp.use_ssl.GetValueOrDefault(false));
@@ -375,7 +377,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
                 msg += $@"Lỗi:Dòng ""{dsdh.sochungtu}"" đã hiệu lực.<br>";
             else if (dsdh.trangthai == "DAGUI")
                 msg += $@"Lỗi:Dòng ""{dsdh.sochungtu}"" đã được gửi trước đó.<br>";
-            else if(!arrGuiDonHangHeThong.Contains(dtkd.ma_dtkd))
+            else if (!arrGuiDonHangHeThong.Contains(dtkd.ma_dtkd))
                 msg += $@"Lỗi:""{dtkd.ma_dtkd}"" chưa triển khai chức năng này.<br>";
             else
             {
@@ -559,7 +561,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
                             foreach (var sctDH in sctDonHangs)
                             {
                                 var c_danhsachdathang_id = "";
-                                if(sctDH.ContainsKey("c_danhsachdathang_id"))
+                                if (sctDH.ContainsKey("c_danhsachdathang_id"))
                                     c_danhsachdathang_id = sctDH["c_danhsachdathang_id"];
 
                                 var soPO = "";
@@ -597,7 +599,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
                             }
                         }
                     }
-                    else if(msgDTFail.Length > 0)
+                    else if (msgDTFail.Length > 0)
                     {
                         msgDT = msgDTFail;
                     }
@@ -940,7 +942,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
             DataSet ds = new DataSet();
             da.Fill(ds);
             var tbl = ds.Tables[0];
-            foreach(DataRow row in tbl.Rows)
+            foreach (DataRow row in tbl.Rows)
             {
                 string msp = row["sanpham"].ToString();
                 row["hinhanh"] = ExcuteSignalRStatic.getImageProduct(msp);
@@ -953,7 +955,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
         catch (Exception ex)
         {
             next = false;
-            context.Response.Write("Không tạo được file \""+ fileNameExcel +"\", " + ex.Message);
+            context.Response.Write("Không tạo được file \"" + fileNameExcel + "\", " + ex.Message);
         }
 
         if (next)
@@ -1032,22 +1034,22 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
                         noidungKhongGia = noidungKhongGia.Replace("[GIATRIDONHANG]", "đã ẩn");
 
                         var atts = new List<System.Net.Mail.Attachment>();
-                        var att =  new System.Net.Mail.Attachment(fileXNXH);
+                        var att = new System.Net.Mail.Attachment(fileXNXH);
                         string name = "Phiếu XNXH.xls";
                         att.Name = name;
                         atts.Add(att);
 
-                        if(File.Exists(fileHHCXN))
+                        if (File.Exists(fileHHCXN))
                         {
-                            att =  new System.Net.Mail.Attachment(fileHHCXN);
+                            att = new System.Net.Mail.Attachment(fileHHCXN);
                             name = "Hàng hóa chưa xác nhận.xls";
                             att.Name = name;
                             atts.Add(att);
                         }
 
-                        if(File.Exists(fileDGCXN))
+                        if (File.Exists(fileDGCXN))
                         {
-                            att =  new System.Net.Mail.Attachment(fileDGCXN);
+                            att = new System.Net.Mail.Attachment(fileDGCXN);
                             name = "Đóng gói chưa xác nhận.xls";
                             att.Name = name;
                             atts.Add(att);
@@ -1251,11 +1253,11 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
 
     public void xoaTaptinSauMails(string fileXNXH, string fileHHCXN, string fileDGCXN)
     {
-        if(File.Exists(fileXNXH))
+        if (File.Exists(fileXNXH))
             File.Delete(fileXNXH);
-        if(File.Exists(fileHHCXN))
+        if (File.Exists(fileHHCXN))
             File.Delete(fileHHCXN);
-        if(File.Exists(fileDGCXN))
+        if (File.Exists(fileDGCXN))
             File.Delete(fileDGCXN);
     }
 
@@ -1272,7 +1274,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
             if (dsdh.md_trangthai_id.Equals("SOANTHAO"))
             {
                 var msgs = new List<Dictionary<string, string>>(msgPublics);
-                var madtkds = msgs.Select(s=>s.Keys.FirstOrDefault()).ToList();
+                var madtkds = msgs.Select(s => s.Keys.FirstOrDefault()).ToList();
 
                 string ma_dtkd = db.md_doitackinhdoanhs.
                         Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).
@@ -1423,14 +1425,14 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
         }
 
         //Tạm thời chỉ áp dụng Anco1
-        if(arrGuiDonHangHeThong[0].Contains(dtkd.ma_dtkd))
+        if (arrGuiDonHangHeThong[0].Contains(dtkd.ma_dtkd))
         {
-            if(m.trangthai == CHUAGUI | m.trangthai == TUCHOI | string.IsNullOrEmpty(m.trangthai))
+            if (m.trangthai == CHUAGUI | m.trangthai == TUCHOI | string.IsNullOrEmpty(m.trangthai))
             {
                 m.huongdanlamhang = huongdanlamhang;
                 m.huongdanlamhangchung = huongdanlamhangchung;
             }
-            else if(m.huongdanlamhang != huongdanlamhang | m.huongdanlamhangchung != huongdanlamhangchung)
+            else if (m.huongdanlamhang != huongdanlamhang | m.huongdanlamhangchung != huongdanlamhangchung)
             {
                 jqGridHelper.Utils.writeResult(0, "Không thể sửa HDLH khi đã gửi DSDH");
                 goto EndEventHandler;
@@ -1444,7 +1446,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
 
         db.SubmitChanges();
 
-        EndEventHandler:;
+    EndEventHandler:;
     }
 
     public void add(HttpContext context)
@@ -1558,14 +1560,14 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
                     File.Delete(link);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = ex.Message;
         }
 
-        EndEventHandler:;
+    EndEventHandler:;
 
-        if(msg.Length <= 0)
+        if (msg.Length <= 0)
         {
             jqGridHelper.Utils.writeResult(1, "Xóa thành công.!");
         }
@@ -1707,7 +1709,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
             DataSet ds = new DataSet();
             da.Fill(ds);
             var tbl = ds.Tables[0];
-            foreach(DataRow row in tbl.Rows)
+            foreach (DataRow row in tbl.Rows)
             {
                 string msp = row["sanpham"].ToString();
                 row["hinhanh"] = ExcuteSignalRStatic.getImageProduct(msp);
@@ -1742,8 +1744,6 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
             var imgs = new List<AvariablePrj.lstImage>();
             foreach (var img in rptPI.Lstimage)
             {
-                img.column = img.column - 1;
-                img.columnLast = img.columnLast - 1;
                 img.dx1 = 10;
                 img.dx2 = 1000;
                 img.dy1 = 40;
@@ -1773,13 +1773,19 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
             //wb = rptPI.ConfigExcel.setImageForExcel(wb, rptPI.Lstimage);
 
             var url = path + Guid.NewGuid().ToString() + ".xls";
-            var xfile = new FileStream(url, FileMode.Create, FileAccess.ReadWrite);
-            wb.Write(xfile);
-            xfile.Close();
-            xfile.Dispose();
+            using (var xfile = new FileStream(url, FileMode.Create, FileAccess.ReadWrite))
+            {
+                wb.Write(xfile);
+                xfile.Close();
+                xfile.Dispose();
+            }
 
-            fileNamePdf =  path + fileNamePdf;
-            var result = OfficeToPDF.ExcelConverter.Convert(url, fileNamePdf, null, rptPI.Lstimage, rptPI.LstText);
+            fileNamePdf = path + fileNamePdf;
+            var s1 = wb.GetSheetAt(0);
+            var excel = new OfficeToPDF.ExcelConverter();
+            excel.lstImage = rptPI.Lstimage;
+            excel.lstText = rptPI.LstText;
+            var result = excel.ConvertInterop(url, fileNamePdf, s1.LastRowNum, 0);
             File.Delete(url);
             //rptDanhSachDatHang report = new rptDanhSachDatHang();
             //SqlDataAdapter da = new SqlDataAdapter(getSqlDsdhPdf(dsdh.c_danhsachdathang_id, guiNCC), mdbc.GetConnection);

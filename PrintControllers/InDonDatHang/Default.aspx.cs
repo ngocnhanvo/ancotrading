@@ -40,8 +40,6 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
         {
             foreach(var img in lstimage)
             {
-                img.column = img.column - 1;
-                img.columnLast = img.columnLast - 1;
                 img.dx1 = 10;
                 img.dx2 = 1000;
                 img.dy1 = 40;
@@ -61,26 +59,28 @@ public partial class PrintControllers_InDonDatHang_Default : System.Web.UI.Page
         }
         else 
         {
+            var s1 = hsswb.GetSheetAt(0);
+            var excel = new OfficeToPDF.ExcelConverter();
+            excel.lstImage = lstimage;
+            excel.lstText = lstText;
             var fileName = "DSDH_" + c_danhsachdathang_id + "_" + Guid.NewGuid().ToString();
             string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
             url = url.Replace("PrintControllers\\InDonDatHang\\", "");
 
-            var xfile = new FileStream(url, FileMode.Create, System.IO.FileAccess.ReadWrite);
-            hsswb.Write(xfile);
-            xfile.Close();
-            xfile.Dispose();
-
-            if (type == "pdf")
+            using (var xfile = new FileStream(url, FileMode.Create, System.IO.FileAccess.ReadWrite))
             {
-                var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
-
-                var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstimage, lstText);
-                File.Delete(url);
-
-                Response.Write(result);
-                if(result.Length <= 0)
-                    Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width&remove=true", fileName));
+                hsswb.Write(xfile);
+                xfile.Close();
+                xfile.Dispose();
             }
+
+            var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
+            var result = excel.ConvertInterop(url, urlPDF, s1.LastRowNum, 0);
+            File.Delete(url);
+
+            Response.Write(result);
+            if(result.Length <= 0)
+                Response.Redirect(string.Format("../../ViewPDFPublic/index.aspx?urlpdf=../ReportPdf/{0}.pdf&zoomprint=0.999&zoom=page-width&remove=true", fileName));
         }
     }
 }

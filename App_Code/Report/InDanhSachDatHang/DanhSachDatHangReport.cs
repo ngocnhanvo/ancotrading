@@ -581,8 +581,8 @@ public class DanhSachDatHangReport
                     {
                         row = row,
                         rowLast = row,
-                        column = 3,
-                        columnLast = 3,
+                        column = 2,
+                        columnLast = 2,
                         link = imgPath,
                         heightCell = 70,
                         widthCell = 5000
@@ -677,8 +677,8 @@ public class DanhSachDatHangReport
                 s1.GetRow(row).CreateCell(11).SetCellFormula(String.Format("SUM(L{0}:L{1})", m, row));
 
             s1.GetRow(row).GetCell(11).CellStyle = cellBoldAmount;
-            s1.GetRow(row).CreateCell(15).SetCellFormula(String.Format("SUM(Q{0}:Q{1})", m, row));
-            s1.GetRow(row).GetCell(15).CellStyle = cellBoldCBM;
+            s1.GetRow(row).CreateCell(16).SetCellFormula(String.Format("SUM(Q{0}:Q{1})", m, row));
+            s1.GetRow(row).GetCell(16).CellStyle = cellBoldCBM;
 
             row++;
             //start +

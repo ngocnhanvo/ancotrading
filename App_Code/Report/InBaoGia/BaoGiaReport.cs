@@ -1,12 +1,13 @@
-﻿using System;
+﻿using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.SS.Util;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Web;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-using System.IO;
-using NPOI.SS.Util;
-using System.Data;
+using static AvariablePrj;
 
 /// <summary>
 /// Summary description for BaoGiaReport
@@ -481,7 +482,9 @@ public class BaoGiaReport
                 lstimage.Add(new AvariablePrj.lstImage()
                 {
                     row = rowDt,
-                    column = 2,
+                    rowLast = rowDt,
+                    column = 1,
+                    columnLast = 1,
                     link = imgPath
                 });
 
@@ -884,16 +887,23 @@ public class BaoGiaReport
             url = ExcuteSignalRStatic.mapPathSignalR($"~ReportPdf/{fileName}.xls");
         }
 
-        var xfile = new FileStream(url, FileMode.Create, System.IO.FileAccess.ReadWrite);
-        hsswb.Write(xfile);
-        xfile.Close();
-        xfile.Dispose();
+        using (var xfile = new FileStream(url, FileMode.Create, System.IO.FileAccess.ReadWrite))
+        {
+            hsswb.Write(xfile);
+            xfile.Close();
+            xfile.Dispose();
+        }
+
+        var s1 = hsswb.GetSheetAt(0);
+        var excel = new OfficeToPDF.ExcelConverter();
+        excel.lstImage = Lstimage;
+        excel.lstText = null;
 
         if (type == "pdf")
         {
             var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
 
-            var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, Lstimage, new List<AvariablePrj.lstText>());
+            var result = excel.ConvertInterop(url, urlPDF, s1.LastRowNum, 0);
 
             if (!mail)
             {
@@ -908,12 +918,7 @@ public class BaoGiaReport
         else
         {
             var urlXls = url.Replace(fileName + ".xls", fileName + "1.xls");
-            var excel = new OfficeToPDF.ExcelConverter();
-            foreach (var img in Lstimage)
-                img.column -= 1;
-            excel.lstImage = Lstimage;
-            excel.lstText = null;
-            var result = excel.ConvertInterop(url, urlXls, null);
+            var result = excel.ConvertInterop(url, urlXls, s1.LastRowNum, 0);
 
             if (!mail)
             {

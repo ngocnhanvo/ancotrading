@@ -976,7 +976,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                     lstimage.Add(new AvariablePrj.lstImage
                     {
                         row = row,
-                        column = 3,
+                        rowLast = row,
+                        column = 2,
+                        columnLast = 2,
                         link = imgPath,
                         heightCell = 60
                     });
@@ -1381,15 +1383,21 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         string url = Server.MapPath(string.Format(@"ReportPdf/{0}.xls", fileName));
         url = url.Replace("PrintControllers\\InDonHang\\", "");
 
-        var xfile = new FileStream(url, FileMode.Create, System.IO.FileAccess.ReadWrite);
-        hsswb.Write(xfile);
-        xfile.Close();
-        xfile.Dispose();
+        using (var xfile = new FileStream(url, FileMode.Create, System.IO.FileAccess.ReadWrite))
+        {
+            hsswb.Write(xfile);
+            xfile.Close();
+            xfile.Dispose();
+        }
 
+        var s1 = hsswb.GetSheetAt(0);
+        var excel = new OfficeToPDF.ExcelConverter();
+        excel.lstImage = lstimage;
+        excel.lstText = lstText;
         if (type == "pdf")
         {
             var urlPDF = url.Replace(fileName + ".xls", fileName + ".pdf");
-            var result = OfficeToPDF.ExcelConverter.Convert(url, urlPDF, null, lstimage, lstText);
+            var result = excel.ConvertInterop(url, urlPDF, s1.LastRowNum, 0);
             File.Delete(url);
             Response.Write(result);
             if (result.Length <= 0)
@@ -1397,13 +1405,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
         }
         else
         {
+            excel.lstText = null;
             var urlXls = url.Replace(fileName + ".xls", fileName + "1.xls");
-            var excel = new OfficeToPDF.ExcelConverter();
-            foreach (var img in lstimage)
-                img.column -= 1;
-            excel.lstImage = lstimage;
-            //excel.lstText = lstText;
-            var result = excel.ConvertInterop(url, urlXls, null);
+            var result = excel.ConvertInterop(url, urlXls, s1.LastRowNum, 0);
             File.Delete(url);
             Response.Write(result);
             if (result.Length <= 0)
