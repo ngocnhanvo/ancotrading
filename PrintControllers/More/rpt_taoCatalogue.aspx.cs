@@ -146,7 +146,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         row7.GetCell(0).CellStyle = s11_notBold_notWrapT_notBorder_CENTER;
         s1.AddMergedRegion(new CellRangeAddress(row, row, 0, maxColumn));
 
-        if(laplai > 0)
+        if (laplai > 0)
         {
             row1.GetCell(getCell).SetCellValue("");
             row2.GetCell(getCell).SetCellValue("");
@@ -159,7 +159,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
 
     public int addRowFooter(int row, int laplai, int layoutHH)
     {
-        if(!inNgang)
+        if (!inNgang)
         {
             row += 7;
         }
@@ -302,7 +302,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
                 if (spCount % layoutHangHoa == 0 | spCount == spcls.Count)
                 {
                     row = addRowHeader(row, item, laplai);
-                    
+
                     var lstms = spcls.Skip(spTime * layoutHangHoa).Take(layoutHangHoa).ToList();
 
                     row = sptt.addRowInPage(row, lstms);
@@ -329,7 +329,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
             {
                 if (msCount % layoutMauSac == 0 | msCount == mscls.Count)
                 {
-					row = addRowHeader(row, item, laplai);
+                    row = addRowHeader(row, item, laplai);
                     s1.CreateRow(row).CreateCell(0).SetCellValue("Available color:");
                     s1.GetRow(row).GetCell(0).CellStyle = s11_Bold_notWrapT_notBorder_LEFT;
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 10));
@@ -357,7 +357,7 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
             {
                 if (dtCount % layoutDetai == 0 | dtCount == dtcls.Count)
                 {
-					row = addRowHeader(row, item, laplai);
+                    row = addRowHeader(row, item, laplai);
                     s1.CreateRow(row).CreateCell(0).SetCellValue("Available pattern:");
                     s1.GetRow(row).GetCell(0).CellStyle = s11_Bold_notWrapT_notBorder_LEFT;
                     s1.AddMergedRegion(new CellRangeAddress(row, row, 0, 10));
@@ -423,7 +423,12 @@ public partial class PrintControllers_More_rpt_taoCatalogue : System.Web.UI.Page
         excelConvert.endRow = s1.LastRowNum;
         excelConvert.endColumn = 10;
 
-        var msg = excelConvert.ConvertInterop(urlExcel, printCf.isPDF.GetValueOrDefault(false) ? urlPDF : urlExcel, null);
+        var msg = excelConvert.ConvertInterop(
+            urlExcel,
+            printCf.isPDF.GetValueOrDefault(false) ? urlPDF : urlExcel,
+            excelConvert.endRow.GetValueOrDefault(0),
+            excelConvert.endColumn.GetValueOrDefault(0)
+        );
 
         if (msg.Length <= 0)
         {
