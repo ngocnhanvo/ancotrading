@@ -1337,7 +1337,7 @@ public class DonHangController : IHttpHandler, IDisposable
                 var tbps = Public.layTruongBoPhan(db, Helper.TENBP_NGHIEPVU).Select(s => s.email).ToList();
                 if (tbps.Count <= 0)
                 {
-                    msg = $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_NGHIEPVU}";
+					jqGridHelper.Utils.writeResult(0, $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_NGHIEPVU}");
                     goto EndEventHandler;
                 }
                 string emailTBPs = string.Join(";", tbps);
