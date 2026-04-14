@@ -12,6 +12,7 @@ public static class Helper
     #region bien toan cuc
     public static string nhanvienchungtu = "vongocnhancd10cntt2@gmail.com";
     public static string TENBP_NGHIEPVU = "Nghiệp Vụ";
+    public static string TENBP_CHUNGTU = "Chứng Từ";
     public static string MACV_TruongBoPhan = "TBP";
     public static string NCC = "NCC";
     public static string CHUAGUI = "CHUAGUI";
