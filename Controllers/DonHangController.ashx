@@ -1334,10 +1334,10 @@ public class DonHangController : IHttpHandler, IDisposable
 
             if (m.md_trangthai_id.Equals(Helper.HIEULUC))
             {
-                var tbps = Public.layTruongBoPhan(db, Helper.TENBP_NGHIEPVU).Select(s => s.email).ToList();
+                var tbps = Public.layTruongBoPhan(db, Helper.TENBP_CHUNGTU).Select(s => s.email).ToList();
                 if (tbps.Count <= 0)
                 {
-					jqGridHelper.Utils.writeResult(0, $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_NGHIEPVU}");
+					jqGridHelper.Utils.writeResult(0, $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_CHUNGTU}");
                     goto EndEventHandler;
                 }
                 string emailTBPs = string.Join(";", tbps);
