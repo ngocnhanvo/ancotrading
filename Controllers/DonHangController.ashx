@@ -129,12 +129,12 @@ public class DonHangController : IHttpHandler, IDisposable
             var tbps = (from a in db.nhanviens
                         join b in db.vaitros on a.mavt equals b.mavt
                         join c in db.vaitro2s on a.vaitro2_id equals c.vaitro2_id
-                        where b.tenvt == Helper.TENBP_NGHIEPVU && c.ma_vt2 == Helper.MACV_TruongBoPhan
+                        where b.tenvt == Helper.TENBP_CHUNGTU && c.ma_vt2 == Helper.MACV_TruongBoPhan
                         orderby a.manv
                         select a.email).ToList();
             if (tbps.Count <= 0)
             {
-                msg = $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_NGHIEPVU}";
+                msg = $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_CHUNGTU}";
                 goto EndEventHandler;
             }
             var emailTBPs = string.Join(";", tbps);
