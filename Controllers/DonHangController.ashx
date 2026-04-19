@@ -1337,7 +1337,7 @@ public class DonHangController : IHttpHandler, IDisposable
                 var tbps = Public.layTruongBoPhan(db, Helper.TENBP_CHUNGTU).Select(s => s.email).ToList();
                 if (tbps.Count <= 0)
                 {
-					jqGridHelper.Utils.writeResult(0, $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_CHUNGTU}");
+                    jqGridHelper.Utils.writeResult(0, $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_CHUNGTU}");
                     goto EndEventHandler;
                 }
                 string emailTBPs = string.Join(";", tbps);
@@ -1348,6 +1348,7 @@ public class DonHangController : IHttpHandler, IDisposable
                 m.nhanvienCT = nvct;
 
                 var codoingaypass = false;
+                var emailNVCT = "";
                 if (ngaypass != null)
                 {
                     if (m.ngaypass == null)
@@ -1359,6 +1360,16 @@ public class DonHangController : IHttpHandler, IDisposable
                     {
                         jqGridHelper.Utils.writeResult(0, "Không thể đổi ngày pass kiểm hóa khi đơn hàng đã hiệu lực và trường đã có giá trị trước đó.");
                         goto EndEventHandler;
+                    }
+
+                    if(codoingaypass)
+                    {
+                        emailNVCT = db.nhanviens.Where(s => s.manv == m.nhanvienCT).Select(s => s.email).FirstOrDefault();
+                        if(string.IsNullOrWhiteSpace(emailNVCT))
+                        {
+                            jqGridHelper.Utils.writeResult(0, $@"Không tìm thấy email của nhân viên chứng từ ""{m.nhanvienCT}""");
+                            goto EndEventHandler;
+                        }
                     }
                 }
                 db.SubmitChanges();
@@ -1383,7 +1394,7 @@ public class DonHangController : IHttpHandler, IDisposable
                     var attachments = new List<System.Net.Mail.Attachment>();
                     mail.Send(
                         nv.email
-                        , m.nhanvienCT
+                        , emailNVCT
                         , cc
                         , ""
                         , title
