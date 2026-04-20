@@ -182,9 +182,7 @@
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 },
 				afterSubmit: function(rs, postdata) { 
-					alert(rs.responseText);
-					$.jgrid.hideModal('#delmodgrid_nhomnangluc', {gbox:'#gbox_gridnhomnangluc'});
-                    return false;
+					return showMsgDialog(rs);
 				},
                 errorTextFormat:function(data) { 
                     return 'Lỗi: ' + data.responseText 
@@ -195,9 +193,7 @@
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 },
 				afterSubmit: function(rs, postdata) { 
-					alert(rs.responseText);
-					$.jgrid.hideModal('#delmodgrid_nhomnangluc', {gbox:'#gbox_gridnhomnangluc'});
-                    return false;
+					return showMsgDialog(rs);
 				},
                 errorTextFormat:function(data) { 
                     return 'Lỗi: ' + data.responseText 
@@ -214,9 +210,7 @@
                     formid.closest('div.ui-jqdialog').dialogCenter(); 
                 },
 				afterSubmit: function(rs, postdata) { 
-					alert(rs.responseText);
-					$.jgrid.hideModal('#delmodgrid_nhomnangluc', {gbox:'#gbox_gridnhomnangluc'});
-                    return false;
+					return showMsgDialog(rs);
 				},
                 errorTextFormat:function(data) { 
                     return 'Lỗi: ' + data.responseText 
