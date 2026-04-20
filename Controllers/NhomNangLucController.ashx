@@ -68,19 +68,19 @@ public class NhomNangLucController : IHttpHandler
                 goto EndEventHandler;
             }
 
-            var nl = db.md_nhomnanglucs.Where(p =>
+            var m = db.md_nhomnanglucs.Where(p =>
                 p.md_chungloai_id.Equals(clid) &
                 p.hehang.Equals(cl.code_cl) &
                 p.nhom == nhom &
                 p.md_nhomnangluc_id != id
                 ).FirstOrDefault();
-            if (nl == null)
+            if (m != null)
             {
                 msg = "Nhóm Năng Lực đã tồn tại!";
                 goto EndEventHandler;
             }
 
-            var m = db.md_nhomnanglucs.Single(p => p.md_nhomnangluc_id == id);
+            m = db.md_nhomnanglucs.Single(p => p.md_nhomnangluc_id == id);
             var mnu = new md_nhomnangluc();
             m.CopyPropertiesTo(mnu);
             m.hehang = cl.code_cl;
