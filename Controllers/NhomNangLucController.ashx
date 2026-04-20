@@ -55,30 +55,40 @@ public class NhomNangLucController : IHttpHandler
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
 
-        md_chungloai cl = db.md_chungloais.Single(p => p.md_chungloai_id.Equals(context.Request.Form["md_chungloai_id"]));
+        string clid = context.Request.Form["md_chungloai_id"];
         string nhom = context.Request.Form["nhom"];
-        var nl = db.md_nhomnanglucs.Where(p =>
-            p.md_chungloai_id.Equals(context.Request.Form["md_chungloai_id"]) &
-            p.hehang.Equals(cl.code_cl) &
-            p.nhom == nhom &
-            p.md_nhomnangluc_id != context.Request.Form["id"]
-            );
-        if (nl.Count() > 0)
+        string id = context.Request.Form["id"];
+
+        try
         {
-            msg = "Nhóm Năng Lực đã tồn tại!";
-        }
-        else
-        {
-            md_nhomnangluc m = db.md_nhomnanglucs.Single(p => p.md_nhomnangluc_id == context.Request.Form["id"]);
+            var cl = db.md_chungloais.Single(p => p.md_chungloai_id.Equals(clid));
+            if (cl == null)
+            {
+                msg = "Chủng loại đã tồn tại!";
+                goto EndEventHandler;
+            }
+
+            var nl = db.md_nhomnanglucs.Where(p =>
+                p.md_chungloai_id.Equals(clid) &
+                p.hehang.Equals(cl.code_cl) &
+                p.nhom == nhom &
+                p.md_nhomnangluc_id != id
+                ).FirstOrDefault();
+            if (nl == null)
+            {
+                msg = "Nhóm Năng Lực đã tồn tại!";
+                goto EndEventHandler;
+            }
+
+            var m = db.md_nhomnanglucs.Single(p => p.md_nhomnangluc_id == id);
             var mnu = new md_nhomnangluc();
             m.CopyPropertiesTo(mnu);
             m.hehang = cl.code_cl;
-            m.nhom = context.Request.Form["nhom"];
-            m.md_chungloai_id = context.Request.Form["md_chungloai_id"];
+            m.nhom = nhom;
+            m.md_chungloai_id = cl.md_chungloai_id;
             m.mota_tiengviet = context.Request.Form["mota_tiengviet"];
             m.hscode = context.Request.Form["hscode"];
             m.thoigianlamhang = int.Parse(context.Request.Form["thoigianlamhang"]);
-
             m.mota = context.Request.Form["mota"];
             m.hoatdong = hd;
             m.nguoicapnhat = UserUtils.getUser(context);
@@ -99,9 +109,18 @@ public class NhomNangLucController : IHttpHandler
                 );
             }
             db.SubmitChanges();
-            msg = "Cập nhật thành công.";
         }
-        context.Response.Write(msg);
+        catch (Exception ex)
+        {
+            msg = ex.Message;
+        }
+
+    EndEventHandler:;
+
+        if (msg.Length <= 0)
+            jqGridHelper.Utils.writeResult(1, "Sửa nhóm năng lực thành công");
+        else
+            jqGridHelper.Utils.writeResult(0, msg);
     }
 
     public void add(HttpContext context)
