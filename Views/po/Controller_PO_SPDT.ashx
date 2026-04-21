@@ -82,10 +82,10 @@ public class Controller_PO_SPDT : IHttpHandler, IDisposable
                 goto EndEventHandler;
             }
 
-            var tbps = Public.layTruongBoPhan(db, Helper.TENBP_NGHIEPVU).Select(s => s.email).ToList();
+            var tbps = Public.layTruongBoPhan(db, Helper.TENBP_CHUNGTU).Select(s => s.email).ToList();
             if (tbps.Count <= 0)
             {
-                msg = $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_NGHIEPVU}";
+                msg = $@"Không tìm thấy trưởng bộ phận của bộ phận {Helper.TENBP_CHUNGTU}";
                 goto EndEventHandler;
             }
             string emailTBPs = string.Join(";", tbps);
