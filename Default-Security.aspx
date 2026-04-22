@@ -22,7 +22,7 @@
         " AND nv.manv = @manv " +
         " ORDER BY m.sortorder asc, m.ngaytao desc";
 
-    String sqlAdmin = "select * from menu ORDER BY sortorder asc, ngaytao desc";
+    String sqlAdmin = "select * from menu where hoatdong = 1 ORDER BY sortorder asc, ngaytao desc";
 
 
     System.Data.DataTable dt = new System.Data.DataTable();
