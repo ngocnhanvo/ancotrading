@@ -77,6 +77,8 @@ public class GiaSanPhamImportController : IHttpHandler
                     {
                         var gsp = ImportUtils.getGiaSanPham(cellTenPB, cellMaHH);
                         var import = new GiaSanPhamImport(sp.md_sanpham_id, pbg.md_phienbangia_id, cellGia, cellMoTa, cellBarCode, cellPhi);
+                        import.IdSanPham = sp.md_sanpham_id;
+                        import.MaSanPham = sp.ma_sanpham;
                         if (gsp == null)
                         {
                             import.Import();

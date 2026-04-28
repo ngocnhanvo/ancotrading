@@ -257,7 +257,8 @@ public class ProductPauseController : IHttpHandler
                                     anhiepluc_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = sp.GetType().Name,
-                                    id_lienket = sp.md_sanpham_id
+                                    id_lienket = sp.md_sanpham_id,
+                                    ma_lienket = sp.ma_sanpham
                                 }
                             );
                         }
@@ -317,7 +318,8 @@ public class ProductPauseController : IHttpHandler
                             anhiepluc_check = false,
                             hanhdong = VoNgocNhan.API_Data.edit,
                             table = sp.GetType().Name,
-                            id_lienket = sp.md_sanpham_id
+                            id_lienket = sp.md_sanpham_id,
+                            ma_lienket = sp.ma_sanpham
                         }
                     );
                     db.SubmitChanges();

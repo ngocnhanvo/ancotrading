@@ -15,7 +15,7 @@ using ExcelLibrary.SpreadSheet;
 public class GiaSanPhamImport : ImportOriginal
 {
     LinqDBDataContext db = new LinqDBDataContext();
-    private String maSanPham, tenPhienBanGia, moTa, barCode;
+    private String idSanPham, maSanPham, tenPhienBanGia, moTa, barCode;
     private decimal gia, phi;
     public String Barcode
     {
@@ -27,7 +27,11 @@ public class GiaSanPhamImport : ImportOriginal
         get { return moTa; }
         set { moTa = value; }
     }
-
+    public String IdSanPham
+    {
+        get { return idSanPham; }
+        set { idSanPham = value; }
+    }
     public String MaSanPham
     {
         get { return maSanPham; }
@@ -66,7 +70,7 @@ public class GiaSanPhamImport : ImportOriginal
     public GiaSanPhamImport(String md_sanpham_id, String md_phienbangia_id, decimal gia, string moTa, string barCode
         , decimal phi, DateTime ngayTao, String nguoiTao, DateTime ngayCapNhat, String nguoiCapNhat, bool hoatDong)
     {
-        this.maSanPham = md_sanpham_id;
+        this.idSanPham = md_sanpham_id;
         this.tenPhienBanGia = md_phienbangia_id;
         this.gia = gia;
         this.phi = phi;
@@ -83,7 +87,7 @@ public class GiaSanPhamImport : ImportOriginal
     {
         md_giasanpham gsp = new md_giasanpham();
         gsp.md_giasanpham_id = ImportUtils.getNEWID();
-        gsp.md_sanpham_id = maSanPham;
+        gsp.md_sanpham_id = idSanPham;
         gsp.md_phienbangia_id = tenPhienBanGia;
         gsp.gia = gia;
         gsp.phi = phi;
@@ -104,7 +108,8 @@ public class GiaSanPhamImport : ImportOriginal
                 nexxdecor_check = false,
                 hanhdong = VoNgocNhan.API_Data.add,
                 table = gsp.GetType().Name,
-                id_lienket = gsp.md_giasanpham_id
+                id_lienket = gsp.md_giasanpham_id,
+                ma_lienket = MaSanPham
             }
         );
         db.SubmitChanges();
@@ -113,7 +118,7 @@ public class GiaSanPhamImport : ImportOriginal
 
     public void Update()
     {
-        md_giasanpham o = db.md_giasanphams.FirstOrDefault(p => p.md_sanpham_id.Equals(maSanPham) && p.md_phienbangia_id.Equals(tenPhienBanGia));
+        md_giasanpham o = db.md_giasanphams.FirstOrDefault(p => p.md_sanpham_id.Equals(idSanPham) && p.md_phienbangia_id.Equals(tenPhienBanGia));
         var mnu = new md_giasanpham();
         o.CopyPropertiesTo(mnu);
         o.gia = gia;
@@ -134,7 +139,8 @@ public class GiaSanPhamImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = o.GetType().Name,
-                    id_lienket = o.md_giasanpham_id
+                    id_lienket = o.md_giasanpham_id,
+                    ma_lienket = MaSanPham
                 }
             );
         }

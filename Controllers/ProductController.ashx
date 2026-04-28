@@ -154,7 +154,8 @@ public class ProductController : IHttpHandler
                             anhiepluc_check = false,
                             hanhdong = VoNgocNhan.API_Data.edit,
                             table = sp2.GetType().Name,
-                            id_lienket = sp2.md_sanpham_id
+                            id_lienket = sp2.md_sanpham_id,
+                            ma_lienket = sp2.ma_sanpham
                         }
                     );
                 }
@@ -209,7 +210,8 @@ public class ProductController : IHttpHandler
                                         anhiepluc_check = false,
                                         hanhdong = VoNgocNhan.API_Data.edit,
                                         table = sp2.GetType().Name,
-                                        id_lienket = sp2.md_sanpham_id
+                                        id_lienket = sp2.md_sanpham_id,
+                                        ma_lienket = sp2.ma_sanpham
                                     }
                                 );
                             }
@@ -234,7 +236,8 @@ public class ProductController : IHttpHandler
                                     anhiepluc_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = sp.GetType().Name,
-                                    id_lienket = sp.md_sanpham_id
+                                    id_lienket = sp.md_sanpham_id,
+                                    ma_lienket = sp.ma_sanpham
                                 }
                             );
                             db.SubmitChanges();
@@ -508,7 +511,8 @@ public class ProductController : IHttpHandler
                         anhiepluc_check = false,
                         hanhdong = VoNgocNhan.API_Data.edit,
                         table = m.GetType().Name,
-                        id_lienket = m.md_sanpham_id
+                        id_lienket = m.md_sanpham_id,
+                        ma_lienket = m.ma_sanpham
                     }
                 );
                 db.SubmitChanges();
@@ -591,7 +595,8 @@ public class ProductController : IHttpHandler
                         nexxdecor_check = false,
                         hanhdong = VoNgocNhan.API_Data.add,
                         table = mnu.GetType().Name,
-                        id_lienket = mnu.md_sanpham_id
+                        id_lienket = mnu.md_sanpham_id,
+                        ma_lienket = mnu.ma_sanpham
                     }
                 );
                 db.SubmitChanges();
@@ -625,7 +630,8 @@ public class ProductController : IHttpHandler
                         anhiepluc_check = false,
                         hanhdong = VoNgocNhan.API_Data.del,
                         table = sp.GetType().Name,
-                        id_lienket = sp.md_sanpham_id
+                        id_lienket = sp.md_sanpham_id,
+                        ma_lienket = sp.ma_sanpham
                     }
                 );
                 db.SubmitChanges();

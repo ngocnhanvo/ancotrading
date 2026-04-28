@@ -105,7 +105,8 @@ public class PortController : IHttpHandler
                         nexxdecor_check = false,
                         hanhdong = VoNgocNhan.API_Data.edit,
                         table = m.GetType().Name,
-                        id_lienket = m.md_cangbien_id
+                        id_lienket = m.md_cangbien_id,
+                        ma_lienket = m.ma_cangbien
                     }
                 );
             }
@@ -153,7 +154,8 @@ public class PortController : IHttpHandler
                    nexxdecor_check = false,
                    hanhdong = VoNgocNhan.API_Data.add,
                    table = obj.GetType().Name,
-                   id_lienket = obj.md_cangbien_id
+                   id_lienket = obj.md_cangbien_id,
+                   ma_lienket = obj.ma_cangbien
                }
            );
             db.SubmitChanges();
@@ -191,7 +193,8 @@ public class PortController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_cangbien_id
+                    id_lienket = mnu.md_cangbien_id,
+                    ma_lienket = mnu.ma_cangbien
                 }
             );
             db.SubmitChanges();

@@ -311,7 +311,8 @@ public class DongGoiImport : ImportOriginal
                    nexxdecor_check = false,
                    hanhdong = VoNgocNhan.API_Data.add,
                    table = o.GetType().Name,
-                   id_lienket = o.md_donggoi_id
+                   id_lienket = o.md_donggoi_id,
+                   ma_lienket = o.ma_donggoi
                }
             );
         db.SubmitChanges();
@@ -366,7 +367,8 @@ public class DongGoiImport : ImportOriginal
                         nexxdecor_check = false,
                         hanhdong = VoNgocNhan.API_Data.edit,
                         table = o.GetType().Name,
-                        id_lienket = o.md_donggoi_id
+                        id_lienket = o.md_donggoi_id,
+                        ma_lienket = o.ma_donggoi
                     }
                 );
             }

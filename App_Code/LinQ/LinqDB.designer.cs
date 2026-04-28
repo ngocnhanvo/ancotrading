@@ -1,4 +1,4 @@
-//Update at 06/04/2026 20:08:25
+//Update at 27/04/2026 14:46:06
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -305,6 +305,15 @@ partial void Deletemd_phanquyenimport(md_phanquyenimport instance);
 partial void Insermd_phienbangia(md_phienbangia instance);
 partial void Updatemd_phienbangia(md_phienbangia instance);
 partial void Deletemd_phienbangia(md_phienbangia instance);
+partial void Insermd_phieuthongtinsanpham(md_phieuthongtinsanpham instance);
+partial void Updatemd_phieuthongtinsanpham(md_phieuthongtinsanpham instance);
+partial void Deletemd_phieuthongtinsanpham(md_phieuthongtinsanpham instance);
+partial void Insermd_phieuthongtinsanpham_log(md_phieuthongtinsanpham_log instance);
+partial void Updatemd_phieuthongtinsanpham_log(md_phieuthongtinsanpham_log instance);
+partial void Deletemd_phieuthongtinsanpham_log(md_phieuthongtinsanpham_log instance);
+partial void Insermd_phieuthongtinsanpham_sanpham(md_phieuthongtinsanpham_sanpham instance);
+partial void Updatemd_phieuthongtinsanpham_sanpham(md_phieuthongtinsanpham_sanpham instance);
+partial void Deletemd_phieuthongtinsanpham_sanpham(md_phieuthongtinsanpham_sanpham instance);
 partial void Insermd_phukien(md_phukien instance);
 partial void Updatemd_phukien(md_phukien instance);
 partial void Deletemd_phukien(md_phukien instance);
@@ -1074,6 +1083,27 @@ public System.Data.Linq.Table<md_phienbangia> md_phienbangias
 get
 {
 return this.GetTable<md_phienbangia>();
+}
+}
+public System.Data.Linq.Table<md_phieuthongtinsanpham> md_phieuthongtinsanphams
+{
+get
+{
+return this.GetTable<md_phieuthongtinsanpham>();
+}
+}
+public System.Data.Linq.Table<md_phieuthongtinsanpham_log> md_phieuthongtinsanpham_logs
+{
+get
+{
+return this.GetTable<md_phieuthongtinsanpham_log>();
+}
+}
+public System.Data.Linq.Table<md_phieuthongtinsanpham_sanpham> md_phieuthongtinsanpham_sanphams
+{
+get
+{
+return this.GetTable<md_phieuthongtinsanpham_sanpham>();
 }
 }
 public System.Data.Linq.Table<md_phukien> md_phukiens
@@ -2748,6 +2778,7 @@ private string _ad_log_id;
 private string _taikhoan;
 private string _table;
 private string _id_lienket;
+private string _ma_lienket;
 private string _hanhdong;
 private string _chitiet;
 private System.Nullable<System.DateTime> _ngaytao;
@@ -2772,6 +2803,8 @@ partial void OntableChanging(string value);
 partial void OntableChanged();
 partial void Onid_lienketChanging(string value);
 partial void Onid_lienketChanged();
+partial void Onma_lienketChanging(string value);
+partial void Onma_lienketChanged();
 partial void OnhanhdongChanging(string value);
 partial void OnhanhdongChanged();
 partial void OnchitietChanging(string value);
@@ -2874,6 +2907,25 @@ this.SendPropertyChanging();
 this._id_lienket = value;
 this.SendPropertyChanged("id_lienket");
 this.Onid_lienketChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ma_lienket", DbType="Nvarchar(250)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @ma_lienket
+{
+get
+{
+return this._ma_lienket;
+}
+set
+{
+if ((this._ma_lienket != value))
+{
+this.Onma_lienketChanging(value);
+this.SendPropertyChanging();
+this._ma_lienket = value;
+this.SendPropertyChanged("ma_lienket");
+this.Onma_lienketChanged();
 }
 }
 }
@@ -34396,6 +34448,7 @@ private System.Nullable<bool> _islienhe;
 private System.Nullable<bool> _isdocquyen;
 private string _md_cangbien_id;
 private string _md_nguondtkd_id;
+private string _api_xuongsx;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -34460,6 +34513,8 @@ partial void Onmd_cangbien_idChanging(string value);
 partial void Onmd_cangbien_idChanged();
 partial void Onmd_nguondtkd_idChanging(string value);
 partial void Onmd_nguondtkd_idChanged();
+partial void Onapi_xuongsxChanging(string value);
+partial void Onapi_xuongsxChanged();
 #endregion
 public md_doitackinhdoanh()
 {
@@ -35032,6 +35087,25 @@ this.SendPropertyChanging();
 this._md_nguondtkd_id = value;
 this.SendPropertyChanged("md_nguondtkd_id");
 this.Onmd_nguondtkd_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_api_xuongsx", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @api_xuongsx
+{
+get
+{
+return this._api_xuongsx;
+}
+set
+{
+if ((this._api_xuongsx != value))
+{
+this.Onapi_xuongsxChanging(value);
+this.SendPropertyChanging();
+this._api_xuongsx = value;
+this.SendPropertyChanged("api_xuongsx");
+this.Onapi_xuongsxChanged();
 }
 }
 }
@@ -45504,6 +45578,1246 @@ this.SendPropertyChanging();
 this._ngay_hethan = value;
 this.SendPropertyChanged("ngay_hethan");
 this.Onngay_hethanChanged();
+}
+}
+}
+public event PropertyChangingEventHandler PropertyChanging;
+public event PropertyChangedEventHandler PropertyChanged;
+protected virtual void SendPropertyChanging()
+{
+if ((this.PropertyChanging != null))
+{
+this.PropertyChanging(this, emptyChangingEventArgs);
+}
+}
+protected virtual void SendPropertyChanged(String propertyName)
+{
+if ((this.PropertyChanged != null))
+{
+this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+}
+}
+}
+
+
+[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.md_phieuthongtinsanpham")]
+public partial class md_phieuthongtinsanpham : INotifyPropertyChanging, INotifyPropertyChanged
+{
+private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+private string _md_phieuthongtinsanpham_id;
+private string _md_doitackinhdoanh_id;
+private string _trangthai1;
+private string _trangthai2;
+private string _tieude;
+private string _noidung;
+private System.Nullable<System.DateTime> _ngaylap;
+private System.Nullable<System.DateTime> _ngaygui;
+private System.Nullable<System.DateTime> _ngaynhan;
+private System.Nullable<System.DateTime> _ngayapdung;
+private System.Nullable<System.DateTime> _ngaytao;
+private string _nguoitao;
+private System.Nullable<System.DateTime> _ngaycapnhat;
+private string _nguoicapnhat;
+private string _mota;
+private System.Nullable<bool> _hoatdong;
+#region Extensibility Method Definitions
+partial void OnLoaded();
+partial void OnValidate(System.Data.Linq.ChangeAction action);
+partial void OnCreated();
+partial void Onmd_phieuthongtinsanpham_idChanging(string value);
+partial void Onmd_phieuthongtinsanpham_idChanged();
+partial void Onmd_doitackinhdoanh_idChanging(string value);
+partial void Onmd_doitackinhdoanh_idChanged();
+partial void Ontrangthai1Changing(string value);
+partial void Ontrangthai1Changed();
+partial void Ontrangthai2Changing(string value);
+partial void Ontrangthai2Changed();
+partial void OntieudeChanging(string value);
+partial void OntieudeChanged();
+partial void OnnoidungChanging(string value);
+partial void OnnoidungChanged();
+partial void OnngaylapChanging(System.Nullable<System.DateTime> value);
+partial void OnngaylapChanged();
+partial void OnngayguiChanging(System.Nullable<System.DateTime> value);
+partial void OnngayguiChanged();
+partial void OnngaynhanChanging(System.Nullable<System.DateTime> value);
+partial void OnngaynhanChanged();
+partial void OnngayapdungChanging(System.Nullable<System.DateTime> value);
+partial void OnngayapdungChanged();
+partial void OnngaytaoChanging(System.Nullable<System.DateTime> value);
+partial void OnngaytaoChanged();
+partial void OnnguoitaoChanging(string value);
+partial void OnnguoitaoChanged();
+partial void OnngaycapnhatChanging(System.Nullable<System.DateTime> value);
+partial void OnngaycapnhatChanged();
+partial void OnnguoicapnhatChanging(string value);
+partial void OnnguoicapnhatChanged();
+partial void OnmotaChanging(string value);
+partial void OnmotaChanged();
+partial void OnhoatdongChanging(System.Nullable<bool> value);
+partial void OnhoatdongChanged();
+#endregion
+public md_phieuthongtinsanpham()
+{
+OnCreated();
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_md_phieuthongtinsanpham_id", DbType="Nvarchar(32) NOT NULL", CanBeNull=false, IsPrimaryKey=true , UpdateCheck=UpdateCheck.Never)]
+public string @md_phieuthongtinsanpham_id
+{
+get
+{
+return this._md_phieuthongtinsanpham_id;
+}
+set
+{
+if ((this._md_phieuthongtinsanpham_id != value))
+{
+this.Onmd_phieuthongtinsanpham_idChanging(value);
+this.SendPropertyChanging();
+this._md_phieuthongtinsanpham_id = value;
+this.SendPropertyChanged("md_phieuthongtinsanpham_id");
+this.Onmd_phieuthongtinsanpham_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_md_doitackinhdoanh_id", DbType="Nvarchar(32) NOT NULL", CanBeNull=false , UpdateCheck=UpdateCheck.Never)]
+public string @md_doitackinhdoanh_id
+{
+get
+{
+return this._md_doitackinhdoanh_id;
+}
+set
+{
+if ((this._md_doitackinhdoanh_id != value))
+{
+this.Onmd_doitackinhdoanh_idChanging(value);
+this.SendPropertyChanging();
+this._md_doitackinhdoanh_id = value;
+this.SendPropertyChanged("md_doitackinhdoanh_id");
+this.Onmd_doitackinhdoanh_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_trangthai1", DbType="Nvarchar(255)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @trangthai1
+{
+get
+{
+return this._trangthai1;
+}
+set
+{
+if ((this._trangthai1 != value))
+{
+this.Ontrangthai1Changing(value);
+this.SendPropertyChanging();
+this._trangthai1 = value;
+this.SendPropertyChanged("trangthai1");
+this.Ontrangthai1Changed();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_trangthai2", DbType="Nvarchar(255)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @trangthai2
+{
+get
+{
+return this._trangthai2;
+}
+set
+{
+if ((this._trangthai2 != value))
+{
+this.Ontrangthai2Changing(value);
+this.SendPropertyChanging();
+this._trangthai2 = value;
+this.SendPropertyChanged("trangthai2");
+this.Ontrangthai2Changed();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tieude", DbType="Nvarchar(255)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @tieude
+{
+get
+{
+return this._tieude;
+}
+set
+{
+if ((this._tieude != value))
+{
+this.OntieudeChanging(value);
+this.SendPropertyChanging();
+this._tieude = value;
+this.SendPropertyChanged("tieude");
+this.OntieudeChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_noidung", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @noidung
+{
+get
+{
+return this._noidung;
+}
+set
+{
+if ((this._noidung != value))
+{
+this.OnnoidungChanging(value);
+this.SendPropertyChanging();
+this._noidung = value;
+this.SendPropertyChanged("noidung");
+this.OnnoidungChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaylap", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaylap
+{
+get
+{
+return this._ngaylap;
+}
+set
+{
+if ((this._ngaylap != value))
+{
+this.OnngaylapChanging(value);
+this.SendPropertyChanging();
+this._ngaylap = value;
+this.SendPropertyChanged("ngaylap");
+this.OnngaylapChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaygui", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaygui
+{
+get
+{
+return this._ngaygui;
+}
+set
+{
+if ((this._ngaygui != value))
+{
+this.OnngayguiChanging(value);
+this.SendPropertyChanging();
+this._ngaygui = value;
+this.SendPropertyChanged("ngaygui");
+this.OnngayguiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaynhan", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaynhan
+{
+get
+{
+return this._ngaynhan;
+}
+set
+{
+if ((this._ngaynhan != value))
+{
+this.OnngaynhanChanging(value);
+this.SendPropertyChanging();
+this._ngaynhan = value;
+this.SendPropertyChanged("ngaynhan");
+this.OnngaynhanChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngayapdung", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngayapdung
+{
+get
+{
+return this._ngayapdung;
+}
+set
+{
+if ((this._ngayapdung != value))
+{
+this.OnngayapdungChanging(value);
+this.SendPropertyChanging();
+this._ngayapdung = value;
+this.SendPropertyChanged("ngayapdung");
+this.OnngayapdungChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaytao", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaytao
+{
+get
+{
+return this._ngaytao;
+}
+set
+{
+if ((this._ngaytao != value))
+{
+this.OnngaytaoChanging(value);
+this.SendPropertyChanging();
+this._ngaytao = value;
+this.SendPropertyChanged("ngaytao");
+this.OnngaytaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nguoitao", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @nguoitao
+{
+get
+{
+return this._nguoitao;
+}
+set
+{
+if ((this._nguoitao != value))
+{
+this.OnnguoitaoChanging(value);
+this.SendPropertyChanging();
+this._nguoitao = value;
+this.SendPropertyChanged("nguoitao");
+this.OnnguoitaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaycapnhat", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaycapnhat
+{
+get
+{
+return this._ngaycapnhat;
+}
+set
+{
+if ((this._ngaycapnhat != value))
+{
+this.OnngaycapnhatChanging(value);
+this.SendPropertyChanging();
+this._ngaycapnhat = value;
+this.SendPropertyChanged("ngaycapnhat");
+this.OnngaycapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nguoicapnhat", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @nguoicapnhat
+{
+get
+{
+return this._nguoicapnhat;
+}
+set
+{
+if ((this._nguoicapnhat != value))
+{
+this.OnnguoicapnhatChanging(value);
+this.SendPropertyChanging();
+this._nguoicapnhat = value;
+this.SendPropertyChanged("nguoicapnhat");
+this.OnnguoicapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @mota
+{
+get
+{
+return this._mota;
+}
+set
+{
+if ((this._mota != value))
+{
+this.OnmotaChanging(value);
+this.SendPropertyChanging();
+this._mota = value;
+this.SendPropertyChanged("mota");
+this.OnmotaChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_hoatdong", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @hoatdong
+{
+get
+{
+return this._hoatdong;
+}
+set
+{
+if ((this._hoatdong != value))
+{
+this.OnhoatdongChanging(value);
+this.SendPropertyChanging();
+this._hoatdong = value;
+this.SendPropertyChanged("hoatdong");
+this.OnhoatdongChanged();
+}
+}
+}
+public event PropertyChangingEventHandler PropertyChanging;
+public event PropertyChangedEventHandler PropertyChanged;
+protected virtual void SendPropertyChanging()
+{
+if ((this.PropertyChanging != null))
+{
+this.PropertyChanging(this, emptyChangingEventArgs);
+}
+}
+protected virtual void SendPropertyChanged(String propertyName)
+{
+if ((this.PropertyChanged != null))
+{
+this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+}
+}
+}
+
+
+[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.md_phieuthongtinsanpham_log")]
+public partial class md_phieuthongtinsanpham_log : INotifyPropertyChanging, INotifyPropertyChanged
+{
+private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+private string _md_phieuthongtinsanpham_log_id;
+private string _md_phieuthongtinsanpham_id;
+private string _ad_log_id;
+private string _taikhoan;
+private string _table;
+private string _id_lienket;
+private string _ma_lienket;
+private string _hanhdong;
+private string _chitiet;
+private System.Nullable<System.DateTime> _ngaytao;
+private string _nguoitao;
+private System.Nullable<System.DateTime> _ngaycapnhat;
+private string _nguoicapnhat;
+private string _mota;
+private System.Nullable<bool> _hoatdong;
+#region Extensibility Method Definitions
+partial void OnLoaded();
+partial void OnValidate(System.Data.Linq.ChangeAction action);
+partial void OnCreated();
+partial void Onmd_phieuthongtinsanpham_log_idChanging(string value);
+partial void Onmd_phieuthongtinsanpham_log_idChanged();
+partial void Onmd_phieuthongtinsanpham_idChanging(string value);
+partial void Onmd_phieuthongtinsanpham_idChanged();
+partial void Onad_log_idChanging(string value);
+partial void Onad_log_idChanged();
+partial void OntaikhoanChanging(string value);
+partial void OntaikhoanChanged();
+partial void OntableChanging(string value);
+partial void OntableChanged();
+partial void Onid_lienketChanging(string value);
+partial void Onid_lienketChanged();
+partial void Onma_lienketChanging(string value);
+partial void Onma_lienketChanged();
+partial void OnhanhdongChanging(string value);
+partial void OnhanhdongChanged();
+partial void OnchitietChanging(string value);
+partial void OnchitietChanged();
+partial void OnngaytaoChanging(System.Nullable<System.DateTime> value);
+partial void OnngaytaoChanged();
+partial void OnnguoitaoChanging(string value);
+partial void OnnguoitaoChanged();
+partial void OnngaycapnhatChanging(System.Nullable<System.DateTime> value);
+partial void OnngaycapnhatChanged();
+partial void OnnguoicapnhatChanging(string value);
+partial void OnnguoicapnhatChanged();
+partial void OnmotaChanging(string value);
+partial void OnmotaChanged();
+partial void OnhoatdongChanging(System.Nullable<bool> value);
+partial void OnhoatdongChanged();
+#endregion
+public md_phieuthongtinsanpham_log()
+{
+OnCreated();
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_md_phieuthongtinsanpham_log_id", DbType="Nvarchar(32) NOT NULL", CanBeNull=false, IsPrimaryKey=true , UpdateCheck=UpdateCheck.Never)]
+public string @md_phieuthongtinsanpham_log_id
+{
+get
+{
+return this._md_phieuthongtinsanpham_log_id;
+}
+set
+{
+if ((this._md_phieuthongtinsanpham_log_id != value))
+{
+this.Onmd_phieuthongtinsanpham_log_idChanging(value);
+this.SendPropertyChanging();
+this._md_phieuthongtinsanpham_log_id = value;
+this.SendPropertyChanged("md_phieuthongtinsanpham_log_id");
+this.Onmd_phieuthongtinsanpham_log_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_md_phieuthongtinsanpham_id", DbType="Nvarchar(32) NOT NULL", CanBeNull=false , UpdateCheck=UpdateCheck.Never)]
+public string @md_phieuthongtinsanpham_id
+{
+get
+{
+return this._md_phieuthongtinsanpham_id;
+}
+set
+{
+if ((this._md_phieuthongtinsanpham_id != value))
+{
+this.Onmd_phieuthongtinsanpham_idChanging(value);
+this.SendPropertyChanging();
+this._md_phieuthongtinsanpham_id = value;
+this.SendPropertyChanged("md_phieuthongtinsanpham_id");
+this.Onmd_phieuthongtinsanpham_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ad_log_id", DbType="Varchar(32) NOT NULL", CanBeNull=false , UpdateCheck=UpdateCheck.Never)]
+public string @ad_log_id
+{
+get
+{
+return this._ad_log_id;
+}
+set
+{
+if ((this._ad_log_id != value))
+{
+this.Onad_log_idChanging(value);
+this.SendPropertyChanging();
+this._ad_log_id = value;
+this.SendPropertyChanged("ad_log_id");
+this.Onad_log_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_taikhoan", DbType="Nvarchar(50)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @taikhoan
+{
+get
+{
+return this._taikhoan;
+}
+set
+{
+if ((this._taikhoan != value))
+{
+this.OntaikhoanChanging(value);
+this.SendPropertyChanging();
+this._taikhoan = value;
+this.SendPropertyChanged("taikhoan");
+this.OntaikhoanChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_table", DbType="Nvarchar(50)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @table
+{
+get
+{
+return this._table;
+}
+set
+{
+if ((this._table != value))
+{
+this.OntableChanging(value);
+this.SendPropertyChanging();
+this._table = value;
+this.SendPropertyChanged("table");
+this.OntableChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id_lienket", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @id_lienket
+{
+get
+{
+return this._id_lienket;
+}
+set
+{
+if ((this._id_lienket != value))
+{
+this.Onid_lienketChanging(value);
+this.SendPropertyChanging();
+this._id_lienket = value;
+this.SendPropertyChanged("id_lienket");
+this.Onid_lienketChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ma_lienket", DbType="Nvarchar(250)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @ma_lienket
+{
+get
+{
+return this._ma_lienket;
+}
+set
+{
+if ((this._ma_lienket != value))
+{
+this.Onma_lienketChanging(value);
+this.SendPropertyChanging();
+this._ma_lienket = value;
+this.SendPropertyChanged("ma_lienket");
+this.Onma_lienketChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_hanhdong", DbType="Nvarchar(4)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @hanhdong
+{
+get
+{
+return this._hanhdong;
+}
+set
+{
+if ((this._hanhdong != value))
+{
+this.OnhanhdongChanging(value);
+this.SendPropertyChanging();
+this._hanhdong = value;
+this.SendPropertyChanged("hanhdong");
+this.OnhanhdongChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_chitiet", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @chitiet
+{
+get
+{
+return this._chitiet;
+}
+set
+{
+if ((this._chitiet != value))
+{
+this.OnchitietChanging(value);
+this.SendPropertyChanging();
+this._chitiet = value;
+this.SendPropertyChanged("chitiet");
+this.OnchitietChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaytao", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaytao
+{
+get
+{
+return this._ngaytao;
+}
+set
+{
+if ((this._ngaytao != value))
+{
+this.OnngaytaoChanging(value);
+this.SendPropertyChanging();
+this._ngaytao = value;
+this.SendPropertyChanged("ngaytao");
+this.OnngaytaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nguoitao", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @nguoitao
+{
+get
+{
+return this._nguoitao;
+}
+set
+{
+if ((this._nguoitao != value))
+{
+this.OnnguoitaoChanging(value);
+this.SendPropertyChanging();
+this._nguoitao = value;
+this.SendPropertyChanged("nguoitao");
+this.OnnguoitaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaycapnhat", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaycapnhat
+{
+get
+{
+return this._ngaycapnhat;
+}
+set
+{
+if ((this._ngaycapnhat != value))
+{
+this.OnngaycapnhatChanging(value);
+this.SendPropertyChanging();
+this._ngaycapnhat = value;
+this.SendPropertyChanged("ngaycapnhat");
+this.OnngaycapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nguoicapnhat", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @nguoicapnhat
+{
+get
+{
+return this._nguoicapnhat;
+}
+set
+{
+if ((this._nguoicapnhat != value))
+{
+this.OnnguoicapnhatChanging(value);
+this.SendPropertyChanging();
+this._nguoicapnhat = value;
+this.SendPropertyChanged("nguoicapnhat");
+this.OnnguoicapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota", DbType="Nvarchar(2000)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @mota
+{
+get
+{
+return this._mota;
+}
+set
+{
+if ((this._mota != value))
+{
+this.OnmotaChanging(value);
+this.SendPropertyChanging();
+this._mota = value;
+this.SendPropertyChanged("mota");
+this.OnmotaChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_hoatdong", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @hoatdong
+{
+get
+{
+return this._hoatdong;
+}
+set
+{
+if ((this._hoatdong != value))
+{
+this.OnhoatdongChanging(value);
+this.SendPropertyChanging();
+this._hoatdong = value;
+this.SendPropertyChanged("hoatdong");
+this.OnhoatdongChanged();
+}
+}
+}
+public event PropertyChangingEventHandler PropertyChanging;
+public event PropertyChangedEventHandler PropertyChanged;
+protected virtual void SendPropertyChanging()
+{
+if ((this.PropertyChanging != null))
+{
+this.PropertyChanging(this, emptyChangingEventArgs);
+}
+}
+protected virtual void SendPropertyChanged(String propertyName)
+{
+if ((this.PropertyChanged != null))
+{
+this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+}
+}
+}
+
+
+[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.md_phieuthongtinsanpham_sanpham")]
+public partial class md_phieuthongtinsanpham_sanpham : INotifyPropertyChanging, INotifyPropertyChanged
+{
+private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+private string _md_phieuthongtinsanpham_sanpham_id;
+private string _md_phieuthongtinsanpham_id;
+private string _md_sanpham_id;
+private string _ma_sanpham;
+private System.Nullable<bool> _chungloai;
+private System.Nullable<bool> _kieudang;
+private System.Nullable<bool> _chucnang;
+private System.Nullable<bool> _detai;
+private System.Nullable<bool> _mausac;
+private System.Nullable<bool> _donggoi;
+private System.Nullable<bool> _gia;
+private System.Nullable<bool> _hscode;
+private System.Nullable<bool> _nhomnangluc;
+private System.Nullable<bool> _docquyen;
+private System.Nullable<bool> _thongtinkhac;
+private System.Nullable<System.DateTime> _ngaytao;
+private string _nguoitao;
+private System.Nullable<System.DateTime> _ngaycapnhat;
+private string _nguoicapnhat;
+private string _mota;
+private System.Nullable<bool> _hoatdong;
+#region Extensibility Method Definitions
+partial void OnLoaded();
+partial void OnValidate(System.Data.Linq.ChangeAction action);
+partial void OnCreated();
+partial void Onmd_phieuthongtinsanpham_sanpham_idChanging(string value);
+partial void Onmd_phieuthongtinsanpham_sanpham_idChanged();
+partial void Onmd_phieuthongtinsanpham_idChanging(string value);
+partial void Onmd_phieuthongtinsanpham_idChanged();
+partial void Onmd_sanpham_idChanging(string value);
+partial void Onmd_sanpham_idChanged();
+partial void Onma_sanphamChanging(string value);
+partial void Onma_sanphamChanged();
+partial void OnchungloaiChanging(System.Nullable<bool> value);
+partial void OnchungloaiChanged();
+partial void OnkieudangChanging(System.Nullable<bool> value);
+partial void OnkieudangChanged();
+partial void OnchucnangChanging(System.Nullable<bool> value);
+partial void OnchucnangChanged();
+partial void OndetaiChanging(System.Nullable<bool> value);
+partial void OndetaiChanged();
+partial void OnmausacChanging(System.Nullable<bool> value);
+partial void OnmausacChanged();
+partial void OndonggoiChanging(System.Nullable<bool> value);
+partial void OndonggoiChanged();
+partial void OngiaChanging(System.Nullable<bool> value);
+partial void OngiaChanged();
+partial void OnhscodeChanging(System.Nullable<bool> value);
+partial void OnhscodeChanged();
+partial void OnnhomnanglucChanging(System.Nullable<bool> value);
+partial void OnnhomnanglucChanged();
+partial void OndocquyenChanging(System.Nullable<bool> value);
+partial void OndocquyenChanged();
+partial void OnthongtinkhacChanging(System.Nullable<bool> value);
+partial void OnthongtinkhacChanged();
+partial void OnngaytaoChanging(System.Nullable<System.DateTime> value);
+partial void OnngaytaoChanged();
+partial void OnnguoitaoChanging(string value);
+partial void OnnguoitaoChanged();
+partial void OnngaycapnhatChanging(System.Nullable<System.DateTime> value);
+partial void OnngaycapnhatChanged();
+partial void OnnguoicapnhatChanging(string value);
+partial void OnnguoicapnhatChanged();
+partial void OnmotaChanging(string value);
+partial void OnmotaChanged();
+partial void OnhoatdongChanging(System.Nullable<bool> value);
+partial void OnhoatdongChanged();
+#endregion
+public md_phieuthongtinsanpham_sanpham()
+{
+OnCreated();
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_md_phieuthongtinsanpham_sanpham_id", DbType="Nvarchar(32) NOT NULL", CanBeNull=false, IsPrimaryKey=true , UpdateCheck=UpdateCheck.Never)]
+public string @md_phieuthongtinsanpham_sanpham_id
+{
+get
+{
+return this._md_phieuthongtinsanpham_sanpham_id;
+}
+set
+{
+if ((this._md_phieuthongtinsanpham_sanpham_id != value))
+{
+this.Onmd_phieuthongtinsanpham_sanpham_idChanging(value);
+this.SendPropertyChanging();
+this._md_phieuthongtinsanpham_sanpham_id = value;
+this.SendPropertyChanged("md_phieuthongtinsanpham_sanpham_id");
+this.Onmd_phieuthongtinsanpham_sanpham_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_md_phieuthongtinsanpham_id", DbType="Nvarchar(32) NOT NULL", CanBeNull=false , UpdateCheck=UpdateCheck.Never)]
+public string @md_phieuthongtinsanpham_id
+{
+get
+{
+return this._md_phieuthongtinsanpham_id;
+}
+set
+{
+if ((this._md_phieuthongtinsanpham_id != value))
+{
+this.Onmd_phieuthongtinsanpham_idChanging(value);
+this.SendPropertyChanging();
+this._md_phieuthongtinsanpham_id = value;
+this.SendPropertyChanged("md_phieuthongtinsanpham_id");
+this.Onmd_phieuthongtinsanpham_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_md_sanpham_id", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @md_sanpham_id
+{
+get
+{
+return this._md_sanpham_id;
+}
+set
+{
+if ((this._md_sanpham_id != value))
+{
+this.Onmd_sanpham_idChanging(value);
+this.SendPropertyChanging();
+this._md_sanpham_id = value;
+this.SendPropertyChanged("md_sanpham_id");
+this.Onmd_sanpham_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ma_sanpham", DbType="Nvarchar(150)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @ma_sanpham
+{
+get
+{
+return this._ma_sanpham;
+}
+set
+{
+if ((this._ma_sanpham != value))
+{
+this.Onma_sanphamChanging(value);
+this.SendPropertyChanging();
+this._ma_sanpham = value;
+this.SendPropertyChanged("ma_sanpham");
+this.Onma_sanphamChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_chungloai", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @chungloai
+{
+get
+{
+return this._chungloai;
+}
+set
+{
+if ((this._chungloai != value))
+{
+this.OnchungloaiChanging(value);
+this.SendPropertyChanging();
+this._chungloai = value;
+this.SendPropertyChanged("chungloai");
+this.OnchungloaiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_kieudang", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @kieudang
+{
+get
+{
+return this._kieudang;
+}
+set
+{
+if ((this._kieudang != value))
+{
+this.OnkieudangChanging(value);
+this.SendPropertyChanging();
+this._kieudang = value;
+this.SendPropertyChanged("kieudang");
+this.OnkieudangChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_chucnang", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @chucnang
+{
+get
+{
+return this._chucnang;
+}
+set
+{
+if ((this._chucnang != value))
+{
+this.OnchucnangChanging(value);
+this.SendPropertyChanging();
+this._chucnang = value;
+this.SendPropertyChanged("chucnang");
+this.OnchucnangChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_detai", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @detai
+{
+get
+{
+return this._detai;
+}
+set
+{
+if ((this._detai != value))
+{
+this.OndetaiChanging(value);
+this.SendPropertyChanging();
+this._detai = value;
+this.SendPropertyChanged("detai");
+this.OndetaiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mausac", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @mausac
+{
+get
+{
+return this._mausac;
+}
+set
+{
+if ((this._mausac != value))
+{
+this.OnmausacChanging(value);
+this.SendPropertyChanging();
+this._mausac = value;
+this.SendPropertyChanged("mausac");
+this.OnmausacChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_donggoi", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @donggoi
+{
+get
+{
+return this._donggoi;
+}
+set
+{
+if ((this._donggoi != value))
+{
+this.OndonggoiChanging(value);
+this.SendPropertyChanging();
+this._donggoi = value;
+this.SendPropertyChanged("donggoi");
+this.OndonggoiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_gia", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @gia
+{
+get
+{
+return this._gia;
+}
+set
+{
+if ((this._gia != value))
+{
+this.OngiaChanging(value);
+this.SendPropertyChanging();
+this._gia = value;
+this.SendPropertyChanged("gia");
+this.OngiaChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_hscode", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @hscode
+{
+get
+{
+return this._hscode;
+}
+set
+{
+if ((this._hscode != value))
+{
+this.OnhscodeChanging(value);
+this.SendPropertyChanging();
+this._hscode = value;
+this.SendPropertyChanged("hscode");
+this.OnhscodeChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nhomnangluc", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @nhomnangluc
+{
+get
+{
+return this._nhomnangluc;
+}
+set
+{
+if ((this._nhomnangluc != value))
+{
+this.OnnhomnanglucChanging(value);
+this.SendPropertyChanging();
+this._nhomnangluc = value;
+this.SendPropertyChanged("nhomnangluc");
+this.OnnhomnanglucChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_docquyen", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @docquyen
+{
+get
+{
+return this._docquyen;
+}
+set
+{
+if ((this._docquyen != value))
+{
+this.OndocquyenChanging(value);
+this.SendPropertyChanging();
+this._docquyen = value;
+this.SendPropertyChanged("docquyen");
+this.OndocquyenChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_thongtinkhac", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @thongtinkhac
+{
+get
+{
+return this._thongtinkhac;
+}
+set
+{
+if ((this._thongtinkhac != value))
+{
+this.OnthongtinkhacChanging(value);
+this.SendPropertyChanging();
+this._thongtinkhac = value;
+this.SendPropertyChanged("thongtinkhac");
+this.OnthongtinkhacChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaytao", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaytao
+{
+get
+{
+return this._ngaytao;
+}
+set
+{
+if ((this._ngaytao != value))
+{
+this.OnngaytaoChanging(value);
+this.SendPropertyChanging();
+this._ngaytao = value;
+this.SendPropertyChanged("ngaytao");
+this.OnngaytaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nguoitao", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @nguoitao
+{
+get
+{
+return this._nguoitao;
+}
+set
+{
+if ((this._nguoitao != value))
+{
+this.OnnguoitaoChanging(value);
+this.SendPropertyChanging();
+this._nguoitao = value;
+this.SendPropertyChanged("nguoitao");
+this.OnnguoitaoChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ngaycapnhat", DbType="Datetime", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<System.DateTime> @ngaycapnhat
+{
+get
+{
+return this._ngaycapnhat;
+}
+set
+{
+if ((this._ngaycapnhat != value))
+{
+this.OnngaycapnhatChanging(value);
+this.SendPropertyChanging();
+this._ngaycapnhat = value;
+this.SendPropertyChanged("ngaycapnhat");
+this.OnngaycapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_nguoicapnhat", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @nguoicapnhat
+{
+get
+{
+return this._nguoicapnhat;
+}
+set
+{
+if ((this._nguoicapnhat != value))
+{
+this.OnnguoicapnhatChanging(value);
+this.SendPropertyChanging();
+this._nguoicapnhat = value;
+this.SendPropertyChanged("nguoicapnhat");
+this.OnnguoicapnhatChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_mota", DbType="Nvarchar(MAX)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @mota
+{
+get
+{
+return this._mota;
+}
+set
+{
+if ((this._mota != value))
+{
+this.OnmotaChanging(value);
+this.SendPropertyChanging();
+this._mota = value;
+this.SendPropertyChanged("mota");
+this.OnmotaChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_hoatdong", DbType="Bit", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<bool> @hoatdong
+{
+get
+{
+return this._hoatdong;
+}
+set
+{
+if ((this._hoatdong != value))
+{
+this.OnhoatdongChanging(value);
+this.SendPropertyChanging();
+this._hoatdong = value;
+this.SendPropertyChanged("hoatdong");
+this.OnhoatdongChanged();
 }
 }
 }

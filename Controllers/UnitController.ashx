@@ -72,7 +72,8 @@ public class UnitController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = obj.GetType().Name,
-                    id_lienket = obj.md_donvitinh_id
+                    id_lienket = obj.md_donvitinh_id,
+                    ma_lienket = obj.ma_edi
                 }
             );
         }
@@ -108,7 +109,8 @@ public class UnitController : IHttpHandler
                nexxdecor_check = false,
                hanhdong = VoNgocNhan.API_Data.add,
                table = obj.GetType().Name,
-               id_lienket = obj.md_donvitinh_id
+               id_lienket = obj.md_donvitinh_id,
+               ma_lienket = obj.ma_edi
            }
        );
         db.SubmitChanges();
@@ -137,7 +139,8 @@ public class UnitController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_donvitinh_id
+                    id_lienket = mnu.md_donvitinh_id,
+                    ma_lienket = mnu.ma_edi
                 }
             );
             db.SubmitChanges();

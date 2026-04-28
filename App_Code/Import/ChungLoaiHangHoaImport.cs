@@ -93,7 +93,8 @@ public class ChungLoaiHangHoaImport : ImportOriginal
                 nexxdecor_check = false,
                 hanhdong = VoNgocNhan.API_Data.add,
                 table = mnu.GetType().Name,
-                id_lienket = mnu.md_chungloai_id
+                id_lienket = mnu.md_chungloai_id,
+                ma_lienket = mnu.code_cl
             }
         );
         db.SubmitChanges();
@@ -125,7 +126,8 @@ public class ChungLoaiHangHoaImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = o.GetType().Name,
-                    id_lienket = o.md_chungloai_id
+                    id_lienket = o.md_chungloai_id,
+                    ma_lienket = o.code_cl
                 }
             );
         }

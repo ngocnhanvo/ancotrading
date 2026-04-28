@@ -331,7 +331,8 @@ public class PartnerController : IHttpHandler
                         nexxdecor_check = false,
                         hanhdong = VoNgocNhan.API_Data.edit,
                         table = m.GetType().Name,
-                        id_lienket = m.md_doitackinhdoanh_id
+                        id_lienket = m.md_doitackinhdoanh_id,
+                        ma_lienket = m.ma_dtkd
                     }
                 );
             }
@@ -410,7 +411,8 @@ public class PartnerController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.add,
                     table = dtkd.GetType().Name,
-                    id_lienket = dtkd.md_doitackinhdoanh_id
+                    id_lienket = dtkd.md_doitackinhdoanh_id,
+                    ma_lienket = dtkd.ma_dtkd
                 }
             );
             db.SubmitChanges();
@@ -502,7 +504,8 @@ public class PartnerController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = dtkd.GetType().Name,
-                    id_lienket = dtkd.md_doitackinhdoanh_id
+                    id_lienket = dtkd.md_doitackinhdoanh_id,
+                    ma_lienket = dtkd.ma_dtkd
                 }
             );
             db.SubmitChanges();

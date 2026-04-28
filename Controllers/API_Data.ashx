@@ -58,6 +58,9 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         string oper = context.Request.Params["oper"];
         switch (oper)
         {
+            case "xemthaydoi":
+                this.xemthaydoi(context);
+                break;
             case "logs":
                 this.logs(context);
                 break;
@@ -78,6 +81,9 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 break;
             case "md_cangbien":
                 this.md_cangbien(context);
+                break;
+            case "md_donvitinh":
+                this.md_donvitinh(context);
                 break;
             case "md_donvitinhsanpham":
                 this.md_donvitinhsanpham(context);
@@ -145,6 +151,101 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         }
     }
 
+    public void xemthaydoi(HttpContext context)
+    {
+        string msp = context.Request.Form["msp"];
+        string ncc = context.Request.Form["ncc"];
+        string giamua = $"{ncc}-GIAMUA";
+        try
+        {
+            var sp = db.md_sanphams.Where(s => s.ma_sanpham == msp).FirstOrDefault();
+            var gia = (from a in db.md_banggias
+                       join b in db.md_phienbangias on a.md_banggia_id equals b.md_banggia_id
+                       join c in db.md_giasanphams on b.md_phienbangia_id equals c.md_phienbangia_id
+                       where
+                         c.md_sanpham_id == sp.md_sanpham_id &&
+                         a.ten_banggia == giamua &&
+                         b.ngay_hieuluc <= DateTime.Now
+                       orderby b.ngay_hieuluc descending
+                       select c).FirstOrDefault();
+            var giaSP = gia == null ? -1 : gia.gia.GetValueOrDefault(0);
+            var dgid = db.md_donggoisanphams.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).Select(s => s.md_donggoi_id).FirstOrDefault();
+            var dg = db.md_donggois.Where(s => s.md_donggoi_id == dgid).FirstOrDefault();
+            if (dg == null)
+                dg = new md_donggoi();
+            var dvt1 = db.md_donvitinhs.Where(s => s.md_donvitinh_id == dg.dvt_inner).FirstOrDefault();
+            var dvt2 = db.md_donvitinhs.Where(s => s.md_donvitinh_id == dg.dvt_outer).FirstOrDefault();
+            var kd = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.md_kieudang_id).FirstOrDefault();
+            string ma_kd = kd == null ? "" : kd.ma_kieudang;
+            string ten_kd = kd == null ? "" : kd.ten_tv;
+            var cn = db.md_chucnangs.Where(s => s.md_chucnang_id == sp.md_chucnang_id).FirstOrDefault();
+            string ma_cn = cn == null ? "" : cn.ma_chucnang;
+            string ten_cn = cn == null ? "" : cn.ten_tv;
+            var nnl = db.md_nhomnanglucs.Where(s => s.md_nhomnangluc_id == sp.md_nhomnangluc_id).FirstOrDefault();
+            string ten_nnl = nnl == null ? "" : $"{nnl.hehang}({nnl.nhom})";
+            var hsc = db.md_hscodes.Where(s => s.md_hscode_id == sp.md_hscode_id).FirstOrDefault();
+            string ten_hsc = hsc == null ? "" : hsc.hscode;
+            dynamic result1 = new
+            {
+                sp.ma_sanpham,
+                ten_kd,
+                ma_kd,
+                ten_cn,
+                ma_cn,
+                sp.mota_tiengviet,
+                sp.mota_tienganh,
+                sp.l_cm,
+                sp.w_cm,
+                sp.h_cm,
+                sp.trongluong,
+                sp.dientich,
+                sp.thetich,
+                ten_nnl,
+                ten_hsc,
+                sp.chucnangsp,
+                sp.ngayxacnhan,
+                sp.hinhthucban,
+                giaSP = giaSP.DropTrailingZeros()
+            };
+
+            dynamic result2 = new
+            {
+                dg.ma_donggoi,
+                dg.sl_inner,
+                inner = dvt1.ten_dvt,
+                dg.l1,
+                dg.w1,
+                dg.h1,
+                dg.sl_outer,
+                outer = dvt2.ten_dvt,
+                dg.l2_mix,
+                dg.w2_mix,
+                dg.h2_mix,
+                dg.soluonggoi_ctn_20,
+                dg.soluonggoi_ctn,
+                dg.soluonggoi_ctn_40hc,
+                nxn_dg = dg.ngayxacnhan,
+                dg.mota,
+                dg.doigia_donggoi,
+                tldg = dg.tldg.GetValueOrDefault(0).DropTrailingZeros(),
+                cpdg = dg.cpdg.GetValueOrDefault(0).DropTrailingZeros()
+            };
+
+
+            var data = new
+            {
+                sp = result1,
+                dg = result2
+            };
+
+            context.Response.Write("1" + Newtonsoft.Json.JsonConvert.SerializeObject(data));
+        }
+        catch (Exception ex)
+        {
+            context.Response.Write("0" + ex.ToString());
+        }
+    }
+
     public void logs(HttpContext context)
     {
         string ncc = context.Request.Params["ncc"].removeAllSpaceOrTrimText(true).ToLower();
@@ -157,7 +258,8 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
             if (ncc == "nexxdecor")
             {
                 logs = db.ad_logs.Where(s => s.nexxdecor_check == false).ToList();
-                result = logs.Select(s => new ad_log{
+                result = logs.Select(s => new ad_log
+                {
                     ad_log_id = s.ad_log_id,
                     table = s.table,
                     id_lienket = s.id_lienket,
@@ -171,8 +273,27 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                 db.SubmitChanges();
                 msg = "Lấy logs thành công";
             }
+
+            else if (ncc == "anco1")
+            {
+                logs = db.ad_logs.Where(s => s.anco1_check == false).ToList();
+                result = logs.Select(s => new ad_log
+                {
+                    ad_log_id = s.ad_log_id,
+                    table = s.table,
+                    id_lienket = s.id_lienket,
+                    hanhdong = s.hanhdong,
+                    anco1_check = s.anco1_check
+                }).ToList();
+                foreach (var log in logs)
+                {
+                    log.anco1_check = true;
+                }
+                db.SubmitChanges();
+                msg = "Lấy logs thành công";
+            }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ok = false;
             msg = ex.Message;
@@ -192,7 +313,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         try
         {
             var log = db.ad_logs.Where(s => s.ad_log_id == logid).FirstOrDefault();
-            if(log == null)
+            if (log == null)
             {
                 ok = false;
                 msg = "Không tìm thấy log bạn gửi";
@@ -202,13 +323,13 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
             result = VoNgocNhan.API_Data.layThongTinChiTiet(log.table, log.id_lienket);
             msg = "Lấy logs chi tiết thành công";
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ok = false;
             msg = ex.Message;
         }
 
-        EndEventHandler:;
+    EndEventHandler:;
 
         var rs = new { ok, result, msg };
         context.Response.Write(JsonConvert.SerializeObject(rs));
@@ -230,13 +351,13 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
             var rsps = new List<ThongTinSP>();
             List<md_sanpham> sps = null;
             List<md_kieudang> kds = null;
-            foreach(var key in context.Session.Keys)
+            foreach (var key in context.Session.Keys)
             {
-                if(key.ToString() == "sps")
+                if (key.ToString() == "sps")
                 {
                     sps = context.Session["sps"] as List<md_sanpham>;
                 }
-                else if(key.ToString() == "kds")
+                else if (key.ToString() == "kds")
                 {
                     kds = context.Session["kds"] as List<md_kieudang>;
                 }
@@ -253,7 +374,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
             if (kds == null | skip == 0)
             {
-                kds = db.md_kieudangs.Where(s=>s.trangthai == Helper.HIEULUC).ToList();
+                kds = db.md_kieudangs.Where(s => s.trangthai == Helper.HIEULUC).ToList();
                 context.Session["kds"] = kds;
             }
 
@@ -401,7 +522,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         item.amount = "1";
         item.cbm = cbm;
         string kt = $"{sp.l_cm}x{sp.w_cm}xH{sp.h_cm}cm";
-        item.size = ExcuteSignalRStatic.getSizeRectOrRound(db,sp, kt, kds);
+        item.size = ExcuteSignalRStatic.getSizeRectOrRound(db, sp, kt, kds);
         if (themAnh)
         {
             var imagePath = ExcuteSignalRStatic.mapPathSignalR($"~/{ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham)}");
@@ -636,26 +757,49 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     public void md_sanpham(HttpContext context)
     {
         var msg = "";
-        var ma_sanphams = context.Request.Form["ma_sanphams"];
+        var ma_sanphams = context.Request.Form["ma_sanphams"].removeAllSpaceOrTrimText(true);
+        var ncc = context.Request.Form["ncc"];
         try
         {
-            var lstMSP = ma_sanphams.Split(',');
-            var sps = db.md_sanphams.Where(s => lstMSP.Contains(s.ma_sanpham)).ToList();
-            foreach (var sp in sps)
+            var lstMSP = ma_sanphams.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+            //throw new Exception(lstMSP.Count.ToString());
+            var sps = new List<md_sanpham>();
+            if (lstMSP.Count > 0)
             {
-                var hinhanh = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
-                if (!hinhanh.EndsWith(Public.imgNotFound))
-                    sp.hinhanh = string.Format("Controllers/API_System.ashx?oper=loadImageProduct&msp={0}&ver={1}", sp.ma_sanpham, Helper.getNewId());
-                else
-                    sp.hinhanh = "";
+                sps = db.md_sanphams.Where(s => lstMSP.Contains(s.ma_sanpham)).ToList();
+                foreach (var sp in sps)
+                {
+                    var hinhanh = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
+                    if (!hinhanh.EndsWith(Public.imgNotFound))
+                        sp.hinhanh = string.Format("Controllers/API_System.ashx?oper=loadImageProduct&msp={0}&ver={1}", sp.ma_sanpham, Helper.getNewId());
+                    else
+                        sp.hinhanh = "";
 
-                var hinhanhWeb = ExcuteSignalRStatic.getImageProductWeb(sp.ma_sanpham);
-                if (!hinhanhWeb.EndsWith(Public.imgNotFound))
-                    sp.hinhanhWeb = string.Format("Controllers/API_System.ashx?oper=loadImageProductWeb&msp={0}&ver={1}", sp.ma_sanpham, Helper.getNewId());
-                else
-                    sp.hinhanhWeb = "";
-
+                    var hinhanhWeb = ExcuteSignalRStatic.getImageProductWeb(sp.ma_sanpham);
+                    if (!hinhanhWeb.EndsWith(Public.imgNotFound))
+                        sp.hinhanhWeb = string.Format("Controllers/API_System.ashx?oper=loadImageProductWeb&msp={0}&ver={1}", sp.ma_sanpham, Helper.getNewId());
+                    else
+                        sp.hinhanhWeb = "";
+                }
             }
+            else if (!string.IsNullOrWhiteSpace(ncc))
+            {
+                var dtkd = db.md_doitackinhdoanhs.Where(s => s.ma_dtkd == ncc & (s.api_xuongsx ?? "") != "").FirstOrDefault();
+                if (dtkd != null)
+                {
+                    var spids = db.md_nhacungungmacdinhs.Where(s => s.md_doitackinhdoanh_id == dtkd.md_doitackinhdoanh_id & s.macdinh == true).Select(s => s.md_sanpham_id).Distinct().ToList();
+                    int chunkSize = 2000; // Chia mỗi đợt 2000 id
+                    for (int i = 0; i < spids.Count; i += chunkSize)
+                    {
+                        var chunk = spids.Skip(i).Take(chunkSize).ToList();
+                        var result = db.md_sanphams
+                                       .Where(s => chunk.Contains(s.md_sanpham_id) && s.trangthai == "DHD")
+                                       .ToList();
+                        sps.AddRange(result);
+                    }
+                }
+            }
+
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)
@@ -668,8 +812,8 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     public void md_chungloai(HttpContext context)
     {
         var msg = "";
-        var chungloais = context.Request.Form["chungloais"];
-        var layhet = context.Request.QueryString["layhet"] == "1";
+        var chungloais = context.Request.Form["chungloais"].removeAllSpaceOrTrimText(true);
+        var layhet = context.Request.Params["layhet"] == "1";
         try
         {
             var sps = new List<md_chungloai>();
@@ -679,8 +823,9 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
             }
             else
             {
-                var lstMSP = chungloais.Split(',');
-                sps = db.md_chungloais.Where(s => lstMSP.Contains(s.md_chungloai_id)).ToList();
+                var lstMSP = chungloais.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+                if (lstMSP.Count > 0)
+                    sps = db.md_chungloais.Where(s => lstMSP.Contains(s.code_cl)).ToList();
             }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
@@ -695,10 +840,19 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     {
         var msg = "";
         var chucnangs = context.Request.Form["chucnangs"];
+        var layhet = context.Request.Params["layhet"] == "1";
         try
         {
-            var lstMSP = chucnangs.Split(',');
-            var sps = db.md_chucnangs.Where(s => lstMSP.Contains(s.md_chucnang_id)).ToList();
+            var sps = new List<md_chucnang>();
+            if (layhet)
+            {
+                sps = db.md_chucnangs.Where(s => s.hoatdong == true).ToList();
+            }
+            else
+            {
+                var lstMSP = chucnangs.Split(',');
+                sps = db.md_chucnangs.Where(s => lstMSP.Contains(s.md_chucnang_id)).ToList();
+            }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)
@@ -725,6 +879,31 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
         context.Response.Write(msg);
     }
 
+    public void md_donvitinh(HttpContext context)
+    {
+        var msg = "";
+        var donvitinhs = context.Request.Form["donvitinhs"];
+        var layhet = context.Request.Params["layhet"] == "1";
+        try
+        {
+            var sps = new List<md_donvitinh>();
+            if (layhet)
+            {
+                sps = db.md_donvitinhs.Where(s => s.hoatdong == true).ToList();
+            }
+            else
+            {
+                var lstMSP = donvitinhs.Split(',');
+                sps = db.md_donvitinhs.Where(s => lstMSP.Contains(s.md_donvitinh_id)).ToList();
+            }
+            msg = "1" + JsonConvert.SerializeObject(sps);
+        }
+        catch (Exception ex)
+        {
+            msg = "0" + ex;
+        }
+        context.Response.Write(msg);
+    }
     public void md_donvitinhsanpham(HttpContext context)
     {
         var msg = "";
@@ -746,10 +925,19 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     {
         var msg = "";
         var hscodes = context.Request.Form["hscodes"];
+        var layhet = context.Request.Params["layhet"] == "1";
         try
         {
-            var lstMSP = hscodes.Split(',');
-            var sps = db.md_hscodes.Where(s => lstMSP.Contains(s.md_hscode_id)).ToList();
+            var sps = new List<md_hscode>();
+            if (layhet)
+            {
+                sps = db.md_hscodes.Where(s => s.hoatdong == true).ToList();
+            }
+            else
+            {
+                var lstMSP = hscodes.Split(',');
+                sps = db.md_hscodes.Where(s => lstMSP.Contains(s.md_hscode_id)).ToList();
+            }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)
@@ -763,10 +951,19 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     {
         var msg = "";
         var kieudangs = context.Request.Form["kieudangs"];
+        var layhet = context.Request.Params["layhet"] == "1";
         try
         {
-            var lstMSP = kieudangs.Split(',');
-            var sps = db.md_kieudangs.Where(s => lstMSP.Contains(s.md_kieudang_id)).ToList();
+            var sps = new List<md_kieudang>();
+            if (layhet)
+            {
+                sps = db.md_kieudangs.Where(s => s.hoatdong == true).ToList();
+            }
+            else
+            {
+                var lstMSP = kieudangs.Split(',');
+                sps = db.md_kieudangs.Where(s => lstMSP.Contains(s.md_kieudang_id)).ToList();
+            }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)
@@ -780,10 +977,19 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     {
         var msg = "";
         var nhomnanglucs = context.Request.Form["nhomnanglucs"];
+        var layhet = context.Request.Params["layhet"] == "1";
         try
         {
-            var lstMSP = nhomnanglucs.Split(',');
-            var sps = db.md_nhomnanglucs.Where(s => lstMSP.Contains(s.md_nhomnangluc_id)).ToList();
+            var sps = new List<md_nhomnangluc>();
+            if (layhet)
+            {
+                sps = db.md_nhomnanglucs.Where(s => s.hoatdong == true).ToList();
+            }
+            else
+            {
+                var lstMSP = nhomnanglucs.Split(',');
+                sps = db.md_nhomnanglucs.Where(s => lstMSP.Contains(s.md_nhomnangluc_id)).ToList();
+            }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)
@@ -813,14 +1019,25 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     public void md_donggoisanpham(HttpContext context)
     {
         var msg = "";
-        var sanphams = context.Request.Form["sanphams"];
+        var sanphams = context.Request.Form["sanphams"].removeAllSpaceOrTrimText(true);
         var chuan = context.Request.Form["chuan"] == "true";
+        var layhet = context.Request.Params["layhet"] == "1";
         try
         {
-            var lstMSP = sanphams.Split(',');
-            var sps = db.md_donggoisanphams.Where(s => lstMSP.Contains(s.md_sanpham_id));
-            if (chuan)
-                sps.Where(s => s.macdinh == true);
+            var sps = new List<md_donggoisanpham>();
+            var lstMSP = sanphams.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+            int chunkSize = 2000; // Chia mỗi đợt 2000 id
+            for (int i = 0; i < lstMSP.Count; i += chunkSize)
+            {
+                var chunk = lstMSP.Skip(i).Take(chunkSize).ToList();
+                var result = db.md_donggoisanphams
+                               .Where(s => chunk.Contains(s.md_sanpham_id));
+                if (chuan)
+                    result = result.Where(s => s.macdinh == true);
+
+                sps.AddRange(result.ToList());
+            }
+
             msg = "1" + JsonConvert.SerializeObject(sps.ToList());
         }
         catch (Exception ex)
@@ -833,11 +1050,27 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     public void md_donggoi(HttpContext context)
     {
         var msg = "";
-        var donggois = context.Request.Form["donggois"];
+        var donggois = context.Request.Form["donggois"].removeAllSpaceOrTrimText(true);
+        var layhet = context.Request.Params["layhet"] == "1";
         try
         {
-            var lstMSP = donggois.Split(',');
-            var sps = db.md_donggois.Where(s => lstMSP.Contains(s.md_donggoi_id)).ToList();
+            var sps = new List<md_donggoi>();
+            if (layhet)
+            {
+                sps = db.md_donggois.Where(s => s.hoatdong == true).ToList();
+            }
+            else
+            {
+                var lstMSP = donggois.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+                int chunkSize = 2000; // Chia mỗi đợt 2000 id
+                for (int i = 0; i < lstMSP.Count; i += chunkSize)
+                {
+                    var chunk = lstMSP.Skip(i).Take(chunkSize).ToList();
+                    var result = db.md_donggois
+                                   .Where(s => chunk.Contains(s.md_donggoi_id));
+                    sps.AddRange(result.ToList());
+                }
+            }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)
@@ -850,11 +1083,19 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     public void md_hanghoadocquyen(HttpContext context)
     {
         var msg = "";
-        var sanphams = context.Request.Form["sanphams"];
+        var sanphams = context.Request.Form["sanphams"].removeAllSpaceOrTrimText(true);
         try
         {
-            var lstMSP = sanphams.Split(',');
-            var sps = db.md_hanghoadocquyens.Where(s => lstMSP.Contains(s.md_sanpham_id)).ToList();
+            var sps = new List<md_hanghoadocquyen>();
+            var lstMSP = sanphams.Split(',').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+            int chunkSize = 2000; // Chia mỗi đợt 2000 id
+            for (int i = 0; i < lstMSP.Count; i += chunkSize)
+            {
+                var chunk = lstMSP.Skip(i).Take(chunkSize).ToList();
+                var result = db.md_hanghoadocquyens
+                               .Where(s => chunk.Contains(s.md_sanpham_id));
+                sps.AddRange(result.ToList());
+            }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)
@@ -867,11 +1108,22 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     public void md_doitackinhdoanh(HttpContext context)
     {
         var msg = "";
-        var doitackinhdoanhs = context.Request.Form["doitackinhdoanhs"];
+        var doitackinhdoanhs = context.Request.Form["doitackinhdoanhs"].removeAllSpaceOrTrimText(true);
         try
         {
-            var lstMSP = doitackinhdoanhs.Split(',');
-            var sps = db.md_doitackinhdoanhs.Where(s => lstMSP.Contains(s.md_doitackinhdoanh_id)).ToList();
+            var sps = new List<md_doitackinhdoanh>();
+            var lstMSP = doitackinhdoanhs.Split(',').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+            if (lstMSP.Count > 0)
+            {
+                int chunkSize = 2000; // Chia mỗi đợt 2000 id
+                for (int i = 0; i < lstMSP.Count; i += chunkSize)
+                {
+                    var chunk = lstMSP.Skip(i).Take(chunkSize).ToList();
+                    var result = db.md_doitackinhdoanhs
+                                   .Where(s => chunk.Contains(s.md_doitackinhdoanh_id));
+                    sps.AddRange(result.ToList());
+                }
+            }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)
@@ -935,15 +1187,28 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     public void md_giasanpham(HttpContext context)
     {
         var msg = "";
-        var sanphams = context.Request.Form["sanphams"];
+        var sanphams = context.Request.Form["sanphams"].removeAllSpaceOrTrimText(true);
+        var phienbangias = context.Request.Params["phienbangias"].removeAllSpaceOrTrimText(true);
         try
         {
-            var lstMSP = sanphams.Split(',');
-            var bgBans = db.md_banggias.Where(s => s.banggiaban == true & s.ten_banggia.StartsWith("FOB") & s.hoatdong == true).ToList();
-            var bgIds = bgBans.Select(s => s.md_banggia_id).ToList();
-            var pbgBan = db.md_phienbangias.Where(s => bgIds.Contains(s.md_banggia_id) & s.md_trangthai_id == "HIEULUC" & s.hoatdong == true).OrderByDescending(s => s.ngay_hieuluc).FirstOrDefault();
-            var pbgId = pbgBan == null ? "" : pbgBan.md_phienbangia_id;
-            var sps = db.md_giasanphams.Where(s => lstMSP.Contains(s.md_sanpham_id) & s.md_phienbangia_id == pbgId).ToList();
+            var sps = new List<md_giasanpham>();
+            var lstMSP = sanphams.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+            if (lstMSP.Count > 0)
+            {
+                var bgBans = db.md_banggias.Where(s => s.banggiaban == true & s.ten_banggia.StartsWith("FOB") & s.hoatdong == true).ToList();
+                var bgIds = bgBans.Select(s => s.md_banggia_id).ToList();
+                var pbgBan = db.md_phienbangias.Where(s => bgIds.Contains(s.md_banggia_id) & s.md_trangthai_id == "HIEULUC" & s.hoatdong == true).OrderByDescending(s => s.ngay_hieuluc).FirstOrDefault();
+                var pbgId = pbgBan == null ? "" : pbgBan.md_phienbangia_id;
+                sps = db.md_giasanphams.Where(s => lstMSP.Contains(s.md_sanpham_id) & s.md_phienbangia_id == pbgId).ToList();
+            }
+            else
+            {
+                lstMSP = phienbangias.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+                if (lstMSP.Count > 0)
+                {
+                    sps = db.md_giasanphams.Where(s => lstMSP.Contains(s.md_phienbangia_id)).ToList();
+                }
+            }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)
@@ -956,11 +1221,20 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     public void md_phienbangia(HttpContext context)
     {
         var msg = "";
-        var phienbangias = context.Request.Form["phienbangias"];
+        var phienbangias = context.Request.Form["phienbangias"].removeAllSpaceOrTrimText(true);
+        var banggias = context.Request.Params["banggias"].removeAllSpaceOrTrimText(true);
         try
         {
-            var lstMSP = phienbangias.Split(',');
-            var sps = db.md_phienbangias.Where(s => lstMSP.Contains(s.md_phienbangia_id)).ToList();
+            var sps = new List<md_phienbangia>();
+            var lstMSP = phienbangias.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+            if (lstMSP.Count > 0)
+                sps = db.md_phienbangias.Where(s => lstMSP.Contains(s.md_phienbangia_id) & s.hoatdong == true).ToList();
+            else
+            {
+                lstMSP = banggias.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+                if (lstMSP.Count > 0)
+                    sps = db.md_phienbangias.Where(s => lstMSP.Contains(s.md_banggia_id) & s.hoatdong == true).ToList();
+            }
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)
@@ -973,11 +1247,16 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     public void md_banggia(HttpContext context)
     {
         var msg = "";
-        var banggias = context.Request.Form["banggias"];
+        var banggias = context.Request.Form["banggias"].removeAllSpaceOrTrimText(true);
+        var ncc = context.Request.Params["ncc"].removeAllSpaceOrTrimText(true);
         try
         {
-            var lstMSP = banggias.Split(',');
-            var sps = db.md_banggias.Where(s => lstMSP.Contains(s.md_banggia_id)).ToList();
+            var sps = new List<md_banggia>();
+            var lstMSP = banggias.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+            if (lstMSP.Count > 0)
+                sps = db.md_banggias.Where(s => lstMSP.Contains(s.md_banggia_id)).ToList();
+            else if (!string.IsNullOrWhiteSpace(ncc))
+                sps = db.md_banggias.Where(s => s.ten_banggia == $"{ncc}-GIAMUA").ToList();
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)
@@ -990,20 +1269,31 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     public void md_detai(HttpContext context)
     {
         var msg = "";
-        var detais = context.Request.Form["detais"];
+        var detais = context.Request.Form["detais"].removeAllSpaceOrTrimText(true);
+        var layhet = context.Request.Params["layhet"] == "1";
         try
         {
             var sps = new List<md_detai>();
-            var lstMSP = detais.Split(',');
-            foreach (var msp in lstMSP)
+            var lstMSP = detais.Split(',').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+            if (layhet)
             {
-                var cldt = msp.Split('-');
-                var cl = cldt[0];
-                var dt = cldt[1];
-                var sp = db.md_detais.Where(s => s.code_cl == cl & s.code_dt == dt).FirstOrDefault();
-                if (sp != null)
+                sps = db.md_detais.Where(s => s.hoatdong == true).ToList();
+            }
+            else
+            {
+                if (lstMSP.Count > 0)
                 {
-                    sps.Add(sp);
+                    foreach (var msp in lstMSP)
+                    {
+                        var cldt = msp.Split('-');
+                        var cl = cldt[0];
+                        var dt = cldt[1];
+                        var sp = db.md_detais.Where(s => s.code_cl == cl & s.code_dt == dt).FirstOrDefault();
+                        if (sp != null)
+                        {
+                            sps.Add(sp);
+                        }
+                    }
                 }
             }
 
@@ -1019,24 +1309,31 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
     public void md_mausac(HttpContext context)
     {
         var msg = "";
-        var mausacs = context.Request.Form["mausacs"];
+        var mausacs = context.Request.Form["mausacs"].removeAllSpaceOrTrimText(true);
+        var layhet = context.Request.Params["layhet"] == "1";
         try
         {
             var sps = new List<md_mausac>();
-            var lstMSP = mausacs.Split(',');
-            foreach (var msp in lstMSP)
+            var lstMSP = mausacs.Split(',').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+            if (layhet)
             {
-                var cldt = msp.Split('-');
-                var cl = cldt[0];
-                var dt = cldt[1];
-                var ms = cldt[2];
-                var sp = db.md_mausacs.Where(s => s.code_cl == cl & s.code_dt == dt & s.code_mau == ms).FirstOrDefault();
-                if (sp != null)
+                sps = db.md_mausacs.Where(s => s.hoatdong == true).ToList();
+            }
+            else
+            {
+                foreach (var msp in lstMSP)
                 {
-                    sps.Add(sp);
+                    var cldt = msp.Split('-');
+                    var cl = cldt[0];
+                    var dt = cldt[1];
+                    var ms = cldt[2];
+                    var sp = db.md_mausacs.Where(s => s.code_cl == cl & s.code_dt == dt & s.code_mau == ms).FirstOrDefault();
+                    if (sp != null)
+                    {
+                        sps.Add(sp);
+                    }
                 }
             }
-
             msg = "1" + JsonConvert.SerializeObject(sps);
         }
         catch (Exception ex)

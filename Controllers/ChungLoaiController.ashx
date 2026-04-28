@@ -90,10 +90,10 @@ public class ChungLoaiController : IHttpHandler
                                 HttpContext.Current,
                                 new ad_log
                                 {
-                                    nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = spst.GetType().Name,
-                                    id_lienket = spst.md_chungloai_id
+                                    id_lienket = spst.md_chungloai_id,
+                                    ma_lienket = spst.code_cl
                                 }
                             );
                         }
@@ -110,7 +110,8 @@ public class ChungLoaiController : IHttpHandler
                                     nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = sp.GetType().Name,
-                                    id_lienket = sp.md_chungloai_id
+                                    id_lienket = sp.md_chungloai_id,
+                                    ma_lienket = sp.code_cl
                                 }
                             );
                         db.SubmitChanges();
@@ -208,10 +209,10 @@ public class ChungLoaiController : IHttpHandler
                     context,
                     new ad_log
                     {
-                        nexxdecor_check = false,
                         hanhdong = VoNgocNhan.API_Data.edit,
                         table = m.GetType().Name,
-                        id_lienket = m.md_chungloai_id
+                        id_lienket = m.md_chungloai_id,
+                        ma_lienket = m.code_cl
                     }
                 );
             }
@@ -241,7 +242,7 @@ public class ChungLoaiController : IHttpHandler
                 tv_ngan = context.Request.Form["tv_ngan"],
                 ta_ngan = context.Request.Form["ta_ngan"],
                 nhomchungloai = context.Request.Form["nhomchungloai"],
-                trangthai = "SOANTHAO",
+                trangthai = Helper.SOANTHAO,
                 //titleWeb = context.Request.Form["titleWeb"],
                 //titleSubWeb = context.Request.Form["titleSubWeb"],
                 //dacTinhCL = context.Request.Form["dacTinhCL"],
@@ -261,10 +262,10 @@ public class ChungLoaiController : IHttpHandler
                 db,
                 context,
                 new ad_log {
-                    nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.add,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_chungloai_id
+                    id_lienket = mnu.md_chungloai_id,
+                    ma_lienket = mnu.code_cl
                 }
             );
             db.SubmitChanges();
@@ -290,10 +291,10 @@ public class ChungLoaiController : IHttpHandler
                 db,
                 context,
                 new ad_log {
-                    nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_chungloai_id
+                    id_lienket = mnu.md_chungloai_id,
+                    ma_lienket = mnu.code_cl
                 }
             );
             db.SubmitChanges();

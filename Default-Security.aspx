@@ -276,14 +276,25 @@
 <SCRIPT type="text/javascript">
 	var username_public = "<%=manv%>";
     // function show message dialog
-    function showMsgDialog(data) {
-        var type = eval($(data.responseText).find('type').text());
-        var message = $(data.responseText).find('message').text();
-        if (type == 0) {
-            return [false, message];
-        } else {
-            return [true, message];
-        }
+	function showMsgDialog(data, dt_type) {
+		if (dt_type) {
+            const type = eval($(data).find('type').text());
+            const message = $(data).find('message').text();
+			if (type == 0) {
+                return `<div style='color:red' error>${message}</div>`;
+            } else {
+                return `<div style='color:blue'>${message}</div>`;
+            }
+		}
+		else {
+            const type = eval($(data.responseText).find('type').text());
+            const message = $(data.responseText).find('message').text();
+			if (type == 0) {
+				return [false, message];
+			} else {
+				return [true, message];
+			}
+		}
     }
     
     $(document).ready(function() {

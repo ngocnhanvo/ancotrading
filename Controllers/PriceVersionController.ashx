@@ -127,7 +127,8 @@ public class PriceVersionController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = m.GetType().Name,
-                    id_lienket = m.md_phienbangia_id
+                    id_lienket = m.md_phienbangia_id,
+                    ma_lienket = m.ten_phienbangia
                 }
             );
         }
@@ -165,7 +166,8 @@ public class PriceVersionController : IHttpHandler
                 nexxdecor_check = false,
                 hanhdong = VoNgocNhan.API_Data.add,
                 table = mnu.GetType().Name,
-                id_lienket = mnu.md_phienbangia_id
+                id_lienket = mnu.md_phienbangia_id,
+                ma_lienket = mnu.ten_phienbangia
             }
         );
         db.SubmitChanges();
@@ -194,17 +196,6 @@ public class PriceVersionController : IHttpHandler
             foreach (var gia in gias)
             {
                 db.md_giasanphams.DeleteOnSubmit(gia);
-                VoNgocNhan.API_Data.themLichSuHoatDong(
-                    db,
-                    HttpContext.Current,
-                    new ad_log
-                    {
-                        nexxdecor_check = false,
-                        hanhdong = VoNgocNhan.API_Data.del,
-                        table = gia.GetType().Name,
-                        id_lienket = gia.md_giasanpham_id
-                    }
-                );
             }
 
             db.md_phienbangias.DeleteOnSubmit(pbg);
@@ -216,7 +207,8 @@ public class PriceVersionController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = pbg.GetType().Name,
-                    id_lienket = pbg.md_phienbangia_id
+                    id_lienket = pbg.md_phienbangia_id,
+                    ma_lienket = pbg.ten_phienbangia
                 }
             );
             db.SubmitChanges();

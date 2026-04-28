@@ -77,7 +77,8 @@ public class HsCodeImport : ImportOriginal
                    nexxdecor_check = false,
                    hanhdong = VoNgocNhan.API_Data.add,
                    table = hs.GetType().Name,
-                   id_lienket = hs.md_hscode_id
+                   id_lienket = hs.md_hscode_id,
+                   ma_lienket = $@"{hs.hscode} - {hs.hehang}"
                }
            );
         db.SubmitChanges();
@@ -111,7 +112,8 @@ public class HsCodeImport : ImportOriginal
                         nexxdecor_check = false,
                         hanhdong = VoNgocNhan.API_Data.edit,
                         table = hs.GetType().Name,
-                        id_lienket = hs.md_hscode_id
+                        id_lienket = hs.md_hscode_id,
+                        ma_lienket = $@"{hs.hscode} - {hs.hehang}"
                     }
                 );
             }

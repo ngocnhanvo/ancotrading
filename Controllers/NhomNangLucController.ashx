@@ -102,9 +102,12 @@ public class NhomNangLucController : IHttpHandler
                     new ad_log
                     {
                         nexxdecor_check = false,
+                        anco1_check = false,
+                        anhiepluc_check = false,
                         hanhdong = VoNgocNhan.API_Data.edit,
                         table = m.GetType().Name,
-                        id_lienket = m.md_nhomnangluc_id
+                        id_lienket = m.md_nhomnangluc_id,
+                        ma_lienket = $"{m.hehang} - {m.nhom}"
                     }
                 );
             }
@@ -170,7 +173,8 @@ public class NhomNangLucController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.add,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_nhomnangluc_id
+                    id_lienket = mnu.md_nhomnangluc_id,
+                    ma_lienket = $"{mnu.hehang} - {mnu.nhom}"
                 }
             );
             db.SubmitChanges();
@@ -231,7 +235,8 @@ public class NhomNangLucController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_nhomnangluc_id
+                    id_lienket = mnu.md_nhomnangluc_id,
+                    ma_lienket = $"{mnu.hehang} - {mnu.nhom}"
                 }
             );
             db.SubmitChanges();

@@ -67,7 +67,8 @@ public class ProductPriceController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = pbg.GetType().Name,
-                    id_lienket = pbg.md_phienbangia_id
+                    id_lienket = pbg.md_phienbangia_id,
+                    ma_lienket = pbg.ten_phienbangia
                 }
             );
             db.SubmitChanges();
@@ -124,7 +125,8 @@ public class ProductPriceController : IHttpHandler
                             nexxdecor_check = false,
                             hanhdong = VoNgocNhan.API_Data.edit,
                             table = gsp.GetType().Name,
-                            id_lienket = gsp.md_giasanpham_id
+                            id_lienket = gsp.md_giasanpham_id,
+                            ma_lienket = db.md_sanphams.Where(s=>s.md_sanpham_id == gsp.md_sanpham_id).Select(s=>s.ma_sanpham).FirstOrDefault()
                         }
                     );
                 }
@@ -193,7 +195,8 @@ public class ProductPriceController : IHttpHandler
                             nexxdecor_check = false,
                             hanhdong = VoNgocNhan.API_Data.add,
                             table = mnu.GetType().Name,
-                            id_lienket = mnu.md_giasanpham_id
+                            id_lienket = mnu.md_giasanpham_id,
+                            ma_lienket = db.md_sanphams.Where(s=>s.md_sanpham_id == mnu.md_sanpham_id).Select(s=>s.ma_sanpham).FirstOrDefault()
                         }
                     );
                     db.SubmitChanges();
@@ -237,7 +240,8 @@ public class ProductPriceController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = gsp.GetType().Name,
-                    id_lienket = gsp.md_giasanpham_id
+                    id_lienket = gsp.md_giasanpham_id,
+                    ma_lienket = db.md_sanphams.Where(s=>s.md_sanpham_id == gsp.md_sanpham_id).Select(s=>s.ma_sanpham).FirstOrDefault()
                 }
             );
             db.SubmitChanges();

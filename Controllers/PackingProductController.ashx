@@ -97,7 +97,8 @@ public class PackingProductController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = m.GetType().Name,
-                    id_lienket = m.md_donggoisanpham_id
+                    id_lienket = m.md_donggoisanpham_id,
+                    ma_lienket = db.md_sanphams.Where(s => s.md_sanpham_id == m.md_sanpham_id).Select(s => s.ma_sanpham).FirstOrDefault()
                 }
             );
         }
@@ -157,7 +158,8 @@ public class PackingProductController : IHttpHandler
                        nexxdecor_check = false,
                        hanhdong = VoNgocNhan.API_Data.add,
                        table = mnu.GetType().Name,
-                       id_lienket = mnu.md_donggoisanpham_id
+                       id_lienket = mnu.md_donggoisanpham_id,
+                       ma_lienket = db.md_sanphams.Where(s => s.md_sanpham_id == mnu.md_sanpham_id).Select(s => s.ma_sanpham).FirstOrDefault()
                    }
                 );
                 db.SubmitChanges();
@@ -193,7 +195,8 @@ public class PackingProductController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_donggoisanpham_id
+                    id_lienket = mnu.md_donggoisanpham_id,
+                    ma_lienket = db.md_sanphams.Where(s => s.md_sanpham_id == mnu.md_sanpham_id).Select(s => s.ma_sanpham).FirstOrDefault()
                 }
             );
             db.SubmitChanges();
@@ -203,7 +206,7 @@ public class PackingProductController : IHttpHandler
             msg = ex.Message;
         }
 
-        EndEventHandler:;
+    EndEventHandler:;
 
         if (msg.Length <= 0)
         {

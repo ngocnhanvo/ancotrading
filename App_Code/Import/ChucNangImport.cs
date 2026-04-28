@@ -46,7 +46,7 @@ public class ChucNangImport : ImportOriginal
     public ChucNangImport(String maChucNang, String tiengVietNgan, String tiengAnhNgan, String GhiChu)
         : this(maChucNang, tiengVietNgan, tiengAnhNgan, GhiChu, DateTime.Now, "admin", DateTime.Now, "admin", true)
     {
-    
+
     }
 
     public ChucNangImport(String maChucNang, String tiengVietNgan, String tiengAnhNgan, String GhiChu
@@ -89,7 +89,8 @@ public class ChucNangImport : ImportOriginal
                 nexxdecor_check = false,
                 hanhdong = VoNgocNhan.API_Data.add,
                 table = mnu.GetType().Name,
-                id_lienket = mnu.md_chucnang_id
+                id_lienket = mnu.md_chucnang_id,
+                ma_lienket = mnu.ma_chucnang
             }
         );
         db.SubmitChanges();
@@ -104,12 +105,12 @@ public class ChucNangImport : ImportOriginal
         o.CopyPropertiesTo(mnu);
         o.ten_tv = tv_ngan;
         o.ten_ta = ta_ngan;
-		o.ten_tv_dai = "";
+        o.ten_tv_dai = "";
         o.ten_ta_dai = "";
         o.ngaycapnhat = ngayCapNhat;
         o.nguoicapnhat = nguoiCapNhat;
         o.hoatdong = hoatDong;
-		o.mota = ghichu;
+        o.mota = ghichu;
 
         var diffs = VoNgocNhan.API_Data.GetDifferences(o, mnu);
         if (diffs.Count > 0)
@@ -122,7 +123,8 @@ public class ChucNangImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = o.GetType().Name,
-                    id_lienket = o.md_chucnang_id
+                    id_lienket = o.md_chucnang_id,
+                    ma_lienket = o.ma_chucnang
                 }
             );
         }

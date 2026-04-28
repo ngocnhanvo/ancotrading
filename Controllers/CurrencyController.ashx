@@ -45,8 +45,8 @@ public class CurrencyController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -58,11 +58,11 @@ public class CurrencyController : IHttpHandler
         m.ma_iso = context.Request.Form["ma_iso"];
         m.bieutuong = context.Request.Form["bieutuong"];
         m.mota = context.Request.Form["mota"];
-        
+
         m.hoatdong = hd;
         m.nguoicapnhat = UserUtils.getUser(context);
         m.ngaycapnhat = DateTime.Now;
-        
+
         db.SubmitChanges();
     }
 
@@ -72,7 +72,7 @@ public class CurrencyController : IHttpHandler
         bool hd = false;
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-        
+
         md_dongtien mnu = new md_dongtien
         {
             md_dongtien_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddddhhmmss")),
@@ -133,26 +133,40 @@ public class CurrencyController : IHttpHandler
             sidx = "dt.ma_iso";
         }
 
-        string strsql = "select * from( select dt.*,  ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum from md_dongtien dt)P where RowNum > @start AND RowNum < @end";
+        string strsql = $@"
+            select * 
+            from ( 
+                select dt.*, ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum 
+                from md_dongtien dt
+            )P 
+            where RowNum > @start AND RowNum < @end
+        ";
 
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
-        string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
-        xml += "<rows>";
-        xml += "<page>" + page + "</page>";
-        xml += "<total>" + total_page + "</total>";
-        xml += "<records>" + count + "</records>";
+        string xml = $@"<?xml version=""1.0"" encoding=""UTF-8"" ?>";
+        xml += $@"<rows>";
+        xml += $@"<page>{page}</page>";
+        xml += $@"<total>{total_page}</total>";
+        xml += $@"<records>{count}</records>";
         foreach (System.Data.DataRow row in dt.Rows)
         {
             xml += "<row>";
-            xml += "<cell><![CDATA[" + row[0] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[1] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[2] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[3].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[4] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[5].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[6] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[7] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
+            foreach (System.Data.DataColumn column in dt.Columns)
+            {
+                if (column.DataType == System.Type.GetType("System.DateTime"))
+                {
+                    try
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", ((DateTime)row[column.ColumnName]).ToString(Extension.fmtDate));
+                    }
+                    catch
+                    {
+                        xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", "");
+                    }
+                }
+                else
+                    xml += string.Format(@"<cell><![CDATA[{0}]]></cell>", row[column.ColumnName]);
+            }
             xml += "</row>";
         }
         xml += "</rows>";

@@ -82,7 +82,8 @@ public class PhienBanGiaImport : ImportOriginal
                 nexxdecor_check = false,
                 hanhdong = VoNgocNhan.API_Data.add,
                 table = pbg.GetType().Name,
-                id_lienket = pbg.md_phienbangia_id
+                id_lienket = pbg.md_phienbangia_id,
+                ma_lienket = pbg.ten_phienbangia
             }
         );
         db.SubmitChanges();
@@ -111,7 +112,8 @@ public class PhienBanGiaImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = o.GetType().Name,
-                    id_lienket = o.md_phienbangia_id
+                    id_lienket = o.md_phienbangia_id,
+                    ma_lienket = o.ten_phienbangia
                 }
             );
         }

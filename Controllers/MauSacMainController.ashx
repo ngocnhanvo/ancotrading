@@ -186,7 +186,8 @@ public class MauSacMainController : IHttpHandler
                                     nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = spst.GetType().Name,
-                                    id_lienket = spst.md_mausac_id
+                                    id_lienket = spst.md_mausac_id,
+                                    ma_lienket = $"{spst.code_cl} - {spst.code_dt} - {spst.code_mau}"
                                 }
                             );
                         }
@@ -209,7 +210,8 @@ public class MauSacMainController : IHttpHandler
                                     nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = spst.GetType().Name,
-                                    id_lienket = spst.md_mausac_id
+                                    id_lienket = spst.md_mausac_id,
+                                    ma_lienket = $"{spst.code_cl} - {spst.code_dt} - {spst.code_mau}"
                                 }
                             );
                         }
@@ -226,7 +228,8 @@ public class MauSacMainController : IHttpHandler
                                     nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = sp.GetType().Name,
-                                    id_lienket = sp.md_mausac_id
+                                    id_lienket = sp.md_mausac_id,
+                                    ma_lienket = $"{sp.code_cl} - {sp.code_dt} - {sp.code_mau}"
                                 }
                             );
                         db.SubmitChanges();
@@ -295,7 +298,8 @@ public class MauSacMainController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = m.GetType().Name,
-                    id_lienket = m.md_mausac_id
+                    id_lienket = m.md_mausac_id,
+                    ma_lienket = $"{m.code_cl} - {m.code_dt} - {m.code_mau}"
                 }
             );
         }
@@ -346,7 +350,8 @@ public class MauSacMainController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.add,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_mausac_id
+                    id_lienket = mnu.md_mausac_id,
+                    ma_lienket = $"{mnu.code_cl} - {mnu.code_dt} - {mnu.code_mau}"
                 }
             );
         db.SubmitChanges();
@@ -375,7 +380,8 @@ public class MauSacMainController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_mausac_id
+                    id_lienket = mnu.md_mausac_id,
+                    ma_lienket = $"{mnu.code_cl} - {mnu.code_dt} - {mnu.code_mau}"
                 }
             );
             db.SubmitChanges();

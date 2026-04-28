@@ -163,7 +163,8 @@ public class PhuKienMainController : IHttpHandler
                                     nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = spst.GetType().Name,
-                                    id_lienket = spst.md_phukien_id
+                                    id_lienket = spst.md_phukien_id,
+                                    ma_lienket = spst.code_pk
                                 }
                             );
                         }
@@ -186,7 +187,8 @@ public class PhuKienMainController : IHttpHandler
                                     nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = spst.GetType().Name,
-                                    id_lienket = spst.md_phukien_id
+                                    id_lienket = spst.md_phukien_id,
+                                    ma_lienket = spst.code_pk
                                 }
                             );
                         }
@@ -203,7 +205,8 @@ public class PhuKienMainController : IHttpHandler
                                     nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = sp.GetType().Name,
-                                    id_lienket = sp.md_phukien_id
+                                    id_lienket = sp.md_phukien_id,
+                                    ma_lienket = sp.code_pk
                                 }
                             );
                         db.SubmitChanges();
@@ -266,7 +269,8 @@ public class PhuKienMainController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = m.GetType().Name,
-                    id_lienket = m.md_phukien_id
+                    id_lienket = m.md_phukien_id,
+                    ma_lienket = m.code_pk
                 }
             );
         }
@@ -314,7 +318,8 @@ public class PhuKienMainController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.add,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_phukien_id
+                    id_lienket = mnu.md_phukien_id,
+                    ma_lienket = mnu.code_pk
                 }
             );
         db.SubmitChanges();
@@ -342,7 +347,8 @@ public class PhuKienMainController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_phukien_id
+                    id_lienket = mnu.md_phukien_id,
+                    ma_lienket = mnu.code_pk
                 }
             );
             db.SubmitChanges();

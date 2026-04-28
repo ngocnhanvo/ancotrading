@@ -23,6 +23,9 @@ public class UserQRCodeController : IHttpHandler {
             case "getInfo":
                 this.getInfo(context);
                 break;
+            case "previewAll":
+                this.previewAll(context);
+                break;
             case "createLoginWebsite":
                 this.createLoginWebsite(context);
                 break;
@@ -376,6 +379,73 @@ public class UserQRCodeController : IHttpHandler {
             msg = "0" + ex;
         }
 
+        context.Response.Write(msg);
+    }
+
+    public void previewAll(HttpContext context)
+    {
+        string ma_sanpham = context.Request.Form["msp"];
+        var arrSP = JsonConvert.DeserializeObject<List<dynamic>>(ma_sanpham);
+        string msg = "";
+
+        using (var db = new LinqDBDataContext())
+        {
+            try
+            {
+                for (var i = 0; i < arrSP.Count; i++)
+                {
+                    var rowSP = arrSP[i];
+                    string msp = rowSP.ma_sanpham;
+                    var sp = db.md_sanphams.Where(s => s.ma_sanpham == msp & s.trangthai == "DHD").FirstOrDefault();
+                    if (sp != null)
+                    {
+                        string kt = sp.l_cm + "x" + sp.w_cm + "xH" + sp.h_cm + "cm";
+                        rowSP.kichthuoc = ExcuteSignalRStatic.getSizeRectOrRound(db, sp, kt);
+                        var dtFOB = ExcuteSignalRStatic.getFOB(sp.md_sanpham_id);
+                        rowSP.fob = dtFOB.Rows.Count > 0 ? dtFOB.Rows[0]["ten_cangbien"].ToString() : "";
+                        var dtPrice = ExcuteSignalRStatic.getPrice("'" + sp.ma_sanpham + "'");
+                        rowSP.price = dtPrice.Rows.Count > 0 ? dtPrice.Rows[0]["gia"].ToString() : "";
+                        var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
+                        foreach (System.Data.DataRow row in dt.Rows)
+                        {
+                            string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
+                            string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
+                            var dDVT = ExcuteSignalRStatic.getTextFromInner(dvt_inner, dvt_outer, sl_inner, sl_outer);
+                            rowSP.inner = dDVT.inner;
+                            rowSP.master = dDVT.outer;
+                            rowSP.packingText = dDVT.packingText;
+                            rowSP.sizeText = dDVT.sizeText;
+
+                            rowSP.kichthuocDG = "" + row["l2_mix"] + "x" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
+                            rowSP.CBM = row["v2"].ToString();
+
+                            string slc_20 = row["soluonggoi_ctn_20"].ToString();
+                            string slc_40 = row["soluonggoi_ctn"].ToString();
+                            string slc_40HC = row["soluonggoi_ctn_40hc"].ToString();
+
+                            if (slc_40 != "" & slc_40 != "0")
+                            {
+                                rowSP.slcont += "\\n" + slc_40 + " " + dDVT.quantity + "/40'";
+                            }
+
+                            if (rowSP.slcont != "")
+                            {
+                                string slcont = (rowSP.slcont + "");
+                                rowSP.slcont = slcont.Substring(2);
+                            }
+                        }
+
+                        rowSP.image = string.Format("Controllers/API_System.ashx?oper=loadImageProduct&msp={0}", sp.ma_sanpham);
+                        rowSP.soluong = 1;
+                    }
+                }
+                msg = "1" + JsonConvert.SerializeObject(arrSP);
+            }
+            catch (Exception ex)
+            {
+                msg = "0" + ex;
+            }
+        }
         context.Response.Write(msg);
     }
 

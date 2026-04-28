@@ -79,7 +79,8 @@ public class HsCodeController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = m.GetType().Name,
-                    id_lienket = m.md_hscode_id
+                    id_lienket = m.md_hscode_id,
+                    ma_lienket = $@"{m.hscode} - {m.hehang}"
                 }
             );
         }
@@ -121,7 +122,8 @@ public class HsCodeController : IHttpHandler
                    nexxdecor_check = false,
                    hanhdong = VoNgocNhan.API_Data.add,
                    table = mnu.GetType().Name,
-                   id_lienket = mnu.md_hscode_id
+                   id_lienket = mnu.md_hscode_id,
+                   ma_lienket = $@"{mnu.hscode} - {mnu.hehang}"
                }
            );
         db.SubmitChanges();
@@ -150,7 +152,8 @@ public class HsCodeController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_hscode_id
+                    id_lienket = mnu.md_hscode_id,
+                    ma_lienket = $@"{mnu.hscode} - {mnu.hehang}"
                 }
             );
             db.SubmitChanges();

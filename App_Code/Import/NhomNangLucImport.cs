@@ -113,7 +113,8 @@ public class NhomNangLucImport : ImportOriginal
                 nexxdecor_check = false,
                 hanhdong = VoNgocNhan.API_Data.add,
                 table = nnl.GetType().Name,
-                id_lienket = nnl.md_nhomnangluc_id
+                id_lienket = nnl.md_nhomnangluc_id,
+                ma_lienket = $@"{nnl.hehang} - {nnl.nhom}"
             }
         );
         db.SubmitChanges();
@@ -145,7 +146,8 @@ public class NhomNangLucImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = o.GetType().Name,
-                    id_lienket = o.md_nhomnangluc_id
+                    id_lienket = o.md_nhomnangluc_id,
+                    ma_lienket = $@"{o.hehang} - {o.nhom}"
                 }
             );
         }

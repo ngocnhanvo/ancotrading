@@ -16,9 +16,9 @@ public class ChucNangSanPhamController : IHttpHandler
         oper = context.Request.Form["oper"];
         switch (action)
         {
-			case "updatestatus":
-					this.UpdateStatus(context);
-					break;
+            case "updatestatus":
+                this.UpdateStatus(context);
+                break;
             case "getoption":
                 this.getSelectOption(context);
                 break;
@@ -41,42 +41,42 @@ public class ChucNangSanPhamController : IHttpHandler
                 break;
         }
     }
-	
-	public void UpdateStatus(HttpContext context)
+
+    public void UpdateStatus(HttpContext context)
     {
         String msg = "";
         try
-        {   
+        {
             String id = context.Request.QueryString["md_chucnang_id"];
             String trangthai = context.Request.QueryString["trangthai"];
             md_chucnang sp = db.md_chucnangs.FirstOrDefault(p => p.md_chucnang_id.Equals(id));
 
             if (sp != null | trangthai == "TOACTIVE")
-			{
-				bool next = true;
-				switch (trangthai)
-				{
-					case "HIEULUC":
-						msg = "Đã chuyển trạng thái chức năng sản phẩm thành \"Hiệu lực\"!";
-						break;
-					case "SOANTHAO":
-						msg = "Đã chuyển trạng thái chức năng sản phẩm thành Soạn thảo!";
-						break;
-					case "TOACTIVE":
-						msg = "Đã chuyển tất cả chức năng sản phẩm \"soạn thảo\" sang \"Hiệu lực\"!";
-						break;
-					default:
-						msg = "Không xác định được trạng thái của chức năng sản phẩm!";
-						next = false;
-						break;
-				}
+            {
+                bool next = true;
+                switch (trangthai)
+                {
+                    case "HIEULUC":
+                        msg = "Đã chuyển trạng thái chức năng sản phẩm thành \"Hiệu lực\"!";
+                        break;
+                    case "SOANTHAO":
+                        msg = "Đã chuyển trạng thái chức năng sản phẩm thành Soạn thảo!";
+                        break;
+                    case "TOACTIVE":
+                        msg = "Đã chuyển tất cả chức năng sản phẩm \"soạn thảo\" sang \"Hiệu lực\"!";
+                        break;
+                    default:
+                        msg = "Không xác định được trạng thái của chức năng sản phẩm!";
+                        next = false;
+                        break;
+                }
 
-				if (next)
-				{
-					if (trangthai.Equals("TOACTIVE"))
-					{
-						var spsSoanThao = db.md_chucnangs.Where(s => s.trangthai == Helper.SOANTHAO).ToList();
-                        foreach(var spst in spsSoanThao)
+                if (next)
+                {
+                    if (trangthai.Equals("TOACTIVE"))
+                    {
+                        var spsSoanThao = db.md_chucnangs.Where(s => s.trangthai == Helper.SOANTHAO).ToList();
+                        foreach (var spst in spsSoanThao)
                         {
                             spst.trangthai = Helper.HIEULUC;
                             VoNgocNhan.API_Data.themLichSuHoatDong(
@@ -87,15 +87,16 @@ public class ChucNangSanPhamController : IHttpHandler
                                     nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = spst.GetType().Name,
-                                    id_lienket = spst.md_chucnang_id
+                                    id_lienket = spst.md_chucnang_id,
+                                    ma_lienket = spst.ma_chucnang
                                 }
                             );
                         }
                         db.SubmitChanges();
-					}
-					else
-					{	
-						sp.trangthai = trangthai;
+                    }
+                    else
+                    {
+                        sp.trangthai = trangthai;
                         VoNgocNhan.API_Data.themLichSuHoatDong(
                                 db,
                                 HttpContext.Current,
@@ -104,17 +105,18 @@ public class ChucNangSanPhamController : IHttpHandler
                                     nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = sp.GetType().Name,
-                                    id_lienket = sp.md_chucnang_id
+                                    id_lienket = sp.md_chucnang_id,
+                                    ma_lienket = sp.ma_chucnang
                                 }
                             );
-						db.SubmitChanges();
-					}
-				}
-			}
-			else
-			{
-				msg = "Chưa chọn chức năng SP hoặc chức năng SP không tồn tại!";
-			}
+                        db.SubmitChanges();
+                    }
+                }
+            }
+            else
+            {
+                msg = "Chưa chọn chức năng SP hoặc chức năng SP không tồn tại!";
+            }
         }
         catch (Exception ex)
         {
@@ -130,8 +132,8 @@ public class ChucNangSanPhamController : IHttpHandler
         SelectHtmlControl s = new SelectHtmlControl(sql);
         context.Response.Write(s.ToString());
     }
-    
-    
+
+
     public void edit(HttpContext context)
     {
         String h = context.Request.Form["hoatdong"].ToLower();
@@ -147,12 +149,12 @@ public class ChucNangSanPhamController : IHttpHandler
         m.ten_ta = context.Request.Form["ten_ta"];
         m.ten_tv_dai = context.Request.Form["ten_tv_dai"];
         m.ten_ta_dai = context.Request.Form["ten_ta_dai"];
-        
+
         m.mota = context.Request.Form["mota"];
         m.hoatdong = hd;
         m.nguoicapnhat = UserUtils.getUser(context);
         m.ngaycapnhat = DateTime.Now;
-        
+
         var diffs = VoNgocNhan.API_Data.GetDifferences(m, mnu);
         if (diffs.Count > 0)
         {
@@ -164,7 +166,8 @@ public class ChucNangSanPhamController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = m.GetType().Name,
-                    id_lienket = m.md_chucnang_id
+                    id_lienket = m.md_chucnang_id,
+                    ma_lienket = m.ma_chucnang
                 }
             );
         }
@@ -177,7 +180,7 @@ public class ChucNangSanPhamController : IHttpHandler
         bool hd = false;
         if (h.Equals("on") || h.Equals("true"))
         { hd = true; }
-        
+
         md_chucnang mnu = new md_chucnang
         {
             md_chucnang_id = Helper.getNewId(),
@@ -187,7 +190,7 @@ public class ChucNangSanPhamController : IHttpHandler
             ten_tv_dai = context.Request.Form["ten_tv_dai"],
             ten_ta_dai = context.Request.Form["ten_ta_dai"],
             trangthai = Helper.SOANTHAO,
-			
+
             mota = context.Request.Form["mota"],
             hoatdong = hd,
             nguoitao = UserUtils.getUser(context),
@@ -200,11 +203,13 @@ public class ChucNangSanPhamController : IHttpHandler
         VoNgocNhan.API_Data.themLichSuHoatDong(
                 db,
                 context,
-                new ad_log {
+                new ad_log
+                {
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.add,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_chucnang_id
+                    id_lienket = mnu.md_chucnang_id,
+                    ma_lienket = mnu.ma_chucnang
                 }
             );
         db.SubmitChanges();
@@ -228,23 +233,25 @@ public class ChucNangSanPhamController : IHttpHandler
             VoNgocNhan.API_Data.themLichSuHoatDong(
                 db,
                 context,
-                new ad_log {
+                new ad_log
+                {
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.del,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_chucnang_id
+                    id_lienket = mnu.md_chucnang_id,
+                    ma_lienket = mnu.ma_chucnang
                 }
             );
             db.SubmitChanges();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = ex.Message;
         }
 
-        EndEventHandler:;
+    EndEventHandler:;
 
-        if(msg.Length <= 0)
+        if (msg.Length <= 0)
         {
             jqGridHelper.Utils.writeResult(1, "Xóa chức năng thành công");
         }
@@ -268,7 +275,7 @@ public class ChucNangSanPhamController : IHttpHandler
             jqGridHelper.Filter f = jqGridHelper.Filter.CreateFilter(_filters);
             filter = f.ToScript();
         }
-        
+
         String sqlCount = "SELECT COUNT(*) AS count FROM md_chucnang where 1=1 {0}";
         sqlCount = string.Format(sqlCount, filter);
         int page = int.Parse(context.Request.QueryString["page"]);
@@ -299,7 +306,7 @@ public class ChucNangSanPhamController : IHttpHandler
 
         string strsql = "select * from( " +
             " select cn.md_chucnang_id, cn.trangthai, cn.ma_chucnang, cn.ten_tv, cn.ten_ta, cn.ten_tv_dai, cn.ten_ta_dai, cn.ngaytao, cn.nguoitao, cn.ngaycapnhat, cn.nguoicapnhat, cn.mota, cn.hoatdong " +
-            ",  ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum "+
+            ",  ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
             " from md_chucnang cn where 1=1 {0}" +
             ")P where RowNum > @start AND RowNum < @end";
         strsql = string.Format(strsql, filter);

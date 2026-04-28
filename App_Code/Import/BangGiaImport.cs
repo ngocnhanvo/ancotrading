@@ -83,7 +83,8 @@ public class BangGiaImport : ImportOriginal
                 nexxdecor_check = false,
                 hanhdong = VoNgocNhan.API_Data.add,
                 table = mnu.GetType().Name,
-                id_lienket = mnu.md_banggia_id
+                id_lienket = mnu.md_banggia_id,
+                ma_lienket = mnu.ten_banggia
             }
         );
         db.SubmitChanges();
@@ -112,7 +113,8 @@ public class BangGiaImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = bg.GetType().Name,
-                    id_lienket = bg.md_banggia_id
+                    id_lienket = bg.md_banggia_id,
+                    ma_lienket = mnu.ten_banggia
                 }
             );
         }

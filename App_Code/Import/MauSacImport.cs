@@ -154,7 +154,8 @@ public class MauSacImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.add,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_mausac_id
+                    id_lienket = mnu.md_mausac_id,
+                    ma_lienket = $"{code_cl} - {code_dt} - {code_mau}"
                 }
             );
         db.SubmitChanges();
@@ -188,7 +189,8 @@ public class MauSacImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = o.GetType().Name,
-                    id_lienket = o.md_mausac_id
+                    id_lienket = o.md_mausac_id,
+                    ma_lienket = $"{code_cl} - {code_dt} - {code_mau}"
                 }
             );
         }

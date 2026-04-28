@@ -185,7 +185,7 @@
 					<% 
 					string str = "<option value=\"\"></option>";
 					//foreach (md_doitackinhdoanh cn in db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id != null & s.md_doitackinhdoanh_id != "" & s.md_loaidtkd_id == "e39d870cb41bf429e4e033e37c8a4789").OrderBy(s=> s.ma_dtkd))
-					foreach (md_doitackinhdoanh cn in db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id != null & s.md_doitackinhdoanh_id != "" & (s.md_loaidtkd_id == kh_id | s.md_loaidtkd_id == ncc_id | s.md_loaidtkd_id == ncuvt_id)
+					foreach (md_doitackinhdoanh cn in db.md_doitackinhdoanhs.Where(s => s.hoatdong == true && s.md_doitackinhdoanh_id != null & s.md_doitackinhdoanh_id != "" & (s.md_loaidtkd_id == kh_id | s.md_loaidtkd_id == ncc_id | s.md_loaidtkd_id == ncuvt_id)
 					).OrderBy(s=> s.ma_dtkd))
 					{
 						string selected = "";

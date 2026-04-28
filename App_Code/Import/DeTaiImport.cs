@@ -132,7 +132,8 @@ public class DeTaiImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.add,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_detai_id
+                    id_lienket = mnu.md_detai_id,
+                    ma_lienket = $"{code_cl} - {code_dt}"
                 }
             );
         db.SubmitChanges();
@@ -166,7 +167,8 @@ public class DeTaiImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = o.GetType().Name,
-                    id_lienket = o.md_detai_id
+                    id_lienket = o.md_detai_id,
+                    ma_lienket = $"{o.code_cl} - {o.code_dt}"
                 }
             );
         }

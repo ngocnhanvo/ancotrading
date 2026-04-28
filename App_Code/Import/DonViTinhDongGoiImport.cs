@@ -1,6 +1,8 @@
-﻿using System;
-using System.Data;
+﻿using ExcelLibrary.BinaryFileFormat;
+using ExcelLibrary.SpreadSheet;
+using System;
 using System.Configuration;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
@@ -9,7 +11,6 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
-using ExcelLibrary.SpreadSheet;
 
 
 public class DonViTinhDongGoiImport : ImportOriginal
@@ -74,7 +75,8 @@ public class DonViTinhDongGoiImport : ImportOriginal
                nexxdecor_check = false,
                hanhdong = VoNgocNhan.API_Data.add,
                table = obj.GetType().Name,
-               id_lienket = obj.md_donvitinh_id
+               id_lienket = obj.md_donvitinh_id,
+               ma_lienket = obj.ma_edi
            }
         );
         db.SubmitChanges();
@@ -101,7 +103,8 @@ public class DonViTinhDongGoiImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = o.GetType().Name,
-                    id_lienket = o.md_donvitinh_id
+                    id_lienket = o.md_donvitinh_id,
+                    ma_lienket = o.ma_edi
                 }
             );
         }

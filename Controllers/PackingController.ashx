@@ -90,10 +90,10 @@ public class PackingController : IHttpHandler
                                 HttpContext.Current,
                                 new ad_log
                                 {
-                                    nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = spst.GetType().Name,
-                                    id_lienket = spst.md_donggoi_id
+                                    id_lienket = spst.md_donggoi_id,
+                                    ma_lienket = spst.ma_donggoi
                                 }
                             );
                         }
@@ -110,7 +110,8 @@ public class PackingController : IHttpHandler
                                     nexxdecor_check = false,
                                     hanhdong = VoNgocNhan.API_Data.edit,
                                     table = sp.GetType().Name,
-                                    id_lienket = sp.md_donggoi_id
+                                    id_lienket = sp.md_donggoi_id,
+                                    ma_lienket = sp.ma_donggoi
                                 }
                             );
                         db.SubmitChanges();
@@ -321,10 +322,10 @@ public class PackingController : IHttpHandler
                     context,
                     new ad_log
                     {
-                        nexxdecor_check = false,
                         hanhdong = VoNgocNhan.API_Data.edit,
                         table = m.GetType().Name,
-                        id_lienket = m.md_donggoi_id
+                        id_lienket = m.md_donggoi_id,
+                        ma_lienket = m.ma_donggoi,
                     }
                 );
             }
@@ -419,7 +420,8 @@ public class PackingController : IHttpHandler
                    nexxdecor_check = false,
                    hanhdong = VoNgocNhan.API_Data.add,
                    table = mnu.GetType().Name,
-                   id_lienket = mnu.md_donggoi_id
+                   id_lienket = mnu.md_donggoi_id,
+                   ma_lienket = mnu.ma_donggoi
                }
             );
             db.SubmitChanges();
@@ -455,7 +457,8 @@ public class PackingController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = mnu.GetType().Name,
-                    id_lienket = mnu.md_donggoi_id
+                    id_lienket = mnu.md_donggoi_id,
+                    ma_lienket = mnu.ma_donggoi
                 }
             );
             db.SubmitChanges();

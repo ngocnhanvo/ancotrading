@@ -176,7 +176,8 @@ public class ProductSOANTHAOController : IHttpHandler
                                 anhiepluc_check = false,
                                 hanhdong = VoNgocNhan.API_Data.edit,
                                 table = sp.GetType().Name,
-                                id_lienket = sp.md_sanpham_id
+                                id_lienket = sp.md_sanpham_id,
+                                ma_lienket = sp.ma_sanpham
                             }
                         );
                         msg += string.Format(@"<div style='color: blue'>mã SP:{0} đã chuyển sang ngưng hoạt động</div>", sp.ma_sanpham);
@@ -213,7 +214,8 @@ public class ProductSOANTHAOController : IHttpHandler
                                 anhiepluc_check = false,
                                 hanhdong = VoNgocNhan.API_Data.edit,
                                 table = sp.GetType().Name,
-                                id_lienket = sp.md_sanpham_id
+                                id_lienket = sp.md_sanpham_id,
+                                ma_lienket = sp.ma_sanpham
                             }
                         );
                         msg += string.Format(@"<div style='color: blue'>mã SP:{0} đã chuyển sang Đang hoạt động</div>", sp.ma_sanpham);
@@ -454,7 +456,8 @@ public class ProductSOANTHAOController : IHttpHandler
                         anhiepluc_check = false,
                         hanhdong = VoNgocNhan.API_Data.edit,
                         table = m.GetType().Name,
-                        id_lienket = m.md_sanpham_id
+                        id_lienket = m.md_sanpham_id,
+                        ma_lienket = m.ma_sanpham
                     }
                 );
                 db.SubmitChanges();
@@ -538,7 +541,8 @@ public class ProductSOANTHAOController : IHttpHandler
                         nexxdecor_check = false,
                         hanhdong = VoNgocNhan.API_Data.add,
                         table = mnu.GetType().Name,
-                        id_lienket = mnu.md_sanpham_id
+                        id_lienket = mnu.md_sanpham_id,
+                        ma_lienket = mnu.ma_sanpham
                     }
                 );
                 db.SubmitChanges();
@@ -572,7 +576,8 @@ public class ProductSOANTHAOController : IHttpHandler
                         anhiepluc_check = false,
                         hanhdong = VoNgocNhan.API_Data.edit,
                         table = sp.GetType().Name,
-                        id_lienket = sp.md_sanpham_id
+                        id_lienket = sp.md_sanpham_id,
+                        ma_lienket = sp.ma_sanpham
                     }
                 );
                 db.SubmitChanges();

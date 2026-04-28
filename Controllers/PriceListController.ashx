@@ -97,7 +97,8 @@ public class PriceListController : IHttpHandler
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = m.GetType().Name,
-                    id_lienket = m.md_banggia_id
+                    id_lienket = m.md_banggia_id,
+                    ma_lienket = m.ten_banggia
                 }
             );
         }
@@ -147,7 +148,8 @@ public class PriceListController : IHttpHandler
                 nexxdecor_check = false,
                 hanhdong = VoNgocNhan.API_Data.add,
                 table = mnu.GetType().Name,
-                id_lienket = mnu.md_banggia_id
+                id_lienket = mnu.md_banggia_id,
+                ma_lienket = mnu.ten_banggia
             }
         );
         db.SubmitChanges();
@@ -160,28 +162,40 @@ public class PriceListController : IHttpHandler
         try
         {
             var bg = db.md_banggias.Where(s => s.md_banggia_id == id).FirstOrDefault();
-            if(bg == null)
+            if (bg == null)
             {
                 msg = "Không tìm thấy bảng giá đã chọn";
                 goto EndEventHandler;
             }
 
             var pbgs = db.md_phienbangias.Where(s => s.md_banggia_id == id).ToList();
-            if(pbgs.Count > 0)
+            if (pbgs.Count > 0)
             {
                 msg = "Bảng giá có chứa phiên bản giá!";
                 goto EndEventHandler;
             }
 
             db.md_banggias.DeleteOnSubmit(bg);
+            VoNgocNhan.API_Data.themLichSuHoatDong(
+                db,
+                context,
+                new ad_log
+                {
+                    nexxdecor_check = false,
+                    hanhdong = VoNgocNhan.API_Data.del,
+                    table = bg.GetType().Name,
+                    id_lienket = bg.md_banggia_id,
+                    ma_lienket = bg.ten_banggia
+                }
+            );
             db.SubmitChanges();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             msg = ex.Message;
         }
 
-        EndEventHandler:;
+    EndEventHandler:;
 
         if (msg.Length <= 0)
         {
