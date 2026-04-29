@@ -167,7 +167,7 @@ public class TaoPackingListController : IHttpHandler {
                 p.md_doitackinhdoanh_id = donhang.md_doitackinhdoanh_id;
                 line.md_sanpham_id = item["md_sanpham_id"].ToString();
                 line.mota_tienganh = dongdonhang.mota_tienganh;
-                //line.mota_tiengviet = dongdonhang.mota_tiengviet;
+                line.mota_tiengviet = dongdonhang.mota_tiengviet;
                 line.ma_sanpham_khach = dongdonhang.ma_sanpham_khach;
                 line.soluong = decimal.Parse(item["slthuc_nhapxuat"].ToString());
                 line.gia = dongnx.dongia;
