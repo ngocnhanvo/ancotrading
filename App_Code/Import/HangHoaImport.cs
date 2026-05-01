@@ -247,7 +247,8 @@ public class HangHoaImport : ImportOriginal
                 anhiepluc_check = false,
                 hanhdong = VoNgocNhan.API_Data.add,
                 table = sp.GetType().Name,
-                id_lienket = sp.md_sanpham_id
+                id_lienket = sp.md_sanpham_id,
+                ma_lienket = sp.ma_sanpham
             }
         );
         db.SubmitChanges();
@@ -304,7 +305,8 @@ public class HangHoaImport : ImportOriginal
                     anhiepluc_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = o.GetType().Name,
-                    id_lienket = o.md_sanpham_id
+                    id_lienket = o.md_sanpham_id,
+                    ma_lienket = o.ma_sanpham
                 }
             );
         }
