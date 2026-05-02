@@ -275,7 +275,7 @@ public class Controller_YeuCauCapNhat_DongHang : IHttpHandler, IDisposable
                     }
                 }
             }
-            else
+            else if(!string.IsNullOrWhiteSpace(log.ma_lienket))
             {
                 updateLog(log, dtkd.ma_dtkd, pttspLogs);
             }

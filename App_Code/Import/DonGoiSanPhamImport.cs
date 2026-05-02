@@ -14,7 +14,7 @@ using ExcelLibrary.SpreadSheet;
 
 public class DonGoiSanPhamImport : ImportOriginal
 {
-    private String maDongGoi, maSanPham;
+    private String maDongGoi, maSanPham, idSanPham;
     private bool macDinh;
 
     public bool MacDinh
@@ -35,6 +35,12 @@ public class DonGoiSanPhamImport : ImportOriginal
         set { maSanPham = value; }
     }
 
+    public String IdSanPham
+    {
+        get { return idSanPham; }
+        set { idSanPham = value; }
+    }
+
     public DonGoiSanPhamImport()
     {
     
@@ -50,7 +56,7 @@ public class DonGoiSanPhamImport : ImportOriginal
         , DateTime ngayTao, String nguoiTao, DateTime ngayCapNhat, String nguoiCapNhat, bool hoatDong)
     {
         this.maDongGoi = md_donggoi_id;
-        this.maSanPham = md_sanpham_id;
+        this.idSanPham = md_sanpham_id;
         this.macDinh = macDinh;
         this.ngayTao = ngayTao;
         this.nguoiTao = nguoiTao;
@@ -65,7 +71,7 @@ public class DonGoiSanPhamImport : ImportOriginal
         {
             md_donggoisanpham_id = Helper.getNewId(),
             md_donggoi_id = maDongGoi,
-            md_sanpham_id = maSanPham,
+            md_sanpham_id = idSanPham,
             soluong = 1,
             macdinh = macDinh,
             hoatdong = hoatDong,
@@ -84,7 +90,8 @@ public class DonGoiSanPhamImport : ImportOriginal
                nexxdecor_check = false,
                hanhdong = VoNgocNhan.API_Data.add,
                table = mnu.GetType().Name,
-               id_lienket = mnu.md_donggoisanpham_id
+               id_lienket = mnu.md_donggoisanpham_id,
+               ma_lienket = MaSanPham
            }
         );
         db.SubmitChanges();
@@ -113,7 +120,8 @@ public class DonGoiSanPhamImport : ImportOriginal
                     nexxdecor_check = false,
                     hanhdong = VoNgocNhan.API_Data.edit,
                     table = o.GetType().Name,
-                    id_lienket = o.md_donggoisanpham_id
+                    id_lienket = o.md_donggoisanpham_id,
+                    ma_lienket = MaSanPham
                 }
             );
         }
