@@ -631,7 +631,7 @@ public partial class PrintControllers_InDanhMucKhaiHQ02_Default : System.Web.UI.
             string sql_de = @"select ma_sanpham, hscode, soluong, gia, thanhtien, 'VIETNAM' as xuatxu,
                                 mota_tiengviet, ten_dvt
                             from
-                            (select sp.ma_sanpham, cdnx.mota_tiengviet, hscode.hscode,
+                            (select sp.ma_sanpham, dpk.mota_tiengviet, hscode.hscode,
 	                            dpk.soluong, dpk.gia, dpk.thanhtien,
 	                            dpk.mota_tienganh, dvt.mota as ten_dvt
                             from c_dongpklinv dpk

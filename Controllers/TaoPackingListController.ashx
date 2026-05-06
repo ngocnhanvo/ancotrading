@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data;
 
-public class TaoPackingListController : IHttpHandler {
+public class TaoPackingListController : IHttpHandler
+{
     LinqDBDataContext db = new LinqDBDataContext();
 
     public void ProcessRequest(HttpContext context)
@@ -44,18 +45,18 @@ public class TaoPackingListController : IHttpHandler {
             var dtkd = db.md_doitackinhdoanhs.Where(s => s.md_doitackinhdoanh_id == md_doitackinhdoanh_id).FirstOrDefault();
 
             String txtSoInvoice = "";
-            if(selTheoSCT)
+            if (selTheoSCT)
                 txtSoInvoice = jqGridHelper.Utils.taoChungTuXuatKho(dtkd, db, txtSCT_giucho);
             else
             {
                 txtSoInvoice = context.Request.Form["p[txtSoInvoice]"].removeAllSpaceOrTrimText(true);
-                if(txtSoInvoice.Length <= 0)
+                if (txtSoInvoice.Length <= 0)
                 {
                     throw new Exception("Phải điền số Invoice");
                 }
 
                 var inv = db.c_packinginvoices.Where(s => s.so_inv == txtSoInvoice).FirstOrDefault();
-                if(inv != null)
+                if (inv != null)
                 {
                     throw new Exception("Số Invoice đã được sử dụng trước đó");
                 }
@@ -65,9 +66,9 @@ public class TaoPackingListController : IHttpHandler {
             c_donhang_spd spd = null;
             var p = new c_packinginvoice();
             var hsct = db.c_donhangchungtus.Where(s => s.c_donhang_id == donhangM.c_donhang_id).FirstOrDefault();
-            if(hsct != null)
+            if (hsct != null)
             {
-                if(string.IsNullOrWhiteSpace(hsct.dongghep))
+                if (string.IsNullOrWhiteSpace(hsct.dongghep))
                 {
                     p.etd2 = hsct.ngayETD;
                     spd = db.c_donhang_spds.Where(s => s.c_donhang_id == hsct.c_donhang_id).FirstOrDefault();
@@ -88,7 +89,7 @@ public class TaoPackingListController : IHttpHandler {
             }
 
             p.c_packinginvoice_id = Helper.getNewId();
-            if(spd != null)
+            if (spd != null)
             {
                 p.POD = spd.POD;
                 p.Forwarder = spd.Forwarder;
@@ -157,7 +158,7 @@ public class TaoPackingListController : IHttpHandler {
                 var dongdonhang = db.c_dongdonhangs.Single(ddh => ddh.c_dongdonhang_id.Equals(item["c_dongdonhang_id"]));
                 var donhang = db.c_donhangs.Single(dh => dh.c_donhang_id.Equals(dongdonhang.c_donhang_id));
                 string c_danhsachdathang_id = db.c_dongdsdhs.Where(s => s.c_dongdsdh_id == dongnx.c_dongdsdh_id).Select(s => s.c_danhsachdathang_id).FirstOrDefault();
-                if(lstDHs.Where(s=>s.c_donhang_id == donhang.c_donhang_id).Count() <= 0)
+                if (lstDHs.Where(s => s.c_donhang_id == donhang.c_donhang_id).Count() <= 0)
                     lstDHs.Add(donhang);
                 line.c_dongpklinv_id = Security.EncodeMd5Hash(DateTime.Now.ToString("yyyyMMddhhmmss") + item["c_dongnhapxuat_id"].ToString());
                 line.c_packinginvoice_id = p.c_packinginvoice_id;
@@ -211,7 +212,7 @@ public class TaoPackingListController : IHttpHandler {
                 var chucnang = db.md_chucnangs.Where(s => s.md_chucnang_id == sp.md_chucnang_id).FirstOrDefault();
                 var chungloai = db.md_chungloais.Where(s => s.md_chungloai_id == sp.md_chungloai_id).FirstOrDefault();
                 var detai = db.md_detais.Where(s => s.code_cl == chungloai.code_cl & s.code_dt == sp.ma_sanpham.Substring(6, 2)).FirstOrDefault();
-                var dvt = db.md_donvitinhsanphams.Where(s=>s.md_donvitinhsanpham_id == sp.md_donvitinhsanpham_id).FirstOrDefault();
+                var dvt = db.md_donvitinhsanphams.Where(s => s.md_donvitinhsanpham_id == sp.md_donvitinhsanpham_id).FirstOrDefault();
                 var dongHoaDon = new c_hoadon_ct();
                 dongHoaDon.c_hoadon_ct_id = Helper.getNewId();
                 dongHoaDon.c_hoadon_id = hoadon.c_hoadon_id;
@@ -225,7 +226,7 @@ public class TaoPackingListController : IHttpHandler {
                 var bocai = sp.ma_sanpham.Substring(9, 2);
                 if (dvt.ma_edi == "set")
                 {
-                    var ten_bo = db.md_bos.Where(s => s.ma_bo == bocai & s.ten_bo != null).Select(s=>s.ten_bo).FirstOrDefault();
+                    var ten_bo = db.md_bos.Where(s => s.ma_bo == bocai & s.ten_bo != null).Select(s => s.ten_bo).FirstOrDefault();
                     dongHoaDon.ten_dvt = ten_bo;
                 }
                 else
@@ -236,9 +237,13 @@ public class TaoPackingListController : IHttpHandler {
                 sothutu += 10;
             }
 
-            if(lstDHs.Count > 0)
+            var dhids = lstDHs.Select(s => s.c_donhang_id).ToList();
+            var dongpkls = db.c_dongpklinvs.Where(s => dhids.Contains(s.c_donhang_id)).Select(s => s.c_donhang_id).ToList();
+            lstDHs = lstDHs.Where(s => !dongpkls.Contains(s.c_donhang_id)).ToList();
+            if (lstDHs.Count > 0)
             {
                 p.tiendatcocPO = lstDHs.Select(s => s.datcoc.GetValueOrDefault(0)).Sum();
+                p.tiendatcoc = p.tiendatcocPO;
             }
 
             //tao comudity tren packing-list/invoice
@@ -292,20 +297,22 @@ public class TaoPackingListController : IHttpHandler {
             p.diengiaicong_po = diendai_phitang;
             p.diengiaitru_po = diendai_phigiam;
 
-            var lstHHStr = lstHH.Where(s=>(bool)s["discount_hehang"]).Select(s => new {
+            var lstHHStr = lstHH.Where(s => (bool)s["discount_hehang"]).Select(s => new
+            {
                 hh = s["code_cl"].ToString(),
                 po = s["po"].ToString(),
                 containerSeal = s["containerSeal"].ToString()
             }).Distinct();
 
-            var lstPOStr = lstHH.Where(s=>!(bool)s["discount_hehang"]).Select(
-                s => new {
+            var lstPOStr = lstHH.Where(s => !(bool)s["discount_hehang"]).Select(
+                s => new
+                {
                     po = s["po"].ToString(),
                     containerSeal = s["containerSeal"].ToString()
                 }
             ).Distinct();
 
-            foreach(var hhPO in lstHHStr)
+            foreach (var hhPO in lstHHStr)
             {
                 var rowHHs = lstHH.Where(s => s["code_cl"].ToString() == hhPO.hh & s["po"].ToString() == hhPO.po & s["containerSeal"].ToString() == hhPO.containerSeal);
                 var tt = rowHHs.Sum(s => double.Parse(s["thanhtien"].ToString()));
@@ -313,7 +320,7 @@ public class TaoPackingListController : IHttpHandler {
                 totaldiscount = totaldiscount + (decimal)Math.Round(tt * discount / 100, 2);
             }
 
-            foreach(var po in lstPOStr)
+            foreach (var po in lstPOStr)
             {
                 var rowHHs = lstHH.Where(s => s["po"].ToString() == po.po & s["containerSeal"].ToString() == po.containerSeal);
                 var tt = rowHHs.Sum(s => double.Parse(s["thanhtien"].ToString()));
@@ -369,7 +376,7 @@ public class TaoPackingListController : IHttpHandler {
                 context.Response.Write(ex.Message);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             context.Response.Write(ex.Message);
         }
@@ -378,8 +385,10 @@ public class TaoPackingListController : IHttpHandler {
 
 
 
-    public bool IsReusable {
-        get {
+    public bool IsReusable
+    {
+        get
+        {
             return false;
         }
     }

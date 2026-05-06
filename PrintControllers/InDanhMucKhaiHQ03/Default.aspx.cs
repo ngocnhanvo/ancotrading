@@ -464,7 +464,7 @@ public partial class PrintControllers_InDanhMucKhaiHQ03_Default : System.Web.UI.
                         mota_tiengviet, ten_dvt , (trongluong * soluong) as trongluong, mota
                     from (
                         select 
-                            sp.ma_sanpham, cdnx.mota_tiengviet, hscode.hscode,
+                            sp.ma_sanpham, dpk.mota_tiengviet, hscode.hscode,
 	                        dpk.soluong, dpk.gia, dpk.thanhtien,
 	                        dpk.mota_tienganh, dvt.ten_dvt, sp.trongluong, cl.ta_ngan as mota
                         from c_dongpklinv dpk

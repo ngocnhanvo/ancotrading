@@ -627,7 +627,7 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                     select 
                         sp.ma_sanpham, cdd.ma_sanpham_khach, case when cdd.sl_outer = 0 then 0 else round(dpk.soluong/cdd.sl_outer, 1) end as noofpack ,
 					    dpk.soluong, dpk.gia, dpk.thanhtien, cdd.l2, cdd.w2, cdd.h2, cdd.l1, cdd.w1, cdd.h1,
-					    sp.mota_tiengviet, dvt.ten_dvt, mdg.sl_outer as sl_outer_dg, 
+					    dpk.mota_tiengviet, dvt.ten_dvt, mdg.sl_outer as sl_outer_dg, 
 					    (select ten_dvt from md_donvitinh where md_donvitinh_id = mdg.dvt_outer) as dvt_outer,		
 					    case when cdd.sl_outer = 0 then 0 else (round((cdd.l2 * cdd.h2 * cdd.w2/1000000 * dpk.soluong/cdd.sl_outer), 3)) end as cbm,
 					    (sp.trongluong*dpk.soluong) as nkg, cdd.sl_inner, cdd.sl_outer, hsc.hscode

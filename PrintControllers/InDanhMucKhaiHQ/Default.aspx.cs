@@ -20,7 +20,7 @@ public partial class PrintControllers_InDanhMucKhaiHQ_Default : System.Web.UI.Pa
         try
         {
             String c_pkivn_id = Request.QueryString["c_packinglist_id"];
-			String select = String.Format(@"select sp.ma_sanpham, hsc.hscode ,sp.mota_tiengviet , 'VIETNAM' as xuatxu, cdp.soluong, 
+			String select = String.Format(@"select sp.ma_sanpham, hsc.hscode ,cdp.mota_tiengviet , 'VIETNAM' as xuatxu, cdp.soluong, 
 												dvt.mota, cdp.gia, cdp.thanhtien
 											from c_dongpklinv cdp left join md_sanpham sp on cdp.md_sanpham_id = sp.md_sanpham_id
 												left join md_donvitinhsanpham dvt on sp.md_donvitinhsanpham_id = dvt.md_donvitinhsanpham_id
