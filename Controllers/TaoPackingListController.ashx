@@ -237,6 +237,8 @@ public class TaoPackingListController : IHttpHandler
                 sothutu += 10;
             }
 
+			p.tiendatcocPO = 0;
+			p.tiendatcoc = 0;
             var dhids = lstDHs.Select(s => s.c_donhang_id).ToList();
             var dongpkls = db.c_dongpklinvs.Where(s => dhids.Contains(s.c_donhang_id)).Select(s => s.c_donhang_id).ToList();
             lstDHs = lstDHs.Where(s => !dongpkls.Contains(s.c_donhang_id)).ToList();
