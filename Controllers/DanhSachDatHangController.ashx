@@ -10,6 +10,8 @@ using System.Data;
 using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Net;
+using System.Text;
 
 public class DanhSachDatHangController : IHttpHandler, IDisposable
 {
@@ -59,7 +61,11 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
             case "activepi":
                 this.activePI(context);
                 break;
-
+            //begin#vothanhsang
+            case "sendbasewebhook":
+                this.sendBaseWebhook(context);
+                break;
+            //end#vothanhsang
             case "getoption":
                 this.getSelectOption(context);
                 break;
@@ -90,6 +96,280 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
                 break;
         }
     }
+
+    public void sendBaseWebhook(HttpContext context)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.Charset = "UTF-8";
+
+        string excelPath = "";
+        string pdfPath = "";
+
+        try
+        {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            string piId = context.Request["piId"];
+
+            if (string.IsNullOrWhiteSpace(piId))
+            {
+                WriteJson(context, false, "Thiếu piId");
+                return;
+            }
+
+            string manv = UserUtils.getUser(context);
+            var nv = db.nhanviens.FirstOrDefault(p => p.manv.Equals(manv));
+
+            if (nv == null)
+            {
+                WriteJson(context, false, "Không tìm thấy nhân viên đăng nhập");
+                return;
+            }
+
+            var dsdh = db.c_danhsachdathangs.FirstOrDefault(x => x.c_danhsachdathang_id == piId);
+            if (dsdh == null)
+            {
+                WriteJson(context, false, "Không tìm thấy DSDH");
+                return;
+            }
+
+            var dh = db.c_donhangs.FirstOrDefault(x => x.c_donhang_id == dsdh.c_donhang_id);
+            if (dh == null)
+            {
+                WriteJson(context, false, "Không tìm thấy PO");
+                return;
+            }
+
+            var dtkd = db.md_doitackinhdoanhs
+                .FirstOrDefault(x => x.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id);
+
+            string maXuong = dtkd != null ? dtkd.ma_dtkd : "";
+            string chonXuong = MapTenXuong(maXuong);
+
+            DateTime shipmentDate = dh.shipmenttime.HasValue ? dh.shipmenttime.Value : DateTime.Now;
+
+            string ngayGiaoHang = shipmentDate.ToString("dd/MM/yyyy");
+            string ngayXongHang = shipmentDate.AddDays(-7).ToString("dd/MM/yyyy");
+
+            string mota = string.IsNullOrWhiteSpace(dsdh.mota) ? "" : dsdh.mota.Trim();
+            string canKiemHoa = mota.ToUpper().StartsWith("QCKH") ? "1" : "0";
+
+            // Tạo file Excel + PDF đơn đặt hàng có giá
+            //var fileDDHs = taoFileDonDatHang(context, manv, maXuong, dsdh, false);
+            var oldWriter = context.Response.Output;
+            var tempWriter = new StringWriter();
+
+            context.Response.Clear();
+            context.Response.Output = tempWriter;
+            var fileDDHs = taoFileDonDatHangBaseVn(context, manv, maXuong, dsdh, false);
+            
+
+            string reportErrorHtml = tempWriter.ToString();
+
+            context.Response.Clear();
+            context.Response.Output = oldWriter;
+            context.Response.ContentType = "application/json";
+            context.Response.Charset = "UTF-8";
+
+
+            if (fileDDHs == null || fileDDHs.Count < 2)
+            {
+                WriteJson(context, false, "Không tạo được file đơn đặt hàng");
+                return;
+            }
+
+            excelPath = fileDDHs[0];
+            pdfPath = fileDDHs[1];
+
+            if (string.IsNullOrWhiteSpace(excelPath) || !File.Exists(excelPath))
+            {
+                WriteJson(context, false, "Không tạo được file Excel đơn đặt hàng");
+                return;
+            }
+
+            bool hasPdf = !string.IsNullOrWhiteSpace(pdfPath) && File.Exists(pdfPath);
+
+            string pdfErrorText = "";
+
+            if (!hasPdf)
+            {
+                if (context.Items["BaseVnPdfError"] != null)
+                {
+                    pdfErrorText = context.Items["BaseVnPdfError"].ToString();
+                }
+                else if (!string.IsNullOrWhiteSpace(reportErrorHtml))
+                {
+                    pdfErrorText = reportErrorHtml
+                        .Replace("<div>", "")
+                        .Replace("</div>", " ")
+                        .Replace("<div style='margin-left:5px;'>", "")
+                        .Trim();
+                }
+                else
+                {
+                    pdfErrorText = "PDF chưa tạo được nhưng chưa có thông tin lỗi.";
+                }
+            }
+
+            string url = "https://service.base.vn/extapi/v1/ticket/create";
+
+            var fields = new Dictionary<string, string>();
+
+            fields["access_token_v2"] = "11185~kf3DiJCmLfq9KUbJ8G8Bp-EJdhl5suy9LysdqtfwfQlo485iGNXlD4pXh9X2WdbLBJfopt9exRHc8b8KzFuHq2j4dqCdYBG4XXV-4q3-CFyRCRLPsNDAZGe44xN_37x2ugOHq_v6f8L8Dswhu04K9A";
+            fields["service_id"] = "42631";
+            fields["block_id"] = "42632";
+
+            fields["username"] =nv.usernamebase ;
+
+            fields["name"] = "Phiếu yêu cầu đơn hàng " + dh.sochungtu +
+                             " tương ứng DSDH " + dsdh.sochungtu;
+
+            fields["followers"] = string.IsNullOrWhiteSpace(dsdh.nguoi_phutrach)
+                ? ""
+                : dsdh.nguoi_phutrach.Trim();
+
+            //fields["root_content"] =
+            //    "Tạo tự động từ hệ thống ERP\n" +
+            //    "Mã đơn hàng: " + dh.sochungtu + "\n" +
+            //    "DSDH: " + dsdh.sochungtu + "\n" +
+            //    "Xưởng/NCC: " + maXuong + "\n" +
+            //    "Ngày giao hàng dự kiến: " + ngayGiaoHang + "\n" +
+            //    "Ngày xong hàng dự kiến: " + ngayXongHang + "\n" +
+            //    "File đính kèm: PDF + Excel đơn đặt hàng";
+            fields["root_content"] =
+    "Tạo tự động từ hệ thống ERP\n" +
+    "Mã đơn hàng: " + dh.sochungtu + "\n" +
+    "DSDH: " + dsdh.sochungtu + "\n" +
+    "Xưởng/NCC: " + maXuong + "\n" +
+    "Ngày giao hàng dự kiến: " + ngayGiaoHang + "\n" +
+    "Ngày xong hàng dự kiến: " + ngayXongHang + "\n" +
+    "File đính kèm: " + (hasPdf ? "PDF + Excel đơn đặt hàng" : "Excel đơn đặt hàng. PDF chưa tạo được.");
+
+            fields["service_ma_don_hang"] = dh.sochungtu;
+            fields["service_ngay_giao_hang_du_kien"] = ngayGiaoHang;
+            fields["service_ngay_xong_hang_du_kien"] = ngayXongHang;
+            fields["service_can_kiem_hoa"] = canKiemHoa;
+            fields["service_chon_xuong"] = chonXuong;
+            //fields["service_file_layout"] = "Đã đính kèm PDF + Excel đơn đặt hàng từ ERP";
+            fields["service_file_layout"] = hasPdf
+    ? "Đã đính kèm PDF + Excel đơn đặt hàng từ ERP"
+    : "Đã đính kèm Excel đơn đặt hàng từ ERP. PDF chưa tạo được.";
+
+
+
+            var files = new List<BaseUploadFile>();
+
+            // Nếu có PDF thì gửi luôn
+            if (hasPdf)
+            {
+                files.Add(new BaseUploadFile
+                {
+                    FieldName = "root_file[]",
+                    FilePath = pdfPath,
+                    FileName = "Don_Dat_Hang_" + MakeSafeFileName(dsdh.sochungtu) + ".pdf",
+                    ContentType = "application/pdf"
+                });
+            }
+
+            // Excel luôn gửi
+            files.Add(new BaseUploadFile
+            {
+                FieldName = "root_file[]",
+                FilePath = excelPath,
+                FileName = "Don_Dat_Hang_" + MakeSafeFileName(dsdh.sochungtu) + ".xls",
+                ContentType = "application/vnd.ms-excel"
+            });
+
+
+
+
+
+
+            string baseResult = PostMultipart(url, fields, files);
+
+            dynamic baseObj = JsonConvert.DeserializeObject(baseResult);
+
+            string code = baseObj != null ? Convert.ToString(baseObj.code) : "";
+            string messageBase = baseObj != null ? Convert.ToString(baseObj.message) : "";
+            string data = baseObj != null ? Convert.ToString(baseObj.data) : "";
+
+            bool ok =
+                code == "1" ||
+                (
+                    code == "0" &&
+                    !string.IsNullOrWhiteSpace(data) &&
+                    !messageBase.ToLower().Contains("invalid") &&
+                    !messageBase.ToLower().Contains("error")
+                );
+
+            //context.Response.Write(JsonConvert.SerializeObject(new
+            //{
+            //    success = ok,
+            //    message = ok
+            //        ? "Tạo phiếu Base.vn thành công, đã đính kèm PDF + Excel đơn đặt hàng"
+            //        : "Base.vn từ chối dữ liệu",
+            //    excelFile = Path.GetFileName(excelPath),
+            //    pdfFile = Path.GetFileName(pdfPath),
+            //    baseResponse = baseResult
+            //}));
+            context.Response.Write(JsonConvert.SerializeObject(new
+{
+    success = ok,
+    message = ok
+        ? (hasPdf
+            ? "Tạo phiếu Base.vn thành công, đã đính kèm PDF + Excel đơn đặt hàng"
+            : "Tạo phiếu Base.vn thành công, đã đính kèm Excel. PDF chưa tạo được.")
+        : "Base.vn từ chối dữ liệu",
+
+    excelFile = Path.GetFileName(excelPath),
+    pdfFile = hasPdf ? Path.GetFileName(pdfPath) : "",
+    hasPdf = hasPdf,
+    pdfError = pdfErrorText,
+    baseResponse = baseResult
+}));
+        }
+        catch (WebException wex)
+        {
+            string err = wex.Message;
+
+            if (wex.Response != null)
+            {
+                using (var reader = new StreamReader(wex.Response.GetResponseStream()))
+                {
+                    err += " | Base response: " + reader.ReadToEnd();
+                }
+            }
+
+            context.Response.Write(JsonConvert.SerializeObject(new
+            {
+                success = false,
+                message = err,
+                stackTrace = wex.ToString()
+            }));
+        }
+
+        catch (Exception ex)
+        {
+            context.Response.Clear();
+            context.Response.ContentType = "application/json";
+            context.Response.Charset = "UTF-8";
+            context.Response.StatusCode = 200;
+
+            context.Response.Write(JsonConvert.SerializeObject(new
+            {
+                success = false,
+                message = ex.Message,
+                stackTrace = ex.ToString()
+            }));
+        }
+    }
+
+   
+
+
+
+
+
 
     public void danhsachdathang(HttpContext context)
     {
@@ -1261,7 +1541,151 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
             File.Delete(fileDGCXN);
     }
 
-    public void activePI(HttpContext context)
+     public void activePI(HttpContext context)
+    {
+        String msg = "";
+        try
+        {
+            String piId = context.Request.QueryString["piId"];
+            c_danhsachdathang dsdh = db.c_danhsachdathangs.FirstOrDefault(p => p.c_danhsachdathang_id.Equals(piId));
+
+            c_donhang donhang = db.c_donhangs.FirstOrDefault(dh => dh.c_donhang_id.Equals(dsdh.c_donhang_id));
+
+            if (dsdh.md_trangthai_id.Equals("SOANTHAO"))
+            {
+                var msgs = new List<Dictionary<string, string>>(msgPublics);
+                var madtkds = msgs.Select(s => s.Keys.FirstOrDefault()).ToList();
+
+                string ma_dtkd = db.md_doitackinhdoanhs.
+                        Where(s => s.md_doitackinhdoanh_id == dsdh.md_doitackinhdoanh_id).
+                        Select(s => s.ma_dtkd).FirstOrDefault();
+
+               bool laNhaCungCapCanKiemTra = madtkds.Contains(ma_dtkd);
+
+                bool duocHieuLuc = false;
+
+                // Mặc định: các NCC trong msgPublics phải ở trạng thái Đã Nhận
+                if (laNhaCungCapCanKiemTra)
+                {
+                    if (ma_dtkd == "ANBINH")
+                    {
+                        // Riêng ANBINH: Đã Nhận hoặc Đã Gửi đều được hiệu lực
+                        duocHieuLuc = dsdh.trangthai == "DAHIEULUC" || dsdh.trangthai == "DAGUI";
+                    }
+                    else
+                    {
+                        // Các NCC khác: vẫn bắt buộc Đã Nhận
+                        duocHieuLuc = dsdh.trangthai == "DAHIEULUC";
+                    }
+                }
+                else
+                {
+                    // NCC không nằm trong danh sách kiểm tra thì cho hiệu lực bình thường
+                    duocHieuLuc = true;
+                }
+
+                if (!duocHieuLuc)
+                {
+                    if (ma_dtkd == "ANBINH")
+                    {
+                        msg = String.Format(
+                            @"Hiệu lực thất bại! {0} phải trong trạng thái ""Đã nhận"" hoặc ""Đã gửi""",
+                            dsdh.sochungtu
+                        );
+                    }
+                    else
+                    {
+                        msg = String.Format(
+                            @"Hiệu lực thất bại! {0} phải trong trạng thái ""Đã nhận""",
+                            dsdh.sochungtu
+                        );
+                    }
+                }
+                else
+                {
+                    c_kehoachxuathang kehoach = new c_kehoachxuathang();
+                    kehoach.c_kehoachxuathang_id = Security.EncodeMd5Hash(DateTime.Now.ToString());
+                    kehoach.c_donhang_id = dsdh.c_donhang_id;
+                    kehoach.chungloaihang = "";
+                    kehoach.c_danhsachdathang_id = dsdh.sochungtu;
+                    kehoach.md_doitackinhdoanh_id = dsdh.md_doitackinhdoanh_id;
+                    kehoach.so_po = dsdh.so_po;
+                    kehoach.shipmenttime = donhang.shipmenttime;
+                    kehoach.ngaygiaohang = dsdh.hangiaohang_po;
+                    kehoach.ngayxonghang = dsdh.hangiaohang_po;
+                    kehoach.ngayxacnhanbaobi = dsdh.hangiaohang_po.Value.AddDays(-35);
+                    kehoach.cont20 = 0;
+                    kehoach.cont40 = 0;
+                    kehoach.cont40hc = 0;
+                    kehoach.md_trangthai_id = "SOANTHAO";
+                    kehoach.ngaytao = DateTime.Now;
+                    kehoach.ngaycapnhat = DateTime.Now;
+                    kehoach.nguoitao = UserUtils.getUser(context);
+                    kehoach.nguoicapnhat = UserUtils.getUser(context);
+                    kehoach.hoatdong = true;
+
+                    string sql_cbm = @"select SUM(tmp.cbm) 
+                                        from (
+                                            select case when cdg.sl_outer = 0 then 0
+                                                    else round(((cdg.l2 * cdg.h2 * cdg.w2) * cdh.sl_dathang/cdg.sl_outer)/1000000, 3) end as cbm
+                                                from c_dongdsdh cdh, c_dongdonhang cdg
+                                                where 
+                                                    cdh.c_dongdonhang_id = cdg.c_dongdonhang_id
+                                                    and c_danhsachdathang_id = '" + piId + "') as tmp";
+
+                    decimal cbm = (decimal)mdbc.ExecuteScalar(sql_cbm);
+                    kehoach.cbm = Math.Round(cbm, 3);
+                    kehoach.cbm_conlai = Math.Round(cbm, 3);
+
+                    string sql = @"select code_cl
+                        from md_chungloai where md_chungloai_id
+                        in(
+                            select distinct ms.md_chungloai_id
+                            from c_dongdsdh cnx, md_sanpham ms 
+                            where ms.md_sanpham_id = cnx.md_sanpham_id and 
+                                c_danhsachdathang_id in ('" + piId + "')" +
+                            ")order by code_cl";
+
+                    string cole_cl = " ";
+                    DataTable com = mdbc.GetData(sql);
+                    foreach (DataRow item in com.Rows)
+                    {
+                        cole_cl += item[0].ToString() + ", ";
+                    }
+
+                    kehoach.chungloaihang = cole_cl.Length > 2 ? cole_cl.Substring(0, cole_cl.Length - 2) : "";
+                    db.c_kehoachxuathangs.InsertOnSubmit(kehoach);
+
+                    dsdh.md_trangthai_id = "HIEULUC";
+                    db.SubmitChanges();
+
+                    String getTongSlConLai = "select sum(soluong_conlai) from c_dongdonhang ddh where ddh.c_donhang_id = @c_donhang_id";
+                    int c = int.Parse(mdbc.ExecuteScalar(getTongSlConLai, "@c_donhang_id", dsdh.c_donhang_id).ToString());
+
+                    if (c < 1)
+                    {
+                        donhang.ismakepi = true;
+                        db.SubmitChanges();
+                    }
+
+                    msg = String.Format("Hiệu lực danh sách đặt hàng {0} thành công.!", dsdh.sochungtu);
+                }
+
+
+            }
+            else
+            {
+                msg = String.Format("Hiện trạng thái danh sách đặt hàng {0} đã là hiệu lực.!", dsdh.sochungtu);
+            }
+        }
+        catch (SqlException ex)
+        {
+            msg = "Lỗi xảy ra khi hiệu lực PI" + ex.Message;
+        }
+        context.Response.Write(msg);
+    }
+
+    public void activePIThanhSangTest(HttpContext context)
     {
         String msg = "";
         try
@@ -1354,6 +1778,8 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
 
                     msg = String.Format("Hiệu lực danh sách đặt hàng {0} thành công.!", dsdh.sochungtu);
                 }
+
+
             }
             else
             {
@@ -1446,7 +1872,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
 
         db.SubmitChanges();
 
-    EndEventHandler:;
+        EndEventHandler:;
     }
 
     public void add(HttpContext context)
@@ -1565,7 +1991,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
             msg = ex.Message;
         }
 
-    EndEventHandler:;
+        EndEventHandler:;
 
         if (msg.Length <= 0)
         {
@@ -1787,106 +2213,7 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
             excel.lstText = rptPI.LstText;
             var result = excel.ConvertInterop(url, fileNamePdf, s1.LastRowNum, 0);
             File.Delete(url);
-            //rptDanhSachDatHang report = new rptDanhSachDatHang();
-            //SqlDataAdapter da = new SqlDataAdapter(getSqlDsdhPdf(dsdh.c_danhsachdathang_id, guiNCC), mdbc.GetConnection);
-            //DataSet ds = new DataSet();
-            //da.Fill(ds);
-            //var tbl = ds.Tables[0];
-            //if (tbl.Rows.Count > 0)
-            //{
-            //    string c_danhsachdathang_id = dsdh.c_danhsachdathang_id;
-            //    tbl.Columns.Add("money", Type.GetType("System.String"));
-            //    tbl.Columns.Add("mota_cong", Type.GetType("System.String"));
-            //    tbl.Columns.Add("mota_tru", Type.GetType("System.String"));
-            //    tbl.Columns.Add("discount", Type.GetType("System.Double"));
-            //    tbl.Columns.Add("giatritang", Type.GetType("System.Double"));
-            //    tbl.Columns.Add("giatrigiam", Type.GetType("System.Double"));
-            //    tbl.Columns.Add("tongtiendatru", Type.GetType("System.Double"));
-            //    //Header
 
-            //    //Footer
-            //    int lastRow = tbl.Rows.Count - 1;
-
-            //    var strSumThanhTien = tbl.Compute("Sum(thanhtien)", string.Empty).ToString();
-            //    double? total = null;
-            //    if (!string.IsNullOrEmpty(strSumThanhTien))
-            //        total = double.Parse(strSumThanhTien);
-
-            //    var strDiscount = tbl.Rows[0]["discountdecimal"].ToString();
-            //    double? discount_ = null;
-            //    if (!string.IsNullOrEmpty(strDiscount))
-            //        discount_ = double.Parse(strDiscount);
-
-            //    var totalDiscount = total.GetValueOrDefault(0) * discount_.GetValueOrDefault(0) / 100;
-            //    tbl.Rows[lastRow]["discount"] = totalDiscount;
-
-            //    var phitang = (from t in db.c_phidathangs where t.isphicong.Equals(true) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
-            //    tbl.Rows[lastRow]["giatritang"] = phitang.GetValueOrDefault(0);
-
-            //    var phigiam = (from t in db.c_phidathangs where t.isphicong.Equals(false) && t.c_danhsachdathang_id.Equals(c_danhsachdathang_id) select t.sotien).Sum();
-            //    tbl.Rows[lastRow]["giatrigiam"] = phigiam.GetValueOrDefault(0);
-
-            //    var varTang = db.c_phidathangs.FirstOrDefault(tg => tg.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && tg.isphicong.Equals(true));
-            //    var varGiam = db.c_phidathangs.FirstOrDefault(gi => gi.c_danhsachdathang_id.Equals(c_danhsachdathang_id) && gi.isphicong.Equals(false));
-
-            //    string dgTang, dgGiam;
-            //    dgTang = varTang == null ? "" : varTang.mota;
-            //    dgGiam = varGiam == null ? "" : varGiam.mota;
-
-            //    double? totalUSD = null;
-            //    string textMoney = "";
-            //    if (guiNCC == false)
-            //    {
-            //        totalUSD = total - (double)totalDiscount + (double)phitang.GetValueOrDefault(0) - (double)phigiam.GetValueOrDefault(0);
-            //        if (totalUSD != null)
-            //        {
-            //            if (new string[] { "VINHGIA" }.Contains(ma_dtkd))
-            //            {
-            //                string m = MoneyToWord.ConvertMoneyToText(totalUSD.ToString()).Replace("Dollars", "");
-            //                int j = m.LastIndexOf("and");
-
-            //                if (m.Contains("Cents") | m.Contains("Cent"))
-            //                {
-            //                    m = m.Replace("Cents", "").Replace("Cent", "");
-            //                    m = m.Insert(m.Length, "cents");
-            //                }
-            //                else
-            //                {
-            //                    m = m.Replace("Cents", "").Replace("Cent", "");
-            //                }
-            //                textMoney = m;
-            //            }
-            //            else
-            //            {
-            //                textMoney = MoneyToWord.ConvertMoneyToTextVND((decimal)totalUSD.GetValueOrDefault(0));
-            //            }
-            //            tbl.Rows[lastRow]["money"] = textMoney;
-            //            tbl.Rows[lastRow]["tongtiendatru"] = totalUSD;
-            //        }
-            //    }
-
-            //    string diengiai_cong = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 1 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
-            //    DataTable cong_ = mdbc.GetData(diengiai_cong);
-            //    var mota_cong = new List<string>();
-            //    for (int i_ = 0; i_ < cong_.Rows.Count; i_++)
-            //    {
-            //        mota_cong.Add(cong_.Rows[i_]["mota"].ToString());
-            //    }
-
-            //    string diengiai_tru = String.Format(@"select t.mota from c_phidathang t where t.isphicong = 0 and t.c_danhsachdathang_id = '{0}'", c_danhsachdathang_id == null ? "" : c_danhsachdathang_id);
-            //    DataTable tru_ = mdbc.GetData(diengiai_tru);
-            //    var mota_tru = new List<string>();
-            //    for (int i_ = 0; i_ < tru_.Rows.Count; i_++)
-            //    {
-            //        mota_tru.Add(tru_.Rows[i_]["mota"].ToString());
-            //    }
-            //    tbl.Rows[lastRow]["mota_cong"] = string.Join(",", mota_cong);
-            //    tbl.Rows[lastRow]["mota_tru"] = string.Join(",", mota_tru);
-            //}
-            //report.DataSource = ds;
-            //report.DataAdapter = da;
-            //fileNamePdf = path + fileNamePdf;
-            //report.ExportToPdf(fileNamePdf);
         }
         catch (Exception ex)
         {
@@ -1935,4 +2262,269 @@ public class DanhSachDatHangController : IHttpHandler, IDisposable
     {
         get { return false; }
     }
+
+
+
+    //Begin ThanhSang
+    public class BaseUploadFile
+    {
+        public string FieldName { get; set; }
+        public string FilePath { get; set; }
+        public string FileName { get; set; }
+        public string ContentType { get; set; }
+    }
+
+    private string PostMultipart(string url, Dictionary<string, string> fields, List<BaseUploadFile> files)
+    {
+        string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+        request.Method = "POST";
+        request.ContentType = "multipart/form-data; boundary=" + boundary;
+        request.Accept = "application/json";
+        request.UserAgent = "AncoTrading ERP";
+        request.Timeout = 180000;
+        request.KeepAlive = false;
+
+        try
+        {
+            using (Stream requestStream = request.GetRequestStream())
+            {
+                foreach (var field in fields)
+                {
+                    WriteString(requestStream, "--" + boundary + "\r\n");
+                    WriteString(requestStream, "Content-Disposition: form-data; name=\"" + field.Key + "\"\r\n\r\n");
+                    WriteString(requestStream, (field.Value ?? "") + "\r\n");
+                }
+
+                foreach (var file in files)
+                {
+                    if (file == null || string.IsNullOrWhiteSpace(file.FilePath) || !File.Exists(file.FilePath))
+                        continue;
+
+                    WriteString(requestStream, "--" + boundary + "\r\n");
+                    WriteString(requestStream,
+                        "Content-Disposition: form-data; name=\"" + file.FieldName + "\"; filename=\"" + file.FileName + "\"\r\n");
+                    WriteString(requestStream, "Content-Type: " + file.ContentType + "\r\n\r\n");
+
+                    using (FileStream fs = new FileStream(file.FilePath, FileMode.Open, FileAccess.Read))
+                    {
+                        byte[] buffer = new byte[8192];
+                        int bytesRead;
+
+                        while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            requestStream.Write(buffer, 0, bytesRead);
+                        }
+                    }
+
+                    WriteString(requestStream, "\r\n");
+                }
+
+                WriteString(requestStream, "--" + boundary + "--\r\n");
+            }
+
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+            using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+        catch (WebException ex)
+        {
+            string responseText = "";
+
+            if (ex.Response != null)
+            {
+                using (StreamReader reader = new StreamReader(ex.Response.GetResponseStream(), Encoding.UTF8))
+                {
+                    responseText = reader.ReadToEnd();
+                }
+            }
+
+            throw new Exception("Base.vn HTTP lỗi: " + ex.Message + " | Response: " + responseText, ex);
+        }
+    }
+
+    private void WriteString(Stream stream, string text)
+    {
+        byte[] bytes = Encoding.UTF8.GetBytes(text);
+        stream.Write(bytes, 0, bytes.Length);
+    }
+
+    private string MapTenXuong(string maXuong)
+    {
+        if (maXuong == "ANCO1") return "Xưởng Anco1";
+        if (maXuong == "ANHIEPLUC") return "Xưởng Anhiepluc";
+        if (maXuong == "ANBINH") return "Xưởng Anbinh";
+
+        return maXuong;
+    }
+
+    private string MakeSafeFileName(string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+            return DateTime.Now.ToString("yyyyMMddHHmmss");
+
+        foreach (char c in Path.GetInvalidFileNameChars())
+            fileName = fileName.Replace(c, '_');
+
+        return fileName;
+    }
+
+    private void WriteJson(HttpContext context, bool success, string message)
+    {
+        context.Response.Write(JsonConvert.SerializeObject(new
+        {
+            success = success,
+            message = message
+        }));
+    }
+    //End ThanhSang
+
+    // Begin VoThanhSang
+        public List<string> taoFileDonDatHangBaseVn(HttpContext context, string manv, string ma_dtkd, c_danhsachdathang dsdh, bool guiNCC)
+{
+    string fileName = manv + "Don-Dat-Hang-BaseVn-" + DateTime.Now.ToString("ssmmhh-dd-MM-yyyy") + guiNCC.ToString();
+
+    string fileNameXls = path + fileName + ".xls";
+    string fileNamePdf = path + fileName + ".pdf";
+
+    var arrLst = new List<string>();
+
+    try
+    {
+        var rptPI = new DanhSachDatHangReport(dsdh.c_danhsachdathang_id, logoPath, productImagePath);
+        rptPI.guiNCC = guiNCC;
+
+        var wb = rptPI.CreateWBPI();
+
+        var imgs = new List<AvariablePrj.lstImage>();
+        foreach (var img in rptPI.Lstimage)
+        {
+            img.dx1 = 10;
+            img.dx2 = 1000;
+            img.dy1 = 40;
+            img.dy2 = 215;
+            imgs.Add(img);
+        }
+
+        wb = rptPI.ConfigExcel.setImageForExcel(wb, imgs);
+
+        using (var xfile = new FileStream(fileNameXls, FileMode.Create, FileAccess.ReadWrite))
+        {
+            wb.Write(xfile);
+        }
+    }
+    catch (Exception ex)
+    {
+        fileNameXls = "";
+        context.Items["BaseVnPdfError"] = "Không tạo được Excel Base.vn: " + ex.Message;
+    }
+
+    if (!string.IsNullOrWhiteSpace(fileNameXls) && File.Exists(fileNameXls))
+    {
+        try
+        {
+            string err;
+            bool okPdf = ConvertExcelToPdfByLibreOffice(fileNameXls, fileNamePdf, out err);
+
+            if (!okPdf)
+            {
+                fileNamePdf = "";
+                context.Items["BaseVnPdfError"] = err;
+            }
+        }
+        catch (Exception ex)
+        {
+            fileNamePdf = "";
+            context.Items["BaseVnPdfError"] = "Lỗi convert Excel sang PDF: " + ex.Message;
+        }
+    }
+
+    arrLst.Add(fileNameXls);
+    arrLst.Add(fileNamePdf);
+
+    return arrLst;
+}
+        private bool ConvertExcelToPdfByLibreOffice(string excelPath, string pdfPath, out string error)
+{
+    error = "";
+
+    if (string.IsNullOrWhiteSpace(excelPath) || !File.Exists(excelPath))
+    {
+        error = "Không tìm thấy file Excel để chuyển PDF.";
+        return false;
+    }
+
+    string soffice = @"C:\Program Files\LibreOffice\program\soffice.exe";
+
+    if (!File.Exists(soffice))
+    {
+        soffice = @"C:\Program Files (x86)\LibreOffice\program\soffice.exe";
+    }
+
+    if (!File.Exists(soffice))
+    {
+        error = "Không tìm thấy LibreOffice. Cần cài LibreOffice trên server/IIS.";
+        return false;
+    }
+
+    string outputDir = Path.GetDirectoryName(pdfPath);
+    string expectedPdf = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(excelPath) + ".pdf");
+
+    try
+    {
+        if (File.Exists(expectedPdf))
+            File.Delete(expectedPdf);
+
+        if (File.Exists(pdfPath))
+            File.Delete(pdfPath);
+
+        ProcessStartInfo psi = new ProcessStartInfo();
+        psi.FileName = soffice;
+        psi.Arguments = "--headless --nologo --nofirststartwizard --convert-to pdf --outdir \"" 
+                        + outputDir + "\" \"" + excelPath + "\"";
+        psi.CreateNoWindow = true;
+        psi.UseShellExecute = false;
+        psi.RedirectStandardOutput = true;
+        psi.RedirectStandardError = true;
+
+        using (Process p = Process.Start(psi))
+        {
+            string output = p.StandardOutput.ReadToEnd();
+            string err = p.StandardError.ReadToEnd();
+
+            bool exited = p.WaitForExit(120000);
+
+            if (!exited)
+            {
+                try { p.Kill(); } catch { }
+                error = "LibreOffice convert PDF quá thời gian.";
+                return false;
+            }
+
+            if (!File.Exists(expectedPdf))
+            {
+                error = "LibreOffice không tạo ra file PDF. Output: " + output + " Error: " + err;
+                return false;
+            }
+
+            if (!expectedPdf.Equals(pdfPath, StringComparison.OrdinalIgnoreCase))
+            {
+                File.Move(expectedPdf, pdfPath);
+            }
+
+            return File.Exists(pdfPath);
+        }
+    }
+    catch (Exception ex)
+    {
+        error = "Lỗi LibreOffice: " + ex.Message;
+        return false;
+    }
+}
+
+
+    // End VoThanhSang
 }

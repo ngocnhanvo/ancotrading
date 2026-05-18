@@ -141,6 +141,12 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
 
                 string bc = ma_sanpham.Substring(9, 2);
 
+                //Beginvothanhsang
+                var mspsKhongLayTheoBo = new string[] { "36", "42", "49", "98" };
+                bool khongLayTheoBo = ma_sanpham.Length >= 2
+                    && mspsKhongLayTheoBo.Contains(ma_sanpham.Substring(0, 2));
+                //EndVoThanhSang
+
                 var dgsp = (from a in db.md_sanphams
                             join b in db.md_donggoisanphams on a.md_sanpham_id equals b.md_sanpham_id
                             join c in db.md_donggois on b.md_donggoi_id equals c.md_donggoi_id
@@ -165,7 +171,8 @@ public partial class PrintControllers_InThongTinSanPhamQRCode_Default : System.W
                                 s.qutyPerCont
                             }).FirstOrDefault();
 
-                if (bc.Substring(0, 1) != "0" & bc != "S1" & bc.Substring(0, 1) != "F")
+                //if (bc.Substring(0, 1) != "0" & bc != "S1" & bc.Substring(0, 1) != "F")
+                if (!khongLayTheoBo && bc.Substring(0, 1) != "0" && bc != "S1" && bc.Substring(0, 1) != "F") //BeginEndVoThanhSang
                 {
                     rowDetails.GetCell(4).SetCellValue(dgsp == null ? "" : dgsp.inner);
                     rowDetails.GetCell(5).SetCellValue(dgsp == null ? "" : dgsp.outer);

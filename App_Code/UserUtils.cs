@@ -280,11 +280,11 @@ public static class UserUtils
                         where c.md_sanpham_id == sp.md_sanpham_id
                         select new { c.md_sanpham_id }).Count();
 
-        
+
         var path = ExcuteSignalRStatic.getImageProduct(sp.ma_sanpham);
         var HinhAnh = path != Public.imgNotFound;
 
-        if(HinhAnh)
+        if (HinhAnh)
             HinhAnh = System.IO.File.Exists(ExcuteSignalRStatic.mapPathSignalR(string.Format("~/{0}", path)));
 
         if (countDG <= 0)
@@ -316,20 +316,20 @@ public static class UserUtils
         propInfo.SetValue(collection, true, new object[] { });
     }
 
-    public static string createPI(HttpContext context, c_donhang donhang, List<dongDatHang> dsSanPham,  LinqDBDataContext db)
+    public static string createPI(HttpContext context, c_donhang donhang, List<dongDatHang> dsSanPham, LinqDBDataContext db)
     {
 
         // String selSCT = @"SELECT (sct.tiento + '/' + CAST(sct.so_duocgan as nvarchar(32)) + '/' + hauto) as sochungtu 
-						 // FROM md_sochungtu sct, md_loaichungtu lct 
-						 // WHERE sct.md_loaichungtu_id = lct.md_loaichungtu_id AND lct.kieu_doituong = N'PI'";
+        // FROM md_sochungtu sct, md_loaichungtu lct 
+        // WHERE sct.md_loaichungtu_id = lct.md_loaichungtu_id AND lct.kieu_doituong = N'PI'";
 
         // String sochungtu = (String)mdbc.ExecuteScalar(selSCT);
-		
-		var sctObject = db.md_sochungtus
-			.Join(db.md_loaichungtus, sct => sct.md_loaichungtu_id, lct => lct.md_loaichungtu_id, (sct, lct) => new { sct, lct })
-			.Where(s=>s.lct.kieu_doituong == "PI" & s.sct.tiento == "DSDH").FirstOrDefault();
-			
-		String sochungtu = sctObject == null ? "" : string.Format(@"{0}/{1}/{2}", sctObject.sct.tiento, sctObject.sct.so_duocgan, sctObject.sct.hauto);
+
+        var sctObject = db.md_sochungtus
+            .Join(db.md_loaichungtus, sct => sct.md_loaichungtu_id, lct => lct.md_loaichungtu_id, (sct, lct) => new { sct, lct })
+            .Where(s => s.lct.kieu_doituong == "PI" & s.sct.tiento == "DSDH").FirstOrDefault();
+
+        String sochungtu = sctObject == null ? "" : string.Format(@"{0}/{1}/{2}", sctObject.sct.tiento, sctObject.sct.so_duocgan, sctObject.sct.hauto);
 
         var dsPartner = dsSanPham.Select(p => p.md_doitackinhdoanh_id).Distinct().ToList();
 
@@ -355,7 +355,7 @@ public static class UserUtils
                     dondathang.discount = donhang.discount;
             }
         }
-        else if(new string[] { "ANCO1" }.Contains(maNCC))
+        else if (new string[] { "ANCO1" }.Contains(maNCC))
         {
             if (donhang.discount.GetValueOrDefault(0) == 100)
                 dondathang.discount = donhang.discount;
@@ -409,8 +409,8 @@ public static class UserUtils
 
             decimal giachuan = gianhap;
             //Neu doi tac la VINHGIA
-            
-			decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, 0, 0, db);
+
+            decimal gianhap2 = get_gianhap(context, ma_dtkd_select, ddonhang.giafob.Value, 0, 0, db);
             var giaNhap2BD = gianhap2;
             decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2, db);
             decimal tylePT = get_gianhap(context, ma_dtkd_select, -1, -1, -1, db);
@@ -424,18 +424,35 @@ public static class UserUtils
             }
             var phiDiscount_VND = jqGridHelper.Utils.Round5(phiDiscount * tygia, -2);
             //Chi phí đóng gói từng dòng hàng
-            var phiDongGoi = ddonhang.apdung_cpdg.GetValueOrDefault(false) ? ddonhang.cpdg.GetValueOrDefault(0) : 0;
-            var phiDongGoi_VND = jqGridHelper.Utils.Round5(phiDongGoi * tygia, -2);
+            //var phiDongGoi = ddonhang.apdung_cpdg.GetValueOrDefault(false) ? ddonhang.cpdg.GetValueOrDefault(0) : 0;
+
+            decimal phiDongGoi = 0;
+
+            //if (ddonhang.apdung_cpdg.GetValueOrDefault(false))
+            //{
+            phiDongGoi = jqGridHelper.Utils.Round5(
+                ddonhang.cpdg.GetValueOrDefault(0) * 23000,
+                -2
+            );
+            //}
+
+
+
+
+
+
+            //var phiDongGoi_VND = jqGridHelper.Utils.Round5(phiDongGoi * tygia, -2);
+            decimal phiDongGoi_VND = phiDongGoi;
 
             var msps = new string[] { "36", "42", "49", "98" };
             if (msps.Contains(sp.ma_sanpham.Substring(0, 2)))
                 coGiaMua = true;
-
-            if (maNCC == "ANCO1")
-            {
-                if(coGiaMua)
-                    giaNhap2BD = -1;
-            }
+            // Bỏ trường hợp Lấy từ bảng giá 
+            //if (maNCC == "ANCO1")
+            //{
+            //    if(coGiaMua)
+            //        giaNhap2BD = -1;
+            //}
 
             if (giaNhap2BD > -1)
             {
@@ -448,7 +465,7 @@ public static class UserUtils
                     gianhap2 = gianhap2 - gianhap2 * getDiscountgPO(donhang, ddonhang) / 100;
 
                 if (maNCC != "VINHGIA")
-                {    
+                {
                     gianhap = gianhap2;
                     giachuan = jqGridHelper.Utils.Round5(gianhap, -2);
                     phiDiscount = phiDiscount_VND;
@@ -457,7 +474,7 @@ public static class UserUtils
                 }
                 else
                 {
-					gianhap = ddonhang.discount.GetValueOrDefault(0) > 0 ? gianhap2 : giaNhap2BD;
+                    gianhap = ddonhang.discount.GetValueOrDefault(0) > 0 ? gianhap2 : giaNhap2BD;
                     giachuan = gianhap;
                     gianhap = giachuan + phiDiscount + phiDongGoi;
                 }
@@ -780,7 +797,7 @@ public static class UserUtils
         var phanBoDiscountVaoGia = pbds.GetValueOrDefault(false) ? giaFOBvaPhi * discount / 100 : 0;
         var giaHopDong = giaFOBvaPhi - phanBoDiscountVaoGia;
 
-        if(ddh.apdung_cpdg.GetValueOrDefault(false))
+        if (ddh.apdung_cpdg.GetValueOrDefault(false))
             giaHopDong = giaHopDong + ddh.cpdg.GetValueOrDefault(0);
 
         return round == null ? giaHopDong : Math.Round(giaHopDong, round.GetValueOrDefault(0), MidpointRounding.AwayFromZero);
@@ -795,7 +812,7 @@ public static class UserUtils
         }
         else
         {
-            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : (dh.discount.GetValueOrDefault(0) <= 0 ? (decimal)ddh.discount.GetValueOrDefault(0): dh.discount.GetValueOrDefault(0));
+            discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : (dh.discount.GetValueOrDefault(0) <= 0 ? (decimal)ddh.discount.GetValueOrDefault(0) : dh.discount.GetValueOrDefault(0));
         }
         return discount;
     }
@@ -808,7 +825,7 @@ public static class UserUtils
         {
             discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : dh.discount.GetValueOrDefault(0);
         }
-        else if(type == 1)
+        else if (type == 1)
         {
             discount = dh.phanbodiscount.GetValueOrDefault(false) ? 0 : (decimal)ddh.discount.GetValueOrDefault(0);
         }
@@ -822,3 +839,4 @@ public static class UserUtils
         public string tien;
     }
 }
+

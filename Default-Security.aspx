@@ -1054,7 +1054,7 @@
 										window.open(printURL + "?md_sanpham_id=" + valueLike+"&typedg=" + $('#chk_dgmd_ptt0').prop('checked')
 										+ status_, "In Thông Tin Sản Phẩm", windowSize);
 									} else {
-										alert('Bạn chưa chọn sản phẩm cần in.!');
+										alert('Bạn chưa chọn sản phẩm cần in1.!');
 									}
 								}
 								else if (printType == "printThongTinMore") {

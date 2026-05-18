@@ -1,4 +1,4 @@
-//Update at 27/04/2026 14:46:06
+//Update at 13/05/2026 10:41:35
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -51590,6 +51590,7 @@ private System.Nullable<bool> _themPhiSauHL;
 private System.Nullable<bool> _canOTP;
 private string _smtp;
 private string _vaitro2_id;
+private string _usernamebase;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -51650,6 +51651,8 @@ partial void OnsmtpChanging(string value);
 partial void OnsmtpChanged();
 partial void Onvaitro2_idChanging(string value);
 partial void Onvaitro2_idChanged();
+partial void OnusernamebaseChanging(string value);
+partial void OnusernamebaseChanged();
 #endregion
 public nhanvien()
 {
@@ -52184,6 +52187,25 @@ this.SendPropertyChanging();
 this._vaitro2_id = value;
 this.SendPropertyChanged("vaitro2_id");
 this.Onvaitro2_idChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_usernamebase", DbType="Nvarchar(100) NOT NULL", CanBeNull=false , UpdateCheck=UpdateCheck.Never)]
+public string @usernamebase
+{
+get
+{
+return this._usernamebase;
+}
+set
+{
+if ((this._usernamebase != value))
+{
+this.OnusernamebaseChanging(value);
+this.SendPropertyChanging();
+this._usernamebase = value;
+this.SendPropertyChanged("usernamebase");
+this.OnusernamebaseChanged();
 }
 }
 }
