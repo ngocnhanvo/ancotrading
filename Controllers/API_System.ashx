@@ -110,7 +110,7 @@ public class API_System : IHttpHandler
                 isZipped = true;
             }
 
-            string encodedFileName = Uri.EscapeDataString(downloadName);
+            string encodedFileName = Uri.EscapeDataString(downloadName).Replace("'", "%27");
             context.Response.Clear();
             context.Response.Buffer = false;
             context.Response.AddHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFileName);
