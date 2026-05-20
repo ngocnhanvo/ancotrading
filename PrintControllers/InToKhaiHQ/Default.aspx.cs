@@ -22,6 +22,14 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         else
             return "BO";
     }
+    // 
+    //  <td>
+    // 
+    //   </td> 
+    //
+    //
+    //  
+
     protected void Page_Load(object sender, EventArgs e)
     {
         //try
@@ -690,10 +698,16 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                 ir.CreateCell(8).CellFormula = String.Format("F{0}*H{0}", r + 1);
                 //ir.CreateCell(8).SetCellValue(double.Parse(g_dt["thanhtien"].ToString()));
                 ir.GetCell(8).CellStyle = styleNumber0i00Border12;
-                int result;
-                bool isNumber = int.TryParse(bocai, out result);
-                ir.CreateCell(9).SetCellValue(isNumber ? bocai.ToNullableInt().Value : 1);
+
+                //int result;
+                //bool isNumber = int.TryParse(bocai, out result);
+                //ir.CreateCell(9).SetCellValue(isNumber ? bocai.ToNullableInt().Value : 1);
+                //ir.GetCell(9).CellStyle = styleNumber0Border12;
+
+                int slCaiChoTungMaHang = LaySLCaiChoTungMaHang(msp);
+                ir.CreateCell(9).SetCellValue(slCaiChoTungMaHang); 
                 ir.GetCell(9).CellStyle = styleNumber0Border12;
+
 
                 ir.CreateCell(10).SetCellValue(double.Parse(g_dt["nkg"].ToString()));
                 ir.GetCell(10).CellStyle = styleNumber0i00Border12;
@@ -1079,4 +1093,44 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
         font.FontHeightInPoints = size;
         return font;
     }
+
+    //#VoThanhSang
+    private int LaySLCaiChoTungMaHang(string maSanPham)
+    {
+        if (string.IsNullOrEmpty(maSanPham) || maSanPham.Length < 11)
+            return 1;
+
+        string ma = maSanPham.Substring(9, 2).ToUpper(); // vị trí 10 và 11
+
+        // 01 → 07 = 1
+        if (ma == "01" || ma == "02" || ma == "03" || ma == "04" || ma == "05" || ma == "06" || ma == "07")
+            return 1;
+
+        // S1-S7, B1-B7, L1-L7
+        if ((ma.StartsWith("S") || ma.StartsWith("B") || ma.StartsWith("L")) && ma.Length == 2)
+        {
+            int so;
+            if (int.TryParse(ma.Substring(1, 1), out so) && so >= 1 && so <= 7)
+                return so;
+        }
+
+        // X1-X6
+        switch (ma)
+        {
+            case "X1":
+            case "X2":
+            case "X3":
+                return 2;
+
+            case "X4":
+            case "X5":
+                return 3;
+
+            case "X6":
+                return 4;
+        }
+
+        return 1;
+    }
+    //EnVoThanhSang
 }
