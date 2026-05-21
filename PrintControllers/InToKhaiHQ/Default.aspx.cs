@@ -48,7 +48,7 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
                 cpk.noiden, 
                 cpk.blno, 
                 cpk.commodity, 
-                cpk.etd2, 
+                cpk.etd, 
                 cpk.commodityvn,  
                 diengiaicong_po, 
                 giatricong_po, 
@@ -482,8 +482,24 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
 
         s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Ngày tàu chạy:");
         s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
-        var date_etd2 = dt.Rows[0]["etd2"].ToString().ToNullableDate();
-        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(date_etd2 == null ? "" : date_etd2.Value.ToString(Extension.fmtDate));
+        //var date_etd2 = dt.Rows[0]["etd2"].ToString().ToNullableDate();
+        //s1.GetRow(rowVNN).CreateCell(2).SetCellValue(date_etd2 == null ? "" : date_etd2.Value.ToString(Extension.fmtDate));
+
+        DateTime dateEtd;
+
+        string etdText = dt.Rows[0]["etd"] == DBNull.Value
+            ? ""
+            : dt.Rows[0]["etd"].ToString();
+
+        if (DateTime.TryParse(etdText, out dateEtd))
+        {
+            s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dateEtd.ToString(Extension.fmtDate));
+        }
+        else
+        {
+            s1.GetRow(rowVNN).CreateCell(2).SetCellValue(etdText);
+        }
+
         s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
         s1.GetRow(rowVNN).HeightInPoints = 22;
         //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 8));
@@ -499,7 +515,9 @@ public partial class PrintControllers_InToKhaiHQ_Default : System.Web.UI.Page
 
         s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("Cảng đến:");
         s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
-        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(to);
+        //s1.GetRow(rowVNN).CreateCell(2).SetCellValue(to);
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["noiden"].ToString());// #vothanhsang
+
         s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_noWrap;
         s1.GetRow(rowVNN).HeightInPoints = 22;
         //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 8));

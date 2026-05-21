@@ -128,7 +128,7 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         font22Bold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
 
         IFont font14Bold = hssfworkbook.CreateFont();
-        font14Bold.FontHeightInPoints = 14;
+        font14Bold.FontHeightInPoints = 13;
         font14Bold.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
 
         IFont font18Bold = hssfworkbook.CreateFont();
@@ -441,26 +441,80 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
         s1.GetRow(rowVNN).HeightInPoints = 22;
         rowVNN++;
 
+
+
+
+        string dc_kh = dt.Rows[0]["ten_dtkd"].ToString()
+            + "\nAddress: " + dt.Rows[0]["diachi"].ToString();
+            //+ "\nTel: " + dt.Rows[0]["tel"].ToString()
+            //+ "\nFax: " + dt.Rows[0]["fax"].ToString();
+
         s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("For the account & risk of the buyer:");
         s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
-        s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 6));
-        s1.GetRow(rowVNN).HeightInPoints = 22;
-        rowVNN++;
-        rowVNN++;
-        string dc_kh = "";
-        dc_kh = dt.Rows[0]["ten_dtkd"].ToString() + " \nAddress:" + dt.Rows[0]["diachi"].ToString() + "\nTel:" + dt.Rows[0]["tel"].ToString() + "\nFax:" + dt.Rows[0]["fax"].ToString();
-        HSSFRichTextString rich = new HSSFRichTextString(dc_kh);
-        s1.CreateRow(rowVNN).CreateCell(2).SetCellValue(rich);
+
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dc_kh);
         s1.GetRow(rowVNN).GetCell(2).CellStyle = styleTop14Bold;
-        s1.GetRow(rowVNN).HeightInPoints = 95;
+
         s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 6));
-        s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("M/V:");
-        s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
-        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["mv"].ToString());
-        s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_nowrap;
-        s1.GetRow(rowVNN).HeightInPoints = 22;
-        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 6));
+        s1.GetRow(rowVNN).HeightInPoints = 95;
+
         rowVNN++;
+
+
+
+
+        //s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("For the account & risk of the buyer:");
+        //s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 6));
+        //s1.GetRow(rowVNN).HeightInPoints = 22;
+
+        //rowVNN++;
+        //rowVNN++;
+        //string dc_kh = "";
+        //dc_kh = dt.Rows[0]["ten_dtkd"].ToString() + " \nAddress:" + dt.Rows[0]["diachi"].ToString() + "\nTel:" + dt.Rows[0]["tel"].ToString() + "\nFax:" + dt.Rows[0]["fax"].ToString();
+        //HSSFRichTextString rich = new HSSFRichTextString(dc_kh);
+        //s1.CreateRow(rowVNN).CreateCell(2).SetCellValue(rich);
+        //s1.GetRow(rowVNN).GetCell(2).CellStyle = styleTop14Bold;
+        //s1.GetRow(rowVNN).HeightInPoints = 95;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 6));
+        //s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("M/V:");
+        //s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        //s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["mv"].ToString());
+        //s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_nowrap;
+        //s1.GetRow(rowVNN).HeightInPoints = 22;
+        //rowVNN++;
+
+
+
+
+
+        //rowVNN++;
+        //rowVNN++;
+
+        //string dc_kh = "";
+        //dc_kh = dt.Rows[0]["ten_dtkd"].ToString()
+        //    + "\nAddress: " + dt.Rows[0]["diachi"].ToString()
+        //    + "\nTel: " + dt.Rows[0]["tel"].ToString()
+        //    + "\nFax: " + dt.Rows[0]["fax"].ToString();
+
+        //HSSFRichTextString rich = new HSSFRichTextString(dc_kh);
+
+        //s1.CreateRow(rowVNN).CreateCell(0).SetCellValue(rich);
+        //s1.GetRow(rowVNN).GetCell(0).CellStyle = styleTop14Bold;
+        //s1.GetRow(rowVNN).HeightInPoints = 95;
+        //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 0, 6));
+        //rowVNN++;
+
+        //// M/V xuống dòng mới
+        //s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("M/V:");
+        //s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
+        //s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["mv"].ToString());
+        //s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_nowrap;
+        //s1.GetRow(rowVNN).HeightInPoints = 22;
+        //rowVNN++;
+
+
+
 
         s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("From:");
         s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
@@ -472,7 +526,9 @@ public partial class PrintControllers_InInvoice_Default : System.Web.UI.Page
 
         s1.CreateRow(rowVNN).CreateCell(0).SetCellValue("To:");
         s1.GetRow(rowVNN).GetCell(0).CellStyle = style12;
-        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(to);
+        //s1.GetRow(rowVNN).CreateCell(2).SetCellValue(to);
+        s1.GetRow(rowVNN).CreateCell(2).SetCellValue(dt.Rows[0]["noiden"].ToString()); // #vothanhsang
+
         s1.GetRow(rowVNN).GetCell(2).CellStyle = style12_nowrap;
         s1.GetRow(rowVNN).HeightInPoints = 22;
         //s1.AddMergedRegion(new CellRangeAddress(rowVNN, rowVNN, 2, 6));
