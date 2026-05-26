@@ -157,6 +157,7 @@ public class UserController : IHttpHandler {
         u.vaitro2_id = context.Request.Form["tencv"].removeAllSpaceOrTrimText(true);
         u.mota = context.Request.Form["mota"];
         u.hoten = context.Request.Form["hoten"];
+        u.usernamebase = context.Request.Form["usernamebase"]; //#vothanhsang
         u.email = context.Request.Form["email"];
         u.email_pass = context.Request.Form["email_pass"] == "" ? u.email_pass : context.Request.Form["email_pass"];
         u.smtp = context.Request.Form["smtp"];
@@ -216,6 +217,7 @@ public class UserController : IHttpHandler {
                 mavt = context.Request.Form["tenvt"],
                 vaitro2_id = context.Request.Form["tencv"].removeAllSpaceOrTrimText(true),
                 hoten = context.Request.Form["hoten"],
+                usernamebase = context.Request.Form["usernamebase"],//#vothanhsang
                 email = context.Request.Form["email"],
                 email_pass = context.Request.Form["email_pass"],
                 smtp = context.Request.Form["smtp"],
@@ -350,6 +352,7 @@ public class UserController : IHttpHandler {
             xml += "<cell><![CDATA[" + row["tenvt"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tencv"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["hoten"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["usernamebase"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["email"] + "]]></cell>";
             xml += "<cell><![CDATA[" + "" + "]]></cell>";
             xml += "<cell><![CDATA[" + row["smtpserver"] + "]]></cell>";

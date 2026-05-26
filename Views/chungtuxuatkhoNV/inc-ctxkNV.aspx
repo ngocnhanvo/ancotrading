@@ -4,6 +4,7 @@
 <%@ Register Src="master.ascx" TagName="ctxk" TagPrefix="master" %>
 <%@ Register Src="cacdonghangNV.ascx" TagName="cdh" TagPrefix="detail" %>
 <%@ Register Src="cackhoanphiNV.ascx" TagName="ckp" TagPrefix="detail" %>
+
 <script type="text/javascript">
     var id_inc_ctxkNV = "";
     $(document).ready(function () {

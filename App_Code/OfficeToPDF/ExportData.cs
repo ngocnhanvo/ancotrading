@@ -715,7 +715,7 @@ namespace OfficeToPDF
 
                 var urlPDF = urlExcel.Substring(0, urlExcel.LastIndexOf(".") + 1) + "pdf";
 				string msg = "", urlFN = "";
-                /*var excelConvert = new ExcelConverter();
+                var excelConvert = new ExcelConverter();
                 excelConvert.lstText = null;
                 excelConvert.lstImage = lstImage;
                 excelConvert.lstTextReplace = lstTextReplace;
@@ -724,46 +724,8 @@ namespace OfficeToPDF
 
                 excelConvert.endRow = infoExcel.rptFooter;
                 excelConvert.endColumn = maxColumn;
-                string urlFN = printCf.isPDF.GetValueOrDefault(false) ? urlPDF : urlExcel;
-                var msg = excelConvert.ConvertInterop(urlExcel, urlFN, null);*/
-				
-				urlFN = printCf.isPDF.GetValueOrDefault(false) ? urlPDF : urlExcel;
-                var req = new AvariablePrj.ExportRequest {
-                    urlExcel = urlExcel,
-                    urlFN = urlFN,
-                    lstImage = lstImage,
-                    lstTextReplace = lstTextReplace,
-                    lstAutoSizeColumn = lstAutoSizeColumn,
-                    endrow = infoExcel.rptFooter.GetValueOrDefault(0),
-                    endColumn = maxColumn
-                };
-                string urlInterop = Helper.urlReportExcel;
-                var request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(urlInterop);
-                request.Method = "POST";
-                request.ContentType = "application/json";
-
-                request.Timeout = 120000;
-                request.ReadWriteTimeout = 120000;
-
-                // Convert object -> JSON
-                string json = Newtonsoft.Json.JsonConvert.SerializeObject(req);
-                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(json);
-
-                request.ContentLength = bytes.Length;
-
-                // Write body
-                using (var stream = request.GetRequestStream())
-                {
-                    stream.Write(bytes, 0, bytes.Length);
-                }
-
-                // Read response
-                using (var response = (System.Net.HttpWebResponse)request.GetResponse())
-                using (var reader = new StreamReader(response.GetResponseStream()))
-                {
-                    string result = reader.ReadToEnd();
-                    msg = result;
-                }
+                urlFN = printCf.isPDF.GetValueOrDefault(false) ? urlPDF : urlExcel;
+                msg = excelConvert.ConvertInterop(urlExcel, urlFN, s1.LastRowNum, maxColumn);
 
                 if (msg.Length <= 0)
                 {

@@ -35,8 +35,9 @@
         $('#tabs-dathang-details').tabs();
     });
 
-
+    // Hiệu Lực
     function funcActivePI() {
+        //alert("KKK");
         let msg = "";
         let id = $('#grid_ds_dathang').jqGrid('getGridParam', 'selrow');
 
@@ -92,11 +93,71 @@
                                     $("#btn-close").button("enable");
                                 });
 
+                                //$.get("Controllers/DanhSachDatHangController.ashx?action=activepi&piId=" + id, function (result) {
+                                //    $('#dialog-active-pi').find('#dialog-caution').html(result);
+                                //    $('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
+                                //});
+                                // #vothanhsang
+                                //$.get("Controllers/DanhSachDatHangController.ashx?action=activepi&piId=" + id, function (result) {
+
+                                //    $('#dialog-active-pi').find('#dialog-caution').html(result);
+                                //    $('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
+
+
+
+
+                                //    $.ajax({
+                                //        url: "Controllers/DanhSachDatHangController.ashx?action=sendbasewebhook&piId=" + id,
+                                //        type: "POST",
+                                //        dataType: "json",
+                                //        success: function (rs) {
+                                //            console.log("Base webhook success:", rs);
+                                //            alert(rs.message);
+                                //        },
+                                //        error: function (xhr, status, error) {
+                                //            console.log("Status:", xhr.status);
+                                //            console.log("Error:", error);
+                                //            console.log("Response:", xhr.responseText);
+                                //            alert("Lỗi gửi Base webhook: " + xhr.responseText);
+                                //        }
+                                //    });
+                                //});
+                                ////////////////////////////////////////////////////////////////////////////////////////////////
+
                                 $.get("Controllers/DanhSachDatHangController.ashx?action=activepi&piId=" + id, function (result) {
-                                    //$('#dialog-caution').css({ 'color': 'green' });
+
                                     $('#dialog-active-pi').find('#dialog-caution').html(result);
                                     $('#grid_ds_dathang').jqGrid().trigger('reloadGrid');
+
+                                    // Chỉ gửi Base.vn nếu activePI thành công
+                                    if (result.indexOf("thành công") >= 0) {
+
+                                        $.ajax({
+                                            url: "Controllers/DanhSachDatHangController.ashx?action=sendbasewebhook&piId=" + id,
+                                            type: "POST",
+                                            dataType: "json",
+                                            success: function (rs) {
+                                                console.log("Base webhook success:", rs);
+                                                alert(rs.message);
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.log("Status:", xhr.status);
+                                                console.log("Error:", error);
+                                                console.log("Response:", xhr.responseText);
+                                                alert("Lỗi gửi Base webhook: " + xhr.responseText);
+                                            }
+                                        });
+
+                                    } else {
+                                        alert("Không thể hiệu lực và gửi Base.vn được vì :\n" + result);
+                                    }
                                 });
+
+
+                                
+
+
+
                             }
                         },
                         {
@@ -401,6 +462,7 @@
 
 <script>
     function dupEditDanhSachDatHang(rowid) {
+        
         <% if (DaoRules.GetRuleEdit(Context))
     { %>
         $(this).jqGrid('editGridRow', rowid, {

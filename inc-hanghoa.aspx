@@ -180,7 +180,8 @@
             });
     }
 	
-	function funcPrintSP() {
+    function funcPrintSP() {
+        //alert("Hello");
         funcPrintSPPublic('grid_ds_sanpham');
     }
 	

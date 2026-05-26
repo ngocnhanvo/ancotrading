@@ -160,31 +160,42 @@ public partial class PrintControllers_ExportQRCode_Default : System.Web.UI.Page
                 rowDetails.GetCell(9).CellStyle = cellNumber;
 
                 string bc = ma_sanpham.Substring(9, 2);
-				
-				var dgsp = (from a in db.md_sanphams
-							   join b in db.md_donggoisanphams on a.md_sanpham_id equals b.md_sanpham_id
-							   join c in db.md_donggois on b.md_donggoi_id equals c.md_donggoi_id
-							   where a.ma_sanpham == ma_sanpham & b.macdinh == true
-							   select new { 
-									c.sl_inner, 
-									dvtInner = db.md_donvitinhs.Where(s=>s.md_donvitinh_id == c.dvt_inner).Select(s=>s.ten_dvt).FirstOrDefault(),
-									c.sl_outer,
-									dvtOuter = db.md_donvitinhs.Where(s=>s.md_donvitinh_id == c.dvt_outer).Select(s=>s.ten_dvt).FirstOrDefault(),
-									c.l2_mix,
-									c.w2_mix,
-									c.h2_mix,
-									qutyPerCont = c.soluonggoi_ctn_20 + " pal/20\"; " + c.soluonggoi_ctn + " pal/40\""
-								}).ToList().Select(s => new {
-									inner = s.sl_inner + " " + s.dvtInner,
-									outer = s.sl_outer + " " +  s.dvtOuter,
-									palletSize = 
-									"L" + s.l2_mix.GetValueOrDefault(0).ToString("#,#0.#") + 
-									"- W" + s.w2_mix.GetValueOrDefault(0).ToString("#,#0.#") + 
-									"- H" + s.h2_mix.GetValueOrDefault(0).ToString("#,#0.#") + " cm",
-									s.qutyPerCont
-								}).FirstOrDefault();
-								
-				if (bc.Substring(0, 1) != "0" & bc != "S1" & bc.Substring(0, 1) != "F")
+
+                var dgsp = (from a in db.md_sanphams
+                            join b in db.md_donggoisanphams on a.md_sanpham_id equals b.md_sanpham_id
+                            join c in db.md_donggois on b.md_donggoi_id equals c.md_donggoi_id
+                            where a.ma_sanpham == ma_sanpham & b.macdinh == true
+                            select new
+                            {
+                                c.sl_inner,
+                                dvtInner = db.md_donvitinhs.Where(s => s.md_donvitinh_id == c.dvt_inner).Select(s => s.ten_dvt).FirstOrDefault(),
+                                c.sl_outer,
+                                dvtOuter = db.md_donvitinhs.Where(s => s.md_donvitinh_id == c.dvt_outer).Select(s => s.ten_dvt).FirstOrDefault(),
+                                c.l2_mix,
+                                c.w2_mix,
+                                c.h2_mix,
+                                qutyPerCont = c.soluonggoi_ctn_20 + " pal/20\"; " + c.soluonggoi_ctn + " pal/40\""
+                            }).ToList().Select(s => new
+                            {
+                                inner = s.sl_inner + " " + s.dvtInner,
+                                outer = s.sl_outer + " " + s.dvtOuter,
+                                palletSize =
+                                "L" + s.l2_mix.GetValueOrDefault(0).ToString("#,#0.#") +
+                                "- W" + s.w2_mix.GetValueOrDefault(0).ToString("#,#0.#") +
+                                "- H" + s.h2_mix.GetValueOrDefault(0).ToString("#,#0.#") + " cm",
+                                s.qutyPerCont
+                            }).FirstOrDefault();
+
+
+
+
+
+
+
+
+
+
+                if (bc.Substring(0, 1) != "0" & bc != "S1" & bc.Substring(0, 1) != "F")
                 {
                     rowDetails.GetCell(4).SetCellValue(dgsp == null ? "" : dgsp.inner);
                     rowDetails.GetCell(5).SetCellValue(dgsp == null ? "" : dgsp.outer);

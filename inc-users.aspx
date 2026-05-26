@@ -68,6 +68,15 @@
                 , edittype: 'text'
             },
             {
+                fixed: true, name: 'usernamebase'
+                , label: 'Username Base'
+                , index: 'usernamebase'
+                , width: 120
+                , editable: true
+                , edittype: 'text'
+            },
+
+            {
                 fixed: true, name: 'email'
                 , label: 'Email'
                 , index: 'email'
