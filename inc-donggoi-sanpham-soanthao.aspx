@@ -717,7 +717,7 @@
                     dataInit : function (elem) { 
                         $(elem).combogrid({
                             width: '480px',
-                            url: 'Controllers/ProductController.ashx?action=getcombogrid',
+                            url: 'Controllers/ProductSOANTHAOController.ashx?action=getcombogrid',
                             colModel: [
                                 { 'columnName': 'md_sanpham_id', 'width': '0', 'label': 'ID', hidden:true }
                               , { 'columnName': 'ma_sanpham', 'width': '50', 'label': 'Mã SP', 'align':'left'}

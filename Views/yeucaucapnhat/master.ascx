@@ -161,6 +161,82 @@
                 ]
         });
     }
+
+    function in_yeucaucapnhatHangHoa() {
+        let windowSize = "width=700,height=700,scrollbars=yes";
+        let poId = $('#grid_ds_yeucaucapnhat').jqGrid('getGridParam', 'selrow');
+        if (!poId) {
+            alert('Không tìm thấy dòng đã chọn');
+            return;
+        }
+
+        let name = 'dialog-print-yeucaucapnhat';
+        let title = 'Trích xuất dữ liệu';
+        let content = `
+        <div style="width: 100%; height: 100%; max-width: 500px; padding-bottom: 10px; background-color: #ffffff; overflow: hidden;box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 8px;">
+            <table style="width: 100%; border-collapse: collapse; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                <tr>
+                    <td style="padding: 14px 16px; width: 90px; vertical-align: middle;">
+                        <label style="font-weight: 600; color: #4a5568; font-size: 14px;">Tên table</label>
+                    </td>
+                    <td style="padding: 14px 16px; vertical-align: middle;">
+                        <select id="sel_table_yeucaucapnhat" style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; color: #334155; background-color: #fff; outline: none; box-sizing: border-box;">
+                            <option>Đang tải...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 14px 16px; vertical-align: middle;">
+                        <label style="font-weight: 600; color: #4a5568; font-size: 14px;">Mã nhận diện</label>
+                    </td>
+                    <td style="padding: 14px 16px; vertical-align: middle;">
+                        <input type="text" id="inp_manhandien_yeucaucapnhat" placeholder="Nhập mã nhận diện..." style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; color: #334155; outline: none; box-sizing: border-box;"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        `;
+        $('body').append(`<div title="${title}" id="${name}">${content}</div>`);
+        let $select = $('#sel_table_yeucaucapnhat');
+        let $manhandien = $('#inp_manhandien_yeucaucapnhat');
+        let nameParent = '#' + name;
+        $(nameParent).dialog({
+            modal: true,
+            width: 420,
+            open: function (event, ui) {
+                const url = $('#grid_ds_yeucaucapnhat').jqGrid('getGridParam', 'url');
+                $select.empty();
+                $.post(url, { oper: 'loadDT', id: poId }, function (rs) {
+                    const data = JSON.parse(rs);
+                    $.each(data, function (index, item) {
+                        console.log(item);
+                        $select.append(`<option value="${item.table}">${item.ten}</option>`);
+                    });
+                });
+            },
+            close: function () {
+                $('#btn-print-close').click();
+            },
+            buttons: [
+                {
+                    id: "btn-print-ok",
+                    text: "In",
+                    click: function () {
+                        const windowSize = "width=700,height=700,scrollbars=yes";
+                        let printURL = `Views/yeucaucapnhat/in/phieuYCcapnhatHH.aspx?id=${poId}&loai=${$select.val()}&mnd=${$manhandien.val()}`;
+                        window.open(printURL, `In Thông Tin ${$select.val()}`, windowSize);
+                    }
+                }
+                , {
+                    id: "btn-print-close",
+                    text: "Thoát",
+                    click: function () {
+                        $(this).dialog("destroy").remove();
+                    }
+                }
+            ]
+        });
+    }
 </script>
 
 <uc1:jqGrid ID="grid_ds_yeucaucapnhat"
@@ -170,6 +246,7 @@
     RowNumbers="true"
     FuncActive="funcHieuLucYCCapNhat"
     GuiDonHang="guiphieu_yeucaucapnhatHangHoa"
+    BtnPrint="in_yeucaucapnhatHangHoa"
     OndblClickRow="
         function(rowid) { 
             $(`#edit_grid_ds_yeucaucapnhat`).click();     

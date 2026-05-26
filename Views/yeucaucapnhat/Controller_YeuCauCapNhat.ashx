@@ -41,6 +41,9 @@ public class Controller_YeuCauCapNhat : IHttpHandler, IDisposable
             default:
                 switch (oper)
                 {
+                    case "loadDT":
+                        this.loadDT(context);
+                        break;
                     case "del":
                         this.del(context);
                         break;
@@ -56,6 +59,43 @@ public class Controller_YeuCauCapNhat : IHttpHandler, IDisposable
                 }
                 break;
         }
+    }
+
+    public void loadDT(HttpContext context)
+    {
+        var id = context.Request.Form["id"];
+        var pyc = db.md_phieuthongtinsanphams.Where(s => s.md_phieuthongtinsanpham_id == id).FirstOrDefault();
+        if(pyc == null)
+        {
+            throw new Exception("Không tìm thấy phiếu đã chọn");
+        }
+
+        var tableNameMapping = new Dictionary<string, string>
+        {
+            { "md_chungloai", "Chủng loại" },
+            { "md_kieudang", "Kiểu dáng" },
+            { "md_chucnang", "Chức năng" },
+            { "md_nhomnangluc", "Nhóm năng lực" },
+            { "md_hscode", "HSCode" },
+            { "md_detai", "Đề tài" },
+            { "md_mausac", "Màu sắc" },
+            { "md_banggia", "Bảng giá" },
+            { "md_phienbangia", "Phiên bản giá" },
+            { "md_giasanpham", "Giá sản phẩm" },
+            { "md_sanpham", "Sản phẩm" },
+            { "md_donggoi", "Đóng gói" },
+            { "md_donggoisanpham", "Đóng gói SP" }
+        };
+
+        var tables = db.md_phieuthongtinsanpham_logs
+            .Where(s => s.md_phieuthongtinsanpham_id == pyc.md_phieuthongtinsanpham_id)
+            .ToList();
+        var result = tables.Select(s => new
+        {
+            table = s.table,
+            ten = tableNameMapping.ContainsKey(s.table ?? "") ? tableNameMapping[s.table ?? ""] : ""
+        }).Where(s => !string.IsNullOrWhiteSpace(s.ten)).Distinct().OrderBy(s => s.ten).ToList();
+        context.Response.Write(Newtonsoft.Json.JsonConvert.SerializeObject(result));
     }
 
     public void kiemtraTTGui(HttpContext context)
@@ -217,7 +257,7 @@ public class Controller_YeuCauCapNhat : IHttpHandler, IDisposable
                 body += "Truy cập vào hệ thống để xem chi tiết thay đổi";
                 mail.Send(
                     nv.email
-                    , dtkd.email
+                    , dtkd.email_nhandulieugoc
                     , nv.email_cc
                     , title
                     , body

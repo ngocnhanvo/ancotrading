@@ -175,15 +175,23 @@ namespace OfficeToPDF
                             var link = ExcuteSignalRStatic.mapPathSignalR("~/" + dt.Rows[0][a].ToString());
                             if (lstImage.Where(s => s.link == link).Count() <= 0)
                             {
-                                lstImage.Add(new AvariablePrj.lstImage()
+                                if (File.Exists(link))
                                 {
-                                    column = item.FirstColumn,
-                                    columnLast = item.LastColumn,
-                                    row = item.FirstRow,
-                                    rowLast = item.LastRow,
-                                    keepSize = true,
-                                    link = link
-                                });
+                                    lstImage.Add(new AvariablePrj.lstImage()
+                                    {
+                                        column = item.FirstColumn,
+                                        columnLast = item.LastColumn,
+                                        row = item.FirstRow,
+                                        rowLast = item.LastRow,
+                                        keepSize = true,
+                                        link = link
+                                    });
+                                }
+                                else
+                                {
+                                    cell.SetCellValue("");
+                                    cell.SetCellType(CellType.Blank);
+                                }
                             }
                         }
                     }
@@ -295,15 +303,23 @@ namespace OfficeToPDF
                                         var link = ExcuteSignalRStatic.mapPathSignalR("~/" + dt.Rows[0][a].ToString());
                                         if (lstImage.Where(s => s.link == link).Count() <= 0)
                                         {
-                                            lstImage.Add(new AvariablePrj.lstImage()
+                                            if (File.Exists(link))
                                             {
-                                                column = col,
-                                                columnLast = col,
-                                                row = i,
-                                                rowLast = i,
-                                                keepSize = true,
-                                                link = link
-                                            });
+                                                lstImage.Add(new AvariablePrj.lstImage()
+                                                {
+                                                    column = col,
+                                                    columnLast = col,
+                                                    row = i,
+                                                    rowLast = i,
+                                                    keepSize = true,
+                                                    link = link
+                                                });
+                                            }
+                                            else
+                                            {
+                                                cell.SetCellValue("");
+                                                cell.SetCellType(CellType.Blank);
+                                            }
                                         }
                                     }
 

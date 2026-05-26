@@ -113,6 +113,15 @@
         , editable:true
     },
     {
+    fixed: true, name: 'email_nhandulieugoc', hidden: true
+        , label: 'Email (nhận DLG)'
+        , index: 'dtkd.email_nhandulieugoc'
+        , width: 100
+        , edittype: 'text'
+        , editable: true
+        , editrules:{ edithidden:true }
+    },
+    {
         fixed: true, name: 'url'
         , label: 'Website'
         , index: 'dtkd.url'

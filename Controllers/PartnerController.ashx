@@ -304,8 +304,9 @@ public class PartnerController : IHttpHandler
             m.chucvu = context.Request.Form["chucvu"];
             m.tel = context.Request.Form["tel"];
             m.fax = context.Request.Form["fax"];
-            m.email = context.Request.Form["email"];
-            m.emailkt = context.Request.Form["emailkt"];
+            m.email = context.Request.Form["email"].removeAllSpaceOrTrimText(true);
+            m.emailkt = context.Request.Form["emailkt"].removeAllSpaceOrTrimText(true);
+            m.email_nhandulieugoc = context.Request.Form["email_nhandulieugoc"].removeAllSpaceOrTrimText(true);
             m.url = context.Request.Form["url"];
             m.diachi = context.Request.Form["diachi"];
             m.so_taikhoan = context.Request.Form["so_taikhoan"];
@@ -374,8 +375,9 @@ public class PartnerController : IHttpHandler
                 chucvu = context.Request.Form["chucvu"],
                 tel = context.Request.Form["tel"],
                 fax = context.Request.Form["fax"],
-                email = context.Request.Form["email"],
-                emailkt = context.Request.Form["emailkt"],
+                email = context.Request.Form["email"].removeAllSpaceOrTrimText(true),
+                emailkt = context.Request.Form["emailkt"].removeAllSpaceOrTrimText(true),
+                email_nhandulieugoc = context.Request.Form["email_nhandulieugoc"].removeAllSpaceOrTrimText(true),
                 url = context.Request.Form["url"],
                 diachi = context.Request.Form["diachi"],
                 so_taikhoan = context.Request.Form["so_taikhoan"],
@@ -393,7 +395,7 @@ public class PartnerController : IHttpHandler
                 ngaytao = DateTime.Now,
                 ngaycapnhat = DateTime.Now
             };
-            
+
             var qg = db.md_quocgias.Where(s => s.md_quocgia_id == dtkd.md_quocgia_id).FirstOrDefault();
             if(qg != null)
             {
@@ -428,7 +430,7 @@ public class PartnerController : IHttpHandler
     {
         string msg = "";
         String id = context.Request.Form["id"];
-        
+
         // Kiem tra NCC da dc su dung
         string sqlCount = @"DECLARE @SearchStr nvarchar(MAX) = '" + id + @"'
 							DECLARE @Results TABLE (ColumnName nvarchar(370), ColumnValue nvarchar(3630))
@@ -516,7 +518,7 @@ public class PartnerController : IHttpHandler
             msg = ex.Message;
         }
 
-        EndEventHandler:;
+    EndEventHandler:;
 
         if (msg.Length > 0)
             jqGridHelper.Utils.writeResult(0, msg);
@@ -542,21 +544,16 @@ public class PartnerController : IHttpHandler
             filter = f.ToScript();
         }
 
-        String sqlCount = "SELECT COUNT(1) AS count " +
-            " FROM md_doitackinhdoanh dtkd " +
-            " LEFT JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id " +
-            " LEFT JOIN md_khuvuc kv ON dtkd.md_khuvuc_id = kv.md_khuvuc_id " +
-            " LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id " +
-            " LEFT JOIN md_nguondtkd ndt ON dtkd.md_nguondtkd_id = ndt.md_nguondtkd_id" +
-            " WHERE 1=1 {0} " + filter;
-
-        if (isncc != null)
-        {
-            sqlCount = String.Format(sqlCount, " AND isncc = " + isncc);
-        }
-        else {
-            sqlCount = String.Format(sqlCount, "");
-        }
+        string isNCC = (isncc == null ? "" : "AND dtkd.isncc = " + isncc);
+        String sqlCount = $@"
+            SELECT COUNT(1) AS count
+            FROM md_doitackinhdoanh dtkd
+            LEFT JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id
+            LEFT JOIN md_khuvuc kv ON dtkd.md_khuvuc_id = kv.md_khuvuc_id
+            LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id
+            LEFT JOIN md_nguondtkd ndt ON dtkd.md_nguondtkd_id = ndt.md_nguondtkd_id
+            WHERE 1=1 {isNCC} {filter}
+        ";
 
         int page = int.Parse(context.Request.QueryString["page"]);
         int limit = int.Parse(context.Request.QueryString["rows"]);
@@ -584,32 +581,58 @@ public class PartnerController : IHttpHandler
             sidx = "dtkd.ma_dtkd";
         }
 
-        string strsql = "SELECT * FROM( " +
-            " SELECT dtkd.md_doitackinhdoanh_id, dtkd.md_loaidtkd_id, dtkd.md_quocgia_id, dtkd.md_khuvuc_id, " +
-            " dtkd.ma_dtkd, dtkd.ten_dtkd, dtkd.daidien, dtkd.chucvu, dtkd.tel, dtkd.fax, dtkd.email, dtkd.emailkt, dtkd.url, dtkd.diachi, "+
-            " dtkd.md_banggia_id, dtkd.so_taikhoan, dtkd.nganhang, dtkd.masothue, dtkd.tong_congno, dtkd.isncc, " +
-            " dtkd.ngaytao, dtkd.nguoitao, dtkd.ngaycapnhat, dtkd.nguoicapnhat, dtkd.mota, dtkd.hoatdong, dtkd.islienhe, dtkd.isdocquyen, dtkd.md_cangbien_id, " +
-            " qg.ten_quocgia as tenqg, kv.ten_khuvuc as tenkv, ldt.ten_loaidtkd as tenloai, " +
-            @" (case when md_cangbien_id is not null then (select ten_cangbien from md_cangbien where md_cangbien_id = dtkd.md_cangbien_id)
-                    else null end) as cangbien, " +
-            " ndt.ten_nguondtkd as md_nguondtkd_id, " +
-            " ROW_NUMBER() OVER (ORDER BY " + sidx + " " + sord + ") as RowNum " +
-            " FROM md_doitackinhdoanh dtkd " +
-            " LEFT JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id " +
-            " LEFT JOIN md_khuvuc kv ON dtkd.md_khuvuc_id = kv.md_khuvuc_id " +
-            " LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id " +
-            " LEFT JOIN md_nguondtkd ndt ON dtkd.md_nguondtkd_id = ndt.md_nguondtkd_id " +
-            " WHERE 1=1 {0} " + filter +
-            " )P WHERE RowNum > @start AND RowNum < @end";
-
-        if (isncc != null)
-        {
-            strsql = String.Format(strsql, " AND isncc = " + isncc);
-        }
-        else
-        {
-            strsql = String.Format(strsql, "");
-        }
+        string strsql = $@"
+            SELECT * FROM (
+                SELECT 
+                    dtkd.md_doitackinhdoanh_id, 
+                    dtkd.md_loaidtkd_id, 
+                    dtkd.md_quocgia_id, 
+                    dtkd.md_khuvuc_id,
+                    dtkd.ma_dtkd, 
+                    dtkd.ten_dtkd, 
+                    dtkd.daidien, 
+                    dtkd.chucvu, 
+                    dtkd.tel, 
+                    dtkd.fax, 
+                    dtkd.email, 
+                    dtkd.emailkt, 
+                    dtkd.email_nhandulieugoc,
+                    dtkd.url, 
+                    dtkd.diachi,
+                    dtkd.md_banggia_id, 
+                    dtkd.so_taikhoan, 
+                    dtkd.nganhang, 
+                    dtkd.masothue, 
+                    dtkd.tong_congno, 
+                    dtkd.isncc,
+                    dtkd.ngaytao, 
+                    dtkd.nguoitao, 
+                    dtkd.ngaycapnhat, 
+                    dtkd.nguoicapnhat, 
+                    dtkd.mota, 
+                    dtkd.hoatdong, 
+                    dtkd.islienhe, 
+                    dtkd.isdocquyen, 
+                    dtkd.md_cangbien_id,
+                    qg.ten_quocgia as tenqg, 
+                    kv.ten_khuvuc as tenkv, 
+                    ldt.ten_loaidtkd as tenloai,
+                    (
+                        case when md_cangbien_id is not null 
+                        then (select ten_cangbien from md_cangbien where md_cangbien_id = dtkd.md_cangbien_id)
+                        else null end
+                    ) as cangbien,
+                    ndt.ten_nguondtkd as md_nguondtkd_id,
+                    ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
+                FROM md_doitackinhdoanh dtkd
+                    LEFT JOIN md_quocgia qg ON dtkd.md_quocgia_id = qg.md_quocgia_id
+                    LEFT JOIN md_khuvuc kv ON dtkd.md_khuvuc_id = kv.md_khuvuc_id
+                    LEFT JOIN md_loaidtkd ldt ON dtkd.md_loaidtkd_id = ldt.md_loaidtkd_id
+                    LEFT JOIN md_nguondtkd ndt ON dtkd.md_nguondtkd_id = ndt.md_nguondtkd_id
+                    WHERE 1=1 {isNCC} {filter}
+            )P 
+            WHERE RowNum > @start AND RowNum < @end
+        ";
 
         System.Data.DataTable dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
@@ -630,6 +653,7 @@ public class PartnerController : IHttpHandler
             xml += "<cell><![CDATA[" + row["fax"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["email"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["emailkt"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["email_nhandulieugoc"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["url"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["diachi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tenqg"] + "]]></cell>";
