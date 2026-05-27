@@ -153,92 +153,145 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
     public void xemthaydoi(HttpContext context)
     {
-        string msp = context.Request.Form["msp"];
+        var msps = context.Request.Form["msp"].removeAllSpaceOrTrimText(true).Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
         string ncc = context.Request.Form["ncc"];
         string giamua = $"{ncc}-GIAMUA";
         try
         {
-            var sp = db.md_sanphams.Where(s => s.ma_sanpham == msp).FirstOrDefault();
-            var gia = (from a in db.md_banggias
-                       join b in db.md_phienbangias on a.md_banggia_id equals b.md_banggia_id
-                       join c in db.md_giasanphams on b.md_phienbangia_id equals c.md_phienbangia_id
-                       where
-                         c.md_sanpham_id == sp.md_sanpham_id &&
-                         a.ten_banggia == giamua &&
-                         b.ngay_hieuluc <= DateTime.Now
-                       orderby b.ngay_hieuluc descending
-                       select c).FirstOrDefault();
-            var giaSP = gia == null ? -1 : gia.gia.GetValueOrDefault(0);
-            var dgid = db.md_donggoisanphams.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).Select(s => s.md_donggoi_id).FirstOrDefault();
-            var dg = db.md_donggois.Where(s => s.md_donggoi_id == dgid).FirstOrDefault();
-            if (dg == null)
-                dg = new md_donggoi();
-            var dvt1 = db.md_donvitinhs.Where(s => s.md_donvitinh_id == dg.dvt_inner).FirstOrDefault();
-            var dvt2 = db.md_donvitinhs.Where(s => s.md_donvitinh_id == dg.dvt_outer).FirstOrDefault();
-            var kd = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.md_kieudang_id).FirstOrDefault();
-            string ma_kd = kd == null ? "" : kd.ma_kieudang;
-            string ten_kd = kd == null ? "" : kd.ten_tv;
-            var cn = db.md_chucnangs.Where(s => s.md_chucnang_id == sp.md_chucnang_id).FirstOrDefault();
-            string ma_cn = cn == null ? "" : cn.ma_chucnang;
-            string ten_cn = cn == null ? "" : cn.ten_tv;
-            var nnl = db.md_nhomnanglucs.Where(s => s.md_nhomnangluc_id == sp.md_nhomnangluc_id).FirstOrDefault();
-            string ten_nnl = nnl == null ? "" : $"{nnl.hehang}({nnl.nhom})";
-            var hsc = db.md_hscodes.Where(s => s.md_hscode_id == sp.md_hscode_id).FirstOrDefault();
-            string ten_hsc = hsc == null ? "" : hsc.hscode;
-            dynamic result1 = new
+            var lst = new List<dynamic>();
+            foreach (var msp in msps)
             {
-                sp.ma_sanpham,
-                ten_kd,
-                ma_kd,
-                ten_cn,
-                ma_cn,
-                sp.mota_tiengviet,
-                sp.mota_tienganh,
-                sp.l_cm,
-                sp.w_cm,
-                sp.h_cm,
-                sp.trongluong,
-                sp.dientich,
-                sp.thetich,
-                ten_nnl,
-                ten_hsc,
-                sp.chucnangsp,
-                sp.ngayxacnhan,
-                sp.hinhthucban,
-                giaSP = giaSP.DropTrailingZeros()
-            };
+                var sp = db.md_sanphams.Where(s => s.ma_sanpham == msp).FirstOrDefault();
+                dynamic result1 = new
+                {
+                    ma_sanpham = msp,
+                    ten_kd = "",
+                    ma_kd = "",
+                    ten_cn = "",
+                    ma_cn = "",
+                    mota_tiengviet = "",
+                    mota_tienganh = "",
+                    l_cm = "",
+                    w_cm = "",
+                    h_cm = "",
+                    trongluong = "",
+                    dientich = "",
+                    thetich = "",
+                    ten_nnl = "",
+                    ten_hsc = "",
+                    chucnangsp = "",
+                    ngayxacnhan = "",
+                    hinhthucban = "",
+                    giaSP = ""
+                };
 
-            dynamic result2 = new
-            {
-                dg.ma_donggoi,
-                dg.sl_inner,
-                inner = dvt1.ten_dvt,
-                dg.l1,
-                dg.w1,
-                dg.h1,
-                dg.sl_outer,
-                outer = dvt2.ten_dvt,
-                dg.l2_mix,
-                dg.w2_mix,
-                dg.h2_mix,
-                dg.soluonggoi_ctn_20,
-                dg.soluonggoi_ctn,
-                dg.soluonggoi_ctn_40hc,
-                nxn_dg = dg.ngayxacnhan,
-                dg.mota,
-                dg.doigia_donggoi,
-                tldg = dg.tldg.GetValueOrDefault(0).DropTrailingZeros(),
-                cpdg = dg.cpdg.GetValueOrDefault(0).DropTrailingZeros()
-            };
+                dynamic result2 = new
+                {
+                    ma_donggoi = "",
+                    sl_inner = "",
+                    inner = "",
+                    l1 = "",
+                    w1 = "",
+                    h1 = "",
+                    sl_outer = "",
+                    outer = "",
+                    l2_mix = "",
+                    w2_mix = "",
+                    h2_mix = "",
+                    soluonggoi_ctn_20 = "",
+                    soluonggoi_ctn = "",
+                    soluonggoi_ctn_40hc = "",
+                    nxn_dg = "",
+                    mota = "",
+                    doigia_donggoi = "",
+                    tldg = "",
+                    cpdg = ""
+                };
 
+                if (sp != null)
+                {
+                    var gia = (from a in db.md_banggias
+                               join b in db.md_phienbangias on a.md_banggia_id equals b.md_banggia_id
+                               join c in db.md_giasanphams on b.md_phienbangia_id equals c.md_phienbangia_id
+                               where
+                                 c.md_sanpham_id == sp.md_sanpham_id &&
+                                 a.ten_banggia == giamua &&
+                                 b.ngay_hieuluc <= DateTime.Now
+                               orderby b.ngay_hieuluc descending
+                               select c).FirstOrDefault();
+                    var giaSP = gia == null ? -1 : gia.gia.GetValueOrDefault(0);
+                    var dgid = db.md_donggoisanphams.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).Select(s => s.md_donggoi_id).FirstOrDefault();
+                    var dg = db.md_donggois.Where(s => s.md_donggoi_id == dgid).FirstOrDefault();
+                    if (dg == null)
+                        dg = new md_donggoi();
+                    var dvt1 = db.md_donvitinhs.Where(s => s.md_donvitinh_id == dg.dvt_inner).FirstOrDefault();
+                    var dvt2 = db.md_donvitinhs.Where(s => s.md_donvitinh_id == dg.dvt_outer).FirstOrDefault();
+                    var kd = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.md_kieudang_id).FirstOrDefault();
+                    string ma_kd = kd == null ? "" : kd.ma_kieudang;
+                    string ten_kd = kd == null ? "" : kd.ten_tv;
+                    var cn = db.md_chucnangs.Where(s => s.md_chucnang_id == sp.md_chucnang_id).FirstOrDefault();
+                    string ma_cn = cn == null ? "" : cn.ma_chucnang;
+                    string ten_cn = cn == null ? "" : cn.ten_tv;
+                    var nnl = db.md_nhomnanglucs.Where(s => s.md_nhomnangluc_id == sp.md_nhomnangluc_id).FirstOrDefault();
+                    string ten_nnl = nnl == null ? "" : $"{nnl.hehang}({nnl.nhom})";
+                    var hsc = db.md_hscodes.Where(s => s.md_hscode_id == sp.md_hscode_id).FirstOrDefault();
+                    string ten_hsc = hsc == null ? "" : hsc.hscode;
+                    result1 = new
+                    {
+                        sp.ma_sanpham,
+                        ten_kd,
+                        ma_kd,
+                        ten_cn,
+                        ma_cn,
+                        sp.mota_tiengviet,
+                        sp.mota_tienganh,
+                        sp.l_cm,
+                        sp.w_cm,
+                        sp.h_cm,
+                        sp.trongluong,
+                        sp.dientich,
+                        sp.thetich,
+                        ten_nnl,
+                        ten_hsc,
+                        sp.chucnangsp,
+                        sp.ngayxacnhan,
+                        sp.hinhthucban,
+                        giaSP = giaSP.DropTrailingZeros()
+                    };
 
-            var data = new
-            {
-                sp = result1,
-                dg = result2
-            };
+                    result2 = new
+                    {
+                        dg.ma_donggoi,
+                        dg.sl_inner,
+                        inner = dvt1.ten_dvt,
+                        dg.l1,
+                        dg.w1,
+                        dg.h1,
+                        dg.sl_outer,
+                        outer = dvt2.ten_dvt,
+                        dg.l2_mix,
+                        dg.w2_mix,
+                        dg.h2_mix,
+                        dg.soluonggoi_ctn_20,
+                        dg.soluonggoi_ctn,
+                        dg.soluonggoi_ctn_40hc,
+                        nxn_dg = dg.ngayxacnhan,
+                        dg.mota,
+                        dg.doigia_donggoi,
+                        dg.tldg,
+                        dg.cpdg
+                    };
+                }
 
-            context.Response.Write("1" + Newtonsoft.Json.JsonConvert.SerializeObject(data));
+                var data = new
+                {
+                    sp = result1,
+                    dg = result2
+                };
+                lst.Add(data);
+            }
+
+            context.Response.Write("1" + Newtonsoft.Json.JsonConvert.SerializeObject(lst));
         }
         catch (Exception ex)
         {
