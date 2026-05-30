@@ -597,7 +597,27 @@
 				});
 			/* - Gửi đơn đặt hàng */
 			<% }
+
     else { }%>
+
+
+
+       <% if (!_InBangPhieuChi.Equals(""))
+		{ %>
+        /* Gửi đơn đặt hàng */
+        $("#<%=ID%>").jqGrid('navButtonAdd','#<%=ID%>-pager',{
+				caption:""
+				, title:"In Bảng Kê phiếu chi"
+				, buttonicon: "ui-icon ui-icon-print"
+				, onClickButton : <%= _InBangPhieuChi %>
+				});
+			/* - Gửi đơn đặt hàng */
+			<% }
+
+    else { }%>
+
+
+
     });
 </script>
 

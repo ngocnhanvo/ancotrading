@@ -138,14 +138,75 @@ public class DongDonHangController : IHttpHandler, IDisposable
     {
         context.Response.ContentType = "text/plain";
         context.Response.Charset = "UTF-8";
+
         string c_donhang_id = context.Request.QueryString["c_donhang_id"];
         string md_sanpham_id = context.Request.QueryString["md_sanpham_id"];
+
         var itemJS = UserUtils.get_giasanpham(context, c_donhang_id, md_sanpham_id, db);
 
+        var donhang = db.c_donhangs.FirstOrDefault(d => d.c_donhang_id == c_donhang_id);
+
+        string md_donggoi_id = "";
+
+        //var giaSP = db.md_giasanphams
+        //    .Where(g => g.md_sanpham_id == md_sanpham_id)
+        //    .OrderByDescending(g => g.ngaytao)
+        //    .FirstOrDefault();
+decimal giaDangLay = decimal.Parse(itemJS["gia"].ToString());
+decimal phiDangLay = decimal.Parse(itemJS["phi"].ToString());
+
+var giaSP = db.md_giasanphams
+    .Where(g =>
+        g.md_sanpham_id == md_sanpham_id
+        && g.hoatdong == true
+        && g.gia == giaDangLay
+        && g.phi == phiDangLay
+        && g.ma_donggoi != null
+        && g.ma_donggoi.Trim() != ""
+    )
+    .OrderByDescending(g => g.ngaytao)
+    .FirstOrDefault();
+
+
+
+    if (giaSP != null && !string.IsNullOrEmpty(giaSP.ma_donggoi))
+{
+    string maDongGoiImport = giaSP.ma_donggoi.Trim();
+
+    var donggoi = db.md_donggois.FirstOrDefault(dg =>
+        dg.ma_donggoi.Trim() == maDongGoiImport
+    );
+
+    if (donggoi != null)
+        md_donggoi_id = donggoi.md_donggoi_id;
+}
+
+
+
+
+
+
+
+        itemJS["md_donggoi_id"] = md_donggoi_id;
+
         var entries = itemJS.Select(d =>
-           string.Format("\"{0}\": [\"{1}\"]", d.Key, string.Join(",", d.Value).Replace("\"","\\\"")));
+            string.Format("\"{0}\": [\"{1}\"]", d.Key, string.Join(",", d.Value).Replace("\"", "\\\"")));
+
         context.Response.Write("{" + string.Join(",", entries) + "}");
     }
+
+    //public void getGiaSanPham(HttpContext context)
+    //{
+    //    context.Response.ContentType = "text/plain";
+    //    context.Response.Charset = "UTF-8";
+    //    string c_donhang_id = context.Request.QueryString["c_donhang_id"];
+    //    string md_sanpham_id = context.Request.QueryString["md_sanpham_id"];
+    //    var itemJS = UserUtils.get_giasanpham(context, c_donhang_id, md_sanpham_id, db);
+
+    //    var entries = itemJS.Select(d =>
+    //       string.Format("\"{0}\": [\"{1}\"]", d.Key, string.Join(",", d.Value).Replace("\"","\\\"")));
+    //    context.Response.Write("{" + string.Join(",", entries) + "}");
+    //}
 
     public void getSelectOption(HttpContext context)
     {
@@ -171,11 +232,12 @@ public class DongDonHangController : IHttpHandler, IDisposable
             String md_sanpham_id = context.Request.Form["sanpham_id"];
             string docquyen = context.Request.Form["docquyen"];
             // Lấy đóng gói của sản phẩm
+            //String md_donggoi_id = context.Request.Form["md_donggoi_id"];
             String md_donggoi_id = context.Request.Form["md_donggoi_id"];
 
             var phiVal = decimal.Parse(context.Request.Form["phi"]);
 
-            if (md_donggoi_id == null)
+            if (string.IsNullOrEmpty(md_donggoi_id))
             {
                 jqGridHelper.Utils.writeResult(0, "Bạn chưa chọn đóng gói");
             }
@@ -185,7 +247,9 @@ public class DongDonHangController : IHttpHandler, IDisposable
             }
             else
             {
+                //md_donggoi donggoi = db.md_donggois.Single(p => p.md_donggoi_id.Equals(md_donggoi_id));
                 md_donggoi donggoi = db.md_donggois.Single(p => p.md_donggoi_id.Equals(md_donggoi_id));
+
                 c_dongdonhang m = db.c_dongdonhangs.Single(p => p.c_dongdonhang_id == context.Request.Form["id"]);
 
                 var donhang = db.c_donhangs.Single(d => d.c_donhang_id.Equals(m.c_donhang_id));
@@ -337,7 +401,11 @@ public class DongDonHangController : IHttpHandler, IDisposable
 
         // Lấy đóng gói của sản phẩm
         //md_donggoi donggoi = LinqUtils.getDongGoi(md_sanpham_id);
-        md_donggoi donggoi = db.md_donggois.FirstOrDefault(s => s.md_donggoi_id == context.Request.Form["md_donggoi_id"]);
+        //md_donggoi donggoi = db.md_donggois.FirstOrDefault(s => s.md_donggoi_id == context.Request.Form["md_donggoi_id"]);
+
+        string md_donggoi_id = context.Request.Form["md_donggoi_id"];
+
+        md_donggoi donggoi = db.md_donggois.FirstOrDefault(s => s.md_donggoi_id == md_donggoi_id);
         // Lấy số thứ tự cao nhất trong đơn hàng
         int maxLine = LinqUtils.getMaxSttDonHang(c_donhang_id);
 
@@ -739,24 +807,7 @@ public class DongDonHangController : IHttpHandler, IDisposable
         context.Response.Write(xml);
     }
 
-    // public string check_hanghoadocquyen(string md_sanpham_id, string md_doitackinhdoanh_id) {
-    // string msg = "";
-    // md_hanghoadocquyen hhdq = db.md_hanghoadocquyens.FirstOrDefault(s=>s.md_sanpham_id == md_sanpham_id);
-    // if(hhdq != null) {
-    // md_doitackinhdoanh dtkd = db.md_doitackinhdoanhs.FirstOrDefault(s=>s.md_doitackinhdoanh_id == hhdq.md_doitackinhdoanh_id);
-    // if(dtkd != null) {
-    // if(dtkd.md_doitackinhdoanh_id != md_doitackinhdoanh_id) {
-    // md_quocgia quocgia = db.md_quocgias.FirstOrDefault(s=>s.md_quocgia_id == dtkd.md_quocgia_id);
-    // string ten_qg = "";
-    // if(quocgia != null) {
-    // ten_qg = quocgia.ten_quocgia;
-    // }
-    // msg = "Mã hàng độc quyền cho khách "+ dtkd.ma_dtkd +" ở thị trường "+ ten_qg +". Bạn có muốn mở bán cho khách hàng của bạn không ? YES/NO";
-    // }
-    // }
-    // }
-    // return msg;
-    // }
+
 
     public void Dispose()
     {

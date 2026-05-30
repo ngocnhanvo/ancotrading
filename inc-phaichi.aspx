@@ -1,5 +1,7 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="inc-phaichi.aspx.cs" Inherits="inc_phaichi" %>
 <%@ Register src="jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
+
+
 <script>
 function Chitudong(action) {
 
@@ -405,7 +407,53 @@ function Chitudong(action) {
         let windowSize = "width=700,height=700,scrollbars=yes";
         window.open(printURL + "?id=" + ids, "In phiếu ủy nhiệm chi", windowSize);
     }
+
+
+
+
+
+   
+
+
+
 </script>
+
+<script type="text/javascript">
+    function inBangKeUNC() {
+        var id = $('#grid_ds_phaichi').jqGrid('getGridParam', 'selrow');
+
+        if (id == null || id == '') {
+            alert('Chưa chọn phiếu chi để in bảng kê UNC!');
+            return;
+        }
+
+        var url = "PrintControllers/InBangKeUyNhiemChiAnCoBinhDuong/?id=" + id;
+        window.open(url, "Bảng kê ủy nhiệm chi", "width=900,height=700,scrollbars=yes");
+    }
+
+    $('#grid_ds_phaichi').jqGrid('navButtonAdd', '#grid_ds_phaichi-pager', {
+        caption: ""
+        , title: "Chi tự động"
+        , buttonicon: "ui-icon-circle-plus"
+        , position: "first"
+        , onClickButton: Chitudong
+    });
+
+    $('#grid_ds_phaichi').jqGrid('navButtonAdd', '#grid_ds_phaichi-pager', {
+        caption: ""
+        , title: "In bảng kê UNC Excel"
+        , buttonicon: "ui-icon-print"
+        , position: "first"
+        , onClickButton: inBangKeUNC
+    });
+
+    createRightPanel('grid_ds_phaichi');
+    createRightPanel('grid_ds_chitietphaichi');
+
+</script>
+
+
+
 
 <div class="ui-layout-south ui-widget-content" id="layout-south-phaichi">
     <div class="ui-layout-center" id="tabs-phaichi-details">
@@ -761,6 +809,7 @@ function Chitudong(action) {
             RowNumbers="true"
             FuncActive="funcActiveChi"
 			InPhieuChi="inphieuchi1"
+            InBangPhieuChi="inBangKeUNC"
             OndblClickRow = "function(rowid) { $(this).jqGrid('editGridRow', rowid, 
             {
                 beforeShowForm: function (formid) {

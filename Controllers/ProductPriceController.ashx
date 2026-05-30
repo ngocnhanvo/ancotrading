@@ -111,6 +111,8 @@ public class ProductPriceController : IHttpHandler
                 gsp.mota = context.Request.Form["mota"];
                 gsp.barcode = context.Request.Form["barcode"];
 
+                gsp.ma_donggoi = context.Request.Form["ma_donggoi"];//#vothanhsang-dong goi
+
                 gsp.hoatdong = hd;
                 gsp.ngaycapnhat = DateTime.Now;
                 gsp.nguoicapnhat = UserUtils.getUser(context);
@@ -179,6 +181,7 @@ public class ProductPriceController : IHttpHandler
                         phi = decimal.Parse(context.Request.Form["phi"]),
                         mota = context.Request.Form["mota"],
                         barcode = context.Request.Form["barcode"],
+                        ma_donggoi = context.Request.Form["ma_donggoi"],//#vothanhsang-donggoi
                         hoatdong = hd,
                         ngaytao = DateTime.Now,
                         ngaycapnhat = DateTime.Now,
@@ -325,7 +328,6 @@ public class ProductPriceController : IHttpHandler
         {
             sidx = "gia";
         }
-
         string strsql = @"
             select * from(
                 select 
@@ -338,18 +340,42 @@ public class ProductPriceController : IHttpHandler
                     , (gsp.gia + isnull(gsp.phi, 0)) as tongGia
                     , gsp.mota
                     , gsp.barcode
+                    , gsp.ma_donggoi
                     , gsp.ngaytao
                     , gsp.nguoitao
                     , gsp.ngaycapnhat
                     , gsp.nguoicapnhat
                     , gsp.hoatdong
                     , ROW_NUMBER() OVER (ORDER BY {1} {2}) as RowNum
-                FROM md_giasanpham gsp, md_sanpham sp
-                WHERE 
-                    gsp.md_sanpham_id = sp.md_sanpham_id
-                    AND gsp.md_phienbangia_id = N'{0}' {3}
+                FROM md_giasanpham gsp
+                JOIN md_sanpham sp ON gsp.md_sanpham_id = sp.md_sanpham_id
+                WHERE gsp.md_phienbangia_id = N'{0}' {3}
             )P
             WHERE RowNum > @start AND RowNum < @end";
+        //string strsql = @"
+        //    select * from(
+        //        select 
+        //            gsp.md_giasanpham_id
+        //            , gsp.md_phienbangia_id
+        //            , sp.md_sanpham_id
+        //            , sp.ma_sanpham as tensp
+        //            , gsp.gia
+        //            , isnull(gsp.phi, 0) as phi
+        //            , (gsp.gia + isnull(gsp.phi, 0)) as tongGia
+        //            , gsp.mota
+        //            , gsp.barcode
+        //            , gsp.ngaytao
+        //            , gsp.nguoitao
+        //            , gsp.ngaycapnhat
+        //            , gsp.nguoicapnhat
+        //            , gsp.hoatdong
+        //            , ROW_NUMBER() OVER (ORDER BY {1} {2}) as RowNum
+        //        FROM md_giasanpham gsp, md_sanpham sp
+        //        WHERE 
+        //            gsp.md_sanpham_id = sp.md_sanpham_id
+        //            AND gsp.md_phienbangia_id = N'{0}' {3}
+        //    )P
+        //    WHERE RowNum > @start AND RowNum < @end";
 
         if (cateId != null)
         {
@@ -377,6 +403,7 @@ public class ProductPriceController : IHttpHandler
             xml += "<cell><![CDATA[" + row["tongGia"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["mota"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["barcode"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["ma_donggoi"] + "]]></cell>"; //#vothanhsang dong goi1
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
             xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaycapnhat"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";

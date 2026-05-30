@@ -712,7 +712,7 @@
 		        <uc1:jqGrid  ID="grid_ds_quycachdonggoi" 
                 SortName="md_donggoisanpham_id" 
                 UrlFileAction="Controllers/QuyCachDongGoiController.ashx" 
-                ColNames="['md_donggoisanpham_id', 'Tên Ðóng Gói', 'Mã SP'
+                ColNames="['md_donggoisanpham_id', 'Tên Ðóng Gói','Mã Đóng Gói', 'Mã SP'
                         , 'SL Inner', 'ÐVT Inner', 'L1', 'W1', 'H1'
                         , 'SL Outer', 'ÐVT Outer', 'L2', 'W2', 'H2', 'V2'
                         , 'SL gói/ctn40', 'VD', 'VN', 'VL'
@@ -738,6 +738,13 @@
                      , width: 100
                      , edittype: 'text'
                 },
+                    {
+                     fixed: true, name: 'ma_donggoi'
+                     , index: 'dg.ma_donggoi'
+                     , editable: false
+                     , width: 150
+                     , edittype: 'text'
+                    },
                 {
                      fixed: true, name: 'ma_sanpham'
                      , index: 'ma_sanpham'

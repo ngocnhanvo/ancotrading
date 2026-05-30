@@ -1,5 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="inc-giasanpham.aspx.cs" Inherits="inc_giasanpham" %>
 <%@ Register src="jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
+
 <script>
     $(function() {
         $('#lay-center-banggia').parent().layout({
@@ -165,6 +166,7 @@
     }
     
 </script>
+
 <DIV class="ui-layout-north ui-widget-content" id="lay-north-banggia">
     <uc1:jqGrid  ID="grid_ds_banggia" 
             Caption="Bảng giá"
@@ -420,11 +422,33 @@
                                 { 'columnName': 'md_sanpham_id', 'width': '0', 'label': 'ID', hidden:true }
                               , { 'columnName': 'ma_sanpham', 'width': '50', 'label': 'Mã SP', 'align':'left'}
                               , { 'columnName': 'mota_tiengviet', 'width': '50', 'label': 'Mô Tả TV' , 'align':'left'}],
-                              select: function(event, ui) {
-                                    $(elem).val(ui.item.ma_sanpham);
-                                    $('#sanpham_id').val(ui.item.md_sanpham_id);
-                                    return false;
-                              }
+           
+select: function(event, ui) {
+    $(elem).val(ui.item.ma_sanpham);
+    $('#sanpham_id').val(ui.item.md_sanpham_id);
+
+    $.ajax({
+        url: 'Controllers/DongGoiController.ashx?action=getoption&md_sanpham_id=' + ui.item.md_sanpham_id,
+        type: 'GET',
+        success: function (html) {
+            $('#ma_donggoi').html(html);
+
+            if ($('#ma_donggoi option').length > 0) {
+                $('#ma_donggoi').val($('#ma_donggoi option:first').val());
+            }
+        },
+        error: function (xhr) {
+            alert('Lỗi lấy đóng gói: ' + xhr.responseText);
+        }
+    });
+
+    return false;
+}
+
+
+
+
+
                         });
                     } 
                 }
@@ -487,6 +511,19 @@
                 , editrules:{ edithidden: true }
                 , width: 100
                 , editable:true
+            },
+            {
+                fixed: true
+                , name: 'ma_donggoi'
+                , index: 'gsp.ma_donggoi'
+                , label: 'Mã Đóng Gói'
+                , width: 120
+                , editable: true
+                , edittype: 'select'
+                , editrules: { required:true }
+                , editoptions: {
+                    dataUrl: 'Controllers/DongGoiController.ashx?action=getoption'
+                }
             },
             {
                 fixed: true

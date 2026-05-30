@@ -41,6 +41,10 @@ public class ProductController : IHttpHandler
             case "getdetail":
                 this.getDetail(context);
                 break;
+            //#vothanhsang dong goi
+            //case "getdonggoitheosanpham":
+            //    this.getDongGoiTheoSanPham(context);
+            //    break;
             default:
                 switch (oper)
                 {
@@ -53,11 +57,65 @@ public class ProductController : IHttpHandler
                     case "add":
                         this.add(context);
                         break;
+
                     default:
                         this.load(context);
                         break;
                 }
                 break;
+        }
+    }
+    public void getDongGoiTheoSanPham(HttpContext context)
+    {
+        context.Response.ContentType = "text/html";
+        context.Response.Charset = "UTF-8";
+
+        try
+        {
+            string md_sanpham_id = context.Request.QueryString["md_sanpham_id"];
+
+            string sql = @"
+            SELECT 
+                dg.md_donggoi_id,
+                dg.ten_donggoi,
+                ISNULL(dgsp.macdinh, 0) AS macdinh
+            FROM md_donggoisanpham dgsp
+            INNER JOIN md_donggoi dg 
+                ON dgsp.md_donggoi_id = dg.md_donggoi_id
+            WHERE dgsp.md_sanpham_id = @md_sanpham_id
+              AND ISNULL(dgsp.hoatdong, 1) = 1
+              AND ISNULL(dg.hoatdong, 1) = 1
+            ORDER BY ISNULL(dgsp.macdinh, 0) DESC, dg.ten_donggoi ASC
+        ";
+
+            System.Data.DataTable dt = mdbc.GetData(sql, "@md_sanpham_id", md_sanpham_id);
+
+            string html = "";
+
+            foreach (System.Data.DataRow row in dt.Rows)
+            {
+                string macdinh = row["macdinh"].ToString().ToLower();
+
+                string selected = macdinh == "true" || macdinh == "1"
+                    ? " selected='selected'"
+                    : "";
+
+                html += "<option value='" + row["md_donggoi_id"] + "'" + selected + ">"
+                     + row["ten_donggoi"]
+                     + "</option>";
+            }
+
+            if (html == "")
+            {
+                html = "<option value=''>Không có đóng gói</option>";
+            }
+
+            context.Response.Write(html);
+        }
+        catch (Exception ex)
+        {
+            context.Response.StatusCode = 500;
+            context.Response.Write("Lỗi getDongGoiTheoSanPham: " + ex.Message);
         }
     }
 
@@ -215,7 +273,7 @@ public class ProductController : IHttpHandler
                                     }
                                 );
                             }
-                            
+
                         }
                         else
                         {

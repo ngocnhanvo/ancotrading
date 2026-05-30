@@ -17,6 +17,8 @@ public class GiaSanPhamImport : ImportOriginal
     LinqDBDataContext db = new LinqDBDataContext();
     private String idSanPham, maSanPham, tenPhienBanGia, moTa, barCode;
     private decimal gia, phi;
+    private String maDongGoi;//#vothanhsang
+
     public String Barcode
     {
         get { return barCode; }
@@ -55,20 +57,27 @@ public class GiaSanPhamImport : ImportOriginal
         get { return phi; }
         set { phi = value; }
     }
+    // #vothanhsang
+    public String MaDongGoi
+    {
+        get { return maDongGoi; }
+        set { maDongGoi = value; }
+    }
+
 
     public GiaSanPhamImport()
     {
         db.CommandTimeout = 100 * 60;
     }
 
-    public GiaSanPhamImport(String md_sanpham_id, String md_phienbangia_id, decimal gia, string moTa, string barCode, decimal phi)
-        : this(md_sanpham_id, md_phienbangia_id, gia, moTa, barCode, phi, DateTime.Now, "admin", DateTime.Now, "admin", true)
+    public GiaSanPhamImport(String md_sanpham_id, String md_phienbangia_id, decimal gia, string moTa, string barCode, decimal phi, string maDongGoi)
+        : this(md_sanpham_id, md_phienbangia_id, gia, moTa, barCode, phi, maDongGoi, DateTime.Now, "admin", DateTime.Now, "admin", true)
     {
         db.CommandTimeout = 100 * 60;
     }
 
     public GiaSanPhamImport(String md_sanpham_id, String md_phienbangia_id, decimal gia, string moTa, string barCode
-        , decimal phi, DateTime ngayTao, String nguoiTao, DateTime ngayCapNhat, String nguoiCapNhat, bool hoatDong)
+        , decimal phi, string maDongGoi, DateTime ngayTao, String nguoiTao, DateTime ngayCapNhat, String nguoiCapNhat, bool hoatDong)
     {
         this.idSanPham = md_sanpham_id;
         this.tenPhienBanGia = md_phienbangia_id;
@@ -76,6 +85,7 @@ public class GiaSanPhamImport : ImportOriginal
         this.phi = phi;
         this.moTa = moTa;
         this.barCode = barCode;
+        this.maDongGoi = maDongGoi;//#vothanhsang
         this.ngayTao = ngayTao;
         this.nguoiTao = nguoiTao;
         this.ngayCapNhat = ngayCapNhat;
@@ -93,6 +103,7 @@ public class GiaSanPhamImport : ImportOriginal
         gsp.phi = phi;
         gsp.mota = moTa;
         gsp.barcode = barCode;
+        gsp.ma_donggoi = maDongGoi;// #vothanhsang
         gsp.ngaytao = ngayTao;
         gsp.nguoitao = nguoiTao;
         gsp.ngaycapnhat = ngayCapNhat;
@@ -125,6 +136,7 @@ public class GiaSanPhamImport : ImportOriginal
         o.phi = phi;
         o.mota = moTa;
         o.barcode = barCode;
+        o.ma_donggoi = maDongGoi;
         o.ngaycapnhat = ngayCapNhat;
         o.nguoicapnhat = nguoiCapNhat;
         o.hoatdong = hoatDong;

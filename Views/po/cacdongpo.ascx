@@ -29,6 +29,11 @@
         let editPhiFOB = $('#editphi', frm);
         giafobGoc.val('Đang tải...');
         giafob.val('Đang tải...');
+        //#BeginVoThanhSang
+        //window.md_donggoi_id_theo_gia = '';
+        window.md_donggoi_id_theo_gia = '';
+        
+        //#EndVoThanhSang
         $.ajax({
             url: "Controllers/DongDonHangController.ashx?action=getgiasanpham&c_donhang_id=" + c_donhang_id + "&md_sanpham_id=" + md_sanpham_id,
             type: "GET",
@@ -37,6 +42,12 @@
                 giafobGoc.val(data.gia[0]);
                 giafob.val(data.gia[0]);
                 phifob.val(data.phi[0]);
+                //#BeginVoThanhSang
+                if (data.md_donggoi_id && data.md_donggoi_id[0] != '') {
+                    window.md_donggoi_id_theo_gia = data.md_donggoi_id[0];
+                }
+                updatePackingPO_CallBack(md_sanpham_id);
+                //#EndVoThanhSang
                 updateMoTaGiaPO_CallBack(c_donhang_id, md_sanpham_id);
 
                 if (phifob.val() == 0) {
@@ -81,6 +92,15 @@
 
                 if (packingHtml != 'null') {
                     $("#md_donggoi_id", frm).removeAttr("disabled").html($(arr_pkl[0]).html());
+
+                    //#BeginVoThanhSang
+
+                    if (window.md_donggoi_id_theo_gia &&
+                        $("#md_donggoi_id option[value='" + window.md_donggoi_id_theo_gia + "']", frm).length > 0) {
+
+                        $("#md_donggoi_id", frm).val(window.md_donggoi_id_theo_gia);
+                    }
+                    //#EndVoThanhSang
                     $("#docquyen", frm).val(arr_pkl[1]);
                     $("#md_donggoi_id", frm).off('change');
                     let action = $('#edithdgrid_ds_chitietpo').text();
@@ -236,9 +256,10 @@
                             $(elem).val(ui.item.ma_sanpham);
                             $('#sanpham_id').val(ui.item.md_sanpham_id);
                             var c_donhang_id = $('#grid_ds_po').jqGrid('getGridParam', 'selrow');
-                                    
+                            
+        
                             updateGiaSanPhamPO_CallBack(c_donhang_id, ui.item.md_sanpham_id)                    
-                            updatePackingPO_CallBack(ui.item.md_sanpham_id);
+                            
                             updateNhaCungUngPO_CallBack(ui.item.md_sanpham_id);
 									
                             return false;

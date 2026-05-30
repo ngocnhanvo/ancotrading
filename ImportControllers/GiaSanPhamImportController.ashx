@@ -57,7 +57,7 @@ public class GiaSanPhamImportController : IHttpHandler
                     String cellMoTa = row.GetCell(3).Value == null ? String.Empty : row.GetCell(3).Value.ToString();
                     String cellBarCode = row.GetCell(4).Value == null ? String.Empty : row.GetCell(4).Value.ToString();
                     decimal cellPhi = row.GetCell(5).Value == null ? 0 : decimal.Parse(row.GetCell(5).Value.ToString());
-
+                    String cellMaDongGoi = row.GetCell(6).Value == null ? String.Empty : row.GetCell(6).Value.ToString().Trim();
                     md_phienbangia pbg = ImportUtils.getPhienBanGia(cellTenPB);
                     md_sanpham sp = ImportUtils.getSanPham(cellMaHH);
 
@@ -76,7 +76,9 @@ public class GiaSanPhamImportController : IHttpHandler
                     if (next)
                     {
                         var gsp = ImportUtils.getGiaSanPham(cellTenPB, cellMaHH);
-                        var import = new GiaSanPhamImport(sp.md_sanpham_id, pbg.md_phienbangia_id, cellGia, cellMoTa, cellBarCode, cellPhi);
+                        //var import = new GiaSanPhamImport(sp.md_sanpham_id, pbg.md_phienbangia_id, cellGia, cellMoTa, cellBarCode, cellPhi);
+                        //String cellMaDongGoi = row.GetCell(6).Value == null ? String.Empty : row.GetCell(6).Value.ToString().Trim();
+                    var import = new GiaSanPhamImport(sp.md_sanpham_id,pbg.md_phienbangia_id,cellGia,cellMoTa,cellBarCode,cellPhi,cellMaDongGoi);
                         import.IdSanPham = sp.md_sanpham_id;
                         import.MaSanPham = sp.ma_sanpham;
                         if (gsp == null)

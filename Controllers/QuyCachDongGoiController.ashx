@@ -61,7 +61,7 @@ public class QuyCachDongGoiController : IHttpHandler {
         }
         
         string strsql = "select * from( " +
-            " select dgsp.md_donggoisanpham_id, dg.ten_donggoi, sp.ma_sanpham" +
+            " select dgsp.md_donggoisanpham_id, dg.ten_donggoi,dg.ma_donggoi, sp.ma_sanpham" +
             " , dg.sl_inner, (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_inner) as dvtinner" +
             " , dg.l1, dg.w1, dg.h1 " +
             " , dg.sl_outer, (select ten_dvt from md_donvitinh where md_donvitinh_id = dg.dvt_outer) as dvtouter " +
@@ -115,12 +115,13 @@ public class QuyCachDongGoiController : IHttpHandler {
             xml += "<cell><![CDATA[" + row[18] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[19] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[20] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[21].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[22] + "]]></cell>";
-            xml += "<cell><![CDATA[" + DateTime.Parse(row[23].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
-            xml += "<cell><![CDATA[" + row[24] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[21] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[22].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[23] + "]]></cell>";
+            xml += "<cell><![CDATA[" + DateTime.Parse(row[24].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
             xml += "<cell><![CDATA[" + row[25] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[26] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[27] + "]]></cell>";
             xml += "</row>";
         }
         xml += "</rows>";

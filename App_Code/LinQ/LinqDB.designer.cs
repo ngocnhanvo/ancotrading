@@ -1,4 +1,4 @@
-//Update at 13/05/2026 10:41:35
+//Update at 30/05/2026 13:21:58
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -34449,6 +34449,7 @@ private System.Nullable<bool> _isdocquyen;
 private string _md_cangbien_id;
 private string _md_nguondtkd_id;
 private string _api_xuongsx;
+private string _email_nhandulieugoc;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -34515,6 +34516,8 @@ partial void Onmd_nguondtkd_idChanging(string value);
 partial void Onmd_nguondtkd_idChanged();
 partial void Onapi_xuongsxChanging(string value);
 partial void Onapi_xuongsxChanged();
+partial void Onemail_nhandulieugocChanging(string value);
+partial void Onemail_nhandulieugocChanged();
 #endregion
 public md_doitackinhdoanh()
 {
@@ -35106,6 +35109,25 @@ this.SendPropertyChanging();
 this._api_xuongsx = value;
 this.SendPropertyChanged("api_xuongsx");
 this.Onapi_xuongsxChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_email_nhandulieugoc", DbType="Nvarchar(512)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @email_nhandulieugoc
+{
+get
+{
+return this._email_nhandulieugoc;
+}
+set
+{
+if ((this._email_nhandulieugoc != value))
+{
+this.Onemail_nhandulieugocChanging(value);
+this.SendPropertyChanging();
+this._email_nhandulieugoc = value;
+this.SendPropertyChanged("email_nhandulieugoc");
+this.Onemail_nhandulieugocChanged();
 }
 }
 }
@@ -38294,6 +38316,7 @@ private string _mota;
 private System.Nullable<bool> _hoatdong;
 private string _barcode;
 private System.Nullable<decimal> _phi;
+private string _ma_donggoi;
 #region Extensibility Method Definitions
 partial void OnLoaded();
 partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -38322,6 +38345,8 @@ partial void OnbarcodeChanging(string value);
 partial void OnbarcodeChanged();
 partial void OnphiChanging(System.Nullable<decimal> value);
 partial void OnphiChanged();
+partial void Onma_donggoiChanging(string value);
+partial void Onma_donggoiChanged();
 #endregion
 public md_giasanpham()
 {
@@ -38552,6 +38577,25 @@ this.SendPropertyChanging();
 this._phi = value;
 this.SendPropertyChanged("phi");
 this.OnphiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ma_donggoi", DbType="Nvarchar(50)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public string @ma_donggoi
+{
+get
+{
+return this._ma_donggoi;
+}
+set
+{
+if ((this._ma_donggoi != value))
+{
+this.Onma_donggoiChanging(value);
+this.SendPropertyChanging();
+this._ma_donggoi = value;
+this.SendPropertyChanged("ma_donggoi");
+this.Onma_donggoiChanged();
 }
 }
 }

@@ -80,6 +80,7 @@ public partial class jqGrid : System.Web.UI.UserControl
         , _funcPhanBoCocInv = ""
 		, _GuiDonHang = "" //Gui don hang
         , _InPhieuChi = "" //In Phieu Chi
+        , _InBangPhieuChi = "" //In Phieu Chi
         , _funcCopyDonHang = "" //Copy don hang po
 		;
     public String Toppager
@@ -518,8 +519,13 @@ public partial class jqGrid : System.Web.UI.UserControl
         get { return _InPhieuChi; }
         set { _InPhieuChi = value; }
     }
-	
-	//_FuncCopyDonHang
+    //_InBangPhieuChi
+    public String InBangPhieuChi
+    {
+        get { return _InBangPhieuChi; }
+        set { _InBangPhieuChi = value; }
+    }
+    //_FuncCopyDonHang
     public String FuncCopyDonHang    {
         get { return _funcCopyDonHang; }
         set { _funcCopyDonHang = value; }
