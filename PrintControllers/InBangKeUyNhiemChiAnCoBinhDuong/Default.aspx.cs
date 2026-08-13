@@ -93,7 +93,8 @@ public partial class PrintControllers_InBangKeUyNhiemChiAnCoBinhDuong_Default : 
         Response.Write(".title{font-size:16pt;font-weight:bold;text-align:center;}");
         Response.Write(".noborder{border:0px !important;}");
         Response.Write(".center{text-align:center;}");
-        Response.Write(".sotk{text-align:right;mso-number-format:'\\@';}");
+        //Response.Write(".sotk{text-align:right;mso-number-format:'\\@';}");
+        Response.Write(".sotk{mso-number-format:\"\\@\";text-align:left;}");
 
         Response.Write("</style></head><body>");
 
@@ -143,7 +144,9 @@ public partial class PrintControllers_InBangKeUyNhiemChiAnCoBinhDuong_Default : 
             Response.Write("<td class='center'>" + FormatDate(r["NgayDNTT"]) + "</td>");
             Response.Write("<td>" + Server.HtmlEncode(r["TenCongTy"].ToString()) + "</td>");
             //Response.Write("<td>" + Server.HtmlEncode(r["SoTK"].ToString()) + "</td>");
-            Response.Write("<td class='sotk' style=\"mso-number-format:'\\@';text-align:right;\">" + Server.HtmlEncode(FormatSoTK(r["SoTK"])) + "</td>");
+            //Response.Write("<td class='sotk' style=\"mso-number-format:'\\@';text-align:right;\">" + Server.HtmlEncode(FormatSoTK(r["SoTK"])) + "</td>");
+            string soTK = FormatSoTK(r["SoTK"]);
+            Response.Write("<td class='sotk'>" + Server.HtmlEncode(soTK) + "</td>");
             Response.Write("<td>" + Server.HtmlEncode(r["NganHang"].ToString()) + "</td>");
             Response.Write("<td class='right'>" + FormatMoney(r["SoTien"]) + "</td>");
             Response.Write("<td>" + Server.HtmlEncode(r["NoiDung"].ToString()) + "</td>");
@@ -209,18 +212,25 @@ public partial class PrintControllers_InBangKeUyNhiemChiAnCoBinhDuong_Default : 
     {
         if (value == null || value == DBNull.Value) return "";
 
-        string s = value.ToString().Trim();
-
-        decimal d;
-        if (decimal.TryParse(
-            s,
-            System.Globalization.NumberStyles.Any,
-            System.Globalization.CultureInfo.InvariantCulture,
-            out d))
-        {
-            return d.ToString("0");
-        }
-
-        return s;
+        // Không ép kiểu số, giữ nguyên chuỗi để không mất số 0 đầu
+        return value.ToString().Trim();
     }
+    //private string FormatSoTK(object value)
+    //{
+    //    if (value == null || value == DBNull.Value) return "";
+
+    //    string s = value.ToString().Trim();
+
+    //    decimal d;
+    //    if (decimal.TryParse(
+    //        s,
+    //        System.Globalization.NumberStyles.Any,
+    //        System.Globalization.CultureInfo.InvariantCulture,
+    //        out d))
+    //    {
+    //        return d.ToString("0");
+    //    }
+
+    //    return s;
+    //}
 }

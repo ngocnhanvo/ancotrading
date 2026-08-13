@@ -29,6 +29,16 @@
             , hidden: true
         },
         {
+            fixed: true, name: 'mota'
+            , label: 'Tên Khách'
+            , index: 'spd.mota'
+            , editable: true
+            , width: 100
+            , edittype: 'text'
+
+            
+        },
+        {
             fixed: true, name: 'Forwarder'
             , label: 'Forwarder'
             , index: 'spd.Forwarder'
@@ -145,14 +155,7 @@
             , edittype: 'text'
             , hidden: true
         },
-        {
-            fixed: true, name: 'mota'
-            , label: 'Mô tả'
-            , index: 'cl.mota'
-            , width: 100
-            , editable:true
-            , edittype: 'textarea'
-        },
+        
         {
             fixed: true, name: 'hoatdong', hidden: true
             , label: 'Hoạt động'

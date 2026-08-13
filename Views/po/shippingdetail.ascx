@@ -11,23 +11,26 @@
         RowNumbers="true"
         OndblClickRow = "function(rowid) { $('#edit_grid_ds_donhang_spdt').click(); }"
         ColModel = "[
+
         {
-            fixed: true, name: 'md_doitackinhdoanh_spd_id'
-            , index: 'spd.md_doitackinhdoanh_spd_id'
-            , width: 100
-            , hidden: true 
-            , editable:true
-            , edittype: 'text'
-            , key: true
-        },
-        {
-            fixed: true, name: 'md_donhang_id'
-            , index: 'spd.md_donhang_id'
-            , editable: false
-            , width: 100
-            , edittype: 'select'
-            , hidden: true
-        },
+    fixed: true
+    , name: 'c_donhang_spd_id'
+    , index: 'spd.c_donhang_spd_id'
+    , width: 100
+    , hidden: true
+    , editable: true
+    , edittype: 'text'
+    , key: true
+},
+{
+    fixed: true
+    , name: 'c_donhang_id'
+    , index: 'spd.c_donhang_id'
+    , editable: false
+    , width: 100
+    , edittype: 'text'
+    , hidden: true
+},
         {
             name: 'trangthai'
             , label: 'TT'
@@ -41,6 +44,15 @@
             , stype : 'select'
             , searchoptions:{sopt:['eq'], value:':[ALL];CHUAGUI:Chưa gửi;DAGUI:Đã gửi' }
         },
+        {
+    fixed: true
+    , name: 'TenKhachHang'
+    , label: 'Tên Khách Hàng'
+    , index: 'spd.TenKhachHang'
+    , editable: true
+    , width: 180
+    , edittype: 'text'
+},
         {
             fixed: true, name: 'Forwarder'
             , label: 'Forwarder'

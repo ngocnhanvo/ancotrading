@@ -150,6 +150,7 @@ public class Controller_HoSoChungTu_Taptin : IHttpHandler, IDisposable
         var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = $@"<?xml version=""1.0"" encoding=""UTF-8"" ?>";
         xml += $@"<rows>";
+            
         xml += $@"<page>{page}</page>";
         xml += $@"<total>{total_page}</total>";
         xml += $@"<records>{count}</records>";

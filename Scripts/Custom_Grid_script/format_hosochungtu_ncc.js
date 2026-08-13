@@ -42,26 +42,101 @@ var format_donhang_spd_forwarder = {
             </div>
         `);
         
+        //let gridMaster = $('#gridMaster');
+        //let $dh = $('#grid_ds_po').getRowData(id_inc_po);
+
+
         let gridMaster = $('#gridMaster');
-        let $dh = $('#grid_ds_po').getRowData(id_inc_po);
-        let madtkd = $dh ? $dh.md_doitackinhdoanh_id : '';
+
+        // ID của PO đang được chọn
+        let poid = id_inc_po || '';
+
+        if (!poid) {
+            alert('Chưa chọn PO.');
+            $('#dlg_gridSmal_2').dialog('destroy').remove();
+            return;
+        }
+
+        console.log('PO ID gửi lên:', poid);
+
         let frmid = '#FrmGrid_grid_ds_donhang_spdt';
+
+        
+
+
+
+
+        //let selRowMaster = function (rowid) {
+        //    if (!rowid)
+        //        rowid = gridMaster.jqGrid('getGridParam', 'selrow');
+        //    let cell = gridMaster.getRowData(rowid);
+        //    id_elem.val(cell.Forwarder);
+        //    $('#Shipper', frmid).val(cell.Shipper);
+
+
+        //    $('#Consignee', frmid).val(cell.Consignee);
+        //    $('#Notify', frmid).val(cell.Notify);
+        //    $('#AlsoNotify', frmid).val(cell.AlsoNotify);
+        //    $('#POD', frmid).val(cell.POD);
+        //    $('#PlaceOfDelivery', frmid).val(cell.PlaceOfDelivery);
+        //    $('#AddressForSendingOriginalDocs', frmid).val(cell.AddressForSendingOriginalDocs);
+        //    $('#EmailSendPaymentRequest', frmid).val(cell.EmailSendPaymentRequest);
+        //    $('#CacLoaiCTYC', frmid).val(cell.CacLoaiCTYC);
+        //    $('#dlg_gridSmal_2').dialog("destroy").remove();
+        //};
+
         let selRowMaster = function (rowid) {
-            if (!rowid)
-                rowid = gridMaster.jqGrid('getGridParam', 'selrow');
-            let cell = gridMaster.getRowData(rowid);
+
+            if (!rowid) {
+                rowid = gridMaster.jqGrid(
+                    'getGridParam',
+                    'selrow'
+                );
+            }
+
+            if (!rowid) {
+                alert('Hãy chọn một dòng Shipping Detail.');
+                return;
+            }
+
+            let cell = gridMaster.jqGrid(
+                'getRowData',
+                rowid
+            );
+
+            // Tên khách hàng lấy từ mota của Shipping Detail đối tác
+            $('#TenKhachHang', frmid).val(cell.mota);
+
             id_elem.val(cell.Forwarder);
             $('#Shipper', frmid).val(cell.Shipper);
             $('#Consignee', frmid).val(cell.Consignee);
             $('#Notify', frmid).val(cell.Notify);
             $('#AlsoNotify', frmid).val(cell.AlsoNotify);
             $('#POD', frmid).val(cell.POD);
-            $('#PlaceOfDelivery', frmid).val(cell.PlaceOfDelivery);
-            $('#AddressForSendingOriginalDocs', frmid).val(cell.AddressForSendingOriginalDocs);
-            $('#EmailSendPaymentRequest', frmid).val(cell.EmailSendPaymentRequest);
-            $('#CacLoaiCTYC', frmid).val(cell.CacLoaiCTYC);
-            $('#dlg_gridSmal_2').dialog("destroy").remove();
+
+            $('#PlaceOfDelivery', frmid)
+                .val(cell.PlaceOfDelivery);
+
+            $('#AddressForSendingOriginalDocs', frmid)
+                .val(cell.AddressForSendingOriginalDocs);
+
+            $('#EmailSendPaymentRequest', frmid)
+                .val(cell.EmailSendPaymentRequest);
+
+            $('#CacLoaiCTYC', frmid)
+                .val(cell.CacLoaiCTYC);
+
+            $('#dlg_gridSmal_2')
+                .dialog('destroy')
+                .remove();
         };
+
+
+
+
+
+
+
         let widthDialog = 800;
         $('#dlg_gridSmal_2').dialog({
             modal: true,
@@ -88,8 +163,11 @@ var format_donhang_spd_forwarder = {
                         repeatitems: false,
                         id: "md_phienbangia_id"
                     },
+                    //postData: {
+                    //    madtkd: madtkd
+                    //},
                     postData: {
-                        madtkd: madtkd
+                        poid: poid
                     },
                     colModel: [
                         {
@@ -101,13 +179,31 @@ var format_donhang_spd_forwarder = {
                             , edittype: 'text'
                             , key: true
                         },
+                        //{
+                        //    fixed: true, name: 'md_donhang_id'
+                        //    , index: 'spd.md_donhang_id'
+                        //    , editable: false
+                        //    , width: 100
+                        //    , edittype: 'select'
+                        //    , hidden: true
+                        //},
                         {
-                            fixed: true, name: 'md_donhang_id'
-                            , index: 'spd.md_donhang_id'
+                            fixed: true
+                            , name: 'md_doitackinhdoanh_id'
+                            , index: 'spd.md_doitackinhdoanh_id'
                             , editable: false
                             , width: 100
-                            , edittype: 'select'
+                            , edittype: 'text'
                             , hidden: true
+                        },
+                        {
+                            fixed: true
+                            , name: 'mota'
+                            , label: 'Tên khách hàng'
+                            , index: 'spd.mota'
+                            , editable: false
+                            , width: 180
+                            , edittype: 'text'
                         },
                         {
                             fixed: true, name: 'Forwarder'
@@ -184,7 +280,7 @@ var format_donhang_spd_forwarder = {
                         {
                             fixed: true, name: 'CacLoaiCTYC'
                             , label: 'Các loại CT yêu cầu'
-                            , index: 'spd.CacLoaiCTYC'
+                            , index: 'spd.CacLoaiCTYC'                         
                             , editable: true
                             , width: 100
                             , edittype: 'text'
@@ -192,7 +288,8 @@ var format_donhang_spd_forwarder = {
                         {
                             fixed: true, name: 'ngaytao'
                             , label: 'Ngày tạo'
-                            , index: 'cl.ngaytao'
+                            //, index: 'cl.ngaytao'
+                            , index: 'spd.ngaytao'
                             , width: 100
                             , editable: false
                             , edittype: 'text'
@@ -201,7 +298,8 @@ var format_donhang_spd_forwarder = {
                         {
                             fixed: true, name: 'nguoitao'
                             , label: 'Người tạo'
-                            , index: 'cl.nguoitao'
+                            //, index: 'cl.nguoitao'
+                            , index: 'spd.nguoitao'
                             , width: 100
                             , editable: false
                             , edittype: 'text'
@@ -210,7 +308,8 @@ var format_donhang_spd_forwarder = {
                         {
                             fixed: true, name: 'ngaycapnhat'
                             , label: 'Ngày cập nhật'
-                            , index: 'cl.ngaycapnhat'
+                            //, index: 'cl.ngaycapnhat'
+                            , index: 'spd.ngaycapnhat'
                             , width: 100
                             , editable: false
                             , edittype: 'text'
@@ -220,20 +319,14 @@ var format_donhang_spd_forwarder = {
                         {
                             fixed: true, name: 'nguoicapnhat'
                             , label: 'Người cập nhật'
-                            , index: 'cl.nguoicapnhat'
+                            //, index: 'cl.nguoicapnhat'
+                            , index: 'spd.nguoicapnhat'
                             , width: 100
                             , editable: false
                             , edittype: 'text'
                             , hidden: true
                         },
-                        {
-                            fixed: true, name: 'mota'
-                            , label: 'Mô tả'
-                            , index: 'cl.mota'
-                            , width: 100
-                            , editable: true
-                            , edittype: 'textarea'
-                        },
+                    
                         {
                             fixed: true, name: 'hoatdong', hidden: true
                             , label: 'Hoạt động'

@@ -59,6 +59,15 @@
         , editable:true
     },
     {
+    fixed: true, name: 'payer'
+    , label: 'Payer'
+    , index: 'dtkd.payer'
+    , width: 100
+    , edittype: 'text'
+    , editable: true
+    , hidden: false
+    },
+    {
         fixed: true, name: 'daidien'
         , label: 'Đại Diện'
         , index: 'dtkd.daidien'

@@ -161,7 +161,7 @@ public class Controller_PO_SPDT : IHttpHandler, IDisposable
                 msg = $@"Shipping Detail đã được gửi trước đó";
                 goto EndEventHandler;
             }
-
+            spd.TenKhachHang = context.Request.Form["TenKhachHang"].removeAllSpaceOrTrimText(true);
             spd.Forwarder = context.Request.Form["Forwarder"].removeAllSpaceOrTrimText(true);
             spd.Shipper = context.Request.Form["Shipper"].removeAllSpaceOrTrimText(true);
             spd.Consignee = context.Request.Form["Consignee"].removeAllSpaceOrTrimText(true);
@@ -220,6 +220,7 @@ public class Controller_PO_SPDT : IHttpHandler, IDisposable
             spd.c_donhang_spd_id = Helper.getNewId();
             spd.trangthai = Helper.CHUAGUI;
             spd.c_donhang_id = donhang.c_donhang_id;
+            spd.TenKhachHang = context.Request.Form["TenKhachHang"].removeAllSpaceOrTrimText(true);
             spd.Forwarder = context.Request.Form["Forwarder"].removeAllSpaceOrTrimText(true);
             spd.Shipper = context.Request.Form["Shipper"].removeAllSpaceOrTrimText(true);
             spd.Consignee = context.Request.Form["Consignee"].removeAllSpaceOrTrimText(true);
@@ -349,6 +350,7 @@ public class Controller_PO_SPDT : IHttpHandler, IDisposable
                 spd.c_donhang_spd_id, 
                 spd.c_donhang_id, 
                 spd.trangthai,
+                spd.TenKhachHang,
                 spd.Forwarder, 
                 spd.Shipper,
                 spd.Consignee,

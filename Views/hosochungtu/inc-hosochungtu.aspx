@@ -4,6 +4,10 @@
 <%@ Register Src="master.ascx" TagName="hosochungtu" TagPrefix="master" %>
 <%@ Register Src="cacdonghsct.ascx" TagName="ddh" TagPrefix="detail" %>
 <%@ Register Src="taptindinhkem.ascx" TagName="ttdk" TagPrefix="detail" %>
+<%--#beginvts-02-06-2026--%>
+<%@ Register Src="solanbosung.ascx" TagName="slbs" TagPrefix="detail" %>
+<%@ Register Src="solanxuat.ascx" TagName="slx" TagPrefix="detail" %>
+<%--#endvts-02-06-2026--%>
 
 <script type="text/javascript">
     var id_inc_hosochungtu = "";
@@ -32,6 +36,13 @@
                     $("#grid_ds_chitiethsct").setGridHeight(o.height() - 97);
                     $("#grid_dinhkemhsct").setGridWidth(o.width());
                     $("#grid_dinhkemhsct").setGridHeight(o.height() - 97);
+                    /*#beginvts-02-06-2026*/
+                    $("#grid_solanbosung").setGridWidth(o.width());
+                    $("#grid_solanbosung").setGridHeight(o.height() - 97);
+
+                    $("#grid_solanxuat").setGridWidth(o.width());
+                    $("#grid_solanxuat").setGridHeight(o.height() - 97);
+                    /*#endvts-02-06-2026*/
                 }
             }
         });
@@ -44,10 +55,14 @@
          <ul>
             <li><a href="#hosochungtu-details-1">Các dòng hàng</a></li>
             <li><a href="#hosochungtu-details-2">Tập tin đính kèm</a></li>
+             <li><a href="#hosochungtu-details-3">Số Lần Bổ Sung</a></li>
+             <li><a href="#hosochungtu-details-4">Số lần Xuất</a></li>
         </ul>
 
         <detail:ddh runat="server" />
         <detail:ttdk runat="server" />
+        <detail:slbs runat="server" />
+        <detail:slx runat="server" />
     </div>
     <div class="ui-layout-east" style="text-align:center; background:#f4f0ec">
 		<table style="width:100%; height:100%">

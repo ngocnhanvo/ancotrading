@@ -300,6 +300,7 @@ public class PartnerController : IHttpHandler
             m.md_banggia_id = context.Request.Form["banggia"] == "" ? null : context.Request.Form["banggia"];
             m.ma_dtkd = context.Request.Form["ma_dtkd"];
             m.ten_dtkd = context.Request.Form["ten_dtkd"];
+            m.payer = (context.Request.Form["payer"] ?? "").Trim();
             m.daidien = context.Request.Form["daidien"];
             m.chucvu = context.Request.Form["chucvu"];
             m.tel = context.Request.Form["tel"];
@@ -371,6 +372,7 @@ public class PartnerController : IHttpHandler
                 md_banggia_id = context.Request.Form["banggia"] == "" ? null : context.Request.Form["banggia"],
                 ma_dtkd = context.Request.Form["ma_dtkd"],
                 ten_dtkd = context.Request.Form["ten_dtkd"],
+                payer = (context.Request.Form["payer"] ?? "").Trim(),
                 daidien = context.Request.Form["daidien"],
                 chucvu = context.Request.Form["chucvu"],
                 tel = context.Request.Form["tel"],
@@ -590,6 +592,7 @@ public class PartnerController : IHttpHandler
                     dtkd.md_khuvuc_id,
                     dtkd.ma_dtkd, 
                     dtkd.ten_dtkd, 
+                    dtkd.payer,
                     dtkd.daidien, 
                     dtkd.chucvu, 
                     dtkd.tel, 
@@ -647,6 +650,7 @@ public class PartnerController : IHttpHandler
             xml += "<cell><![CDATA[" + row["tenloai"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["ten_dtkd"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["payer"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["daidien"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["chucvu"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["tel"] + "]]></cell>";

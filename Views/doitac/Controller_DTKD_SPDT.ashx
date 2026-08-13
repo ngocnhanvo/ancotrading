@@ -220,13 +220,42 @@ public class Controller_DTKD_SPDT : IHttpHandler
             filter = f.ToScript();
         }
 
-        string id = context.Request.QueryString["id"];
-        string whereSQL = $"and spd.md_doitackinhdoanh_id = '{id}'";
-        string madtkd = context.Request.Params["madtkd"];
-        if(!string.IsNullOrWhiteSpace(madtkd))
-        {
-            whereSQL = $"and spd.md_doitackinhdoanh_id in (select md_doitackinhdoanh_id from md_doitackinhdoanh where ma_dtkd = '{madtkd}')";
-        }
+
+string id = context.Request.Params["id"];
+string poid = context.Request.Params["poid"];
+
+string whereSQL = "and 1 = 0";
+
+// Có poid nghĩa là popup Forwarder được mở từ trang PO
+bool laPopupForwarder =
+    !string.IsNullOrWhiteSpace(poid);
+
+if (laPopupForwarder)
+{
+    poid = poid.Trim().Replace("'", "''");
+
+    // Tìm khách hàng trực tiếp từ PO đang được chọn
+    whereSQL = $@"
+        and spd.md_doitackinhdoanh_id =
+        (
+            select top 1 dh.md_doitackinhdoanh_id
+            from c_donhang dh
+            where dh.c_donhang_id = '{poid}'
+        )
+    ";
+}
+// Trang Shipping Detail của Đối tác
+else if (!string.IsNullOrWhiteSpace(id))
+{
+    id = id.Trim().Replace("'", "''");
+
+    whereSQL = $@"
+        and spd.md_doitackinhdoanh_id = '{id}'
+    ";
+}
+
+
+        
 
         String sqlCount = $@"
             SELECT COUNT(1) AS count 
@@ -259,11 +288,48 @@ public class Controller_DTKD_SPDT : IHttpHandler
             sord = "desc";
         }
 
+        //string strsql = $@"
+        //select * from(
+        //    select 
+        //        spd.md_doitackinhdoanh_spd_id, 
+        //        spd.md_doitackinhdoanh_id, 
+        //        spd.mota,
+        //        spd.Forwarder, 
+        //        spd.Shipper,
+        //        spd.Consignee,
+        //        spd.Notify,
+        //        spd.AlsoNotify,
+        //        spd.POD,
+        //        spd.PlaceOfDelivery,
+        //        spd.AddressForSendingOriginalDocs,
+        //        spd.EmailSendPaymentRequest,
+        //        spd.CacLoaiCTYC,
+        //        spd.ngaytao, 
+        //        spd.nguoitao, 
+        //        spd.ngaycapnhat, 
+        //        spd.nguoicapnhat, 
+        //        spd.hoatdong,
+        //        ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
+        //    FROM md_doitackinhdoanh_spd spd
+        //    WHERE 1=1 {whereSQL} {filter}
+        //)P WHERE RowNum > @start AND RowNum < @end";
+
+
+
+
+        // Cả trang Đối tác và popup Forwarder đều cần cột mota
+        // mota được dùng để hiển thị Tên khách hàng
+        string cotMota = "spd.mota,";
+
         string strsql = $@"
-        select * from(
+        select * from
+        (
             select 
                 spd.md_doitackinhdoanh_spd_id, 
-                spd.md_doitackinhdoanh_id, 
+                spd.md_doitackinhdoanh_id,
+
+                {cotMota}
+
                 spd.Forwarder, 
                 spd.Shipper,
                 spd.Consignee,
@@ -278,12 +344,20 @@ public class Controller_DTKD_SPDT : IHttpHandler
                 spd.nguoitao, 
                 spd.ngaycapnhat, 
                 spd.nguoicapnhat, 
-                spd.mota,
                 spd.hoatdong,
-                ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
+
+                ROW_NUMBER() OVER
+                (
+                    ORDER BY {sidx} {sord}
+                ) AS RowNum
+
             FROM md_doitackinhdoanh_spd spd
-            WHERE 1=1 {whereSQL} {filter}
-        )P WHERE RowNum > @start AND RowNum < @end";
+            WHERE 1 = 1
+                {whereSQL}
+                {filter}
+        ) P
+        WHERE RowNum > @start
+          AND RowNum < @end";
 
         var dt = mdbc.GetData(strsql, "@start", start, "@end", end);
         string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";

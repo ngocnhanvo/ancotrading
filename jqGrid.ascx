@@ -196,6 +196,11 @@
         });
         /* - Print */
         <% } else { }%>
+
+
+              
+
+
         
          <% if(!_funcChangeStatus.Equals("")) { %>
         /* gui mail */
@@ -624,3 +629,5 @@
 <table class="ui-layout-center" id="<%=ID%>"></table>
 <div id="<%=ID%>-pager"></div>
 <div id="<%=ID%>-toolbar"></div>
+
+

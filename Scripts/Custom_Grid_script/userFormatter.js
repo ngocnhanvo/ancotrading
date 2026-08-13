@@ -1,12 +1,28 @@
-﻿function download(e, t, n) {
+﻿////function download(e, t, n) {
+////    if (e == "err") { return "-"; }
+
+////    if (e != "-") {
+////        console.log(t);
+////        let aStyle = `display: block;width: fit-content;margin: 0px auto;`;
+////        let spanStyle = `top: -2px;position: relative;`;
+////        let link = `Controllers/API_System.ashx?oper=downloadFile&id=${e}`;
+////        return `<a style="${aStyle}" href="#" onclick="modify_code('${link}')"><span style="${spanStyle}" class="ui-icon ui-icon-document"></span></a>`;
+////    }
+////    return e;
+////}
+function download(e, t, n) {
     if (e == "err") { return "-"; }
 
     if (e != "-") {
-        console.log(t);
+        // console.log(t);
+
         let aStyle = `display: block;width: fit-content;margin: 0px auto;`;
         let spanStyle = `top: -2px;position: relative;`;
         let link = `Controllers/API_System.ashx?oper=downloadFile&id=${e}`;
-        return `<a style="${aStyle}" href="#" onclick="modify_code('${link}')"><span style="${spanStyle}" class="ui-icon ui-icon-document"></span></a>`;
+
+        return `<a style="${aStyle}" href="#" onclick="modify_code('${link}')">
+                    <span style="${spanStyle}" class="ui-icon ui-icon-document"></span>
+                </a>`;
     }
     return e;
 }

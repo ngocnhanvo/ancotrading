@@ -2,9 +2,165 @@
 <%@ Register src="jqGrid.ascx" tagname="jqGrid" tagprefix="uc1" %>
 <%@ Register Src="~/Views/po/shippingdetail.ascx" TagName="spdt" TagPrefix="detail" %>
 <%@ Register Src="~/Views/po/cacdongpo.ascx" TagName="ddh" TagPrefix="detail" %>
+
+
+<%--<style type="text/css">
+    /* PO sắp đến hoặc đã quá Shipment Time */
+    #grid_ds_po tr.po-canhbao-shipment > td {
+        background-color: #f4a6a6 !important;
+        color: #7a0000 !important;
+        font-weight: 600;
+    }
+
+    /* Khi người dùng click chọn dòng cảnh báo */
+    #grid_ds_po tr.po-canhbao-shipment.ui-state-highlight > td {
+        background-color: #e57373 !important;
+        color: #5f0000 !important;
+        font-weight: 700;
+    }
+</style>--%>
+
 <script>
     var id_inc_po = '';
     var nvcts_po = <%=nvctsStr%>;
+
+
+    //// Chuyển ngày dd/MM/yyyy thành kiểu Date
+    //function parseNgayVietNamPO(value) {
+    //    value = $('<div/>')
+    //        .html(value || '')
+    //        .text()
+    //        .trim();
+
+    //    if (!value) {
+    //        return null;
+    //    }
+
+    //    var parts = value.split('/');
+
+    //    if (parts.length !== 3) {
+    //        return null;
+    //    }
+
+    //    var ngay = parseInt(parts[0], 10);
+    //    var thang = parseInt(parts[1], 10);
+    //    var nam = parseInt(parts[2], 10);
+
+    //    if (
+    //        isNaN(ngay) ||
+    //        isNaN(thang) ||
+    //        isNaN(nam)
+    //    ) {
+    //        return null;
+    //    }
+
+    //    var result = new Date(
+    //        nam,
+    //        thang - 1,
+    //        ngay
+    //    );
+
+    //    result.setHours(0, 0, 0, 0);
+
+    //    // Kiểm tra ngày hợp lệ
+    //    if (
+    //        result.getFullYear() !== nam ||
+    //        result.getMonth() !== thang - 1 ||
+    //        result.getDate() !== ngay
+    //    ) {
+    //        return null;
+    //    }
+
+    //    return result;
+    //}
+
+
+    //// Tô màu các PO có Shipment Time cần cảnh báo
+    //function toMauCanhBaoShipmentTimePO() {
+    //    var grid = $('#grid_ds_po');
+
+    //    var rowIds = grid.jqGrid(
+    //        'getDataIDs'
+    //    );
+
+    //    // Ngày hiện tại
+    //    var ngayCanhBao = new Date();
+
+    //    ngayCanhBao.setHours(
+    //        0,
+    //        0,
+    //        0,
+    //        0
+    //    );
+
+    //    // Ngày hiện tại + 30 ngày
+    //    ngayCanhBao.setDate(
+    //        ngayCanhBao.getDate() + 30
+    //    );
+
+    //    for (var i = 0; i < rowIds.length; i++) {
+    //        var rowId = rowIds[i];
+
+    //        var row = grid.jqGrid(
+    //            'getRowData',
+    //            rowId
+    //        );
+
+    //        var rowElement = grid.find(
+    //            '#' + $.jgrid.jqID(rowId)
+    //        );
+
+    //        // Xóa màu cũ trước khi kiểm tra lại
+    //        rowElement.removeClass(
+    //            'po-canhbao-shipment'
+    //        );
+
+    //        // Formatter có thể trả HTML nên phải lấy nội dung text
+    //        var trangThaiChungTu = $('<div/>')
+    //            .html(row.trangthaict || '')
+    //            .text()
+    //            .trim()
+    //            .toUpperCase();
+
+    //        // Không áp dụng cho Đã gửi hoặc Đã nhận
+    //        var daGuiHoacDaNhan =
+    //            trangThaiChungTu === 'DAGUI' ||
+    //            trangThaiChungTu === 'DAHIEULUC' ||
+    //            trangThaiChungTu.indexOf('ĐÃ GỬI') >= 0 ||
+    //            trangThaiChungTu.indexOf('ĐÃ NHẬN') >= 0;
+
+    //        if (daGuiHoacDaNhan) {
+    //            continue;
+    //        }
+
+    //        var shipmentTime = parseNgayVietNamPO(
+    //            row.shipmenttime
+    //        );
+
+    //        if (shipmentTime === null) {
+    //            continue;
+    //        }
+
+    //        // Ngày hiện tại + 30 ngày > Shipment Time
+    //        if (
+    //            ngayCanhBao.getTime() >
+    //            shipmentTime.getTime()
+    //        ) {
+    //            rowElement.addClass(
+    //                'po-canhbao-shipment'
+    //            );
+    //        }
+    //    }
+    //}
+
+
+
+
+
+
+
+
+
     $(function () {
         $('#lay-center-po').parent().layout({
             south: {
@@ -1667,6 +1823,7 @@
             }
             ]"
             GridComplete = "var o = $(this).parent().parent().parent().parent().parent(); $(this).setGridHeight($(o).height()-90);"
+
             FilterToolbar = "true"
             Height = "420"
             ShowAdd ="<%$ Code: DaoRules.GetRuleAdd(Context).ToString().ToLower() %>"
@@ -1840,7 +1997,47 @@
                 buttonicon: "ui-icon-lightbulb",
                 title: "Gửi chứng từ",
                 onClickButton: function () {
+
+                    // #beginvts-02-06-2026
                     let ids = $("#grid_ds_po").jqGrid('getGridParam', 'selarrrow');
+
+                    if (!ids || ids.length <= 0) {
+                        alert('Bạn chưa chọn PO cần gửi chứng từ.');
+                        return;
+                    }
+
+                    let khachHangId = '';
+                    let poKhacKhach = [];
+
+                    for (let i in ids) {
+                        let id = ids[i];
+                        let row = $("#grid_ds_po").getRowData(id);
+                        let dtkdId = row.md_doitackinhdoanh_id;
+
+                        if (!khachHangId) {
+                            khachHangId = dtkdId;
+                        } else if (khachHangId !== dtkdId) {
+                            poKhacKhach.push(row.sochungtu);
+                        }
+                    }
+
+                    //if (poKhacKhach.length > 0) {
+                    //    alert('Không thể gửi chứng từ. Các PO được chọn phải cùng khách hàng.');
+                    //    return;
+                    //}
+                    // #endvts-02-06-2026
+
+                    let guiNhieuDonRiengLe = poKhacKhach.length > 0;
+
+
+
+
+
+
+
+
+
+                    //let ids = $("#grid_ds_po").jqGrid('getGridParam', 'selarrrow');
                     let options = '';
                     for (let i in ids) {
                         let id = ids[i];
@@ -1848,101 +2045,331 @@
                         options += `<option value="${id}">${row.sochungtu}</option>`;
                     }
 
+                    // #begin vothanhsang
+                    let formChuyen = '';
+
+                    if (guiNhieuDonRiengLe) {
+                        formChuyen = `
+        <tr>
+            <td>Loại chuyển</td>
+            <td>
+                <input type="hidden" id="loaichuyen_po" value="NhieuDonRiengLe" />
+                <b>Chọn gửi nhiều đơn riêng lẻ</b>
+            </td>
+        </tr>
+        <tr class="tr_ct">
+            <td>Ghi chú</td>
+            <td><textarea id="ghichu_po"></textarea></td>
+        </tr>
+        <tr class="tr_ct">
+            <td colspan="2">
+                <label>Tập tin đính kèm</label><br>
+                <input style="margin-top: 7px;" type="file" multiple id="ttdk1_po" accept=".xls,.xlsx,.doc,.docx,.pdf" />
+            </td>
+        </tr>
+    `;
+                    }
+                    else {
+                        formChuyen = `
+        <tr>
+            <td>Loại chuyển</td>
+            <td>
+                <select id="loaichuyen_po">
+                    <option value="Moi">Mới</option>
+                    <option value="Bosung">Bổ sung</option>
+                    <option value="Dacbiet">Gửi không cần điền thông tin</option>
+                    <option value="ChuyenXuat2Lan">Chuyển xuất 2 lần</option>
+                    <option value="ChuyenXuat3Lan">Chuyển xuất 3 lần</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Đơn hàng ưu tiên</td>
+            <td><select id="dhut_po">${options}</select></td>
+        </tr>
+        <tr class="tr_ct">
+            <td>Cont 20</td>
+            <td><input id="slcont20_po" type="number"/></td>
+        </tr>
+        <tr class="tr_ct">
+            <td>Cont 40DC</td>
+            <td><input id="slcont40_po" type="number"/></td>
+        </tr>
+        <tr class="tr_ct">
+            <td>Cont 40HC</td>
+            <td><input id="slcont40hc_po" type="number"/></td>
+        </tr>
+        <tr class="tr_ct">
+            <td>Cont 45</td>
+            <td><input id="slcont45_po" type="number"/></td>
+        </tr>
+        <tr class="tr_ct">
+            <td>Cont LCL</td>
+            <td><input id="slcontLCL_po" type="number"/></td>
+        </tr>
+        <tr class="tr_ct">
+            <td>Ngày điều chỉnh</td>
+            <td><input id="nxhdc_po" style="width:100px" type="text"/></td>
+        </tr>
+        <tr class="tr_ct">
+            <td>Ghi chú</td>
+            <td><textarea id="ghichu_po"></textarea></td>
+        </tr>
+<tr class="tr_ct">
+    <td colspan="2">
+        <label>Tập tin đính kèm</label><br>
+        <input style="margin-top: 7px;" type="file" multiple id="ttdk1_po" accept=".xls,.xlsx,.doc,.docx,.pdf" />
+    </td>
+</tr>
+
+<tr id="tr_box_chuyenxuat_nhieulan" style="display:none;">
+    <td colspan="2">
+        <div id="box_chuyenxuat_nhieulan" style="display:none;"></div>
+    </td>
+</tr>
+    `;
+                    }
                     let iddlg = 'dialog-chuyenchungtu';
                     $('body').append(`<div title="Gửi đến chứng từ" id="${iddlg}">
-                        <div style="display:none" id="waitChuyenChungTu"><img style="width:30px; height:30px" src="iconcollection/loading.gif"/></div>
-                        <div style="margin-top:5px;">
-                            <table style="width:100%">
-                                <tr>
-                                    <td>Loại chuyển</td>
-                                    <td>
-                                        <select id="loaichuyen_po">
-                                            <option value="Moi">Mới</option>
-                                            <option value="Bosung">Bổ sung</option>
-                                            <option value="Dacbiet">Gửi không cần điền thông tin</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Đơn hàng ưu tiên</td>
-                                    <td><select id="dhut_po">${options}</select></td>
-                                </tr>
-                                <tr class="tr_ct">
-                                    <td>Cont 20</td>
-                                    <td><input id="slcont20_po" type="number"/></td>
-                                </tr>
-                                <tr class="tr_ct">
-                                    <td>Cont 40DC</td>
-                                    <td><input id="slcont40_po" type="number"/></td>
-                                </tr>
-                                <tr class="tr_ct">
-                                    <td>Cont 40HC</td>
-                                    <td><input id="slcont40hc_po" type="number"/></td>
-                                </tr>
-                                <tr class="tr_ct">
-                                    <td>Cont 45</td>
-                                    <td><input id="slcont45_po" type="number"/></td>
-                                </tr>
-                                <tr class="tr_ct">
-                                    <td>Cont LCL</td>
-                                    <td><input id="slcontLCL_po" type="number"/></td>
-                                </tr>
-                                <tr class="tr_ct">
-                                    <td>NXH điều chỉnh</td>
-                                    <td><input id="nxhdc_po" style="width:100px" type="text"/></td>
-                                </tr>
-                                <tr class="tr_ct">
-                                    <td>Ghi chú</td>
-                                    <td><textarea id="ghichu_po"></textarea></td>
-                                </tr>
-                                <tr class="tr_ct">
-                                    <td colspan="2">
-                                        <label>Tập tin đính kèm</label><br>
-                                        <input style="margin-top: 7px;" type="file" multiple id="ttdk1_po" accept=".xls,.xlsx,.doc,.docx,.pdf" />
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>`);
+    <div style="display:none" id="waitChuyenChungTu">
+        <img style="width:30px; height:30px" src="iconcollection/loading.gif"/>
+    </div>
+    <div style="margin-top:5px;">
+        <table style="width:100%">
+            ${formChuyen}
+        </table>
+    </div>
+</div>`);
+                    //# end vothanhsang
+
+
+                    function taoBlockChuyenXuatLan(soLan, options) {
+                        return `
+        <div class="box_chuyenxuat_lan" data-lan="${soLan}" 
+             style="border:1px solid #ccc; padding:8px; margin-top:8px; background:#fafafa;">
+            
+            <div style="font-weight:bold; color:#8a5a00; margin-bottom:6px;">
+                Thông tin chuyển xuất lần ${soLan}
+            </div>
+
+            <table style="width:100%; border-collapse:collapse;">
+                <tr>
+                    <td style="width:95px;">Đơn hàng ưu tiên</td>
+                    <td style="width:190px;">
+                        <select id="dhut_po_lan_${soLan}" style="width:175px;">
+                            ${options}
+                        </select>
+                    </td>
+
+                    <td style="width:95px;">Ngày điều chỉnh</td>
+                    <td>
+                        <input id="nxhdc_po_lan_${soLan}" style="width:100px;" type="text" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Cont 20</td>
+                    <td><input id="slcont20_po_lan_${soLan}" style="width:170px;" type="number" /></td>
+
+                    <td>Cont 40DC</td>
+                    <td><input id="slcont40_po_lan_${soLan}" style="width:170px;" type="number" /></td>
+                </tr>
+
+                <tr>
+                    <td>Cont 40HC</td>
+                    <td><input id="slcont40hc_po_lan_${soLan}" style="width:170px;" type="number" /></td>
+
+                    <td>Cont 45</td>
+                    <td><input id="slcont45_po_lan_${soLan}" style="width:170px;" type="number" /></td>
+                </tr>
+
+                <tr>
+                    <td>Cont LCL</td>
+                    <td><input id="slcontLCL_po_lan_${soLan}" style="width:170px;" type="number" /></td>
+
+                    <td>Tập tin</td>
+                    <td>
+                        <input type="file" multiple id="ttdk1_po_lan_${soLan}" accept=".xls,.xlsx,.doc,.docx,.pdf" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Ghi chú</td>
+                    <td colspan="3">
+                        <textarea id="ghichu_po_lan_${soLan}" 
+                                  style="width:98%; height:45px; resize:vertical;"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    `;
+                    }
+
+                   
+                    function xuLyHienThiChuyenXuatNhieuLan(options, iddlg) {
+                        let loai = $('#loaichuyen_po').val();
+                        let soLan = 0;
+
+                        if (loai == 'ChuyenXuat2Lan') {
+                            soLan = 2;
+                        }
+                        else if (loai == 'ChuyenXuat3Lan') {
+                            soLan = 3;
+                        }
+
+                        if (soLan > 0) {
+                            // Ẩn toàn bộ form cũ
+                            $(`#${iddlg} table tr.tr_ct`).hide();
+                            $('#dhut_po').closest('tr').hide();
+
+                            // Hiện vùng nhập nhiều lần
+                            $('#tr_box_chuyenxuat_nhieulan').show();
+
+                            let html = '';
+                            for (let i = 1; i <= soLan; i++) {
+                                html += taoBlockChuyenXuatLan(i, options);
+                            }
+
+                            $('#box_chuyenxuat_nhieulan').html(html).show();
+
+                            for (let i = 1; i <= soLan; i++) {
+                                $('#nxhdc_po_lan_' + i).datepicker({
+                                    changeMonth: true,
+                                    changeYear: true,
+                                    dateFormat: 'dd/mm/yy'
+                                });
+                            }
+                        }
+                        else {
+                            $('#box_chuyenxuat_nhieulan').hide().html('');
+                            $('#tr_box_chuyenxuat_nhieulan').hide();
+
+                            $('#dhut_po').closest('tr').show();
+
+                            if (loai == 'Dacbiet') {
+                                $(`#${iddlg} table tr.tr_ct`).hide();
+                            }
+                            else {
+                                $(`#${iddlg} table tr.tr_ct`).show();
+                            }
+                        }
+
+                        setTimeout(function () {
+                            let dlg = $('#' + iddlg).closest('.ui-dialog');
+
+                            dlg.css({
+                                top: ($(window).scrollTop() + 20) + 'px',
+                                left: Math.max(10, (($(window).width() - dlg.outerWidth()) / 2) + $(window).scrollLeft()) + 'px'
+                            });
+                        }, 50);
+                    }
 
                     // create new dialog
                     $(`#${iddlg}`).dialog({
-                        modal: true
-                        , open: function (event, ui) {
-                            //hide close button.
+
+                        modal: true,
+                        width: Math.min(720, $(window).width() - 30),
+                        height: 'auto',
+
+                        open: function (event, ui) {
                             $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
-                            $('#nxhdc_po').datepicker({ changeMonth: true, changeYear: true, dateFormat: 'dd/mm/yy' });
-                            $('#loaichuyen_po').change(function () {
-                                let val = $(this).val();
-                                if(val == 'Dacbiet')
-                                    $(`#${iddlg} table tr.tr_ct`).hide();
-                                else
-                                    $(`#${iddlg} table tr.tr_ct`).show();
+
+                            $(this).css({
+                                'max-height': ($(window).height() - 110) + 'px',
+                                'overflow-y': 'auto',
+                                'overflow-x': 'hidden'
+                            });
+
+                            if ($('#nxhdc_po').length > 0) {
+                                $('#nxhdc_po').datepicker({
+                                    changeMonth: true,
+                                    changeYear: true,
+                                    dateFormat: 'dd/mm/yy'
+                                });
+                            }
+
+                            $('#loaichuyen_po').off('change').on('change', function () {
+                                xuLyHienThiChuyenXuatNhieuLan(options, iddlg);
+                            });
+
+                            $('#loaichuyen_po').change();
+
+                            let dlg = $('#' + iddlg).closest('.ui-dialog');
+                            dlg.css({
+                                top: ($(window).scrollTop() + 20) + 'px',
+                                left: Math.max(10, (($(window).width() - dlg.outerWidth()) / 2) + $(window).scrollLeft()) + 'px'
                             });
                         }
+
                         , buttons: {
                             'Đồng ý': function () {
-                                let slcont20 = Number($('#slcont20_po').val());
-                                let slcont40 = Number($('#slcont40_po').val());
-                                let slcont40hc = Number($('#slcont40hc_po').val());
-                                let slcont45 = Number($('#slcont45_po').val());
-                                let slcontLCL = Number($('#slcontLCL_po').val());
+                                let loaiChuyenPO = $('#loaichuyen_po').val();
+                                let laChuyenXuatNhieuLan = loaiChuyenPO == 'ChuyenXuat2Lan' || loaiChuyenPO == 'ChuyenXuat3Lan';
+                                let soLanChuyenXuat = 1;
+
+                                if (loaiChuyenPO == 'ChuyenXuat2Lan') {
+                                    soLanChuyenXuat = 2;
+                                }
+                                else if (loaiChuyenPO == 'ChuyenXuat3Lan') {
+                                    soLanChuyenXuat = 3;
+                                }
+
+
+                                let laNhieuDonRiengLe = $('#loaichuyen_po').val() == 'NhieuDonRiengLe';
+
+                                let slcont20 = laNhieuDonRiengLe ? '' : Number($('#slcont20_po').val());
+                                let slcont40 = laNhieuDonRiengLe ? '' : Number($('#slcont40_po').val());
+                                let slcont40hc = laNhieuDonRiengLe ? '' : Number($('#slcont40hc_po').val());
+                                let slcont45 = laNhieuDonRiengLe ? '' : Number($('#slcont45_po').val());
+                                let slcontLCL = laNhieuDonRiengLe ? '' : Number($('#slcontLCL_po').val());
+                                //let slcont20 = Number($('#slcont20_po').val());
+                                //let slcont40 = Number($('#slcont40_po').val());
+                                //let slcont40hc = Number($('#slcont40hc_po').val());
+                                //let slcont45 = Number($('#slcont45_po').val());
+                                //let slcontLCL = Number($('#slcontLCL_po').val());
+                                let $btnDongY = $(this);
+                                $btnDongY.button('disable');
 
                                 let $wait = $('#waitChuyenChungTu');
                                 $wait.css('display', '');
                                 let page = $('#grid_ds_po').getGridParam("page");
                                 let data = new FormData();
+
                                 data.append('action', 'ChuyenChungTu');
                                 data.append('id', ids.toString());
-                                data.append('dhut_po', $('#dhut_po').val());
+
+
+                                data.append('dhut_po', laNhieuDonRiengLe ? '' : $('#dhut_po').val());
                                 data.append('slcont20', slcont20);
                                 data.append('slcont40', slcont40);
                                 data.append('slcont40hc', slcont40hc);
                                 data.append('slcont45', slcont45);
                                 data.append('slcontLCL', slcontLCL);
-                                data.append('nxhdc_po', $('#nxhdc_po').val());
+                                data.append('nxhdc_po', laNhieuDonRiengLe ? '' : $('#nxhdc_po').val());
                                 data.append('ghichu_po', $('#ghichu_po').val());
                                 data.append('loaichuyen_po', $('#loaichuyen_po').val());
+
+                                data.append('so_lan_chuyenxuat', soLanChuyenXuat);
+
+                                if (laChuyenXuatNhieuLan) {
+                                    for (let lan = 1; lan <= soLanChuyenXuat; lan++) {
+                                        data.append('dhut_po_lan_' + lan, $('#dhut_po_lan_' + lan).val());
+                                        data.append('slcont20_lan_' + lan, Number($('#slcont20_po_lan_' + lan).val()));
+                                        data.append('slcont40_lan_' + lan, Number($('#slcont40_po_lan_' + lan).val()));
+                                        data.append('slcont40hc_lan_' + lan, Number($('#slcont40hc_po_lan_' + lan).val()));
+                                        data.append('slcont45_lan_' + lan, Number($('#slcont45_po_lan_' + lan).val()));
+                                        data.append('slcontLCL_lan_' + lan, Number($('#slcontLCL_po_lan_' + lan).val()));
+                                        data.append('nxhdc_po_lan_' + lan, $('#nxhdc_po_lan_' + lan).val());
+                                        data.append('ghichu_po_lan_' + lan, $('#ghichu_po_lan_' + lan).val());
+
+                                        let fileListLan = $('#ttdk1_po_lan_' + lan)[0].files;
+                                        for (let i = 0; i < fileListLan.length; i++) {
+                                            data.append('ttdk1_po_lan_' + lan, fileListLan[i]);
+                                        }
+                                    }
+                                }
+
+
                                 let fileList = $('#ttdk1_po')[0].files;
                                 for (let i = 0; i < fileList.length; i++) {
                                     data.append('ttdk1_po', fileList[i]);
@@ -1962,6 +2389,13 @@
                                             alert(result);
                                             $wait.css('display', 'none');
                                         }
+                                    },
+                                    error: function () {
+                                        alert('Lỗi gửi chứng từ.');
+                                    },
+                                    complete: function () {
+                                        $wait.css('display', 'none');
+                                        $btnDongY.button('enable');
                                     }
                                 });
                             },
