@@ -460,16 +460,22 @@ public class Controller_YeuCauCapNhat : IHttpHandler, IDisposable
             db.md_phieuthongtinsanpham_sanphams.DeleteAllOnSubmit(dhs);
             var dhlogs = db.md_phieuthongtinsanpham_logs.Where(s => s.md_phieuthongtinsanpham_id == pyc.md_phieuthongtinsanpham_id).ToList();
             var logids = dhlogs.Select(s => s.ad_log_id).Distinct().ToList();
-            var logs = db.ad_logs.Where(s => logids.Contains(s.ad_log_id)).ToList();
-            foreach (var log in logs)
+            int batchSize = 1000; // Giới hạn 1,000 item mỗi đợt để an toàn dưới ngưỡng 2,100 tham số
+            for (int i = 0; i < logids.Count; i += batchSize)
             {
-                if (dtkd == "ANCO1")
+                var batchIds = logids.Skip(i).Take(batchSize).ToList();
+                var logs = db.ad_logs.Where(s => batchIds.Contains(s.ad_log_id)).ToList();
+
+                foreach (var log in logs)
                 {
-                    log.anco1_check = false;
-                }
-                else if (dtkd == "ANHIEPLUC")
-                {
-                    log.anhiepluc_check = false;
+                    if (dtkd == "ANCO1")
+                    {
+                        log.anco1_check = false;
+                    }
+                    else if (dtkd == "ANHIEPLUC")
+                    {
+                        log.anhiepluc_check = false;
+                    }
                 }
             }
             db.md_phieuthongtinsanpham_logs.DeleteAllOnSubmit(dhlogs);
