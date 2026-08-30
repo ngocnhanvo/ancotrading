@@ -279,42 +279,33 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IReadOnlySessionSt
                             dgs.Select(s => s.ma_donggoi ?? "")),
 
                         sl_inner = string.Join("\n",
-                            dgs.Select(s => s.sl_inner == null ? "" : s.sl_inner.ToString())),
-
-                        inner = string.Join("\n",
                             dgs.Select(s =>
-                                s.dvt_inner != null && dvts.ContainsKey(s.dvt_inner)
-                                    ? dvts[s.dvt_inner]
-                                    : ""
-                            )),
+                            s.sl_inner == null ? "" : s.sl_inner.ToString()
+                            + s.dvt_inner != null && dvts.ContainsKey(s.dvt_inner)
+                                ? " " + dvts[s.dvt_inner]
+                                : ""
+                        )),
 
                         l1 = string.Join("\n",
-                            dgs.Select(s => s.l1 == null ? "" : s.l1.ToString())),
-
-                        w1 = string.Join("\n",
-                            dgs.Select(s => s.w1 == null ? "" : s.w1.ToString())),
-
-                        h1 = string.Join("\n",
-                            dgs.Select(s => s.h1 == null ? "" : s.h1.ToString())),
+                            dgs.Select(s => s.l1 == null ? "" : s.l1.ToString()
+                            + s.w1 == null ? "" : "x" + s.w1.ToString()
+                            + s.h1 == null ? "" : "x" + s.h1.ToString()
+                        )),
 
                         sl_outer = string.Join("\n",
-                            dgs.Select(s => s.sl_outer == null ? "" : s.sl_outer.ToString())),
-
-                        outer = string.Join("\n",
                             dgs.Select(s =>
-                                s.dvt_outer != null && dvts.ContainsKey(s.dvt_outer)
-                                    ? dvts[s.dvt_outer]
-                                    : ""
-                            )),
+                            s.sl_outer == null ? "" : s.sl_outer.ToString()
+                            + s.dvt_outer != null && dvts.ContainsKey(s.dvt_outer)
+                                ? " " + dvts[s.dvt_outer]
+                                : ""
+                        )),
 
                         l2_mix = string.Join("\n",
-                            dgs.Select(s => s.l2_mix == null ? "" : s.l2_mix.ToString())),
-
-                        w2_mix = string.Join("\n",
-                            dgs.Select(s => s.w2_mix == null ? "" : s.w2_mix.ToString())),
-
-                        h2_mix = string.Join("\n",
-                            dgs.Select(s => s.h2_mix == null ? "" : s.h2_mix.ToString())),
+                            dgs.Select(s => 
+                            s.l2_mix == null ? "" : s.l2_mix.ToString()
+                            + s.w2_mix == null ? "" : "x" + s.w2_mix.ToString()
+                            + s.h2_mix == null ? "" : "x" + s.h2_mix.ToString()
+                            )),
 
                         soluonggoi_ctn_20 = string.Join("\n",
                             dgs.Select(s => s.soluonggoi_ctn_20 == null ? "" : s.soluonggoi_ctn_20.ToString())),
