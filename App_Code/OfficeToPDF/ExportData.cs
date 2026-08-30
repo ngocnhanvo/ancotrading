@@ -713,19 +713,24 @@ namespace OfficeToPDF
                 xfile.Close();
                 xfile.Dispose();
 
+                var skipInter = viewer.Attributes != null ? viewer.Attributes["skipInterop"] == "1" : false;
                 var urlPDF = urlExcel.Substring(0, urlExcel.LastIndexOf(".") + 1) + "pdf";
 				string msg = "", urlFN = "";
-                var excelConvert = new ExcelConverter();
-                excelConvert.lstText = null;
-                excelConvert.lstImage = lstImage;
-                excelConvert.lstTextReplace = lstTextReplace;
-                excelConvert.lstFormula = lstFormula;
-                excelConvert.lstAutoSizeColumn = lstAutoSizeColumn;
 
-                excelConvert.endRow = infoExcel.rptFooter;
-                excelConvert.endColumn = maxColumn;
-                urlFN = printCf.isPDF.GetValueOrDefault(false) ? urlPDF : urlExcel;
-                msg = excelConvert.ConvertInterop(urlExcel, urlFN, s1.LastRowNum, maxColumn);
+                if (!skipInter)
+                {
+                    var excelConvert = new ExcelConverter();
+                    excelConvert.lstText = null;
+                    excelConvert.lstImage = lstImage;
+                    excelConvert.lstTextReplace = lstTextReplace;
+                    excelConvert.lstFormula = lstFormula;
+                    excelConvert.lstAutoSizeColumn = lstAutoSizeColumn;
+
+                    excelConvert.endRow = infoExcel.rptFooter;
+                    excelConvert.endColumn = maxColumn;
+                    urlFN = printCf.isPDF.GetValueOrDefault(false) ? urlPDF : urlExcel;
+                    msg = excelConvert.ConvertInterop(urlExcel, urlFN, s1.LastRowNum, maxColumn);
+                }
 
                 if (msg.Length <= 0)
                 {

@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionState
+public class API_Data : IHttpHandler, System.Web.SessionState.IReadOnlySessionState
 {
     private LinqDBDataContext db = new LinqDBDataContext();
     public class ThongTinSP
@@ -220,12 +220,26 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
                                orderby b.ngay_hieuluc descending
                                select c).FirstOrDefault();
                     var giaSP = gia == null ? -1 : gia.gia.GetValueOrDefault(0);
-                    var dgid = db.md_donggoisanphams.Where(s => s.md_sanpham_id == sp.md_sanpham_id & s.macdinh == true).Select(s => s.md_donggoi_id).FirstOrDefault();
-                    var dg = db.md_donggois.Where(s => s.md_donggoi_id == dgid).FirstOrDefault();
-                    if (dg == null)
-                        dg = new md_donggoi();
-                    var dvt1 = db.md_donvitinhs.Where(s => s.md_donvitinh_id == dg.dvt_inner).FirstOrDefault();
-                    var dvt2 = db.md_donvitinhs.Where(s => s.md_donvitinh_id == dg.dvt_outer).FirstOrDefault();
+                    var dgids = db.md_donggoisanphams
+                        .Where(s => s.md_sanpham_id == sp.md_sanpham_id)
+                        .Select(s => s.md_donggoi_id)
+                        .ToList();
+
+                    var dgs = db.md_donggois
+                        .Where(s => dgids.Contains(s.md_donggoi_id))
+                        .OrderBy(s => s.ma_donggoi)
+                        .ToList();
+
+                    var dvtIds = dgs
+                        .SelectMany(s => new[] { s.dvt_inner, s.dvt_outer })
+                        .Where(s => s != null)
+                        .Distinct()
+                        .ToList();
+
+                    var dvts = db.md_donvitinhs
+                        .Where(s => dvtIds.Contains(s.md_donvitinh_id))
+                        .ToDictionary(s => s.md_donvitinh_id, s => s.ten_dvt);
+
                     var kd = db.md_kieudangs.Where(s => s.md_kieudang_id == sp.md_kieudang_id).FirstOrDefault();
                     string ma_kd = kd == null ? "" : kd.ma_kieudang;
                     string ten_kd = kd == null ? "" : kd.ten_tv;
@@ -261,25 +275,72 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IRequiresSessionSt
 
                     result2 = new
                     {
-                        dg.ma_donggoi,
-                        dg.sl_inner,
-                        inner = dvt1.ten_dvt,
-                        dg.l1,
-                        dg.w1,
-                        dg.h1,
-                        dg.sl_outer,
-                        outer = dvt2.ten_dvt,
-                        dg.l2_mix,
-                        dg.w2_mix,
-                        dg.h2_mix,
-                        dg.soluonggoi_ctn_20,
-                        dg.soluonggoi_ctn,
-                        dg.soluonggoi_ctn_40hc,
-                        nxn_dg = dg.ngayxacnhan,
-                        dg.mota,
-                        dg.doigia_donggoi,
-                        dg.tldg,
-                        dg.cpdg
+                        ma_donggoi = string.Join("\n",
+                            dgs.Select(s => s.ma_donggoi ?? "")),
+
+                        sl_inner = string.Join("\n",
+                            dgs.Select(s => s.sl_inner == null ? "" : s.sl_inner.ToString())),
+
+                        inner = string.Join("\n",
+                            dgs.Select(s =>
+                                s.dvt_inner != null && dvts.ContainsKey(s.dvt_inner)
+                                    ? dvts[s.dvt_inner]
+                                    : ""
+                            )),
+
+                        l1 = string.Join("\n",
+                            dgs.Select(s => s.l1 == null ? "" : s.l1.ToString())),
+
+                        w1 = string.Join("\n",
+                            dgs.Select(s => s.w1 == null ? "" : s.w1.ToString())),
+
+                        h1 = string.Join("\n",
+                            dgs.Select(s => s.h1 == null ? "" : s.h1.ToString())),
+
+                        sl_outer = string.Join("\n",
+                            dgs.Select(s => s.sl_outer == null ? "" : s.sl_outer.ToString())),
+
+                        outer = string.Join("\n",
+                            dgs.Select(s =>
+                                s.dvt_outer != null && dvts.ContainsKey(s.dvt_outer)
+                                    ? dvts[s.dvt_outer]
+                                    : ""
+                            )),
+
+                        l2_mix = string.Join("\n",
+                            dgs.Select(s => s.l2_mix == null ? "" : s.l2_mix.ToString())),
+
+                        w2_mix = string.Join("\n",
+                            dgs.Select(s => s.w2_mix == null ? "" : s.w2_mix.ToString())),
+
+                        h2_mix = string.Join("\n",
+                            dgs.Select(s => s.h2_mix == null ? "" : s.h2_mix.ToString())),
+
+                        soluonggoi_ctn_20 = string.Join("\n",
+                            dgs.Select(s => s.soluonggoi_ctn_20 == null ? "" : s.soluonggoi_ctn_20.ToString())),
+
+                        soluonggoi_ctn = string.Join("\n",
+                            dgs.Select(s => s.soluonggoi_ctn == null ? "" : s.soluonggoi_ctn.ToString())),
+
+                        soluonggoi_ctn_40hc = string.Join("\n",
+                            dgs.Select(s => s.soluonggoi_ctn_40hc == null ? "" : s.soluonggoi_ctn_40hc.ToString())),
+
+                        nxn_dg = string.Join("\n",
+                            dgs.Select(s => s.ngayxacnhan == null
+                                ? ""
+                                : s.ngayxacnhan.Value.ToString("dd/MM/yyyy"))),
+
+                        mota = string.Join("\n",
+                            dgs.Select(s => s.mota ?? "")),
+
+                        doigia_donggoi = string.Join("\n",
+                            dgs.Select(s => s.doigia_donggoi == null ? "" : s.doigia_donggoi.ToString())),
+
+                        tldg = string.Join("\n",
+                            dgs.Select(s => s.tldg == null ? "" : s.tldg.ToString())),
+
+                        cpdg = string.Join("\n",
+                            dgs.Select(s => s.cpdg == null ? "" : s.cpdg.ToString()))
                     };
                 }
 
