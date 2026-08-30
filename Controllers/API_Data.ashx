@@ -281,30 +281,30 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IReadOnlySessionSt
                         sl_inner = string.Join("\n",
                             dgs.Select(s =>
                             s.sl_inner == null ? "" : s.sl_inner.ToString()
-                            + s.dvt_inner != null && dvts.ContainsKey(s.dvt_inner)
+                            + (s.dvt_inner != null && dvts.ContainsKey(s.dvt_inner)
                                 ? " " + dvts[s.dvt_inner]
-                                : ""
+                                : "")
                         )),
 
                         l1 = string.Join("\n",
-                            dgs.Select(s => s.l1 == null ? "" : s.l1.ToString()
-                            + s.w1 == null ? "" : "x" + s.w1.ToString()
-                            + s.h1 == null ? "" : "x" + s.h1.ToString()
+                            dgs.Select(s => (s.l1 == null ? "" : s.l1.ToString())
+                            + (s.w1 == null ? "" : "x" + s.w1.ToString())
+                            + (s.h1 == null ? "" : "x" + s.h1.ToString())
                         )),
 
                         sl_outer = string.Join("\n",
                             dgs.Select(s =>
                             s.sl_outer == null ? "" : s.sl_outer.ToString()
-                            + s.dvt_outer != null && dvts.ContainsKey(s.dvt_outer)
+                            + (s.dvt_outer != null && dvts.ContainsKey(s.dvt_outer)
                                 ? " " + dvts[s.dvt_outer]
-                                : ""
+                                : "")
                         )),
 
                         l2_mix = string.Join("\n",
                             dgs.Select(s => 
                             s.l2_mix == null ? "" : s.l2_mix.ToString()
-                            + s.w2_mix == null ? "" : "x" + s.w2_mix.ToString()
-                            + s.h2_mix == null ? "" : "x" + s.h2_mix.ToString()
+                            + (s.w2_mix == null ? "" : "x" + s.w2_mix.ToString())
+                            + (s.h2_mix == null ? "" : "x" + s.h2_mix.ToString())
                             )),
 
                         soluonggoi_ctn_20 = string.Join("\n",
