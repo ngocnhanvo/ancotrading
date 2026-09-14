@@ -1049,20 +1049,6 @@
                 , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
             },
             {
-                fixed: true, name: 'phi'
-                , label: 'Phí'
-                , index: 'ddsdh.phi'
-                , width: 100
-                , edittype: 'text'
-                , editable: xemgiaDSDH == 'True'
-				, hidden: xemgiaDSDH == 'False'
-                , editrules: { required:true, number: true, minValue:1 }
-                , editoptions: {disabled: true}
-                , align:'right'
-                , formatter:'currency'
-                , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
-            },
-            {
                 fixed: true, name: 'phidg'
                 , label: 'Phí ĐG'
                 , index: 'ddsdh.phidg'

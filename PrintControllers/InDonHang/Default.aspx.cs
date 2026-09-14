@@ -239,14 +239,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             FROM (
                 SELECT 
                     B.*
-                    , B.giasautang + B.cpdg2 - 
-                    (
-                        case 
-                            when isnull(B.phanbodiscount, 0) = 1
-                            then B.giasautang * B.discount / 100
-                            else 0 
-                        end
-                    ) as giafob
                     , CASE
 				        WHEN B.sl_inner = 0
 				        THEN B.n_w_inner + B.t_thung_outer
@@ -273,7 +265,6 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 			    (
                     SELECT 
                         A.*
-                        , (A.giafob0 + A.phi) + (A.giafob0 * A.tanggia / 100) as giasautang
                         , (select dbo.get_commodity(N'{0}') )  + ' products' as commodity
                         , '{1}' as money
                         , '{4}' as diengiaicong
@@ -319,7 +310,9 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                             , N'{3}' as discount_hehang_value
                             , isnull(ddh.giachuan, ddh.giafob) as giachuan
                             , ddh.giafob as giafob0
+                            , ddh.giahopdong as giafob
                             , isnull(ddh.phi, 0) as phi
+                            , isnull(ddh.phitru, 0) as phitru_donghang
 						    , sp.l_cm, sp.w_cm, sp.h_cm, sp.l_inch, sp.w_inch, sp.h_inch
                             , convert(varchar, dh.shipmenttime, 106) as shipmenttime
                             , cb.ten_cangbien
@@ -763,7 +756,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
             columnHeaders.Add(new columnHeader()
             {
-                text = "Phí",
+                text = "Phí cộng",
                 value = "phi",
                 columnAt = 33,
                 width = 0
@@ -771,9 +764,17 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
 
             columnHeaders.Add(new columnHeader()
             {
+                text = "Phí trừ",
+                value = "phitru_donghang",
+                columnAt = 34,
+                width = 0
+            });
+
+            columnHeaders.Add(new columnHeader()
+            {
                 text = "CPĐG",
                 value = "cpdg",
-                columnAt = 34,
+                columnAt = 35,
                 width = 0
             });
 
@@ -781,7 +782,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
             {
                 text = "Discount (%)",
                 value = "discountHH",
-                columnAt = 35,
+                columnAt = 36,
                 width = 0
             });
 
@@ -1015,7 +1016,7 @@ public partial class PrintControllers_InDonHang_Default : System.Web.UI.Page
                         cel_row_t.SetCellValue(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val));
                         cel_row_t.CellStyle = cellSoLuong;
                     }
-                    else if (new string[] { "giafob", "giachuan", "phi", "cpdg" }.Contains(columnHeader.value))
+                    else if (new string[] { "giafob", "giachuan", "phi", "phitru_donghang", "cpdg" }.Contains(columnHeader.value))
                     {
                         var val = dt.Rows[i][columnHeader.value].ToString();
                         cel_row_t.SetCellValue(Math.Round(double.Parse(string.IsNullOrWhiteSpace(val) ? "0" : val), 2));

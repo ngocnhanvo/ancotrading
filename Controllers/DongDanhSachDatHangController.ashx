@@ -280,7 +280,7 @@ public class DongDanhSachDatHangController : IHttpHandler, IDisposable
             xml += "<cell><![CDATA[" + row["tem_dan"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sl_dathang"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["giachuan"] + "]]></cell>";
-            xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
+            //xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phidg"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["gianhap"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["sl_dagiao"] + "]]></cell>";

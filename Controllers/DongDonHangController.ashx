@@ -269,7 +269,7 @@ var giaSP = db.md_giasanphams
                     {
                         m.giafob = decimal.Parse(context.Request.Form["giafob"]);
                     }
-                    m.phi = phiVal;
+                    //m.phi = phiVal;
                     m.soluong = decimal.Parse(context.Request.Form["soluong"]);
                     m.soluong_conlai = decimal.Parse(context.Request.Form["soluong"]);
 
@@ -547,7 +547,7 @@ var giaSP = db.md_giasanphams
                 mnu = Public.DiscountHehangValue(donhang.discount_hehang_value, mnu, db);
             }
 
-            mnu.phi = phiVal;
+            //mnu.phi = phiVal;
             mnu.soluong = decimal.Parse(context.Request.Form["soluong"]);
             mnu.soluong_conlai = decimal.Parse(context.Request.Form["soluong"]);
             mnu.soluong_daxuat = 0;
@@ -698,56 +698,43 @@ var giaSP = db.md_giasanphams
 
         string strsql = $@"
             select 
-                P.*, 
-                P.giasautang + P.cpdg2 - 
-                (
-                    case 
-                        when isnull(P.phanbodiscount, 0) = 1
-                        then P.giasautang * P.discount / 100
-                        else 0 
-                    end
-                )
-                as giahopdong
+                P.*
             from (
-                select 
-                    P.*
-                    , (P.giafob + P.phi) + (P.giafob * P.tanggia / 100) as giasautang
-                    , (case when P.apdung_cpdg = 1 then isnull(P.cpdg, 0) else 0 end) as cpdg2
-                from (
-                    SELECT
-                        ddh.c_dongdonhang_id
-                        , dh.c_donhang_id
-                        , sp.trangthai
-                        , ddh.sothutu
-                        , sp.md_sanpham_id
-                        , sp.ma_sanpham
-                        , ddh.ma_sanpham_khach
-                        , isnull(ddh.giafobGoc, ddh.giafob) as giafobGoc
-                        , ddh.giafob
-                        , isnull(ddh.phi, 0) as phi
-                        , (case when isnull(dh.discount, 0) > 0 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discount
-                        , (case when isnull(dh.tanggia, 0) > 0 then isnull(dh.tanggia, 0) else isnull(ddh.tanggia, 0) end) as tanggia
-                        , dh.phanbodiscount
-                        , ddh.soluong
-                        , dg.ten_donggoi
-                        , dg.mota as motadonggoi
-                        , ddh.sl_inner
-                        , ddh.l1, ddh.w1, ddh.h1,  ddh.sl_outer, ddh.l2, ddh.w2, ddh.h2
-                        , ddh.sl_cont, ddh.v2, ddh.cpdg, ddh.apdung_cpdg, dtkd.ma_dtkd, ddh.ngaytao, ddh.nguoitao
-                        , ddh.ngaycapnhat,  ddh.nguoicapnhat, ddh.mota
-                        , ddh.hoatdong ,ddh.trangthai as trangthai_ddh, ddh.docquyen, ddh.barcode, ddh.editphi
-                        , ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
-                    FROM
-                        c_dongdonhang ddh
-                        left join c_donhang dh on ddh.c_donhang_id = dh.c_donhang_id
-                        left join md_sanpham sp on ddh.md_sanpham_id = sp.md_sanpham_id
-                        left join md_kieudang kd on kd.md_kieudang_id = sp.md_kieudang_id
-                        left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
-                        left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id
-                        left join md_doitackinhdoanh dtkd on ddh.nhacungungid = dtkd.md_doitackinhdoanh_id
-                    WHERE
-                        dh.c_donhang_id = N'{poId}' {filter}
-                )P
+                SELECT
+                    ddh.c_dongdonhang_id
+                    , dh.c_donhang_id
+                    , sp.trangthai
+                    , ddh.sothutu
+                    , sp.md_sanpham_id
+                    , sp.ma_sanpham
+                    , ddh.ma_sanpham_khach
+                    , isnull(ddh.giafobGoc, ddh.giafob) as giafobGoc
+                    , ddh.giafob
+                    , ddh.giahopdong
+                    , isnull(ddh.phi, 0) as phi
+                    , isnull(ddh.phitru, 0) as phitru
+                    , (case when isnull(dh.discount, 0) > 0 then isnull(dh.discount, 0) else isnull(ddh.discount, 0) end) as discount
+                    , (case when isnull(dh.tanggia, 0) > 0 then isnull(dh.tanggia, 0) else isnull(ddh.tanggia, 0) end) as tanggia
+                    , dh.phanbodiscount
+                    , ddh.soluong
+                    , dg.ten_donggoi
+                    , dg.mota as motadonggoi
+                    , ddh.sl_inner
+                    , ddh.l1, ddh.w1, ddh.h1,  ddh.sl_outer, ddh.l2, ddh.w2, ddh.h2
+                    , ddh.sl_cont, ddh.v2, ddh.cpdg, ddh.apdung_cpdg, dtkd.ma_dtkd, ddh.ngaytao, ddh.nguoitao
+                    , ddh.ngaycapnhat,  ddh.nguoicapnhat, ddh.mota
+                    , ddh.hoatdong ,ddh.trangthai as trangthai_ddh, ddh.docquyen, ddh.barcode, ddh.editphi
+                    , ROW_NUMBER() OVER (ORDER BY {sidx} {sord}) as RowNum
+                FROM
+                    c_dongdonhang ddh
+                    left join c_donhang dh on ddh.c_donhang_id = dh.c_donhang_id
+                    left join md_sanpham sp on ddh.md_sanpham_id = sp.md_sanpham_id
+                    left join md_kieudang kd on kd.md_kieudang_id = sp.md_kieudang_id
+                    left join md_chucnang cn on sp.md_chucnang_id = cn.md_chucnang_id
+                    left join md_donggoi dg on ddh.md_donggoi_id = dg.md_donggoi_id
+                    left join md_doitackinhdoanh dtkd on ddh.nhacungungid = dtkd.md_doitackinhdoanh_id
+                WHERE
+                    dh.c_donhang_id = N'{poId}' {filter}
             )P
             WHERE RowNum > @start AND RowNum < @end
         ";
@@ -772,6 +759,7 @@ var giaSP = db.md_giasanphams
             xml += "<cell><![CDATA[" + row["giafobGoc"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["giafob"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["phi"] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row["phitru"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["cpdg"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["apdung_cpdg"] + "]]></cell>";
             xml += "<cell><![CDATA[" + row["discount"] + "]]></cell>";

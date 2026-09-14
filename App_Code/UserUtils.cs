@@ -415,14 +415,16 @@ public static class UserUtils
             decimal tygia = get_gianhap(context, ma_dtkd_select, -2, -2, -2, db);
             decimal tylePT = get_gianhap(context, ma_dtkd_select, -1, -1, -1, db);
             //Chi phí từng dòng hàng
-            var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
-            if (!donhang.chuyenphiDSDH.GetValueOrDefault(false))
-                phiDiscount = 0;
-            else if (donhang.discount.GetValueOrDefault(0) > 0)
-            {
-                phiDiscount = ddonhang.phi.GetValueOrDefault(0);
-            }
-            var phiDiscount_VND = jqGridHelper.Utils.Round5(phiDiscount * tygia, -2);
+            decimal phiDiscount = 0, phiDiscount_VND = 0;
+            //var phiDiscount = ddonhang.phi.GetValueOrDefault(0) * 100 / (100 + (decimal)ddonhang.discount.GetValueOrDefault(0));
+            //if (!donhang.chuyenphiDSDH.GetValueOrDefault(false))
+            //    phiDiscount = 0;
+            //else if (donhang.discount.GetValueOrDefault(0) > 0)
+            //{
+            //    phiDiscount = ddonhang.phi.GetValueOrDefault(0);
+            //}
+            //var phiDiscount_VND = jqGridHelper.Utils.Round5(phiDiscount * tygia, -2);
+
             //Chi phí đóng gói từng dòng hàng
             //var phiDongGoi = ddonhang.apdung_cpdg.GetValueOrDefault(false) ? ddonhang.cpdg.GetValueOrDefault(0) : 0;
 
@@ -788,19 +790,20 @@ public static class UserUtils
 
     public static decimal getGiaHopDongPO(c_donhang dh, c_dongdonhang ddh, int? round, bool? pbds)
     {
-        var giaFOB = ddh.giafob.GetValueOrDefault(0);
-        var pt_tanggia = dh.tanggia.GetValueOrDefault(0) > 0 ? dh.tanggia.GetValueOrDefault(0) : ddh.tanggia.GetValueOrDefault(0);
-        var gt_tanggia = giaFOB * pt_tanggia / 100;
-        pbds = pbds == null ? dh.phanbodiscount.GetValueOrDefault(false) : pbds.GetValueOrDefault(false);
-        var giaFOBvaPhi = giaFOB + ddh.phi.GetValueOrDefault(0) + gt_tanggia;
-        var discount = dh.discount.GetValueOrDefault(0) > 0 ? dh.discount.GetValueOrDefault(0) : (decimal)ddh.discount.GetValueOrDefault(0);
-        var phanBoDiscountVaoGia = pbds.GetValueOrDefault(false) ? giaFOBvaPhi * discount / 100 : 0;
-        var giaHopDong = giaFOBvaPhi - phanBoDiscountVaoGia;
+        return ddh.giahopdong.GetValueOrDefault(0);
+        //var giaFOB = ddh.giafob.GetValueOrDefault(0);
+        //var pt_tanggia = dh.tanggia.GetValueOrDefault(0) > 0 ? dh.tanggia.GetValueOrDefault(0) : ddh.tanggia.GetValueOrDefault(0);
+        //var gt_tanggia = giaFOB * pt_tanggia / 100;
+        //pbds = pbds == null ? dh.phanbodiscount.GetValueOrDefault(false) : pbds.GetValueOrDefault(false);
+        //var giaFOBvaPhi = giaFOB + ddh.phi.GetValueOrDefault(0) - ddh.phitru.GetValueOrDefault(0) + gt_tanggia;
+        //var discount = dh.discount.GetValueOrDefault(0) > 0 ? dh.discount.GetValueOrDefault(0) : (decimal)ddh.discount.GetValueOrDefault(0);
+        //var phanBoDiscountVaoGia = pbds.GetValueOrDefault(false) ? giaFOBvaPhi * discount / 100 : 0;
+        //var giaHopDong = giaFOBvaPhi - phanBoDiscountVaoGia;
 
-        if (ddh.apdung_cpdg.GetValueOrDefault(false))
-            giaHopDong = giaHopDong + ddh.cpdg.GetValueOrDefault(0);
+        //if (ddh.apdung_cpdg.GetValueOrDefault(false))
+        //    giaHopDong = giaHopDong + ddh.cpdg.GetValueOrDefault(0);
 
-        return round == null ? giaHopDong : Math.Round(giaHopDong, round.GetValueOrDefault(0), MidpointRounding.AwayFromZero);
+        //return round == null ? giaHopDong : Math.Round(giaHopDong, round.GetValueOrDefault(0), MidpointRounding.AwayFromZero);
     }
 
     public static decimal getDiscountgPO(c_donhang dh, c_dongdonhang ddh)

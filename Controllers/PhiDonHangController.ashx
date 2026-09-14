@@ -13,10 +13,13 @@ public class PhiDonHangController : IHttpHandler, IDisposable
     {
         context.DisposeOnPipelineCompleted(this);
         String action, oper;
-        action = context.Request.QueryString["action"];
+        action = context.Request.Params["action"];
         oper = context.Request.Form["oper"];
         switch (action)
         {
+            case "phanBoPhi":
+                this.phanBoPhi(context);
+                break;
             case "getoption":
                 this.getSelectOption(context);
                 break;
@@ -40,6 +43,107 @@ public class PhiDonHangController : IHttpHandler, IDisposable
         }
     }
 
+    public void phanBoPhi(HttpContext context)
+    {
+        string msg = "";
+        var ok = false;
+
+        var id = context.Request.Form["id"];
+
+        var donhang = db.c_donhangs
+            .FirstOrDefault(s => s.c_donhang_id == id);
+
+        if (donhang == null)
+        {
+            msg = "Không tìm thấy đơn hàng";
+            goto EndEventHandler;
+        }
+
+        if (donhang.md_trangthai_id != Helper.SOANTHAO)
+        {
+            msg = @"Đơn hàng không ở trạng thái ""Soạn Thảo""";
+            goto EndEventHandler;
+        }
+
+        var donghangs = db.c_dongdonhangs
+            .Where(s => s.c_donhang_id == donhang.c_donhang_id)
+            .ToList();
+
+        if (donghangs.Count <= 0)
+        {
+            msg = "Đơn hàng chưa có dòng hàng";
+            goto EndEventHandler;
+        }
+
+        var phis = db.c_phidonhangs
+            .Where(s =>
+                s.c_donhang_id == donhang.c_donhang_id
+                && s.hoatdong == true
+            )
+            .ToList();
+
+        if (phis.Count <= 0)
+        {
+            msg = "Đơn hàng chưa có phí";
+            goto EndEventHandler;
+        }
+
+        decimal tongSoLuong = donghangs.Sum(s => s.soluong.GetValueOrDefault(0));
+
+        if (tongSoLuong <= 0)
+        {
+            msg = "Tổng số lượng phải lớn hơn 0";
+            goto EndEventHandler;
+        }
+
+        // TODO: thay điều kiện bằng field thực tế của c_phidonhang
+        decimal tongPhiCong = phis
+            .Where(s => s.phitang == true)
+            .ToList().Sum(s => s.phi.GetValueOrDefault(0));
+
+        decimal tongPhiTru = phis
+            .Where(s => (s.phitang ?? false) == false)
+            .ToList().Sum(s => s.phi.GetValueOrDefault(0));
+
+        decimal phiCong = Math.Round(
+            tongPhiCong / tongSoLuong,
+            2,
+            MidpointRounding.AwayFromZero
+        );
+
+        decimal phiTru = Math.Round(
+            tongPhiTru / tongSoLuong,
+            2,
+            MidpointRounding.AwayFromZero
+        );
+
+        foreach (var donghang in donghangs)
+        {
+            donghang.phi = phiCong;
+            donghang.phitru = phiTru;
+        }
+
+        db.SubmitChanges();
+
+        ok = true;
+        msg = $@"Đã phân bổ phí thành công.
+Phí cộng: {phiCong:N2}
+Phí trừ: {phiTru:N2}";
+
+    EndEventHandler:;
+
+        var result = new
+        {
+            ok,
+            msg
+        };
+
+        context.Response.ContentType = "application/json";
+        context.Response.Write(
+            Newtonsoft.Json.JsonConvert.SerializeObject(result)
+        );
+    }
+
     public void getSelectOption(HttpContext context)
     {
         //String sql = "select md_bocai_id, code_bc from md_bocai where hoatdong = 1 order by code_bc desc";
@@ -61,24 +165,26 @@ public class PhiDonHangController : IHttpHandler, IDisposable
         string phitang_kh = "false";
         string diengiai_kh = "";
         string ma_dtkd_select = "", md_doitackinhdoanh_id = "";
-        string dsncc_check_ptr =  context.Request.Form["dsncc_check_ptr"];
-        string dsncc_check_chhet =  context.Request.Form["dsncc_check_chhet"];
+        string dsncc_check_ptr = context.Request.Form["dsncc_check_ptr"];
+        string dsncc_check_chhet = context.Request.Form["dsncc_check_chhet"];
         int check = 0;
-        if(tracho_ncc == "true") {
+        if (tracho_ncc == "true")
+        {
             phitang_kh = context.Request.Form["phitang_kh"].ToLower();
             diengiai_kh = context.Request.Form["diengiai_kh"].ToLower();
             check_chhet = context.Request.Form["check_chhet"].ToLower();
             check_ptr = context.Request.Form["check_ptr"].ToLower();
             check_ptrCBM = context.Request.Form["check_ptrCBM"].ToLower();
 
-            if(check_chhet == "true")
+            if (check_chhet == "true")
                 check = 1;
-            else if(check_ptr == "true")
+            else if (check_ptr == "true")
                 check = 2;
-            else if(check_ptrCBM == "true")
+            else if (check_ptrCBM == "true")
                 check = 3;
 
-            if(check > 0 & check < 3) {
+            if (check > 0 & check < 3)
+            {
                 md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
                 ma_dtkd_select = db.md_doitackinhdoanhs.SingleOrDefault(p => p.md_doitackinhdoanh_id == md_doitackinhdoanh_id).ma_dtkd;
             }
@@ -109,12 +215,12 @@ public class PhiDonHangController : IHttpHandler, IDisposable
         switch (dh.md_trangthai_id)
         {
             case "SOANTHAO":
-                if(tg != null)
+                if (tg != null)
                 {
                     switch (check)
                     {
                         case 1:
-                            phi_vnd = decimal.Parse(context.Request.Form["phi"]) * tg.chia_cho.Value ;
+                            phi_vnd = decimal.Parse(context.Request.Form["phi"]) * tg.chia_cho.Value;
                             break;
                         case 2:
                             phi_vnd = decimal.Parse(context.Request.Form["phi"]) * tg.chia_cho.Value * gianhap;
@@ -181,21 +287,23 @@ public class PhiDonHangController : IHttpHandler, IDisposable
         string ma_dtkd_select = "", md_doitackinhdoanh_id = "";
 
         int check = 0;
-        if(tracho_ncc == "true") {
+        if (tracho_ncc == "true")
+        {
             phitang_kh = context.Request.Form["phitang_kh"].ToLower();
             diengiai_kh = context.Request.Form["diengiai_kh"].ToLower();
             check_chhet = context.Request.Form["check_chhet"].ToLower();
             check_ptr = context.Request.Form["check_ptr"].ToLower();
             check_ptrCBM = context.Request.Form["check_ptrCBM"].ToLower();
 
-            if(check_chhet == "true")
+            if (check_chhet == "true")
                 check = 1;
-            else if(check_ptr == "true")
+            else if (check_ptr == "true")
                 check = 2;
-            else if(check_ptrCBM == "true")
+            else if (check_ptrCBM == "true")
                 check = 3;
 
-            if(check > 0 & check < 3) {
+            if (check > 0 & check < 3)
+            {
                 md_doitackinhdoanh_id = context.Request.Form["md_doitackinhdoanh_id"];
                 ma_dtkd_select = db.md_doitackinhdoanhs.SingleOrDefault(p => p.md_doitackinhdoanh_id == md_doitackinhdoanh_id).ma_dtkd;
             }
@@ -236,11 +344,12 @@ public class PhiDonHangController : IHttpHandler, IDisposable
 
         decimal cbm = 0;
         string[] nangluc_split = nangluc.Split(',');
-        for(int i = 0; i < nangluc_split.Count(); i++)
+        for (int i = 0; i < nangluc_split.Count(); i++)
         {
             string[] cbm_ncc = nangluc_split[i].Split(':');
-            if(ma_dtkd_select == cbm_ncc[0]) {
-                try { cbm = decimal.Parse(cbm_ncc[1]); }catch{ }
+            if (ma_dtkd_select == cbm_ncc[0])
+            {
+                try { cbm = decimal.Parse(cbm_ncc[1]); } catch { }
             }
         }
 
@@ -255,18 +364,18 @@ public class PhiDonHangController : IHttpHandler, IDisposable
         switch (dh.md_trangthai_id)
         {
             case "SOANTHAO":
-                if(tg != null)
+                if (tg != null)
                 {
                     switch (check)
                     {
                         case 1:
-                            phi_vnd = decimal.Parse(context.Request.Form["phi"]) * tg.chia_cho.Value ;
+                            phi_vnd = decimal.Parse(context.Request.Form["phi"]) * tg.chia_cho.Value;
                             break;
                         case 2:
                             phi_vnd = decimal.Parse(context.Request.Form["phi"]) * tg.chia_cho.Value * gianhap;
                             break;
                         case 3:
-                            phi_vnd = decimal.Parse(context.Request.Form["phi"]) * tg.chia_cho.Value *  vnn / 100;
+                            phi_vnd = decimal.Parse(context.Request.Form["phi"]) * tg.chia_cho.Value * vnn / 100;
                             break;
                         default:
                             phi_vnd = -1;
@@ -458,7 +567,8 @@ public class PhiDonHangController : IHttpHandler, IDisposable
         }
     }
 
-    public decimal get_gianhap(HttpContext context, string ma_dtkd_select) {
+    public decimal get_gianhap(HttpContext context, string ma_dtkd_select)
+    {
         //Tinh % theo nha cung ung
         decimal gianhap = 1;
         if (("VINHGIA").Contains(ma_dtkd_select))
@@ -466,12 +576,12 @@ public class PhiDonHangController : IHttpHandler, IDisposable
             gianhap = gianhap * 82 / 100;
         }
         //Neu doi tac la AN BINH, ANCO1, ANHIEPLUC, ANCOHUNG
-        else if(ma_dtkd_select == "AN BINH" | ma_dtkd_select == "ANCO1" | ma_dtkd_select == "ANHIEPLUC" | ma_dtkd_select == "ANCOHUNG")
+        else if (ma_dtkd_select == "AN BINH" | ma_dtkd_select == "ANCO1" | ma_dtkd_select == "ANHIEPLUC" | ma_dtkd_select == "ANCOHUNG")
         {
             gianhap = gianhap * 80 / 100;
         }
         //Neu doi tac la TITAN
-        else if(ma_dtkd_select == "TITAN")
+        else if (ma_dtkd_select == "TITAN")
         {
             gianhap = gianhap * 95 / 100;
         }

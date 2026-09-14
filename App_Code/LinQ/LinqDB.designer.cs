@@ -1,4 +1,4 @@
-//Update at 15/07/2026 15:08:04
+//Update at 10/09/2026 14:30:22
 #pragma warning disable 1591
 using System;
 using System.Collections.Generic;
@@ -10468,6 +10468,7 @@ private System.Nullable<decimal> _giachuan;
 private System.Nullable<double> _discount;
 private string _barcode;
 private System.Nullable<decimal> _phi;
+private System.Nullable<decimal> _phitru;
 private System.Nullable<bool> _editphi;
 private string _code_cl;
 private string _md_chungloai_id;
@@ -10570,6 +10571,8 @@ partial void OnbarcodeChanging(string value);
 partial void OnbarcodeChanged();
 partial void OnphiChanging(System.Nullable<decimal> value);
 partial void OnphiChanged();
+partial void OnphitruChanging(System.Nullable<decimal> value);
+partial void OnphitruChanged();
 partial void OneditphiChanging(System.Nullable<bool> value);
 partial void OneditphiChanged();
 partial void Oncode_clChanging(string value);
@@ -11398,6 +11401,25 @@ this.SendPropertyChanging();
 this._phi = value;
 this.SendPropertyChanged("phi");
 this.OnphiChanged();
+}
+}
+}
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_phitru", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @phitru
+{
+get
+{
+return this._phitru;
+}
+set
+{
+if ((this._phitru != value))
+{
+this.OnphitruChanging(value);
+this.SendPropertyChanging();
+this._phitru = value;
+this.SendPropertyChanged("phitru");
+this.OnphitruChanged();
 }
 }
 }

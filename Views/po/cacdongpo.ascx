@@ -24,9 +24,9 @@
         let frm = "#FrmGrid_grid_ds_chitietpo";
         let giafobGoc = $('#giafobGoc', frm);
         let giafob = $('#giafob', frm);
-        let phifob = $('#phi', frm);
+        //let phifob = $('#phi', frm);
         let docquyen = $('#docquyen', frm);
-        let editPhiFOB = $('#editphi', frm);
+        //let editPhiFOB = $('#editphi', frm);
         giafobGoc.val('Đang tải...');
         giafob.val('Đang tải...');
         //#BeginVoThanhSang
@@ -41,7 +41,7 @@
                 data = JSON.parse(data);
                 giafobGoc.val(data.gia[0]);
                 giafob.val(data.gia[0]);
-                phifob.val(data.phi[0]);
+                //phifob.val(data.phi[0]);
                 //#BeginVoThanhSang
                 if (data.md_donggoi_id && data.md_donggoi_id[0] != '') {
                     window.md_donggoi_id_theo_gia = data.md_donggoi_id[0];
@@ -50,9 +50,9 @@
                 //#EndVoThanhSang
                 updateMoTaGiaPO_CallBack(c_donhang_id, md_sanpham_id);
 
-                if (phifob.val() == 0) {
-                    editPhiFOB.prop('checked', true).change();
-                }
+                // if (phifob.val() == 0) {
+                //     editPhiFOB.prop('checked', true).change();
+                // }
             }
         });
     }
@@ -132,30 +132,30 @@
         celgia_db = $('#grid_ds_po').jqGrid('getCell', id_sel, 'gia_db');
         //--
         let giafob = $('#giafob', frm);
-        let phifob = $('#phi', frm);
+        //let phifob = $('#phi', frm);
         let docquyen = $('#tr_docquyen', frm);
-        let editphiTr = $('#tr_editphi', frm);
-        let editphi = $('#editphi', frm);
+        //let editphiTr = $('#tr_editphi', frm);
+        //let editphi = $('#editphi', frm);
         if (celgia_db == 'True') {
             giafob.prop('disabled', true);
-            editphi.off('change');
-            editphi.change(function () {
-                phifob.prop('disabled', !editphi.prop('checked'));
-            });
-            editphi.change();
+            //editphi.off('change');
+            //editphi.change(function () {
+                //phifob.prop('disabled', !editphi.prop('checked'));
+            //});
+            //editphi.change();
         }
         else {
             if (vnnIsAdmin == 'True') {
                 giafob.prop('disabled', false);
-                phifob.prop('disabled', false);
+                //phifob.prop('disabled', false);
             }
             else {
                 giafob.prop('disabled', suaGiaPO != 'True');
-                phifob.prop('disabled', false);
+                //phifob.prop('disabled', false);
             }
         }
         docquyen.hide();
-        editphiTr.hide(); 
+        //editphiTr.hide(); 
     }
 </script>
 
@@ -304,17 +304,30 @@
 	},
     {
 		name: 'phi'
-		, label: 'Phí'
+		, label: 'Phí cộng'
 		, index: 'ddh.phi'
 		, fixed:true , width: 100
 		, edittype: 'text'
 		, editable: true
 		, editrules: { required:true, number: true }
-		, editoptions:{ defaultValue: '0' }
+		, editoptions:{ defaultValue: '0', disabled: true }
 		, align: 'right'
 		, formatter:'currency'
 		, formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
 	},
+    {
+	    name: 'phitru'
+	    , label: 'Phí trừ'
+	    , index: 'ddh.phitru'
+	    , fixed:true , width: 100
+	    , edittype: 'text'
+	    , editable: true
+	    , editrules: { required:true, number: true }
+	    , editoptions:{ defaultValue: '0', disabled: true }
+	    , align: 'right'
+	    , formatter:'currency'
+	    , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
+    },
     {
 		name: 'cpdg'
 		, label: 'CPĐG'
@@ -618,10 +631,10 @@
 		, label: 'Cho phép sửa phí'
         , index: 'ddh.editphi'
         , edittype: 'checkbox'
-        , editoptions:{ value:'True:False', defaultValue: 'False' }
+        , editoptions:{ value:'True:False', defaultValue: 'True' }
         , fixed:true 
 		, width: 100
-        , editable:true
+        , editable:false
 		, hidden: true
         , editrules: { edithidden:true }
     }
@@ -650,7 +663,7 @@
                     $(formid).parent().parent().parent().dialog('destroy').remove();
                     alert('Hãy chọn một đơn hàng mới có thể tạo chi tiết.!');
                 }else{
-                    phiTheoPhanTramDonHang(formid);
+                    //phiTheoPhanTramDonHang(formid);
                     $('#tr_' + forId + ' td.DataTD input#' + forId, formid).val(masterId);
 							
 					$('#ma_sanpham', formid).mask('99-*****-**-**');
@@ -716,7 +729,7 @@
     EditFormOptions ="
         width: 450,
         beforeShowForm: function (formid) {
-            phiTheoPhanTramDonHang(formid);
+            //phiTheoPhanTramDonHang(formid);
             $('#ma_sanpham', formid).mask('**-*****-**-**');
             $('#ma_sanpham', formid).prop('disabled', true);
             $('#tr_giafob', formid).show();
