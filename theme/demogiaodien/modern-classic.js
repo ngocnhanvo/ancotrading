@@ -102,20 +102,6 @@
         }
     }
 
-    function hidePrimaryPagerActions(gridId) {
-        var ids = [
-            '#add_' + gridId,
-            '#edit_' + gridId,
-            '#del_' + gridId,
-            '#refresh_' + gridId
-        ];
-        $(ids.join(',')).hide();
-
-        // Export/print is intentionally moved out of the crowded pager. It remains
-        // available from the three-dot menu because that menu proxies the old button.
-        $('#' + gridId + '-pager .ui-pg-button[title="Trích Xuất Dữ Liệu"]').hide();
-    }
-
     function createMasterActions() {
         var $actions = $('<div class="po-modern-actions"></div>');
         var $add = $('<button type="button" class="po-modern-action po-modern-action-primary"><span>＋</span> Thêm</button>');
@@ -207,28 +193,34 @@
             }
         } catch (ignoreOuter) { }
 
+        // Keep the legacy product-image east pane. The previous demo pass closed
+        // it to gain grid width, but that removed useful product context.
         try {
             var detailLayout = $details.data('layout');
-            if (detailLayout && detailLayout.close) {
-                detailLayout.close('east');
+            if (detailLayout) {
+                if (detailLayout.sizePane) detailLayout.sizePane('east', 220);
+                if (detailLayout.open) detailLayout.open('east');
                 if (detailLayout.resizeAll) detailLayout.resizeAll();
             }
         } catch (ignoreInner) { }
 
         var masterHeight = $master.height();
         if (masterHeight > 120 && $('#grid_ds_po').length) {
+            // setGridWidth expects the usable content width. innerWidth includes
+            // the demo pane padding, so subtract it to avoid spilling right.
+            var masterWidth = Math.max(300, $master.innerWidth() - 20);
             $('#grid_ds_po').setGridHeight(Math.max(110, masterHeight - 72));
-            $('#grid_ds_po').setGridWidth($master.width());
+            $('#grid_ds_po').setGridWidth(masterWidth);
         }
 
         var $tabs = $('#tabs-donhang-details');
         var detailHeight = $tabs.height();
-        var detailWidth = $tabs.width();
+        var detailWidth = $tabs.innerWidth();
         if (detailHeight > 120 && detailWidth > 100) {
             $.each(['grid_ds_chitietpo', 'grid_khoanphi', 'grid_ds_donhang_spdt'], function (_, gridId) {
                 var $grid = $('#' + gridId);
                 if ($grid.length) {
-                    $grid.setGridWidth(detailWidth);
+                    $grid.setGridWidth(Math.max(300, detailWidth - 2));
                     $grid.setGridHeight(Math.max(110, detailHeight - 84));
                 }
             });
@@ -250,15 +242,12 @@
         $gbox.before($toolbar);
 
         $gbox.find('.ui-jqgrid-titlebar').hide();
-        hidePrimaryPagerActions('grid_ds_po');
 
         var $detailActions = createDetailActions();
         $('#tabs-donhang-details').append($detailActions);
 
-        $.each(['grid_ds_chitietpo', 'grid_khoanphi', 'grid_ds_donhang_spdt'], function (_, gridId) {
-            hidePrimaryPagerActions(gridId);
-        });
-
+        // Keep all original pager buttons visible. The modern top actions are
+        // shortcuts, while the pager remains the complete legacy tool surface.
         $('#tabs-donhang-details').on('tabsshow.demoPo tabsselect.demoPo', function () {
             $('.po-modern-more-menu').hide();
             window.setTimeout(resizePoWorkspace, 0);
