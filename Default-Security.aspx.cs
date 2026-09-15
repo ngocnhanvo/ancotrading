@@ -20,5 +20,9 @@ public partial class Default_Security : System.Web.UI.Page
 
             script += string.Format(@"<script src=""{0}"" type=""text/javascript""></script>{1}", srcD_link, Environment.NewLine);
         }
+
+        // UI demo only: keep the production shell untouched and layer the
+        // Modern Classic behavior/theme from the demogiaodien branch.
+        script += string.Format(@"<script src=""theme/demogiaodien/modern-classic.js?ver={0}"" type=""text/javascript""></script>{1}", Guid.NewGuid(), Environment.NewLine);
     }
 }
