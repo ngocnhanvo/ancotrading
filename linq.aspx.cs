@@ -25,6 +25,19 @@ public partial class Linq : System.Web.UI.Page
         result.InnerHtml = $"Updated Linq on {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}";
     }
 
+    protected void generateDBMap_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            var outputPath = DatabaseSchemaMapGenerator.Generate(Context);
+            result.InnerHtml = $"Generated DB Map on {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}\r\n{outputPath}";
+        }
+        catch (Exception ex)
+        {
+            result.InnerHtml = "Generate DB Map failed:\r\n" + ex.ToString();
+        }
+    }
+
     protected void openmssql_Click(object sender, EventArgs e)
     {
         Response.Redirect("mssql.aspx");
