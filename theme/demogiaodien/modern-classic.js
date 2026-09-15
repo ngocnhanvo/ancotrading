@@ -63,7 +63,11 @@
             return '<span class="po-summary-label">Đơn hàng:</span><strong class="po-summary-primary">Chưa chọn</strong>';
         }
 
-        var parts = value.split(',');
+        // Caption data is formatted like:
+        // Đơn hàng:..., CBM:..., Amount:11,728.80, Quantity:..., Đặt cọc:...
+        // Do not split on every comma because Amount may contain a thousands
+        // separator. Split only when the next token is another "label:" pair.
+        var parts = value.split(/,\s*(?=[^,:]+\s*:)/);
         var html = [];
         $.each(parts, function (index, item) {
             var part = $.trim(item);
