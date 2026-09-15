@@ -121,6 +121,8 @@ public class PhiDonHangController : IHttpHandler, IDisposable
         {
             donghang.phi = phiCong;
             donghang.phitru = phiTru;
+            donghang.phi_pb = phiCong;
+            donghang.phitru_pb = phiTru;
         }
 
         db.SubmitChanges();
