@@ -47,10 +47,17 @@
                 if (!wasOpen) {
                     $li.addClass('active');
 
-                    // Align dropdown with the selected top-level module when room permits.
-                    var left = $li.position().left;
-                    var maxLeft = Math.max(0, $(window).width() - $panel.outerWidth() - 16);
-                    $panel.css('left', Math.min(116 + left, maxLeft) + 'px').show();
+                    // The dropdown is absolutely positioned inside #ribbon, so use
+                    // the button's real document offset minus the ribbon offset.
+                    // The previous code added the 116px logo gutter twice, which
+                    // caused the mega menu to drift to the right of the clicked tab.
+                    var ribbonLeft = $ribbon.offset().left;
+                    var buttonLeft = $li.offset().left;
+                    var left = Math.max(0, buttonLeft - ribbonLeft);
+                    var panelWidth = $panel.outerWidth() || 520;
+                    var maxLeft = Math.max(0, $ribbon.innerWidth() - panelWidth - 8);
+
+                    $panel.css('left', Math.min(left, maxLeft) + 'px').show();
                 }
             });
 
