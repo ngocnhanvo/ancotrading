@@ -430,8 +430,10 @@ body.demo-modern-ui .po-modern-more-empty { padding: 8px; color: #7c8a96; font-s
 /* The summary is now above the master grid, so the legacy caption is redundant. */
 body.demo-modern-ui #gbox_grid_ds_po .ui-jqgrid-titlebar { display: none !important; }
 
+/* Let jqGrid own its pixel width. Forcing the gbox to 100% caused the master
+   header/body/pager to overrun the padded center pane on the right. */
 body.demo-modern-ui #gbox_grid_ds_po {
-    width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box;
 }
 
@@ -513,9 +515,19 @@ body.demo-modern-ui #tabs-donhang-details .ui-tabs-panel {
     background: #fff;
 }
 
-/* In the demo, the detail grid gets the full width; product image can be revisited later. */
+/* Keep the original product preview pane on the right. */
 body.demo-modern-ui #layout-south-po.po-modern-detail-layout > .ui-layout-east {
-    display: none !important;
+    display: block;
+    background: #fff !important;
+    border-left: 1px solid #dfe6eb !important;
+    box-sizing: border-box;
+}
+
+body.demo-modern-ui #layout-south-po #product-view-po {
+    max-width: calc(100% - 12px) !important;
+    max-height: calc(100% - 12px) !important;
+    margin: 6px auto !important;
+    object-fit: contain;
 }
 
 /* jqGrid's multiselect checkbox is required by the PO selection logic; style the
