@@ -42,28 +42,35 @@ The trigger has historically updated multiple derived order-line values. When ch
 
 ### Allocation is only valid for editable draft orders
 
-**Status: Confirmed from prior implementation work**
+**Status: Confirmed**
 
 Order-fee allocation (`phanBoPhi`) is guarded by order state and required data:
 
 - the order must be in the system's draft/`SOANTHAO` state before allocation is allowed;
 - the order must contain order lines;
-- active order fees must exist before fee allocation can proceed.
+- active order fees must exist before fee allocation can proceed;
+- total order-line quantity must be greater than zero.
+
+The allocation calculates per-unit add/subtract fees from active `c_phidonhang` records. When allocation succeeds, each `c_dongdonhang` receives the same calculated per-unit values in both the live fee fields and the allocation snapshot fields:
+
+- `phi = phi_pb =` allocated add fee (`phiCong`);
+- `phitru = phitru_pb =` allocated subtract fee (`phiTru`).
+
+`phi_pb` and `phitru_pb` therefore preserve the values produced specifically by the **"Phân bổ phí vào dòng hàng"** action, while the existing `phi` and `phitru` fields continue to receive the same values for compatibility with existing behavior.
 
 **Where implemented:**
 
-- server-side order controller/action containing `phanBoPhi(HttpContext context)` — exact current repository path must be located before the next modification.
+- `Controllers/PhiDonHangController.ashx` -> `phanBoPhi(HttpContext context)`.
 
 **Related:**
 
 - `c_donhang`
-- `c_dongdonhang`
+- `c_dongdonhang.phi`
+- `c_dongdonhang.phitru`
+- `c_dongdonhang.phi_pb`
+- `c_dongdonhang.phitru_pb`
 - `c_phidonhang`
 - `Helper.SOANTHAO`
-
-**Notes:**
-
-There was prior code where the second validation accidentally checked the order-line count again when the intent was to validate fees. When revisiting this flow, verify that the active-fee collection itself is checked.
 
 ---
 
