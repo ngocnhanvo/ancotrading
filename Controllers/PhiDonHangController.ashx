@@ -79,12 +79,13 @@ public class PhiDonHangController : IHttpHandler, IDisposable
             .Where(s =>
                 s.c_donhang_id == donhang.c_donhang_id
                 && s.hoatdong == true
+                && (s.daphanbo ?? false) == false
             )
             .ToList();
 
         if (phis.Count <= 0)
         {
-            msg = "Đơn hàng chưa có phí";
+            msg = "Đơn hàng không có phí mới cần phân bổ";
             goto EndEventHandler;
         }
 
@@ -96,14 +97,13 @@ public class PhiDonHangController : IHttpHandler, IDisposable
             goto EndEventHandler;
         }
 
-        // TODO: thay điều kiện bằng field thực tế của c_phidonhang
         decimal tongPhiCong = phis
             .Where(s => s.phitang == true)
-            .ToList().Sum(s => s.phi.GetValueOrDefault(0));
+            .Sum(s => s.phi.GetValueOrDefault(0));
 
         decimal tongPhiTru = phis
             .Where(s => (s.phitang ?? false) == false)
-            .ToList().Sum(s => s.phi.GetValueOrDefault(0));
+            .Sum(s => s.phi.GetValueOrDefault(0));
 
         decimal phiCong = Math.Round(
             tongPhiCong / tongSoLuong,
@@ -119,18 +119,23 @@ public class PhiDonHangController : IHttpHandler, IDisposable
 
         foreach (var donghang in donghangs)
         {
-            donghang.phi = phiCong;
-            donghang.phitru = phiTru;
-            donghang.phi_pb = phiCong;
-            donghang.phitru_pb = phiTru;
+            donghang.phi = donghang.phi.GetValueOrDefault(0) + phiCong;
+            donghang.phitru = donghang.phitru.GetValueOrDefault(0) + phiTru;
+            donghang.phi_pb = donghang.phi_pb.GetValueOrDefault(0) + phiCong;
+            donghang.phitru_pb = donghang.phitru_pb.GetValueOrDefault(0) + phiTru;
+        }
+
+        foreach (var phi in phis)
+        {
+            phi.daphanbo = true;
         }
 
         db.SubmitChanges();
 
         ok = true;
-        msg = $@"Đã phân bổ phí thành công.
-Phí cộng: {phiCong:N2}
-Phí trừ: {phiTru:N2}";
+        msg = $@"Đã phân bổ {phis.Count} phí mới thành công.
+Phí cộng thêm: {phiCong:N2}
+Phí trừ thêm: {phiTru:N2}";
 
     EndEventHandler:;
 
@@ -407,7 +412,8 @@ Phí trừ: {phiTru:N2}";
                         ngaycapnhat = DateTime.Now,
                         nguoitao = UserUtils.getUser(context),
                         nguoicapnhat = UserUtils.getUser(context),
-                        phi_vnd = phi_vnd
+                        phi_vnd = phi_vnd,
+                        daphanbo = false
                     };
 
                     db.c_phidonhangs.InsertOnSubmit(mnu);
