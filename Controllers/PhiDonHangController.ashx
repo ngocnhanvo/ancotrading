@@ -543,6 +543,7 @@ Phí trừ thêm: {phiTru:N2}";
                 xml += "<cell><![CDATA[]]></cell>";
                 xml += "<cell><![CDATA[" + row["ma_dtkd"] + "]]></cell>";
                 xml += "<cell><![CDATA[" + row["phitang_kh"] + "]]></cell>";
+                xml += "<cell><![CDATA[" + row["daphanbo"] + "]]></cell>";
 
                 xml += "<cell><![CDATA[" + DateTime.Parse(row["ngaytao"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
                 xml += "<cell><![CDATA[" + row["nguoitao"] + "]]></cell>";
