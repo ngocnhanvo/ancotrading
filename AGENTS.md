@@ -13,16 +13,18 @@ This file is the mandatory entry point for AI agents working on this repository.
 
 Read `docs/knowledge-base/README.md` first, then read the knowledge-base documents relevant to the task.
 
-When a task depends on database structure, also read `docs/database/schema-map.json` if it exists. It is a generated metadata-only map of the current SQL Server schema (tables, columns, keys, indexes and trigger metadata). Use it before guessing table/column relationships, but remember that the live DB remains the final source of truth.
+When a task depends on database structure, also read `docs/database/schema-map.json` if it exists. It is a generated metadata-only map of the current SQL Server schema (tables, columns, keys, indexes and trigger metadata). Use it before guessing table/column relationships. The live DB remains the final source of truth.
 
-Do not treat documentation as a replacement for inspecting the current code and database model. Code + DB remain the source of truth for implementation details.
+Important project-specific rule: the generated LINQ-to-SQL files are not committed reliably to Git. Therefore, when a table/column exists in `docs/database/schema-map.json`, AI agents must assume the local/runtime LINQ model has the corresponding generated entity/property available, even when that property is absent from the committed `LinqDB.designer.cs`. Do not block implementation or fall back to raw SQL merely because the committed LINQ designer is stale. Only question this assumption when there is concrete runtime/compiler evidence that the local LINQ model is not synchronized.
+
+Do not treat documentation as a replacement for inspecting current business code. Code + DB remain the source of truth for implementation behavior, while `schema-map.json` is the repository-visible source of truth for DB structure unavailable through committed LINQ artifacts.
 
 ## High-level code map
 
 The current repository is organized around areas such as:
 
 - `App_Code/` — shared C# code, helpers, imports/exports, mail, catalogue logic and data-access related code.
-- `App_Code/LinQ/` — LINQ-to-SQL model (`LinqDB.dbml`) and generated designer code. `DatabaseSchemaMapGenerator.cs` generates the AI/developer DB metadata map.
+- `App_Code/LinQ/` — LINQ-to-SQL model (`LinqDB.dbml`) and generated designer code. `DatabaseSchemaMapGenerator.cs` generates the AI/developer DB metadata map. Generated LINQ artifacts may be newer locally than the committed copies.
 - `Controllers/` — HTTP handlers (`.ashx`) implementing APIs and module/business actions.
 - `ImportControllers/` — import endpoints/workflows.
 - `ExportControllers/` — export endpoints/workflows.
@@ -34,7 +36,7 @@ This is not assumed to use the DalatHoa `Controller/JQGrid/JQGridModify` or Enti
 
 1. Inspect the relevant current code before proposing or implementing a change.
 2. Trace business flows end-to-end when data is synchronized across modules, tables, handlers or triggers. Do not infer behavior from field names alone.
-3. Never edit generated `App_Code/LinQ/LinqDB.designer.cs` casually. Changes to the database model should be understood through the DBML/database workflow first.
+3. Never edit generated `App_Code/LinQ/LinqDB.designer.cs` casually. Changes to the database model should be understood through the DBML/database workflow first. Absence of a schema-mapped field from the committed designer is not evidence that the field is unavailable locally.
 4. Preserve the existing architecture by default. Do not introduce MVC, repository/service layers, a new ORM, or a new framework into an isolated module merely to modernize it.
 5. Keep `Confirmed` and `Inferred` knowledge separate. A rule confirmed by the project owner is stronger than an interpretation derived only from code.
 6. For every durable business rule, record `Where implemented:` with the relevant `file -> class/function/handler` when known.
@@ -42,10 +44,13 @@ This is not assumed to use the DalatHoa `Controller/JQGrid/JQGridModify` or Enti
 8. When a task teaches us a reusable architectural fact, convention, business rule or design decision, update `docs/knowledge-base/` as part of that task.
 9. If code and knowledge-base documentation disagree, investigate the discrepancy. Prefer current code/DB for implementation behavior and update stale documentation when the correct behavior is established.
 10. For DB-structure questions, inspect `docs/database/schema-map.json` first when available. The map contains metadata only and must never be treated as business row data.
+11. If `schema-map.json` contains a column that committed LINQ generated files do not, proceed as though the LINQ property exists in the user's current local generated model. Do not require a LINQ commit as a prerequisite.
 
 ## Database schema-map workflow
 
 Authorized SQL/admin users can open `linq.aspx` and use **Generate DB Map**. The page uses the same `Security.userSQL` gate and DB configuration as the existing LINQ update tooling. Generation writes `docs/database/schema-map.json`; commit that generated file when the database structure has materially changed so other agents can inspect the schema without direct database access.
+
+The schema map specifically exists because generated LINQ artifacts cannot always be committed. Its purpose is to let AI agents reason about the current DB/LINQ shape without needing direct DB access or a current committed `LinqDB.designer.cs`.
 
 ## Knowledge-base maintenance
 
