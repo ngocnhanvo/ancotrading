@@ -25,7 +25,6 @@ body.demo-modern-ui #ribbon {
     background: #fff;
 }
 
-/* Reuse the existing ANCO logo node, but move it to the left like the approved mockup. */
 body.demo-modern-ui > .ui-layout-north > div:nth-child(2) {
     top: 9px !important;
     left: 22px !important;
@@ -37,7 +36,6 @@ body.demo-modern-ui > .ui-layout-north > div:nth-child(2) {
     z-index: 3 !important;
 }
 
-/* Existing UserNameProfile stays functional, only its position is modernized. */
 body.demo-modern-ui > .ui-layout-north > div:first-child {
     top: 0 !important;
     right: 18px !important;
@@ -96,7 +94,6 @@ body.demo-modern-ui #ribbon ul.tab-navigation li.active a:after {
     font-size: 10px;
 }
 
-/* Dropdown overlays the workspace; it no longer consumes layout height. */
 body.demo-modern-ui #ribbon .tab-content {
     position: absolute;
     z-index: 1010;
@@ -116,7 +113,6 @@ body.demo-modern-ui #ribbon .tab-content {
     box-shadow: 0 10px 28px rgba(31,45,61,.18);
 }
 
-/* Neutralize the legacy horizontal ScrollerMenu inside dropdowns. */
 body.demo-modern-ui #ribbon .tab-content div.sc_menu,
 body.demo-modern-ui #ribbon .tab-content ul.sc_menu {
     position: relative !important;
@@ -195,7 +191,6 @@ body.demo-modern-ui #ribbon .items .name span {
     line-height: 36px !important;
 }
 
-/* Workspace tabs sit directly below the compact 46px header. */
 body.demo-modern-ui #tabs-main,
 body.demo-modern-ui #tab_buttons,
 body.demo-modern-ui #tab_panels { background: #f4f6f8; }
@@ -238,18 +233,299 @@ body.demo-modern-ui #tab_buttons .ui-tabs-nav li.ui-state-active a {
     font-weight: 600;
 }
 
-/* jqGrid base skin; detailed PO workspace comes in the next phase. */
-body.demo-modern-ui .ui-jqgrid { border-color:#d8dee4; border-radius:0; font-family:inherit; }
+/* Base jqGrid skin. */
+body.demo-modern-ui .ui-jqgrid {
+    border: 1px solid #dce4ea;
+    border-radius: 5px;
+    background: #fff;
+    font-family: inherit;
+    box-shadow: none;
+}
 body.demo-modern-ui .ui-jqgrid .ui-jqgrid-hdiv,
-body.demo-modern-ui .ui-jqgrid .ui-jqgrid-htable th { background:#edf1f4; color:#37474f; border-color:#d8dee4; }
-body.demo-modern-ui .ui-jqgrid tr.jqgrow td { height:27px; padding:2px 5px; border-color:#e3e7ea; }
-body.demo-modern-ui .ui-jqgrid tr.jqgrow:hover td { background:#f3f8f5; }
+body.demo-modern-ui .ui-jqgrid .ui-jqgrid-htable th {
+    background: #eef2f5;
+    color: #334a5e;
+    border-color: #d8e0e6;
+    font-weight: 600;
+}
+body.demo-modern-ui .ui-jqgrid .ui-jqgrid-htable th div { line-height: 24px; }
+body.demo-modern-ui .ui-jqgrid tr.jqgrow td {
+    height: 27px;
+    padding: 2px 5px;
+    border-color: #e3e8ec;
+    color: #34495e;
+}
+body.demo-modern-ui .ui-jqgrid tr.ui-jqgrid-labels th { height: 27px; }
+body.demo-modern-ui .ui-jqgrid tr.jqgrow:hover td { background:#f4f9f6; }
 body.demo-modern-ui .ui-jqgrid tr.jqgrow.ui-state-highlight td,
-body.demo-modern-ui .ui-jqgrid tr.ui-state-highlight td { background:#dff3e8 !important; color:#203b2c; }
-body.demo-modern-ui .ui-jqgrid .ui-jqgrid-pager { background:#fff; border-color:#d8dee4; }
+body.demo-modern-ui .ui-jqgrid tr.ui-state-highlight td {
+    background:#dff3e8 !important;
+    color:#203b2c;
+}
+body.demo-modern-ui .ui-jqgrid .ui-jqgrid-pager {
+    min-height: 31px;
+    background:#fff;
+    border-color:#d8dee4;
+}
+body.demo-modern-ui .ui-jqgrid .ui-search-toolbar th {
+    padding: 2px 3px;
+    background: #f7f9fa;
+}
+body.demo-modern-ui .ui-jqgrid .ui-search-toolbar input,
+body.demo-modern-ui .ui-jqgrid .ui-search-toolbar select {
+    height: 22px;
+    box-sizing: border-box;
+    border: 1px solid #ccd6de;
+    background: #fff;
+}
+
 body.demo-modern-ui .ui-button,
 body.demo-modern-ui button,
 body.demo-modern-ui input[type="button"],
 body.demo-modern-ui input[type="submit"] { font-family:inherit; }
 body.demo-modern-ui .ui-dialog { border:1px solid #cfd8df; box-shadow:0 12px 32px rgba(0,0,0,.18); }
 body.demo-modern-ui .ui-dialog .ui-dialog-titlebar { background:#344b5f; color:#fff; border:0; border-radius:0; }
+
+/* P/O master-detail workspace ------------------------------------------------ */
+body.demo-modern-ui #lay-center-po,
+body.demo-modern-ui #layout-south-po,
+body.demo-modern-ui #tabs-donhang-details {
+    background: #f5f7f9 !important;
+}
+
+body.demo-modern-ui #lay-center-po.po-modern-master {
+    padding: 8px 10px 5px !important;
+    box-sizing: border-box;
+    overflow: hidden !important;
+}
+
+body.demo-modern-ui .po-modern-toolbar {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 43px;
+    margin: 0 0 6px;
+    padding: 0 8px 0 12px;
+    box-sizing: border-box;
+    background: #fff;
+    border: 1px solid #dfe6eb;
+    border-radius: 5px;
+}
+
+body.demo-modern-ui .po-modern-summary {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    color: #243b4d;
+}
+
+body.demo-modern-ui .po-modern-summary span,
+body.demo-modern-ui .po-modern-summary strong {
+    font-size: 12px;
+}
+
+body.demo-modern-ui .po-modern-summary .po-summary-label {
+    margin-right: 5px;
+    color: #617281;
+    font-weight: 500;
+}
+
+body.demo-modern-ui .po-modern-summary strong { margin-right: 4px; }
+body.demo-modern-ui .po-modern-summary .po-summary-primary {
+    color: #07894f;
+    font-size: 15px;
+    font-weight: 700;
+}
+body.demo-modern-ui .po-summary-sep {
+    display: inline-block;
+    width: 1px;
+    height: 18px;
+    margin: 0 12px 0 8px;
+    background: #dfe5e9;
+}
+
+body.demo-modern-ui .po-modern-actions,
+body.demo-modern-ui .po-modern-detail-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex: 0 0 auto;
+}
+
+body.demo-modern-ui .po-modern-action {
+    height: 32px;
+    min-width: 72px;
+    padding: 0 14px;
+    border: 1px solid #d4dde4;
+    border-radius: 5px;
+    background: #fff;
+    color: #294154;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+body.demo-modern-ui .po-modern-action:hover {
+    background: #f5f8fa;
+    border-color: #bbc9d3;
+}
+
+body.demo-modern-ui .po-modern-action-primary {
+    border-color: #07894f;
+    background: #07894f;
+    color: #fff;
+}
+
+body.demo-modern-ui .po-modern-action-primary:hover {
+    border-color: #067743;
+    background: #067743;
+}
+
+body.demo-modern-ui .po-modern-more-button {
+    min-width: 52px;
+    padding: 0 12px;
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+
+body.demo-modern-ui .po-modern-more-wrap {
+    position: relative;
+}
+
+body.demo-modern-ui .po-modern-more-menu {
+    position: absolute;
+    z-index: 3000;
+    top: 37px;
+    right: 0;
+    width: 210px;
+    max-height: 310px;
+    overflow-y: auto;
+    padding: 5px;
+    background: #fff;
+    border: 1px solid #d7e0e6;
+    border-radius: 5px;
+    box-shadow: 0 10px 28px rgba(31,45,61,.18);
+}
+
+body.demo-modern-ui .po-modern-more-item {
+    display: block;
+    width: 100%;
+    min-height: 31px;
+    padding: 6px 9px;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: #334a5e;
+    text-align: left;
+    cursor: pointer;
+}
+body.demo-modern-ui .po-modern-more-item:hover { background: #edf8f2; color: #087b47; }
+body.demo-modern-ui .po-modern-more-empty { padding: 8px; color: #7c8a96; font-size: 11px; }
+
+/* The summary is now above the master grid, so the legacy caption is redundant. */
+body.demo-modern-ui #gbox_grid_ds_po .ui-jqgrid-titlebar { display: none !important; }
+
+body.demo-modern-ui #gbox_grid_ds_po {
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+/* Keep pager for paging/columns/business tools, but make it visually lighter. */
+body.demo-modern-ui #grid_ds_po-pager,
+body.demo-modern-ui #grid_ds_chitietpo-pager,
+body.demo-modern-ui #grid_khoanphi-pager,
+body.demo-modern-ui #grid_ds_donhang_spdt-pager {
+    border-top: 1px solid #e2e7eb !important;
+}
+
+body.demo-modern-ui .ui-jqgrid .ui-pg-table td.ui-pg-button {
+    padding: 0 4px;
+    border: 0;
+    background: transparent;
+}
+body.demo-modern-ui .ui-jqgrid .ui-pg-table td.ui-pg-button:hover {
+    background: #eef6f2;
+}
+
+/* Detail tabs and actions share one compact row, matching the approved mockup. */
+body.demo-modern-ui #tabs-donhang-details.po-modern-details {
+    position: relative;
+    padding: 0 !important;
+    border: 0;
+    overflow: hidden !important;
+}
+
+body.demo-modern-ui #tabs-donhang-details > .ui-tabs-nav {
+    min-height: 42px;
+    margin: 0;
+    padding: 0 315px 0 10px;
+    box-sizing: border-box;
+    background: #fff;
+    border: 1px solid #dfe6eb;
+    border-bottom: 0;
+    border-radius: 5px 5px 0 0;
+}
+
+body.demo-modern-ui #tabs-donhang-details > .ui-tabs-nav li {
+    height: 41px;
+    margin: 0 4px 0 0;
+    border: 0;
+    background: transparent;
+}
+
+body.demo-modern-ui #tabs-donhang-details > .ui-tabs-nav li a {
+    padding: 13px 12px 10px;
+    color: #536777;
+    font-size: 12px;
+}
+
+body.demo-modern-ui #tabs-donhang-details > .ui-tabs-nav li.ui-tabs-selected,
+body.demo-modern-ui #tabs-donhang-details > .ui-tabs-nav li.ui-state-active {
+    background: #fff;
+    box-shadow: inset 0 -3px 0 #07894f;
+}
+body.demo-modern-ui #tabs-donhang-details > .ui-tabs-nav li.ui-tabs-selected a,
+body.demo-modern-ui #tabs-donhang-details > .ui-tabs-nav li.ui-state-active a {
+    color: #07894f;
+    font-weight: 700;
+}
+
+body.demo-modern-ui .po-modern-detail-actions {
+    position: absolute;
+    z-index: 30;
+    top: 5px;
+    right: 9px;
+}
+body.demo-modern-ui .po-modern-detail-actions .po-modern-action {
+    height: 31px;
+    min-width: 67px;
+}
+body.demo-modern-ui .po-modern-detail-actions .po-modern-more-button { min-width: 48px; }
+
+body.demo-modern-ui #tabs-donhang-details .ui-tabs-panel {
+    padding: 0 !important;
+    border: 0;
+    background: #fff;
+}
+
+/* In the demo, the detail grid gets the full width; product image can be revisited later. */
+body.demo-modern-ui #layout-south-po.po-modern-detail-layout > .ui-layout-east {
+    display: none !important;
+}
+
+/* jqGrid's multiselect checkbox is required by the PO selection logic; style the
+   native column instead of adding another checkbox column. */
+body.demo-modern-ui #gbox_grid_ds_po .cbox,
+body.demo-modern-ui #gbox_grid_ds_chitietpo .cbox,
+body.demo-modern-ui #gbox_grid_khoanphi .cbox,
+body.demo-modern-ui #gbox_grid_ds_donhang_spdt .cbox {
+    width: 13px;
+    height: 13px;
+    margin: 0;
+    vertical-align: middle;
+}
