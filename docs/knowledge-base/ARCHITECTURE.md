@@ -38,15 +38,34 @@ Do not assume every class here is a generic helper; inspect the actual dependenc
 
 **Status: Confirmed from repository**
 
-LINQ-to-SQL data-access model.
+LINQ-to-SQL and database tooling.
 
 Important files:
 
 - `LinqDB.dbml` — database mapping/model definition.
 - `LinqDB.designer.cs` — large generated LINQ-to-SQL source file.
 - `LinqDB.dbml.layout` — designer layout metadata.
-- `InfomationDB.cs` — additional DB-related code; inspect before relying on its purpose.
-- `ADmin_UpdateLinq.cs` — additional LINQ-related code; inspect before relying on its purpose.
+- `InfomationDB.cs` — reads the configured SQL Server connection information used by the LINQ tooling.
+- `ADmin_UpdateLinq.cs` — generates/updates the LINQ model code.
+- `DatabaseSchemaMapGenerator.cs` — reads SQL Server system metadata only and writes `docs/database/schema-map.json` for developers/AI agents.
+
+### Database schema map
+
+**Status: Confirmed**
+
+`linq.aspx` is the existing restricted database/LINQ administration page. Access is protected by `Security.userSQL`. Alongside the existing LINQ update, Git pull and MSSQL actions, it exposes **Generate DB Map**.
+
+The generator uses the same database configuration exposed through `InfomationDB` and reads SQL Server catalog metadata (`sys.tables`, `sys.columns`, keys, indexes and trigger metadata). It does not query business/table rows.
+
+Generated output:
+
+```text
+docs/database/schema-map.json
+```
+
+The map is deterministic/sorted so a regenerated file can be meaningfully reviewed with Git diff. It includes table/column type metadata, nullability, identity/computed/default information, primary keys, foreign keys, indexes/unique indexes and trigger names/events/status. Trigger SQL bodies are intentionally not exported.
+
+For database-structure investigation, agents should inspect this map before guessing relationships. The live database remains the final source of truth; regenerate the map after material schema changes.
 
 ### `Controllers/`
 
@@ -54,14 +73,7 @@ Important files:
 
 Contains many ASP.NET `.ashx` handlers. These handlers form an important server-side request/action layer rather than an ASP.NET MVC controller layer.
 
-Observed examples:
-
-- `API_Android.ashx`
-- `API_Data.ashx`
-- `API_System.ashx`
-- `API_Website.ashx`
-- `BaoCaoController.ashx`
-- module-specific handlers such as `BienTauController.ashx`, `BoCaiController.ashx`, `BoPhanController.ashx`, `CangXuatHangController.ashx`, etc.
+Observed examples include `API_Android.ashx`, `API_Data.ashx`, `API_System.ashx`, `API_Website.ashx`, `BaoCaoController.ashx` and many module-specific handlers.
 
 When investigating a UI action, search for the URL/handler called by the JavaScript or form, then trace the selected action/method inside the relevant `.ashx` handler into shared/data-access code.
 
@@ -108,7 +120,7 @@ Some modules can bypass one or more layers. Always trace the actual task-specifi
 
 AncoTrading has business behavior that can also live in SQL Server triggers or database-side logic. A C# change can therefore have effects not obvious from the handler alone.
 
-When a task involves calculated fields, synchronized records, order lines, prices, fees, statuses, inventory/accounting values or automatic updates, check whether a DB trigger/stored routine participates before changing the C# side.
+When a task involves calculated fields, synchronized records, order lines, prices, fees, statuses, inventory/accounting values or automatic updates, inspect `docs/database/schema-map.json` when available to identify structural relationships and attached triggers, then inspect the actual trigger/stored routine implementation when behavior depends on its SQL body.
 
 ## Architectural caution
 
