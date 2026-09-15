@@ -67,6 +67,45 @@ There was prior code where the second validation accidentally checked the order-
 
 ---
 
+## PO — order-line fee editability
+
+### `phi` / "Phí cộng" is intended to be editable by default
+
+**Status: Confirmed**
+
+In the PO order-line Add/Edit form under `#donhang-details-1`, the field `phi` (display label **"Phí cộng"**) is intended to be editable by default while the surrounding PO/order state permits editing.
+
+The jqGrid column may correctly declare `editable: true` but still render as locked if its `editoptions` contains `disabled: true`:
+
+```js
+{
+    name: 'phi',
+    label: 'Phí cộng',
+    index: 'ddh.phi',
+    editable: true,
+    editoptions: { defaultValue: '0', disabled: true }
+}
+```
+
+Therefore, when diagnosing a PO fee field that appears permanently locked, inspect `editoptions.disabled` before adding new permission or JavaScript unlock logic. To restore the intended default editability, remove `disabled: true` (or otherwise ensure it is not disabled).
+
+**Where implemented:**
+
+- `Views/po/cacdongpo.ascx` — jqGrid order-line column definition for `name: 'phi'`; this is the PO detail UI loaded under `#donhang-details-1`.
+- `Controllers/DongDonHangController.ashx` -> `edit(HttpContext context)` — server accepts `Request.Form["phi"]`, validates that the value is non-negative, and assigns it to `c_dongdonhang.phi` for editable draft orders.
+
+**Related:**
+
+- `c_dongdonhang.phi`
+- PO detail tab `#donhang-details-1`
+- `Helper.SOANTHAO`
+
+**Notes:**
+
+Do not confuse jqGrid's `editable: true` with the final enabled/disabled state of the generated input. `editoptions: { disabled: true }` overrides the practical ability to type into the field even though the column itself is marked editable.
+
+---
+
 ## Cross-module synchronization rule template
 
 When a future task reveals two-way or automatic synchronization, document both directions explicitly rather than writing only "A syncs with B".
