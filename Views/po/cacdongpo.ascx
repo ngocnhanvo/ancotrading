@@ -310,7 +310,7 @@
 		, edittype: 'text'
 		, editable: true
 		, editrules: { required:true, number: true }
-		, editoptions:{ defaultValue: '0', disabled: true }
+		, editoptions:{ defaultValue: '0' }
 		, align: 'right'
 		, formatter:'currency'
 		, formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
@@ -323,7 +323,7 @@
 	    , edittype: 'text'
 	    , editable: true
 	    , editrules: { required:true, number: true }
-	    , editoptions:{ defaultValue: '0', disabled: true }
+	    , editoptions:{ defaultValue: '0' }
 	    , align: 'right'
 	    , formatter:'currency'
 	    , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 2, prefix: ''}
