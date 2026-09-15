@@ -1,6 +1,4 @@
-/* Modern Classic demo theme.
- * Scoped to body.demo-modern-ui so production/legacy styling remains untouched.
- */
+/* Modern Classic demo theme. Scoped so the legacy production theme remains intact. */
 body.demo-modern-ui {
     background: #f4f6f8;
     color: #263238;
@@ -8,185 +6,233 @@ body.demo-modern-ui {
     font-size: 13px;
 }
 
-body.demo-modern-ui .ui-layout-north {
-    background: #ffffff;
+/* Main shell: the old north pane was 92px high and permanently contained the ribbon. */
+body.demo-modern-ui > .ui-layout-north {
+    overflow: visible !important;
+    background: #fff;
     border: 0;
     border-bottom: 1px solid #dfe3e8;
-    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    box-shadow: 0 1px 5px rgba(31,45,61,.12);
+    z-index: 1005 !important;
 }
 
 body.demo-modern-ui #ribbon {
-    height: 100%;
-    background: #ffffff;
+    position: relative;
+    height: 46px;
+    padding-left: 116px;
+    padding-right: 285px;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+/* Reuse the existing ANCO logo node, but move it to the left like the approved mockup. */
+body.demo-modern-ui > .ui-layout-north > div:nth-child(2) {
+    top: 10px !important;
+    left: 24px !important;
+    right: auto !important;
+    width: 78px !important;
+    height: 27px !important;
+    background-position: left center !important;
+}
+
+/* Existing UserNameProfile stays functional, only its position is modernized. */
+body.demo-modern-ui > .ui-layout-north > div:first-child {
+    top: 0 !important;
+    right: 18px !important;
+    width: 245px !important;
+    height: 46px;
+    padding: 0 !important;
+    line-height: 46px;
+    text-align: right;
+    white-space: nowrap;
+    z-index: 3;
 }
 
 body.demo-modern-ui #ribbon ul.tab-navigation {
-    height: 38px;
+    height: 46px;
     margin: 0;
-    padding: 0 250px 0 14px;
+    padding: 0;
     list-style: none;
-    background: #263746;
+    background: #fff;
     border: 0;
+    white-space: nowrap;
 }
 
 body.demo-modern-ui #ribbon ul.tab-navigation li {
     float: left;
-    height: 38px;
+    height: 46px;
     margin: 0;
     border: 0;
 }
 
 body.demo-modern-ui #ribbon ul.tab-navigation li a {
     display: block;
-    height: 38px;
-    padding: 0 14px;
-    color: #e8edf1;
+    height: 46px;
+    padding: 0 16px;
+    color: #405261;
     font-size: 12px;
     font-weight: 600;
-    line-height: 38px;
+    line-height: 46px;
     text-decoration: none;
     text-transform: uppercase;
-    letter-spacing: .2px;
+    letter-spacing: .15px;
+    box-sizing: border-box;
 }
 
-body.demo-modern-ui #ribbon ul.tab-navigation li:hover a,
+body.demo-modern-ui #ribbon ul.tab-navigation li:hover a {
+    background: #f3f7f5;
+    color: #087b47;
+}
+
 body.demo-modern-ui #ribbon ul.tab-navigation li.active a {
-    background: #344b5f;
-    color: #ffffff;
+    background: #07894f;
+    color: #fff;
 }
 
+body.demo-modern-ui #ribbon ul.tab-navigation li.active a:after {
+    content: "  ▾";
+    font-size: 10px;
+}
+
+/* Dropdown overlays the workspace; it no longer consumes layout height. */
 body.demo-modern-ui #ribbon .tab-content {
     position: absolute;
-    z-index: 1000;
-    top: 38px;
-    left: 0;
-    right: 0;
-    min-height: 52px;
-    padding: 5px 10px;
-    background: #ffffff;
-    border-bottom: 1px solid #dfe3e8;
-    box-shadow: 0 5px 14px rgba(31,45,61,.12);
+    z-index: 1010;
+    top: 46px;
+    left: 116px;
+    right: auto;
+    width: 520px;
+    max-height: 420px;
+    overflow: auto;
+    padding: 8px;
+    box-sizing: border-box;
+    background: #fff;
+    border: 1px solid #dce3e8;
+    border-top: 3px solid #07894f;
+    box-shadow: 0 10px 28px rgba(31,45,61,.18);
 }
 
-body.demo-modern-ui #ribbon .sc_menu,
-body.demo-modern-ui #ribbon ul.sc_menu {
-    height: 50px !important;
-    background: transparent;
+body.demo-modern-ui #ribbon .tab-content .sc_menu,
+body.demo-modern-ui #ribbon .tab-content ul.sc_menu {
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
+}
+
+body.demo-modern-ui #ribbon .tab-content ul.sc_menu li {
+    float: left;
+    width: 50%;
+    height: 42px;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 body.demo-modern-ui #ribbon .items {
-    height: 44px;
-    min-width: 68px;
-    margin: 0 3px;
-    padding: 3px 8px;
+    position: relative;
+    width: auto !important;
+    height: 38px !important;
+    min-width: 0;
+    margin: 2px 4px !important;
+    padding: 0 8px 0 40px !important;
     border: 1px solid transparent;
     border-radius: 4px;
-    background: transparent;
+    background: transparent !important;
+    box-sizing: border-box;
+    cursor: pointer;
 }
 
 body.demo-modern-ui #ribbon .items:hover,
 body.demo-modern-ui #ribbon .items-hover {
-    background: #eef4f8;
-    border-color: #d6e1e8;
+    background: #edf8f2 !important;
+    border-color: #d4eadf;
+}
+
+body.demo-modern-ui #ribbon .items > div:first-child {
+    position: absolute;
+    left: 9px;
+    top: 7px;
+    width: 24px;
+    height: 24px;
 }
 
 body.demo-modern-ui #ribbon .items img.icon {
-    max-height: 24px;
-    width: auto;
+    max-width: 22px;
+    max-height: 22px;
+}
+
+body.demo-modern-ui #ribbon .items .name {
+    height: 36px !important;
+    padding: 0 !important;
+    text-align: left !important;
+    line-height: 36px !important;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 body.demo-modern-ui #ribbon .items .name span {
     color: #34495e !important;
-    font-size: 11px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 36px !important;
 }
 
+/* Workspace tabs sit directly below the compact 46px header. */
 body.demo-modern-ui #tabs-main,
 body.demo-modern-ui #tab_buttons,
-body.demo-modern-ui #tab_panels {
-    background: #f4f6f8;
-}
+body.demo-modern-ui #tab_panels { background: #f4f6f8; }
 
 body.demo-modern-ui #tab_buttons {
-    min-height: 32px;
+    min-height: 34px;
     border-bottom: 1px solid #d9dee3;
 }
 
 body.demo-modern-ui #tab_buttons .ui-tabs-nav {
-    min-height: 31px;
-    padding: 0 8px;
-    background: #ffffff;
+    min-height: 33px;
+    padding: 0 14px;
+    background: #fff;
     border: 0;
     border-radius: 0;
 }
 
 body.demo-modern-ui #tab_buttons .ui-tabs-nav li {
-    margin: 3px 2px 0 0;
+    margin: 3px 3px 0 0;
     border: 0;
     border-radius: 4px 4px 0 0;
     background: transparent;
 }
 
 body.demo-modern-ui #tab_buttons .ui-tabs-nav li a {
-    padding: 6px 24px 6px 10px;
+    padding: 7px 25px 7px 11px;
     color: #52606d;
     font-size: 12px;
 }
 
 body.demo-modern-ui #tab_buttons .ui-tabs-nav li.ui-tabs-selected,
 body.demo-modern-ui #tab_buttons .ui-tabs-nav li.ui-state-active {
-    background: #eef4f8;
-    box-shadow: inset 0 -2px 0 #4f7f9d;
+    background: #eef8f3;
+    box-shadow: inset 0 -2px 0 #07894f;
 }
 
-body.demo-modern-ui .ui-jqgrid {
-    border-color: #d8dee4;
-    border-radius: 0;
-    font-family: inherit;
+body.demo-modern-ui #tab_buttons .ui-tabs-nav li.ui-tabs-selected a,
+body.demo-modern-ui #tab_buttons .ui-tabs-nav li.ui-state-active a {
+    color: #087b47;
+    font-weight: 600;
 }
 
+/* jqGrid base skin; detailed PO workspace comes in the next phase. */
+body.demo-modern-ui .ui-jqgrid { border-color:#d8dee4; border-radius:0; font-family:inherit; }
 body.demo-modern-ui .ui-jqgrid .ui-jqgrid-hdiv,
-body.demo-modern-ui .ui-jqgrid .ui-jqgrid-htable th {
-    background: #edf1f4;
-    color: #37474f;
-    border-color: #d8dee4;
-}
-
-body.demo-modern-ui .ui-jqgrid tr.jqgrow td {
-    height: 27px;
-    padding: 2px 5px;
-    border-color: #e3e7ea;
-}
-
-body.demo-modern-ui .ui-jqgrid tr.jqgrow:hover td {
-    background: #f3f7fa;
-}
-
+body.demo-modern-ui .ui-jqgrid .ui-jqgrid-htable th { background:#edf1f4; color:#37474f; border-color:#d8dee4; }
+body.demo-modern-ui .ui-jqgrid tr.jqgrow td { height:27px; padding:2px 5px; border-color:#e3e7ea; }
+body.demo-modern-ui .ui-jqgrid tr.jqgrow:hover td { background:#f3f8f5; }
 body.demo-modern-ui .ui-jqgrid tr.jqgrow.ui-state-highlight td,
-body.demo-modern-ui .ui-jqgrid tr.ui-state-highlight td {
-    background: #dcecf7 !important;
-    color: #203442;
-}
-
-body.demo-modern-ui .ui-jqgrid .ui-jqgrid-pager {
-    background: #ffffff;
-    border-color: #d8dee4;
-}
-
+body.demo-modern-ui .ui-jqgrid tr.ui-state-highlight td { background:#dff3e8 !important; color:#203b2c; }
+body.demo-modern-ui .ui-jqgrid .ui-jqgrid-pager { background:#fff; border-color:#d8dee4; }
 body.demo-modern-ui .ui-button,
 body.demo-modern-ui button,
 body.demo-modern-ui input[type="button"],
-body.demo-modern-ui input[type="submit"] {
-    font-family: inherit;
-}
-
-body.demo-modern-ui .ui-dialog {
-    border: 1px solid #cfd8df;
-    box-shadow: 0 12px 32px rgba(0,0,0,.18);
-}
-
-body.demo-modern-ui .ui-dialog .ui-dialog-titlebar {
-    background: #344b5f;
-    color: #ffffff;
-    border: 0;
-    border-radius: 0;
-}
+body.demo-modern-ui input[type="submit"] { font-family:inherit; }
+body.demo-modern-ui .ui-dialog { border:1px solid #cfd8df; box-shadow:0 12px 32px rgba(0,0,0,.18); }
+body.demo-modern-ui .ui-dialog .ui-dialog-titlebar { background:#344b5f; color:#fff; border:0; border-radius:0; }
