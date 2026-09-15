@@ -24,5 +24,6 @@ public partial class Default_Security : System.Web.UI.Page
         // UI demo only: keep the production shell untouched and layer the
         // Modern Classic behavior/theme from the demogiaodien branch.
         script += string.Format(@"<script src=""theme/demogiaodien/modern-classic.js?ver={0}"" type=""text/javascript""></script>{1}", Guid.NewGuid(), Environment.NewLine);
+        script += string.Format(@"<script src=""theme/demogiaodien/po-layout-fix.js?ver={0}"" type=""text/javascript""></script>{1}", Guid.NewGuid(), Environment.NewLine);
     }
 }
