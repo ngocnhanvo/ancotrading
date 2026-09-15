@@ -12,7 +12,7 @@
     UrlFileAction="Controllers/PhiDonHangController.ashx" 
     ColNames="['c_phidonhang_id', 'Đơn Hàng', 
 			'Khách hàng', 'Phí', 'Là Phí Tăng', 'Diễn giải', 'Phân bổ NCU',
-			'Nhà cung ứng', 'NCU', 'Là Phí Tăng NCC'
+			'Nhà cung ứng', 'NCU', 'Là Phí Tăng NCC', 'Đã phân bổ'
 			, 'Ngày tạo' 
             , 'Người Tạo', 'Ngày Cập Nhật'
             , 'Người Cập Nhật', 'Diễn giải'
@@ -123,6 +123,15 @@
          , edittype: 'checkbox'
          , align: 'center'
          , editoptions:{ value:'True:False', defaultValue: 'True' }
+         , formatter: 'checkbox'
+    },
+    {
+         name: 'daphanbo'
+         , index: 'bc.daphanbo'
+         , editable: false
+         , fixed:true , width: 80
+         , edittype: 'checkbox'
+         , align: 'center'
          , formatter: 'checkbox'
     },
     {
