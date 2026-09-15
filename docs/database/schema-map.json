@@ -16999,6 +16999,20 @@
           "computedDefinition": null,
           "primaryKey": false,
           "primaryKeyOrdinal": 0
+        },
+        {
+          "name": "daphanbo",
+          "type": "bit",
+          "maxLength": 1,
+          "precision": 1,
+          "scale": 0,
+          "nullable": true,
+          "identity": false,
+          "computed": false,
+          "default": null,
+          "computedDefinition": null,
+          "primaryKey": false,
+          "primaryKeyOrdinal": 0
         }
       ],
       "foreignKeys": [
