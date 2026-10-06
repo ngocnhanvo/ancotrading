@@ -6,6 +6,34 @@ Only record rules that are useful beyond a single implementation session. Keep e
 
 ---
 
+## Nexxdecor — product code and image filename compatibility
+
+### Nexxdecor variants use a two-letter third block
+
+**Status: Confirmed**
+
+Nexxdecor products imported into the shared Anco catalogue use the same 14-character / 4-block product-code shape:
+
+```text
+NN-NNNNN-AA-NN
+```
+
+For Nexxdecor, block 3 is exactly two alphabetic characters. It must not contain the reserved Anco letters `S`, `B`, `L`, `X`, `F`, or `G`.
+
+Examples:
+
+- `36-02305-TC-01` is a valid Nexxdecor code/image basename.
+- `42-01400-TW-16` is a valid Nexxdecor code/image basename.
+
+Product image uploads must accept these Nexxdecor basenames in addition to the existing Anco filename formats. The upload rule must stay aligned with the Nexxdecor code classification used by the public product-detail flow so the same code is not accepted in one path and rejected in another.
+
+**Where implemented:**
+
+- `Controllers/UserQRCodeController.ashx` -> `getInfo(HttpContext context)` — classifies Nexxdecor product variants.
+- `Controllers/UploadFileWeb.ashx` -> `ProcessRequest(HttpContext context)` — validates product image filenames before saving.
+
+---
+
 ## Orders — order-line derived fields and formula versioning
 
 ### Formula selection by order creation date
