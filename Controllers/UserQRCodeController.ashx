@@ -5,6 +5,7 @@ using System.Web;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 public class UserQRCodeController : IHttpHandler {
     private LinqDBDataContext db = new LinqDBDataContext();
@@ -98,6 +99,9 @@ public class UserQRCodeController : IHttpHandler {
             {
                 string cl = sp.ma_sanpham.Substring(0, 2);
                 string bc = sp.ma_sanpham.Substring(9, 2);
+                string bcUpper = bc.ToUpperInvariant();
+                bool isNexxVariant = Regex.IsMatch(sp.ma_sanpham, @"^[0-9]{2}-[0-9]{5}-[A-Z]{2}-[0-9]{2}$", RegexOptions.IgnoreCase)
+                    && bcUpper.IndexOfAny(new char[] { 'S', 'B', 'L', 'X', 'F', 'G' }) < 0;
 
                 var plhh = db.md_chungloais.Where(s => s.code_cl == cl).FirstOrDefault();
                 if (plhh != null)
@@ -114,7 +118,7 @@ public class UserQRCodeController : IHttpHandler {
 
                 dong6 = sp.ma_sanpham;
                 //dong 7, dong 8, dong 9
-                if (bc.Substring(0, 1) != "0" & bc != "S1")
+                if (!isNexxVariant && bc.Substring(0, 1) != "0" & bc != "S1")
                 {
                     var arrBoChas = new string[] {
                         "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9",
@@ -367,6 +371,7 @@ public class UserQRCodeController : IHttpHandler {
                 json["mausac"] = mausac_json;
                 json["size"] = size;
                 json["sizeSel"] = sizeSel;
+                json["codeType"] = isNexxVariant ? "NEXX" : "ANCO";
                 json["packingText"] = packingText;
                 json["sizeText"] = sizeText;
                 json["shape"] = shape;
