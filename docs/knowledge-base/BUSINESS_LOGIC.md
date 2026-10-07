@@ -18,12 +18,13 @@ Nexxdecor products imported into the shared Anco catalogue use the same 14-chara
 NN-NNNNN-AA-NN
 ```
 
-For Nexxdecor, block 3 is exactly two alphabetic characters. It must not contain the reserved Anco letters `S`, `B`, `L`, `X`, `F`, or `G`.
+For Nexxdecor, block 3 is exactly two alphabetic characters. Classification is based on the complete two-letter block shape; individual letters are not banned. For example, `TB` is a valid Nexxdecor block.
 
 Examples:
 
 - `36-02305-TC-01` is a valid Nexxdecor code/image basename.
 - `42-01400-TW-16` is a valid Nexxdecor code/image basename.
+- `42-05101-TB-16` is a valid Nexxdecor code/image basename.
 
 Product image uploads must accept these Nexxdecor basenames in addition to the existing Anco filename formats. The upload rule must stay aligned with the Nexxdecor code classification used by the public product-detail flow so the same code is not accepted in one path and rejected in another.
 
