@@ -99,9 +99,7 @@ public class UserQRCodeController : IHttpHandler {
             {
                 string cl = sp.ma_sanpham.Substring(0, 2);
                 string bc = sp.ma_sanpham.Substring(9, 2);
-                string bcUpper = bc.ToUpperInvariant();
-                bool isNexxVariant = Regex.IsMatch(sp.ma_sanpham, @"^[0-9]{2}-[0-9]{5}-[A-Z]{2}-[0-9]{2}$", RegexOptions.IgnoreCase)
-                    && bcUpper.IndexOfAny(new char[] { 'S', 'B', 'L', 'X', 'F', 'G' }) < 0;
+                bool isNexxVariant = Regex.IsMatch(sp.ma_sanpham, @"^[0-9]{2}-[0-9]{5}-[A-Z]{2}-[0-9]{2}$", RegexOptions.IgnoreCase);
 
                 var plhh = db.md_chungloais.Where(s => s.code_cl == cl).FirstOrDefault();
                 if (plhh != null)
