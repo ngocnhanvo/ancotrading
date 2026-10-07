@@ -26,9 +26,7 @@ public class UploadFileWeb : IHttpHandler
                 var rgxMauSac4 = new Regex("^[0-9][0-9]-[0-9][0-9][0-9][0-9][0-9]-G[0-9]-[0-9][0-9]$");
                 var rgxNexxVariant = new Regex("^[0-9]{2}-[0-9]{5}-[A-Z]{2}-[0-9]{2}$", RegexOptions.IgnoreCase);
 
-                string nexxVariant = filterName.Length >= 11 ? filterName.Substring(9, 2).ToUpperInvariant() : "";
-                bool isNexxVariant = rgxNexxVariant.IsMatch(filterName)
-                    && nexxVariant.IndexOfAny(new char[] { 'S', 'B', 'L', 'X', 'F', 'G' }) < 0;
+                bool isNexxVariant = rgxNexxVariant.IsMatch(filterName);
 
                 if (rgxMauSac2.IsMatch(filterName) | rgxMauSac3.IsMatch(filterName) | rgxMauSac4.IsMatch(filterName) | isNexxVariant)
                 {
