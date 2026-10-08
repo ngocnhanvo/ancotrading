@@ -28,6 +28,13 @@ Examples:
 
 Product image uploads must accept these Nexxdecor basenames in addition to the existing Anco filename formats. The upload rule must stay aligned with the Nexxdecor code classification used by the public product-detail flow so the same code is not accepted in one path and rejected in another.
 
+Special `XX` rule:
+
+- `NN-NNNNN-XX-NN` represents a Nexxdecor table/chair set MAHH.
+- The product-detail response must leave Packing, Pallet size, Q'ty cont and Available sizes empty for `XX`.
+- Colors remain available and selectable normally.
+- `XX` remains the product-code block used when the selected color is added to the inquiry list; it is not a visible size option.
+
 **Where implemented:**
 
 - `Controllers/UserQRCodeController.ashx` -> `getInfo(HttpContext context)` — classifies Nexxdecor product variants.
