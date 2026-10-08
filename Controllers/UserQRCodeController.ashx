@@ -100,6 +100,7 @@ public class UserQRCodeController : IHttpHandler {
                 string cl = sp.ma_sanpham.Substring(0, 2);
                 string bc = sp.ma_sanpham.Substring(9, 2);
                 bool isNexxVariant = Regex.IsMatch(sp.ma_sanpham, @"^[0-9]{2}-[0-9]{5}-[A-Z]{2}-[0-9]{2}$", RegexOptions.IgnoreCase);
+                bool isNexxSet = isNexxVariant && bc.Equals("XX", StringComparison.OrdinalIgnoreCase);
 
                 var plhh = db.md_chungloais.Where(s => s.code_cl == cl).FirstOrDefault();
                 if (plhh != null)
@@ -150,6 +151,8 @@ public class UserQRCodeController : IHttpHandler {
                 }
 
                 sizeSel = sizeSel.Length > 0 ? sizeSel.Substring(0, sizeSel.Length - 1) : "";
+                if (isNexxSet)
+                    sizeSel = "";
 
                 var dt = ExcuteSignalRStatic.getPrice(arr_sanpham);
                 string kichthuoc_9 = "";
@@ -195,35 +198,49 @@ public class UserQRCodeController : IHttpHandler {
                     }
                 }
 
-                dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
-                foreach (System.Data.DataRow row in dt.Rows)
+                if (isNexxSet)
                 {
-                    string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
-                    string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
-
-                    var dDVT = ExcuteSignalRStatic.getTextFromInner(dvt_inner, dvt_outer, sl_inner, sl_outer);
-                    if (dDVT != null)
+                    dong9 = "";
+                    dong10 = "";
+                    dong11 = "";
+                    dong12 = "";
+                    dong13 = "";
+                    dong14 = "";
+                    packingText = "";
+                    sizeText = "";
+                }
+                else
+                {
+                    dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
+                    foreach (System.Data.DataRow row in dt.Rows)
                     {
-                        dong10 = dDVT.inner;
-                        dong11 = dDVT.outer;
-                        packingText = dDVT.packingText;
-                        sizeText = dDVT.sizeText;
-                    }
+                        string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
+                        string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
 
-                    dong12 = "L" + row["l2_mix"] + "xW" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
-                    dong13 = row["v2"].ToString();
+                        var dDVT = ExcuteSignalRStatic.getTextFromInner(dvt_inner, dvt_outer, sl_inner, sl_outer);
+                        if (dDVT != null)
+                        {
+                            dong10 = dDVT.inner;
+                            dong11 = dDVT.outer;
+                            packingText = dDVT.packingText;
+                            sizeText = dDVT.sizeText;
+                        }
 
-                    string slc_20 = row["soluonggoi_ctn_20"].ToString();
-                    string slc_40 = row["soluonggoi_ctn"].ToString();
-                    string slc_40HC = row["soluonggoi_ctn_40hc"].ToString();
+                        dong12 = "L" + row["l2_mix"] + "xW" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
+                        dong13 = row["v2"].ToString();
 
-                    if (slc_40 != "" & slc_40 != "0")
-                    {
-                        dong14 += "\\n" + slc_40 + " " + dDVT.quantity + "/40'";
-                    }
-                    if (dong14 != "")
-                    {
-                        dong14 = dong14.Substring(2);
+                        string slc_20 = row["soluonggoi_ctn_20"].ToString();
+                        string slc_40 = row["soluonggoi_ctn"].ToString();
+                        string slc_40HC = row["soluonggoi_ctn_40hc"].ToString();
+
+                        if (slc_40 != "" & slc_40 != "0")
+                        {
+                            dong14 += "\\n" + slc_40 + " " + dDVT.quantity + "/40'";
+                        }
+                        if (dong14 != "")
+                        {
+                            dong14 = dong14.Substring(2);
+                        }
                     }
                 }
                 //dong 15
@@ -370,6 +387,7 @@ public class UserQRCodeController : IHttpHandler {
                 json["size"] = size;
                 json["sizeSel"] = sizeSel;
                 json["codeType"] = isNexxVariant ? "NEXX" : "ANCO";
+                json["isNexxSet"] = isNexxSet ? "1" : "0";
                 json["packingText"] = packingText;
                 json["sizeText"] = sizeText;
                 json["shape"] = shape;
@@ -408,33 +426,49 @@ public class UserQRCodeController : IHttpHandler {
                         rowSP.fob = dtFOB.Rows.Count > 0 ? dtFOB.Rows[0]["ten_cangbien"].ToString() : "";
                         var dtPrice = ExcuteSignalRStatic.getPrice("'" + sp.ma_sanpham + "'");
                         rowSP.price = dtPrice.Rows.Count > 0 ? dtPrice.Rows[0]["gia"].ToString() : "";
-                        var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
-                        foreach (System.Data.DataRow row in dt.Rows)
+                        bool isNexxSet = sp.ma_sanpham.Length >= 11
+                            && sp.ma_sanpham.Substring(9, 2).Equals("XX", StringComparison.OrdinalIgnoreCase);
+
+                        if (isNexxSet)
                         {
-                            string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
-                            string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
-                            var dDVT = ExcuteSignalRStatic.getTextFromInner(dvt_inner, dvt_outer, sl_inner, sl_outer);
-                            rowSP.inner = dDVT.inner;
-                            rowSP.master = dDVT.outer;
-                            rowSP.packingText = dDVT.packingText;
-                            rowSP.sizeText = dDVT.sizeText;
-
-                            rowSP.kichthuocDG = "" + row["l2_mix"] + "x" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
-                            rowSP.CBM = row["v2"].ToString();
-
-                            string slc_20 = row["soluonggoi_ctn_20"].ToString();
-                            string slc_40 = row["soluonggoi_ctn"].ToString();
-                            string slc_40HC = row["soluonggoi_ctn_40hc"].ToString();
-
-                            if (slc_40 != "" & slc_40 != "0")
+                            rowSP.inner = "";
+                            rowSP.master = "";
+                            rowSP.packingText = "";
+                            rowSP.sizeText = "";
+                            rowSP.kichthuocDG = "";
+                            rowSP.CBM = "";
+                            rowSP.slcont = "";
+                        }
+                        else
+                        {
+                            var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
+                            foreach (System.Data.DataRow row in dt.Rows)
                             {
-                                rowSP.slcont += "\\n" + slc_40 + " " + dDVT.quantity + "/40'";
-                            }
+                                string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
+                                string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
+                                var dDVT = ExcuteSignalRStatic.getTextFromInner(dvt_inner, dvt_outer, sl_inner, sl_outer);
+                                rowSP.inner = dDVT.inner;
+                                rowSP.master = dDVT.outer;
+                                rowSP.packingText = dDVT.packingText;
+                                rowSP.sizeText = dDVT.sizeText;
 
-                            if (rowSP.slcont != "")
-                            {
-                                string slcont = (rowSP.slcont + "");
-                                rowSP.slcont = slcont.Substring(2);
+                                rowSP.kichthuocDG = "" + row["l2_mix"] + "x" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
+                                rowSP.CBM = row["v2"].ToString();
+
+                                string slc_20 = row["soluonggoi_ctn_20"].ToString();
+                                string slc_40 = row["soluonggoi_ctn"].ToString();
+                                string slc_40HC = row["soluonggoi_ctn_40hc"].ToString();
+
+                                if (slc_40 != "" & slc_40 != "0")
+                                {
+                                    rowSP.slcont += "\\n" + slc_40 + " " + dDVT.quantity + "/40'";
+                                }
+
+                                if (rowSP.slcont != "")
+                                {
+                                    string slcont = (rowSP.slcont + "");
+                                    rowSP.slcont = slcont.Substring(2);
+                                }
                             }
                         }
 
