@@ -169,33 +169,49 @@ public class MainHub : Hub
                     rowSP.fob = dtFOB.Rows.Count > 0 ? dtFOB.Rows[0]["ten_cangbien"].ToString() : "";
                     var dtPrice = ExcuteSignalRStatic.getPrice("'" +sp.ma_sanpham + "'");
                     rowSP.price = dtPrice.Rows.Count > 0 ? dtPrice.Rows[0]["gia"].ToString() : "";
-                    var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
-                    foreach (System.Data.DataRow row in dt.Rows)
+                    bool isNexxSet = sp.ma_sanpham.Length >= 11
+                        && sp.ma_sanpham.Substring(9, 2).Equals("XX", StringComparison.OrdinalIgnoreCase);
+
+                    if (isNexxSet)
                     {
-                        string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
-                        string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
-                        var dDVT = ExcuteSignalRStatic.getTextFromInner(dvt_inner, dvt_outer, sl_inner, sl_outer);
-                        rowSP.inner = dDVT.inner;
-                        rowSP.master = dDVT.outer;
-                        rowSP.packingText = dDVT.packingText;
-                        rowSP.sizeText = dDVT.sizeText;
-
-                        rowSP.kichthuocDG = "" + row["l2_mix"] + "x" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
-                        rowSP.CBM = row["v2"].ToString();
-
-                        string slc_20 = row["soluonggoi_ctn_20"].ToString();
-                        string slc_40 = row["soluonggoi_ctn"].ToString();
-                        string slc_40HC = row["soluonggoi_ctn_40hc"].ToString();
-
-                        if (slc_40 != "" & slc_40 != "0")
+                        rowSP.inner = "";
+                        rowSP.master = "";
+                        rowSP.packingText = "";
+                        rowSP.sizeText = "";
+                        rowSP.kichthuocDG = "";
+                        rowSP.CBM = "";
+                        rowSP.slcont = "";
+                    }
+                    else
+                    {
+                        var dt = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id);
+                        foreach (System.Data.DataRow row in dt.Rows)
                         {
-                            rowSP.slcont += "\\n" + slc_40 + " " + dDVT.quantity + "/40'";
-                        }
+                            string sl_inner = row["sl_inner"].ToString(), dvt_inner = row["dvtinner"].ToString();
+                            string sl_outer = row["sl_outer"].ToString(), dvt_outer = row["dvtouter"].ToString();
+                            var dDVT = ExcuteSignalRStatic.getTextFromInner(dvt_inner, dvt_outer, sl_inner, sl_outer);
+                            rowSP.inner = dDVT.inner;
+                            rowSP.master = dDVT.outer;
+                            rowSP.packingText = dDVT.packingText;
+                            rowSP.sizeText = dDVT.sizeText;
 
-                        if (rowSP.slcont != "")
-                        {
-                            string slcont = (rowSP.slcont + "");
-                            rowSP.slcont = slcont.Substring(2);
+                            rowSP.kichthuocDG = "" + row["l2_mix"] + "x" + row["w2_mix"] + "xH" + row["h2_mix"] + "cm";
+                            rowSP.CBM = row["v2"].ToString();
+
+                            string slc_20 = row["soluonggoi_ctn_20"].ToString();
+                            string slc_40 = row["soluonggoi_ctn"].ToString();
+                            string slc_40HC = row["soluonggoi_ctn_40hc"].ToString();
+
+                            if (slc_40 != "" & slc_40 != "0")
+                            {
+                                rowSP.slcont += "\\n" + slc_40 + " " + dDVT.quantity + "/40'";
+                            }
+
+                            if (rowSP.slcont != "")
+                            {
+                                string slcont = (rowSP.slcont + "");
+                                rowSP.slcont = slcont.Substring(2);
+                            }
                         }
                     }
 
