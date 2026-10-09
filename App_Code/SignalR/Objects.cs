@@ -492,7 +492,7 @@ public class Objects
                     where 
                         1=1
                         and ma_sanpham in ('{0}')
-                        and dgsp.macdinh = 1
+                        and (dgsp.macdinh = 1 or substring(sp.ma_sanpham, 10, 2) = 'XX')
                         and cxh.macdinh = 1
                 )A
                 order by A.kd, A.ms, A.dt
@@ -724,8 +724,16 @@ public class Objects
                 s1.GetRow(rowTTDT).CreateCell(3).SetCellValue(dtDetails.Rows[i]["inner"].ToString());
                 s1.GetRow(rowTTDT).CreateCell(4).SetCellValue(dtDetails.Rows[i]["master"].ToString());
 
-                s1.GetRow(rowTTDT).CreateCell(5).SetCellValue(double.Parse(dtDetails.Rows[i]["nopack"].ToString()));
-                s1.GetRow(rowTTDT).GetCell(5).SetCellType(CellType.Numeric);
+                double noPack;
+                if (double.TryParse(dtDetails.Rows[i]["nopack"].ToString(), out noPack))
+                {
+                    s1.GetRow(rowTTDT).CreateCell(5).SetCellValue(noPack);
+                    s1.GetRow(rowTTDT).GetCell(5).SetCellType(CellType.Numeric);
+                }
+                else
+                {
+                    s1.GetRow(rowTTDT).CreateCell(5).SetCellValue("");
+                }
 
                 s1.GetRow(rowTTDT).CreateCell(6).SetCellValue(dtDetails.Rows[i]["ten_cangbien"].ToString());
             }
