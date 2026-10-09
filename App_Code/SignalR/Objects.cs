@@ -493,7 +493,7 @@ public class Objects
                         1=1
                         and ma_sanpham in ('{0}')
                         and (dgsp.macdinh = 1 or substring(sp.ma_sanpham, 10, 2) = 'XX')
-                        and cxh.macdinh = 1
+                        and (cxh.macdinh = 1 or substring(sp.ma_sanpham, 10, 2) = 'XX')
                 )A
                 order by A.kd, A.ms, A.dt
             ", strSps);
