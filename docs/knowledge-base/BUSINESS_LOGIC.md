@@ -39,6 +39,7 @@ Special `XX` rule:
 
 - `Controllers/UserQRCodeController.ashx` -> `getInfo(HttpContext context)` — classifies Nexxdecor product variants.
 - `Controllers/UploadFileWeb.ashx` -> `ProcessRequest(HttpContext context)` — validates product image filenames before saving.
+- `App_Code/SignalR/MainHub.cs` -> `PreviewAll(dynamic arrSP)` — supplies inquiry/cart preview data; `XX` must return empty packing fields instead of omitting them.
 
 ---
 
