@@ -29,7 +29,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
 
         String selChungTuDH = $@"
             select top (1) 
-                dh.sochungtu, dh.ngaylap, dh.customer_order_no, ngh.thongtin, pmt.ma_paymentterm, pmt.ten_paymentterm, spd.Consignee, dh.payer
+                dh.sochungtu, dh.ngaylap, dh.customer_order_no, ngh.thongtin, pmt.ma_paymentterm, pmt.ten_paymentterm, spd.Consignee
             from 
                 c_donhang dh
                 left join c_dongpklinv dpkl on dh.c_donhang_id = dpkl.c_donhang_id
@@ -52,13 +52,12 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         string ma_paymentterm = dtChungTuDH.Rows[0][4].ToString();
         string paymentterm = dtChungTuDH.Rows[0][5].ToString();
         string Consignee = dtChungTuDH.Rows[0][6].ToString();
-        string payer = dtChungTuDH.Rows[0][7].ToString();
 
         DataTable dt = mdbc.GetData(select);
 
         if (dt.Rows.Count != 0)
         {
-            HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt, chungTuDH, paymentterm, nganhang, ngayLapDH, customerNo, ma_paymentterm, Consignee, payer);
+            HSSFWorkbook hssfworkbook = this.CreateWorkBookPO(dt, chungTuDH, paymentterm, nganhang, ngayLapDH, customerNo, ma_paymentterm, Consignee);
             String saveAsFileName = String.Format("SaleContact-{0}.xls", DateTime.Now);
             this.SaveFile(hssfworkbook, saveAsFileName);
         }
@@ -73,7 +72,7 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         //}
     }
 
-    public HSSFWorkbook CreateWorkBookPO(DataTable dt, String chungTuDH, String paymentterm, String nganhang, DateTime ngayLapDH, string customerNo, string ma_paymentterm, string Consignee, string payer)
+    public HSSFWorkbook CreateWorkBookPO(DataTable dt, String chungTuDH, String paymentterm, String nganhang, DateTime ngayLapDH, string customerNo, string ma_paymentterm, string Consignee)
     {
         LinqDBDataContext db = new LinqDBDataContext();
         String c_pkivn_id = Request.QueryString["c_packinglist_id"];
@@ -436,25 +435,6 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 2, 7));
         s1.GetRow(rowH).HeightInPoints = 95;
         rowH++;
-        s1.CreateRow(rowH).CreateCell(0).SetCellValue("The Payer:");
-        s1.GetRow(rowH).GetCell(0).CellStyle = style12TopBold_noWrap;
-        s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 1));
-        s1.GetRow(rowH).CreateCell(2).SetCellValue(payer);
-        s1.GetRow(rowH).GetCell(2).CellStyle = style12TopBold_noWrap;
-        //s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 2, 7));
-        s1.GetRow(rowH).HeightInPoints = 21;
-        rowH++;
-        if (tendtkd != Consignee & !string.IsNullOrWhiteSpace(Consignee))
-        {
-            s1.CreateRow(rowH).CreateCell(0).SetCellValue("The consignee:");
-            s1.GetRow(rowH).GetCell(0).CellStyle = style12TopBold_noWrap;
-            s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 1));
-            s1.GetRow(rowH).CreateCell(2).SetCellValue(Consignee);
-            s1.GetRow(rowH).GetCell(2).CellStyle = style12TopBold_noWrap;
-            //s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 2, 7));
-            s1.GetRow(rowH).HeightInPoints = 21;
-            rowH++;
-        }
         s1.CreateRow(rowH).CreateCell(0).SetCellValue("ANCO Company agrees to sale and the Buyer agrees to buy the goods under terms and conditions as follows:");
         s1.GetRow(rowH).GetCell(0).CellStyle = style12_noWrap;
         //s1.AddMergedRegion(new CellRangeAddress(rowH, rowH, 0, 7));
@@ -943,6 +923,27 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         s1.GetRow(r).HeightInPoints = 22;
 
         r++;
+        // Consignee comes from the latest sent Shipping Detail. Only print it when
+        // it identifies a different party than the Buyer.
+        if (ShouldPrintConsignee(Consignee, tendtkd))
+        {
+            IRow consigneeRow = s1.CreateRow(r);
+            consigneeRow.CreateCell(0).SetCellValue("The consignee:");
+            consigneeRow.GetCell(0).CellStyle = style12Top;
+            s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 1));
+
+            string consigneeText = Consignee.Trim();
+            consigneeRow.CreateCell(2).SetCellValue(consigneeText);
+            consigneeRow.GetCell(2).CellStyle = style12Top;
+            s1.AddMergedRegion(new CellRangeAddress(r, r, 2, 7));
+
+            // Let multiline Shipping Detail fit the merged Excel cell.
+            int estimatedLines = consigneeText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Sum(line => Math.Max(1, (line.Length + 69) / 70));
+            consigneeRow.HeightInPoints = Math.Min(240, Math.Max(22, estimatedLines * 18));
+            r++;
+        }
+
         s1.CreateRow(r).CreateCell(0).SetCellValue("Payment term:");
         s1.GetRow(r).GetCell(0).CellStyle = style12Top;
         s1.AddMergedRegion(new CellRangeAddress(r, r, 0, 1));
@@ -982,6 +983,47 @@ public partial class PrintControllers_InSaleContact_Default : System.Web.UI.Page
         string dvts = string.Join(",", lstDVTs.Distinct().OrderBy(s => s));
         s1.GetRow(rowH).GetCell(4).SetCellValue($"Quantity {dvts}");
         return hssfworkbook;
+    }
+
+    // Shipping Detail may contain the Buyer's company name followed by address
+    // or tax information, so comparing the full Consignee string is insufficient.
+    private static bool ShouldPrintConsignee(string consignee, string buyerName)
+    {
+        if (string.IsNullOrWhiteSpace(consignee))
+            return false;
+        if (string.IsNullOrWhiteSpace(buyerName))
+            return true;
+
+        string buyer = NormalizePartyText(buyerName);
+        string fullConsignee = NormalizePartyText(consignee);
+        if (string.Equals(fullConsignee.TrimEnd('.'), buyer.TrimEnd('.'), StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        string firstLine = consignee.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+        if (string.Equals(NormalizePartyText(firstLine).TrimEnd('.'), buyer.TrimEnd('.'), StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        // Example: "CANTIA S.A. DE C.V. TAX ID: ..." is still the same Buyer.
+        if (fullConsignee.StartsWith(buyer, StringComparison.OrdinalIgnoreCase))
+        {
+            string remaining = fullConsignee.Substring(buyer.Length);
+            if (remaining.Length == 0)
+                return false;
+            if (char.IsWhiteSpace(remaining[0]) || remaining[0] == ',')
+            {
+                remaining = remaining.TrimStart(' ', '\t', ',');
+                string[] buyerDetailPrefixes = { "TAX ID", "TAX NO", "TAX CODE", "ADDRESS", "ADDR", "TEL", "PHONE", "FAX", "ZIP CODE" };
+                if (buyerDetailPrefixes.Any(prefix => remaining.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static string NormalizePartyText(string value)
+    {
+        return string.Join(" ", (value ?? "").Split((char[])null, StringSplitOptions.RemoveEmptyEntries));
     }
 
     public void SaveFile(HSSFWorkbook hsswb, String saveAsFileName)
