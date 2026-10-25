@@ -59,15 +59,15 @@ jobs:
           git -c "http.extraheader=$AUTH_HEADER" clone --single-branch --branch master --depth 1 "$AZURE_URL" "$AZURE_DIR"
 
           # Do not mirror the whole GitHub branch: Azure master may contain independent changes.
-          if git -C "$AZURE_DIR" apply --reverse --check "$RUNNER_TEMP/sale-contract.patch"; then
+          if git -C "$AZURE_DIR" apply --reverse --check --ignore-space-change --whitespace=nowarn "$RUNNER_TEMP/sale-contract.patch"; then
             echo 'Already applied on Azure production master; no commit needed.'
             exit 0
           fi
-          if ! git -C "$AZURE_DIR" apply --check "$RUNNER_TEMP/sale-contract.patch"; then
+          if ! git -C "$AZURE_DIR" apply --check --ignore-space-change --whitespace=nowarn "$RUNNER_TEMP/sale-contract.patch"; then
             echo 'Azure Sale Contract file differs from expected base. Aborting rather than overwriting production.' >&2
             exit 1
           fi
-          git -C "$AZURE_DIR" apply "$RUNNER_TEMP/sale-contract.patch"
+          git -C "$AZURE_DIR" apply --ignore-space-change --whitespace=nowarn "$RUNNER_TEMP/sale-contract.patch"
           git -C "$AZURE_DIR" diff --check
           file="$AZURE_DIR/$TARGET_FILE"
           grep -Fq 'ShouldPrintConsignee(Consignee, tendtkd)' "$file"
