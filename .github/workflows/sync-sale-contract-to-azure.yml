@@ -1,0 +1,80 @@
+name: One-time AncoTrading Sale Contract sync to Azure DevOps
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/sync-sale-contract-to-azure.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: anco-sale-contract-azure-sync
+  cancel-in-progress: false
+
+jobs:
+  sync-sale-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SOURCE_COMMIT: beaaa25c386bb5c4cdf4e437845788c1aa0c7ecc
+      TARGET_FILE: PrintControllers/InSaleContact/Default.aspx.cs
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - name: Check out GitHub source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Prepare exact Sale Contract change
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=2 origin "$SOURCE_COMMIT"
+          git diff --name-only "$SOURCE_COMMIT^" "$SOURCE_COMMIT" > "$RUNNER_TEMP/changed-files.txt"
+          test "$(cat "$RUNNER_TEMP/changed-files.txt")" = "$TARGET_FILE" || {
+            echo 'Source commit contains unexpected files; refusing to deploy.' >&2
+            exit 1
+          }
+          git diff --binary "$SOURCE_COMMIT^" "$SOURCE_COMMIT" -- "$TARGET_FILE" > "$RUNNER_TEMP/sale-contract.patch"
+          test -s "$RUNNER_TEMP/sale-contract.patch" || {
+            echo 'Empty Sale Contract patch; refusing to deploy.' >&2
+            exit 1
+          }
+
+      - name: Apply only the approved change on Azure production master
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$AZURE_PAT" ]; then
+            echo 'Missing Azure DevOps PAT secret. Configure AZURE_DEVOPS_PAT (or AZDO_PAT / ADO_PAT / AZURE_PAT / AZURE_DEVOPS_TOKEN).' >&2
+            exit 1
+          fi
+          AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          AZURE_DIR="$RUNNER_TEMP/azure-production"
+          git -c "http.extraheader=$AUTH_HEADER" clone --single-branch --branch master --depth 1 "$AZURE_URL" "$AZURE_DIR"
+
+          # Do not mirror the whole GitHub branch: Azure master may contain independent changes.
+          if git -C "$AZURE_DIR" apply --reverse --check "$RUNNER_TEMP/sale-contract.patch"; then
+            echo 'Already applied on Azure production master; no commit needed.'
+            exit 0
+          fi
+          if ! git -C "$AZURE_DIR" apply --check "$RUNNER_TEMP/sale-contract.patch"; then
+            echo 'Azure Sale Contract file differs from expected base. Aborting rather than overwriting production.' >&2
+            exit 1
+          fi
+          git -C "$AZURE_DIR" apply "$RUNNER_TEMP/sale-contract.patch"
+          git -C "$AZURE_DIR" diff --check
+          file="$AZURE_DIR/$TARGET_FILE"
+          grep -Fq 'ShouldPrintConsignee(Consignee, tendtkd)' "$file"
+          ! grep -Fq 'SetCellValue("The Payer:")' "$file"
+          git -C "$AZURE_DIR" add -- "$TARGET_FILE"
+          git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
+          git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
+          git -C "$AZURE_DIR" commit -m "fix: sync Sale Contract consignee layout from GitHub beaaa25c"
+          git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
+          echo 'Production sync completed successfully.'
