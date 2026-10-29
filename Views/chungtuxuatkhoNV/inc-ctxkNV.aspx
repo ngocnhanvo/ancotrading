@@ -25,7 +25,8 @@
             }
         });
 
-        $('#layout-south-ctxkNV').layout({
+        // Keep a reference so the product image east pane can be hidden on non-product tabs.
+        var detailLayout = $('#layout-south-ctxkNV').layout({
             center: {
                 onresize: function () {
                     var o = $("#tabs-ctxkNV-details")
@@ -36,11 +37,33 @@
             }
         });
 
+        // The product image pane belongs only to the product lines tab.
+        // Use jQuery Layout's hide/show (not CSS display:none) so the center
+        // pane expands to full width and its grids receive resize events.
+        function updateProductImagePane(panel) {
+            if (!detailLayout || !detailLayout.state || !detailLayout.state.east) return;
+            var showProductImage = panel && panel.id === "ctxkNV-details-1";
+            if (showProductImage) {
+                if (detailLayout.state.east.isHidden) {
+                    detailLayout.show("east", true, true);
+                }
+            } else if (!detailLayout.state.east.isHidden) {
+                detailLayout.hide("east", true);
+            }
+            if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.resize();
+        }
+
+        $('#tabs-ctxkNV-details').bind('tabsshow.ancoProductImage', function (event, ui) {
+            updateProductImagePane(ui.panel);
+        });
+
         // Feature-gated UI preview: no real allocation writes.
         if (/(?:\?|&)phanbococ_preview=1(?:&|$)/.test(window.location.search)) {
             $('#tabs-ctxkNV-details .anco-pb-preview-tab').show();
         }
         $('#tabs-ctxkNV-details').tabs();
+        // The initial tab does not always fire tabsshow in jQuery UI 1.8.
+        updateProductImagePane($('#tabs-ctxkNV-details > .ui-tabs-panel:visible')[0]);
         if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.init();
     });
 </script>
