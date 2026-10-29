@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_COMMIT: d668c992e4d21dbc1ec4e0f27100983017fc018c
-      MERGE_BASE: b9764a85b72da4d9728931c659fa7509a208cf10
+      SOURCE_COMMIT: 51a751b28724306faf5652284896301ab10028a6
+      MERGE_BASE: 41bca81f8f5b9912183f6e3533a76561a35fc0e0
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
     steps:
@@ -121,6 +121,6 @@ jobs:
           fi
           git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
           git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
-          git -C "$AZURE_DIR" commit -m 'fix: show product image only in Invoice product rows tab (GitHub d668c992)'
+          git -C "$AZURE_DIR" commit -m 'fix: make PO allocation preview tab visible reliably (GitHub 51a751b2)'
           git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
           echo 'Gated preview UI synchronized to Azure production master.'
