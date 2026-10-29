@@ -1,7 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="inc-packing-list-invoice.aspx.cs" Inherits="inc_packing_list_invoice" %>
 
 <%@ Register Src="jqGrid.ascx" TagName="jqGrid" TagPrefix="uc1" %>
-<%@ Register Src="~/Views/phanbococpo/phanbococpo.ascx" TagName="phanbococpo" TagPrefix="pb" %>
 <script>
     $(function () {
         $('#lay-center-pklivn').parent().layout({
@@ -14,7 +13,6 @@
                     // sett height
                     $("#grid_ds_chitietplivn").setGridHeight(h + 4 - 80);
                     $("#grid_ds_chitietphanboplivn").setGridHeight(h + 4 - 80);
-                    if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.resize();
                 }
             },
             center: {
@@ -32,7 +30,6 @@
                     //set width
                     $("#grid_ds_chitietplivn").setGridWidth(w);
                     $("#grid_ds_chitietphanboplivn").setGridWidth(w);
-                    if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.resize();
                 }
             },
             east: {
@@ -43,7 +40,6 @@
         });
 
         $('#tab-pklivn-detail').tabs();
-        if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.init();
     });
 
     function phanBoCocInvoice() {
@@ -829,7 +825,6 @@
 				$('#grid_ds_chitietplivn')[0].triggerToolbar();
                 $('#grid_ds_chitietphanboplivn').jqGrid('getGridParam', 'postData').pklId = ids;
 				$('#grid_ds_chitietphanboplivn')[0].triggerToolbar();
-                if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.setInvoice(ids);
             }
         "
         runat="server" />
@@ -839,7 +834,6 @@
     <div class="ui-layout-center" id="tab-pklivn-detail">
         <ul>
             <li><a href="#nav-tabs-pklivn1">Chi Tiết Packing List - Invoice</a></li>
-            <li class="anco-pb-preview-tab" style="display:none"><a href="#nav-tabs-pklivn-pb">Phân bổ cọc</a></li>
             <li><a href="#nav-tabs-pklivn2">Chi tiết các khoản</a></li>
         </ul>
         <div id="nav-tabs-pklivn1">
@@ -1036,8 +1030,6 @@
                 runat="server" />
         </div>
 
-
-        <pb:phanbococpo runat="server" />
         <div id="nav-tabs-pklivn2">
             <uc1:jqGrid  ID="grid_ds_chitietphanboplivn" 
             FilterToolbar="true"
@@ -1244,7 +1236,6 @@
         </div>
     </div>
 </div>
-
 
 <%-- VNN --%>
 <script>

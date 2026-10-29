@@ -99,7 +99,7 @@ window.ancoPhanBoCocPO = (function ($) {
         var label = "Chưa chọn Invoice";
         if (hasInvoice()) {
             try {
-                var data = $("#grid_ds_plivn").jqGrid("getRowData", invoiceId);
+                var data = $("#grid_ds_ctxk").jqGrid("getRowData", invoiceId);
                 label = "Invoice: " + (data.so_inv || data.so_pkl || invoiceId);
             } catch (e) { label = "Invoice đã chọn"; }
         }
@@ -124,8 +124,8 @@ window.ancoPhanBoCocPO = (function ($) {
         if (!enabled || initialized || !$("#nav-tabs-pklivn-pb").length) return;
         initialized = buildGrids();
         if (!initialized) return;
-        $("#tab-pklivn-detail .anco-pb-preview-tab").show();
-        var $tabs = $("#tab-pklivn-detail");
+        $("#tabs-ctxk-details .anco-pb-preview-tab").show();
+        var $tabs = $("#tabs-ctxk-details");
         $tabs.bind("tabsshow.ancoPb tabsactivate.ancoPb", function () { window.setTimeout(resize, 0); });
         $("#anco-pb-preview-state").bind("change.ancoPb", function () {
             state = $(this).val();
@@ -168,8 +168,8 @@ window.ancoPhanBoCocPO = (function ($) {
         drawPOs();
         var selectedInvoice = null;
         try {
-            if ($("#grid_ds_plivn")[0] && $("#grid_ds_plivn")[0].grid)
-                selectedInvoice = $("#grid_ds_plivn").jqGrid("getGridParam", "selrow");
+            if ($("#grid_ds_ctxk")[0] && $("#grid_ds_ctxk")[0].grid)
+                selectedInvoice = $("#grid_ds_ctxk").jqGrid("getGridParam", "selrow");
         } catch (e) { selectedInvoice = null; }
         setInvoice(selectedInvoice);
         window.setTimeout(resize, 0);
