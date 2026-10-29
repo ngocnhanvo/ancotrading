@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_COMMIT: 443c0befa11882194b1deec2af74f89517468114
-      MERGE_BASE: 166b20f401285302f243285281c6255fc883675c
+      SOURCE_COMMIT: b9764a85b72da4d9728931c659fa7509a208cf10
+      MERGE_BASE: 443c0befa11882194b1deec2af74f89517468114
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
     steps:
@@ -38,6 +38,8 @@ jobs:
             inc-packing-list-invoice.aspx
             Views/chungtuxuatkho/inc-ctxk.aspx
             Views/chungtuxuatkho/master.ascx
+            Views/chungtuxuatkhoNV/inc-ctxkNV.aspx
+            Views/chungtuxuatkhoNV/master.ascx
             Views/phanbococpo/phanbococpo.ascx
             Views/phanbococpo/phanbococpo.ascx.cs
             Views/phanbococpo/phanbococpo.js
@@ -50,8 +52,8 @@ jobs:
           for path in "${paths[@]}"; do
             git cat-file -e "$SOURCE_COMMIT:$path"
           done
-          git show "$SOURCE_COMMIT:Views/chungtuxuatkho/inc-ctxk.aspx" | grep -q 'pb:phanbococpo runat="server"'
-          if git show "$SOURCE_COMMIT:inc-packing-list-invoice.aspx" | grep -q 'pb:phanbococpo'; then
+          git show "$SOURCE_COMMIT:Views/chungtuxuatkhoNV/inc-ctxkNV.aspx" | grep -q 'pb:phanbococpo runat="server"'
+          if git show "$SOURCE_COMMIT:inc-packing-list-invoice.aspx" | grep -q 'pb:phanbococpo' || git show "$SOURCE_COMMIT:Views/chungtuxuatkho/inc-ctxk.aspx" | grep -q 'pb:phanbococpo'; then
             echo 'Unexpected preview still present in old Invoice screen.' >&2
             exit 1
           fi
@@ -76,6 +78,8 @@ jobs:
             inc-packing-list-invoice.aspx
             Views/chungtuxuatkho/inc-ctxk.aspx
             Views/chungtuxuatkho/master.ascx
+            Views/chungtuxuatkhoNV/inc-ctxkNV.aspx
+            Views/chungtuxuatkhoNV/master.ascx
             Views/phanbococpo/phanbococpo.ascx
             Views/phanbococpo/phanbococpo.ascx.cs
             Views/phanbococpo/phanbococpo.js
@@ -117,6 +121,6 @@ jobs:
           fi
           git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
           git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
-          git -C "$AZURE_DIR" commit -m 'fix: show PO deposit preview in active Invoice screen (GitHub 443c0bef)'
+          git -C "$AZURE_DIR" commit -m 'fix: show PO deposit preview in NV export document screen (GitHub b9764a85)'
           git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
           echo 'Gated preview UI synchronized to Azure production master.'
