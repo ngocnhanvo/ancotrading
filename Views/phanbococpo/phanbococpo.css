@@ -1,5 +1,5 @@
 /* Scoped to the PO deposit-allocation tab: no global jqGrid or Invoice overrides. */
-#tabs-ctxkNV-details .anco-pb-preview-tab { display: none; }
+/* Preview gate is the inline display:none on the tab <li>; do not add a CSS hide rule. */
 #nav-tabs-pklivn-pb.anco-pb { box-sizing: border-box; padding: 5px 7px; height: 100%; min-height: 250px; font-size: 12px; }
 .anco-pb .anco-pb-titlebar, .anco-pb .anco-pb-panel-title, .anco-pb .anco-pb-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .anco-pb .anco-pb-titlebar { flex-wrap: wrap; padding: 3px 0 7px; }

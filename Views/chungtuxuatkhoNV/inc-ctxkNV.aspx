@@ -59,7 +59,7 @@
 
         // Feature-gated UI preview: no real allocation writes.
         if (/(?:\?|&)phanbococ_preview=1(?:&|$)/.test(window.location.search)) {
-            $('#tabs-ctxkNV-details .anco-pb-preview-tab').show();
+            $('#tabs-ctxkNV-details .anco-pb-preview-tab').css('display', 'list-item');
         }
         $('#tabs-ctxkNV-details').tabs();
         // The initial tab does not always fire tabsshow in jQuery UI 1.8.

@@ -124,7 +124,7 @@ window.ancoPhanBoCocPO = (function ($) {
         if (!enabled || initialized || !$("#nav-tabs-pklivn-pb").length) return;
         initialized = buildGrids();
         if (!initialized) return;
-        $("#tabs-ctxkNV-details .anco-pb-preview-tab").show();
+        $("#tabs-ctxkNV-details .anco-pb-preview-tab").css("display", "list-item");
         var $tabs = $("#tabs-ctxkNV-details");
         $tabs.bind("tabsshow.ancoPb tabsactivate.ancoPb", function () { window.setTimeout(resize, 0); });
         $("#anco-pb-preview-state").bind("change.ancoPb", function () {

@@ -1,7 +1,7 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeFile="phanbococpo.ascx.cs" Inherits="Views_phanbococpo_phanbococpo" %>
 <%-- Preview-only UI until the server allocation workflow and checks are complete. --%>
-<link rel="stylesheet" type="text/css" href="Views/phanbococpo/phanbococpo.css?v=20261030" />
-<script type="text/javascript" src="Views/phanbococpo/phanbococpo.js?v=20261030"></script>
+<link rel="stylesheet" type="text/css" href="Views/phanbococpo/phanbococpo.css?v=20261030b" />
+<script type="text/javascript" src="Views/phanbococpo/phanbococpo.js?v=20261030b"></script>
 <div id="nav-tabs-pklivn-pb" class="anco-pb" role="region" aria-label="Phân bổ tiền cọc theo PO">
     <div class="anco-pb-titlebar">
         <strong>Phân bổ tiền đặt cọc từ PO vào Invoice</strong>
