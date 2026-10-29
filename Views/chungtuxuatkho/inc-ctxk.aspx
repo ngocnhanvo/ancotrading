@@ -4,7 +4,6 @@
 <%@ Register Src="master.ascx" TagName="ctxk" TagPrefix="master" %>
 <%@ Register Src="cacdonghang.ascx" TagName="cdh" TagPrefix="detail" %>
 <%@ Register Src="cackhoanphi.ascx" TagName="ckp" TagPrefix="detail" %>
-<%@ Register Src="~/Views/phanbococpo/phanbococpo.ascx" TagName="phanbococpo" TagPrefix="pb" %>
 <script type="text/javascript">
     var id_inc_ctxk = "";
     $(document).ready(function () {
@@ -30,29 +29,21 @@
                     var o = $("#tabs-ctxk-details")
                     $("#grid_ds_chitietctxk").setGridWidth(o.width());
                     $("#grid_ds_chitietctxk").setGridHeight(o.height() - 97);
-                    if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.resize();
                 }
             }
         });
 
-        // Enable the preview tab before initializing jQuery UI Tabs, so it is registered as a tab.
-        if (/(?:\?|&)phanbococ_preview=1(?:&|$)/.test(window.location.search)) {
-            $('#tabs-ctxk-details .anco-pb-preview-tab').show();
-        }
         $('#tabs-ctxk-details').tabs();
-        if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.init();
     });
 </script>
 <div class="ui-layout-south ui-widget-content" id="layout-south-ctxk">
     <div class="ui-layout-center" id="tabs-ctxk-details">
          <ul>
             <li><a href="#ctxk-details-1">Các dòng hàng</a></li>
-            <li class="anco-pb-preview-tab" style="display:none"><a href="#nav-tabs-pklivn-pb">Phân bổ cọc</a></li>
             <li><a href="#ctxk-details-2">Chi tiết các khoản</a></li>
         </ul>
 
         <detail:cdh runat="server" />
-        <pb:phanbococpo runat="server" />
         <detail:ckp runat="server" />
     </div>
     <div class="ui-layout-east" style="text-align:center; background:#f4f0ec">

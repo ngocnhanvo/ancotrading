@@ -4,6 +4,7 @@
 <%@ Register Src="master.ascx" TagName="ctxk" TagPrefix="master" %>
 <%@ Register Src="cacdonghangNV.ascx" TagName="cdh" TagPrefix="detail" %>
 <%@ Register Src="cackhoanphiNV.ascx" TagName="ckp" TagPrefix="detail" %>
+<%@ Register Src="~/Views/phanbococpo/phanbococpo.ascx" TagName="phanbococpo" TagPrefix="pb" %>
 
 <script type="text/javascript">
     var id_inc_ctxkNV = "";
@@ -30,21 +31,29 @@
                     var o = $("#tabs-ctxkNV-details")
                     $("#grid_ds_chitietctxkNV").setGridWidth(o.width());
                     $("#grid_ds_chitietctxkNV").setGridHeight(o.height() - 97);
+                    if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.resize();
                 }
             }
         });
 
+        // Feature-gated UI preview: no real allocation writes.
+        if (/(?:\?|&)phanbococ_preview=1(?:&|$)/.test(window.location.search)) {
+            $('#tabs-ctxkNV-details .anco-pb-preview-tab').show();
+        }
         $('#tabs-ctxkNV-details').tabs();
+        if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.init();
     });
 </script>
 <div class="ui-layout-south ui-widget-content" id="layout-south-ctxkNV">
     <div class="ui-layout-center" id="tabs-ctxkNV-details">
          <ul>
             <li><a href="#ctxkNV-details-1">Các dòng hàng</a></li>
+            <li class="anco-pb-preview-tab" style="display:none"><a href="#nav-tabs-pklivn-pb">Phân bổ cọc</a></li>
             <li><a href="#ctxkNV-details-2">Chi tiết các khoản</a></li>
         </ul>
 
         <detail:cdh runat="server" />
+        <pb:phanbococpo runat="server" />
         <detail:ckp runat="server" />
     </div>
     <div class="ui-layout-east" style="text-align:center; background:#f4f0ec">

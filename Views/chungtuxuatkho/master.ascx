@@ -659,7 +659,6 @@
 			$('#grid_ds_ctxkDH')[0].triggerToolbar();
             $('#grid_ds_ctxkPhi').jqGrid('getGridParam', 'postData').pklId = ids;
 			$('#grid_ds_ctxkPhi')[0].triggerToolbar();
-            if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.setInvoice(ids);
         }
     "
     runat="server" />

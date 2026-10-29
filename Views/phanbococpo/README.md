@@ -1,6 +1,6 @@
 # Giao diện phân bổ cọc PO -> Invoice (giai đoạn 1)
 
-- Điểm tích hợp: tab \`Phân bổ cọc\` trong \`inc-packing-list-invoice.aspx\` (bên cạnh Chi Tiết Packing List - Invoice).
+- Điểm tích hợp: tab \`Phân bổ cọc\` trong \`Views/chungtuxuatkhoNV/inc-ctxkNV.aspx\` (bên cạnh Các dòng hàng).
 - Module riêng: \`phanbococpo.ascx\`, \`phanbococpo.ascx.cs\`, \`phanbococpo.js\`, \`phanbococpo.css\`.
 - Controller dự phòng: \`Controller_PhanBoCocPO.ashx\`, cố ý trả HTTP 501 (không thực hiện ghi dữ liệu).
 - Tab được ẩn trong hoạt động bình thường. Để xem, tải trang AncoTrading với query \`phanbococ_preview=1\` rồi vào mục Packing List - Invoice và chọn Invoice.
