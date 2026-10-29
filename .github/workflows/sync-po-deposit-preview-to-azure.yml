@@ -93,7 +93,7 @@ jobs:
           done
 
           git -C "$AZURE_DIR" add -- "$TARGET_FILE" "${paths[@]}"
-          git -C "$AZURE_DIR" diff --cached --check
+          git -C "$AZURE_DIR" -c core.whitespace=cr-at-eol diff --cached --check
           if git -C "$AZURE_DIR" diff --cached --quiet; then
             echo 'Preview UI already synchronized, no production change required.'
             exit 0
