@@ -109,15 +109,32 @@ window.ancoPhanBoCocPO = (function ($) {
     }
     function resize() {
         if (!enabled || !initialized) return;
-        var $panel = $("#nav-tabs-pklivn-pb");
-        if (!$panel.is(":visible")) return;
-        var left = $panel.find(".anco-pb-left .anco-pb-grid-wrap").width();
-        var right = $panel.find(".anco-pb-right .anco-pb-grid-wrap").width();
-        var height = Math.max(120, $panel.find(".anco-pb-grid-wrap").first().height() - 28);
-        if (left > 0) $("#anco-pb-po-grid").jqGrid("setGridWidth", left - 2);
-        if (right > 0) $("#anco-pb-detail-grid").jqGrid("setGridWidth", right - 2);
-        $("#anco-pb-po-grid").jqGrid("setGridHeight", height);
-        $("#anco-pb-detail-grid").jqGrid("setGridHeight", height);
+        var $panel = $("#nav-tabs-pklivn-pb"), $tabs = $("#tabs-ctxkNV-details");
+        if (!$panel.is(":visible") || !$tabs.length) return;
+
+        // The jQuery Layout center height includes the tabs navigation bar.
+        // The content panel must consume only the space BELOW that bar;
+        // height:100% alone would push the summary/buttons underneath the footer.
+        var $navigation = $tabs.children("ul.ui-tabs-nav");
+        var available = $tabs.height() - $navigation.outerHeight(true);
+        if (available > 0) $panel.css("height", Math.floor(available) + "px");
+
+        // The flex middle section now fills whatever remains after the header,
+        // preview notice, warning and summary. Only jqGrid's BODY scrolls.
+        $panel.find(".anco-pb-grid-wrap").each(function () {
+            var $wrap = $(this), $table = $wrap.find("table.ui-jqgrid-btable").first();
+            if (!$table.length) return;
+            var width = Math.max(0, Math.floor($wrap.innerWidth()) - 2);
+            var $grid = $wrap.find("table").first();
+            var $wrapper = $grid.closest(".ui-jqgrid");
+            var $header = $wrapper.find(".ui-jqgrid-hdiv").first();
+            var $footer = $wrapper.find(".ui-jqgrid-sdiv").first();
+            var headerHeight = $header.length ? $header.outerHeight(true) : 0;
+            var footerHeight = $footer.length ? $footer.outerHeight(true) : 0;
+            var height = Math.max(0, Math.floor($wrap.innerHeight() - headerHeight - footerHeight - 4));
+            if (width > 0) $grid.jqGrid("setGridWidth", width);
+            $grid.jqGrid("setGridHeight", height);
+        });
     }
     function init() {
         enabled = /(?:\?|&)phanbococ_preview=1(?:&|$)/.test(window.location.search);

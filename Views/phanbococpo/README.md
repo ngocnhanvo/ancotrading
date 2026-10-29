@@ -9,3 +9,5 @@
 - Nút \`Lưu (PB)\` luôn vô hiệu trong giai đoạn này. Không sửa bảng CSDL, trạng thái, hay endpoint phân bổ Thu Chi cũ.
 - Giai đoạn 2 cần thiết kế bảng lưu PO–Invoice, nguồn tiền cọc thực, API đọc/lưu, trạng thái soạn thảo, kiểm tra số dư trong transaction khi hiệu lực, hủy hiệu lực và hồi quy.
 - Trước khi mở tab cho người dùng chính thức: bỏ dữ liệu mẫu, hoàn tất backend, kiểm thử, rồi bỏ feature gate.
+
+- Giao diện tự điều chỉnh chiều cao theo vùng nội dung sau thanh tab; thanh tổng tiền ở dưới luôn hiển thị, còn jqGrid PO và chi tiết cuộn độc lập khi nhiều dòng.
