@@ -125,7 +125,7 @@ window.ancoPhanBoCocPO = (function ($) {
             var $wrap = $(this), $table = $wrap.find("table.ui-jqgrid-btable").first();
             if (!$table.length) return;
             var width = Math.max(0, Math.floor($wrap.innerWidth()) - 2);
-            var $grid = $wrap.find("table").first();
+            var $grid = $table; // jqGrid body table, not the header's table
             var $wrapper = $grid.closest(".ui-jqgrid");
             var $header = $wrapper.find(".ui-jqgrid-hdiv").first();
             var $footer = $wrapper.find(".ui-jqgrid-sdiv").first();
