@@ -825,6 +825,7 @@
 				$('#grid_ds_chitietplivn')[0].triggerToolbar();
                 $('#grid_ds_chitietphanboplivn').jqGrid('getGridParam', 'postData').pklId = ids;
 				$('#grid_ds_chitietphanboplivn')[0].triggerToolbar();
+                if (window.ancoPbPoPreview) window.ancoPbPoPreview.selectInvoice(ids);
             }
         "
         runat="server" />
@@ -834,6 +835,7 @@
     <div class="ui-layout-center" id="tab-pklivn-detail">
         <ul>
             <li><a href="#nav-tabs-pklivn1">Chi Tiết Packing List - Invoice</a></li>
+            <li class="anco-pb-preview-tab"><a href="#nav-tabs-pklivn-pb">Phân bổ cọc</a></li>
             <li><a href="#nav-tabs-pklivn2">Chi tiết các khoản</a></li>
         </ul>
         <div id="nav-tabs-pklivn1">
@@ -1028,6 +1030,40 @@
                     }
                 "
                 runat="server" />
+        </div>
+
+
+        <%-- UI preview only. Live PO deposit allocation requires a separate data and validation phase. --%>
+        <div id="nav-tabs-pklivn-pb" class="anco-pb-preview-panel">
+            <div class="anco-pb-head">
+                <strong>Phân bổ tiền đặt cọc từ PO vào Invoice</strong>
+                <span id="anco-pb-invoice-name">Chọn Invoice ở danh sách phía trên</span>
+                <label class="anco-pb-demo-state">Xem thử trạng thái:
+                    <select id="anco-pb-demo-status"><option value="draft">Soạn thảo</option><option value="active">Hiệu lực</option></select>
+                </label>
+            </div>
+            <div class="anco-pb-demo-note"><strong>GIAO DIỆN XEM TRƯỚC</strong> — Các PO và số tiền bên dưới là dữ liệu minh họa. Chưa kết nối dữ liệu thật và chưa có chức năng lưu vào hệ thống.</div>
+            <div class="anco-pb-columns">
+                <section class="anco-pb-left" aria-label="Danh sách PO của Invoice">
+                    <div class="anco-pb-section-title">PO thuộc Invoice <small>(chọn một PO)</small></div>
+                    <div class="anco-pb-table-scroll">
+                        <table class="anco-pb-grid"><thead><tr><th>PO</th><th>Cọc gốc</th><th>Đã PB</th><th>Cọc còn</th></tr></thead><tbody id="anco-pb-po-body"></tbody></table>
+                    </div>
+                </section>
+                <section class="anco-pb-right" aria-label="Chi tiết phân bổ tiền cọc">
+                    <div class="anco-pb-section-title"><span id="anco-pb-selected-po">Chi tiết phân bổ</span>
+                        <button type="button" id="anco-pb-add-row">+ Thêm dòng phân bổ</button>
+                    </div>
+                    <div class="anco-pb-table-scroll">
+                        <table class="anco-pb-grid"><thead><tr><th>STT</th><th>Tiền cọc trước PB</th><th>Tiền phân bổ</th><th>Tiền cọc sau PB</th><th>Thao tác</th></tr></thead><tbody id="anco-pb-detail-body"></tbody></table>
+                    </div>
+                    <div id="anco-pb-error" role="alert"></div>
+                </section>
+            </div>
+            <div class="anco-pb-footer">
+                <span>Tổng tiền phân bổ vào Invoice (dự kiến): <strong id="anco-pb-total">0.00</strong></span>
+                <button type="button" id="anco-pb-save" disabled="disabled" title="Chức năng lưu sẽ được kết nối ở giai đoạn xử lý dữ liệu">Lưu (PB) — chưa kết nối</button>
+            </div>
         </div>
 
         <div id="nav-tabs-pklivn2">
@@ -1236,6 +1272,128 @@
         </div>
     </div>
 </div>
+
+
+<%-- AncoTrading: mock-only preview for new PO -> Invoice deposit allocation UI.
+     Keep hidden in normal production flow; enable with ?phanbococ_preview=1. --%>
+<style type="text/css">
+    .anco-pb-preview-tab { display: none; }
+    #nav-tabs-pklivn-pb { padding: 5px 8px; box-sizing: border-box; font-size: 12px; height: 100%; min-height: 220px; }
+    .anco-pb-head, .anco-pb-section-title, .anco-pb-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .anco-pb-head { padding: 3px 0 7px; flex-wrap: wrap; }
+    .anco-pb-head strong { font-size: 13px; }
+    .anco-pb-demo-state { color: #555; }
+    .anco-pb-demo-note { padding: 6px 9px; margin-bottom: 7px; border: 1px solid #e5c772; background: #fff8d9; color: #765109; }
+    .anco-pb-columns { display: flex; gap: 8px; height: calc(100% - 115px); min-height: 130px; }
+    .anco-pb-left, .anco-pb-right { min-width: 0; border: 1px solid #b9c4ce; display: flex; flex-direction: column; }
+    .anco-pb-left { flex: 0 0 36%; } .anco-pb-right { flex: 1; }
+    .anco-pb-section-title { background: #e6ecf1; padding: 5px 7px; font-weight: bold; border-bottom: 1px solid #b9c4ce; min-height: 24px; box-sizing: border-box; }
+    .anco-pb-section-title small { font-weight: normal; color: #666; }
+    .anco-pb-section-title button, .anco-pb-footer button { font-size: 12px; padding: 4px 9px; cursor: pointer; }
+    .anco-pb-section-title button:disabled { cursor: not-allowed; }
+    .anco-pb-table-scroll { overflow: auto; flex: 1; }
+    table.anco-pb-grid { width: 100%; border-collapse: collapse; white-space: nowrap; }
+    .anco-pb-grid th, .anco-pb-grid td { border: 1px solid #d4d9dd; padding: 5px 6px; text-align: right; }
+    .anco-pb-grid th { background: #f2f3f4; position: sticky; top: 0; z-index: 1; }
+    .anco-pb-grid th:first-child, .anco-pb-grid td:first-child { text-align: left; }
+    .anco-pb-grid tr.anco-pb-po-row { cursor: pointer; }
+    .anco-pb-grid tr.anco-pb-po-row:hover { background: #f4f9fc; }
+    .anco-pb-grid tr.anco-pb-selected { background: #dceaf4; font-weight: bold; }
+    .anco-pb-grid input.anco-pb-amount { box-sizing: border-box; width: 100%; min-width: 80px; max-width: 140px; text-align: right; padding: 3px; }
+    .anco-pb-grid button.anco-pb-remove { font-size: 11px; color: #a02323; cursor: pointer; }
+    #anco-pb-error { color: #a02323; padding: 3px 7px; min-height: 16px; }
+    .anco-pb-footer { border-top: 1px solid #bdc6ce; margin-top: 7px; padding-top: 6px; font-size: 12px; }
+    .anco-pb-footer strong { color: #176327; font-size: 14px; }
+    .anco-pb-footer button:disabled { color: #777; cursor: not-allowed; }
+</style>
+<script type="text/javascript">
+    window.ancoPbPoPreview = (function () {
+        var enabled = /(?:\?|&)phanbococ_preview=1(?:&|$)/.test(window.location.search);
+        var selected = 0, active = false;
+        var po = [
+            { code: "PO MẪU 001", original: 10000, allocated: 4000, rows: [1000, 1500] },
+            { code: "PO MẪU 002", original: 8000, allocated: 1000, rows: [2000] },
+            { code: "PO MẪU 003", original: 5000, allocated: 5000, rows: [] }
+        ];
+        function num(value) { return Math.round((Number(value) || 0) * 100) / 100; }
+        function money(value) { return num(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+        function remaining(p) { return num(p.original - p.allocated); }
+        function usedInDraft(p) { var n = 0; $.each(p.rows, function(i, v) { n += num(v); }); return num(n); }
+        function render() {
+            if (!enabled || !$("#anco-pb-po-body").length) return;
+            var html = "", total = 0;
+            $.each(po, function(i, p) {
+                total += usedInDraft(p);
+                html += '<tr class="anco-pb-po-row ' + (i === selected ? "anco-pb-selected" : "") + '" data-po="' + i + '"><td>' + p.code + '</td><td>' + money(p.original) + '</td><td>' + money(p.allocated) + '</td><td>' + money(remaining(p)) + '</td></tr>';
+            });
+            $("#anco-pb-po-body").html(html);
+            var p = po[selected], before = remaining(p), detail = "";
+            $("#anco-pb-selected-po").text("Chi tiết phân bổ — " + p.code);
+            $.each(p.rows, function(i, value) {
+                var after = num(before - num(value));
+                detail += '<tr><td>' + (i + 1) + '</td><td>' + money(before) + '</td><td><input class="anco-pb-amount" type="number" min="0" step="0.01" data-row="' + i + '" value="' + num(value) + '"' + (active ? ' disabled="disabled"' : '') + '></td><td>' + money(after) + '</td><td><button type="button" class="anco-pb-remove" data-row="' + i + '"' + (active ? ' disabled="disabled"' : '') + '>Xóa</button></td></tr>';
+                before = after;
+            });
+            $("#anco-pb-detail-body").html(detail || '<tr><td colspan="5" style="text-align:center;color:#777">PO chưa có dòng phân bổ trong Invoice này</td></tr>');
+            $("#anco-pb-add-row").prop("disabled", active || remaining(p) <= usedInDraft(p));
+            $("#anco-pb-total").text(money(total));
+        }
+        function selectInvoice(id) {
+            if (!enabled) return;
+            var value = "Chọn Invoice ở danh sách phía trên";
+            if (id && id !== "0") {
+                try {
+                    var data = $("#grid_ds_plivn").jqGrid("getRowData", id);
+                    value = "Invoice đang chọn: " + (data.so_inv || data.so_pkl || id);
+                } catch (e) { value = "Invoice đang chọn"; }
+            }
+            $("#anco-pb-invoice-name").text(value);
+        }
+        function init() {
+            if (!enabled || !$("#nav-tabs-pklivn-pb").length) return;
+            $("#tab-pklivn-detail .anco-pb-preview-tab").show();
+            $("#anco-pb-demo-status").on("change", function() {
+                active = $(this).val() === "active";
+                $("#anco-pb-error").text("");
+                render();
+            });
+            $("#anco-pb-po-body").on("click", "tr[data-po]", function() {
+                selected = Number($(this).attr("data-po"));
+                $("#anco-pb-error").text("");
+                render();
+            });
+            $("#anco-pb-add-row").on("click", function() {
+                var p = po[selected];
+                if (!active && remaining(p) > usedInDraft(p)) {
+                    p.rows.push(0); render();
+                    $("#anco-pb-detail-body input.anco-pb-amount").last().focus();
+                }
+            });
+            $("#anco-pb-detail-body").on("change", "input.anco-pb-amount", function() {
+                if (active) return;
+                var index = Number($(this).attr("data-row")), p = po[selected], entered = Number($(this).val());
+                var other = usedInDraft(p) - num(p.rows[index]);
+                if (!isFinite(entered) || entered < 0 || num(entered) + other > remaining(p)) {
+                    $("#anco-pb-error").text("Số phân bổ phải không âm và không vượt tiền cọc còn lại của PO.");
+                    render(); return;
+                }
+                p.rows[index] = num(entered);
+                $("#anco-pb-error").text("");
+                render();
+            });
+            $("#anco-pb-detail-body").on("click", "button.anco-pb-remove", function() {
+                if (active) return;
+                po[selected].rows.splice(Number($(this).attr("data-row")), 1);
+                $("#anco-pb-error").text("");
+                render();
+            });
+            selectInvoice($("#grid_ds_plivn").jqGrid("getGridParam", "selrow"));
+            render();
+        }
+        $(init);
+        return { selectInvoice: selectInvoice };
+    }());
+</script>
 
 <%-- VNN --%>
 <script>
