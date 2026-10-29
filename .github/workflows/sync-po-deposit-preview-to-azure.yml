@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_COMMIT: 51a751b28724306faf5652284896301ab10028a6
-      MERGE_BASE: 41bca81f8f5b9912183f6e3533a76561a35fc0e0
+      SOURCE_COMMIT: 994ccbe3c5f753de92fde64633df70321c9e272a
+      MERGE_BASE: b06170a2255d9ece06e5929d3d3b4bad6d7015b9
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
     steps:
@@ -121,6 +121,6 @@ jobs:
           fi
           git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
           git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
-          git -C "$AZURE_DIR" commit -m 'fix: make PO allocation preview tab visible reliably (GitHub 51a751b2)'
+          git -C "$AZURE_DIR" commit -m 'fix: fit PO allocation preview height above footer (GitHub 994ccbe3)'
           git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
           echo 'Gated preview UI synchronized to Azure production master.'
