@@ -1,0 +1,105 @@
+name: One-time AncoTrading PO deposit allocation UI preview sync to Azure
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/sync-po-deposit-preview-to-azure.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: anco-po-deposit-azure-sync
+  cancel-in-progress: false
+
+jobs:
+  sync-ui-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SOURCE_COMMIT: 166b20f401285302f243285281c6255fc883675c
+      MERGE_BASE: 05b4551e13718a9515d430f9ccb3db1e910c230b
+      TARGET_FILE: inc-packing-list-invoice.aspx
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - name: Checkout GitHub source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate preview-only source and required files
+        shell: bash
+        run: |
+          set -euo pipefail
+          paths=(
+            Views/phanbococpo/phanbococpo.ascx
+            Views/phanbococpo/phanbococpo.ascx.cs
+            Views/phanbococpo/phanbococpo.js
+            Views/phanbococpo/phanbococpo.css
+            Views/phanbococpo/Controller_PhanBoCocPO.ashx
+            Views/phanbococpo/README.md
+          )
+          git cat-file -e "$SOURCE_COMMIT^{commit}"
+          git cat-file -e "$MERGE_BASE^{commit}"
+          for path in "${paths[@]}"; do
+            git cat-file -e "$SOURCE_COMMIT:$path"
+          done
+          git show "$SOURCE_COMMIT:$TARGET_FILE" | grep -q 'pb:phanbococpo runat="server"'
+          git show "$SOURCE_COMMIT:Views/phanbococpo/Controller_PhanBoCocPO.ashx" | grep -q 'StatusCode = 501'
+          echo 'UI-only source verified.'
+
+      - name: Merge only preview UI into Azure production master
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$AZURE_PAT" ]; then
+            echo 'Missing Azure DevOps PAT secret; Azure deployment was not attempted.' >&2
+            exit 1
+          fi
+          AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          AZURE_DIR="$RUNNER_TEMP/azure-production"
+          git -c "http.extraheader=$AUTH_HEADER" clone --single-branch --branch master --depth 1 "$AZURE_URL" "$AZURE_DIR"
+
+          # Three-way merge preserves independent Azure changes. Conflicts abort instead of overwriting production.
+          git show "$MERGE_BASE:$TARGET_FILE" > "$RUNNER_TEMP/invoice-base.aspx"
+          git show "$SOURCE_COMMIT:$TARGET_FILE" > "$RUNNER_TEMP/invoice-updated.aspx"
+          if ! git merge-file -p "$AZURE_DIR/$TARGET_FILE" "$RUNNER_TEMP/invoice-base.aspx" "$RUNNER_TEMP/invoice-updated.aspx" > "$RUNNER_TEMP/invoice-merged.aspx"; then
+            echo 'Invoice UI merge conflict. Production was not modified.' >&2
+            exit 1
+          fi
+          mv "$RUNNER_TEMP/invoice-merged.aspx" "$AZURE_DIR/$TARGET_FILE"
+
+          paths=(
+            Views/phanbococpo/phanbococpo.ascx
+            Views/phanbococpo/phanbococpo.ascx.cs
+            Views/phanbococpo/phanbococpo.js
+            Views/phanbococpo/phanbococpo.css
+            Views/phanbococpo/Controller_PhanBoCocPO.ashx
+            Views/phanbococpo/README.md
+          )
+          for path in "${paths[@]}"; do
+            sourcefile="$RUNNER_TEMP/source-$(basename "$path")"
+            git show "$SOURCE_COMMIT:$path" > "$sourcefile"
+            if [ -f "$AZURE_DIR/$path" ] && ! cmp -s "$sourcefile" "$AZURE_DIR/$path"; then
+              echo "Existing Azure module file differs: $path; refusing overwrite." >&2
+              exit 1
+            fi
+            mkdir -p "$(dirname "$AZURE_DIR/$path")"
+            cp "$sourcefile" "$AZURE_DIR/$path"
+          done
+
+          git -C "$AZURE_DIR" add -- "$TARGET_FILE" "${paths[@]}"
+          git -C "$AZURE_DIR" diff --cached --check
+          if git -C "$AZURE_DIR" diff --cached --quiet; then
+            echo 'Preview UI already synchronized, no production change required.'
+            exit 0
+          fi
+          git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
+          git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
+          git -C "$AZURE_DIR" commit -m 'feat: add gated PO deposit allocation UI preview (GitHub 166b20f4)'
+          git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
+          echo 'Gated preview UI synchronized to Azure production master.'
