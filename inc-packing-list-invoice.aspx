@@ -1387,7 +1387,13 @@
                 $("#anco-pb-error").text("");
                 render();
             });
-            selectInvoice($("#grid_ds_plivn").jqGrid("getGridParam", "selrow"));
+            var currentInvoiceId = null;
+            try {
+                if ($("#grid_ds_plivn")[0] && $("#grid_ds_plivn")[0].grid) {
+                    currentInvoiceId = $("#grid_ds_plivn").jqGrid("getGridParam", "selrow");
+                }
+            } catch (e) { currentInvoiceId = null; }
+            selectInvoice(currentInvoiceId);
             render();
         }
         $(init);
