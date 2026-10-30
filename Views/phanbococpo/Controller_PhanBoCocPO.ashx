@@ -50,7 +50,7 @@ public class Controller_PhanBoCocPO : IHttpHandler, IRequiresSessionState
             }
         }
 
-        string invoiceId = (isSave ? context.Request.Form["invoiceId"] : context.Request.QueryString["invoiceId"] ?? "").Trim();
+        string invoiceId = ((isSave ? context.Request.Form["invoiceId"] : context.Request.QueryString["invoiceId"]) ?? "").Trim();
         if (invoiceId.Length == 0 || invoiceId.Length > 32)
         {
             Error(context, 400, "invalid_invoice", "Chưa chọn Invoice hợp lệ.");
@@ -259,7 +259,7 @@ public class Controller_PhanBoCocPO : IHttpHandler, IRequiresSessionState
     }
 
 
-    private sealed class DraftRow
+    public sealed class DraftRow
     {
         public string id { get; set; }
         public string poId { get; set; }
@@ -278,9 +278,10 @@ public class Controller_PhanBoCocPO : IHttpHandler, IRequiresSessionState
             return;
         }
 
-        if (rows == null || rows.Count > 100 || expectedVersion.Length != 64 ||
+        if (rows == null || rows.Count > 100 || expectedVersion.Length != 64 || json.Length > 40000 ||
             rows.Any(r => r == null || String.IsNullOrWhiteSpace(r.poId) ||
-                r.poId.Length > 32 || r.amount <= 0 || r.amount > 999999999999m ||
+                r.poId.Length > 32 || (r.id != null && r.id.Length > 40) ||
+                r.amount <= 0 || r.amount > 999999999999m ||
                 Decimal.Round(r.amount, 2) != r.amount))
         {
             Error(context, 400, "invalid_rows", "Mỗi dòng phải có PO hợp lệ và số tiền lớn hơn 0, tối đa 2 chữ số thập phân (tối đa 100 dòng).");
