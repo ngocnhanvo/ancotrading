@@ -13,7 +13,6 @@
     // is not a reliable initialization boundary in that loading path.
     var ancoPbModuleRequestNV = null;
     window.ancoEnsurePhanBoCocPONV = function () {
-        if (!/(?:\?|&)phanbococ_preview=1(?:&|$)/.test(window.location.search)) return;
         if (!$("#nav-tabs-pklivn-pb").length) return;
 
         function finish() {
@@ -33,7 +32,7 @@
             return;
         }
         if (!ancoPbModuleRequestNV) {
-            ancoPbModuleRequestNV = $.getScript("Views/phanbococpo/phanbococpo.js?v=20261030j")
+            ancoPbModuleRequestNV = $.getScript("Views/phanbococpo/phanbococpo.js?v=20261030k")
                 .fail(function () {
                     $("#anco-pb-warning").text("Không tải được phanbococpo.js. Kiểm tra Network và tải lại trang.");
                     ancoPbModuleRequestNV = null;
@@ -93,10 +92,6 @@
             }
         });
 
-        // Feature-gated UI preview: no real allocation writes.
-        if (/(?:\?|&)phanbococ_preview=1(?:&|$)/.test(window.location.search)) {
-            $('#tabs-ctxkNV-details .anco-pb-preview-tab').css('display', 'list-item');
-        }
         $('#tabs-ctxkNV-details').tabs();
         // The initial tab does not always fire tabsshow in jQuery UI 1.8.
         updateProductImagePane($('#tabs-ctxkNV-details > .ui-tabs-panel:visible')[0]);
@@ -107,7 +102,7 @@
     <div class="ui-layout-center" id="tabs-ctxkNV-details">
          <ul>
             <li><a href="#ctxkNV-details-1">Các dòng hàng</a></li>
-            <li class="anco-pb-preview-tab" style="display:none"><a href="#nav-tabs-pklivn-pb">Phân bổ cọc</a></li>
+            <li class="anco-pb-preview-tab"><a href="#nav-tabs-pklivn-pb">Phân bổ cọc</a></li>
             <li><a href="#ctxkNV-details-2">Chi tiết các khoản</a></li>
         </ul>
 
