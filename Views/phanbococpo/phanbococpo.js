@@ -91,7 +91,7 @@ window.ancoPhanBoCocPO = (function ($) {
                 poRows=data.po||[]; detailRows=data.details||[];
                 invoiceState=data.invoice&&data.invoice.status ? data.invoice.status:"";
                 $("#anco-pb-invoice-state").text(invoiceState||"Không xác định");
-                $("#anco-pb-invoice-label").text("Invoice: "+(data.invoice&&data.invoice.number ? data.invoice.number:invoiceId));
+                $("#anco-pb-invoice-label").text(data.invoice&&data.invoice.number ? data.invoice.number:invoiceId);
                 var total=0; $.each(detailRows,function(i,r){total+=num(r.amount);});
                 $("#anco-pb-sum").text(money(total));
                 notice(poRows.length ? "":"Invoice này không có dòng hàng liên kết PO.",false);
