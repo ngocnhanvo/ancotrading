@@ -81,14 +81,15 @@ public class Controller_PhanBoCocPO : IHttpHandler
                 }
 
                 stage = "connect_sql";
-                using (var connection = new SqlConnection(db.Connection.ConnectionString))
+                using (var connection = mdbc.GetConnection)
                 {
                     connection.Open();
                     stage = "verify_table";
                     using (var check = new SqlCommand(
                         "SELECT OBJECT_ID(N'dbo.c_packinginvoice_phanbo', N'U')", connection))
                     {
-                        if (check.ExecuteScalar() == DBNull.Value)
+                        object tableId = check.ExecuteScalar();
+                        if (tableId == null || tableId == DBNull.Value)
                         {
                             Error(context, 503, "schema_pending",
                                 "Chưa có bảng c_packinginvoice_phanbo. Quản trị SQL cần chạy script docs/database/migrations/20261030_c_packinginvoice_phanbo.sql.");
