@@ -1,0 +1,77 @@
+name: Test PO allocation SQL transaction (rollback only)
+on:
+  push:
+    branches: [master]
+    paths: [.github/workflows/test-po-allocation-sql-transaction.yml]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  rollback-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+      - name: Validate draft allocation and rollback on test SQL
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.ANCOTRADING_SQL_DATABASE }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        shell: bash
+        run: |
+          set +x
+          python - <<'PY'
+          import os,sys,uuid
+          import pymssql
+          host=os.environ['SQL_SERVER'].strip(); port=None
+          if ',' in host and host.rsplit(',',1)[-1].isdigit(): host,port=host.rsplit(',',1)
+          kwargs=dict(server=host,user=os.environ['SQL_USER'],password=os.environ['SQL_PASSWORD'],database=os.environ['SQL_DATABASE'],login_timeout=12,timeout=20,autocommit=False)
+          if port: kwargs['port']=port
+          con=pymssql.connect(**kwargs)
+          try:
+              cur=con.cursor()
+              cur.execute("""
+                SELECT TOP 1 i.c_packinginvoice_id, po.c_donhang_id,
+                     CAST(po.datcoc AS decimal(18,2))
+                FROM dbo.c_packinginvoice i
+                JOIN dbo.c_dongpklinv d ON d.c_packinginvoice_id=i.c_packinginvoice_id
+                JOIN dbo.c_donhang po ON po.c_donhang_id=d.c_donhang_id
+                WHERE i.md_trangthai_id='SOANTHAO' AND ISNULL(po.datcoc,0)>0
+                ORDER BY i.c_packinginvoice_id,po.c_donhang_id
+              """)
+              row=cur.fetchone()
+              if not row:
+                  print('RESULT: NO_DRAFT_CANDIDATE');sys.exit(1)
+              iid,pid,dep=row
+              amount=min(dep,100)
+              print('FOUND_DRAFT_CANDIDATE: YES, POSITIVE_DEPOSIT: YES')
+              cur.execute("SELECT COUNT(*) FROM dbo.c_packinginvoice_phanbo WHERE c_packinginvoice_id=%s",(iid,))
+              before=cur.fetchone()[0]
+              tmp=uuid.uuid4().hex
+              cur.execute("""
+                INSERT INTO dbo.c_packinginvoice_phanbo
+                (c_packinginvoice_phanbo_id,c_packinginvoice_id,c_donhang_id,sotienphanbo,nguoitao)
+                VALUES (%s,%s,%s,%s,%s)
+              """,(tmp,iid,pid,amount,"github-test"))
+              cur.execute("SELECT COUNT(*) FROM dbo.c_packinginvoice_phanbo WHERE c_packinginvoice_phanbo_id=%s",(tmp,))
+              assert cur.fetchone()[0]==1
+              cur.execute("UPDATE dbo.c_packinginvoice_phanbo SET sotienphanbo=%s WHERE c_packinginvoice_phanbo_id=%s",(amount/2,tmp))
+              cur.execute("DELETE FROM dbo.c_packinginvoice_phanbo WHERE c_packinginvoice_phanbo_id=%s",(tmp,))
+              con.rollback()
+              cur.execute("SELECT COUNT(*) FROM dbo.c_packinginvoice_phanbo WHERE c_packinginvoice_id=%s",(iid,))
+              assert cur.fetchone()[0]==before,'Rollback failed to restore initial count'
+              print('DRAFT_INSERT_UPDATE_DELETE: PASS')
+              print('TRANSACTION_ROLLBACK: PASS')
+              cur.execute("SELECT COUNT(*) FROM dbo.c_packinginvoice WHERE ISNULL(tiendatcocPO,0)<>0")
+              print('INVOICE_PO_DEPOSIT_FIELD_NONZERO_ROWS:',cur.fetchone()[0])
+              cur.execute("SELECT COUNT(*) FROM dbo.c_packinginvoice WHERE ISNULL(tiendatcoc,0)<>0")
+              print('INVOICE_DEPOSIT_FIELD_NONZERO_ROWS:',cur.fetchone()[0])
+          except Exception:
+              con.rollback()
+              print('RESULT: SQL_TRANSACTION_TEST_FAILED')
+              raise
+          finally:
+              con.close()
+          PY
