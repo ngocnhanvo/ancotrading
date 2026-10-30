@@ -10,3 +10,4 @@
 - API `Controller_PhanBoCocPO.ashx?action=load&invoiceId=...` đọc qua SQL, kiểm tra quyền theo Invoice master và trả JSON.
 - Preview bật khi query có `phanbococ_preview=1`. Nút thêm/lưu vẫn bị khóa, chưa ghi CSDL và chưa can thiệp hiệu lực chứng từ.
 - Pha tiếp theo: kiểm soát lưu bản nháp, áp dụng và hoàn tác khi hiệu lực trong transaction chống phân bổ vượt cọc.
+- Do phần `Chứng từ XK` được thêm bằng jQuery UI AJAX tab, JavaScript phân bổ phải nạp qua `window.ancoEnsurePhanBoCocPONV` từ `inc-ctxkNV.aspx` sau khi tab được thêm vào DOM. Hàm này dùng `$.getScript` một lần, rồi `init + syncInvoice`, tránh tình trạng `setInvoice` đến trước `init` làm API không được gọi. Khi mở lại tab, module phát hiện DOM jqGrid mới và tái khởi tạo.

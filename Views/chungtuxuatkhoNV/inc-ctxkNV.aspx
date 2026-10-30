@@ -8,6 +8,39 @@
 
 <script type="text/javascript">
     var id_inc_ctxkNV = "";
+    // This page is injected through the main jQuery UI AJAX tabs. Load the
+    // allocation module explicitly; an external <script> inside ASCX markup
+    // is not a reliable initialization boundary in that loading path.
+    var ancoPbModuleRequestNV = null;
+    window.ancoEnsurePhanBoCocPONV = function () {
+        if (!/(?:\?|&)phanbococ_preview=1(?:&|$)/.test(window.location.search)) return;
+        if (!$("#nav-tabs-pklivn-pb").length) return;
+
+        function finish() {
+            if (!window.ancoPhanBoCocPO) {
+                $("#anco-pb-warning").text("Không thể khởi tạo module phân bổ cọc.");
+                return;
+            }
+            window.ancoPhanBoCocPO.init();
+            // Read the current grid selection at completion time. The user
+            // might have selected a different Invoice while JS was loading.
+            window.ancoPhanBoCocPO.syncInvoice();
+            window.ancoPhanBoCocPO.resize();
+        }
+
+        if (window.ancoPhanBoCocPO) {
+            finish();
+            return;
+        }
+        if (!ancoPbModuleRequestNV) {
+            ancoPbModuleRequestNV = $.getScript("Views/phanbococpo/phanbococpo.js?v=20261030e")
+                .fail(function () {
+                    $("#anco-pb-warning").text("Không tải được phanbococpo.js. Kiểm tra Network và tải lại trang.");
+                    ancoPbModuleRequestNV = null;
+                });
+        }
+        ancoPbModuleRequestNV.done(finish);
+    };
     $(document).ready(function () {
         $('#layout-center-ctxkNV').parent().layout({
             south: {
@@ -55,6 +88,9 @@
 
         $('#tabs-ctxkNV-details').bind('tabsshow.ancoProductImage', function (event, ui) {
             updateProductImagePane(ui.panel);
+            if (ui.panel && ui.panel.id === "nav-tabs-pklivn-pb") {
+                window.ancoEnsurePhanBoCocPONV();
+            }
         });
 
         // Feature-gated UI preview: no real allocation writes.
@@ -64,7 +100,7 @@
         $('#tabs-ctxkNV-details').tabs();
         // The initial tab does not always fire tabsshow in jQuery UI 1.8.
         updateProductImagePane($('#tabs-ctxkNV-details > .ui-tabs-panel:visible')[0]);
-        if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.init();
+        window.ancoEnsurePhanBoCocPONV();
     });
 </script>
 <div class="ui-layout-south ui-widget-content" id="layout-south-ctxkNV">

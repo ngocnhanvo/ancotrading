@@ -3,6 +3,7 @@ window.ancoPhanBoCocPO = (function ($) {
     "use strict";
     var enabled = false, initialized = false, invoiceId = null, invoiceState = "";
     var selectedPo = null, poRows = [], detailRows = [], request = null, serial = 0;
+    var mountedGridNode = null;
     function num(v) { v = Number(v); return isFinite(v) ? Math.round(v * 100) / 100 : 0; }
     function money(v) { return num(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
     function safe(v) { return $("<div/>").text(v == null ? "" : String(v)).html(); }
@@ -107,12 +108,14 @@ window.ancoPhanBoCocPO = (function ($) {
         });
     }
     function setInvoice(id) {
+        if(!initialized)init();
         if(!enabled||!initialized)return;
         var next=id==null?null:String(id);
         if(next===invoiceId)return;
         invoiceId=next;load();
     }
     function syncInvoice() {
+        if(!initialized)init();
         if(!enabled||!initialized)return;
         var id=null;
         try{
@@ -139,7 +142,14 @@ window.ancoPhanBoCocPO = (function ($) {
     }
     function init() {
         enabled=/(?:\?|&)phanbococ_preview=1(?:&|$)/.test(window.location.search);
-        if(!enabled||initialized||!$("#nav-tabs-pklivn-pb").length)return;
+        var currentNode = $("#anco-pb-po-grid")[0];
+        if(!enabled||!currentNode||!$("#nav-tabs-pklivn-pb").length)return;
+        // The outer AJAX tab may be closed and reopened: the old jqGrid node
+        // is gone even though the JS module still exists on window.
+        if(initialized && mountedGridNode===currentNode)return;
+        if(request && request.readyState!==4) request.abort();
+        initialized=false;invoiceId=null;selectedPo=null;poRows=[];detailRows=[];
+        mountedGridNode=currentNode;
         initialized=createGrids();
         if(!initialized){notice("Không tải được jqGrid.",true);return;}
         $("#tabs-ctxkNV-details .anco-pb-preview-tab").css("display","list-item");

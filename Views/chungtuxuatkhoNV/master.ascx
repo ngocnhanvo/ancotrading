@@ -922,7 +922,8 @@
 			$('#grid_ds_ctxkDHNV')[0].triggerToolbar();
             $('#grid_ds_ctxkPhiNV').jqGrid('getGridParam', 'postData').pklId = ids;
 			$('#grid_ds_ctxkPhiNV')[0].triggerToolbar();
-            if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.setInvoice(ids);
+            if (window.ancoEnsurePhanBoCocPONV) window.ancoEnsurePhanBoCocPONV();
+            else if (window.ancoPhanBoCocPO) window.ancoPhanBoCocPO.setInvoice(ids);
         }
     "
     runat="server" />
