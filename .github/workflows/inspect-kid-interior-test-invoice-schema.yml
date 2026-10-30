@@ -1,0 +1,70 @@
+name: Inspect TEST Invoice clone schema for KID INTERIOR
+on:
+  push:
+    branches: [master]
+    paths: [.github/workflows/inspect-kid-interior-test-invoice-schema.yml]
+permissions: {contents: read}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+      - name: Inspect column requirements and triggers without writing
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.ANCOTRADING_SQL_DATABASE }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        run: |
+          set +x
+          python - <<'PY'
+          import os,pymssql
+          host=os.environ["SQL_SERVER"].strip()
+          port=None
+          if "," in host and host.rsplit(",",1)[1].isdigit():host,port=host.rsplit(",",1)
+          kw=dict(server=host,user=os.environ["SQL_USER"],password=os.environ["SQL_PASSWORD"],
+                  database=os.environ["SQL_DATABASE"],login_timeout=12,timeout=20,as_dict=True)
+          if port:kw["port"]=port
+          with pymssql.connect(**kw) as con:
+            with con.cursor() as c:
+              for table in ("c_packinginvoice","c_dongpklinv"):
+                print("=== TABLE:",table)
+                c.execute("""
+                  SELECT c.name, t.name AS type_name, c.max_length,
+                         c.is_nullable, c.is_identity, c.is_computed,
+                         dc.definition AS default_sql
+                  FROM sys.columns c
+                  JOIN sys.types t ON t.user_type_id=c.user_type_id
+                  LEFT JOIN sys.default_constraints dc ON dc.object_id=c.default_object_id
+                  WHERE c.object_id=OBJECT_ID(%s,'U')
+                  ORDER BY c.column_id
+                """,("dbo."+table,))
+                for row in c.fetchall():
+                  if row["is_nullable"]==0 or row["default_sql"] is not None or row["is_identity"] or row["is_computed"]:
+                    print("REQUIRED_OR_DEFAULT:",row)
+                c.execute("""SELECT t.name,m.definition,t.is_disabled FROM sys.triggers t
+                             JOIN sys.sql_modules m ON m.object_id=t.object_id
+                             WHERE t.parent_id=OBJECT_ID(%s)""",("dbo."+table,))
+                for t in c.fetchall():
+                  print("TRIGGER:",t["name"],"disabled:",t["is_disabled"])
+                  print((t["definition"] or "")[:20000])
+              c.execute("""
+                SELECT i.so_inv,i.md_trangthai_id,i.so_pkl,i.nguoitao,i.hoatdong,i.ngay_motokhai
+                FROM dbo.c_packinginvoice i WHERE i.so_inv='KI 00230-25'
+              """)
+              print("ORIGINAL:",c.fetchall())
+              c.execute("""
+                SELECT TOP 2 d.c_dongpklinv_id,d.c_packinginvoice_id,d.c_donhang_id,
+                       d.c_dongnhapxuat_id,d.c_nhapxuat_id,d.soluong,d.gia,d.thanhtien,d.hoatdong
+                FROM dbo.c_dongpklinv d
+                JOIN dbo.c_packinginvoice i ON i.c_packinginvoice_id=d.c_packinginvoice_id
+                WHERE i.so_inv='KI 00230-25'
+              """)
+              print("SAMPLE_LINKS:",c.fetchall())
+              c.execute("SELECT COUNT(*) AS n FROM dbo.c_packinginvoice WHERE so_inv LIKE 'TEST-PB-KID-%'")
+              print("EXISTING_TEST_INVOICES:",c.fetchone()["n"])
+              print("READ_ONLY_INSPECTION_COMPLETED")
+          PY
