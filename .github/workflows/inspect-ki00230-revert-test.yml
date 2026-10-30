@@ -65,5 +65,40 @@ jobs:
                 print("=== TRIGGER_START:",t['trigger_name'],"DISABLED:",t['is_disabled'])
                 print((t['definition'] or '').strip()[:16000])
                 print("=== TRIGGER_END:",t['trigger_name'])
+              if len(rows)==1:
+                key=rows[0]['c_packinginvoice_id']
+                c.execute("""
+                    SELECT DISTINCT nx.c_nhapxuat_id, nx.cr_invoice
+                    FROM dbo.c_dongpklinv d
+                    JOIN dbo.c_dongnhapxuat dx ON dx.c_dongnhapxuat_id=d.c_dongnhapxuat_id
+                    JOIN dbo.c_nhapxuat nx ON nx.c_nhapxuat_id=dx.c_nhapxuat_id
+                    WHERE d.c_packinginvoice_id=%s
+                """,(key,))
+                links=c.fetchall()
+                print("DISTINCT_NX_COUNT:",len(links))
+                print("NX_FLAG_COUNTS:", {str(flag):sum(1 for x in links if x['cr_invoice']==flag) for flag in (0,1,None)})
+                c.execute("""
+                    WITH related_nx AS (
+                        SELECT DISTINCT nx.c_nhapxuat_id
+                        FROM dbo.c_dongpklinv d
+                        JOIN dbo.c_dongnhapxuat dx ON dx.c_dongnhapxuat_id=d.c_dongnhapxuat_id
+                        JOIN dbo.c_nhapxuat nx ON nx.c_nhapxuat_id=dx.c_nhapxuat_id
+                        WHERE d.c_packinginvoice_id=%s
+                    )
+                    SELECT DISTINCT other.c_packinginvoice_id, other.md_trangthai_id
+                    FROM related_nx x
+                    JOIN dbo.c_dongnhapxuat dx ON dx.c_nhapxuat_id=x.c_nhapxuat_id
+                    JOIN dbo.c_dongpklinv d ON d.c_dongnhapxuat_id=dx.c_dongnhapxuat_id
+                    JOIN dbo.c_packinginvoice other ON other.c_packinginvoice_id=d.c_packinginvoice_id
+                    WHERE other.c_packinginvoice_id<>%s
+                """,(key,key))
+                others=c.fetchall()
+                print("OTHER_INVOICES_SHARING_NX:",len(others))
+                print("OTHER_EFFECTIVE_INVOICES:",sum(1 for x in others if x['md_trangthai_id']=='HIEULUC'))
+              c.execute("""
+                  SELECT name,is_disabled FROM sys.triggers
+                  WHERE parent_id=OBJECT_ID('dbo.c_nhapxuat') ORDER BY name
+              """)
+              print("NX_UPDATE_TRIGGER_NAMES:",c.fetchall())
               print("READ_ONLY_INSPECTION_COMPLETE")
           PY
