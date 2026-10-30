@@ -84,7 +84,7 @@ window.ancoPhanBoCocPO = (function ($) {
         request=$.ajax({
             url:"Views/phanbococpo/Controller_PhanBoCocPO.ashx",
             type:"GET",dataType:"json",cache:false,
-            data:{action:"load",invoiceId:invoiceId},
+            data:{action:"load",invoiceId:invoiceId,diagnostic:1},
             success:function(data){
                 if(ticket!==serial)return;
                 if(!data || !data.ok){notice(data&&data.message ? data.message:"Dữ liệu trả về không hợp lệ.",true);return;}
@@ -103,7 +103,9 @@ window.ancoPhanBoCocPO = (function ($) {
                 if(!data){try{data=$.parseJSON(xhr.responseText);}catch(ignored){}}
                 $("#anco-pb-invoice-label").text("Không tải được Invoice");
                 $("#anco-pb-invoice-state").text("Lỗi");
-                notice(data&&data.message ? data.message:"Không thể tải dữ liệu. Kiểm tra API và CSDL.",true);
+                var detail=data&&data.diagnostic;
+                var suffix=detail ? " [bước: "+detail.stage+"; SQL #"+detail.sqlNumber+"]" : "";
+                notice((data&&data.message ? data.message:"Không thể tải dữ liệu. Kiểm tra API và CSDL.")+suffix,true);
             }
         });
     }
