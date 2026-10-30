@@ -58,8 +58,10 @@ jobs:
             echo 'Unexpected preview still present in old Invoice screen.' >&2
             exit 1
           fi
-          git show "$SOURCE_COMMIT:Views/phanbococpo/Controller_PhanBoCocPO.ashx" | grep -q 'StatusCode = 501'
-          echo 'UI-only source verified.'
+          git show "$SOURCE_COMMIT:Views/phanbococpo/Controller_PhanBoCocPO.ashx" | grep -q 'SELECT OBJECT_ID'
+          git show "$SOURCE_COMMIT:Views/phanbococpo/Controller_PhanBoCocPO.ashx" | grep -q 'HttpMethod'
+          git show "$SOURCE_COMMIT:docs/database/migrations/20261030_c_packinginvoice_phanbo.sql" | grep -q 'CREATE TABLE dbo.c_packinginvoice_phanbo'
+          echo 'Read-only data access and migration script verified.'
 
       - name: Merge only preview UI into Azure production master
         shell: bash
