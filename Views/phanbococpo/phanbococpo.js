@@ -107,7 +107,8 @@ window.ancoPhanBoCocPO = (function ($) {
         if (selectedPo) g.jqGrid("setSelection",selectedPo,false);
         drawDetails(); resize();
     }
-    function load() {
+    function load(preservePoSelection) {
+        var previousPo = preservePoSelection ? selectedPo : null;
         serial++; var ticket=serial;
         if(request && request.readyState!==4) request.abort();
         poRows=[];detailRows=[];editableRows=[];selectedPo=null;invoiceState="";dirty=false;version="";clear();
@@ -129,6 +130,7 @@ window.ancoPhanBoCocPO = (function ($) {
                 poRows=data.po||[]; detailRows=data.details||[];
                 editableRows=$.map(detailRows,function(r){return $.extend({},r);});
                 version=data.version||""; dirty=false;
+                selectedPo=previousPo;
                 invoiceState=data.invoice&&data.invoice.status ? data.invoice.status:"";
                 $("#anco-pb-invoice-state").text(invoiceState||"Không xác định");
                 $("#anco-pb-invoice-label").text(data.invoice&&data.invoice.number ? data.invoice.number:invoiceId);
@@ -161,6 +163,15 @@ window.ancoPhanBoCocPO = (function ($) {
             return;
         }
         invoiceId=next;load();
+    }
+    // Explicit revalidation of a selected Invoice after a status change.
+    // setInvoice intentionally does not reload an unchanged Invoice ID.
+    function refreshInvoice(id) {
+        if(!initialized)init();
+        if(!enabled||!initialized)return;
+        // A slow activation response must not overwrite another selected INV.
+        if(!invoiceId||String(id)!==invoiceId||saving)return;
+        load(true);
     }
     function syncInvoice() {
         if(!initialized)init();
@@ -269,5 +280,5 @@ window.ancoPhanBoCocPO = (function ($) {
         });
         syncInvoice();window.setTimeout(resize,0);
     }
-    return {init:init,setInvoice:setInvoice,syncInvoice:syncInvoice,resize:resize};
+    return {init:init,setInvoice:setInvoice,syncInvoice:syncInvoice,refreshInvoice:refreshInvoice,resize:resize};
 }(jQuery));

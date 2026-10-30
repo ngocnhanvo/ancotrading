@@ -33,7 +33,7 @@
             return;
         }
         if (!ancoPbModuleRequestNV) {
-            ancoPbModuleRequestNV = $.getScript("Views/phanbococpo/phanbococpo.js?v=20261030i")
+            ancoPbModuleRequestNV = $.getScript("Views/phanbococpo/phanbococpo.js?v=20261030j")
                 .fail(function () {
                     $("#anco-pb-warning").text("Không tải được phanbococpo.js. Kiểm tra Network và tải lại trang.");
                     ancoPbModuleRequestNV = null;

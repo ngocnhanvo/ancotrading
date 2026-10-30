@@ -245,6 +245,21 @@
                                     //$('#dialog-caution').css({ 'color': 'green' });
                                     $('#dialog-active-packinglist').find('#dialog-caution').html(result);
                                     $('#grid_ds_ctxkNV').jqGrid().trigger('reloadGrid');
+
+                                    // Reloading the master does not reselect the same Invoice.
+                                    // Refresh PO balances only after an acknowledged activation.
+                                    var responseText = $.trim(result);
+                                    var activated = responseText.indexOf("Hiệu lực Packing List - Invoice ") === 0 &&
+                                        responseText.indexOf(" thành công.") !== -1;
+                                    var alreadyEffective = responseText.indexOf("Hiện trạng thái Packing List - Invoice ") === 0 &&
+                                        responseText.indexOf(" đã là hiệu lực.") !== -1;
+                                    if (activated || alreadyEffective) {
+                                        if (window.ancoPhanBoCocPO && window.ancoPhanBoCocPO.refreshInvoice) {
+                                            window.ancoPhanBoCocPO.refreshInvoice(id);
+                                        } else if (window.ancoEnsurePhanBoCocPONV) {
+                                            window.ancoEnsurePhanBoCocPONV();
+                                        }
+                                    }
                                 });
                             }
                         },
