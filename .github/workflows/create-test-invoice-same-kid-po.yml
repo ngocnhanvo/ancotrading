@@ -1,0 +1,177 @@
+name: One-time TEST Invoice with KID INTERIOR PO balance verification
+on:
+  push:
+    branches: [master]
+    paths: [.github/workflows/create-test-invoice-same-kid-po.yml]
+permissions: {contents: read}
+jobs:
+  create-test-invoice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+      - name: Create isolated draft Invoice in SQL TEST and validate effective PO balance
+        shell: bash
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.ANCOTRADING_SQL_DATABASE }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        run: |
+          set +x
+          python - <<'PY'
+          import os, uuid, sys
+          from decimal import Decimal
+          import pymssql
+
+          original = "KI 00230-25"
+          new_number = "TEST-PB-KID-20261030"
+          po_number = "001/KID INTERIOR_SR-25"
+          expected_deposit, expected_allocated = Decimal("445.29"), Decimal("45.00")
+          expected_remaining = expected_deposit - expected_allocated
+          host = os.environ["SQL_SERVER"].strip()
+          port = None
+          if "," in host and host.rsplit(",", 1)[-1].isdigit():
+              host, port = host.rsplit(",", 1)
+          kwargs = dict(server=host, user=os.environ["SQL_USER"],
+                        password=os.environ["SQL_PASSWORD"],
+                        database=os.environ["SQL_DATABASE"],
+                        login_timeout=12, timeout=25, autocommit=False, as_dict=True)
+          if port: kwargs["port"] = port
+          conn = pymssql.connect(**kwargs)
+
+          try:
+              with conn.cursor() as cur:
+                  cur.execute("SET XACT_ABORT ON")
+                  cur.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
+                  cur.execute("""
+                      SELECT c_packinginvoice_id, md_trangthai_id, md_doitackinhdoanh_id
+                      FROM dbo.c_packinginvoice WITH(UPDLOCK,HOLDLOCK)
+                      WHERE so_inv=%s
+                  """, (original,))
+                  source = cur.fetchall()
+                  if len(source) != 1 or source[0]["md_trangthai_id"] != "HIEULUC":
+                      raise RuntimeError("ABORT: original invoice must exist and be effective")
+                  source_id = source[0]["c_packinginvoice_id"]
+                  cur.execute("""
+                      SELECT DISTINCT dh.c_donhang_id, dh.sochungtu,
+                                      CONVERT(decimal(18,2), ISNULL(dh.datcoc,0)) AS deposit
+                      FROM dbo.c_dongpklinv d
+                      JOIN dbo.c_donhang dh ON dh.c_donhang_id=d.c_donhang_id
+                      WHERE d.c_packinginvoice_id=%s
+                  """,(source_id,))
+                  pos = cur.fetchall()
+                  if len(pos) != 1 or pos[0]["sochungtu"] != po_number or pos[0]["deposit"] != expected_deposit:
+                      raise RuntimeError("ABORT: original PO/deposit no longer matches the expected test fixture")
+                  po_id = pos[0]["c_donhang_id"]
+                  cur.execute("""
+                      SELECT CONVERT(decimal(18,2),COALESCE(SUM(pb.sotienphanbo),0)) AS amt
+                      FROM dbo.c_packinginvoice_phanbo pb
+                      JOIN dbo.c_packinginvoice pi ON pi.c_packinginvoice_id=pb.c_packinginvoice_id
+                      WHERE pb.c_donhang_id=%s AND pi.md_trangthai_id=N'HIEULUC'
+                  """,(po_id,))
+                  effective = cur.fetchone()["amt"]
+                  if effective != expected_allocated:
+                      raise RuntimeError("ABORT: effective allocations changed since inspection")
+                  cur.execute("""
+                      SELECT c_packinginvoice_id FROM dbo.c_packinginvoice
+                      WHERE so_inv=%s
+                  """,(new_number,))
+                  existing = cur.fetchall()
+                  if existing:
+                      raise RuntimeError("ABORT: test Invoice number already exists, refusing duplicate")
+
+                  new_id, new_line_id = uuid.uuid4().hex, uuid.uuid4().hex
+                  # Minimal synthetic test Invoice, zero goods/amount, no export references.
+                  # Do NOT clone original shipment, sales lines, financial amounts or export flags.
+                  cur.execute("""
+                      INSERT INTO dbo.c_packinginvoice (
+                          c_packinginvoice_id,so_inv,so_pkl,ngaylap,ngaytao,nguoitao,
+                          md_doitackinhdoanh_id,md_trangthai_id,hoatdong,
+                          totalgross,totalnet,totaldis,tiendatcoc,tiendatcocPO,
+                          discount,giatri_cong,giatri_tru
+                      )
+                      VALUES (%s,%s,%s,GETDATE(),GETDATE(),%s,
+                              %s,'SOANTHAO',1,
+                              0,0,0,0,0,0,0,0)
+                  """,(new_id,new_number,new_number,"superadmin",source[0]["md_doitackinhdoanh_id"]))
+                  if cur.rowcount != 1:
+                      raise RuntimeError("ABORT: test Invoice insert affected unexpected rows")
+
+                  cur.execute("""
+                      INSERT INTO dbo.c_dongpklinv(
+                          c_dongpklinv_id,c_packinginvoice_id,c_donhang_id,
+                          md_doitackinhdoanh_id,ngaytao,nguoitao,hoatdong,
+                          line,soluong,gia,thanhtien
+                      ) VALUES (%s,%s,%s,%s,GETDATE(),%s,1,1,0,0,0)
+                  """,(new_line_id,new_id,po_id,source[0]["md_doitackinhdoanh_id"],"superadmin"))
+                  if cur.rowcount != 1:
+                      raise RuntimeError("ABORT: PO link insert affected unexpected rows")
+
+                  # Mirror SELECT used by Controller_PhanBoCocPO; only HIEULUC
+                  # Invoice allocations reduce the cross-Invoice PO balance.
+                  cur.execute("""
+                      WITH linked_po AS (
+                          SELECT DISTINCT d.c_donhang_id
+                          FROM dbo.c_dongpklinv d WHERE d.c_packinginvoice_id=%s
+                          AND d.c_donhang_id IS NOT NULL
+                      )
+                      SELECT dh.sochungtu,
+                             CONVERT(decimal(18,2),ISNULL(dh.datcoc,0)) AS deposited,
+                             CONVERT(decimal(18,2),ISNULL(activePb.tong,0)) AS allocated,
+                             CONVERT(decimal(18,2),ISNULL(dh.datcoc,0)-ISNULL(activePb.tong,0)) AS remaining
+                      FROM linked_po lp JOIN dbo.c_donhang dh ON dh.c_donhang_id=lp.c_donhang_id
+                      OUTER APPLY (
+                          SELECT SUM(pb.sotienphanbo) AS tong
+                          FROM dbo.c_packinginvoice_phanbo pb
+                          JOIN dbo.c_packinginvoice pi
+                            ON pi.c_packinginvoice_id=pb.c_packinginvoice_id
+                          WHERE pb.c_donhang_id=dh.c_donhang_id AND pi.md_trangthai_id=N'HIEULUC'
+                      ) activePb
+                  """,(new_id,))
+                  balances = cur.fetchall()
+                  if len(balances)!=1:
+                      raise RuntimeError("ABORT: new test Invoice must resolve exactly one PO")
+                  record=balances[0]
+                  if not (record["sochungtu"]==po_number and
+                          record["deposited"]==expected_deposit and
+                          record["allocated"]==expected_allocated and
+                          record["remaining"]==expected_remaining):
+                      raise RuntimeError("ABORT: PO balance does not match current effective allocations")
+
+                  cur.execute("""
+                      SELECT COUNT(*) AS n FROM dbo.c_dongpklinv
+                      WHERE c_packinginvoice_id=%s
+                      AND (c_dongnhapxuat_id IS NOT NULL OR c_nhapxuat_id IS NOT NULL)
+                  """,(new_id,))
+                  if cur.fetchone()["n"] != 0:
+                      raise RuntimeError("ABORT: synthetic test Invoice must not reference physical exports")
+                  cur.execute("SELECT md_trangthai_id FROM dbo.c_packinginvoice WHERE c_packinginvoice_id=%s",(source_id,))
+                  if cur.fetchone()["md_trangthai_id"]!="HIEULUC":
+                      raise RuntimeError("ABORT: original Invoice status was modified")
+                  cur.execute("""
+                      SELECT COUNT(*) AS n FROM dbo.c_packinginvoice_phanbo
+                      WHERE c_packinginvoice_id=%s
+                  """,(new_id,))
+                  if cur.fetchone()["n"]!=0:
+                      raise RuntimeError("ABORT: new Invoice should not have any allocations")
+                  conn.commit()
+                  print("TRANSACTION: COMMITTED")
+                  print("NEW_TEST_INVOICE:", new_number)
+                  print("INVOICE_STATUS: SOANTHAO")
+                  print("PO:", po_number)
+                  print("PO_ORIGINAL_DEPOSIT:", record["deposited"])
+                  print("PO_ALLOCATED_EFFECTIVE:", record["allocated"])
+                  print("PO_REMAINING_FOR_SECOND_INVOICE:", record["remaining"])
+                  print("ORIGINAL_INVOICE_UNCHANGED: YES")
+                  print("TEST_LINE_HAS_NO_PHYSICAL_EXPORT: YES")
+          except Exception as exc:
+              conn.rollback()
+              print("TRANSACTION: ROLLED_BACK")
+              print("ERROR:",type(exc).__name__,str(exc)[:400])
+              sys.exit(1)
+          finally:
+              conn.close()
+          PY
