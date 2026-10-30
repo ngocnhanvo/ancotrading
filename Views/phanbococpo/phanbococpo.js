@@ -143,6 +143,10 @@ window.ancoPhanBoCocPO = (function ($) {
         if(!enabled||!initialized)return;
         var next=id==null?null:String(id);
         if(next===invoiceId)return;
+        if(saving){notice("Đang lưu phân bổ, vui lòng chọn Invoice sau khi hoàn tất.",true);
+            try { $("#grid_ds_ctxkNV").jqGrid("setSelection",invoiceId,false); } catch(ignored) {}
+            return;
+        }
         if(dirty && !window.confirm("Phân bổ chưa lưu sẽ bị hủy khi chuyển Invoice. Tiếp tục?")) {
             try { $("#grid_ds_ctxkNV").jqGrid("setSelection",invoiceId,false); } catch(ignored) {}
             return;
@@ -205,13 +209,13 @@ window.ancoPhanBoCocPO = (function ($) {
         $("#anco-pb-detail-grid").off("change.ancoPb").on("change.ancoPb","input.anco-pb-cell-input",function(){
             if(!saveAllowed())return;
             var id=$(this).attr("data-row"),str=$.trim($(this).val()).replace(/,/g,"");
-            if(!/^\d+(\.\d{1,2})?$/.test(str)||Number(str)<=0){notice("Số tiền phân bổ phải lớn hơn 0, tối đa 2 số lẻ.",true);return;}
+            if(!/^\d+(\.\d{1,2})?$/.test(str)||Number(str)<=0){notice("Số tiền phân bổ phải lớn hơn 0, tối đa 2 số lẻ.",true);drawDetails();return;}
             var row=null;
             $.each(editableRows,function(i,r){if(r.id===id){row=r;return false;}});
             if(!row)return;
             var po=currentPo(),amount=num(str);
             if(totalForPo(po.id)-num(row.amount)+amount>num(po.remaining)){
-                notice("Tiền phân bổ vượt cọc còn lại của PO.",true);return;
+                notice("Tiền phân bổ vượt cọc còn lại của PO.",true);drawDetails();return;
             }
             row.amount=amount;dirty=true;notice("",false);drawDetails();sumAll();
         });
