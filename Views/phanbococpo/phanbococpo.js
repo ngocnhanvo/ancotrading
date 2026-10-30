@@ -52,7 +52,7 @@ window.ancoPhanBoCocPO = (function ($) {
                 {name:"code",width:177,sortable:false},
                 {name:"deposited",width:98,align:"right",sortable:false},
                 {name:"allocated",width:117,align:"right",sortable:false},
-                {name:"draft",width:137,align:"right",sortable:false},
+                {name:"draft",width:137,align:"right",sortable:false,hidden:true},
                 {name:"remaining",width:98,align:"right",sortable:false}
             ],
             onSelectRow:function(id) { selectedPo=id; drawDetails(); }
@@ -65,7 +65,7 @@ window.ancoPhanBoCocPO = (function ($) {
                 {name:"before",width:145,sortable:false,align:"right"},
                 {name:"amount",width:145,sortable:false,align:"right"},
                 {name:"after",width:145,sortable:false,align:"right"},
-                {name:"createdAt",width:125,sortable:false},
+                {name:"createdAt",width:125,sortable:false,align:"center"},
                 {name:"createdBy",width:100,sortable:false},
                 {name:"actions",width:74,sortable:false,align:"center"}
             ]
