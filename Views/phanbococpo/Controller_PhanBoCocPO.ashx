@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
@@ -35,6 +36,10 @@ public class Controller_PhanBoCocPO : IHttpHandler
             return;
         }
 
+        // The error stage and SQL error number identify failures without exposing
+        // SQL internals to ordinary users. Detailed SQL diagnostics require admin.
+        string stage = "open_context";
+        bool isAdmin = false;
         try
         {
             using (var db = new LinqDBDataContext())
@@ -46,6 +51,7 @@ public class Controller_PhanBoCocPO : IHttpHandler
                     return;
                 }
 
+                stage = "lookup_invoice";
                 var invoice = db.c_packinginvoices
                     .Where(p => p.c_packinginvoice_id == invoiceId)
                     .Select(p => new { p.c_packinginvoice_id, p.so_inv, p.md_trangthai_id, p.nguoitao })
@@ -58,10 +64,12 @@ public class Controller_PhanBoCocPO : IHttpHandler
                 }
 
                 // Match the Invoice master grid's visibility (creator + own group, admin bypass).
+                stage = "verify_permissions";
                 bool admin = db.nhanviens
                     .Where(p => p.manv == user)
                     .Select(p => p.isadmin)
                     .FirstOrDefault() == true;
+                isAdmin = admin;
                 if (!admin && !String.Equals(invoice.nguoitao, user, StringComparison.OrdinalIgnoreCase))
                 {
                     var group = LinqUtils.GetUserListInGroup(user);
@@ -72,9 +80,11 @@ public class Controller_PhanBoCocPO : IHttpHandler
                     }
                 }
 
+                stage = "connect_sql";
                 using (var connection = new SqlConnection(db.Connection.ConnectionString))
                 {
                     connection.Open();
+                    stage = "verify_table";
                     using (var check = new SqlCommand(
                         "SELECT OBJECT_ID(N'dbo.c_packinginvoice_phanbo', N'U')", connection))
                     {
@@ -121,6 +131,7 @@ public class Controller_PhanBoCocPO : IHttpHandler
                         ) currentPb
                         ORDER BY dh.sochungtu, dh.c_donhang_id";
 
+                    stage = "read_po_balances";
                     using (var cmd = new SqlCommand(poSql, connection))
                     {
                         cmd.Parameters.Add("@invoiceId", SqlDbType.NVarChar, 32).Value = invoiceId;
@@ -153,6 +164,7 @@ public class Controller_PhanBoCocPO : IHttpHandler
                           )
                         ORDER BY pb.ngaytao, pb.c_packinginvoice_phanbo_id";
 
+                    stage = "read_allocation_details";
                     using (var cmd = new SqlCommand(detailSql, connection))
                     {
                         cmd.Parameters.Add("@invoiceId", SqlDbType.NVarChar, 32).Value = invoiceId;
@@ -172,6 +184,7 @@ public class Controller_PhanBoCocPO : IHttpHandler
                         }
                     }
 
+                    stage = "serialize_response";
                     context.Response.Write(JsonConvert.SerializeObject(new
                     {
                         ok = true,
@@ -182,13 +195,31 @@ public class Controller_PhanBoCocPO : IHttpHandler
                 }
             }
         }
-        catch (SqlException)
+        catch (SqlException ex)
         {
-            // Avoid sending SQL schema, connection details or secrets to the browser.
-            Error(context, 500, "database_error", "Không đọc được dữ liệu phân bổ cọc từ SQL Server. Vui lòng kiểm tra CSDL và bảng phân bổ.");
+            Trace.TraceError("Controller_PhanBoCocPO failed. Stage={0}, SqlNumber={1}, SqlState={2}. {3}",
+                stage, ex.Number, ex.State, ex.ToString());
+            // Never reveal SQL internals to non-admins. For the authenticated
+            // administrator, diagnostic=1 exposes the server's exact SQL error.
+            if (isAdmin && String.Equals(context.Request.QueryString["diagnostic"], "1", StringComparison.Ordinal))
+            {
+                context.Response.StatusCode = 500;
+                context.Response.Write(JsonConvert.SerializeObject(new
+                {
+                    ok = false,
+                    code = "database_error",
+                    message = "SQL Server trả về lỗi khi tải phân bổ cọc.",
+                    diagnostic = new { stage = stage, sqlNumber = ex.Number, sqlState = ex.State, sqlMessage = ex.Message }
+                }));
+            }
+            else
+            {
+                Error(context, 500, "database_error", "Không đọc được dữ liệu phân bổ cọc từ SQL Server. Vui lòng kiểm tra CSDL và bảng phân bổ.");
+            }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Trace.TraceError("Controller_PhanBoCocPO unexpected error. Stage={0}. {1}", stage, ex.ToString());
             Error(context, 500, "unexpected_error", "Không tải được phân bổ cọc. Vui lòng kiểm tra nhật ký máy chủ.");
         }
     }
