@@ -1,0 +1,75 @@
+name: AncoTrading deposit test candidates (read only)
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/check-po-allocation-test-candidates.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+      - name: Count candidate records without revealing business identifiers
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.ANCOTRADING_SQL_DATABASE }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        shell: bash
+        run: |
+          set +x
+          python - <<'PY'
+          import os, pymssql, sys
+          if not all(os.environ.get(k) for k in ("SQL_SERVER", "SQL_DATABASE", "SQL_USER", "SQL_PASSWORD")):
+              print("CHECK FAILED: missing SQL secret"); sys.exit(1)
+          host = os.environ["SQL_SERVER"].strip()
+          port = None
+          if "," in host and host.rsplit(",", 1)[1].isdigit():
+              host, port = host.rsplit(",", 1)
+          opts = dict(server=host, user=os.environ["SQL_USER"],
+                      password=os.environ["SQL_PASSWORD"], database=os.environ["SQL_DATABASE"],
+                      login_timeout=12, timeout=20, as_dict=True)
+          if port is not None: opts["port"] = str(port)
+          with pymssql.connect(**opts) as con:
+              with con.cursor() as cur:
+                  queries = [
+                      ("POS_WITH_POSITIVE_DEPOSIT", """
+                       SELECT COUNT(*) AS n FROM dbo.c_donhang
+                       WHERE ISNULL(datcoc, 0) > 0"""),
+                      ("DRAFT_INVOICES_WITH_POSITIVE_DEPOSIT_PO", """
+                       SELECT COUNT(*) AS n FROM dbo.c_packinginvoice i
+                       WHERE i.md_trangthai_id = 'SOANTHAO'
+                         AND EXISTS (
+                           SELECT 1 FROM dbo.c_dongpklinv d
+                           JOIN dbo.c_donhang po ON po.c_donhang_id = d.c_donhang_id
+                           WHERE d.c_packinginvoice_id = i.c_packinginvoice_id
+                             AND ISNULL(po.datcoc, 0) > 0
+                         )"""),
+                      ("ALL_INVOICES_WITH_POSITIVE_DEPOSIT_PO", """
+                       SELECT COUNT(*) AS n FROM dbo.c_packinginvoice i
+                       WHERE EXISTS (
+                           SELECT 1 FROM dbo.c_dongpklinv d
+                           JOIN dbo.c_donhang po ON po.c_donhang_id = d.c_donhang_id
+                           WHERE d.c_packinginvoice_id = i.c_packinginvoice_id
+                             AND ISNULL(po.datcoc, 0) > 0
+                       )"""),
+                      ("EXISTING_PO_ALLOCATIONS", """
+                       SELECT COUNT(*) AS n FROM dbo.c_packinginvoice_phanbo"""),
+                  ]
+                  for name, sql in queries:
+                      try:
+                          cur.execute(sql)
+                          print(name + ": " + str(cur.fetchone()["n"]))
+                      except pymssql.DatabaseError as e:
+                          print(name + ": QUERY_FAILED " + str(e.args[0] if e.args else "unknown"))
+                  print("READ_ONLY_CANDIDATE_CHECK_COMPLETE")
+          PY
