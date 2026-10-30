@@ -1,4 +1,4 @@
-name: One-time AncoTrading PO deposit allocation UI preview sync to Azure
+name: Open PO deposit allocation tab in Azure production
 
 on:
   push:
@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_COMMIT: e06ed8ac20b1880db83923d9915b95613df65004
-      MERGE_BASE: 9a42de6ac4e60325fca1f53fbf4f6ab17ba0b165
+      SOURCE_COMMIT: 113387f91fd8ebd71e2754706a754c94ec783e81
+      MERGE_BASE: e06ed8ac20b1880db83923d9915b95613df65004
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
     steps:
@@ -30,41 +30,29 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Validate preview-only source and required files
+      - name: Validate public tab source and required files
         shell: bash
         run: |
           set -euo pipefail
           paths=(
-            inc-packing-list-invoice.aspx
-            Views/chungtuxuatkho/inc-ctxk.aspx
-            Views/chungtuxuatkho/master.ascx
             Views/chungtuxuatkhoNV/inc-ctxkNV.aspx
-            Views/chungtuxuatkhoNV/master.ascx
-            Views/phanbococpo/phanbococpo.ascx
-            Views/phanbococpo/phanbococpo.ascx.cs
             Views/phanbococpo/phanbococpo.js
-            Views/phanbococpo/phanbococpo.css
-            Views/phanbococpo/Controller_PhanBoCocPO.ashx
-            Views/phanbococpo/README.md
-            docs/database/migrations/20261030_c_packinginvoice_phanbo.sql
           )
           git cat-file -e "$SOURCE_COMMIT^{commit}"
           git cat-file -e "$MERGE_BASE^{commit}"
           for path in "${paths[@]}"; do
             git cat-file -e "$SOURCE_COMMIT:$path"
           done
-          git show "$SOURCE_COMMIT:Views/chungtuxuatkhoNV/inc-ctxkNV.aspx" | grep -q 'pb:phanbococpo runat="server"'
-          if git show "$SOURCE_COMMIT:inc-packing-list-invoice.aspx" | grep -q 'pb:phanbococpo' || git show "$SOURCE_COMMIT:Views/chungtuxuatkho/inc-ctxk.aspx" | grep -q 'pb:phanbococpo'; then
-            echo 'Unexpected preview still present in old Invoice screen.' >&2
+          git show "$SOURCE_COMMIT:Views/chungtuxuatkhoNV/inc-ctxkNV.aspx" | grep -q '<li class="anco-pb-preview-tab"><a'
+          if git show "$SOURCE_COMMIT:Views/chungtuxuatkhoNV/inc-ctxkNV.aspx" | grep -q 'phanbococ_preview=1' ||
+             git show "$SOURCE_COMMIT:Views/phanbococpo/phanbococpo.js" | grep -q 'phanbococ_preview=1'; then
+            echo 'URL feature gate is still present; refusing sync.' >&2
             exit 1
           fi
-          git show "$SOURCE_COMMIT:Views/phanbococpo/Controller_PhanBoCocPO.ashx" | grep -q 'SELECT OBJECT_ID'
-          git show "$SOURCE_COMMIT:Views/phanbococpo/Controller_PhanBoCocPO.ashx" | grep -q 'HttpMethod'
-          git show "$SOURCE_COMMIT:Views/phanbococpo/Controller_PhanBoCocPO.ashx" | grep -q 'mdbc.GetConnection'
-          git show "$SOURCE_COMMIT:docs/database/migrations/20261030_c_packinginvoice_phanbo.sql" | grep -q 'CREATE TABLE dbo.c_packinginvoice_phanbo'
-          echo 'Read-only data access and migration script verified.'
+          echo 'Default-visible PO allocation tab and ungated module verified.'
 
-      - name: Merge only preview UI into Azure production master
+
+      - name: Three-way merge only public tab changes into Azure master
         shell: bash
         run: |
           set -euo pipefail
@@ -76,21 +64,11 @@ jobs:
           AZURE_DIR="$RUNNER_TEMP/azure-production"
           git -c "http.extraheader=$AUTH_HEADER" clone --single-branch --branch master --depth 1 "$AZURE_URL" "$AZURE_DIR"
 
-          # Apply only this UI change to known paths, preserving independent Azure edits.
+          # Apply only the two tab/module changes, preserving independent Azure edits.
           # Three-way merge conflicts abort before staging or pushing anything.
           paths=(
-            inc-packing-list-invoice.aspx
-            Views/chungtuxuatkho/inc-ctxk.aspx
-            Views/chungtuxuatkho/master.ascx
             Views/chungtuxuatkhoNV/inc-ctxkNV.aspx
-            Views/chungtuxuatkhoNV/master.ascx
-            Views/phanbococpo/phanbococpo.ascx
-            Views/phanbococpo/phanbococpo.ascx.cs
             Views/phanbococpo/phanbococpo.js
-            Views/phanbococpo/phanbococpo.css
-            Views/phanbococpo/Controller_PhanBoCocPO.ashx
-            Views/phanbococpo/README.md
-            docs/database/migrations/20261030_c_packinginvoice_phanbo.sql
           )
           for path in "${paths[@]}"; do
             sourcefile="$RUNNER_TEMP/new-$(echo "$path" | tr '/' '_')"
@@ -121,11 +99,11 @@ jobs:
           git -C "$AZURE_DIR" add -- "${paths[@]}"
           git -C "$AZURE_DIR" -c core.whitespace=cr-at-eol diff --cached --check
           if git -C "$AZURE_DIR" diff --cached --quiet; then
-            echo 'Preview UI already synchronized, no production change required.'
+            echo 'PO allocation tab already synchronized, no production change required.'
             exit 0
           fi
           git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
           git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
-          git -C "$AZURE_DIR" commit -m 'fix: refresh PO allocation after Invoice activation (GitHub e06ed8ac)'
+          git -C "$AZURE_DIR" commit -m 'fix: open PO allocation tab without preview URL (GitHub 113387f)'
           git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
-          echo 'Gated preview UI synchronized to Azure production master.'
+          echo 'PO allocation tab synchronized to Azure production master.'
