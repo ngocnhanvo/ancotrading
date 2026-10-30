@@ -13,10 +13,18 @@ window.ancoPhanBoCocPO = (function ($) {
         $.each(editableRows, function(i,r) { if(r.poId===id) sum += num(r.amount); });
         return num(sum);
     }
-    function sumAll() {
-        var total = 0;
-        $.each(editableRows, function(i,r) { total += num(r.amount); });
-        $("#anco-pb-sum").text(money(total));
+    // Show proposed allocation for the currently selected PO, not the
+    // total for every PO linked to this Invoice. Draft figures do NOT reduce
+    // "Cọc còn" until the Invoice is effective.
+    function refreshProposedTotals() {
+        var po = currentPo(), grid = $("#anco-pb-po-grid");
+        $("#anco-pb-po-sum").text(po ? money(totalForPo(po.id)) : "0.00");
+        if (!grid.length || !grid[0].grid) return;
+        $.each(poRows, function(i, row) {
+            if (grid.jqGrid("getInd", row.id, true)) {
+                grid.jqGrid("setCell", row.id, "draft", money(totalForPo(row.id)));
+            }
+        });
     }
     function refreshButtons() {
         var po = currentPo(), eligible = saveAllowed() && !saving;
@@ -32,19 +40,20 @@ window.ancoPhanBoCocPO = (function ($) {
     function clear() {
         $("#anco-pb-po-grid,#anco-pb-detail-grid").each(function () { $(this).jqGrid("clearGridData"); });
         $("#anco-pb-current-po").text("Chi tiết phân bổ");
-        $("#anco-pb-sum").text("0.00");
+        $("#anco-pb-po-sum").text("0.00");
         refreshButtons();
     }
     function createGrids() {
         if (!$.fn.jqGrid) return false;
         $("#anco-pb-po-grid").jqGrid({
             datatype:"local", height:100, rowNum:1000, gridview:true,
-            colNames:["PO","Cọc gốc","Đã PB (hiệu lực)","Cọc còn"],
+            colNames:["PO","Cọc gốc","Đã PB (hiệu lực)","Đã PB (SOANTHAO)","Cọc còn"],
             colModel:[
-                {name:"code",width:170,sortable:false},
-                {name:"deposited",width:120,align:"right",sortable:false},
-                {name:"allocated",width:125,align:"right",sortable:false},
-                {name:"remaining",width:120,align:"right",sortable:false}
+                {name:"code",width:177,sortable:false},
+                {name:"deposited",width:98,align:"right",sortable:false},
+                {name:"allocated",width:117,align:"right",sortable:false},
+                {name:"draft",width:137,align:"right",sortable:false},
+                {name:"remaining",width:98,align:"right",sortable:false}
             ],
             onSelectRow:function(id) { selectedPo=id; drawDetails(); }
         });
@@ -67,7 +76,7 @@ window.ancoPhanBoCocPO = (function ($) {
         var g=$("#anco-pb-detail-grid"), po=currentPo();
         g.jqGrid("clearGridData");
         $("#anco-pb-current-po").text(po ? "Chi tiết phân bổ — "+po.code : "Chi tiết phân bổ");
-        if (!po) { refreshButtons(); return; }
+        if (!po) { refreshProposedTotals(); refreshButtons(); return; }
         var balance=num(po.remaining) + (invoiceState==="HIEULUC" ? num(po.currentAllocated) : 0), idx=0;
         $.each(editableRows,function(i,row) {
             if (row.poId!==po.id) return;
@@ -83,6 +92,7 @@ window.ancoPhanBoCocPO = (function ($) {
                 createdAt:safe(row.createdAt||""),createdBy:safe(row.createdBy||""),actions:remove
             });
         });
+        refreshProposedTotals();
         refreshButtons();
     }
     function draw() {
@@ -90,12 +100,12 @@ window.ancoPhanBoCocPO = (function ($) {
         $.each(poRows,function(i,po){
             g.jqGrid("addRowData",po.id,{
                 code:safe(po.code),deposited:money(po.deposited),
-                allocated:money(po.allocated),remaining:money(po.remaining)
+                allocated:money(po.allocated),draft:money(totalForPo(po.id)),remaining:money(po.remaining)
             });
         });
         if (!currentPo()) selectedPo=poRows.length ? poRows[0].id : null;
         if (selectedPo) g.jqGrid("setSelection",selectedPo,false);
-        drawDetails(); sumAll(); resize();
+        drawDetails(); resize();
     }
     function load() {
         serial++; var ticket=serial;
@@ -122,7 +132,6 @@ window.ancoPhanBoCocPO = (function ($) {
                 invoiceState=data.invoice&&data.invoice.status ? data.invoice.status:"";
                 $("#anco-pb-invoice-state").text(invoiceState||"Không xác định");
                 $("#anco-pb-invoice-label").text(data.invoice&&data.invoice.number ? data.invoice.number:invoiceId);
-                sumAll();
                 notice(poRows.length ? "":"Invoice này không có dòng hàng liên kết PO.",false);
                 draw();
             },
@@ -203,7 +212,7 @@ window.ancoPhanBoCocPO = (function ($) {
             if(!saveAllowed()||!po||editableRows.length>=100)return;
             if(totalForPo(po.id)>=num(po.remaining)){notice("PO đã hết tiền cọc.",true);return;}
             editableRows.push({id:"tmp-"+(++tempId),poId:po.id,amount:0,createdAt:"",createdBy:""});
-            dirty=true;drawDetails();sumAll();
+            dirty=true;drawDetails();refreshProposedTotals();
             $("#anco-pb-detail-grid input.anco-pb-cell-input").last().focus();
         });
         $("#anco-pb-detail-grid").off("change.ancoPb").on("change.ancoPb","input.anco-pb-cell-input",function(){
@@ -217,13 +226,13 @@ window.ancoPhanBoCocPO = (function ($) {
             if(totalForPo(po.id)-num(row.amount)+amount>num(po.remaining)){
                 notice("Tiền phân bổ vượt cọc còn lại của PO.",true);drawDetails();return;
             }
-            row.amount=amount;dirty=true;notice("",false);drawDetails();sumAll();
+            row.amount=amount;dirty=true;notice("",false);drawDetails();refreshProposedTotals();
         });
         $("#anco-pb-detail-grid").off("click.ancoPb").on("click.ancoPb","button.anco-pb-delete",function(){
             if(!saveAllowed())return;
             var id=$(this).attr("data-row");
             editableRows=$.grep(editableRows,function(r){return r.id!==id;});
-            dirty=true;notice("",false);drawDetails();sumAll();
+            dirty=true;notice("",false);drawDetails();refreshProposedTotals();
         });
         $("#anco-pb-save").off("click.ancoPb").on("click.ancoPb",function(){
             if(!saveAllowed()||!dirty||saving)return;

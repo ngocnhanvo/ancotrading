@@ -1,6 +1,6 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeFile="phanbococpo.ascx.cs" Inherits="Views_phanbococpo_phanbococpo" %>
 <%-- Preview-only UI until the server allocation workflow and checks are complete. --%>
-<link rel="stylesheet" type="text/css" href="Views/phanbococpo/phanbococpo.css?v=20261030f" />
+<link rel="stylesheet" type="text/css" href="Views/phanbococpo/phanbococpo.css?v=20261030h" />
 <%-- JS is explicitly loaded by inc-ctxkNV.aspx after the AJAX tab has been inserted. --%>
 <div id="nav-tabs-pklivn-pb" class="anco-pb" role="region" aria-label="Phân bổ tiền cọc theo PO">
     <input type="hidden" id="anco-pb-csrf" value="<%= HttpUtility.HtmlAttributeEncode(AllocationToken) %>" />
@@ -16,6 +16,7 @@
             <div class="anco-pb-panel-title">
                 <span id="anco-pb-current-po">Chi tiết phân bổ</span>
                 <span class="anco-pb-header-actions">
+                    <span class="anco-pb-po-summary">Dự kiến PB PO: <strong id="anco-pb-po-sum">0.00</strong></span>
                     <span class="anco-pb-invoice-state">Trạng thái: <strong id="anco-pb-invoice-state">—</strong></span>
                     <button type="button" id="anco-pb-add" disabled="disabled">+ Thêm dòng</button>
                 </span>
@@ -25,7 +26,6 @@
         </section>
     </div>
     <div class="anco-pb-bottom">
-        <span>Tổng phân bổ vào Invoice (dự kiến): <strong id="anco-pb-sum">0.00</strong></span>
         <button type="button" id="anco-pb-save" disabled="disabled" title="Chỉ lưu bản nháp, chưa ghi nhận hiệu lực">Lưu (PB)</button>
     </div>
 </div>
