@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_COMMIT: 994ccbe3c5f753de92fde64633df70321c9e272a
-      MERGE_BASE: b06170a2255d9ece06e5929d3d3b4bad6d7015b9
+      SOURCE_COMMIT: 9e7861bb7b6c8bddaced88ed6f48c0ee7478e239
+      MERGE_BASE: 7fde7c830c7d6ae80c44ff5da9bdeac3edf1b4e5
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
     steps:
@@ -46,6 +46,7 @@ jobs:
             Views/phanbococpo/phanbococpo.css
             Views/phanbococpo/Controller_PhanBoCocPO.ashx
             Views/phanbococpo/README.md
+            docs/database/migrations/20261030_c_packinginvoice_phanbo.sql
           )
           git cat-file -e "$SOURCE_COMMIT^{commit}"
           git cat-file -e "$MERGE_BASE^{commit}"
@@ -86,6 +87,7 @@ jobs:
             Views/phanbococpo/phanbococpo.css
             Views/phanbococpo/Controller_PhanBoCocPO.ashx
             Views/phanbococpo/README.md
+            docs/database/migrations/20261030_c_packinginvoice_phanbo.sql
           )
           for path in "${paths[@]}"; do
             sourcefile="$RUNNER_TEMP/new-$(echo "$path" | tr '/' '_')"
@@ -121,6 +123,6 @@ jobs:
           fi
           git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
           git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
-          git -C "$AZURE_DIR" commit -m 'fix: fit PO allocation preview height above footer (GitHub 994ccbe3)'
+          git -C "$AZURE_DIR" commit -m 'feat: read real PO allocation rows and add no-FK table migration (GitHub 9e7861bb)'
           git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
           echo 'Gated preview UI synchronized to Azure production master.'
