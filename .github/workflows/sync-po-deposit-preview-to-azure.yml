@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_COMMIT: 9e7861bb7b6c8bddaced88ed6f48c0ee7478e239
-      MERGE_BASE: 7fde7c830c7d6ae80c44ff5da9bdeac3edf1b4e5
+      SOURCE_COMMIT: 291e962142e5f6652f052ec39c677388e9b77873
+      MERGE_BASE: 9dd98ee0b0b969fa41a0c7b272b1bdda99268727
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
     steps:
@@ -125,6 +125,6 @@ jobs:
           fi
           git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
           git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
-          git -C "$AZURE_DIR" commit -m 'feat: read real PO allocation rows and add no-FK table migration (GitHub 9e7861bb)'
+          git -C "$AZURE_DIR" commit -m 'fix: initialize PO allocation after AJAX tab load (GitHub 291e9621)'
           git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
           echo 'Gated preview UI synchronized to Azure production master.'
