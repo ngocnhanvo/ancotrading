@@ -1,0 +1,69 @@
+name: Inspect KI 00230-25 rollback safety (SQL TEST only)
+on:
+  push:
+    branches: [master]
+    paths: [.github/workflows/inspect-ki00230-revert-test.yml]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+      - name: Read current Invoice, dependencies and trigger definitions
+        shell: bash
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.ANCOTRADING_SQL_DATABASE }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        run: |
+          set +x
+          python - <<'PY'
+          import os, pymssql,sys
+          host=os.environ['SQL_SERVER'].strip()
+          port=None
+          if ',' in host and host.rsplit(',',1)[1].isdigit():
+              host,port=host.rsplit(',',1)
+          kw=dict(server=host,user=os.environ['SQL_USER'],password=os.environ['SQL_PASSWORD'],database=os.environ['SQL_DATABASE'],login_timeout=12,timeout=20,as_dict=True)
+          if port:kw['port']=port
+          with pymssql.connect(**kw) as conn:
+            with conn.cursor() as c:
+              c.execute("SELECT DB_NAME() AS dbname")
+              print("CONNECTED_DATABASE:",c.fetchone()['dbname'])
+              c.execute("SELECT c_packinginvoice_id,so_inv,md_trangthai_id FROM dbo.c_packinginvoice WHERE so_inv=%s",("KI 00230-25",))
+              rows=c.fetchall()
+              print("INVOICE_MATCHES:",len(rows))
+              for row in rows:
+                print("INVOICE:",row['so_inv'],"STATUS:",row['md_trangthai_id'])
+                key=row['c_packinginvoice_id']
+                c.execute("""SELECT COUNT(DISTINCT d.c_donhang_id) AS po_count,
+                                    COUNT(*) AS item_count
+                             FROM dbo.c_dongpklinv d
+                             WHERE d.c_packinginvoice_id=%s""",(key,))
+                print("LINKED_ROWS:",c.fetchone())
+                c.execute("""SELECT COUNT(*) AS allocation_rows,
+                                    COALESCE(SUM(sotienphanbo),0) AS allocation_total
+                             FROM dbo.c_packinginvoice_phanbo WHERE c_packinginvoice_id=%s""",(key,))
+                print("ALLOCATION:",c.fetchone())
+                c.execute("""SELECT COUNT(*) AS related_nx_count,
+                                    SUM(CASE WHEN ISNULL(nx.cr_invoice,0)=1 THEN 1 ELSE 0 END) AS issued_nx
+                             FROM dbo.c_dongpklinv d
+                             JOIN dbo.c_dongnhapxuat dx ON dx.c_dongnhapxuat_id=d.c_dongnhapxuat_id
+                             JOIN dbo.c_nhapxuat nx ON nx.c_nhapxuat_id=dx.c_nhapxuat_id
+                             WHERE d.c_packinginvoice_id=%s""",(key,))
+                print("RELATED_NHAPXUAT:",c.fetchone())
+              c.execute("""SELECT t.name AS trigger_name, t.is_disabled, m.definition
+                           FROM sys.triggers t
+                           JOIN sys.sql_modules m ON m.object_id=t.object_id
+                           WHERE t.parent_id=OBJECT_ID('dbo.c_packinginvoice')
+                           ORDER BY t.name""")
+              for t in c.fetchall():
+                print("=== TRIGGER_START:",t['trigger_name'],"DISABLED:",t['is_disabled'])
+                print((t['definition'] or '').strip()[:16000])
+                print("=== TRIGGER_END:",t['trigger_name'])
+              print("READ_ONLY_INSPECTION_COMPLETE")
+          PY
