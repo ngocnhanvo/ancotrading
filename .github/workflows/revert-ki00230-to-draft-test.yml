@@ -1,0 +1,142 @@
+name: One-time revert KI 00230-25 to draft on SQL TEST
+on:
+  push:
+    branches: [master]
+    paths: [.github/workflows/revert-ki00230-to-draft-test.yml]
+
+permissions: {contents: read}
+jobs:
+  revert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+      - name: Guarded atomic revert of one TEST invoice and its linked export flag
+        shell: bash
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.ANCOTRADING_SQL_DATABASE }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        run: |
+          set +x
+          python - <<'PY'
+          import os, pymssql, decimal, sys
+          required=("SQL_SERVER","SQL_DATABASE","SQL_USER","SQL_PASSWORD")
+          if any(not os.environ.get(k) for k in required):
+              sys.exit("FAILED: SQL test connection secrets are incomplete")
+          host=os.environ["SQL_SERVER"].strip()
+          port=None
+          if "," in host and host.rsplit(",",1)[1].isdigit():
+              host,port=host.rsplit(",",1)
+          kw=dict(server=host,user=os.environ["SQL_USER"],password=os.environ["SQL_PASSWORD"],
+                  database=os.environ["SQL_DATABASE"],login_timeout=12,timeout=20,
+                  autocommit=False,as_dict=True)
+          if port:kw["port"]=port
+          con=pymssql.connect(**kw)
+          target="KI 00230-25"
+          try:
+              with con.cursor() as cur:
+                  cur.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
+                  cur.execute("""
+                      SELECT c_packinginvoice_id, md_trangthai_id,
+                             tiendatra,tienconlai,hoahongdatra
+                      FROM dbo.c_packinginvoice WITH(UPDLOCK,HOLDLOCK)
+                      WHERE so_inv=%s
+                  """,(target,))
+                  records=cur.fetchall()
+                  if len(records)!=1:
+                      raise RuntimeError("ABORT: expected exactly one target invoice")
+                  current=records[0]
+                  key=current["c_packinginvoice_id"]
+                  initial=current["md_trangthai_id"]
+                  if initial=="SOANTHAO":
+                      print("ALREADY_DRAFT: no database changes requested")
+                      con.rollback()
+                      sys.exit(0)
+                  if initial!="HIEULUC":
+                      raise RuntimeError("ABORT: Invoice is not HIEULUC")
+                  print("CURRENT_STATUS: HIEULUC")
+                  cur.execute("""
+                      SELECT DISTINCT nx.c_nhapxuat_id, nx.cr_invoice
+                      FROM dbo.c_dongpklinv d
+                      JOIN dbo.c_dongnhapxuat dx ON dx.c_dongnhapxuat_id=d.c_dongnhapxuat_id
+                      JOIN dbo.c_nhapxuat nx WITH(UPDLOCK,HOLDLOCK)
+                          ON nx.c_nhapxuat_id=dx.c_nhapxuat_id
+                      WHERE d.c_packinginvoice_id=%s
+                  """,(key,))
+                  nx=cur.fetchall()
+                  if len(nx)!=1 or nx[0]["cr_invoice"] not in (1,True):
+                      raise RuntimeError("ABORT: expected exactly one linked invoiced export")
+                  nxid=nx[0]["c_nhapxuat_id"]
+                  cur.execute("""
+                      SELECT COUNT(DISTINCT other.c_packinginvoice_id) AS n
+                      FROM dbo.c_dongnhapxuat dx
+                      JOIN dbo.c_dongpklinv d ON d.c_dongnhapxuat_id=dx.c_dongnhapxuat_id
+                      JOIN dbo.c_packinginvoice other ON other.c_packinginvoice_id=d.c_packinginvoice_id
+                      WHERE dx.c_nhapxuat_id=%s AND other.c_packinginvoice_id<>%s
+                  """,(nxid,key))
+                  if cur.fetchone()["n"]!=0:
+                      raise RuntimeError("ABORT: linked export is shared by another invoice")
+                  cur.execute("""
+                      SELECT COUNT(*) AS n, COALESCE(SUM(sotienphanbo),0) AS total
+                      FROM dbo.c_packinginvoice_phanbo WITH(HOLDLOCK)
+                      WHERE c_packinginvoice_id=%s
+                  """,(key,))
+                  allocation=cur.fetchone()
+                  if allocation["n"]!=1 or allocation["total"]!=decimal.Decimal("45.00"):
+                      raise RuntimeError("ABORT: saved allocation no longer matches inspected test data")
+                  print("ALLOCATION_BEFORE: 1 row, 45.00 (preserved)")
+                  cur.execute("""
+                      UPDATE dbo.c_packinginvoice
+                      SET md_trangthai_id='SOANTHAO'
+                      WHERE c_packinginvoice_id=%s AND md_trangthai_id='HIEULUC'
+                  """,(key,))
+                  if cur.rowcount!=1:
+                      raise RuntimeError("ABORT: status update did not affect exactly 1 Invoice")
+                  cur.execute("""
+                      UPDATE dbo.c_nhapxuat
+                      SET cr_invoice=0
+                      WHERE c_nhapxuat_id=%s AND cr_invoice=1
+                  """,(nxid,))
+                  if cur.rowcount!=1:
+                      raise RuntimeError("ABORT: linked export flag did not update exactly once")
+                  cur.execute("""
+                      SELECT md_trangthai_id,tiendatra,tienconlai,hoahongdatra
+                      FROM dbo.c_packinginvoice
+                      WHERE c_packinginvoice_id=%s
+                  """,(key,))
+                  result=cur.fetchone()
+                  if result["md_trangthai_id"]!="SOANTHAO":
+                      raise RuntimeError("ABORT: invoice status verification failed")
+                  for col in ("tiendatra","tienconlai","hoahongdatra"):
+                      if result[col]!=current[col]:
+                          raise RuntimeError("ABORT: financial column changed unexpectedly: "+col)
+                  cur.execute("SELECT cr_invoice AS flag FROM dbo.c_nhapxuat WHERE c_nhapxuat_id=%s",(nxid,))
+                  if cur.fetchone()["flag"] not in (0,False):
+                      raise RuntimeError("ABORT: linked export flag verification failed")
+                  cur.execute("""
+                      SELECT COUNT(*) AS n, COALESCE(SUM(sotienphanbo),0) AS total
+                      FROM dbo.c_packinginvoice_phanbo
+                      WHERE c_packinginvoice_id=%s
+                  """,(key,))
+                  after=cur.fetchone()
+                  if after["n"]!=allocation["n"] or after["total"]!=allocation["total"]:
+                      raise RuntimeError("ABORT: allocation was modified unexpectedly")
+                  con.commit()
+                  print("INVOICE: KI 00230-25")
+                  print("FINAL_STATUS: SOANTHAO")
+                  print("LINKED_EXPORT_CR_INVOICE: 0")
+                  print("PRESERVED_ALLOCATION: 1 row, 45.00")
+                  print("FINANCIAL_TOTALS_UNCHANGED: YES")
+                  print("TRANSACTION: COMMITTED")
+          except Exception as exc:
+              con.rollback()
+              print("TRANSACTION: ROLLED_BACK")
+              print("REASON:", type(exc).__name__,str(exc)[:250])
+              sys.exit(1)
+          finally:
+              con.close()
+          PY
