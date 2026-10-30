@@ -100,5 +100,15 @@ jobs:
                   WHERE parent_id=OBJECT_ID('dbo.c_nhapxuat') ORDER BY name
               """)
               print("NX_UPDATE_TRIGGER_NAMES:",c.fetchall())
+              c.execute("""
+                  SELECT t.name, m.definition
+                  FROM sys.triggers t JOIN sys.sql_modules m ON m.object_id=t.object_id
+                  WHERE t.parent_id=OBJECT_ID('dbo.c_nhapxuat')
+                  ORDER BY t.name
+              """)
+              for t in c.fetchall():
+                print("=== NX_TRIGGER_START:",t['name'])
+                print((t['definition'] or '')[:10000])
+                print("=== NX_TRIGGER_END:",t['name'])
               print("READ_ONLY_INSPECTION_COMPLETE")
           PY
