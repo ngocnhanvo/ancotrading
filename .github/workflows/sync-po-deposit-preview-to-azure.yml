@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_COMMIT: bc0e6c8d28383f49a250474754525a35edc1ab00
-      MERGE_BASE: 51dd1a29fd410ba1cd618ddc8babee9c44ed44fd
+      SOURCE_COMMIT: 4ff72120bbabb1bcf2d99a2c25b983abe575b726
+      MERGE_BASE: bc0e6c8d28383f49a250474754525a35edc1ab00
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
     steps:
@@ -126,6 +126,6 @@ jobs:
           fi
           git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
           git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
-          git -C "$AZURE_DIR" commit -m 'feat: test-only PO allocation draft save (GitHub bc0e6c8d)'
+          git -C "$AZURE_DIR" commit -m 'feat: per-PO draft allocation totals in UI (GitHub 4ff72120)'
           git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
           echo 'Gated preview UI synchronized to Azure production master.'
