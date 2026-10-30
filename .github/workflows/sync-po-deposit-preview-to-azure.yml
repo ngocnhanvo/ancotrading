@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_COMMIT: 291e962142e5f6652f052ec39c677388e9b77873
-      MERGE_BASE: 9dd98ee0b0b969fa41a0c7b272b1bdda99268727
+      SOURCE_COMMIT: 14017d3219949ff3f33c0e4ee4d5b5ba81de029c
+      MERGE_BASE: bc0ced6bc768db56bd905be78c0c68004f37f0c9
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
     steps:
@@ -125,6 +125,6 @@ jobs:
           fi
           git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
           git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
-          git -C "$AZURE_DIR" commit -m 'fix: initialize PO allocation after AJAX tab load (GitHub 291e9621)'
+          git -C "$AZURE_DIR" commit -m 'fix: admin-only SQL diagnostic stage for PO allocation errors (GitHub 14017d32)'
           git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
           echo 'Gated preview UI synchronized to Azure production master.'
