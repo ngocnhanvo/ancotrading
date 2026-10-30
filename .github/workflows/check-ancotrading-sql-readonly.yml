@@ -1,0 +1,101 @@
+name: AncoTrading SQL read-only connectivity check
+
+# Run automatically once when this workflow is added or changed,
+# and allow explicit on-demand reruns in GitHub Actions.
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/check-ancotrading-sql-readonly.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ancotrading-sql-readonly-check
+  cancel-in-progress: false
+
+jobs:
+  check-sql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Python environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install SQL Server connection client
+        run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+
+      - name: Check SQL connection and PO deposit allocation schema (NO WRITES)
+        shell: bash
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.ANCOTRADING_SQL_DATABASE }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        run: |
+          set +x
+          python - <<'PY'
+          import os, sys
+          required = ("SQL_SERVER", "SQL_DATABASE", "SQL_USER", "SQL_PASSWORD")
+          absent = [name for name in required if not os.getenv(name)]
+          if absent:
+              print("RESULT: MISSING_SECRETS (" + ", ".join(absent) + ")")
+              sys.exit(1)
+
+          import pymssql
+          server = os.environ["SQL_SERVER"].strip()
+          # A common SQL Server connection setting is SERVER,PORT.
+          host = server
+          port = None
+          if "," in host and host.rsplit(",", 1)[1].isdigit():
+              host, port = host.rsplit(",", 1)
+              port = int(port)
+          kwargs = {
+              "server": host,
+              "user": os.environ["SQL_USER"],
+              "password": os.environ["SQL_PASSWORD"],
+              "database": os.environ["SQL_DATABASE"],
+              "login_timeout": 12,
+              "timeout": 12,
+              "autocommit": True,
+              "as_dict": True,
+          }
+          if port is not None:
+              kwargs["port"] = str(port)
+          try:
+              with pymssql.connect(**kwargs) as con:
+                  with con.cursor() as cur:
+                      cur.execute("SELECT DB_NAME() AS current_db")
+                      cur.fetchone()
+                      print("RESULT: CONNECTED (database selected)")
+                      names = ("c_packinginvoice_phanbo", "c_packinginvoice", "c_dongpklinv", "c_donhang")
+                      for table in names:
+                          cur.execute("SELECT OBJECT_ID(%s, 'U') AS id", ("dbo." + table,))
+                          obj = cur.fetchone()["id"]
+                          print("TABLE " + table + ": " + ("EXISTS" if obj is not None else "NOT_FOUND"))
+                      cur.execute("""
+                          SELECT name FROM sys.columns
+                          WHERE object_id = OBJECT_ID('dbo.c_packinginvoice_phanbo', 'U')
+                      """)
+                      columns = {r["name"] for r in cur.fetchall()}
+                      required_cols = {"c_packinginvoice_phanbo_id","c_packinginvoice_id","c_donhang_id","sotienphanbo"}
+                      if columns:
+                          print("ALLOCATION_COLUMNS: " + ("OK" if required_cols <= columns else "MISSING_REQUIRED_COLUMNS"))
+                      print("RESULT: READ_ONLY_CHECK_COMPLETE")
+          except pymssql.OperationalError as ex:
+              # Do not print exception text: it can contain the server name or login.
+              code = ex.args[0] if ex.args and isinstance(ex.args[0], int) else "unknown"
+              print("RESULT: CONNECTION_OR_LOGIN_FAILED (driver code: %s)" % code)
+              sys.exit(2)
+          except pymssql.DatabaseError as ex:
+              code = ex.args[0] if ex.args and isinstance(ex.args[0], int) else "unknown"
+              print("RESULT: QUERY_FAILED (driver code: %s)" % code)
+              sys.exit(3)
+          except Exception as ex:
+              print("RESULT: UNEXPECTED_CHECK_FAILURE (%s)" % type(ex).__name__)
+              sys.exit(4)
+          PY
