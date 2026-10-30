@@ -3,6 +3,8 @@
 <link rel="stylesheet" type="text/css" href="Views/phanbococpo/phanbococpo.css?v=20261030f" />
 <%-- JS is explicitly loaded by inc-ctxkNV.aspx after the AJAX tab has been inserted. --%>
 <div id="nav-tabs-pklivn-pb" class="anco-pb" role="region" aria-label="Phân bổ tiền cọc theo PO">
+    <input type="hidden" id="anco-pb-csrf" value="<%= HttpUtility.HtmlAttributeEncode(AllocationToken) %>" />
+    <input type="hidden" id="anco-pb-write-enabled" value="<%= SaveEnabled ? "true" : "false" %>" />
     <div class="anco-pb-main">
         <section class="anco-pb-panel anco-pb-left" aria-label="Danh sách PO có cọc">
             <div class="anco-pb-panel-title">
@@ -24,6 +26,6 @@
     </div>
     <div class="anco-pb-bottom">
         <span>Tổng phân bổ vào Invoice (dự kiến): <strong id="anco-pb-sum">0.00</strong></span>
-        <button type="button" id="anco-pb-save" disabled="disabled" title="Chưa triển khai ghi dữ liệu và kiểm tra số dư khi hiệu lực">Lưu (PB) — chưa kết nối</button>
+        <button type="button" id="anco-pb-save" disabled="disabled" title="Chỉ lưu bản nháp, chưa ghi nhận hiệu lực">Lưu (PB)</button>
     </div>
 </div>
