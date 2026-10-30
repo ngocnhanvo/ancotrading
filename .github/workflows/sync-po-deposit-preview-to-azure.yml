@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_COMMIT: 14017d3219949ff3f33c0e4ee4d5b5ba81de029c
-      MERGE_BASE: bc0ced6bc768db56bd905be78c0c68004f37f0c9
+      SOURCE_COMMIT: 3c276e38bf64d29be29305546fbde71c797a8318
+      MERGE_BASE: 17781b49c90d2acc0c49c95b2c502014d8f129c2
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
     steps:
@@ -60,6 +60,7 @@ jobs:
           fi
           git show "$SOURCE_COMMIT:Views/phanbococpo/Controller_PhanBoCocPO.ashx" | grep -q 'SELECT OBJECT_ID'
           git show "$SOURCE_COMMIT:Views/phanbococpo/Controller_PhanBoCocPO.ashx" | grep -q 'HttpMethod'
+          git show "$SOURCE_COMMIT:Views/phanbococpo/Controller_PhanBoCocPO.ashx" | grep -q 'mdbc.GetConnection'
           git show "$SOURCE_COMMIT:docs/database/migrations/20261030_c_packinginvoice_phanbo.sql" | grep -q 'CREATE TABLE dbo.c_packinginvoice_phanbo'
           echo 'Read-only data access and migration script verified.'
 
@@ -125,6 +126,6 @@ jobs:
           fi
           git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
           git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
-          git -C "$AZURE_DIR" commit -m 'fix: admin-only SQL diagnostic stage for PO allocation errors (GitHub 14017d32)'
+          git -C "$AZURE_DIR" commit -m 'fix: use standard mdbc connection in PO deposit API (GitHub 3c276e38)'
           git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
           echo 'Gated preview UI synchronized to Azure production master.'
