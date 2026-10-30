@@ -1,7 +1,7 @@
 /* Real, read-only PO -> Invoice allocation grids. No deposit writes in this phase. */
 window.ancoPhanBoCocPO = (function ($) {
     "use strict";
-    var enabled = false, initialized = false, invoiceId = null, invoiceState = "";
+    var initialized = false, invoiceId = null, invoiceState = "";
     var selectedPo = null, poRows = [], detailRows = [], request = null, serial = 0;
     var mountedGridNode = null;
     var editableRows = [], version = "", dirty = false, saving = false, tempId = 0;
@@ -151,7 +151,7 @@ window.ancoPhanBoCocPO = (function ($) {
     }
     function setInvoice(id) {
         if(!initialized)init();
-        if(!enabled||!initialized)return;
+        if(!initialized)return;
         var next=id==null?null:String(id);
         if(next===invoiceId)return;
         if(saving){notice("Đang lưu phân bổ, vui lòng chọn Invoice sau khi hoàn tất.",true);
@@ -168,14 +168,14 @@ window.ancoPhanBoCocPO = (function ($) {
     // setInvoice intentionally does not reload an unchanged Invoice ID.
     function refreshInvoice(id) {
         if(!initialized)init();
-        if(!enabled||!initialized)return;
+        if(!initialized)return;
         // A slow activation response must not overwrite another selected INV.
         if(!invoiceId||String(id)!==invoiceId||saving)return;
         load(true);
     }
     function syncInvoice() {
         if(!initialized)init();
-        if(!enabled||!initialized)return;
+        if(!initialized)return;
         var id=null;
         try{
             var g=$("#grid_ds_ctxkNV");
@@ -184,7 +184,7 @@ window.ancoPhanBoCocPO = (function ($) {
         setInvoice(id);
     }
     function resize() {
-        if(!enabled||!initialized)return;
+        if(!initialized)return;
         var panel=$("#nav-tabs-pklivn-pb"), tabs=$("#tabs-ctxkNV-details");
         if(!panel.is(":visible")||!tabs.length)return;
         var available=tabs.height()-tabs.children("ul.ui-tabs-nav").outerHeight(true);
@@ -200,9 +200,8 @@ window.ancoPhanBoCocPO = (function ($) {
         });
     }
     function init() {
-        enabled=/(?:\?|&)phanbococ_preview=1(?:&|$)/.test(window.location.search);
         var currentNode = $("#anco-pb-po-grid")[0];
-        if(!enabled||!currentNode||!$("#nav-tabs-pklivn-pb").length)return;
+        if(!currentNode||!$("#nav-tabs-pklivn-pb").length)return;
         // The outer AJAX tab may be closed and reopened: the old jqGrid node
         // is gone even though the JS module still exists on window.
         if(initialized && mountedGridNode===currentNode)return;
