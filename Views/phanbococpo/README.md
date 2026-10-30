@@ -11,3 +11,13 @@
 - Preview bật khi query có `phanbococ_preview=1`. Nút thêm/lưu vẫn bị khóa, chưa ghi CSDL và chưa can thiệp hiệu lực chứng từ.
 - Pha tiếp theo: kiểm soát lưu bản nháp, áp dụng và hoàn tác khi hiệu lực trong transaction chống phân bổ vượt cọc.
 - Do phần `Chứng từ XK` được thêm bằng jQuery UI AJAX tab, JavaScript phân bổ phải nạp qua `window.ancoEnsurePhanBoCocPONV` từ `inc-ctxkNV.aspx` sau khi tab được thêm vào DOM. Hàm này dùng `$.getScript` một lần, rồi `init + syncInvoice`, tránh tình trạng `setInvoice` đến trước `init` làm API không được gọi. Khi mở lại tab, module phát hiện DOM jqGrid mới và tái khởi tạo.
+
+## Pha lưu thử bản nháp (chưa hiệu lực)
+
+- API POST `action=save` lưu các dòng `c_packinginvoice_phanbo`, **chỉ khi SOANTHAO**, và chỉ cho tài khoản admin trong giai đoạn thử.
+- POST yêu cầu CSRF token của Session; kiểm tra PO thực sự thuộc Invoice, số tiền >0, tối đa 2 số lẻ, tổng theo PO không vượt `c_donhang.datcoc - cọc đã phân bổ bởi INV HIEULUC`.
+- Sử dụng một giao dịch SQL `SERIALIZABLE`, khóa Invoice và các PO, kiểm tra version để từ chối lưu đè bản nháp thay đổi bởi phiên khác.
+- Có thể thêm/sửa/xóa nhiều dòng phân bổ. Không tạo khóa ngoài SQL thật.
+- **Mặc định server luôn từ chối ghi**. Chỉ trên Web.config của máy **TEST**, thêm vào `<appSettings>`: `<add key="EnablePOAllocationDraftSave" value="true" />`. Không commit mật khẩu, không bật cờ này trên production.
+- Không thay đổi `c_packinginvoice.tiendatcoc`, `tiendatcocPO` và không tác động trạng thái HIEULUC. Hai cột tiền đang có dữ liệu nghiệp vụ khác; cần xác minh cách cộng tổng trước khi tích hợp.
+- Dữ liệu test trong GitHub Secrets là database TEST. Workflow `test-po-allocation-sql-transaction.yml` đã chạy INSERT/UPDATE/DELETE và ROLLBACK thành công, không lưu dòng thử.
