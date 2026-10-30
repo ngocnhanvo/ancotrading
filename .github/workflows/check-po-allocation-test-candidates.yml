@@ -71,5 +71,24 @@ jobs:
                           print(name + ": " + str(cur.fetchone()["n"]))
                       except pymssql.DatabaseError as e:
                           print(name + ": QUERY_FAILED " + str(e.args[0] if e.args else "unknown"))
+                  cur.execute("""
+                      SELECT DISTINCT TOP (10)
+                          i.so_inv AS invoice_no,
+                          po.sochungtu AS po_no,
+                          CONVERT(decimal(18,2), po.datcoc) AS deposit
+                      FROM dbo.c_packinginvoice i
+                      JOIN dbo.c_dongpklinv d
+                        ON d.c_packinginvoice_id = i.c_packinginvoice_id
+                      JOIN dbo.c_donhang po
+                        ON po.c_donhang_id = d.c_donhang_id
+                      WHERE i.md_trangthai_id = 'SOANTHAO'
+                        AND ISNULL(po.datcoc, 0) > 0
+                      ORDER BY i.so_inv, po.sochungtu
+                  """)
+                  rows = cur.fetchall()
+                  print("DRAFT_TEST_CANDIDATE_COUNT: " + str(len(rows)))
+                  for row in rows:
+                      print("DRAFT_TEST_INVOICE: %s | PO: %s | COC_GOC: %.2f" %
+                            (row["invoice_no"], row["po_no"], row["deposit"]))
                   print("READ_ONLY_CANDIDATE_CHECK_COMPLETE")
           PY
