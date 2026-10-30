@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_COMMIT: db163648b48b29ae1a2377ef30ce509236a10873
-      MERGE_BASE: bc8652f1a7d2da51a6644681c4f888941b36acd0
+      SOURCE_COMMIT: 51dd1a29fd410ba1cd618ddc8babee9c44ed44fd
+      MERGE_BASE: 4c99a0148a7326dc2e534ea6dc7b1cedbe56daf7
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
     steps:
@@ -126,6 +126,6 @@ jobs:
           fi
           git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
           git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
-          git -C "$AZURE_DIR" commit -m 'style: move Invoice number to PO allocation grid header (GitHub db163648)'
+          git -C "$AZURE_DIR" commit -m 'fix: collapse empty message strip under allocation detail grid (GitHub 51dd1a29)'
           git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
           echo 'Gated preview UI synchronized to Azure production master.'
