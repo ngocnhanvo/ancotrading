@@ -1,6 +1,6 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeFile="phanbococpo.ascx.cs" Inherits="Views_phanbococpo_phanbococpo" %>
 <%-- Preview-only UI until the server allocation workflow and checks are complete. --%>
-<link rel="stylesheet" type="text/css" href="Views/phanbococpo/phanbococpo.css?v=20261030e" />
+<link rel="stylesheet" type="text/css" href="Views/phanbococpo/phanbococpo.css?v=20261030f" />
 <%-- JS is explicitly loaded by inc-ctxkNV.aspx after the AJAX tab has been inserted. --%>
 <div id="nav-tabs-pklivn-pb" class="anco-pb" role="region" aria-label="Phân bổ tiền cọc theo PO">
     <div class="anco-pb-main">
