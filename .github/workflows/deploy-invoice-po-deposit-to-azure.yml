@@ -1,0 +1,111 @@
+name: Deploy Invoice PO deposit settlement to Azure master
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/deploy-invoice-po-deposit-to-azure.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: anco-invoice-deposit-azure
+  cancel-in-progress: false
+
+jobs:
+  deploy-invoice-deposit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASE_SHA: 48c5a36ec873472d0d4c8723d6b9c88a7af0c9a9
+      SOURCE_SHA: 116676114b0b7243f9fc733c0c40ce266cc7325e
+      TARGET: Controllers/PackingInvoiceController.ashx
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - name: Checkout approved GitHub source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate source and test targeted merge without database writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "$BASE_SHA^{commit}"
+          git cat-file -e "$SOURCE_SHA^{commit}"
+          git -c core.whitespace=cr-at-eol diff --check "$BASE_SHA" "$SOURCE_SHA" -- "$TARGET"
+          python3 -m py_compile .github/scripts/sync_invoice_activation_to_azure.py
+          mkdir -p "$RUNNER_TEMP/po-deposit"
+          git show "$BASE_SHA:$TARGET" > "$RUNNER_TEMP/po-deposit/before.ashx"
+          git show "$SOURCE_SHA:$TARGET" > "$RUNNER_TEMP/po-deposit/after.ashx"
+          python3 - <<'PY'
+          import os,pathlib,subprocess,sys,tempfile
+          env=pathlib.Path(os.environ["RUNNER_TEMP"],"po-deposit")
+          old=(env/"before.ashx").read_bytes()
+          new=(env/"after.ashx").read_bytes()
+          script=pathlib.Path(".github/scripts/sync_invoice_activation_to_azure.py").resolve()
+          clean=lambda b:b.removeprefix(b"\xef\xbb\xbf").replace(b"\r\n",b"\n")
+          with tempfile.TemporaryDirectory() as td:
+              target=pathlib.Path(td,"PackingInvoiceController.ashx")
+              target.write_bytes(old)
+              def execute(ok=True):
+                  p=subprocess.run([sys.executable,str(script),str(target),str(env/"before.ashx"),str(env/"after.ashx")],capture_output=True,text=True)
+                  if (p.returncode==0)!=ok: raise RuntimeError("Merge fixture failure: "+p.stdout+" "+p.stderr)
+              execute()
+              if clean(target.read_bytes())!=clean(new): raise RuntimeError("Fixture fails to produce exact approved source")
+              execute()
+              if clean(target.read_bytes())!=clean(new): raise RuntimeError("Re-running must be idempotent")
+              target.write_bytes(b"// independent Azure edit\r\n"+old)
+              execute()
+              if not target.read_bytes().startswith(b"// independent Azure edit\r\n"): raise RuntimeError("Unrelated Azure code was overwritten")
+              target.write_bytes(old.replace(b'pak.md_trangthai_id = "HIEULUC";',b'pak.md_trangthai_id = "CHANGED";',1))
+              original=target.read_bytes()
+              execute(False)
+              if target.read_bytes()!=original: raise RuntimeError("Conflicting Azure source must remain unchanged")
+          print("MERGE_TESTS_PASSED: exact output, idempotence, independent edit, conflict guard")
+          PY
+
+      - name: Sync only the Invoice activation source to Azure master
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$AZURE_PAT" ]; then
+            echo "Missing Azure DevOps PAT; no production push." >&2
+            exit 1
+          fi
+          AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          AZURE_DIR="$RUNNER_TEMP/anco-azure-production"
+          git -c "http.extraheader=$AUTH_HEADER" clone --single-branch --branch master --depth 1 "$AZURE_URL" "$AZURE_DIR"
+          python3 .github/scripts/sync_invoice_activation_to_azure.py             "$AZURE_DIR/$TARGET" "$RUNNER_TEMP/po-deposit/before.ashx" "$RUNNER_TEMP/po-deposit/after.ashx"
+          git -C "$AZURE_DIR" add -- "$TARGET"
+          git -C "$AZURE_DIR" -c core.whitespace=cr-at-eol diff --cached --check
+          if git -C "$AZURE_DIR" diff --cached --quiet; then
+            echo "Azure already has the approved Invoice activation logic."
+            exit 0
+          fi
+          git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
+          git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
+          git -C "$AZURE_DIR" commit -m 'feat: update Invoice tiendatcoc from PO allocations on activation'
+          git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
+          echo 'INVOICE_DEPOSIT_AZURE_MASTER_PUSH_SUCCESS'
+
+      - name: Publish Azure sync result
+        if: always()
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ok = "${{ job.status }}" === "success";
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: ok ? "success" : "failure",
+              context: "deploy/anco-invoice-po-deposit",
+              description: ok ? "Invoice PO deposit settled on activation; Azure master synced" : "Azure sync failed; see run log"
+            });
