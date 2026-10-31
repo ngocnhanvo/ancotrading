@@ -1,0 +1,104 @@
+name: Read-only inspect Invoice deposit triggers
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/inspect-invoice-deposit-triggers.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-trigger-definitions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Install read-only SQL client
+        shell: bash
+        run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+      - name: Inspect SQL metadata and definitions (SELECT only, NO WRITES)
+        shell: bash
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.ANCOTRADING_SQL_DATABASE }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        run: |
+          set +x
+          python - <<'PY'
+          import os, re, sys
+          required = ("SQL_SERVER","SQL_DATABASE","SQL_USER","SQL_PASSWORD")
+          if any(not os.environ.get(k) for k in required):
+              print("RESULT: SQL_SECRETS_MISSING")
+              sys.exit(2)
+          import pymssql
+          host = os.environ["SQL_SERVER"].strip()
+          port = None
+          if "," in host and host.rsplit(",",1)[1].isdigit():
+              host, port = host.rsplit(",",1)
+          kwargs = dict(server=host,user=os.environ["SQL_USER"],
+                        password=os.environ["SQL_PASSWORD"],
+                        database=os.environ["SQL_DATABASE"],
+                        as_dict=True,autocommit=True,login_timeout=12,timeout=25)
+          if port: kwargs["port"] = port
+          try:
+              with pymssql.connect(**kwargs) as connection:
+                  with connection.cursor() as cursor:
+                      cursor.execute("SELECT OBJECT_ID(N'dbo.c_packinginvoice',N'U') AS id")
+                      if not cursor.fetchone()["id"]:
+                          raise RuntimeError("PACKINGINVOICE_TABLE_MISSING")
+                      print("CONNECTED_TO_CONFIGURED_SQL_DATABASE")
+                      cursor.execute("""
+                        SELECT t.name, t.is_disabled, t.is_instead_of_trigger,
+                               te.type_desc AS event
+                        FROM sys.triggers t
+                        JOIN sys.trigger_events te ON te.object_id = t.object_id
+                        WHERE t.parent_id = OBJECT_ID(N'dbo.c_packinginvoice',N'U')
+                        ORDER BY t.name, te.type_desc
+                      """)
+                      for row in cursor.fetchall():
+                          print("TABLE_TRIGGER: %s | event=%s | disabled=%s | instead_of=%s" %
+                                (row["name"],row["event"],row["is_disabled"],row["is_instead_of_trigger"]))
+                      cursor.execute("""
+                        SELECT s.name AS schema_name, o.name AS object_name,
+                               o.type_desc AS object_type, m.definition,
+                               OBJECT_NAME(t.parent_id) AS attached_table
+                        FROM sys.sql_modules m
+                        JOIN sys.objects o ON o.object_id=m.object_id
+                        JOIN sys.schemas s ON s.schema_id=o.schema_id
+                        LEFT JOIN sys.triggers t ON t.object_id=o.object_id
+                        WHERE o.type IN ('TR','P','FN','IF','TF','V')
+                          AND (
+                               o.name IN ('update_thanhtoan','update_px_dataoinvoice')
+                               OR LOWER(m.definition) LIKE '%tiendatcoc%'
+                               OR LOWER(m.definition) LIKE '%c_packinginvoice_phanbo%'
+                          )
+                        ORDER BY CASE WHEN o.type='TR' THEN 0 ELSE 1 END,s.name,o.name
+                      """)
+                      results = cursor.fetchall()
+                      print("CANDIDATE_MODULE_COUNT:",len(results))
+                      for row in results:
+                          definition=row["definition"] or ""
+                          key="%s.%s" % (row["schema_name"],row["object_name"])
+                          attached=row["attached_table"] or "-"
+                          print("OBJECT: %s | type=%s | attached_table=%s | definition_visible=%s" %
+                                (key,row["object_type"],attached,bool(definition)))
+                          hits=list(re.finditer(r"(?i)tiendatcoc(?:po)?|c_packinginvoice_phanbo",definition))
+                          print("HIT_COUNT:",len(hits))
+                          for n,hit in enumerate(hits[:8],1):
+                              begin=max(0,hit.start()-240)
+                              end=min(len(definition),hit.end()+330)
+                              snippet=re.sub(r"\s+"," ",definition[begin:end]).strip()
+                              print("  CONTEXT_%d (%s): %s" %(n,hit.group(0),snippet[:580]))
+                          if len(hits)>8: print("  ADDITIONAL_HITS:",len(hits)-8)
+                      print("RESULT: READ_ONLY_TRIGGER_INSPECTION_COMPLETE")
+          except pymssql.Error as exc:
+              code=exc.args[0] if exc.args and isinstance(exc.args[0],int) else "unknown"
+              print("RESULT: SQL_ERROR_CODE",code)
+              sys.exit(1)
+          except Exception as exc:
+              print("RESULT: INSPECTION_ERROR",type(exc).__name__)
+              sys.exit(1)
+          PY
