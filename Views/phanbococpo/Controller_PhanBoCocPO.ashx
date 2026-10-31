@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Configuration;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
@@ -33,14 +32,6 @@ public class Controller_PhanBoCocPO : IHttpHandler, IRequiresSessionState
         }
         if (isSave)
         {
-            // Fail closed: only an explicitly enabled TEST IIS deployment can
-            // save. A GitHub SQL secret does NOT enable writing on production.
-            string enabled = ConfigurationManager.AppSettings["EnablePOAllocationDraftSave"];
-            if (!String.Equals(enabled, "true", StringComparison.OrdinalIgnoreCase))
-            {
-                Error(context, 403, "draft_save_disabled", "Lưu phân bổ đang khóa trên máy chủ này. Chỉ bật EnablePOAllocationDraftSave trên IIS test.");
-                return;
-            }
             if (context.Session == null ||
                 !String.Equals(context.Request.Form["csrf"], context.Session["anco_po_allocation_csrf"] as string, StringComparison.Ordinal) ||
                 String.IsNullOrEmpty(context.Session["anco_po_allocation_csrf"] as string))
@@ -218,10 +209,17 @@ public class Controller_PhanBoCocPO : IHttpHandler, IRequiresSessionState
                     }
 
                     stage = "serialize_response";
+                    // Match the existing POST guards; a disabled UI is never the security boundary.
+                    string writeBlockReason = !admin
+                        ? "Chỉ quản trị viên mới được lưu phân bổ cọc."
+                        : !String.Equals(invoice.md_trangthai_id, "SOANTHAO", StringComparison.Ordinal)
+                        ? "Invoice không ở trạng thái SOANTHAO, không thể thêm hoặc sửa phân bổ cọc."
+                        : "";
                     context.Response.Write(JsonConvert.SerializeObject(new
                     {
                         ok = true,
                         invoice = new { id = invoice.c_packinginvoice_id, number = invoice.so_inv, status = invoice.md_trangthai_id },
+                        writePolicy = new { allowed = writeBlockReason.Length == 0, reason = writeBlockReason },
                         po = poRows,
                         details = detailRows,
                         version = ComputeVersion(connection, null, invoiceId)

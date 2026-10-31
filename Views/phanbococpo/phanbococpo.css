@@ -21,6 +21,7 @@
 .anco-pb .ui-jqgrid, .anco-pb .ui-jqgrid-view { max-width: 100%; }
 .anco-pb .anco-pb-cell-input { box-sizing: border-box; width: 90%; max-width: 130px; min-width: 64px; padding: 3px 4px; text-align: right; }
 .anco-pb .anco-pb-delete { font-size: 11px; color: #9d1e20; cursor: pointer; padding: 2px 5px; }
+.anco-pb #anco-pb-lock-reason { flex: 0 0 auto; background: #fff8e9; border-top: 1px solid #ead9ad; color: #86530b; padding: 6px 8px; font-size: 12px; }
 .anco-pb #anco-pb-warning { flex: 0 0 auto; color: #a02323; min-height: 17px; padding: 3px 7px; font-size: 12px; }
 /* The message area is not a footer: free its space when no warning exists. */
 .anco-pb #anco-pb-warning:empty { display: none; }

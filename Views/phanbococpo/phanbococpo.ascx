@@ -1,10 +1,8 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeFile="phanbococpo.ascx.cs" Inherits="Views_phanbococpo_phanbococpo" %>
-<%-- Preview-only UI until the server allocation workflow and checks are complete. --%>
-<link rel="stylesheet" type="text/css" href="Views/phanbococpo/phanbococpo.css?v=20261030h" />
+<link rel="stylesheet" type="text/css" href="Views/phanbococpo/phanbococpo.css?v=20261031-write" />
 <%-- JS is explicitly loaded by inc-ctxkNV.aspx after the AJAX tab has been inserted. --%>
 <div id="nav-tabs-pklivn-pb" class="anco-pb" role="region" aria-label="Phân bổ tiền cọc theo PO">
     <input type="hidden" id="anco-pb-csrf" value="<%= HttpUtility.HtmlAttributeEncode(AllocationToken) %>" />
-    <input type="hidden" id="anco-pb-write-enabled" value="<%= SaveEnabled ? "true" : "false" %>" />
     <div class="anco-pb-main">
         <section class="anco-pb-panel anco-pb-left" aria-label="Danh sách PO có cọc">
             <div class="anco-pb-panel-title">
@@ -22,6 +20,7 @@
                 </span>
             </div>
             <div class="anco-pb-grid-wrap"><table id="anco-pb-detail-grid"></table></div>
+            <div id="anco-pb-lock-reason" role="status" aria-live="polite" style="display:none"></div>
             <div id="anco-pb-warning" role="alert" aria-live="polite"></div>
         </section>
     </div>

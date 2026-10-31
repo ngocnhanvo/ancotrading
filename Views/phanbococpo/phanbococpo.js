@@ -5,8 +5,28 @@ window.ancoPhanBoCocPO = (function ($) {
     var selectedPo = null, poRows = [], detailRows = [], request = null, serial = 0;
     var mountedGridNode = null;
     var editableRows = [], version = "", dirty = false, saving = false, tempId = 0;
+    var writePolicy = null, loaded = false, loadErrorReason = "";
     function saveAllowed() {
-        return $("#anco-pb-write-enabled").val() === "true" && invoiceState === "SOANTHAO";
+        // Only enable the UI after the authenticated server confirms write permissions.
+        return loaded && writePolicy && writePolicy.allowed === true && invoiceState === "SOANTHAO";
+    }
+    function writeBlockReason() {
+        if (!invoiceId || invoiceId === "0") return "Chưa chọn Invoice để phân bổ cọc.";
+        if (loadErrorReason) return "Không thể phân bổ: " + loadErrorReason;
+        if (!loaded) return "Đang kiểm tra quyền phân bổ và trạng thái Invoice...";
+        if (!writePolicy) return "Máy chủ chưa trả về quyền ghi phân bổ; vui lòng tải lại trang.";
+        if (!writePolicy.allowed) return writePolicy.reason || "Tài khoản này không được phép lưu phân bổ cọc.";
+        if (saving) return "Đang lưu phân bổ, vui lòng đợi.";
+        return "";
+    }
+    function addBlockReason() {
+        var reason = writeBlockReason(), po = currentPo();
+        if (reason) return reason;
+        if (!po) return "Chưa chọn PO thuộc Invoice.";
+        if (num(po.remaining) <= 0) return "PO " + po.code + " không còn tiền cọc để phân bổ.";
+        if (editableRows.length >= 100) return "Đã đạt giới hạn 100 dòng phân bổ trên Invoice.";
+        if (totalForPo(po.id) >= num(po.remaining)) return "PO " + po.code + " đã phân bổ hết tiền cọc còn lại.";
+        return "";
     }
     function totalForPo(id) {
         var sum = 0;
@@ -27,10 +47,13 @@ window.ancoPhanBoCocPO = (function ($) {
         });
     }
     function refreshButtons() {
-        var po = currentPo(), eligible = saveAllowed() && !saving;
-        $("#anco-pb-add").prop("disabled", !eligible || !po || totalForPo(po.id) >= num(po.remaining) || editableRows.length >= 100);
-        $("#anco-pb-save").prop("disabled", !eligible || !dirty);
-        $("#anco-pb-save").text(saving ? "Đang lưu..." : "Lưu (PB)");
+        var addReason = addBlockReason(), writeReason = writeBlockReason();
+        $("#anco-pb-add").prop("disabled", !!addReason).attr("title", addReason || "Thêm dòng phân bổ cọc cho PO được chọn");
+        $("#anco-pb-save").prop("disabled", !!writeReason || !dirty)
+            .attr("title", writeReason || (!dirty ? "Chưa có thay đổi để lưu." : "Lưu phân bổ bản nháp"))
+            .text(saving ? "Đang lưu..." : "Lưu (PB)");
+        // Disabled buttons do not fire click handlers: show the reason beside the grid.
+        $("#anco-pb-lock-reason").text(addReason).toggle(!!addReason);
     }
     function num(v) { v = Number(v); return isFinite(v) ? Math.round(v * 100) / 100 : 0; }
     function money(v) { return num(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
@@ -111,7 +134,8 @@ window.ancoPhanBoCocPO = (function ($) {
         var previousPo = preservePoSelection ? selectedPo : null;
         serial++; var ticket=serial;
         if(request && request.readyState!==4) request.abort();
-        poRows=[];detailRows=[];editableRows=[];selectedPo=null;invoiceState="";dirty=false;version="";clear();
+        poRows=[];detailRows=[];editableRows=[];selectedPo=null;invoiceState="";dirty=false;version="";
+        writePolicy=null;loaded=false;loadErrorReason="";clear();
         if(!invoiceId || invoiceId==="0"){
             $("#anco-pb-invoice-label").text("Chưa chọn Invoice");
             $("#anco-pb-invoice-state").text("—");
@@ -126,12 +150,16 @@ window.ancoPhanBoCocPO = (function ($) {
             data:{action:"load",invoiceId:invoiceId,diagnostic:1},
             success:function(data){
                 if(ticket!==serial)return;
-                if(!data || !data.ok){notice(data&&data.message ? data.message:"Dữ liệu trả về không hợp lệ.",true);return;}
+                if(!data || !data.ok){
+                    loadErrorReason=data&&data.message ? data.message:"Dữ liệu trả về không hợp lệ.";
+                    notice(loadErrorReason,true);refreshButtons();return;
+                }
                 poRows=data.po||[]; detailRows=data.details||[];
                 editableRows=$.map(detailRows,function(r){return $.extend({},r);});
                 version=data.version||""; dirty=false;
                 selectedPo=previousPo;
                 invoiceState=data.invoice&&data.invoice.status ? data.invoice.status:"";
+                writePolicy=data.writePolicy||null;loaded=true;
                 $("#anco-pb-invoice-state").text(invoiceState||"Không xác định");
                 $("#anco-pb-invoice-label").text(data.invoice&&data.invoice.number ? data.invoice.number:invoiceId);
                 notice(poRows.length ? "":"Invoice này không có dòng hàng liên kết PO.",false);
@@ -145,7 +173,8 @@ window.ancoPhanBoCocPO = (function ($) {
                 $("#anco-pb-invoice-state").text("Lỗi");
                 var detail=data&&data.diagnostic;
                 var suffix=detail ? " [bước: "+detail.stage+"; SQL #"+detail.sqlNumber+"]" : "";
-                notice((data&&data.message ? data.message:"Không thể tải dữ liệu. Kiểm tra API và CSDL.")+suffix,true);
+                loadErrorReason=(data&&data.message ? data.message:"Không thể tải dữ liệu. Kiểm tra API và CSDL.")+suffix;
+                notice(loadErrorReason,true);refreshButtons();
             }
         });
     }
@@ -207,6 +236,7 @@ window.ancoPhanBoCocPO = (function ($) {
         if(initialized && mountedGridNode===currentNode)return;
         if(request && request.readyState!==4) request.abort();
         initialized=false;invoiceId=null;selectedPo=null;poRows=[];detailRows=[];editableRows=[];dirty=false;version="";
+        writePolicy=null;loaded=false;loadErrorReason="";
         mountedGridNode=currentNode;
         initialized=createGrids();
         if(!initialized){notice("Không tải được jqGrid.",true);return;}
@@ -219,7 +249,7 @@ window.ancoPhanBoCocPO = (function ($) {
         $("#anco-pb-add,#anco-pb-save").prop("disabled",true);
         $("#anco-pb-add").off("click.ancoPb").on("click.ancoPb",function() {
             var po=currentPo();
-            if(!saveAllowed()||!po||editableRows.length>=100)return;
+            if(addBlockReason()) { refreshButtons(); return; }
             if(totalForPo(po.id)>=num(po.remaining)){notice("PO đã hết tiền cọc.",true);return;}
             editableRows.push({id:"tmp-"+(++tempId),poId:po.id,amount:0,createdAt:"",createdBy:""});
             dirty=true;drawDetails();refreshProposedTotals();
@@ -279,5 +309,5 @@ window.ancoPhanBoCocPO = (function ($) {
         });
         syncInvoice();window.setTimeout(resize,0);
     }
-    return {init:init,setInvoice:setInvoice,syncInvoice:syncInvoice,refreshInvoice:refreshInvoice,resize:resize};
+    return {revision:"20261031-write",init:init,setInvoice:setInvoice,syncInvoice:syncInvoice,refreshInvoice:refreshInvoice,resize:resize};
 }(jQuery));
