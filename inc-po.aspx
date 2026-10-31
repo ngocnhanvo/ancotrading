@@ -1057,7 +1057,7 @@
                  , label: 'Đã cọc'
                  , index: 'dh.datcoc'
                  , editable: false
-                 , fixed:true , width: 110
+                 , fixed:true , width: 70
                  , align: 'right'
                  , formatter: 'number'
                  , formatoptions: { decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, prefix: '' }
@@ -1069,7 +1069,7 @@
                  , label: 'Đã phân bổ'
                  , index: 'activePb.tong'
                  , editable: false
-                 , fixed:true , width: 110
+                 , fixed:true , width: 70
                  , align: 'right'
                  , formatter: 'number'
                  , formatoptions: { decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, prefix: '' }
@@ -1082,7 +1082,7 @@
                  , label: 'Cọc còn lại'
                  , index: 'cocconlai'
                  , editable: false
-                 , fixed:true , width: 110
+                 , fixed:true , width: 70
                  , align: 'right'
                  , formatter: 'number'
                  , formatoptions: { decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, prefix: '' }
