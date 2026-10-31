@@ -1,0 +1,162 @@
+name: One-time AB 00218-26 draft reset on SQL TEST
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/reset-ab00218-to-draft-test.yml
+
+permissions: {contents: read}
+concurrency:
+  group: one-time-ab00218-draft-sql-test
+  cancel-in-progress: false
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+      - name: Guarded single-invoice draft reset, financial and allocation preservation
+        shell: bash
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.ANCOTRADING_SQL_DATABASE }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        run: |
+          set +x
+          python - <<'PY'
+          import os,pymssql,decimal,sys
+          target="AB 00218-26"
+          required=("SQL_SERVER","SQL_DATABASE","SQL_USER","SQL_PASSWORD")
+          if any(not os.environ.get(k) for k in required):
+              sys.exit("FAILED: SQL TEST secrets missing")
+          host=os.environ["SQL_SERVER"].strip()
+          port=None
+          if "," in host and host.rsplit(",",1)[1].isdigit():host,port=host.rsplit(",",1)
+          options=dict(server=host,user=os.environ["SQL_USER"],password=os.environ["SQL_PASSWORD"],
+                       database=os.environ["SQL_DATABASE"],login_timeout=12,timeout=25,
+                       as_dict=True,autocommit=False)
+          if port:options["port"]=port
+          connection=pymssql.connect(**options)
+          snapshot_columns=("tiendatcoc","tiendatcocPO","tiendatra","tienconlai","hoahongdatra")
+          snapshot_sql=",".join(snapshot_columns)
+          try:
+              with connection.cursor() as cur:
+                  cur.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
+                  cur.execute("SELECT DB_NAME() AS db")
+                  if cur.fetchone()["db"]!=os.environ["SQL_DATABASE"]:
+                      raise RuntimeError("Wrong configured database")
+                  cur.execute("""
+                      SELECT c_packinginvoice_id,so_inv,md_trangthai_id,
+                             tiendatcoc,tiendatcocPO,tiendatra,tienconlai,hoahongdatra
+                      FROM dbo.c_packinginvoice WITH (UPDLOCK,HOLDLOCK)
+                      WHERE so_inv=%s
+                  """,(target,))
+                  invoices=cur.fetchall()
+                  if len(invoices)!=1:
+                      raise RuntimeError("Expected exactly one AB 00218-26")
+                  before=invoices[0];key=before["c_packinginvoice_id"]
+                  if before["md_trangthai_id"]=="SOANTHAO":
+                      cur.execute("""
+                          SELECT DISTINCT nx.cr_invoice
+                          FROM dbo.c_dongpklinv d
+                          JOIN dbo.c_dongnhapxuat dx ON dx.c_dongnhapxuat_id=d.c_dongnhapxuat_id
+                          JOIN dbo.c_nhapxuat nx ON nx.c_nhapxuat_id=dx.c_nhapxuat_id
+                          WHERE d.c_packinginvoice_id=%s
+                      """,(key,))
+                      flags=[x["cr_invoice"] for x in cur.fetchall()]
+                      if flags!=[False] and flags!=[0]:
+                          raise RuntimeError("Already draft but linked export remains locked: inspect before retry")
+                      print("ALREADY_DRAFT: no changes")
+                      connection.rollback()
+                      sys.exit(0)
+                  if before["md_trangthai_id"]!="HIEULUC":
+                      raise RuntimeError("Unexpected Invoice status: refuse reset")
+                  cur.execute("""
+                      SELECT COUNT(*) AS n, COALESCE(SUM(sotienphanbo),0) AS total
+                      FROM dbo.c_packinginvoice_phanbo WITH(HOLDLOCK)
+                      WHERE c_packinginvoice_id=%s
+                  """,(key,))
+                  allocations=cur.fetchone()
+                  if allocations["n"]!=3 or allocations["total"]!=decimal.Decimal("37500.00"):
+                      raise RuntimeError("Saved allocations changed from inspected 3 rows / 37500.00")
+                  cur.execute("""
+                      SELECT COUNT(*) AS n, COALESCE(SUM(sotienphanbo),0) AS total
+                      FROM dbo.c_dongphanboinv WITH(HOLDLOCK)
+                      WHERE c_packinginvoice_id=%s
+                  """,(key,))
+                  old_alloc=cur.fetchone()
+                  if old_alloc["n"]!=0:
+                      raise RuntimeError("Legacy allocation rows unexpectedly present")
+                  cur.execute("""
+                      SELECT DISTINCT nx.c_nhapxuat_id,nx.cr_invoice
+                      FROM dbo.c_dongpklinv d
+                      JOIN dbo.c_dongnhapxuat dx ON dx.c_dongnhapxuat_id=d.c_dongnhapxuat_id
+                      JOIN dbo.c_nhapxuat nx WITH(UPDLOCK,HOLDLOCK) ON nx.c_nhapxuat_id=dx.c_nhapxuat_id
+                      WHERE d.c_packinginvoice_id=%s
+                  """,(key,))
+                  linked=cur.fetchall()
+                  if len(linked)!=1 or linked[0]["cr_invoice"] not in (1,True):
+                      raise RuntimeError("Not exactly one linked invoiced export; refuse reset")
+                  export_key=linked[0]["c_nhapxuat_id"]
+                  cur.execute("""
+                      SELECT COUNT(DISTINCT other.c_packinginvoice_id) AS n
+                      FROM dbo.c_dongnhapxuat dx
+                      JOIN dbo.c_dongpklinv d ON d.c_dongnhapxuat_id=dx.c_dongnhapxuat_id
+                      JOIN dbo.c_packinginvoice other ON other.c_packinginvoice_id=d.c_packinginvoice_id
+                      WHERE dx.c_nhapxuat_id=%s AND other.c_packinginvoice_id<>%s
+                  """,(export_key,key))
+                  if cur.fetchone()["n"]!=0:
+                      raise RuntimeError("Export is shared by other Invoices; refuse reset")
+                  cur.execute("""
+                      UPDATE dbo.c_packinginvoice
+                      SET md_trangthai_id=N'SOANTHAO'
+                      WHERE c_packinginvoice_id=%s AND so_inv=%s AND md_trangthai_id=N'HIEULUC'
+                  """,(key,target))
+                  if cur.rowcount!=1:
+                      raise RuntimeError("Invoice UPDATE did not affect exactly one row")
+                  cur.execute("""
+                      UPDATE dbo.c_nhapxuat
+                      SET cr_invoice=0
+                      WHERE c_nhapxuat_id=%s AND cr_invoice=1
+                  """,(export_key,))
+                  if cur.rowcount!=1:
+                      raise RuntimeError("Export UPDATE did not affect exactly one row")
+                  cur.execute("""
+                      SELECT md_trangthai_id,tiendatcoc,tiendatcocPO,tiendatra,tienconlai,hoahongdatra
+                      FROM dbo.c_packinginvoice WHERE c_packinginvoice_id=%s
+                  """,(key,))
+                  after=cur.fetchone()
+                  if after["md_trangthai_id"]!="SOANTHAO":
+                      raise RuntimeError("Draft state verification failed")
+                  for col in snapshot_columns:
+                      if after[col]!=before[col]:
+                          raise RuntimeError("Financial field unexpectedly changed: "+col)
+                  cur.execute("SELECT cr_invoice AS flag FROM dbo.c_nhapxuat WHERE c_nhapxuat_id=%s",(export_key,))
+                  if cur.fetchone()["flag"] not in (0,False):
+                      raise RuntimeError("Linked export flag remains locked")
+                  cur.execute("""
+                      SELECT COUNT(*) AS n,COALESCE(SUM(sotienphanbo),0) AS total
+                      FROM dbo.c_packinginvoice_phanbo WHERE c_packinginvoice_id=%s
+                  """,(key,))
+                  alloc_after=cur.fetchone()
+                  if alloc_after!=allocations:
+                      raise RuntimeError("Allocation rows/total changed unexpectedly")
+                  connection.commit()
+                  print("TARGET_INVOICE:",target)
+                  print("FINAL_INVOICE_STATUS: SOANTHAO")
+                  print("FINAL_EXPORT_CR_INVOICE: 0")
+                  print("PRESERVED_NEW_ALLOCATIONS: 3 rows, 37500.00")
+                  print("FINANCIAL_COLUMNS_UNCHANGED: YES")
+                  print("TRANSACTION: COMMITTED")
+          except Exception as e:
+              connection.rollback()
+              print("TRANSACTION: ROLLED_BACK")
+              print("REASON:",type(e).__name__,str(e)[:250])
+              sys.exit(1)
+          finally:
+              connection.close()
+          PY
