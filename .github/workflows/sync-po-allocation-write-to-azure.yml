@@ -1,0 +1,107 @@
+name: Sync PO allocation write permissions and lock messages to Azure
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/sync-po-allocation-write-to-azure.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: anco-po-allocation-write-azure
+  cancel-in-progress: false
+
+jobs:
+  sync-po-allocation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASE_SHA: 8c8501b23ba77ecfede0e7a063c9ff80dce01afc
+      SOURCE_SHA: d66f4747d53938fc0b5cbaaff65c76dbd6bca3d1
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+
+    steps:
+      - name: Checkout approved GitHub master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Prepare and validate the exact six changed source files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "$BASE_SHA^{commit}"
+          git cat-file -e "$SOURCE_SHA^{commit}"
+          python3 -m py_compile .github/scripts/sync_po_allocation_to_azure.py
+          paths=(
+            Views/phanbococpo/Controller_PhanBoCocPO.ashx
+            Views/phanbococpo/phanbococpo.js
+            Views/phanbococpo/phanbococpo.ascx
+            Views/phanbococpo/phanbococpo.ascx.cs
+            Views/phanbococpo/phanbococpo.css
+            Views/chungtuxuatkhoNV/inc-ctxkNV.aspx
+          )
+          git -c core.whitespace=cr-at-eol diff --check "$BASE_SHA" "$SOURCE_SHA" -- "${paths[@]}"
+          for path in "${paths[@]}"; do
+            mkdir -p "$RUNNER_TEMP/po-before/$(dirname "$path")" "$RUNNER_TEMP/po-after/$(dirname "$path")"
+            git show "$BASE_SHA:$path" > "$RUNNER_TEMP/po-before/$path"
+            git show "$SOURCE_SHA:$path" > "$RUNNER_TEMP/po-after/$path"
+          done
+          ! grep -R -E 'EnablePOAllocationDraftSave|anco-pb-write-enabled' "$RUNNER_TEMP/po-after"
+          grep -q 'writePolicy =' "$RUNNER_TEMP/po-after/Views/phanbococpo/Controller_PhanBoCocPO.ashx"
+          grep -q 'invalid_csrf' "$RUNNER_TEMP/po-after/Views/phanbococpo/Controller_PhanBoCocPO.ashx"
+          node --check "$RUNNER_TEMP/po-after/Views/phanbococpo/phanbococpo.js"
+
+      - name: Preserve Azure changes and synchronize only approved PO allocation files
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$AZURE_PAT" ]; then
+            echo "Azure DevOps PAT missing; production not modified." >&2
+            exit 1
+          fi
+          AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          AZURE_DIR="$RUNNER_TEMP/anco-azure-production"
+          git -c "http.extraheader=$AUTH_HEADER" clone --single-branch --branch master --depth 1 "$AZURE_URL" "$AZURE_DIR"
+          python3 .github/scripts/sync_po_allocation_to_azure.py "$AZURE_DIR" "$RUNNER_TEMP/po-before" "$RUNNER_TEMP/po-after"
+          paths=(
+            Views/phanbococpo/Controller_PhanBoCocPO.ashx
+            Views/phanbococpo/phanbococpo.js
+            Views/phanbococpo/phanbococpo.ascx
+            Views/phanbococpo/phanbococpo.ascx.cs
+            Views/phanbococpo/phanbococpo.css
+            Views/chungtuxuatkhoNV/inc-ctxkNV.aspx
+          )
+          git -C "$AZURE_DIR" add -- "${paths[@]}"
+          git -C "$AZURE_DIR" -c core.whitespace=cr-at-eol diff --cached --check
+          if git -C "$AZURE_DIR" diff --cached --quiet; then
+            echo "Azure production master already has this verified change."
+            exit 0
+          fi
+          git -C "$AZURE_DIR" config user.name "AncoTrading GitHub Sync"
+          git -C "$AZURE_DIR" config user.email "actions@users.noreply.github.com"
+          git -C "$AZURE_DIR" commit -m "fix: allow admin PO draft allocation and show disabled reasons"
+          git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
+          echo "Azure production master now includes PO deposit allocation without appSetting gate."
+
+      - name: Publish Azure deployment result
+        if: always()
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ok = "${{ job.status }}" === "success";
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: ok ? "success" : "failure",
+              context: "deploy/anco-po-allocation-write-azure",
+              description: ok ? "PO allocation permissions synchronized to Azure master" : "Azure sync failed; inspect workflow logs"
+            });
