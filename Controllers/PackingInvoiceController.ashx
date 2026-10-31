@@ -464,11 +464,10 @@ public class PackingInvoiceController : IHttpHandler, IDisposable
                     }
                     else
                     {
-                        pak.md_trangthai_id = "HIEULUC";
-                        db.SubmitChanges();
-                        context.Response.Write(
-                            string.Format("Hiệu lực Packing List - Invoice {0} thành công.!", pak.so_inv)
-                            );
+                        bool activated = ActivatePackingWithPoDeposit(pakId);
+                        context.Response.Write(activated
+                            ? string.Format("Hiệu lực Packing List - Invoice {0} thành công.!", pak.so_inv)
+                            : string.Format("Hiện trạng thái Packing List - Invoice {0} đã là hiệu lực.!", pak.so_inv));
 
                         //                //Cập nhật giá từ USD sang VND cho dòng hàng của phiếu nhập kho
                         //                DataTable dt = mdbc.GetData(timPhieuNhapKho);
@@ -529,6 +528,147 @@ public class PackingInvoiceController : IHttpHandler, IDisposable
         catch (Exception ex)
         {
             context.Response.Write("Lỗi: " + ex.Message);
+        }
+    }
+
+
+    // Apply new PO allocations only at Invoice activation. One UPDATE for
+    // status and deposit lets SQL payment triggers see the final values.
+    private static bool ActivatePackingWithPoDeposit(string invoiceId)
+    {
+        using (SqlConnection connection = mdbc.GetConnection)
+        {
+            connection.Open();
+            using (SqlTransaction tx = connection.BeginTransaction(IsolationLevel.Serializable))
+            {
+                try
+                {
+                    string status;
+                    using (SqlCommand cmd = new SqlCommand(
+                        "SELECT md_trangthai_id FROM dbo.c_packinginvoice WITH(UPDLOCK,HOLDLOCK) WHERE c_packinginvoice_id=@invoice", connection, tx))
+                    {
+                        cmd.Parameters.Add("@invoice", SqlDbType.NVarChar, 32).Value = invoiceId;
+                        object value = cmd.ExecuteScalar();
+                        if (value == null || value == DBNull.Value)
+                            throw new InvalidOperationException("Không tìm thấy Invoice.");
+                        status = Convert.ToString(value);
+                    }
+                    if (status == "HIEULUC")
+                    {
+                        tx.Commit();
+                        return false; // Idempotent: no second deposit settlement.
+                    }
+
+                    var perPo = new SortedDictionary<string, decimal>(StringComparer.Ordinal);
+                    using (SqlCommand check = new SqlCommand(
+                        "SELECT OBJECT_ID(N'dbo.c_packinginvoice_phanbo',N'U')", connection, tx))
+                    {
+                        object tableId = check.ExecuteScalar();
+                        if (tableId != null && tableId != DBNull.Value)
+                        {
+                            using (SqlCommand cmd = new SqlCommand(@"
+                                SELECT c_donhang_id, SUM(sotienphanbo)
+                                FROM dbo.c_packinginvoice_phanbo WITH(HOLDLOCK)
+                                WHERE c_packinginvoice_id=@invoice
+                                GROUP BY c_donhang_id ORDER BY c_donhang_id", connection, tx))
+                            {
+                                cmd.Parameters.Add("@invoice", SqlDbType.NVarChar, 32).Value = invoiceId;
+                                using (SqlDataReader reader = cmd.ExecuteReader())
+                                {
+                                    while (reader.Read())
+                                    {
+                                        if (reader.IsDBNull(0) || reader.IsDBNull(1))
+                                            throw new InvalidOperationException("Dòng phân bổ thiếu PO hoặc tiền cọc.");
+                                        string po = reader.GetString(0);
+                                        decimal amount = reader.GetDecimal(1);
+                                        if (String.IsNullOrWhiteSpace(po) || amount <= 0)
+                                            throw new InvalidOperationException("Dữ liệu phân bổ cọc PO không hợp lệ.");
+                                        perPo.Add(po, amount);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    decimal total = 0;
+                    if (perPo.Count != 0)
+                    {
+                        if (status != "SOANTHAO")
+                            throw new InvalidOperationException("Chỉ INV soạn thảo mới được hiệu lực kèm phân bổ cọc.");
+
+                        // update_thanhtoan already subtracts c_dongphanboinv
+                        // from tienconlai. Block mixed-ledger double counting.
+                        using (SqlCommand cmd = new SqlCommand(
+                            "SELECT COALESCE(SUM(sotienphanbo),0) FROM dbo.c_dongphanboinv WHERE c_packinginvoice_id=@invoice",
+                            connection, tx))
+                        {
+                            cmd.Parameters.Add("@invoice", SqlDbType.NVarChar, 32).Value = invoiceId;
+                            if (Convert.ToDecimal(cmd.ExecuteScalar()) != 0)
+                                throw new InvalidOperationException(
+                                    "Invoice có phân bổ cọc theo quy trình cũ. Cần đối chiếu để tránh tính trùng tiền cọc.");
+                        }
+
+                        // Lock order matches SaveDraft: Invoice, then PO by ID.
+                        foreach (KeyValuePair<string, decimal> allocation in perPo)
+                        {
+                            using (SqlCommand cmd = new SqlCommand(@"
+                                SELECT CONVERT(decimal(18,2), ISNULL(dh.datcoc,0)-ISNULL((
+                                    SELECT SUM(pb.sotienphanbo)
+                                    FROM dbo.c_packinginvoice_phanbo pb
+                                    JOIN dbo.c_packinginvoice pi ON pi.c_packinginvoice_id=pb.c_packinginvoice_id
+                                    WHERE pb.c_donhang_id=dh.c_donhang_id
+                                      AND pi.md_trangthai_id=N'HIEULUC'),0))
+                                FROM dbo.c_donhang dh WITH(UPDLOCK,HOLDLOCK)
+                                WHERE dh.c_donhang_id=@po AND EXISTS (
+                                    SELECT 1 FROM dbo.c_dongpklinv d
+                                    WHERE d.c_packinginvoice_id=@invoice
+                                      AND d.c_donhang_id=dh.c_donhang_id)", connection, tx))
+                            {
+                                cmd.Parameters.Add("@po", SqlDbType.NVarChar, 32).Value = allocation.Key;
+                                cmd.Parameters.Add("@invoice", SqlDbType.NVarChar, 32).Value = invoiceId;
+                                object balance = cmd.ExecuteScalar();
+                                if (balance == null || balance == DBNull.Value)
+                                    throw new InvalidOperationException("PO phân bổ không thuộc Invoice hoặc không tồn tại.");
+                                if (allocation.Value > Convert.ToDecimal(balance))
+                                    throw new InvalidOperationException(
+                                        "Tiền phân bổ vượt cọc còn lại của PO. Vui lòng tải lại và điều chỉnh.");
+                            }
+                            total = checked(total + allocation.Value);
+                        }
+                    }
+
+                    // For old Invoices without new allocation rows, do not
+                    // overwrite the existing tiendatcoc field.
+                    string sql = perPo.Count == 0
+                        ? @"UPDATE dbo.c_packinginvoice SET md_trangthai_id=N'HIEULUC'
+                            WHERE c_packinginvoice_id=@invoice AND md_trangthai_id<>N'HIEULUC';
+                            SELECT @@ROWCOUNT;"
+                        : @"UPDATE dbo.c_packinginvoice
+                            SET md_trangthai_id=N'HIEULUC', tiendatcoc=@deposit
+                            WHERE c_packinginvoice_id=@invoice AND md_trangthai_id=N'SOANTHAO';
+                            SELECT @@ROWCOUNT;";
+                    using (SqlCommand cmd = new SqlCommand(sql, connection, tx))
+                    {
+                        cmd.Parameters.Add("@invoice", SqlDbType.NVarChar, 32).Value = invoiceId;
+                        if (perPo.Count != 0)
+                        {
+                            SqlParameter deposit = cmd.Parameters.Add("@deposit", SqlDbType.Decimal);
+                            deposit.Precision = 18;
+                            deposit.Scale = 2;
+                            deposit.Value = total;
+                        }
+                        if (Convert.ToInt32(cmd.ExecuteScalar()) != 1)
+                            throw new InvalidOperationException("Trạng thái Invoice vừa thay đổi. Vui lòng tải lại.");
+                    }
+                    tx.Commit();
+                    return true;
+                }
+                catch
+                {
+                    try { tx.Rollback(); } catch (InvalidOperationException) {}
+                    throw;
+                }
+            }
         }
     }
 

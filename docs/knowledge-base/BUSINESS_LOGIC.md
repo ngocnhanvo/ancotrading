@@ -168,6 +168,21 @@ Do not confuse jqGrid's `editable: true` with the final enabled/disabled state o
 
 ---
 
+## Invoice — ghi nhận tổng phân bổ PO tại thời điểm hiệu lực
+
+**Status: Confirmed (2026-10-31)**
+
+- Bản nháp (`SOANTHAO`): `Lưu (PB)` lưu bảng `c_packinginvoice_phanbo`, không thay đổi tiền cọc của Invoice.
+- Khi **HIEULUC** và có phân bổ PO mới: gán `c_packinginvoice.tiendatcoc` **bằng tổng** `sotienphanbo` của Invoice, không cộng tiền cọc trước đó. Cập nhật trạng thái + tiền cọc trong một transaction; gọi lại hiệu lực không cộng lặp.
+- Nếu **không** có phân bổ mới: giữ nguyên `tiendatcoc`, chỉ cập nhật trạng thái như luồng cũ (kể cả database chưa triển khai bảng phân bổ mới).
+- Trước hiệu lực: khóa Invoice rồi PO theo ID tăng dần; xác minh mỗi PO có trong Invoice và tổng phân bổ không vượt cọc còn lại sau khi trừ các Invoice khác đã hiệu lực; lỗi thì rollback toàn bộ.
+- Trigger test `update_thanhtoan` không ghi trực tiếp `tiendatcoc`, nhưng tính `tienconlai` theo cả `c_dongphanboinv` và `tiendatcoc`. Nếu Invoice đã có tiền phân bổ trong bảng cũ, không cho hiệu lực kèm phân bổ mới vì có nguy cơ tính trùng; không tự sửa trigger.
+- Không cập nhật `tiendatcocPO` hay các Invoice lịch sử.
+
+**Where implemented:** `Controllers/PackingInvoiceController.ashx` → `activePacking()`, `ActivatePackingWithPoDeposit()`; `Views/phanbococpo/Controller_PhanBoCocPO.ashx` → `SaveDraft()`; DB test trigger `dbo.update_thanhtoan`.
+
+---
+
 ## Cross-module synchronization rule template
 
 When a future task reveals two-way or automatic synchronization, document both directions explicitly rather than writing only "A syncs with B".
