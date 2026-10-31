@@ -1,0 +1,86 @@
+name: Inspect AB 00218-26 for safe draft reset (SQL TEST)
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/inspect-ab00218-draft-test.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+      - name: Read only exact invoice state and dependencies
+        shell: bash
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.ANCOTRADING_SQL_DATABASE }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        run: |
+          set +x
+          python - <<'PY'
+          import os,pymssql,sys
+          required=("SQL_SERVER","SQL_DATABASE","SQL_USER","SQL_PASSWORD")
+          if any(not os.environ.get(n) for n in required):
+              sys.exit("MISSING_TEST_SQL_SECRETS")
+          host=os.environ["SQL_SERVER"].strip()
+          port=None
+          if "," in host and host.rsplit(",",1)[1].isdigit(): host,port=host.rsplit(",",1)
+          opts=dict(server=host,user=os.environ["SQL_USER"],password=os.environ["SQL_PASSWORD"],database=os.environ["SQL_DATABASE"],login_timeout=12,timeout=25,as_dict=True,autocommit=True)
+          if port:opts["port"]=port
+          try:
+            with pymssql.connect(**opts) as conn:
+              with conn.cursor() as c:
+                c.execute("SELECT DB_NAME() AS name")
+                db=c.fetchone()["name"]
+                print("DATABASE_MATCHES_SECRET:",db==os.environ["SQL_DATABASE"])
+                target="AB 00218-26"
+                c.execute("""SELECT c_packinginvoice_id,so_inv,md_trangthai_id,
+                                   CAST(tiendatcoc AS decimal(18,2)) AS tiendatcoc,
+                                   CAST(tiendatcocPO AS decimal(18,2)) AS tiendatcocPO,
+                                   CAST(tienconlai AS decimal(18,2)) AS tienconlai,
+                                   CAST(tiendra AS decimal(18,2)) AS tiendra
+                            FROM dbo.c_packinginvoice WHERE so_inv=%s""".replace(",\n                                   CAST(tiendra AS decimal(18,2)) AS tiendra",""),(target,))
+                rows=c.fetchall()
+                print("INVOICE_MATCHES:",len(rows))
+                if len(rows)!=1:
+                    print("RESULT: NOT_UNIQUE_OR_MISSING");sys.exit(2)
+                row=rows[0];key=row["c_packinginvoice_id"]
+                for col in ("md_trangthai_id","tiendatcoc","tiendatcocPO","tienconlai"):
+                    print("INVOICE_"+col.upper()+":",row[col])
+                c.execute("""SELECT COUNT(*) AS n,COALESCE(SUM(sotienphanbo),0) AS total
+                             FROM dbo.c_packinginvoice_phanbo
+                             WHERE c_packinginvoice_id=%s""",(key,))
+                print("NEW_ALLOCATIONS:",c.fetchone())
+                c.execute("""SELECT COUNT(*) AS n,COALESCE(SUM(sotienphanbo),0) AS total
+                             FROM dbo.c_dongphanboinv
+                             WHERE c_packinginvoice_id=%s""",(key,))
+                print("LEGACY_ALLOCATIONS:",c.fetchone())
+                c.execute("""SELECT DISTINCT nx.c_nhapxuat_id,nx.cr_invoice
+                             FROM dbo.c_dongpklinv d
+                             JOIN dbo.c_dongnhapxuat dx ON dx.c_dongnhapxuat_id=d.c_dongnhapxuat_id
+                             JOIN dbo.c_nhapxuat nx ON nx.c_nhapxuat_id=dx.c_nhapxuat_id
+                             WHERE d.c_packinginvoice_id=%s""",(key,))
+                links=c.fetchall()
+                print("LINKED_EXPORT_COUNT:",len(links))
+                print("LINKED_EXPORT_FLAGS:",[str(x["cr_invoice"]) for x in links])
+                if len(links)==1:
+                    c.execute("""SELECT COUNT(DISTINCT other.c_packinginvoice_id) AS n
+                                 FROM dbo.c_dongnhapxuat dx
+                                 JOIN dbo.c_dongpklinv d ON d.c_dongnhapxuat_id=dx.c_dongnhapxuat_id
+                                 JOIN dbo.c_packinginvoice other ON other.c_packinginvoice_id=d.c_packinginvoice_id
+                                 WHERE dx.c_nhapxuat_id=%s AND other.c_packinginvoice_id<>%s""",(links[0]["c_nhapxuat_id"],key))
+                    print("OTHER_INVOICES_SHARING_EXPORT:",c.fetchone()["n"])
+                c.execute("""SELECT name,is_disabled FROM sys.triggers
+                             WHERE parent_id=OBJECT_ID('dbo.c_packinginvoice') ORDER BY name""")
+                print("INVOICE_TRIGGERS:",[(x["name"],x["is_disabled"]) for x in c.fetchall()])
+                print("RESULT: READ_ONLY_INSPECTION_COMPLETE")
+          except Exception as exc:
+            print("RESULT: INSPECTION_FAILED:",type(exc).__name__,str(exc)[:250]);sys.exit(1)
+          PY
