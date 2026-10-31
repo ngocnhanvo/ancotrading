@@ -64,7 +64,7 @@ old_body = section(base, '                        pak.md_trangthai_id = "HIEULUC
                    '\n\n                        //                //Cập nhật giá')
 new_body = section(new, '                        bool activated = ActivatePackingWithPoDeposit(pakId);',
                    '\n\n                        //                //Cập nhật giá')
-new_helper = section(new, '    // Apply new PO allocations only at Invoice activation.',
+new_helper = section(new, '\n    // Apply new PO allocations only at Invoice activation.',
                      '    public void getSelectOption(HttpContext context)')
 if 'ActivatePackingWithPoDeposit' in base:
     raise RuntimeError("Base already contains the helper; wrong baseline")
