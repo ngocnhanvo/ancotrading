@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - .github/workflows/deploy-invoice-po-deposit-to-azure.yml
+      - .github/scripts/sync_invoice_activation_to_azure.py
   workflow_dispatch:
 
 permissions:
