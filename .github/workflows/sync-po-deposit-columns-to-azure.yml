@@ -6,11 +6,13 @@ on:
     paths:
       - inc-po.aspx
       - Controllers/DonHangController.ashx
+      - .github/scripts/sync_po_deposit_columns.py
       - .github/workflows/sync-po-deposit-columns-to-azure.yml
   workflow_dispatch:
 
 permissions:
   contents: read
+  statuses: write
 
 concurrency:
   group: anco-po-columns-azure-sync
@@ -25,59 +27,68 @@ jobs:
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
     steps:
-      - name: Checkout GitHub master at triggering commit
+      - name: Checkout triggering GitHub master commit
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Validate the precise source change
+      - name: Validate exact source and prepare safe merge inputs
         shell: bash
         run: |
           set -euo pipefail
           git cat-file -e "$BASE_SHA^{commit}"
           git -c core.whitespace=cr-at-eol diff --check "$BASE_SHA" "$GITHUB_SHA" -- inc-po.aspx Controllers/DonHangController.ashx
-          grep -q "name: 'daphanbo'" inc-po.aspx
-          grep -q "name: 'cocconlai'" inc-po.aspx
+          python3 -m py_compile .github/scripts/sync_po_deposit_columns.py
+          for col in datcoc daphanbo cocconlai; do
+            grep -q "name: '$col'" inc-po.aspx
+          done
           grep -q "AS cocconlai" Controllers/DonHangController.ashx
           grep -q "pi.md_trangthai_id = N'HIEULUC'" Controllers/DonHangController.ashx
+          for path in inc-po.aspx Controllers/DonHangController.ashx; do
+            mkdir -p "$RUNNER_TEMP/po-base/$(dirname "$path")" "$RUNNER_TEMP/po-new/$(dirname "$path")"
+            git show "$BASE_SHA:$path" > "$RUNNER_TEMP/po-base/$path"
+            git show "$GITHUB_SHA:$path" > "$RUNNER_TEMP/po-new/$path"
+          done
 
-      - name: Merge only PO column changes into Azure master
+      - name: Apply only PO deposit columns into Azure master
         shell: bash
         run: |
           set -euo pipefail
           if [ -z "$AZURE_PAT" ]; then
-            echo "Missing Azure DevOps PAT; production was not modified." >&2
+            echo "Azure credential missing. Configure AZURE_DEVOPS_PAT or an existing compatible PAT secret." >&2
             exit 1
           fi
           AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
           AZURE_DIR="$RUNNER_TEMP/anco-azure-production"
           git -c "http.extraheader=$AUTH_HEADER" clone --single-branch --branch master --depth 1 "$AZURE_URL" "$AZURE_DIR"
+          python3 .github/scripts/sync_po_deposit_columns.py \
+            "$AZURE_DIR" "$RUNNER_TEMP/po-base" "$RUNNER_TEMP/po-new"
           paths=(inc-po.aspx Controllers/DonHangController.ashx)
-          for path in "${paths[@]}"; do
-            if [ ! -f "$AZURE_DIR/$path" ]; then
-              echo "Missing Azure production file: $path; refusing overwrite." >&2
-              exit 1
-            fi
-            basefile="$RUNNER_TEMP/po-base-$(basename "$path")"
-            newfile="$RUNNER_TEMP/po-new-$(basename "$path")"
-            mergedfile="$RUNNER_TEMP/po-merged-$(basename "$path")"
-            git show "$BASE_SHA:$path" > "$basefile"
-            git show "$GITHUB_SHA:$path" > "$newfile"
-            if ! git merge-file -p -- "$AZURE_DIR/$path" "$basefile" "$newfile" > "$mergedfile"; then
-              echo "Azure has conflicting changes in $path; no production push." >&2
-              exit 1
-            fi
-            mv "$mergedfile" "$AZURE_DIR/$path"
-          done
           git -C "$AZURE_DIR" add -- "${paths[@]}"
           git -C "$AZURE_DIR" -c core.whitespace=cr-at-eol diff --cached --check
           if git -C "$AZURE_DIR" diff --cached --quiet; then
-            echo "Azure master already contains this PO change."
+            echo "Production already contains the 70px PO deposit columns and controller changes."
             exit 0
           fi
           git -C "$AZURE_DIR" config user.name "AncoTrading GitHub Sync"
           git -C "$AZURE_DIR" config user.email "actions@users.noreply.github.com"
-          git -C "$AZURE_DIR" commit -m "feat: show allocated and remaining PO deposits"
+          git -C "$AZURE_DIR" commit -m "fix: sync PO deposit balance columns with 70px widths"
           git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
-          echo "PO deposit columns synchronized to Azure production master."
+          echo "Azure production master synchronized with the validated 70px PO deposit columns."
+
+      - name: Publish deployment status to GitHub commit
+        if: always()
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ok = "${{ job.status }}" === "success";
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: ok ? "success" : "failure",
+              context: "deploy/anco-po-columns-azure",
+              description: ok ? "PO deposit columns synchronized to Azure master" : "Azure sync failed; inspect this workflow run"
+            });
