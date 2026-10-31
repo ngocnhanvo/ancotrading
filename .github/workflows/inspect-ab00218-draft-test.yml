@@ -44,9 +44,8 @@ jobs:
                 c.execute("""SELECT c_packinginvoice_id,so_inv,md_trangthai_id,
                                    CAST(tiendatcoc AS decimal(18,2)) AS tiendatcoc,
                                    CAST(tiendatcocPO AS decimal(18,2)) AS tiendatcocPO,
-                                   CAST(tienconlai AS decimal(18,2)) AS tienconlai,
-                                   CAST(tiendra AS decimal(18,2)) AS tiendra
-                            FROM dbo.c_packinginvoice WHERE so_inv=%s""".replace(",\n                                   CAST(tiendra AS decimal(18,2)) AS tiendra",""),(target,))
+                                   CAST(tienconlai AS decimal(18,2)) AS tienconlai
+                            FROM dbo.c_packinginvoice WHERE so_inv=%s""",(target,))
                 rows=c.fetchall()
                 print("INVOICE_MATCHES:",len(rows))
                 if len(rows)!=1:
