@@ -1053,6 +1053,44 @@
                  , viewable: false
             },
 			{
+                 name: 'datcoc'
+                 , label: 'Đã cọc'
+                 , index: 'dh.datcoc'
+                 , editable: false
+                 , fixed:true , width: 110
+                 , align: 'right'
+                 , formatter: 'number'
+                 , formatoptions: { decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, prefix: '' }
+                 , search: false
+                 , viewable: false
+            },
+			{
+                 name: 'daphanbo'
+                 , label: 'Đã phân bổ'
+                 , index: 'activePb.tong'
+                 , editable: false
+                 , fixed:true , width: 110
+                 , align: 'right'
+                 , formatter: 'number'
+                 , formatoptions: { decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, prefix: '' }
+                 , search: false
+                 , viewable: false
+                 , sortable: false
+            },
+			{
+                 name: 'cocconlai'
+                 , label: 'Cọc còn lại'
+                 , index: 'cocconlai'
+                 , editable: false
+                 , fixed:true , width: 110
+                 , align: 'right'
+                 , formatter: 'number'
+                 , formatoptions: { decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 2, prefix: '' }
+                 , search: false
+                 , viewable: false
+                 , sortable: false
+            },
+			{
                  name: 'discount'
                  , hidden: true
                  , label: 'Discount(%)'

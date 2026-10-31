@@ -1,0 +1,83 @@
+name: Sync PO deposit columns to Azure production
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - inc-po.aspx
+      - Controllers/DonHangController.ashx
+      - .github/workflows/sync-po-deposit-columns-to-azure.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: anco-po-columns-azure-sync
+  cancel-in-progress: false
+
+jobs:
+  sync-po-columns:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASE_SHA: 8d78f30bc92d66813b5a575c4bda4ce99cae0b5b
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - name: Checkout GitHub master at triggering commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate the precise source change
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "$BASE_SHA^{commit}"
+          git -c core.whitespace=cr-at-eol diff --check "$BASE_SHA" "$GITHUB_SHA" -- inc-po.aspx Controllers/DonHangController.ashx
+          grep -q "name: 'daphanbo'" inc-po.aspx
+          grep -q "name: 'cocconlai'" inc-po.aspx
+          grep -q "AS cocconlai" Controllers/DonHangController.ashx
+          grep -q "pi.md_trangthai_id = N'HIEULUC'" Controllers/DonHangController.ashx
+
+      - name: Merge only PO column changes into Azure master
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$AZURE_PAT" ]; then
+            echo "Missing Azure DevOps PAT; production was not modified." >&2
+            exit 1
+          fi
+          AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          AZURE_DIR="$RUNNER_TEMP/anco-azure-production"
+          git -c "http.extraheader=$AUTH_HEADER" clone --single-branch --branch master --depth 1 "$AZURE_URL" "$AZURE_DIR"
+          paths=(inc-po.aspx Controllers/DonHangController.ashx)
+          for path in "${paths[@]}"; do
+            if [ ! -f "$AZURE_DIR/$path" ]; then
+              echo "Missing Azure production file: $path; refusing overwrite." >&2
+              exit 1
+            fi
+            basefile="$RUNNER_TEMP/po-base-$(basename "$path")"
+            newfile="$RUNNER_TEMP/po-new-$(basename "$path")"
+            mergedfile="$RUNNER_TEMP/po-merged-$(basename "$path")"
+            git show "$BASE_SHA:$path" > "$basefile"
+            git show "$GITHUB_SHA:$path" > "$newfile"
+            if ! git merge-file -p -- "$AZURE_DIR/$path" "$basefile" "$newfile" > "$mergedfile"; then
+              echo "Azure has conflicting changes in $path; no production push." >&2
+              exit 1
+            fi
+            mv "$mergedfile" "$AZURE_DIR/$path"
+          done
+          git -C "$AZURE_DIR" add -- "${paths[@]}"
+          git -C "$AZURE_DIR" -c core.whitespace=cr-at-eol diff --cached --check
+          if git -C "$AZURE_DIR" diff --cached --quiet; then
+            echo "Azure master already contains this PO change."
+            exit 0
+          fi
+          git -C "$AZURE_DIR" config user.name "AncoTrading GitHub Sync"
+          git -C "$AZURE_DIR" config user.email "actions@users.noreply.github.com"
+          git -C "$AZURE_DIR" commit -m "feat: show allocated and remaining PO deposits"
+          git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
+          echo "PO deposit columns synchronized to Azure production master."

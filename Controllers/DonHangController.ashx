@@ -2571,6 +2571,9 @@ public void load(HttpContext context)
             END as payer,
             dh.portdischarge, 
 			dh.amount,
+            CONVERT(decimal(18,2), ISNULL(dh.datcoc, 0)) AS datcoc,
+            CONVERT(decimal(18,2), ISNULL(activePb.tong, 0)) AS daphanbo,
+            CONVERT(decimal(18,2), ISNULL(dh.datcoc, 0) - ISNULL(activePb.tong, 0)) AS cocconlai,
             dh.totalcbm, dh.totalcbf, dh.dagui_mail, 
             dh.cont20, dh.cont40, dh.cont40hc, dh.contle, dh.cont45, 
             dh.ismakepi, dh.isdonhangtmp, 
@@ -2603,6 +2606,13 @@ public void load(HttpContext context)
 			left join md_dongtien dtien with (nolock) on dh.md_dongtien_id = dtien.md_dongtien_id
 			left join md_nganhang ngh with (nolock) on dh.md_nganhang_id = ngh.md_nganhang_id
             left join md_phienbangia pbg with (nolock) on dh.phienbangiadacbiet = pbg.md_phienbangia_id
+            OUTER APPLY (
+                SELECT SUM(pb.sotienphanbo) AS tong
+                FROM dbo.c_packinginvoice_phanbo pb
+                INNER JOIN dbo.c_packinginvoice pi ON pi.c_packinginvoice_id = pb.c_packinginvoice_id
+                WHERE pb.c_donhang_id = dh.c_donhang_id
+                  AND pi.md_trangthai_id = N'HIEULUC'
+            ) activePb
             WHERE 1 = 1 {0} {4} {1} )P where RowNum > @start AND RowNum < @end";
 
     strsql = String.Format(strsql,
@@ -2628,6 +2638,9 @@ public void load(HttpContext context)
         xml += "<cell><![CDATA[" + DateTime.Parse(row["shipmenttime"].ToString()).ToString("dd/MM/yyyy") + "]]></cell>";
         xml += "<cell><![CDATA[" + row["totalcbm"] + "]]></cell>";
         xml += "<cell><![CDATA[" + row["amount"] + "]]></cell>";
+        xml += "<cell><![CDATA[" + row["datcoc"] + "]]></cell>";
+        xml += "<cell><![CDATA[" + row["daphanbo"] + "]]></cell>";
+        xml += "<cell><![CDATA[" + row["cocconlai"] + "]]></cell>";
         xml += "<cell><![CDATA[" + row["discount"] + "]]></cell>";
         xml += "<cell><![CDATA[" + row["ten_paymentterm"] + "]]></cell>";
         xml += "<cell><![CDATA[" + row["ma_nganhang"] + "]]></cell>";

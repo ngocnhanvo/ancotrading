@@ -151,6 +151,23 @@ Do not confuse jqGrid's `editable: true` with the final enabled/disabled state o
 
 ---
 
+## PO — tiền cọc đã phân bổ qua Invoice hiệu lực
+
+**Status: Inferred (đồng nhất với logic phân bổ cọc Invoice hiện tại)**
+
+- **Đã cọc:** số cọc gốc trên PO (`c_donhang.datcoc`).
+- **Đã phân bổ:** tổng `c_packinginvoice_phanbo.sotienphanbo` của PO từ những Invoice có `c_packinginvoice.md_trangthai_id = HIEULUC`. Invoice đang `SOANTHAO` chưa trừ tiền cọc thực tế.
+- **Cọc còn lại:** `Đã cọc - Đã phân bổ`. Giữ nguyên dấu nếu dữ liệu bất thường âm, không tự che khoản phân bổ vượt cọc.
+- Lưới PO chỉ đọc các giá trị này; nghiệp vụ ghi phân bổ vẫn thuộc module Invoice.
+
+**Where implemented:**
+
+- `inc-po.aspx` -> `grid_ds_po` — các cột số tiền read-only.
+- `Controllers/DonHangController.ashx` -> `load(HttpContext)` — dữ liệu và XML lưới PO.
+- `Views/phanbococpo/Controller_PhanBoCocPO.ashx` -> `ProcessRequest` / `SaveDraft` — logic số dư Invoice tương ứng.
+
+---
+
 ## Cross-module synchronization rule template
 
 When a future task reveals two-way or automatic synchronization, document both directions explicitly rather than writing only "A syncs with B".
