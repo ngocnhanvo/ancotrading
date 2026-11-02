@@ -82,11 +82,6 @@ public class Controller_PhanBoCocPO : IHttpHandler, IRequiresSessionState
                     .Select(p => p.isadmin)
                     .FirstOrDefault() == true;
                 isAdmin = admin;
-                if (isSave && !admin)
-                {
-                    Error(context, 403, "admin_required", "Giai đoạn thử nghiệm chỉ quản trị viên mới được lưu phân bổ.");
-                    return;
-                }
                 if (!admin && !String.Equals(invoice.nguoitao, user, StringComparison.OrdinalIgnoreCase))
                 {
                     var group = LinqUtils.GetUserListInGroup(user);
@@ -209,10 +204,8 @@ public class Controller_PhanBoCocPO : IHttpHandler, IRequiresSessionState
                     }
 
                     stage = "serialize_response";
-                    // Match the existing POST guards; a disabled UI is never the security boundary.
-                    string writeBlockReason = !admin
-                        ? "Chỉ quản trị viên mới được lưu phân bổ cọc."
-                        : !String.Equals(invoice.md_trangthai_id, "SOANTHAO", StringComparison.Ordinal)
+                    // Keep the existing Invoice draft-state guard; no admin-only restriction.
+                    string writeBlockReason = !String.Equals(invoice.md_trangthai_id, "SOANTHAO", StringComparison.Ordinal)
                         ? "Invoice không ở trạng thái SOANTHAO, không thể thêm hoặc sửa phân bổ cọc."
                         : "";
                     context.Response.Write(JsonConvert.SerializeObject(new
