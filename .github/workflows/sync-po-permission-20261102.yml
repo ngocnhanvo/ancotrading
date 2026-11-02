@@ -1,0 +1,53 @@
+name: Sync PO allocation permission fix to Azure master
+on:
+  push:
+    branches: [master]
+    paths: [.github/workflows/sync-po-permission-20261102.yml]
+permissions: {contents: read}
+concurrency:
+  group: anco-po-permission-sync-20261102
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BEFORE: 263eb8539d49d1c89d283ac43dc70a72d8e751b6
+      AFTER: a37eaea30221130e19a0109d687ae10f479a2535
+      FILE: Views/phanbococpo/Controller_PhanBoCocPO.ashx
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Safely merge approved patch into current Azure master
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$AZURE_PAT" || { echo "Azure PAT missing"; exit 1; }
+          git merge-base --is-ancestor "$AFTER" HEAD
+          test "$(git diff --name-only "$BEFORE" "$AFTER")" = "$FILE"
+          python3 -m py_compile .github/scripts/apply_po_allocation_permission_fix.py
+          git show "$BEFORE:$FILE" > "$RUNNER_TEMP/before.ashx"
+          git show "$AFTER:$FILE" > "$RUNNER_TEMP/after.ashx"
+          AUTH="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          git -c "http.extraheader=$AUTH" clone --quiet --depth 1 --branch master --single-branch "$AZURE_URL" "$RUNNER_TEMP/azure"
+          echo "AZURE_BEFORE=$(git -C "$RUNNER_TEMP/azure" rev-parse HEAD)"
+          python3 .github/scripts/apply_po_allocation_permission_fix.py \
+            "$RUNNER_TEMP/azure/$FILE" "$RUNNER_TEMP/before.ashx" "$RUNNER_TEMP/after.ashx"
+          git -C "$RUNNER_TEMP/azure" add -- "$FILE"
+          git -C "$RUNNER_TEMP/azure" -c core.whitespace=cr-at-eol diff --cached --check
+          if git -C "$RUNNER_TEMP/azure" diff --cached --quiet; then
+            echo "AZURE_ALREADY_UP_TO_DATE"
+            exit 0
+          fi
+          test "$(git -C "$RUNNER_TEMP/azure" diff --cached --name-only)" = "$FILE"
+          git -C "$RUNNER_TEMP/azure" -c user.name="AncoTrading GitHub Sync" -c user.email="actions@users.noreply.github.com" \
+            commit -m "fix: remove admin-only PO allocation save gate"
+          git -C "$RUNNER_TEMP/azure" -c "http.extraheader=$AUTH" push origin HEAD:refs/heads/master
+          EXPECTED="$(git -C "$RUNNER_TEMP/azure" rev-parse HEAD)"
+          ACTUAL="$(git -c "http.extraheader=$AUTH" ls-remote "$AZURE_URL" refs/heads/master | cut -f1)"
+          test "$EXPECTED" = "$ACTUAL"
+          echo "AZURE_MASTER_SYNC_SUCCESS=$ACTUAL"
