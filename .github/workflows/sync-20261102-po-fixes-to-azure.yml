@@ -1,0 +1,116 @@
+name: One-time safe sync of latest PO code fixes to Azure master
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/sync-20261102-po-fixes-to-azure.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: anco-20261102-latest-po-code-azure
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASE_SHA: 3271a1a27bba6f3c9896bbc973168dad7c37467c
+      SOURCE_SHA: 24122f1370dc48c4c9d054da9e6169ad4d5499fe
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+
+    steps:
+      - name: Checkout pinned GitHub source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate exact source changes and merge code
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "$BASE_SHA^{commit}"
+          git cat-file -e "$SOURCE_SHA^{commit}"
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          python3 -m py_compile .github/scripts/merge_latest_github_to_azure.py
+          python3 - <<'PY'
+          import subprocess
+          import os
+          expected={
+              "App_Code/OfficeToPDF/Helper.cs",
+              "App_Code/Public.cs",
+              "Controllers/DongDonHangController.ashx",
+              "Controllers/PackingController.ashx",
+          }
+          changed=set(subprocess.run(
+              ["git", "diff", "--name-only", os.environ["BASE_SHA"], os.environ["SOURCE_SHA"], "--", *sorted(expected)],
+              check=True, capture_output=True, text=True
+          ).stdout.splitlines())
+          if changed != expected:
+              raise SystemExit(f"Unexpected changed source files: {sorted(changed)}")
+          print("APPROVED_SOURCE_PATHS:", *sorted(changed), sep="\n - ")
+          PY
+
+      - name: Read current Azure master and safely merge only the four approved files
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$AZURE_PAT" ]; then
+            echo "Missing Azure authentication; no production modifications."
+            exit 1
+          fi
+          AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          AZURE_DIR="$RUNNER_TEMP/anco-20261102-azure"
+          git -c "http.extraheader=$AUTH_HEADER" clone --quiet --single-branch --branch master --depth 1 "$AZURE_URL" "$AZURE_DIR"
+          echo "AZURE_BEFORE=$(git -C "$AZURE_DIR" rev-parse HEAD)"
+
+          # All four changes are planned and tested before a single checkout file is written.
+          python3 .github/scripts/merge_latest_github_to_azure.py "$BASE_SHA" "$SOURCE_SHA" "$AZURE_DIR"
+
+          paths=(
+            App_Code/OfficeToPDF/Helper.cs
+            App_Code/Public.cs
+            Controllers/DongDonHangController.ashx
+            Controllers/PackingController.ashx
+          )
+          git -C "$AZURE_DIR" add -- "${paths[@]}"
+          git -C "$AZURE_DIR" -c core.whitespace=cr-at-eol diff --cached --check
+          python3 - "$AZURE_DIR" <<'PY'
+          import subprocess, sys
+          az=sys.argv[1]
+          allowed={
+              "App_Code/OfficeToPDF/Helper.cs",
+              "App_Code/Public.cs",
+              "Controllers/DongDonHangController.ashx",
+              "Controllers/PackingController.ashx",
+          }
+          staged=set(subprocess.run(
+              ["git", "-C", az, "diff", "--cached", "--name-only"],
+              check=True, capture_output=True, text=True
+          ).stdout.splitlines())
+          if not staged.issubset(allowed):
+              raise SystemExit(f"Unexpected Azure paths staged; refusing commit: {sorted(staged-allowed)}")
+          print("STAGED_FILES:", sorted(staged))
+          PY
+          if git -C "$AZURE_DIR" diff --cached --quiet; then
+            echo "ALREADY_SYNCED: Azure master already includes approved changes."
+            exit 0
+          fi
+          git -C "$AZURE_DIR" config user.name 'AncoTrading GitHub Sync'
+          git -C "$AZURE_DIR" config user.email 'actions@users.noreply.github.com'
+          git -C "$AZURE_DIR" commit -m "fix: sync latest PO code with nullable code_cl (preserve Azure edits)"
+          # Normal fast-forward push only; never force and never overwrite a newer Azure commit.
+          git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
+          EXPECTED="$(git -C "$AZURE_DIR" rev-parse HEAD)"
+          ACTUAL="$(git -c "http.extraheader=$AUTH_HEADER" ls-remote "$AZURE_URL" refs/heads/master | awk '{print $1}')"
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "Remote Azure head does not match the pushed commit."
+            exit 1
+          fi
+          echo "AZURE_MASTER_SYNC_SUCCESS=$ACTUAL"
