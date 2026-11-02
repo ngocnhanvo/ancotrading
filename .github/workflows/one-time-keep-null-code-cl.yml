@@ -1,0 +1,50 @@
+name: One-time fix nullable PO code_cl on GitHub master
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/one-time-keep-null-code-cl.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-anco-code-cl-null
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: true
+      - name: Apply the exact one-expression fix and push normal git commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          f=Path("App_Code/Public.cs")
+          original=f.read_bytes()
+          before=b'cl = s.code_cl ?? "", dc = s.discount ?? 0'
+          after =b'cl = s.code_cl, dc = s.discount ?? 0'
+          if original.count(before)!=1:
+              raise SystemExit("Safety check failed: expected exactly one old code_cl expression")
+          updated=original.replace(before,after,1)
+          if updated.count(after)!=1:
+              raise SystemExit("Safety check failed: expected exactly one nullable code_cl expression")
+          f.write_bytes(updated)
+          print("Exactly one expression updated; other bytes untouched")
+          PY
+          git -c core.whitespace=cr-at-eol diff --check -- App_Code/Public.cs
+          git add -- App_Code/Public.cs
+          test "$(git diff --cached --name-only)" = "App_Code/Public.cs"
+          git diff --cached --numstat
+          git config user.name "AncoTrading GitHub Sync"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -m "fix(po): preserve null code_cl in order amount grouping"
+          git push origin HEAD:refs/heads/master
+          echo "GITHUB_CODE_CL_NULL_PUSH_SUCCESS"
