@@ -1,0 +1,143 @@
+name: Audit latest GitHub code against Azure production (read only)
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/audit-latest-github-vs-azure.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: anco-github-azure-readonly-audit
+  cancel-in-progress: false
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SOURCE_SHA: a808a0040916dffebf8ce1dc2be3aa8eed2e2f34
+      SOURCE_BASE_SHA: 3271a1a27bba6f3c9896bbc973168dad7c37467c
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - name: Read GitHub version without modifying files
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Fetch Azure master without modifying it
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$AZURE_PAT" ]; then
+            echo "ERROR: Azure DevOps PAT is not configured."
+            exit 1
+          fi
+          AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          git -c "http.extraheader=$AUTH_HEADER" clone --quiet --single-branch --branch master --depth 1 "$AZURE_URL" "$RUNNER_TEMP/azure-master"
+          echo "Azure master successfully fetched read-only."
+
+      - name: Compare all files of the user's latest commit with Azure (dry run)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import os
+          from pathlib import Path
+          import subprocess
+          import tempfile
+
+          root=Path(os.environ["GITHUB_WORKSPACE"])
+          azure=Path(os.environ["RUNNER_TEMP"])/"azure-master"
+          old=os.environ["SOURCE_BASE_SHA"]
+          new=os.environ["SOURCE_SHA"]
+          expected=[
+              "App_Code/OfficeToPDF/Helper.cs",
+              "App_Code/Public.cs",
+              "Controllers/DongDonHangController.ashx",
+              "Controllers/PackingController.ashx",
+          ]
+
+          def git(*args, cwd=root):
+              p=subprocess.run(["git",*args],cwd=cwd,capture_output=True,check=True)
+              return p.stdout
+          def normalized(data):
+              return data.removeprefix(b"\xef\xbb\xbf").replace(b"\r\n",b"\n")
+          def blob(revision,path):
+              return normalized(git("show",revision+":"+path))
+          def stamp(data):
+              return hashlib.sha256(data).hexdigest()[:12]
+          actual=git("diff","--name-only",old,new).decode().splitlines()
+          if set(actual)!=set(expected):
+              raise RuntimeError("Source latest commit files unexpectedly changed; refusing to misreport.")
+          azure_sha=git("rev-parse","HEAD",cwd=azure).decode().strip()
+          print("SOURCE_GITHUB",new)
+          print("SOURCE_BASE",old)
+          print("AZURE_MASTER_SNAPSHOT",azure_sha)
+          print("NOTE: only the four changed paths are assessed for patch conflicts.")
+          print("RESULT|PATH|GH_BASE_SHA256|GH_NEW_SHA256|AZURE_SHA256|DETAIL")
+          results=[]
+          with tempfile.TemporaryDirectory() as temp:
+              folder=Path(temp)
+              for idx,path in enumerate(expected):
+                  prior=blob(old,path)
+                  current=blob(new,path)
+                  azure_file=azure/path
+                  if not azure_file.is_file():
+                      results.append(("MISSING_ON_AZURE",path,stamp(prior),stamp(current),"-","Target path absent"))
+                      continue
+                  live=normalized(azure_file.read_bytes())
+                  if current==prior:
+                      status="NO_CHANGE_IN_COMMIT"
+                      detail="No content change in latest GitHub commit"
+                  elif live==current:
+                      status="ALREADY_SYNCED"
+                      detail="Azure has exact latest content"
+                  elif live==prior:
+                      status="APPLY_CLEANLY"
+                      detail="Azure matches GitHub before the commit"
+                  else:
+                      ours=folder/("ours"+str(idx))
+                      base=folder/("base"+str(idx))
+                      theirs=folder/("theirs"+str(idx))
+                      ours.write_bytes(current)
+                      base.write_bytes(prior)
+                      theirs.write_bytes(live)
+                      merge=subprocess.run(["git","merge-file","-p",str(ours),str(base),str(theirs)],capture_output=True)
+                      if merge.returncode==0:
+                          status="CLEAN_3WAY"
+                          detail="No textual conflict; Azure independent edits must be preserved"
+                      elif merge.returncode==1:
+                          status="CONFLICT"
+                          detail="Overlapping edits; manual merge required"
+                      else:
+                          status="ERROR"
+                          detail="Merge-file tool error code "+str(merge.returncode)
+                  results.append((status,path,stamp(prior),stamp(current),stamp(live),detail))
+
+          for row in results:
+              print("|".join(row))
+          from collections import Counter
+          print("SUMMARY",dict(Counter(row[0] for row in results)))
+          summary=Path(os.environ["GITHUB_STEP_SUMMARY"])
+          lines=[
+              "## GitHub latest commit vs Azure master (read-only)",
+              "GitHub source: \`"+new[:12]+"\`; Azure master: \`"+azure_sha[:12]+"\`",
+              "",
+              "| Result | File | Notes |",
+              "|---|---|---|"
+          ]
+          for status,path,_,_,_,detail in results:
+              lines.append("| "+status+" | \`"+path+"\` | "+detail+" |")
+          lines.extend(["","No commits, pushes, database queries, or production modifications were performed."])
+          summary.write_text("\n".join(lines)+"\n")
+          if any(row[0] in ("CONFLICT","MISSING_ON_AZURE","ERROR") for row in results):
+              raise SystemExit("AUDIT_FOUND_CONFLICT_OR_BLOCKER (no changes made)")
+          print("AUDIT_NO_TEXT_CONFLICT (no changes made)")
+          PY
