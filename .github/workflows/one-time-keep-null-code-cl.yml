@@ -31,6 +31,9 @@ jobs:
           original=f.read_bytes()
           before=b'cl = s.code_cl ?? "", dc = s.discount ?? 0'
           after =b'cl = s.code_cl, dc = s.discount ?? 0'
+          print("FILE_AUDIT", "bytes=", len(original), "old_count=", original.count(before), "code_cl_count=", original.count(b"code_cl"))
+          pos=original.find(b"var ddhs =")
+          print("DDHS_CONTEXT", repr(original[pos:pos+180]) if pos>=0 else "not found")
           if original.count(before)!=1:
               raise SystemExit("Safety check failed: expected exactly one old code_cl expression")
           updated=original.replace(before,after,1)
