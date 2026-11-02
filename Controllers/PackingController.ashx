@@ -192,7 +192,7 @@ public class PackingController : IHttpHandler
             docquyen = check_hanghoadocquyen(md_sanpham_id, dtkd_id);
         }
         else if(c_donhang_id != null) {
-            dtkd_id = db.c_donhangs.FirstOrDefault(p => p.c_donhang_id.Equals(c_donhang_id)).md_doitackinhdoanh_id;
+            dtkd_id = db.c_donhangs.Where(p => p.c_donhang_id.Equals(c_donhang_id)).Select(p => p.md_doitackinhdoanh_id).FirstOrDefault();
             docquyen = check_hanghoadocquyen(md_sanpham_id, dtkd_id);
         }
 
@@ -468,7 +468,7 @@ public class PackingController : IHttpHandler
             msg = ex.Message;
         }
 
-        EndEventHandler:;
+    EndEventHandler:;
 
         if (msg.Length <= 0)
         {

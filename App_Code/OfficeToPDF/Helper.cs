@@ -2,8 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Web;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 /// <summary>
 /// Summary description for Helper
 /// </summary>

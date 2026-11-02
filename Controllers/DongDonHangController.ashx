@@ -55,7 +55,7 @@ public class DongDonHangController : IHttpHandler, IDisposable
 
     public void capnhatAmount(HttpContext context)
     {
-        var dhs = db.c_donhangs.Where(s=>s.md_trangthai_id != Helper.KETTHUC).ToList();
+        var dhs = db.c_donhangs.Where(s=>s.md_trangthai_id != Helper.KETTHUC && (s.amount ?? 0) <= 0).ToList();
         foreach(var dh in dhs)
         {
             Public.triggerDonHang(db, dh, null, true);
@@ -269,7 +269,8 @@ var giaSP = db.md_giasanphams
                     {
                         m.giafob = decimal.Parse(context.Request.Form["giafob"]);
                     }
-                    //m.phi = phiVal;
+                    m.phi = context.Request.Form["phi"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
+                    m.phitru = context.Request.Form["phitru"].removeAllSpaceOrTrimText(true).ToNullableDecimal();
                     m.soluong = decimal.Parse(context.Request.Form["soluong"]);
                     m.soluong_conlai = decimal.Parse(context.Request.Form["soluong"]);
 
