@@ -29,16 +29,18 @@ jobs:
           from pathlib import Path
           f=Path("App_Code/Public.cs")
           original=f.read_bytes()
-          before=b'cl = s.code_cl ?? "", dc = s.discount ?? 0'
-          after =b'cl = s.code_cl, dc = s.discount ?? 0'
-          print("FILE_AUDIT", "bytes=", len(original), "old_count=", original.count(before), "code_cl_count=", original.count(b"code_cl"))
-          pos=original.find(b"var ddhs =")
-          print("DDHS_CONTEXT", repr(original[pos:pos+180]) if pos>=0 else "not found")
-          if original.count(before)!=1:
+          if not original.startswith(b"\\xff\\xfe"):
+              raise SystemExit("Safety check failed: Public.cs must retain its original UTF-16LE encoding")
+          content=original.decode("utf-16")
+          if content.encode("utf-16")!=original:
+              raise SystemExit("Safety check failed: UTF-16 roundtrip mismatch")
+          before='cl = s.code_cl ?? "", dc = s.discount ?? 0'
+          after ='cl = s.code_cl, dc = s.discount ?? 0'
+          if content.count(before)!=1:
               raise SystemExit("Safety check failed: expected exactly one old code_cl expression")
-          updated=original.replace(before,after,1)
-          if updated.count(after)!=1:
-              raise SystemExit("Safety check failed: expected exactly one nullable code_cl expression")
+          updated=content.replace(before,after,1).encode("utf-16")
+          if updated==original or updated.decode("utf-16").count(after)!=1:
+              raise SystemExit("Safety check failed: patch did not change exactly one expression")
           f.write_bytes(updated)
           print("Exactly one expression updated; other bytes untouched")
           PY
