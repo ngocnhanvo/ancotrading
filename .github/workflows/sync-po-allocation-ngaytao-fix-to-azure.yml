@@ -31,20 +31,26 @@ jobs:
           raw=path.read_bytes()
           enc='utf-8-sig' if raw.startswith(b'\xef\xbb\xbf') else 'utf-8'
           text=raw.decode(enc)
-          old='''                        : @"INSERT INTO dbo.c_packinginvoice_phanbo
-                            (c_packinginvoice_phanbo_id,c_packinginvoice_id,c_donhang_id,sotienphanbo,nguoitao)
-                            VALUES (@id,@invoice,@poId,@amount,@user)", connection, tx))'''
-          new='''                        : @"INSERT INTO dbo.c_packinginvoice_phanbo
-                            (c_packinginvoice_phanbo_id,c_packinginvoice_id,c_donhang_id,sotienphanbo,nguoitao,ngaytao)
-                            VALUES (@id,@invoice,@poId,@amount,@user,GETDATE())", connection, tx))'''
-          if text.count(old)==1 and text.count(new)==0:
-              text=text.replace(old,new,1)
+          marker='INSERT INTO dbo.c_packinginvoice_phanbo'
+          old_cols='(c_packinginvoice_phanbo_id,c_packinginvoice_id,c_donhang_id,sotienphanbo,nguoitao)'
+          new_cols='(c_packinginvoice_phanbo_id,c_packinginvoice_id,c_donhang_id,sotienphanbo,nguoitao,ngaytao)'
+          old_vals='VALUES (@id,@invoice,@poId,@amount,@user)'
+          new_vals='VALUES (@id,@invoice,@poId,@amount,@user,GETDATE())'
+          if text.count(marker) != 1:
+              raise RuntimeError('Expected exactly one allocation INSERT marker')
+          if text.count(old_cols)==1 and text.count(old_vals)==1 and text.count(new_cols)==0 and text.count(new_vals)==0:
+              insert_pos=text.index(marker)
+              cols_pos=text.index(old_cols)
+              vals_pos=text.index(old_vals)
+              if not (insert_pos < cols_pos < vals_pos < vals_pos + len(old_vals) < insert_pos + 600):
+                  raise RuntimeError('Expected allocation INSERT pieces are not in the same statement')
+              text=text.replace(old_cols,new_cols,1).replace(old_vals,new_vals,1)
               path.write_bytes(text.encode(enc))
               print('AZURE_CONTROLLER_PATCHED')
-          elif text.count(old)==0 and text.count(new)==1:
+          elif text.count(new_cols)==1 and text.count(new_vals)==1 and text.count(old_cols)==0 and text.count(old_vals)==0:
               print('AZURE_CONTROLLER_ALREADY_PATCHED')
           else:
-              raise RuntimeError('Azure controller differs from expected insert block; refusing overwrite')
+              raise RuntimeError('Azure allocation INSERT differs from expected; refusing overwrite')
           PY
           git -C "$DIR" add -- "$TARGET"
           git -C "$DIR" -c core.whitespace=cr-at-eol diff --cached --check
