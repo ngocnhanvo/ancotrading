@@ -70,7 +70,70 @@
                         <label for="printUyThacXKINV">In HỢP ĐỒNG ỦY THÁC XUẤT KHẨU</label>
                     </td>
                 </tr>
-            </table>`;
+            </table>
+<div id="payment-request-summary" style="display:none; margin-top:10px; padding:8px; border:1px solid #d5d5d5; background:#fffbe6; line-height:1.6;"></div>`;
+
+        var paymentSummarySerial = 0;
+        var paymentSummaryReady = false;
+
+        function paymentMoney(value) {
+            var n = Number(value);
+            if (!isFinite(n)) n = 0;
+            return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function loadPaymentRequestSummary() {
+            var ticket = ++paymentSummarySerial;
+            paymentSummaryReady = false;
+            $("#payment-request-summary").show().html("Đang tải thông tin phân bổ cọc...");
+            $("#btn-print-ok").button("disable");
+
+            if (!pId) {
+                $("#payment-request-summary").html('<span style="color:#a02323">Chưa chọn Invoice để kiểm tra phân bổ cọc.</span>');
+                return;
+            }
+
+            $.ajax({
+                url: "Views/phanbococpo/Controller_PhanBoCocPO.ashx",
+                type: "GET",
+                dataType: "json",
+                cache: false,
+                data: { action: "load", invoiceId: pId },
+                success: function (data) {
+                    if (ticket !== paymentSummarySerial) return;
+                    if (!data || !data.ok || !data.invoice) {
+                        $("#payment-request-summary").html('<span style="color:#a02323">Không đọc được thông tin phân bổ cọc của Invoice.</span>');
+                        return;
+                    }
+
+                    var expected = 0;
+                    $.each(data.details || [], function (_, row) {
+                        var amount = Number(row.amount);
+                        if (isFinite(amount)) expected += amount;
+                    });
+
+                    var actual = Number(data.invoice.actualDeposit);
+                    if (!isFinite(actual)) actual = 0;
+                    var status = data.invoice.status || "";
+                    var used = status === "SOANTHAO" ? expected : actual;
+                    var safeStatus = $("<div/>").text(status).html();
+
+                    $("#payment-request-summary").html(
+                        "<b>Thông tin cọc trước khi in Payment Request</b><br/>" +
+                        "Phân bổ dự kiến (đã lưu): <b>" + paymentMoney(expected) + "</b><br/>" +
+                        "Tiền cọc thực tế trên Invoice: <b>" + paymentMoney(actual) + "</b><br/>" +
+                        "Trạng thái Invoice: <b>" + safeStatus + "</b><br/>" +
+                        "Payment Request sẽ dùng Deposit: <b>" + paymentMoney(used) + "</b>"
+                    );
+                    paymentSummaryReady = true;
+                    $("#btn-print-ok").button("enable");
+                },
+                error: function () {
+                    if (ticket !== paymentSummarySerial) return;
+                    $("#payment-request-summary").html('<span style="color:#a02323">Không đọc được thông tin phân bổ cọc. Vui lòng thử lại trước khi in.</span>');
+                }
+            });
+        }
 
         $('body').append('<div title="' + title + '" id="' + name + '">' + content + '</div>');
         $('#' + name).dialog({
@@ -84,11 +147,22 @@
                 });
 
                 $("[name='rdoPrintType']").bind("click", function () {
-                    if ($(this).attr("value") == "printBL") {
+                    var value = $(this).attr("value");
+                    if (value == "printBL") {
                         $("#md_ncu_id").css("display", "block");
                     }
                     else {
                         $("#md_ncu_id").css("display", "none");
+                    }
+
+                    if (value == "printPaymentRequest") {
+                        loadPaymentRequestSummary();
+                    }
+                    else {
+                        paymentSummarySerial++;
+                        paymentSummaryReady = false;
+                        $("#payment-request-summary").hide().empty();
+                        $("#btn-print-ok").button("enable");
                     }
                 });
             }
@@ -145,6 +219,10 @@
                         }
                         else if (printType == 'printPaymentRequest') {
                             kiemtra_packingINVDaChon();
+                            if (!paymentSummaryReady) {
+                                alert("Chưa tải xong thông tin phân bổ cọc. Vui lòng kiểm tra thông tin trước khi in.");
+                                return;
+                            }
                             printURL += "InPaymentRequest/";
                             window.open("SendMail/PaymentRequest.aspx?pklId=" + pId, "In Mẫu PaymentRequest", windowSize);
                         }
