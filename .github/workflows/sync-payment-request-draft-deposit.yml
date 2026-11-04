@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 20
     env:
       BASE_SHA: e91d74ec6dcbed5d420d430f0c76a0da99a1eca2
-      SOURCE_SHA: 03193f3cfe2312a99cec19ff2beadc1ca456d12b
+      SOURCE_SHA: f951f28c23a82227e26a50937c93631cd9d0f7a5
       TARGET: SendMail/PaymentRequest.aspx.cs
       AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
       AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
