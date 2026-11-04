@@ -59,7 +59,8 @@ window.ancoPhanBoCocPO = (function ($) {
     function money(v) { return num(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
     function safe(v) { return $("<div/>").text(v == null ? "" : String(v)).html(); }
     function notice(s, error) { $("#anco-pb-warning").text(s || "").css("color", error ? "#a02323" : "#59636e"); }
-    function currentPo() { for (var i = 0; i < poRows.length; i++) if (poRows[i].id === selectedPo) return poRows[i]; return null; }
+    function poHasOriginalDeposit(po) { return po && po.deposited != null && num(po.deposited) !== 0; }
+    function currentPo() { for (var i = 0; i < poRows.length; i++) if (poRows[i].id === selectedPo && poHasOriginalDeposit(poRows[i])) return poRows[i]; return null; }
     function clear() {
         $("#anco-pb-po-grid,#anco-pb-detail-grid").each(function () { $(this).jqGrid("clearGridData"); });
         $("#anco-pb-current-po").text("Chi tiết phân bổ");
@@ -120,13 +121,15 @@ window.ancoPhanBoCocPO = (function ($) {
     }
     function draw() {
         var g=$("#anco-pb-po-grid"); g.jqGrid("clearGridData");
-        $.each(poRows,function(i,po){
+        // Display only POs with a non-zero original deposit. Keep full data for draft saving.
+        var visiblePoRows=$.grep(poRows,poHasOriginalDeposit);
+        $.each(visiblePoRows,function(i,po){
             g.jqGrid("addRowData",po.id,{
                 code:safe(po.code),deposited:money(po.deposited),
                 allocated:money(po.allocated),draft:money(totalForPo(po.id)),remaining:money(po.remaining)
             });
         });
-        if (!currentPo()) selectedPo=poRows.length ? poRows[0].id : null;
+        if (!currentPo()) selectedPo=visiblePoRows.length ? visiblePoRows[0].id : null;
         if (selectedPo) g.jqGrid("setSelection",selectedPo,false);
         drawDetails(); resize();
     }
@@ -162,7 +165,7 @@ window.ancoPhanBoCocPO = (function ($) {
                 writePolicy=data.writePolicy||null;loaded=true;
                 $("#anco-pb-invoice-state").text(invoiceState||"Không xác định");
                 $("#anco-pb-invoice-label").text(data.invoice&&data.invoice.number ? data.invoice.number:invoiceId);
-                notice(poRows.length ? "":"Invoice này không có dòng hàng liên kết PO.",false);
+                notice(!poRows.length ? "Invoice này không có dòng hàng liên kết PO." : !$.grep(poRows,poHasOriginalDeposit).length ? "Không có PO nào có cọc gốc khác 0 để hiển thị." : "",false);
                 draw();
             },
             error:function(xhr,status){
@@ -309,5 +312,5 @@ window.ancoPhanBoCocPO = (function ($) {
         });
         syncInvoice();window.setTimeout(resize,0);
     }
-    return {revision:"20261031-write",init:init,setInvoice:setInvoice,syncInvoice:syncInvoice,refreshInvoice:refreshInvoice,resize:resize};
+    return {revision:"20261104-hide-zero-deposit",init:init,setInvoice:setInvoice,syncInvoice:syncInvoice,refreshInvoice:refreshInvoice,resize:resize};
 }(jQuery));
