@@ -1,0 +1,112 @@
+name: Sync Payment Request draft PO deposit to Azure master
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/sync-payment-request-draft-deposit.yml
+permissions:
+  contents: read
+concurrency:
+  group: anco-payment-request-draft-deposit-azure
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASE_SHA: e91d74ec6dcbed5d420d430f0c76a0da99a1eca2
+      SOURCE_SHA: 03193f3cfe2312a99cec19ff2beadc1ca456d12b
+      TARGET: SendMail/PaymentRequest.aspx.cs
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - name: Checkout GitHub source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify source patch and test safe merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "$BASE_SHA^{commit}"
+          git cat-file -e "$SOURCE_SHA^{commit}"
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          test "$(git diff --name-only "$BASE_SHA" "$SOURCE_SHA")" = "$TARGET"
+          git -c core.whitespace=cr-at-eol diff --check "$BASE_SHA" "$SOURCE_SHA" -- "$TARGET"
+          python3 -m py_compile .github/scripts/apply_payment_request_draft_deposit.py
+          git show "$BASE_SHA:$TARGET" > "$RUNNER_TEMP/payment-before.cs"
+          git show "$SOURCE_SHA:$TARGET" > "$RUNNER_TEMP/payment-approved.cs"
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import os, subprocess, sys, tempfile
+          script=Path(".github/scripts/apply_payment_request_draft_deposit.py").resolve()
+          old=Path(os.environ["RUNNER_TEMP"],"payment-before.cs")
+          new=Path(os.environ["RUNNER_TEMP"],"payment-approved.cs")
+          def normalize(data):
+              if data.startswith(b"\xef\xbb\xbf"):
+                  return data[3:].replace(b"\r\n",b"\n")
+              return data.replace(b"\r\n",b"\n")
+          with tempfile.TemporaryDirectory() as folder:
+              test=Path(folder,"PaymentRequest.aspx.cs")
+              def apply(ok=True):
+                  proc=subprocess.run([sys.executable,str(script),str(test),str(old),str(new)],capture_output=True,text=True)
+                  if (proc.returncode==0)!=ok:
+                      raise RuntimeError(f"Merge fixture check failed: {proc.stdout} {proc.stderr}")
+              test.write_bytes(old.read_bytes())
+              apply()
+              if normalize(test.read_bytes())!=normalize(new.read_bytes()):
+                  raise RuntimeError("Approved patch did not reproduce expected source")
+              apply()
+              if normalize(test.read_bytes())!=normalize(new.read_bytes()):
+                  raise RuntimeError("Patch is not idempotent")
+              test.write_bytes(b"// independent Azure edit\r\n"+old.read_bytes())
+              apply()
+              if not test.read_bytes().startswith(b"// independent Azure edit\r\n"):
+                  raise RuntimeError("Independent Azure edit was not preserved")
+              initial=old.read_bytes().replace(
+                  b"                {info.pkl.tiendatcoc.Value} as datcoc,",
+                  b"                {legacyDeposit} as datcoc,",1
+              )
+              test.write_bytes(initial)
+              apply(ok=False)
+              if test.read_bytes()!=initial:
+                  raise RuntimeError("Conflicting Azure file changed despite failing guard")
+          print("MERGE_TESTS_PASSED: exact approved source, idempotent, preserves independent edits, fails closed")
+          PY
+
+      - name: Merge Payment Request print change into latest Azure master
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$AZURE_PAT" ]; then
+            echo "Azure DevOps PAT is missing; no production changes." >&2
+            exit 1
+          fi
+          AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          AZURE_DIR="$RUNNER_TEMP/azure-current-master"
+          git -c "http.extraheader=$AUTH_HEADER" clone --quiet --single-branch --branch master --depth 1 "$AZURE_URL" "$AZURE_DIR"
+          echo "AZURE_BEFORE=$(git -C "$AZURE_DIR" rev-parse HEAD)"
+
+          python3 .github/scripts/apply_payment_request_draft_deposit.py \
+            "$AZURE_DIR/$TARGET" "$RUNNER_TEMP/payment-before.cs" "$RUNNER_TEMP/payment-approved.cs"
+
+          git -C "$AZURE_DIR" add -- "$TARGET"
+          git -C "$AZURE_DIR" -c core.whitespace=cr-at-eol diff --cached --check
+          if git -C "$AZURE_DIR" diff --cached --quiet; then
+            echo "AZURE_ALREADY_SYNCED: No change required"
+            exit 0
+          fi
+          test "$(git -C "$AZURE_DIR" diff --cached --name-only)" = "$TARGET"
+          git -C "$AZURE_DIR" -c user.name="AncoTrading GitHub Sync" -c user.email="actions@users.noreply.github.com" \
+            commit -m "feat: show saved draft PO allocations in Payment Request deposit"
+          git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER" push origin HEAD:refs/heads/master
+          EXPECTED="$(git -C "$AZURE_DIR" rev-parse HEAD)"
+          ACTUAL="$(git -c "http.extraheader=$AUTH_HEADER" ls-remote "$AZURE_URL" refs/heads/master | cut -f1)"
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "Azure remote master differs from pushed SHA" >&2
+            exit 1
+          fi
+          echo "AZURE_MASTER_PAYMENT_REQUEST_SYNC_SUCCESS=$ACTUAL"
