@@ -1,0 +1,74 @@
+name: Sync Payment Request deposit summary to Azure master
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/sync-payment-request-deposit-summary-to-azure.yml
+permissions:
+  contents: read
+concurrency:
+  group: anco-payment-request-deposit-summary
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASE_SHA: 91861793117c56a5338b9308a322a15b28aba536
+      SOURCE_SHA: c284944fd2ccbe9bfdf84dbbf9011166e4979d81
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - name: Checkout GitHub history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate approved two-file change
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          expected=$(printf '%s\n' Views/chungtuxuatkhoNV/master.ascx Views/phanbococpo/Controller_PhanBoCocPO.ashx | sort)
+          actual=$(git diff --name-only "$BASE_SHA" "$SOURCE_SHA" | sort)
+          test "$actual" = "$expected"
+          git -c core.whitespace=cr-at-eol diff --check "$BASE_SHA" "$SOURCE_SHA"
+          git show "$SOURCE_SHA:Views/chungtuxuatkhoNV/master.ascx" | grep -q 'Payment Request sẽ dùng Deposit'
+          git show "$SOURCE_SHA:Views/phanbococpo/Controller_PhanBoCocPO.ashx" | grep -q 'actualDeposit = invoice.tiendatcoc.GetValueOrDefault(0)'
+          echo SOURCE_VALIDATED
+      - name: Merge only approved files into Azure and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$AZURE_PAT" || { echo 'Azure PAT missing'; exit 1; }
+          AUTH="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          DIR="$RUNNER_TEMP/azure"
+          git -c "http.extraheader=$AUTH" clone --quiet --depth 1 --branch master --single-branch "$AZURE_URL" "$DIR"
+          echo "AZURE_BEFORE=$(git -C "$DIR" rev-parse HEAD)"
+          paths=(Views/chungtuxuatkhoNV/master.ascx Views/phanbococpo/Controller_PhanBoCocPO.ashx)
+          for path in "${paths[@]}"; do
+            base="$RUNNER_TEMP/base-$(basename "$path")"
+            src="$RUNNER_TEMP/src-$(basename "$path")"
+            merged="$RUNNER_TEMP/merged-$(basename "$path")"
+            git show "$BASE_SHA:$path" > "$base"
+            git show "$SOURCE_SHA:$path" > "$src"
+            if ! git merge-file -p "$DIR/$path" "$base" "$src" > "$merged"; then
+              echo "Merge conflict in $path; no Azure push" >&2
+              exit 1
+            fi
+            mv "$merged" "$DIR/$path"
+          done
+          grep -q 'Payment Request sẽ dùng Deposit' "$DIR/Views/chungtuxuatkhoNV/master.ascx"
+          grep -q 'actualDeposit = invoice.tiendatcoc.GetValueOrDefault(0)' "$DIR/Views/phanbococpo/Controller_PhanBoCocPO.ashx"
+          git -C "$DIR" add -- "${paths[@]}"
+          git -C "$DIR" -c core.whitespace=cr-at-eol diff --cached --check
+          if git -C "$DIR" diff --cached --quiet; then echo AZURE_ALREADY_SYNCED; exit 0; fi
+          changed=$(git -C "$DIR" diff --cached --name-only | sort)
+          expected=$(printf '%s\n' "${paths[@]}" | sort)
+          test "$changed" = "$expected"
+          git -C "$DIR" -c user.name='AncoTrading GitHub Sync' -c user.email='actions@users.noreply.github.com' commit -m 'feat: show allocation summary before Payment Request print'
+          git -C "$DIR" -c "http.extraheader=$AUTH" push origin HEAD:refs/heads/master
+          EXPECTED=$(git -C "$DIR" rev-parse HEAD)
+          ACTUAL=$(git -c "http.extraheader=$AUTH" ls-remote "$AZURE_URL" refs/heads/master | cut -f1)
+          test "$EXPECTED" = "$ACTUAL"
+          echo "AZURE_MASTER_SYNC_SUCCESS=$ACTUAL"
