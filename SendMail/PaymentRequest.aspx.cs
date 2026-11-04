@@ -112,7 +112,7 @@ public partial class SendMail_PaymentRequest : System.Web.UI.Page
                 N'{toSoKien.ToString()}' as sokien, 
                 {info.pkl.totalgross.ToString()} as tongtieninvoice, 
                 N'{info.pkl.so_inv}' as soinvoice, 
-                {depositForPaymentRequest.ToString(System.Globalization.CultureInfo.InvariantCulture)} as datcoc, 
+                {depositForPaymentRequest.ToString(System.Globalization.CultureInfo.InvariantCulture)} as datcoc,
                 {info.pkl.tienconlai.Value} as giatriconlai, 
                 N'Account No.: {nganhang.thongtin.Replace("'", "''")}' as nganhang,
                 N'{Public.tenTaiKhoanNoTA}' as cp_name,
