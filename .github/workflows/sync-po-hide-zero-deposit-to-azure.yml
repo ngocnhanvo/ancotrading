@@ -1,0 +1,56 @@
+name: Sync zero-deposit PO visibility to Azure master
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/sync-po-hide-zero-deposit-to-azure.yml
+permissions:
+  contents: read
+concurrency:
+  group: anco-po-zero-deposit-20261104
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASE_SHA: 3da9aaa2b4047fa9b38c01908b50009b474fc5dd
+      SOURCE_SHA: 42ab8d25ed1b8e33c071cbddc2bdd99bc709c991
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate source and JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          test "$(git diff --name-only "$BASE_SHA" "$SOURCE_SHA" | wc -l)" -eq 2
+          git -c core.whitespace=cr-at-eol diff --check "$BASE_SHA" "$SOURCE_SHA"
+          node --check Views/phanbococpo/phanbococpo.js
+          python3 -m py_compile .github/scripts/sync_po_hide_zero_deposit.py
+      - name: Safe merge and push to Azure master
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$AZURE_PAT" || { echo 'Azure authentication missing'; exit 1; }
+          AUTH="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          AZURE_DIR="$RUNNER_TEMP/azure-master"
+          git -c "http.extraheader=$AUTH" clone --quiet --depth 1 --branch master --single-branch "$AZURE_URL" "$AZURE_DIR"
+          echo "AZURE_BEFORE=$(git -C "$AZURE_DIR" rev-parse HEAD)"
+          python3 .github/scripts/sync_po_hide_zero_deposit.py "$AZURE_DIR" "$BASE_SHA" "$SOURCE_SHA"
+          paths=(Views/phanbococpo/phanbococpo.js Views/chungtuxuatkhoNV/inc-ctxkNV.aspx)
+          git -C "$AZURE_DIR" add -- "${paths[@]}"
+          git -C "$AZURE_DIR" -c core.whitespace=cr-at-eol diff --cached --check
+          if git -C "$AZURE_DIR" diff --cached --quiet; then echo AZURE_ALREADY_SYNCED; exit 0; fi
+          test "$(git -C "$AZURE_DIR" diff --cached --name-only | wc -l)" -le 2
+          git -C "$AZURE_DIR" -c user.name='AncoTrading GitHub Sync' -c user.email='actions@users.noreply.github.com' commit -m 'fix: hide zero or null original PO deposits in allocation grid'
+          git -C "$AZURE_DIR" -c "http.extraheader=$AUTH" push origin HEAD:refs/heads/master
+          EXPECTED="$(git -C "$AZURE_DIR" rev-parse HEAD)"
+          ACTUAL="$(git -c "http.extraheader=$AUTH" ls-remote "$AZURE_URL" refs/heads/master | cut -f1)"
+          test "$EXPECTED" = "$ACTUAL"
+          echo "AZURE_MASTER_SYNC_SUCCESS=$ACTUAL"
