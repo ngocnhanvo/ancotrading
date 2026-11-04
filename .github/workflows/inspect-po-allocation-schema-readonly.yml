@@ -1,0 +1,89 @@
+name: Inspect PO allocation table schema read-only
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/inspect-po-allocation-schema-readonly.yml
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+      - name: Inspect allocation table schema without writes
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.ANCOTRADING_SQL_DATABASE }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        shell: bash
+        run: |
+          set +x
+          python - <<'PY'
+          import os,sys,pymssql
+          req=['SQL_SERVER','SQL_DATABASE','SQL_USER','SQL_PASSWORD']
+          miss=[x for x in req if not os.getenv(x)]
+          if miss:
+              print('RESULT: MISSING_SECRETS', ','.join(miss)); sys.exit(1)
+          host=os.environ['SQL_SERVER'].strip(); port=None
+          if ',' in host and host.rsplit(',',1)[1].isdigit():
+              host,port=host.rsplit(',',1); port=int(port)
+          kw=dict(server=host,user=os.environ['SQL_USER'],password=os.environ['SQL_PASSWORD'],database=os.environ['SQL_DATABASE'],login_timeout=12,timeout=20,autocommit=True,as_dict=True)
+          if port: kw['port']=str(port)
+          with pymssql.connect(**kw) as con:
+            with con.cursor() as c:
+              c.execute("SELECT DB_NAME() AS db")
+              db=c.fetchone()['db']
+              print('DB_NAME_LENGTH:',len(db or ''))
+              c.execute("SELECT OBJECT_ID('dbo.c_packinginvoice_phanbo','U') AS id")
+              obj=c.fetchone()['id']
+              print('TABLE_EXISTS:',obj is not None)
+              if obj is None: sys.exit(0)
+              c.execute("""
+                SELECT col.column_id,col.name,t.name AS type_name,col.max_length,col.precision,col.scale,
+                       col.is_nullable,col.is_identity,col.is_computed,dc.definition AS default_sql
+                FROM sys.columns col
+                JOIN sys.types t ON t.user_type_id=col.user_type_id
+                LEFT JOIN sys.default_constraints dc ON dc.object_id=col.default_object_id
+                WHERE col.object_id=OBJECT_ID('dbo.c_packinginvoice_phanbo','U')
+                ORDER BY col.column_id
+              """)
+              rows=c.fetchall()
+              for r in rows:
+                  print('COLUMN:',r)
+              c.execute("""
+                SELECT cc.name,cc.definition
+                FROM sys.check_constraints cc
+                WHERE cc.parent_object_id=OBJECT_ID('dbo.c_packinginvoice_phanbo','U')
+                ORDER BY cc.name
+              """)
+              for r in c.fetchall(): print('CHECK:',r)
+              c.execute("""
+                SELECT i.name,i.is_unique,i.is_primary_key
+                FROM sys.indexes i
+                WHERE i.object_id=OBJECT_ID('dbo.c_packinginvoice_phanbo','U') AND i.name IS NOT NULL
+                ORDER BY i.index_id
+              """)
+              for r in c.fetchall(): print('INDEX:',r)
+              c.execute("""
+                SELECT tr.name,tr.is_disabled
+                FROM sys.triggers tr
+                WHERE tr.parent_id=OBJECT_ID('dbo.c_packinginvoice_phanbo','U')
+                ORDER BY tr.name
+              """)
+              triggers=c.fetchall()
+              print('TRIGGER_COUNT:',len(triggers))
+              for r in triggers: print('TRIGGER:',r)
+              # Exact insert requirements used by SaveDraft, without inserting anything.
+              required={'c_packinginvoice_phanbo_id','c_packinginvoice_id','c_donhang_id','sotienphanbo','nguoitao'}
+              names={r['name'] for r in rows}
+              print('SAVE_INSERT_COLUMNS_PRESENT:',required <= names)
+              extra_required=[r['name'] for r in rows if not r['is_nullable'] and not r['is_identity'] and not r['is_computed'] and r['default_sql'] is None and r['name'] not in required]
+              print('EXTRA_NOT_NULL_NO_DEFAULT:',extra_required)
+              print('RESULT: READ_ONLY_SCHEMA_COMPLETE')
+          PY
