@@ -33,7 +33,7 @@ jobs:
           git cat-file -e "$BASE_SHA^{commit}"
           git cat-file -e "$SOURCE_SHA^{commit}"
           git merge-base --is-ancestor "$SOURCE_SHA" HEAD
-          test "$(git diff --name-only "$BASE_SHA" "$SOURCE_SHA")" = "$TARGET"
+          test "$(git diff --name-only "$BASE_SHA" "$SOURCE_SHA" -- "$TARGET")" = "$TARGET"
           git -c core.whitespace=cr-at-eol diff --check "$BASE_SHA" "$SOURCE_SHA" -- "$TARGET"
           python3 -m py_compile .github/scripts/apply_payment_request_draft_deposit.py
           git show "$BASE_SHA:$TARGET" > "$RUNNER_TEMP/payment-before.cs"
