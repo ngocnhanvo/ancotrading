@@ -1,0 +1,99 @@
+name: One-time sync INV zero initial deposit to Azure master
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/sync-invoice-zero-initial-deposit-to-azure.yml
+permissions:
+  contents: read
+concurrency:
+  group: anco-invoice-zero-initial-deposit-to-azure
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASE_SHA: 4196a81e11188c5bc7685064034e81a38d8c6b6a
+      SOURCE_SHA: 06216fed3e3084253b2e2bea0fa60f133367f39d
+      TARGET: Controllers/TaoPackingListController.ashx
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - name: Checkout GitHub history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify exactly one approved source line changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "$BASE_SHA^{commit}"
+          git cat-file -e "$SOURCE_SHA^{commit}"
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          test "$(git diff --name-only "$BASE_SHA" "$SOURCE_SHA")" = "$TARGET"
+          git -c core.whitespace=cr-at-eol diff --check "$BASE_SHA" "$SOURCE_SHA" -- "$TARGET"
+          python3 - <<'PY'
+          import os, subprocess
+          target = os.environ["TARGET"]
+          def git_file(rev):
+              return subprocess.run(["git","show",f"{rev}:{target}"],check=True,capture_output=True).stdout.decode("utf-8-sig").replace("\r\n","\n")
+          old = git_file(os.environ["BASE_SHA"])
+          new = git_file(os.environ["SOURCE_SHA"])
+          previous = "                p.tiendatcoc = p.tiendatcocPO;"
+          approved = "                // p.tiendatcoc = p.tiendatcocPO; // Giữ tiền cọc INV bằng 0 khi tạo; ghi nhận khi hiệu lực từ phân bổ PO."
+          if old.count(previous) != 1 or old.count(approved) != 0:
+              raise RuntimeError("Unexpected GitHub baseline for deposit initialization")
+          if old.replace(previous,approved,1) != new:
+              raise RuntimeError("Source patch contains more than the approved one-line change")
+          if new.count("p.tiendatcoc = 0;") != 1:
+              raise RuntimeError("INV deposit does not initialize to zero")
+          print("SOURCE_VALIDATED: only the approved line is commented; zero initial deposit preserved")
+          PY
+
+      - name: Apply only the approved line to Azure master and verify remote
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$AZURE_PAT" || { echo 'Azure PAT missing - no write performed'; exit 1; }
+          AUTH="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          AZURE_DIR="$RUNNER_TEMP/azure-master"
+          git -c "http.extraheader=$AUTH" clone --quiet --depth 1 --branch master --single-branch "$AZURE_URL" "$AZURE_DIR"
+          echo "AZURE_BEFORE=$(git -C "$AZURE_DIR" rev-parse HEAD)"
+          python3 - "$AZURE_DIR/$TARGET" <<'PY'
+          import pathlib, sys
+          path = pathlib.Path(sys.argv[1])
+          raw = path.read_bytes()
+          enc = "utf-16" if raw.startswith(b"\xff\xfe") else ("utf-8-sig" if raw.startswith(b"\xef\xbb\xbf") else "utf-8")
+          text = raw.decode(enc)
+          if text.encode(enc) != raw:
+              raise RuntimeError("Azure encoding round-trip failed; no modifications")
+          previous = "                p.tiendatcoc = p.tiendatcocPO;"
+          approved = "                // p.tiendatcoc = p.tiendatcocPO; // Giữ tiền cọc INV bằng 0 khi tạo; ghi nhận khi hiệu lực từ phân bổ PO."
+          if text.count(previous) == 1 and text.count(approved) == 0:
+              updated = text.replace(previous,approved,1)
+              if updated.count("p.tiendatcoc = 0;") != 1:
+                  raise RuntimeError("Zero initialization missing: no modifications")
+              output = updated.encode(enc)
+              path.write_bytes(output)
+              print("AZURE_TARGET_PATCHED: only invoice deposit assignment commented")
+          elif text.count(previous) == 0 and text.count(approved) == 1 and text.count("p.tiendatcoc = 0;") == 1:
+              print("AZURE_TARGET_ALREADY_PATCHED")
+          else:
+              raise RuntimeError("Azure source differs from expected, refusing unsafe overwrite")
+          PY
+          git -C "$AZURE_DIR" add -- "$TARGET"
+          git -C "$AZURE_DIR" -c core.whitespace=cr-at-eol diff --cached --check
+          if git -C "$AZURE_DIR" diff --cached --quiet; then
+            echo "AZURE_ALREADY_SYNCED"
+            exit 0
+          fi
+          test "$(git -C "$AZURE_DIR" diff --cached --name-only)" = "$TARGET"
+          git -C "$AZURE_DIR" -c user.name="AncoTrading GitHub Sync" -c user.email="actions@users.noreply.github.com" commit -m "fix(invoice): initialize deposit to zero until PO allocation activation"
+          git -C "$AZURE_DIR" -c "http.extraheader=$AUTH" push origin HEAD:refs/heads/master
+          EXPECTED="$(git -C "$AZURE_DIR" rev-parse HEAD)"
+          ACTUAL="$(git -c "http.extraheader=$AUTH" ls-remote "$AZURE_URL" refs/heads/master | cut -f1)"
+          test "$EXPECTED" = "$ACTUAL"
+          echo "AZURE_MASTER_SYNC_SUCCESS=$ACTUAL"
