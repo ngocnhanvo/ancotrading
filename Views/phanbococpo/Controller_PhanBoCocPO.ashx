@@ -211,7 +211,7 @@ public class Controller_PhanBoCocPO : IHttpHandler, IRequiresSessionState
                     context.Response.Write(JsonConvert.SerializeObject(new
                     {
                         ok = true,
-                        invoice = new { id = invoice.c_packinginvoice_id, number = invoice.so_inv, status = invoice.md_trangthai_id },
+                        invoice = new { id = invoice.c_packinginvoice_id, number = invoice.so_inv, status = invoice.md_trangthai_id, actualDeposit = invoice.tiendatcoc.GetValueOrDefault(0) },
                         writePolicy = new { allowed = writeBlockReason.Length == 0, reason = writeBlockReason },
                         po = poRows,
                         details = detailRows,
