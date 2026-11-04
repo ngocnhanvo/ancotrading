@@ -31,8 +31,8 @@ jobs:
           inc=root/'Views/chungtuxuatkhoNV/inc-ctxkNV.aspx'
           old_rev='20261104-hide-zero-deposit'
           new_rev='20261104-save-diagnostic'
-          old_url='url:"Views/phanbococpo/Controller_PhanBoCocPO.ashx",'
-          new_url='url:"Views/phanbococpo/Controller_PhanBoCocPO.ashx?diagnostic=1",'
+          old_url='url:"Views/phanbococpo/Controller_PhanBoCocPO.ashx",\n                type:"POST",dataType:"json",'
+          new_url='url:"Views/phanbococpo/Controller_PhanBoCocPO.ashx?diagnostic=1",\n                type:"POST",dataType:"json",'
           def patch(path, changes):
               raw=path.read_bytes()
               enc='utf-8-sig' if raw.startswith(b'\xef\xbb\xbf') else 'utf-8'
