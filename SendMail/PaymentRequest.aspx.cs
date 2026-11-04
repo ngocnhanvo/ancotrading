@@ -86,6 +86,17 @@ public partial class SendMail_PaymentRequest : System.Web.UI.Page
         info.pkl.totalgross = info.pkl.totalgross.GetValueOrDefault(0);
         info.pkl.tiendatcoc = info.pkl.tiendatcoc.GetValueOrDefault(0);
         info.pkl.tienconlai = info.pkl.tienconlai.GetValueOrDefault(0);
+
+        // Payment Request can be printed before activation: show saved draft PO allocations.
+        // Effective invoices must continue to use their recorded tiendatcoc.
+        decimal depositForPaymentRequest = info.pkl.tiendatcoc.Value;
+        if (String.Equals(info.pkl.md_trangthai_id, Helper.SOANTHAO, StringComparison.Ordinal))
+        {
+            depositForPaymentRequest = db.ExecuteQuery<decimal>(
+                @"SELECT CONVERT(decimal(18,2), ISNULL(SUM(sotienphanbo), 0))
+                  FROM dbo.c_packinginvoice_phanbo
+                  WHERE c_packinginvoice_id = {0}", pklId).Single();
+        }
         string sql = $@"
             select 
                 N'{dhStr}' as sopo, 
@@ -101,7 +112,7 @@ public partial class SendMail_PaymentRequest : System.Web.UI.Page
                 N'{toSoKien.ToString()}' as sokien, 
                 {info.pkl.totalgross.ToString()} as tongtieninvoice, 
                 N'{info.pkl.so_inv}' as soinvoice, 
-                {info.pkl.tiendatcoc.Value} as datcoc, 
+                {depositForPaymentRequest.ToString(System.Globalization.CultureInfo.InvariantCulture)} as datcoc, 
                 {info.pkl.tienconlai.Value} as giatriconlai, 
                 N'Account No.: {nganhang.thongtin.Replace("'", "''")}' as nganhang,
                 N'{Public.tenTaiKhoanNoTA}' as cp_name,
