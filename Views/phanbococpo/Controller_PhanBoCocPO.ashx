@@ -388,8 +388,8 @@ public class Controller_PhanBoCocPO : IHttpHandler, IRequiresSessionState
                             SET sotienphanbo=@amount, ngaycapnhat=GETDATE(), nguoicapnhat=@user
                             WHERE c_packinginvoice_phanbo_id=@id AND c_packinginvoice_id=@invoice"
                         : @"INSERT INTO dbo.c_packinginvoice_phanbo
-                            (c_packinginvoice_phanbo_id,c_packinginvoice_id,c_donhang_id,sotienphanbo,nguoitao)
-                            VALUES (@id,@invoice,@poId,@amount,@user)", connection, tx))
+                            (c_packinginvoice_phanbo_id,c_packinginvoice_id,c_donhang_id,sotienphanbo,nguoitao,ngaytao)
+                            VALUES (@id,@invoice,@poId,@amount,@user,GETDATE())", connection, tx))
                     {
                         cmd.Parameters.Add("@id", SqlDbType.NVarChar, 32).Value = update ? row.id : Guid.NewGuid().ToString("N");
                         cmd.Parameters.Add("@invoice", SqlDbType.NVarChar, 32).Value = invoiceId;
