@@ -245,7 +245,7 @@ public class TaoPackingListController : IHttpHandler
             if (lstDHs.Count > 0)
             {
                 p.tiendatcocPO = lstDHs.Select(s => s.datcoc.GetValueOrDefault(0)).Sum();
-                p.tiendatcoc = p.tiendatcocPO;
+                // p.tiendatcoc = p.tiendatcocPO; // Giữ tiền cọc INV bằng 0 khi tạo; ghi nhận khi hiệu lực từ phân bổ PO.
             }
 
             //tao comudity tren packing-list/invoice
