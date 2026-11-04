@@ -291,7 +291,7 @@ window.ancoPhanBoCocPO = (function ($) {
             if(!window.confirm("Lưu "+editableRows.length+" dòng phân bổ bản nháp cho Invoice này?"))return;
             saving=true;refreshButtons();notice("Đang lưu bản nháp...",false);
             $.ajax({
-                url:"Views/phanbococpo/Controller_PhanBoCocPO.ashx",
+                url:"Views/phanbococpo/Controller_PhanBoCocPO.ashx?diagnostic=1",
                 type:"POST",dataType:"json",
                 data:{action:"save",invoiceId:invoiceId,version:version,
                     csrf:$("#anco-pb-csrf").val(),
@@ -312,5 +312,5 @@ window.ancoPhanBoCocPO = (function ($) {
         });
         syncInvoice();window.setTimeout(resize,0);
     }
-    return {revision:"20261104-hide-zero-deposit",init:init,setInvoice:setInvoice,syncInvoice:syncInvoice,refreshInvoice:refreshInvoice,resize:resize};
+    return {revision:"20261104-save-diagnostic",init:init,setInvoice:setInvoice,syncInvoice:syncInvoice,refreshInvoice:refreshInvoice,resize:resize};
 }(jQuery));
