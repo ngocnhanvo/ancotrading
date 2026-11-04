@@ -59,8 +59,8 @@ required = (
 if not all(token in insert for token in required) or 'UPDATE' in insert.upper() or 'DELETE' in insert.upper():
     raise RuntimeError("Approved insertion fails required read-only deposit checks")
 
-old_line = '                {info.pkl.tiendatcoc.Value} as datcoc,'
-new_line = '                {depositForPaymentRequest.ToString(System.Globalization.CultureInfo.InvariantCulture)} as datcoc,'
+old_line = '                {info.pkl.tiendatcoc.Value} as datcoc, \n'
+new_line = '                {depositForPaymentRequest.ToString(System.Globalization.CultureInfo.InvariantCulture)} as datcoc,\n'
 if unique_replace(unique_replace(base, anchor + tail, anchor + insert + tail, "GitHub new block"),
                   old_line, new_line, "GitHub SQL alias") != fresh:
     raise RuntimeError("GitHub approved commit modifies additional unexpected code")
