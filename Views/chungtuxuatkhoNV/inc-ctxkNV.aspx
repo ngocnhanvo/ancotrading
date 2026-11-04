@@ -27,12 +27,12 @@
             window.ancoPhanBoCocPO.resize();
         }
 
-        if (window.ancoPhanBoCocPO && window.ancoPhanBoCocPO.revision === "20261104-hide-zero-deposit") {
+        if (window.ancoPhanBoCocPO && window.ancoPhanBoCocPO.revision === "20261104-save-diagnostic") {
             finish();
             return;
         }
         if (!ancoPbModuleRequestNV) {
-            ancoPbModuleRequestNV = $.getScript("Views/phanbococpo/phanbococpo.js?v=20261104-hide-zero-deposit")
+            ancoPbModuleRequestNV = $.getScript("Views/phanbococpo/phanbococpo.js?v=20261104-save-diagnostic")
                 .fail(function () {
                     $("#anco-pb-warning").text("Không tải được phanbococpo.js. Kiểm tra Network và tải lại trang.");
                     ancoPbModuleRequestNV = null;
