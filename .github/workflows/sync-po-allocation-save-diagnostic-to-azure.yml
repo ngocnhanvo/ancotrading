@@ -1,0 +1,60 @@
+name: Sync PO allocation save diagnostics to Azure master
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/sync-po-allocation-save-diagnostic-to-azure.yml
+permissions:
+  contents: read
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - name: Apply exact diagnostic UI change to Azure
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$AZURE_PAT" || { echo 'Azure PAT missing'; exit 1; }
+          AUTH="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          DIR="$RUNNER_TEMP/azure"
+          git -c "http.extraheader=$AUTH" clone --quiet --depth 1 --branch master --single-branch "$AZURE_URL" "$DIR"
+          echo "AZURE_BEFORE=$(git -C "$DIR" rev-parse HEAD)"
+          python3 - "$DIR" <<'PY'
+          from pathlib import Path
+          import sys
+          root=Path(sys.argv[1])
+          js=root/'Views/phanbococpo/phanbococpo.js'
+          inc=root/'Views/chungtuxuatkhoNV/inc-ctxkNV.aspx'
+          old_rev='20261104-hide-zero-deposit'
+          new_rev='20261104-save-diagnostic'
+          old_url='url:"Views/phanbococpo/Controller_PhanBoCocPO.ashx",'
+          new_url='url:"Views/phanbococpo/Controller_PhanBoCocPO.ashx?diagnostic=1",'
+          def patch(path, changes):
+              raw=path.read_bytes()
+              enc='utf-8-sig' if raw.startswith(b'\xef\xbb\xbf') else 'utf-8'
+              text=raw.decode(enc)
+              for old,new,count in changes:
+                  if text.count(old)==count:
+                      text=text.replace(old,new,count)
+                  elif text.count(new)==count and text.count(old)==0:
+                      pass
+                  else:
+                      raise RuntimeError(f'Unexpected Azure content in {path}: {old}')
+              path.write_bytes(text.encode(enc))
+          patch(js,[(old_url,new_url,1),(old_rev,new_rev,1)])
+          patch(inc,[(old_rev,new_rev,2)])
+          print('AZURE_UI_DIAGNOSTIC_PATCH_VALIDATED')
+          PY
+          git -C "$DIR" add -- Views/phanbococpo/phanbococpo.js Views/chungtuxuatkhoNV/inc-ctxkNV.aspx
+          git -C "$DIR" -c core.whitespace=cr-at-eol diff --cached --check
+          if git -C "$DIR" diff --cached --quiet; then echo AZURE_ALREADY_SYNCED; exit 0; fi
+          git -C "$DIR" -c user.name='AncoTrading GitHub Sync' -c user.email='actions@users.noreply.github.com' commit -m 'debug: expose PO allocation SQL error to admin save'
+          git -C "$DIR" -c "http.extraheader=$AUTH" push origin HEAD:refs/heads/master
+          EXPECTED="$(git -C "$DIR" rev-parse HEAD)"
+          ACTUAL="$(git -c "http.extraheader=$AUTH" ls-remote "$AZURE_URL" refs/heads/master | cut -f1)"
+          test "$EXPECTED" = "$ACTUAL"
+          echo "AZURE_MASTER_SYNC_SUCCESS=$ACTUAL"
