@@ -4,6 +4,7 @@ on:
     branches: [master]
     paths:
       - .github/workflows/sync-payment-request-draft-deposit.yml
+      - .github/scripts/apply_payment_request_draft_deposit.py
 permissions:
   contents: read
 concurrency:
