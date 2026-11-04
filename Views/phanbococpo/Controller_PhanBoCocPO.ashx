@@ -66,7 +66,7 @@ public class Controller_PhanBoCocPO : IHttpHandler, IRequiresSessionState
                 stage = "lookup_invoice";
                 var invoice = db.c_packinginvoices
                     .Where(p => p.c_packinginvoice_id == invoiceId)
-                    .Select(p => new { p.c_packinginvoice_id, p.so_inv, p.md_trangthai_id, p.nguoitao })
+                    .Select(p => new { p.c_packinginvoice_id, p.so_inv, p.md_trangthai_id, p.nguoitao, p.tiendatcoc })
                     .FirstOrDefault();
 
                 if (invoice == null)
