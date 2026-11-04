@@ -1,0 +1,69 @@
+name: Inspect production PO allocation schema read-only
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/inspect-prod-po-allocation-schema-readonly.yml
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check 'pymssql==2.3.7'
+      - name: Inspect ancotrading2019 allocation schema without writes
+        env:
+          SQL_SERVER: ${{ secrets.ANCOTRADING_SQL_SERVER }}
+          SQL_USER: ${{ secrets.ANCOTRADING_SQL_USER }}
+          SQL_PASSWORD: ${{ secrets.ANCOTRADING_SQL_PASSWORD }}
+        shell: bash
+        run: |
+          set +x
+          python - <<'PY'
+          import os,sys,pymssql
+          host=os.environ['SQL_SERVER'].strip(); port=None
+          if ',' in host and host.rsplit(',',1)[1].isdigit():
+              host,port=host.rsplit(',',1); port=int(port)
+          kw=dict(server=host,user=os.environ['SQL_USER'],password=os.environ['SQL_PASSWORD'],database='ancotrading2019',login_timeout=12,timeout=20,autocommit=True,as_dict=True)
+          if port: kw['port']=str(port)
+          try:
+            with pymssql.connect(**kw) as con:
+              with con.cursor() as c:
+                c.execute("SELECT DB_NAME() AS db")
+                print('CONNECTED_TO_EXPECTED_DB:',c.fetchone()['db']=='ancotrading2019')
+                c.execute("SELECT OBJECT_ID('dbo.c_packinginvoice_phanbo','U') AS id")
+                obj=c.fetchone()['id']
+                print('TABLE_EXISTS:',obj is not None)
+                if obj is None:
+                    print('RESULT: MISSING_ALLOCATION_TABLE'); sys.exit(0)
+                c.execute("""
+                  SELECT col.column_id,col.name,t.name AS type_name,col.max_length,col.precision,col.scale,
+                         col.is_nullable,col.is_identity,col.is_computed,dc.definition AS default_sql
+                  FROM sys.columns col
+                  JOIN sys.types t ON t.user_type_id=col.user_type_id
+                  LEFT JOIN sys.default_constraints dc ON dc.object_id=col.default_object_id
+                  WHERE col.object_id=OBJECT_ID('dbo.c_packinginvoice_phanbo','U')
+                  ORDER BY col.column_id
+                """)
+                rows=c.fetchall()
+                for r in rows: print('COLUMN:',r)
+                required={'c_packinginvoice_phanbo_id','c_packinginvoice_id','c_donhang_id','sotienphanbo','ngaytao','nguoitao','ngaycapnhat','nguoicapnhat','mota'}
+                names={r['name'] for r in rows}
+                print('MISSING_EXPECTED_COLUMNS:',sorted(required-names))
+                extras=[r['name'] for r in rows if not r['is_nullable'] and not r['is_identity'] and not r['is_computed'] and r['default_sql'] is None and r['name'] not in {'c_packinginvoice_phanbo_id','c_packinginvoice_id','c_donhang_id','sotienphanbo'}]
+                print('EXTRA_REQUIRED_NO_DEFAULT:',extras)
+                c.execute("SELECT COUNT(*) AS n FROM sys.triggers WHERE parent_id=OBJECT_ID('dbo.c_packinginvoice_phanbo','U') AND is_disabled=0")
+                print('ENABLED_TRIGGER_COUNT:',c.fetchone()['n'])
+                c.execute("SELECT COUNT(*) AS n FROM dbo.c_packinginvoice WHERE so_inv LIKE 'dddd%'")
+                print('MATCHING_DDDD_INVOICE_COUNT:',c.fetchone()['n'])
+                c.execute("SELECT COUNT(*) AS n FROM dbo.c_donhang WHERE sochungtu='001/ZG-26'")
+                print('MATCHING_PO_001_ZG_26_COUNT:',c.fetchone()['n'])
+                print('RESULT: PROD_READ_ONLY_SCHEMA_COMPLETE')
+          except Exception as ex:
+            print('RESULT: PROD_SCHEMA_CHECK_FAILED',type(ex).__name__)
+            raise
+          PY
