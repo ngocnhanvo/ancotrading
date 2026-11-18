@@ -594,7 +594,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IReadOnlySessionSt
             ttdg = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id, db);
             if (ttdg != null)
             {
-                slOuter = ttdg.sl_outer.ToString();
+                slOuter = Convert.ToString(ttdg.sl_outer, System.Globalization.CultureInfo.InvariantCulture);
                 var dDVT = ExcuteSignalRStatic.getTextFromInner(ttdg.dvtinner, ttdg.dvtouter, ttdg.sl_inner.ToString(), ttdg.sl_outer.ToString());
                 var inner = dDVT.inner;
                 var outer = dDVT.outer;
