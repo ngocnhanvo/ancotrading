@@ -231,9 +231,9 @@ Do not reverse-engineer all of these merely to fill documentation. Add them when
 **Status: Confirmed (2026-11-18, project owner instruction)**
 
 - The mobile quotation/cart collects independent `Quantity Items` (loose items) and `Quantity Pallet/thùng/kiện` (outer packs). Both can be zero individually, but the calculated total must be positive.
-- For each selected SKU, `Total Qty = Quantity Items + Quantity Pallet/thùng/kiện × SL Outer`. The unit price, line amount and CBM per unit are applied to the converted **Total Qty**. The quantity sent to the server is the converted total, not the number of outer packs.
+- For each selected SKU, `Total Qty = Quantity Items + Quantity Pallet/thùng/kiện × SL Outer`. The unit price and line amount use the converted **Total Qty**. The quantity sent to the server is the converted total, not the number of outer packs. The API's `cbm` represents **CBM Outer** (volume of one outer pack, sourced from `md_donggoi.v2`); it is NOT CBM per loose item. **Total CBM = (Quantity Items / SL Outer + Quantity Pallet/thùng/kiện) × CBM Outer**. Use this formula for line items and cart/quotation totals independently of the monetary calculation.
 - `SL Outer` is sourced from the selected product's default `md_donggoi.sl_outer` via `ExcuteSignalRStatic.getDongGoi` and exposed as a dedicated field in the mobile product API. Do not infer it by parsing human-readable `Packing` text or from `Q'ty cont` (container capacity).
-- Validation must reject selecting outer packs without a valid positive `SL Outer`, reject an all-zero order line, and preserve existing quantity/price semantics for lines without outer packs. In case old locally cached products omit `SL Outer`, require refreshing/reselecting product data rather than using an invented multiplier.
+- Validation must reject selecting outer packs without a valid positive `SL Outer`, reject an all-zero order line, and preserve existing quantity/price semantics for lines without outer packs. For CBM, any nonzero line with missing/invalid `SL Outer` has an unavailable CBM (show `SL Outer required`, never silently report `qty × CBM Outer` or a zero subtotal). In case old locally cached products omit `SL Outer`, require refreshing/reselecting product data rather than using an invented multiplier.
 - Historical server quotations are not retroactively changed. Local saved cart/draft rows retain both user-entered quantities and the conversion factor used for their calculation.
 
 **Where implemented:**
@@ -244,3 +244,5 @@ Do not reverse-engineer all of these merely to fill documentation. Add them when
 - `ancotrading-mobile/modules2/screens/quotation/footer.js` → server quotation quantity payload.
 
 **Related:** `md_donggoi.sl_outer`, `md_donggoisanpham`, `GioHang`, `BaoGiaSP`, SignalR `CreateQO`.
+
+- CBM calculation: `ancotrading-mobile/modules2/Model/quantity.js` (`getLineCbm`) for preview/line/PDF, and `tableSQL/GioHang.js` / `tableSQL/BaoGiaSP.js` for SQL aggregate totals. Keep six decimal places for small loose-item volumes. `Controllers/API_Data.ashx` serializes numeric `cbm` using invariant culture for reliable mobile parsing.

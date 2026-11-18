@@ -610,7 +610,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IReadOnlySessionSt
                     qtyCont = $@"{ttdg.soluonggoi_ctn_40hc} {dDVT.quantity}/40HC'";
                 }
 
-                cbm = ttdg.cbm.GetValueOrDefault(0).ToString();
+                cbm = ttdg.cbm.GetValueOrDefault(0).ToString(System.Globalization.CultureInfo.InvariantCulture);
             }
 
 
