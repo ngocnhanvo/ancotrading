@@ -1,0 +1,162 @@
+name: Sync November 18 ANCO Q-O QR changes to Azure DevOps master
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/sync-20261118-qr-to-azure.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: anco-20261118-qr-azure-sync
+  cancel-in-progress: false
+
+jobs:
+  safe-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      SOURCE_BASE: 3496188410d1f31915a5074f366ad6c236617396
+      SOURCE_SHA: a814bd9deb9991a01b8e99be29c6172f96baca76
+      AZURE_URL: https://dev.azure.com/vongocnhancd10cntt2/AncoTrading/_git/AncoTrading
+      AZURE_PAT: ${{ secrets.AZURE_DEVOPS_PAT || secrets.AZDO_PAT || secrets.ADO_PAT || secrets.AZURE_PAT || secrets.AZURE_DEVOPS_TOKEN }}
+    steps:
+      - name: Check out GitHub source with full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate exact approved GitHub delta and fetch Azure master
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "$SOURCE_BASE^{commit}"
+          git cat-file -e "$SOURCE_SHA^{commit}"
+          test -n "$AZURE_PAT" || { echo 'ERROR: Azure DevOps PAT is not configured'; exit 1; }
+          python3 - <<'PY'
+          import os, subprocess
+          expected = set("""
+          App_Code/LinQ/LinqDB.dbml
+          App_Code/LinQ/LinqDB.designer.cs
+          App_Code/Report/InBaoGia/BaoGiaReport.cs
+          App_Code/SignalR/ExcuteSignalR.cs
+          App_Code/SignalR/MainHubPhone.cs
+          App_Code/SignalR/Objects.cs
+          Controllers/API_Data.ashx
+          Controllers/QuotationQRDetailController.ashx
+          docs/database/migrations/20261118_qo_qr_soluong_pallet.sql
+          docs/knowledge-base/BUSINESS_LOGIC.md
+          inc-quotationqr.aspx
+          """.split())
+          actual = set(subprocess.check_output(
+              ['git','diff','--name-only',os.environ['SOURCE_BASE'],os.environ['SOURCE_SHA']]
+          ).decode().splitlines())
+          if actual != expected:
+              raise SystemExit("Unexpected source delta. Missing: %s; extra: %s" % (expected-actual,actual-expected))
+          print('SOURCE_DELTA_VERIFIED',len(actual),'files at',os.environ['SOURCE_SHA'])
+          PY
+          AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          git -c "http.extraheader=$AUTH_HEADER" clone --quiet --depth 1 --single-branch --branch master "$AZURE_URL" "$RUNNER_TEMP/anco-azure-master"
+          echo "AZURE_BEFORE=$(git -C "$RUNNER_TEMP/anco-azure-master" rev-parse HEAD)"
+
+      - name: Merge only approved paths into Azure and push if conflict-free
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, pathlib, subprocess, tempfile
+
+          root = pathlib.Path(os.environ['GITHUB_WORKSPACE'])
+          azure = pathlib.Path(os.environ['RUNNER_TEMP'])/'anco-azure-master'
+          source_base = os.environ['SOURCE_BASE']
+          source_sha = os.environ['SOURCE_SHA']
+          expected = subprocess.check_output(
+              ['git','diff','--name-only',source_base,source_sha],cwd=root
+          ).decode().splitlines()
+          optional_doc = {'docs/knowledge-base/BUSINESS_LOGIC.md'}
+          edits = {}
+
+          def show(rev,path):
+              proc = subprocess.run(['git','show',rev+':'+path],cwd=root,capture_output=True)
+              if proc.returncode:
+                  return None
+              return proc.stdout
+
+          def normalize(data):
+              if data is None: return None
+              return data.removeprefix(b'\xef\xbb\xbf').replace(b'\r\n',b'\n')
+
+          # Inspect every file first; do not change even the runner's Azure worktree
+          # if any target has a genuine conflict or is unexpectedly absent.
+          for path in expected:
+              base_raw = show(source_base,path)
+              new_raw = show(source_sha,path)
+              dest = azure/path
+              old_raw = dest.read_bytes() if dest.exists() and dest.is_file() else None
+              if new_raw is None:
+                  raise RuntimeError('Deletion not approved: '+path)
+              if old_raw is None:
+                  if base_raw is not None and path not in optional_doc:
+                      raise RuntimeError('Existing source file absent on Azure: '+path)
+                  result = new_raw
+                  status = 'NEW_ON_AZURE'
+              elif normalize(old_raw) == normalize(new_raw):
+                  print('ALREADY_SYNCED',path)
+                  continue
+              elif base_raw is None:
+                  raise RuntimeError('Added GitHub path independently differs on Azure: '+path)
+              elif normalize(old_raw) == normalize(base_raw):
+                  result = new_raw
+                  status = 'APPLY_APPROVED_CHANGE'
+              else:
+                  # Preserve independent Azure edits using a three-way merge.
+                  with tempfile.TemporaryDirectory() as temp:
+                      tmp=pathlib.Path(temp)
+                      ours,base,theirs=(tmp/'azure',tmp/'base',tmp/'github')
+                      ours.write_bytes(normalize(old_raw))
+                      base.write_bytes(normalize(base_raw))
+                      theirs.write_bytes(normalize(new_raw))
+                      merge=subprocess.run(['git','merge-file','-p',str(ours),str(base),str(theirs)],
+                                           capture_output=True)
+                      if merge.returncode != 0:
+                          raise RuntimeError('MERGE_CONFLICT '+path+' (Azure not modified)')
+                      result=merge.stdout
+                      status='MERGED_PRESERVING_AZURE'
+              # Restore Azure's original BOM/EOL convention for changed paths.
+              if old_raw is not None:
+                  norm=normalize(result)
+                  if b'\r\n' in old_raw:
+                      norm=norm.replace(b'\n',b'\r\n')
+                  if old_raw.startswith(b'\xef\xbb\xbf'):
+                      norm=b'\xef\xbb\xbf'+norm
+                  result=norm
+              if result != old_raw:
+                  edits[path]=(result,status)
+              print(status,path)
+
+          for path,(data,status) in edits.items():
+              dest=azure/path
+              dest.parent.mkdir(parents=True,exist_ok=True)
+              dest.write_bytes(data)
+          print('SAFE_MERGE_PREPARED',len(edits),'paths')
+          PY
+
+          AZURE_DIR="$RUNNER_TEMP/anco-azure-master"
+          git -C "$AZURE_DIR" add --             App_Code/LinQ/LinqDB.dbml             App_Code/LinQ/LinqDB.designer.cs             App_Code/Report/InBaoGia/BaoGiaReport.cs             App_Code/SignalR/ExcuteSignalR.cs             App_Code/SignalR/MainHubPhone.cs             App_Code/SignalR/Objects.cs             Controllers/API_Data.ashx             Controllers/QuotationQRDetailController.ashx             docs/database/migrations/20261118_qo_qr_soluong_pallet.sql             docs/knowledge-base/BUSINESS_LOGIC.md             inc-quotationqr.aspx
+          git -C "$AZURE_DIR" -c core.whitespace=cr-at-eol diff --cached --check
+          if git -C "$AZURE_DIR" diff --cached --quiet; then
+            echo 'AZURE_ALREADY_SYNCED'
+            exit 0
+          fi
+          git -C "$AZURE_DIR" -c user.name='AncoTrading GitHub Sync'             -c user.email='actions@users.noreply.github.com'             commit -m 'feat: sync November 18 Android Q-O QR and SL Outer backend changes'
+          AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZURE_PAT" | base64 -w0)"
+          git -C "$AZURE_DIR" -c "http.extraheader=$AUTH_HEADER"             push origin HEAD:refs/heads/master
+          EXPECTED=$(git -C "$AZURE_DIR" rev-parse HEAD)
+          ACTUAL=$(git -c "http.extraheader=$AUTH_HEADER" ls-remote "$AZURE_URL" refs/heads/master | cut -f1)
+          test "$EXPECTED" = "$ACTUAL"
+          echo "AZURE_MASTER_SYNC_SUCCESS=$ACTUAL"
+          echo "No SQL migrations or server deployment were performed."
