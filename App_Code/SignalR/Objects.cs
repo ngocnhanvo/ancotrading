@@ -26,6 +26,8 @@ public class Objects
         public string price;
         public string image;
         public string soluong;
+        // Optional for older Android clients; quantity of outer packages, not loose items.
+        public string qtyPallet;
         public string ghichu;
         public string detai_mausac;
     }

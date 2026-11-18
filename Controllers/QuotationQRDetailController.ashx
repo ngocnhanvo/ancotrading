@@ -46,6 +46,7 @@ public class QuotationQRDetailController : IHttpHandler
         var soluong = context.Request.Form["soluong"].ToNullableInt().GetValueOrDefault(0);
         string ghichu = context.Request.Form["ghichu"].removeAllSpaceOrTrimText(true);
         string donggoiId = context.Request.Form["md_donggoi_id"].removeAllSpaceOrTrimText(true);
+        string palletRaw = context.Request.Form["soluong_pallet"];
         try
         {
             var dbg = db.c_chitietbaogiaqrs.Where(s => s.c_chitietbaogiaqr_id == id).FirstOrDefault();
@@ -68,6 +69,22 @@ public class QuotationQRDetailController : IHttpHandler
                 goto EndEventHandler;
             }
 
+            decimal palletCount = dbg.soluong_pallet.GetValueOrDefault(0);
+            if (palletRaw != null && !decimal.TryParse(palletRaw,
+                    System.Globalization.NumberStyles.Integer,
+                    System.Globalization.CultureInfo.InvariantCulture, out palletCount))
+            {
+                msg = "Quantity Pallet/thung/kien phai la so nguyen.";
+                goto EndEventHandler;
+            }
+            decimal outer = dbg.sl_outer.GetValueOrDefault(0);
+            if (palletCount < 0 || palletCount != decimal.Truncate(palletCount)
+                || (palletCount > 0 && (outer <= 0 || palletCount * outer > soluong)))
+            {
+                msg = "Quantity Pallet/thung/kien khong hop le voi tong so luong/SL Outer.";
+                goto EndEventHandler;
+            }
+            dbg.soluong_pallet = palletCount;
             dbg.soluong = soluong;
             dbg.ghichu = ghichu;
             dbg.md_donggoi_id = donggoiId;
@@ -98,6 +115,7 @@ public class QuotationQRDetailController : IHttpHandler
         var soluong = context.Request.Form["soluong"].ToNullableInt().GetValueOrDefault(0);
         string ghichu = context.Request.Form["ghichu"].removeAllSpaceOrTrimText(true);
         string donggoiId = context.Request.Form["md_donggoi_id"].removeAllSpaceOrTrimText(true);
+        string palletRaw = context.Request.Form["soluong_pallet"];
         try
         {
             var bg = db.c_baogiaqrs.Where(s => s.c_baogiaqr_id == baogia_id).FirstOrDefault();
@@ -126,8 +144,22 @@ public class QuotationQRDetailController : IHttpHandler
                 goto EndEventHandler;
             }
 
+            decimal palletCount = 0;
+            if (!string.IsNullOrWhiteSpace(palletRaw) && !decimal.TryParse(palletRaw,
+                    System.Globalization.NumberStyles.Integer,
+                    System.Globalization.CultureInfo.InvariantCulture, out palletCount))
+            {
+                msg = "Quantity Pallet/thung/kien phai la so nguyen.";
+                goto EndEventHandler;
+            }
+            if (palletCount < 0 || palletCount != decimal.Truncate(palletCount))
+            {
+                msg = "Quantity Pallet/thung/kien khong duoc am.";
+                goto EndEventHandler;
+            }
+
             int order = (spids.Count + 1) * 10;
-            exec.add_ctbg(ma_sanpham, order, -1, bg.c_baogiaqr_id, username, bg.md_doitackinhdoanh_id, db, "qr", soluong, ghichu, donggoiId);
+            exec.add_ctbg(ma_sanpham, order, -1, bg.c_baogiaqr_id, username, bg.md_doitackinhdoanh_id, db, "qr", soluong, ghichu, donggoiId, palletCount);
             var sps = db.md_sanphams.Where(s => spids.Contains(s.md_sanpham_id)).ToList();
             sps.Add(sp);
             exec.createColorRefer(db, sps, bg.c_baogiaqr_id, username);
@@ -262,7 +294,7 @@ public class QuotationQRDetailController : IHttpHandler
             select ctbg.c_chitietbaogiaqr_id, bg.c_baogiaqr_id, sp.trangthai, ctbg.trangthai as trangthai_ctbg, ctbg.sothutu, sp.md_sanpham_id, sp.ma_sanpham, hs.hscode, ctbg.ma_sanpham_khach,
             ctbg.giafob, ctbg.soluong, dg.ten_donggoi, ctbg.sl_inner,
             ctbg.l1, ctbg.w1, ctbg.h1, ctbg.sl_outer, ctbg.l2, ctbg.w2, ctbg.h2, sp.trongluong, ctbg.v2,  ctbg.sl_cont,
-            ctbg.ghichu, ctbg.ngaytao, ctbg.nguoitao, ctbg.ngaycapnhat, ctbg.nguoicapnhat, ctbg.mota, ctbg.hoatdong, ctbg.docquyen,
+            ctbg.ghichu, ctbg.ngaytao, ctbg.nguoitao, ctbg.ngaycapnhat, ctbg.nguoicapnhat, ctbg.mota, ctbg.hoatdong, ctbg.docquyen, ISNULL(ctbg.soluong_pallet, 0) as soluong_pallet,
             ROW_NUMBER() OVER ({1}) as RowNum 
             
 			FROM c_chitietbaogiaqr ctbg with (nolock) 
@@ -302,6 +334,7 @@ public class QuotationQRDetailController : IHttpHandler
             xml += "<cell><![CDATA[" + row[8] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[9] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[10] + "]]></cell>";
+            xml += "<cell><![CDATA[" + row[31] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[11] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[12] + "]]></cell>";
             xml += "<cell><![CDATA[" + row[13] + "]]></cell>";

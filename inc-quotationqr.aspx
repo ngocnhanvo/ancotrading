@@ -589,7 +589,7 @@
                 SortOrder="asc"
                 UrlFileAction="Controllers/QuotationQRDetailController.ashx" 
                 ColNames="['c_chitietbaogiaqr_id', 'Báo Giá', 'TT', 'Trạng Thái', 'STT', 'Mã SP', 'Mã SP', 'HS Code', 'Mã SP Khách',  
-				'Giá FOB', 'Số Lượng',  'Đóng Gói', 'Đóng Gói Inner', 'L1', 'W1', 'H1', 'Đóng Gói Outer', 'L2', 'W2', 'H2','Weight', 'V2', 'SL Cont',  'Ghi Chú', 
+				'Giá FOB', 'Số Lượng', 'Quantity Pallet/thùng/kiện', 'Đóng Gói', 'Đóng Gói Inner', 'L1', 'W1', 'H1', 'Đóng Gói Outer', 'L2', 'W2', 'H2','Weight', 'V2', 'SL Cont',  'Ghi Chú', 
 				'Ngày Tạo', 'Người Tạo', 'Ngày Cập Nhật', 'Người Cập Nhật', 'Mô tả', 'Hoạt Động', 'Độc quyền']"
                 FilterToolbar="true"
                 RowNumbers="true"
@@ -729,6 +729,18 @@
                     , formatoptions:{decimalSeparator:'.', thousandsSeparator: ',', decimalPlaces: 0, prefix: ''}
 					, hidden: false
 					, editrulea:{ edithidden:true }
+                },
+                {
+                    fixed: true, name: 'soluong_pallet'
+                    , index: 'ctbg.soluong_pallet'
+                    , width: 170
+                    , edittype: 'text'
+                    , editable: true
+                    , editrules: { required: true, integer: true, minValue: 0 }
+                    , editoptions: { defaultValue: '0' }
+                    , align: 'right'
+                    , formatter: 'number'
+                    , formatoptions: { decimalSeparator: '.', thousandsSeparator: ',', decimalPlaces: 0, prefix: '' }
                 },
                 {
                     fixed: true, name: 'md_donggoi_id'

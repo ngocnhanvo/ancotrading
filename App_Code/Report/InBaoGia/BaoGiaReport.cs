@@ -129,6 +129,7 @@ public class BaoGiaReport
 				        , dg.sl_outer * (SELECT dbo.f_convertKgToPounds(sp.trongluong, bg.md_trongluong_id)) as n_w_outer
                         , hscode.thanhphan
                         , ctbg.soluong as qty
+                        , {4} as soluong_pallet
                         , round(ctbg.soluong * ctbg.giafob, 2) as amount
                         , isnull(bg.loaiBG, 0) as inCoGia
                         , isnull(ctbg.cpdg, 0) as cpdg
@@ -150,6 +151,9 @@ public class BaoGiaReport
             , orderby
             , tbl
             , tblChild1
+            , LaBaoGiaMauQR.GetValueOrDefault(false)
+                ? "ISNULL(ctbg.soluong_pallet, 0)"
+                : "CAST(0 AS DECIMAL(18,0))"
         );
 
 
@@ -214,7 +218,8 @@ public class BaoGiaReport
 
             ISheet s1 = hssfworkbook.CreateSheet("Sheet1");
 
-            var config = new ExportExcel(hssfworkbook, 0, 32);
+            bool isQr = LaBaoGiaMauQR.GetValueOrDefault(false);
+            var config = new ExportExcel(hssfworkbook, 0, isQr ? 34 : 32);
             var info = new PrintAnco2.InfoExcel();
             var ex_fm = new Excel_Format(hssfworkbook);
             var celltext = ex_fm.getcell(10, false, true, "", "L", "T");
@@ -306,7 +311,7 @@ public class BaoGiaReport
                 = hStyle.BorderTop
                 = NPOI.SS.UserModel.BorderStyle.Thin;
             //--
-            for (int i = 0; i <= 33; i++)
+            for (int i = 0; i <= (isQr ? 34 : 33); i++)
             {
                 headerColumn.CreateCell(i).CellStyle = hStyle;
                 headerColumn2.CreateCell(i).CellStyle = hStyle;
@@ -404,6 +409,12 @@ public class BaoGiaReport
             headerColumn.GetCell(32).SetCellValue("Amount");
             s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 32, 32));
 
+            if (isQr)
+            {
+                headerColumn.GetCell(34).SetCellValue("Quantity Pallet/thùng/kiện");
+                s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 34, 34));
+            }
+
             headerColumn.GetCell(33).SetCellValue("CPĐG");
             s1.AddMergedRegion(new CellRangeAddress(row - 1, row, 33, 33));
 
@@ -449,6 +460,7 @@ public class BaoGiaReport
                 s1.SetColumnHidden(32, true);
             }
 
+            if (isQr) s1.SetColumnWidth(34, 5200);
             s1.SetColumnWidth(33, 2000);
             s1.SetColumnHidden(33, true);
 
@@ -578,17 +590,22 @@ public class BaoGiaReport
                 s1.GetRow(rowDt).CreateCell(31).SetCellValue(double.Parse(dtDetails.Rows[i]["qty"].ToString()));
                 s1.GetRow(rowDt).CreateCell(32).SetCellValue(double.Parse(dtDetails.Rows[i]["amount"].ToString()));
                 s1.GetRow(rowDt).CreateCell(33).SetCellValue(double.Parse(dtDetails.Rows[i]["cpdg"].ToString()));
+                if (isQr)
+                {
+                    s1.GetRow(rowDt).CreateCell(34).SetCellValue(double.Parse(dtDetails.Rows[i]["soluong_pallet"].ToString()));
+                    s1.GetRow(rowDt).GetCell(34).SetCellType(CellType.Numeric);
+                }
             }
 
             rowDt = row;
             for (int i = 0; i < dtDetails.Rows.Count; i++)
             {
                 rowDt++;
-                for (int j = 0; j <= 33; j++)
+                for (int j = 0; j <= (isQr ? 34 : 33); j++)
                 {
                     if (j == 0)
                         s1.GetRow(rowDt).GetCell(j).CellStyle = cellTextCenterBoderAll;
-                    else if (new int[] { 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 27, 31, 32, 33 }.Contains(j))
+                    else if (new int[] { 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 27, 31, 32, 33, 34 }.Contains(j))
                     {
                         s1.GetRow(rowDt).GetCell(j).CellStyle = cellStyleRight;
                     }
@@ -619,6 +636,11 @@ public class BaoGiaReport
             s1.GetRow(row).GetCell(31).CellStyle = cellBold;
             s1.GetRow(row).CreateCell(32).SetCellFormula($@"SUM({col32}1:{col32}{row})");
             s1.GetRow(row).GetCell(32).CellStyle = cellBold;
+            if (isQr)
+            {
+                s1.GetRow(row).CreateCell(34).SetCellFormula($@"SUM(AI1:AI{row})");
+                s1.GetRow(row).GetCell(34).CellStyle = cellBold;
+            }
             int lineNum = 2;
             for (int i = 0; i < dtDistinct.Rows.Count; i++)
             {

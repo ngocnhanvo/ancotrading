@@ -240,6 +240,14 @@ public class ExcuteSignalR
         //Dong goi
         string object3 = "";
         try { object3 = args[3].ToString(); } catch { }
+        // Optional in older Android clients and manually created Q/O.
+        string object4 = "0";
+        try { object4 = args[4].ToString(); } catch { }
+        decimal qtyPallet = 0;
+        if (object0 == "qr" && (!decimal.TryParse(object4, System.Globalization.NumberStyles.Integer,
+                System.Globalization.CultureInfo.InvariantCulture, out qtyPallet)
+            || qtyPallet < 0 || qtyPallet != decimal.Truncate(qtyPallet)))
+            throw new InvalidOperationException("Quantity Pallet/thung/kien must be a non-negative whole number.");
 
         md_sanpham pro = db.md_sanphams.FirstOrDefault(s => s.ma_sanpham == ma_sanpham);
         if (pro != null)
@@ -287,6 +295,14 @@ public class ExcuteSignalR
             trangthai = UserUtils.get_DQ_DG_ALL(null, dgsp.md_donggoi_id, md_doitackinhdoanh_id, pro.md_sanpham_id, db)[0];
             
 
+            if (object0 == "qr" && qtyPallet > 0)
+            {
+                int totalPieces;
+                if (!int.TryParse(object1, out totalPieces) || !sl_outer.HasValue || sl_outer.Value <= 0
+                    || qtyPallet * sl_outer.Value > totalPieces)
+                    throw new InvalidOperationException("Quantity Pallet/thung/kien exceeds total product quantity or SL Outer is invalid.");
+            }
+
             c_chitietbaogia ctbg = new c_chitietbaogia
             {
                 c_chitietbaogia_id = ImportUtils.getNEWID(),
@@ -331,6 +347,7 @@ public class ExcuteSignalR
                 ctbg.CopyPropertiesTo(ctbgqr);
                 ctbgqr.c_chitietbaogiaqr_id = ctbg.c_chitietbaogia_id;
                 ctbgqr.c_baogiaqr_id = c_baogia_id;
+                ctbgqr.soluong_pallet = qtyPallet;
                 db.c_chitietbaogiaqrs.InsertOnSubmit(ctbgqr);
             }
             else

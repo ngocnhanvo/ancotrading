@@ -269,6 +269,7 @@
       <Column Name="sothutu" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="giafob" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
       <Column Name="soluong" Type="System.Decimal" DbType="Decimal(18,0)" CanBeNull="true" />
+      <Column Name="soluong_pallet" Type="System.Decimal" DbType="Decimal(18,0)" CanBeNull="true" />
       <Column Name="md_donggoi_id" Type="System.String" DbType="NVarChar(32)" CanBeNull="true" />
       <Column Name="sl_inner" Type="System.Decimal" DbType="Decimal(18,0)" CanBeNull="true" />
       <Column Name="l1" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />

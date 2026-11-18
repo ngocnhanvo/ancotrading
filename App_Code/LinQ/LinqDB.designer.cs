@@ -7329,6 +7329,7 @@ private string _md_cangbien_id;
 private System.Nullable<int> _sothutu;
 private System.Nullable<decimal> _giafob;
 private System.Nullable<decimal> _soluong;
+private System.Nullable<decimal> _soluong_pallet;
 private string _md_donggoi_id;
 private System.Nullable<decimal> _sl_inner;
 private System.Nullable<decimal> _l1;
@@ -7380,6 +7381,8 @@ partial void OngiafobChanging(System.Nullable<decimal> value);
 partial void OngiafobChanged();
 partial void OnsoluongChanging(System.Nullable<decimal> value);
 partial void OnsoluongChanged();
+partial void Onsoluong_palletChanging(System.Nullable<decimal> value);
+partial void Onsoluong_palletChanged();
 partial void Onmd_donggoi_idChanging(string value);
 partial void Onmd_donggoi_idChanged();
 partial void Onsl_innerChanging(System.Nullable<decimal> value);
@@ -7644,6 +7647,26 @@ this.OnsoluongChanged();
 }
 }
 }
+[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_soluong_pallet", DbType="Numeric", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
+public System.Nullable<decimal> @soluong_pallet
+{
+get
+{
+return this._soluong_pallet;
+}
+set
+{
+if ((this._soluong_pallet != value))
+{
+this.Onsoluong_palletChanging(value);
+this.SendPropertyChanging();
+this._soluong_pallet = value;
+this.SendPropertyChanged("soluong_pallet");
+this.Onsoluong_palletChanged();
+}
+}
+}
+
 [global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_md_donggoi_id", DbType="Nvarchar(32)", CanBeNull=true , UpdateCheck=UpdateCheck.Never)]
 public string @md_donggoi_id
 {
