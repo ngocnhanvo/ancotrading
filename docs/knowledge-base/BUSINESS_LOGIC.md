@@ -223,3 +223,24 @@ These are not business rules. They are reminders of areas that should be documen
 - report calculations that differ from transactional calculations.
 
 Do not reverse-engineer all of these merely to fill documentation. Add them when actual work provides reliable evidence and context.
+
+---
+
+## Android quotation — item and outer-pack quantity conversion
+
+**Status: Confirmed (2026-11-18, project owner instruction)**
+
+- The mobile quotation/cart collects independent `Quantity Items` (loose items) and `Quantity Pallet/thùng/kiện` (outer packs). Both can be zero individually, but the calculated total must be positive.
+- For each selected SKU, `Total Qty = Quantity Items + Quantity Pallet/thùng/kiện × SL Outer`. The unit price, line amount and CBM per unit are applied to the converted **Total Qty**. The quantity sent to the server is the converted total, not the number of outer packs.
+- `SL Outer` is sourced from the selected product's default `md_donggoi.sl_outer` via `ExcuteSignalRStatic.getDongGoi` and exposed as a dedicated field in the mobile product API. Do not infer it by parsing human-readable `Packing` text or from `Q'ty cont` (container capacity).
+- Validation must reject selecting outer packs without a valid positive `SL Outer`, reject an all-zero order line, and preserve existing quantity/price semantics for lines without outer packs. In case old locally cached products omit `SL Outer`, require refreshing/reselecting product data rather than using an invented multiplier.
+- Historical server quotations are not retroactively changed. Local saved cart/draft rows retain both user-entered quantities and the conversion factor used for their calculation.
+
+**Where implemented:**
+
+- `Controllers/API_Data.ashx` → `ThongTinSP` response and `dequyTTSP()` (source of `slOuter`).
+- `ancotrading-mobile/modules2/Model/quantity.js` → common conversion and validation rules.
+- `ancotrading-mobile/modules2/Model/sql.js`, `tableSQL/ThongTinSP.js`, `tableSQL/GioHang.js`, `tableSQL/BaoGiaSP.js` → device cache, draft data and aggregate totals.
+- `ancotrading-mobile/modules2/screens/quotation/footer.js` → server quotation quantity payload.
+
+**Related:** `md_donggoi.sl_outer`, `md_donggoisanpham`, `GioHang`, `BaoGiaSP`, SignalR `CreateQO`.

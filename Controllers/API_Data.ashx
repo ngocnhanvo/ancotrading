@@ -19,6 +19,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IReadOnlySessionSt
         public string packing { get; set; }
         public string palletSize { get; set; }
         public string qtyCont { get; set; }
+        public string slOuter { get; set; }
         public string price { get; set; }
         public string amount { get; set; }
         public string cbm { get; set; }
@@ -586,13 +587,14 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IReadOnlySessionSt
 
     public ThongTinSP dequyTTSP(md_sanpham sp, List<md_sanpham> sps, bool themDongGoi, bool themMau, bool themAnh, string dateStr, LinqDBDataContext db, List<md_kieudang> kds)
     {
-        string packing = "-", palletSize = "-", qtyCont = "-", cbm = "", price = "";
+        string packing = "-", palletSize = "-", qtyCont = "-", cbm = "", price = "", slOuter = "0";
         ExcuteSignalRStatic.getDongGoiResult ttdg = null;
         if (themDongGoi)
         {
             ttdg = ExcuteSignalRStatic.getDongGoi(sp.md_sanpham_id, db);
             if (ttdg != null)
             {
+                slOuter = ttdg.sl_outer.ToString();
                 var dDVT = ExcuteSignalRStatic.getTextFromInner(ttdg.dvtinner, ttdg.dvtouter, ttdg.sl_inner.ToString(), ttdg.sl_outer.ToString());
                 var inner = dDVT.inner;
                 var outer = dDVT.outer;
@@ -623,6 +625,7 @@ public class API_Data : IHttpHandler, System.Web.SessionState.IReadOnlySessionSt
         item.packing = packing;
         item.palletSize = palletSize;
         item.qtyCont = qtyCont;
+        item.slOuter = slOuter;
         item.price = price;
         item.amount = "1";
         item.cbm = cbm;
