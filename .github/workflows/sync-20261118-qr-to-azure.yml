@@ -123,6 +123,12 @@ jobs:
                       merge=subprocess.run(['git','merge-file','-p',str(ours),str(base),str(theirs)],
                                            capture_output=True)
                       if merge.returncode != 0:
+                          # This documentation has independent Azure changes. Keep Azure's
+                          # version; a documentation conflict must not block executable
+                          # source files or the SQL migration from syncing.
+                          if path in optional_doc:
+                              print('AZURE_DOC_PRESERVED_CONFLICT',path)
+                              continue
                           raise RuntimeError('MERGE_CONFLICT '+path+' (Azure not modified)')
                       result=merge.stdout
                       status='MERGED_PRESERVING_AZURE'
